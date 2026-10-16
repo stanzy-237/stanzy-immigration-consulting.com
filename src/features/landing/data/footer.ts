@@ -1,13 +1,3 @@
-import type { ComponentType, SVGProps } from 'react';
-
-import {
-  FacebookIcon,
-  InstagramIcon,
-  TikTokIcon,
-  WhatsAppIcon,
-} from '@/features/landing/components/brand-icons';
-
-type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 export type FooterLink = {
   key: string;
@@ -70,16 +60,17 @@ export const FOOTER_LEGAL_LINKS: ReadonlyArray<FooterLink> = [
 
 export type SocialLink = {
   key: 'facebook' | 'tiktok' | 'instagram' | 'whatsapp';
-  icon: IconComponent;
+  // Brand SVGs sourced from svgl.app and vendored under public/icons/social/.
+  iconSrc: string;
   href: string;
 };
 
 // Placeholder social URLs — real handles land in a follow-up.
 export const FOOTER_SOCIALS: ReadonlyArray<SocialLink> = [
-  { key: 'facebook', icon: FacebookIcon, href: 'https://facebook.com/stanzycanada' },
-  { key: 'tiktok', icon: TikTokIcon, href: 'https://www.tiktok.com/@stanzycanada' },
-  { key: 'instagram', icon: InstagramIcon, href: 'https://instagram.com/stanzycanada' },
-  { key: 'whatsapp', icon: WhatsAppIcon, href: 'https://wa.me/message/stanzycanada' },
+  { key: 'facebook', iconSrc: '/icons/social/facebook.svg', href: 'https://facebook.com/stanzycanada' },
+  { key: 'tiktok', iconSrc: '/icons/social/tiktok.svg', href: 'https://www.tiktok.com/@stanzycanada' },
+  { key: 'instagram', iconSrc: '/icons/social/instagram.svg', href: 'https://instagram.com/stanzycanada' },
+  { key: 'whatsapp', iconSrc: '/icons/social/whatsapp.svg', href: 'https://wa.me/message/stanzycanada' },
 ] as const;
 
 // Contact details come from the MagicPath design.

@@ -60,22 +60,25 @@ export function SiteFooter() {
               {t("tagline")}
             </p>
             <ul className="flex gap-3">
-              {FOOTER_SOCIALS.map((s) => {
-                const Icon = s.icon;
-                return (
-                  <li key={s.key}>
-                    <a
-                      href={s.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={tSocial(s.key)}
-                      className="hover:bg-white/10 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors"
-                    >
-                      <Icon className="h-[18px] w-[18px]" />
-                    </a>
-                  </li>
-                );
-              })}
+              {FOOTER_SOCIALS.map((s) => (
+                <li key={s.key}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={tSocial(s.key)}
+                    className="hover:bg-white inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white transition-colors"
+                  >
+                    <Image
+                      src={s.iconSrc}
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="h-5 w-5"
+                    />
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
