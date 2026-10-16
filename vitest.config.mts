@@ -20,10 +20,29 @@ export default defineConfig({
     setupFiles: ['tests/setup.ts'],
     // Unit tests stub the DB and never read runtime config.
     env: { SKIP_ENV_VALIDATION: '1' },
+    server: {
+      // next-intl ships ESM that imports `next/navigation` without an
+      // extension. Inlining it forces Vite to run the imports through its
+      // resolver (which honours our `resolve.alias` fix) rather than Node's.
+      deps: { inline: [/next-intl/] },
+    },
   },
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+    alias: [
+      {
+        find: '@',
+        replacement: fileURLToPath(new URL('./src', import.meta.url)),
+      },
+      // next-intl's client navigation helpers import `next/navigation` without
+      // the `.js` extension; Vite's resolver does not honour Next's package
+      // exports map, so point it at the actual file for test runs. The
+      // `$` suffix anchors the match so sub-paths are untouched.
+      {
+        find: /^next\/navigation$/,
+        replacement: fileURLToPath(
+          new URL('./node_modules/next/navigation.js', import.meta.url),
+        ),
+      },
+    ],
   },
 });

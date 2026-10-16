@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { LandingView } from '@/features/landing/views/landing-view';
+import { HomeView } from '@/features/landing/views/home-view';
 import type { LocaleParams } from '@/i18n/routing';
 
 export async function generateMetadata({
@@ -20,5 +20,5 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <LandingView />;
+  return <HomeView />;
 }

@@ -7,6 +7,79 @@
     "title": "Stanzy",
     "tagline": "Your journey to Canada, guided.",
     "intro": "Free Express Entry tools, a blog, and consulting services — coming soon.",
-    "localeLabel": "Language"
+    "localeLabel": "Language",
+    "Nav": {
+      "ariaLabel": "Primary navigation",
+      "brand": "Stanzy",
+      "home": "Home",
+      "tools": "Tools",
+      "toolsAriaLabel": "Open the Tools menu",
+      "blog": "Blog",
+      "services": "Services",
+      "servicesAriaLabel": "Open the Services menu",
+      "login": "Log in",
+      "start": "Get started",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "liveMarker": "Live IRCC data",
+      "Tools": {
+        "timelineName": "My Journey",
+        "timelineDesc": "Personal timeline of your immigration milestones",
+        "cloudsName": "Secure Vault",
+        "cloudsDesc": "Your encrypted documents, available anywhere",
+        "itaName": "ITA countdown",
+        "itaDesc": "How long you have left after your invitation",
+        "fswName": "67-point grid",
+        "fswDesc": "Federal Skilled Worker eligibility grid",
+        "crsName": "CRS calculator",
+        "crsDesc": "Compute your Comprehensive Ranking System score",
+        "drawName": "Latest draw",
+        "drawDesc": "Results from the latest Express Entry round",
+        "cnpName": "NOC/CNP lookup",
+        "cnpDesc": "Find your Canadian occupation code"
+      },
+      "Services": {
+        "consultationName": "Private consultation",
+        "consultationDesc": "60 minutes with our immigration consultant",
+        "accompagnementName": "End-to-end support",
+        "accompagnementDesc": "Full assistance through your Express Entry case",
+        "verificationName": "Document review",
+        "verificationDesc": "We review your file before you submit"
+      }
+    },
+    "Footer": {
+      "ariaLabel": "Site footer",
+      "tagline": "Your journey to Canada, guided.",
+      "columns": {
+        "tools": "Our tools",
+        "services": "Our services",
+        "content": "Content",
+        "contact": "Contact"
+      },
+      "content": {
+        "blog": "Blog",
+        "faq": "FAQ",
+        "tiktok": "TikTok"
+      },
+      "contact": {
+        "email": "Email us",
+        "phone": "Call us",
+        "region": "Yaoundé, Cameroon · Montréal, Canada",
+        "book": "Book a consultation"
+      },
+      "legal": {
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "cookies": "Cookies"
+      },
+      "canadaBadge": "Proudly Canada-focused",
+      "copyright": "© {year} Stanzy. All rights reserved.",
+      "Social": {
+        "facebook": "Facebook",
+        "tiktok": "TikTok",
+        "instagram": "Instagram",
+        "whatsapp": "WhatsApp"
+      }
+    }
   }
 }

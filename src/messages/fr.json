@@ -7,6 +7,79 @@
     "title": "Stanzy",
     "tagline": "Votre parcours vers le Canada, accompagné.",
     "intro": "Outils Entrée Express gratuits, blog et services de conseil — bientôt disponibles.",
-    "localeLabel": "Langue"
+    "localeLabel": "Langue",
+    "Nav": {
+      "ariaLabel": "Navigation principale",
+      "brand": "Stanzy",
+      "home": "Accueil",
+      "tools": "Outils",
+      "toolsAriaLabel": "Ouvrir le menu Outils",
+      "blog": "Blog",
+      "services": "Services",
+      "servicesAriaLabel": "Ouvrir le menu Services",
+      "login": "Connexion",
+      "start": "Commencer",
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu",
+      "liveMarker": "Données IRCC en direct",
+      "Tools": {
+        "timelineName": "Mon Parcours",
+        "timelineDesc": "Journal personnel de vos étapes Entrée Express",
+        "cloudsName": "Coffre-fort",
+        "cloudsDesc": "Vos documents chiffrés, accessibles partout",
+        "itaName": "Compte à rebours ITA",
+        "itaDesc": "Le temps qu'il vous reste après votre invitation",
+        "fswName": "67 points",
+        "fswDesc": "Grille d'éligibilité au Programme des travailleurs qualifiés",
+        "crsName": "Calculateur CRS",
+        "crsDesc": "Évaluez votre score du Système de classement global",
+        "drawName": "Dernier tirage",
+        "drawDesc": "Résultats du dernier tirage Entrée Express",
+        "cnpName": "Recherche CNP",
+        "cnpDesc": "Trouvez votre code de profession canadien"
+      },
+      "Services": {
+        "consultationName": "Consultation privée",
+        "consultationDesc": "60 minutes avec notre consultante en immigration",
+        "accompagnementName": "Accompagnement complet",
+        "accompagnementDesc": "Suivi de A à Z pour votre dossier Entrée Express",
+        "verificationName": "Vérification de documents",
+        "verificationDesc": "Nous relisons votre dossier avant soumission"
+      }
+    },
+    "Footer": {
+      "ariaLabel": "Pied de page",
+      "tagline": "Votre parcours vers le Canada, accompagné.",
+      "columns": {
+        "tools": "Nos outils",
+        "services": "Nos services",
+        "content": "Contenu",
+        "contact": "Contact"
+      },
+      "content": {
+        "blog": "Blog",
+        "faq": "FAQ",
+        "tiktok": "TikTok"
+      },
+      "contact": {
+        "email": "Nous écrire",
+        "phone": "Appeler",
+        "region": "Yaoundé, Cameroun · Montréal, Canada",
+        "book": "Réserver une consultation"
+      },
+      "legal": {
+        "privacy": "Confidentialité",
+        "terms": "Conditions",
+        "cookies": "Témoins"
+      },
+      "canadaBadge": "Fièrement orienté Canada",
+      "copyright": "© {year} Stanzy. Tous droits réservés.",
+      "Social": {
+        "facebook": "Facebook",
+        "tiktok": "TikTok",
+        "instagram": "Instagram",
+        "whatsapp": "WhatsApp"
+      }
+    }
   }
 }
