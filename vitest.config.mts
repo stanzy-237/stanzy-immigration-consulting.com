@@ -6,14 +6,16 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   plugins: [react()],
   test: {
-    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
+    include: [
+      'src/**/__tests__/**/*.test.ts',
+      'src/**/__tests__/**/*.test.tsx',
+    ],
     // Node env for pure-logic tests; browser-like tests opt-in with
     // `// @vitest-environment jsdom` at the top of the file so the heavier
     // environment only loads where it is actually needed.
     environment: 'node',
     environmentMatchGlobs: [
-      ['tests/components/**', 'jsdom'],
-      ['tests/**/*.test.tsx', 'jsdom'],
+      ['src/**/__tests__/**/*.test.tsx', 'jsdom'],
     ],
     setupFiles: ['tests/setup.ts'],
     // Unit tests stub the DB and never read runtime config.

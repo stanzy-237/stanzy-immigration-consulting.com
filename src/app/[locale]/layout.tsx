@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Plus_Jakarta_Sans, Syne, Work_Sans } from 'next/font/google';
 
-import { ServiceWorkerRegister } from '@/features/pwa/components/service-worker-register';
+import { ServiceWorkerRegister } from '@/components/service-worker-register';
 import { routing, type LocaleParams } from '@/i18n/routing';
 import { TRPCReactProvider } from '@/trpc/react';
 

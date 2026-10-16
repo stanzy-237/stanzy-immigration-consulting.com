@@ -1,8 +1,8 @@
 import { useTranslations } from 'next-intl';
 
-import { LocaleSwitcher } from '@/features/i18n/components/locale-switcher';
+import { LocaleSwitcher } from '@/features/landing/components/locale-switcher';
 
-export function HomeView() {
+export function LandingView() {
   const t = useTranslations('Home');
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 px-4 py-16">

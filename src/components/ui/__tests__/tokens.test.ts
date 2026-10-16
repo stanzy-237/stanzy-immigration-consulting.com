@@ -14,7 +14,7 @@ import { describe, expect, it } from 'vitest';
  * GLOSSARY.md. Hex values here match it verbatim.
  */
 const globalsCss = readFileSync(
-  fileURLToPath(new URL('../../src/app/globals.css', import.meta.url)),
+  fileURLToPath(new URL('../../../app/globals.css', import.meta.url)),
   'utf8',
 );
 

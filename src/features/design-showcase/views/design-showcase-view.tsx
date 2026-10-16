@@ -21,6 +21,9 @@ import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
+import { SWATCHES, type SwatchSpec } from '@/features/design-showcase/data/swatches';
+import { TYPE_SCALE } from '@/features/design-showcase/data/type-scale';
+
 export function DesignShowcaseView() {
   return (
     <main className="mx-auto max-w-6xl space-y-16 px-6 py-16">
@@ -249,42 +252,7 @@ function Section({
   );
 }
 
-type Swatch = { name: string; hex: string; fg: 'white' | 'ink' };
-
-const SWATCHES: readonly Swatch[] = [
-  { name: 'rouge', hex: '#CC1627', fg: 'white' },
-  { name: 'crimson', hex: '#D93344', fg: 'white' },
-  { name: 'rose', hex: '#EE8A93', fg: 'ink' },
-  { name: 'blush', hex: '#FCEDEF', fg: 'ink' },
-  { name: 'navy-deep', hex: '#0D1F4E', fg: 'white' },
-  { name: 'navy-80', hex: '#1A3065', fg: 'white' },
-  { name: 'steel-blue', hex: '#6B88B5', fg: 'white' },
-  { name: 'ice-blue', hex: '#E8EDF5', fg: 'ink' },
-  { name: 'off-white', hex: '#F7F8FC', fg: 'ink' },
-  { name: 'fog', hex: '#CBD5E0', fg: 'ink' },
-  { name: 'slate', hex: '#4A5568', fg: 'white' },
-  { name: 'ink', hex: '#0D1F4E', fg: 'white' },
-];
-
-type TypeRow = {
-  label: string;
-  token: 'display' | 'h1' | 'h2' | 'h3' | 'h4' | 'body-lg' | 'body';
-  lineHeight: number;
-  weight: number;
-  family: string;
-};
-
-const TYPE_SCALE: readonly TypeRow[] = [
-  { label: 'Display · Syne 72', token: 'display', lineHeight: 1, weight: 700, family: 'font-heading' },
-  { label: 'H1 · Syne 56', token: 'h1', lineHeight: 1.1, weight: 700, family: 'font-heading' },
-  { label: 'H2 · Syne 40', token: 'h2', lineHeight: 1.15, weight: 700, family: 'font-heading' },
-  { label: 'H3 · Syne 28', token: 'h3', lineHeight: 1.2, weight: 700, family: 'font-heading' },
-  { label: 'H4 · Work Sans 20 Semibold', token: 'h4', lineHeight: 1.3, weight: 600, family: 'font-body' },
-  { label: 'Body LG — Work Sans 18', token: 'body-lg', lineHeight: 1.75, weight: 400, family: 'font-body text-text-muted' },
-  { label: 'Body — Work Sans 16', token: 'body', lineHeight: 1.75, weight: 400, family: 'font-body text-text-muted' },
-];
-
-function Swatch({ name, hex, fg }: Swatch) {
+function Swatch({ name, hex, fg }: SwatchSpec) {
   return (
     <div
       style={{ backgroundColor: `var(--${name})` }}

@@ -48,7 +48,7 @@ against MagicPath there.
 
 ## Tests
 
-- `tests/design-system/tokens.test.ts` — token contract (every brand hex and
-  every shadcn↔brand mapping).
-- `tests/components/*.test.tsx` — authored wrappers only. Vendor files are
-  treated as a dependency, not tested here.
+- `src/components/ui/__tests__/tokens.test.ts` — token contract (every brand
+  hex and every shadcn↔brand mapping).
+- `src/components/ui/__tests__/*.test.tsx` — authored wrappers only. Vendor
+  files are treated as a dependency, not tested here.

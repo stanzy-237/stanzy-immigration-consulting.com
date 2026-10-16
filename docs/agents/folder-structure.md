@@ -17,7 +17,8 @@ src/
 ├─ features/            # ALL product code lives here, grouped by feature
 │  └─ <feature>/        # see "Feature folder" below
 ├─ components/
-│  └─ ui/               # shadcn/ui primitives — generic, feature-agnostic
+│  ├─ ui/               # shadcn/ui primitives — generic, feature-agnostic
+│  └─ <x>.tsx           # cross-cutting non-shadcn components (e.g. ServiceWorkerRegister)
 ├─ hooks/               # cross-feature hooks only; feature hooks go in the feature
 ├─ lib/                 # cross-cutting utilities (cn, formatting, analytics)
 ├─ server/              # server-only helpers shared by features (db, auth)
@@ -52,7 +53,7 @@ src/features/<feature>/
 3. **No cross-feature imports between `components/`.** Feature A does not import `src/features/B/components/*`. If two features need the same component, promote it to `src/components/ui/` (if generic) or to a new `src/features/shared/` feature (if domain-specific).
 4. **`src/components/ui/` is for generic primitives only** — the shadcn/ui output and brand-token wrappers. Nothing that mentions a domain term (CRS, tirage, dossier, …) belongs there.
 5. **Data lives next to the feature that owns it.** A static `data/draws.ts` for the home page lives in `src/features/landing/data/`; the live draws tool, when built, owns its own `src/features/draws/data/`.
-6. **Tests live beside the code they test** in `__tests__/` subfolders under the feature (`src/features/<f>/components/__tests__/*.test.tsx`, `src/features/<f>/views/__tests__/*.test.tsx`).
+6. **Tests live beside the code they test** in `__tests__/` subfolders — under the feature (`src/features/<f>/components/__tests__/*.test.tsx`, `src/features/<f>/views/__tests__/*.test.tsx`) and the same way under any other `src/` subtree (`src/components/ui/__tests__/`, `src/server/trpc/routers/__tests__/`, `src/i18n/__tests__/`). Vitest/Playwright config (`tests/setup.ts`, type augmentations) is the only thing that may stay in a top-level `tests/`.
 7. **Imports use `@/` paths.** `@/features/landing/views/home-view`, not relative traversal.
 8. **Naming is kebab-case files, PascalCase exports.** `faq-section.tsx` exporting `FaqSection`.
 
