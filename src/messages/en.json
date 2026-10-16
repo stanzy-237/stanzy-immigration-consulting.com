@@ -56,20 +56,9 @@
       "subtitle": "Clear, practical advice for your Express Entry journey. Fresh free content every week to boost your chances.",
       "cta": "See all our TikToks",
       "spinText": "Watch • Learn • Succeed •",
-      "Videos": {
-        "v1Title": "TODO — swap for real title",
-        "v1Tags": "#ExpressEntry #Canada",
-        "v2Title": "TODO — swap for real title",
-        "v2Tags": "#CanadaImmigration",
-        "v3Title": "Latest Express Entry draw",
-        "v3Tags": "#LatestDraw",
-        "v4Title": "TODO — swap for real title",
-        "v4Tags": "#CRSScore",
-        "v5Title": "TODO — swap for real title",
-        "v5Tags": "#67points",
-        "v6Title": "TODO — swap for real title",
-        "v6Tags": "#ITA"
-      }
+      "viewsLabel": "views",
+      "prev": "Previous video",
+      "next": "Next video"
     },
     "Hero": {
       "eyebrow": "Express Entry · Canada",

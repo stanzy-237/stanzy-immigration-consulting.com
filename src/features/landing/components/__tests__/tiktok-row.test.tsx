@@ -1,53 +1,99 @@
 // @vitest-environment jsdom
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { TikTokRow } from '@/features/landing/components/tiktok-row';
+import { TikTokCarousel } from '@/features/landing/components/tiktok-carousel';
 import { TIKTOK_VIDEOS } from '@/features/landing/data/tiktok-videos';
+import type { TikTokVideoMeta } from '@/features/landing/server/fetch-tiktok-metadata';
 
-import { withIntl } from './test-utils';
+function fixture(key: string, href: string, i: number): TikTokVideoMeta {
+  return {
+    key,
+    href,
+    videoId: href.split('/').pop() ?? '',
+    cover: `https://img.example/${key}.jpg`,
+    playUrl: `https://cdn.example/${key}.mp4`,
+    title: `Vidéo ${key}`,
+    description: `Vidéo ${key}`,
+    tags: ['#test'],
+    views: 1200 * (i + 1),
+    likes: 50,
+  };
+}
 
-describe('TikTokRow', () => {
-  it('renders the section with the eyebrow + split title', () => {
-    render(withIntl(<TikTokRow />));
-    expect(
-      screen.getByRole('region', { name: /Des conseils/i }),
-    ).toBeInTheDocument();
-    const heading = screen.getByRole('heading', { level: 2 });
-    expect(heading.textContent).toMatch(/Des conseils/);
-    expect(within(heading).getByText('clairs')).toHaveClass('text-rouge');
-  });
+const metas: ReadonlyArray<TikTokVideoMeta> = TIKTOK_VIDEOS.map(
+  (v, i): TikTokVideoMeta => fixture(v.key, v.href, i),
+);
 
-  it('exposes the "Voir tous nos TikToks" CTA pointing at the channel', () => {
-    render(withIntl(<TikTokRow />));
-    const cta = screen.getByRole('link', { name: /Voir tous nos TikToks/i });
-    expect(cta).toHaveAttribute('href', 'https://www.tiktok.com/@stanzycanada');
-    expect(cta).toHaveAttribute('target', '_blank');
-    expect(cta).toHaveAttribute('rel', expect.stringContaining('noopener'));
-  });
-
-  it('renders six video cards wired to the real @stanzycanada URLs', () => {
-    render(withIntl(<TikTokRow />));
-    const allLinks = screen.getAllByRole('link');
-    for (const v of TIKTOK_VIDEOS) {
-      const link = allLinks.find((a) => a.getAttribute('href') === v.href);
+describe('TikTokCarousel', () => {
+  it('renders a card for each of the six videos wired to the real TikTok URLs', () => {
+    render(
+      <TikTokCarousel
+        videos={metas}
+        spinText="Watch • Learn • Succeed •"
+        viewsLabel="vues"
+        prevLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+    const links = screen.getAllByRole('link');
+    for (const v of metas) {
+      const link = links.find((a) => a.getAttribute('href') === v.href);
       expect(link, `video ${v.key} link`).toBeDefined();
       expect(link).toHaveAttribute('target', '_blank');
       expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
     }
-    expect(TIKTOK_VIDEOS).toHaveLength(6);
+    expect(metas).toHaveLength(6);
   });
 
-  it('shows the real title we have for the Dernier tirage video', () => {
-    render(withIntl(<TikTokRow />));
-    expect(
-      screen.getByText('Dernier tirage Entrée Express'),
-    ).toBeInTheDocument();
+  it('exposes Prev / Next controls that are keyboard reachable', () => {
+    render(
+      <TikTokCarousel
+        videos={metas}
+        spinText="S"
+        viewsLabel="vues"
+        prevLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+    const next = screen.getByRole('button', { name: 'Next' });
+    const prev = screen.getByRole('button', { name: 'Previous' });
+    expect(next).toBeInTheDocument();
+    expect(prev).toBeInTheDocument();
+    // Clicking Next should not throw even when scrollTo is unavailable in jsdom.
+    expect(() => fireEvent.click(next)).not.toThrow();
+  });
+
+  it('autoplays the active card by rendering an inline muted <video>', () => {
+    const { container } = render(
+      <TikTokCarousel
+        videos={metas}
+        spinText="S"
+        viewsLabel="vues"
+        prevLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+    const videos = container.querySelectorAll('video');
+    expect(videos.length).toBe(metas.length);
+    for (const v of videos) {
+      expect(v).toHaveAttribute('loop');
+      expect(v).toHaveAttribute('playsinline');
+      expect(v).toHaveAttribute('src');
+    }
   });
 
   it('has no axe violations', async () => {
-    const { container } = render(withIntl(<TikTokRow />));
+    const { container } = render(
+      <TikTokCarousel
+        videos={metas}
+        spinText="S"
+        viewsLabel="vues"
+        prevLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
     expect(await axe(container)).toHaveNoViolations();
   });
 });
