@@ -67,7 +67,7 @@ export function SiteFooter() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={tSocial(s.key)}
-                    className="hover:bg-white inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white transition-colors"
+                    className="hover:bg-white/90 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white transition-colors"
                   >
                     <Image
                       src={s.iconSrc}

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, Leaf, Menu } from 'lucide-react';
+import { ChevronDown, Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
@@ -15,6 +15,7 @@ import {
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
+import { MapleLeafIcon } from '@/features/landing/components/brand-icons';
 import {
   SERVICE_ENTRIES,
   TOOL_ENTRIES,
@@ -374,7 +375,7 @@ function DropdownPanel({
               <span className="text-navy-deep flex items-center gap-1.5 text-sm font-medium">
                 {getName(entry)}
                 {entry.maple && mapleLabel ? (
-                  <Leaf
+                  <MapleLeafIcon
                     aria-label={mapleLabel}
                     className="text-rouge h-3.5 w-3.5"
                   />
