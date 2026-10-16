@@ -50,7 +50,7 @@ export default async function DesignShowcasePage({
   return (
     <main className="mx-auto max-w-6xl space-y-16 px-6 py-16">
       <header className="space-y-3">
-        <p className="font-label text-[11px] text-slate">Stanzy Design System</p>
+        <p className="font-label text-text-muted">Stanzy Design System</p>
         <h1 className="text-5xl font-bold tracking-tight text-ink">
           Design showcase
         </h1>
@@ -63,73 +63,28 @@ export default async function DesignShowcasePage({
 
       <Section title="Colour tokens" eyebrow="01 · Palette">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          <Swatch name="rouge" hex="#CC1627" className="bg-rouge text-white" />
-          <Swatch
-            name="crimson"
-            hex="#D93344"
-            className="bg-crimson text-white"
-          />
-          <Swatch name="rose" hex="#EE8A93" className="bg-rose text-ink" />
-          <Swatch name="blush" hex="#FCEDEF" className="bg-blush text-ink" />
-          <Swatch
-            name="navy-deep"
-            hex="#0D1F4E"
-            className="bg-navy-deep text-white"
-          />
-          <Swatch
-            name="navy-80"
-            hex="#1A3065"
-            className="bg-navy-80 text-white"
-          />
-          <Swatch
-            name="steel-blue"
-            hex="#6B88B5"
-            className="bg-steel-blue text-white"
-          />
-          <Swatch
-            name="ice-blue"
-            hex="#E8EDF5"
-            className="bg-ice-blue text-ink"
-          />
-          <Swatch
-            name="off-white"
-            hex="#F7F8FC"
-            className="bg-off-white text-ink"
-          />
-          <Swatch name="fog" hex="#CBD5E0" className="bg-fog text-ink" />
-          <Swatch name="slate" hex="#4A5568" className="bg-slate text-white" />
-          <Swatch name="ink" hex="#0D1F4E" className="bg-ink text-white" />
+          {SWATCHES.map(({ name, hex, fg }) => (
+            <Swatch key={name} name={name} hex={hex} fg={fg} />
+          ))}
         </div>
       </Section>
 
       <Section title="Typography" eyebrow="02 · Type scale">
         <div className="space-y-4">
-          <p style={{ fontSize: 72, lineHeight: 1 }} className="font-heading">
-            Display · Syne 72
-          </p>
-          <p style={{ fontSize: 56, lineHeight: 1.1 }} className="font-heading">
-            H1 · Syne 56
-          </p>
-          <p style={{ fontSize: 40, lineHeight: 1.15 }} className="font-heading">
-            H2 · Syne 40
-          </p>
-          <p style={{ fontSize: 28, lineHeight: 1.2 }} className="font-heading">
-            H3 · Syne 28
-          </p>
-          <p
-            style={{ fontSize: 20, lineHeight: 1.3, fontWeight: 600 }}
-            className="font-body"
-          >
-            H4 · Work Sans 20 Semibold
-          </p>
-          <p style={{ fontSize: 18 }} className="font-body text-slate">
-            Body LG — Work Sans 18. The quick brown fox jumps over the lazy
-            dog.
-          </p>
-          <p style={{ fontSize: 16 }} className="font-body text-slate">
-            Body — Work Sans 16. The quick brown fox jumps over the lazy dog.
-          </p>
-          <p className="font-label text-[11px] text-ink">
+          {TYPE_SCALE.map(({ label, token, lineHeight, weight, family }) => (
+            <p
+              key={label}
+              style={{
+                fontSize: `var(--text-${token})`,
+                lineHeight,
+                fontWeight: weight,
+              }}
+              className={family}
+            >
+              {label}
+            </p>
+          ))}
+          <p className="font-label text-text">
             Label · Plus Jakarta Sans 11 uppercase
           </p>
         </div>
@@ -156,19 +111,19 @@ export default async function DesignShowcasePage({
       <Section title="Form fields" eyebrow="04 · Inputs">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="demo-email" className="font-label text-[11px]">
+            <Label htmlFor="demo-email" className="font-label">
               Email
             </Label>
             <Input id="demo-email" type="email" placeholder="you@example.com" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="demo-disabled" className="font-label text-[11px]">
+            <Label htmlFor="demo-disabled" className="font-label">
               Disabled
             </Label>
             <Input id="demo-disabled" disabled placeholder="Disabled" />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="demo-notes" className="font-label text-[11px]">
+            <Label htmlFor="demo-notes" className="font-label">
               Notes
             </Label>
             <Textarea id="demo-notes" placeholder="Write a note…" />
@@ -311,28 +266,56 @@ function Section({
   return (
     <section className="space-y-6">
       <div>
-        <p className="font-label text-[11px] text-slate">{eyebrow}</p>
-        <h2 className="mt-1 text-3xl font-bold text-ink">{title}</h2>
+        <p className="font-label text-text-muted">{eyebrow}</p>
+        <h2 className="text-text mt-1 text-3xl font-bold">{title}</h2>
       </div>
       {children}
     </section>
   );
 }
 
-function Swatch({
-  name,
-  hex,
-  className,
-}: {
-  name: string;
-  hex: string;
-  className: string;
-}) {
+type Swatch = { name: string; hex: string; fg: 'white' | 'ink' };
+
+const SWATCHES: readonly Swatch[] = [
+  { name: 'rouge', hex: '#CC1627', fg: 'white' },
+  { name: 'crimson', hex: '#D93344', fg: 'white' },
+  { name: 'rose', hex: '#EE8A93', fg: 'ink' },
+  { name: 'blush', hex: '#FCEDEF', fg: 'ink' },
+  { name: 'navy-deep', hex: '#0D1F4E', fg: 'white' },
+  { name: 'navy-80', hex: '#1A3065', fg: 'white' },
+  { name: 'steel-blue', hex: '#6B88B5', fg: 'white' },
+  { name: 'ice-blue', hex: '#E8EDF5', fg: 'ink' },
+  { name: 'off-white', hex: '#F7F8FC', fg: 'ink' },
+  { name: 'fog', hex: '#CBD5E0', fg: 'ink' },
+  { name: 'slate', hex: '#4A5568', fg: 'white' },
+  { name: 'ink', hex: '#0D1F4E', fg: 'white' },
+];
+
+type TypeRow = {
+  label: string;
+  token: 'display' | 'h1' | 'h2' | 'h3' | 'h4' | 'body-lg' | 'body';
+  lineHeight: number;
+  weight: number;
+  family: string;
+};
+
+const TYPE_SCALE: readonly TypeRow[] = [
+  { label: 'Display · Syne 72', token: 'display', lineHeight: 1, weight: 700, family: 'font-heading' },
+  { label: 'H1 · Syne 56', token: 'h1', lineHeight: 1.1, weight: 700, family: 'font-heading' },
+  { label: 'H2 · Syne 40', token: 'h2', lineHeight: 1.15, weight: 700, family: 'font-heading' },
+  { label: 'H3 · Syne 28', token: 'h3', lineHeight: 1.2, weight: 700, family: 'font-heading' },
+  { label: 'H4 · Work Sans 20 Semibold', token: 'h4', lineHeight: 1.3, weight: 600, family: 'font-body' },
+  { label: 'Body LG — Work Sans 18', token: 'body-lg', lineHeight: 1.75, weight: 400, family: 'font-body text-text-muted' },
+  { label: 'Body — Work Sans 16', token: 'body', lineHeight: 1.75, weight: 400, family: 'font-body text-text-muted' },
+];
+
+function Swatch({ name, hex, fg }: Swatch) {
   return (
     <div
-      className={`${className} flex h-24 flex-col justify-between rounded-lg p-3 shadow-sm`}
+      style={{ backgroundColor: `var(--${name})` }}
+      className={`flex h-24 flex-col justify-between rounded-lg p-3 shadow-sm text-${fg}`}
     >
-      <span className="font-label text-[11px]">{name}</span>
+      <span className="font-label">{name}</span>
       <span className="font-mono text-xs">{hex}</span>
     </div>
   );

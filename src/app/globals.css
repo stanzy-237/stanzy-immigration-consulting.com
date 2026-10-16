@@ -126,8 +126,19 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--rouge);
+  --color-danger-foreground: var(--white);
   --color-info: var(--steel-blue);
   --color-info-foreground: var(--white);
+
+  /* Surface + text aliases — consume these from downstream code rather
+     than raw brand tokens or shadcn's --background/--foreground, so
+     palette tweaks only touch globals.css. */
+  --color-surface: var(--white);
+  --color-surface-muted: var(--ice-blue);
+  --color-text: var(--ink);
+  --color-text-muted: var(--slate);
+  --color-text-subtle: var(--steel-blue);
 
   /* Charts */
   --color-chart-1: var(--chart-1);
@@ -187,6 +198,13 @@
   --shadow-sm: 0 1px 3px rgba(13, 31, 78, 0.08);
   --shadow-md: 0 4px 16px rgba(13, 31, 78, 0.12);
   --shadow-lg: 0 8px 32px rgba(13, 31, 78, 0.18);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
 }
 
 @layer base {
@@ -212,7 +230,9 @@
 
 @utility font-label {
   font-family: var(--font-label);
+  font-size: var(--text-label);
   font-weight: 600;
+  line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.2em;
 }
