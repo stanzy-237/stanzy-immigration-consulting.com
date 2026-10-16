@@ -1,0 +1,61 @@
+name: Refresh TikTok carousel
+
+on:
+  schedule:
+    # Weekly, Sunday 03:00 UTC.
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+concurrency:
+  group: refresh-tiktok
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Pull 6 latest @stanzycanada videos → Vercel Blob
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TIKTOK_CHANNEL: 'https://www.tiktok.com/@stanzycanada'
+      DUMP_DIR: tmp/tiktok
+      BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install yt-dlp (latest)
+        run: pip install --upgrade yt-dlp
+
+      - name: Download 6 latest videos + metadata
+        run: |
+          mkdir -p "$DUMP_DIR"
+          yt-dlp \
+            --playlist-items 1-6 \
+            --write-info-json \
+            --write-thumbnail \
+            --convert-thumbnails jpg \
+            --no-write-playlist-metafiles \
+            --format "mp4" \
+            --output "$DUMP_DIR/%(id)s.%(ext)s" \
+            "$TIKTOK_CHANNEL"
+
+      - name: List dump
+        run: ls -lh "$DUMP_DIR"
+
+      - name: Upload to Vercel Blob + write manifest
+        run: node scripts/refresh-tiktok.mjs

@@ -9,18 +9,31 @@ import {
   type TikTokVideo,
 } from '@/features/landing/data/tiktok-videos';
 import { fetchTikTokMetadata } from '@/features/landing/server/fetch-tiktok-metadata';
+import {
+  entryToMeta,
+  fetchTikTokManifest,
+} from '@/features/landing/server/fetch-tiktok-manifest';
 
 const CHANNEL_HREF: string = 'https://www.tiktok.com/@stanzycanada';
 
-export async function TikTokRow(): Promise<ReactNode> {
-  const t = await getTranslations('Home.TikTok');
-  // Fetch sequentially with a tiny stagger so tikwm's rate limit doesn't
-  // drop any of the six videos. Each result is independently cached by
-  // Next's `fetch` under its own URL, so warm caches still parallelise.
+async function loadFallbackMetas() {
   const metas = [];
   for (const v of TIKTOK_VIDEOS as ReadonlyArray<TikTokVideo>) {
     metas.push(await fetchTikTokMetadata(v));
   }
+  return metas;
+}
+
+export async function TikTokRow(): Promise<ReactNode> {
+  const t = await getTranslations('Home.TikTok');
+
+  // Primary path: the weekly GitHub Actions job uploads real MP4s + a
+  // manifest to Vercel Blob. If that's absent (e.g. first deploy before
+  // the cron has run), fall back to the live tikwm proxy per-video.
+  const manifest = await fetchTikTokManifest();
+  const metas = manifest
+    ? manifest.videos.map(entryToMeta)
+    : await loadFallbackMetas();
 
   return (
     <section
