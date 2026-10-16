@@ -48,6 +48,26 @@
         "verificationDesc": "We review your file before you submit"
       }
     },
+    "Hero": {
+      "eyebrow": "Express Entry · Official IRCC system",
+      "headlineLead": "Move to Canada with",
+      "headlineAccent": "Confidence",
+      "subtitle": "Free tools, expert content and personal support to help you succeed in your Canadian immigration journey.",
+      "ctaBook": "Book a consultation",
+      "ctaWhatsapp": "Join WhatsApp",
+      "imageAlt": "Canadian city skyline at sunset",
+      "Stats": {
+        "tools": "free tools",
+        "supported": "candidates supported",
+        "success": "success rate"
+      },
+      "ScoreCard": {
+        "eyebrow": "Your estimated CRS score",
+        "unit": "/ 1200 points",
+        "chip": "Above average",
+        "cta": "Compute my score"
+      }
+    },
     "Footer": {
       "ariaLabel": "Site footer",
       "brandEyebrow": "STANZY IMMIGRATION",

@@ -48,6 +48,26 @@
         "verificationDesc": "Nous relisons votre dossier avant soumission"
       }
     },
+    "Hero": {
+      "eyebrow": "Entrée Express · Système officiel IRCC",
+      "headlineLead": "Immigrez au Canada avec",
+      "headlineAccent": "Confiance",
+      "subtitle": "Outils gratuits, blog expert et accompagnement personnalisé pour réussir votre parcours d'immigration canadienne.",
+      "ctaBook": "Réserver une consultation",
+      "ctaWhatsapp": "Rejoindre WhatsApp",
+      "imageAlt": "Photo d'un paysage urbain canadien au coucher du soleil",
+      "Stats": {
+        "tools": "outils gratuits",
+        "supported": "candidats accompagnés",
+        "success": "taux de réussite"
+      },
+      "ScoreCard": {
+        "eyebrow": "Votre score CRS estimé",
+        "unit": "/ 1200 points",
+        "chip": "Au-dessus de la moyenne",
+        "cta": "Calculer mon score"
+      }
+    },
     "Footer": {
       "ariaLabel": "Pied de page",
       "brandEyebrow": "STANZY IMMIGRATION",
