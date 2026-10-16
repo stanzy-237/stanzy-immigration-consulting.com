@@ -14,9 +14,13 @@ const CHANNEL_HREF: string = 'https://www.tiktok.com/@stanzycanada';
 
 export async function TikTokRow(): Promise<ReactNode> {
   const t = await getTranslations('Home.TikTok');
-  const metas = await Promise.all(
-    TIKTOK_VIDEOS.map((v: TikTokVideo) => fetchTikTokMetadata(v)),
-  );
+  // Fetch sequentially with a tiny stagger so tikwm's rate limit doesn't
+  // drop any of the six videos. Each result is independently cached by
+  // Next's `fetch` under its own URL, so warm caches still parallelise.
+  const metas = [];
+  for (const v of TIKTOK_VIDEOS as ReadonlyArray<TikTokVideo>) {
+    metas.push(await fetchTikTokMetadata(v));
+  }
 
   return (
     <section

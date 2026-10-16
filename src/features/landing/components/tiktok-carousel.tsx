@@ -190,20 +190,27 @@ function TikTokCard({
 }: TikTokCardProps): ReactNode {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Autoplay the active card muted; pause and reset the rest.
+  // Play the active card with sound; mute and pause the rest. Browsers
+  // block unmuted autoplay without a user gesture, so we fall back to
+  // muted autoplay and expose a mute toggle on the card.
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
     if (active) {
-      el.muted = true;
+      el.muted = false;
       const started = el.play();
-      // `.play()` returns a Promise in real browsers but undefined in jsdom.
       if (started && typeof started.catch === 'function') {
         started.catch((): void => {
-          // Autoplay may be blocked; leave the poster showing.
+          // Unmuted autoplay refused — retry muted so at least the frames play.
+          el.muted = true;
+          const muted = el.play();
+          if (muted && typeof muted.catch === 'function') {
+            muted.catch((): void => {});
+          }
         });
       }
     } else {
+      el.muted = true;
       el.pause();
       el.currentTime = 0;
     }
@@ -230,10 +237,10 @@ function TikTokCard({
           ref={videoRef}
           src={video.playUrl}
           poster={video.cover}
-          muted
+          muted={!active}
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
