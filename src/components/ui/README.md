@@ -42,8 +42,9 @@ The sidebar block is navy-on-white for the admin dashboard.
 
 ## Showcase
 
-Every primitive renders at **`/[locale]/_design`** (noindex, env-gated on
-production). Review visual parity against MagicPath there.
+Every primitive renders at **`/[locale]/design`** (noindex, env-gated on
+production — see `NEXT_PUBLIC_ENABLE_DESIGN_SHOWCASE`). Review visual parity
+against MagicPath there.
 
 ## Tests
 
