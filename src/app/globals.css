@@ -4,12 +4,12 @@
 
 /*
  * Stanzy Design System — see GLOSSARY.md and issue #3.
- * Light mode only. Brand palette, typography, and spacing come from
- * the MagicPath "Stanzy Design System" project; shadcn/ui semantic
- * tokens (--primary, --background, etc.) are mapped to those brand tokens.
+ * Light mode only. No dark variant is defined; dark: utilities in shadcn
+ * vendor files become no-ops because nothing ever adds .dark to the tree.
+ * Brand palette, typography, and spacing come from the MagicPath
+ * "Stanzy Design System" project; shadcn/ui semantic tokens (--primary,
+ * --background, etc.) are mapped to those brand tokens.
  */
-
-@custom-variant dark (&:is(.dark *));
 
 :root {
   color-scheme: light;
@@ -53,7 +53,7 @@
   --muted-foreground: var(--slate);
   --accent: var(--ice-blue);
   --accent-foreground: var(--navy-deep);
-  --destructive: var(--rouge);
+  --destructive: var(--crimson);
   --destructive-foreground: var(--white);
   --border: var(--fog);
   --input: var(--fog);

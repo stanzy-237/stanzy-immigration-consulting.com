@@ -232,7 +232,7 @@ export default async function DesignShowcasePage({
             <CardContent className="space-y-2">
               <p className="font-heading text-4xl text-rouge">511</p>
               <p className="text-sm text-slate">
-                CRS minimum · 1 500 invitations
+                CRS minimum · 1 500 ITA émises
               </p>
             </CardContent>
           </Card>
