@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+
+/*
+ * Brand tokens from the Stanzy Design System (epic #1). The full design system
+ * lands in #3; this is the minimal palette/typography wiring so the scaffold
+ * renders on-brand.
+ */
+@theme {
+  --color-rouge: #cc1627;
+  --color-bleu: #0d1f4e;
+  --color-bg: #f7f8fc;
+
+  --font-heading: var(--font-syne), system-ui, sans-serif;
+  --font-body: var(--font-work-sans), system-ui, sans-serif;
+  --font-label: var(--font-plus-jakarta), system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-bleu);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+}

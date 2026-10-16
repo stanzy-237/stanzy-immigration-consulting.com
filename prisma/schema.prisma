@@ -1,0 +1,20 @@
+// Prisma schema for Stanzy Immigration Consulting.
+//
+// Scaffolding only: this wires Prisma to Neon Postgres. Domain models
+// (the Account → Lead → Client identity spine, Dossiers, the blog, etc.)
+// are introduced by their own tickets starting with auth (#4). Keeping the
+// schema model-free here avoids pre-committing the domain shape.
+//
+// Neon connection strings:
+//   DATABASE_URL  — pooled (pgBouncer) URL used by the app at runtime.
+//   DIRECT_URL    — direct (non-pooled) URL used for migrations.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}

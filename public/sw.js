@@ -1,0 +1,91 @@
+/*
+ * Stanzy service worker — app-shell runtime caching.
+ *
+ * Scaffolding-grade PWA support (ticket #2): installable + an offline-resilient
+ * app shell. Strategy:
+ *   - static build assets (/_next/static, icons): cache-first, since they are
+ *     content-hashed and immutable.
+ *   - navigations (HTML): network-first, falling back to the last cached copy
+ *     so a previously visited page still opens offline.
+ *
+ * The free calculators' full offline behaviour (epic #1) is layered on by their
+ * own tickets; this is the shell they cache into.
+ */
+
+const CACHE_VERSION = 'v1';
+const SHELL_CACHE = `stanzy-shell-${CACHE_VERSION}`;
+const ASSET_CACHE = `stanzy-assets-${CACHE_VERSION}`;
+
+const PRECACHE_URLS = ['/fr', '/en', '/manifest.webmanifest'];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches
+      .open(SHELL_CACHE)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .catch(() => {
+        // A failed precache (e.g. offline at install) must not block activation.
+      })
+      .then(() => self.skipWaiting()),
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => ![SHELL_CACHE, ASSET_CACHE].includes(key))
+            .map((key) => caches.delete(key)),
+        ),
+      )
+      .then(() => self.clients.claim()),
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Cache-first for immutable build assets and icons.
+  if (
+    url.pathname.startsWith('/_next/static') ||
+    url.pathname.startsWith('/icons')
+  ) {
+    event.respondWith(cacheFirst(request));
+    return;
+  }
+
+  // Network-first for page navigations.
+  if (request.mode === 'navigate') {
+    event.respondWith(networkFirst(request));
+  }
+});
+
+async function cacheFirst(request) {
+  const cache = await caches.open(ASSET_CACHE);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  const response = await fetch(request);
+  if (response.ok) cache.put(request, response.clone());
+  return response;
+}
+
+async function networkFirst(request) {
+  const cache = await caches.open(SHELL_CACHE);
+  try {
+    const response = await fetch(request);
+    if (response.ok) cache.put(request, response.clone());
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    throw error;
+  }
+}
