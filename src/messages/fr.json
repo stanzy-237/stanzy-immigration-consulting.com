@@ -48,6 +48,29 @@
         "verificationDesc": "Nous relisons votre dossier avant soumission"
       }
     },
+    "TikTok": {
+      "eyebrow": "Stanzy sur TikTok",
+      "titleLead": "Des conseils",
+      "titleAccent": "clairs",
+      "titleRest": "et pratiques, gratuits.",
+      "subtitle": "Des conseils clairs et pratiques pour vos procédures Entrée Express. Chaque semaine, du contenu gratuit pour maximiser vos chances.",
+      "cta": "Voir tous nos TikToks",
+      "spinText": "Regarder • Apprendre • Réussir •",
+      "Videos": {
+        "v1Title": "TODO — titre à remplacer",
+        "v1Tags": "#EntréeExpress #Canada",
+        "v2Title": "TODO — titre à remplacer",
+        "v2Tags": "#ImmigrationCanada",
+        "v3Title": "Dernier tirage Entrée Express",
+        "v3Tags": "#DernierTirage",
+        "v4Title": "TODO — titre à remplacer",
+        "v4Tags": "#ScoreCRS",
+        "v5Title": "TODO — titre à remplacer",
+        "v5Tags": "#67points",
+        "v6Title": "TODO — titre à remplacer",
+        "v6Tags": "#ITA"
+      }
+    },
     "Hero": {
       "eyebrow": "Entrée Express · Canada",
       "headlineLead": "Immigrez au Canada",
