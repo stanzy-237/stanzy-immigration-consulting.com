@@ -1,32 +1,238 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 /*
- * Brand tokens from the Stanzy Design System (epic #1). The full design system
- * lands in #3; this is the minimal palette/typography wiring so the scaffold
- * renders on-brand.
+ * Stanzy Design System — see GLOSSARY.md and issue #3.
+ * Light mode only. No dark variant is defined; dark: utilities in shadcn
+ * vendor files become no-ops because nothing ever adds .dark to the tree.
+ * Brand palette, typography, and spacing come from the MagicPath
+ * "Stanzy Design System" project; shadcn/ui semantic tokens (--primary,
+ * --background, etc.) are mapped to those brand tokens.
  */
-@theme {
-  --color-rouge: #cc1627;
-  --color-bleu: #0d1f4e;
-  --color-bg: #f7f8fc;
-
-  --font-heading: var(--font-syne), system-ui, sans-serif;
-  --font-body: var(--font-work-sans), system-ui, sans-serif;
-  --font-label: var(--font-plus-jakarta), system-ui, sans-serif;
-}
 
 :root {
   color-scheme: light;
+
+  /* Brand palette — raw hex values. Do not reference directly from
+     components; use the semantic tokens below. */
+  --rouge: #cc1627;
+  --crimson: #d93344;
+  --rose: #ee8a93;
+  --blush: #fcedef;
+
+  --navy-deep: #0d1f4e;
+  --navy-80: #1a3065;
+  --steel-blue: #6b88b5;
+  --ice-blue: #e8edf5;
+
+  --white: #ffffff;
+  --off-white: #f7f8fc;
+  --fog: #cbd5e0;
+  --slate: #4a5568;
+  --ink: #0d1f4e;
+
+  --success: #2f855a;
+  --success-foreground: #ffffff;
+  --warning: #b7791f;
+  --warning-foreground: #ffffff;
+
+  /* shadcn semantic tokens mapped to Stanzy palette.
+     Primary = Rouge (CTAs). Secondary = Navy (structural). */
+  --background: var(--off-white);
+  --foreground: var(--ink);
+  --card: var(--white);
+  --card-foreground: var(--ink);
+  --popover: var(--white);
+  --popover-foreground: var(--ink);
+  --primary: var(--rouge);
+  --primary-foreground: var(--white);
+  --secondary: var(--navy-deep);
+  --secondary-foreground: var(--white);
+  --muted: var(--ice-blue);
+  --muted-foreground: var(--slate);
+  --accent: var(--ice-blue);
+  --accent-foreground: var(--navy-deep);
+  --destructive: var(--crimson);
+  --destructive-foreground: var(--white);
+  --border: var(--fog);
+  --input: var(--fog);
+  --ring: var(--rouge);
+
+  /* Charts — brand-first palette. Replace later per dataviz skill. */
+  --chart-1: var(--rouge);
+  --chart-2: var(--navy-deep);
+  --chart-3: var(--steel-blue);
+  --chart-4: var(--rose);
+  --chart-5: var(--navy-80);
+
+  /* Base radius = radius-lg (12px) per design md: cards, modals. */
+  --radius: 0.75rem;
+
+  /* Sidebar (admin) — navy chrome, white content. */
+  --sidebar: var(--navy-deep);
+  --sidebar-foreground: var(--white);
+  --sidebar-primary: var(--rouge);
+  --sidebar-primary-foreground: var(--white);
+  --sidebar-accent: var(--navy-80);
+  --sidebar-accent-foreground: var(--white);
+  --sidebar-border: var(--navy-80);
+  --sidebar-ring: var(--rouge);
 }
 
-body {
-  background-color: var(--color-bg);
-  color: var(--color-bleu);
-  font-family: var(--font-body);
+@theme inline {
+  /* Brand utility colors — use these for brand-direct references,
+     e.g. bg-rouge, text-navy-deep. */
+  --color-rouge: var(--rouge);
+  --color-crimson: var(--crimson);
+  --color-rose: var(--rose);
+  --color-blush: var(--blush);
+  --color-navy-deep: var(--navy-deep);
+  --color-navy-80: var(--navy-80);
+  --color-steel-blue: var(--steel-blue);
+  --color-ice-blue: var(--ice-blue);
+  --color-off-white: var(--off-white);
+  --color-fog: var(--fog);
+  --color-slate: var(--slate);
+  --color-ink: var(--ink);
+
+  /* Legacy brand aliases kept for existing scaffold code. */
+  --color-bleu: var(--navy-deep);
+  --color-bg: var(--off-white);
+
+  /* shadcn semantic colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Status */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--rouge);
+  --color-danger-foreground: var(--white);
+  --color-info: var(--steel-blue);
+  --color-info-foreground: var(--white);
+
+  /* Surface + text aliases — consume these from downstream code rather
+     than raw brand tokens or shadcn's --background/--foreground, so
+     palette tweaks only touch globals.css. */
+  --color-surface: var(--white);
+  --color-surface-muted: var(--ice-blue);
+  --color-text: var(--ink);
+  --color-text-muted: var(--slate);
+  --color-text-subtle: var(--steel-blue);
+
+  /* Charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Fonts (variables set by next/font in [locale]/layout.tsx) */
+  --font-heading: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-work-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-label: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-work-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale */
+  --text-display: 72px;
+  --text-h1: 56px;
+  --text-h2: 40px;
+  --text-h3: 28px;
+  --text-h4: 20px;
+  --text-body-lg: 18px;
+  --text-body: 16px;
+  --text-body-sm: 14px;
+  --text-caption: 12px;
+  --text-label: 11px;
+
+  /* Spacing (8px base, plus the specific tokens from the design md) */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-24: 96px;
+  --spacing-32: 128px;
+
+  /* Radii — explicit values from the design md override shadcn's calc scheme */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(13, 31, 78, 0.08);
+  --shadow-md: 0 4px 16px rgba(13, 31, 78, 0.12);
+  --shadow-lg: 0 8px 32px rgba(13, 31, 78, 0.18);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-heading);
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    font-family: var(--font-body);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.04em;
+  }
+}
+
+@utility font-label {
+  font-family: var(--font-label);
+  font-size: var(--text-label);
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
 }
