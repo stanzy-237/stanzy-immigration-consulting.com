@@ -22,6 +22,7 @@
       "openMenu": "Ouvrir le menu",
       "closeMenu": "Fermer le menu",
       "liveMarker": "Données IRCC en direct",
+      "localeToggle": "Changer de langue",
       "Tools": {
         "timelineName": "Mon Parcours",
         "timelineDesc": "Journal personnel de vos étapes Entrée Express",

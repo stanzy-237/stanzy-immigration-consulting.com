@@ -1,7 +1,6 @@
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
-import { LocaleSwitcher } from '@/features/landing/components/locale-switcher';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 
@@ -14,7 +13,6 @@ export function HomeView(): ReactNode {
         <h1 className="text-5xl font-bold text-rouge">{t('title')}</h1>
         <p className="text-2xl text-bleu">{t('tagline')}</p>
         <p className="text-lg text-bleu/70">{t('intro')}</p>
-        <LocaleSwitcher label={t('localeLabel')} />
       </main>
       <SiteFooter />
     </>

@@ -24,6 +24,7 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 import { MapleLeafIcon } from '@/features/landing/components/brand-icons';
+import { LocaleToggle } from '@/features/landing/components/locale-toggle';
 import {
   SERVICE_ENTRIES,
   TOOL_ENTRIES,
@@ -170,7 +171,8 @@ export function SiteNav(): ReactNode {
           />
         </ul>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
+          <LocaleToggle ariaLabel={t('localeToggle')} />
           <Link
             href="/connexion"
             className="text-navy-deep hover:bg-fog/40 rounded-md px-3 py-2 text-sm font-medium transition-colors"
@@ -224,7 +226,11 @@ export function SiteNav(): ReactNode {
                 getName={(e: NavMenuEntry): string => tServices(e.labelKey)}
                 onNavigate={closeMobile}
               />
-              <div className="mt-4 flex flex-col gap-2 px-4">
+              <div className="mt-4 flex flex-col gap-3 px-4">
+                <LocaleToggle
+                  ariaLabel={t('localeToggle')}
+                  className="self-start"
+                />
                 <Link
                   href="/connexion"
                   className="text-navy-deep rounded-md border border-fog px-3 py-2 text-center text-sm font-medium"

@@ -22,6 +22,7 @@
       "openMenu": "Open menu",
       "closeMenu": "Close menu",
       "liveMarker": "Live IRCC data",
+      "localeToggle": "Change language",
       "Tools": {
         "timelineName": "My Journey",
         "timelineDesc": "Personal timeline of your immigration milestones",
