@@ -49,23 +49,26 @@
       }
     },
     "Hero": {
-      "eyebrow": "Express Entry · Official IRCC system",
-      "headlineLead": "Move to Canada with",
-      "headlineAccent": "Confidence",
-      "subtitle": "Free tools, expert content and personal support to help you succeed in your Canadian immigration journey.",
+      "eyebrow": "Express Entry · Canada",
+      "headlineLead": "Move to Canada",
+      "headlineRest": "with",
+      "headlineAccent": "Confidence.",
+      "subtitle": "Access free tools, expert content and personal support to maximise your chances of success in Express Entry.",
       "ctaBook": "Book a consultation",
       "ctaWhatsapp": "Join WhatsApp",
-      "imageAlt": "Canadian city skyline at sunset",
+      "imageAlt": "Canadian immigration candidate celebrating success",
       "Stats": {
         "tools": "free tools",
         "supported": "candidates supported",
         "success": "success rate"
       },
       "ScoreCard": {
-        "eyebrow": "Your estimated CRS score",
-        "unit": "/ 1200 points",
-        "chip": "Above average",
-        "cta": "Compute my score"
+        "tag": "CRS Score",
+        "badge": "Updated",
+        "unit": "pts",
+        "sub": "Latest Express Entry draw",
+        "status": "ITA likely",
+        "cta": "Compute my score →"
       }
     },
     "Footer": {

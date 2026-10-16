@@ -49,23 +49,26 @@
       }
     },
     "Hero": {
-      "eyebrow": "Entrée Express · Système officiel IRCC",
-      "headlineLead": "Immigrez au Canada avec",
-      "headlineAccent": "Confiance",
-      "subtitle": "Outils gratuits, blog expert et accompagnement personnalisé pour réussir votre parcours d'immigration canadienne.",
+      "eyebrow": "Entrée Express · Canada",
+      "headlineLead": "Immigrez au Canada",
+      "headlineRest": "avec",
+      "headlineAccent": "Confiance.",
+      "subtitle": "Accédez à des outils gratuits, du contenu expert et un accompagnement personnalisé pour maximiser vos chances de succès à l'Entrée Express.",
       "ctaBook": "Réserver une consultation",
       "ctaWhatsapp": "Rejoindre WhatsApp",
-      "imageAlt": "Photo d'un paysage urbain canadien au coucher du soleil",
+      "imageAlt": "Candidat à l'immigration canadienne célébrant son succès",
       "Stats": {
         "tools": "outils gratuits",
-        "supported": "candidats accompagnés",
-        "success": "taux de réussite"
+        "supported": "personnes accompagnées",
+        "success": "de réussite"
       },
       "ScoreCard": {
-        "eyebrow": "Votre score CRS estimé",
-        "unit": "/ 1200 points",
-        "chip": "Au-dessus de la moyenne",
-        "cta": "Calculer mon score"
+        "tag": "Score CRS",
+        "badge": "Mis à jour",
+        "unit": "pts",
+        "sub": "Dernier tirage Entrée Express",
+        "status": "Invitation possible",
+        "cta": "Calculer mon score →"
       }
     },
     "Footer": {

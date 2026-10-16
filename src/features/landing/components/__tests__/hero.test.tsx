@@ -11,9 +11,11 @@ import { withIntl } from './test-utils';
 describe('Hero', () => {
   it('renders the headline with the accent word highlighted', () => {
     render(withIntl(<Hero />));
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Immigrez au Canada avec Confiance/i }),
-    ).toBeInTheDocument();
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading.textContent).toMatch(/Immigrez au Canada/);
+    expect(heading.textContent).toMatch(/avec/);
+    expect(heading.textContent).toMatch(/Confiance\./);
+    expect(within(heading).getByText('Confiance.')).toHaveClass('text-rouge');
   });
 
   it('exposes the two primary CTAs', () => {
