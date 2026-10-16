@@ -49,31 +49,51 @@
     },
     "Footer": {
       "ariaLabel": "Pied de page",
-      "tagline": "Votre parcours vers le Canada, accompagné.",
+      "brandEyebrow": "STANZY IMMIGRATION",
+      "tagline": "Des outils gratuits, du contenu expert et un accompagnement personnalisé pour réussir votre immigration au Canada.",
       "columns": {
-        "tools": "Nos outils",
-        "services": "Nos services",
-        "content": "Contenu",
-        "contact": "Contact"
+        "tools": "NOS OUTILS",
+        "services": "NOS SERVICES",
+        "content": "CONTENU",
+        "contact": "CONTACT"
+      },
+      "Tools": {
+        "timeline": "Timeline Immigration",
+        "crs": "Calculateur CRS",
+        "fsw": "Calculateur 67 points",
+        "ita": "Compte à rebours ITA",
+        "draw": "Dernier tirage",
+        "cnp": "Recherche code CNP"
+      },
+      "Services": {
+        "consultation": "Consultation privée",
+        "accompagnement": "Accompagnement EE",
+        "verification": "Vérification documents",
+        "tcf": "TCF Express Academy",
+        "ede": "EDE — WES & IQUAS"
       },
       "content": {
         "blog": "Blog",
-        "faq": "FAQ",
-        "tiktok": "TikTok"
+        "tiktok": "TikTok @stanzycanada"
       },
       "contact": {
-        "email": "Nous écrire",
-        "phone": "Appeler",
-        "region": "Yaoundé, Cameroun · Montréal, Canada",
+        "emailLabel": "EMAIL",
+        "emailValue": "contact@stanzy-immigration-consulting.com",
+        "phoneLabel": "TÉLÉPHONE",
+        "phoneValue": "+237 679 306 015",
+        "regionLabel": "LOCALISATION",
+        "regionValue": "Douala, Cameroun",
         "book": "Réserver une consultation"
       },
       "legal": {
-        "privacy": "Confidentialité",
-        "terms": "Conditions",
-        "cookies": "Témoins"
+        "privacy": "Politique de confidentialité",
+        "terms": "Mentions légales",
+        "cookies": "Conditions d'utilisation"
       },
-      "canadaBadge": "Fièrement orienté Canada",
-      "copyright": "© {year} Stanzy. Tous droits réservés.",
+      "canadaBadge": "Canada",
+      "copyright": "© {year} Stanzy Immigration Consulting. Tous droits réservés.",
+      "madeWith": "Fait avec",
+      "madeWithTail": "pour la communauté francophone.",
       "Social": {
         "facebook": "Facebook",
         "tiktok": "TikTok",

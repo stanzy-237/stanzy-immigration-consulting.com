@@ -49,31 +49,51 @@
     },
     "Footer": {
       "ariaLabel": "Site footer",
-      "tagline": "Your journey to Canada, guided.",
+      "brandEyebrow": "STANZY IMMIGRATION",
+      "tagline": "Free tools, expert content and personal support to help you succeed in your Canadian immigration journey.",
       "columns": {
-        "tools": "Our tools",
-        "services": "Our services",
-        "content": "Content",
-        "contact": "Contact"
+        "tools": "OUR TOOLS",
+        "services": "OUR SERVICES",
+        "content": "CONTENT",
+        "contact": "CONTACT"
+      },
+      "Tools": {
+        "timeline": "Immigration Timeline",
+        "crs": "CRS calculator",
+        "fsw": "67-point calculator",
+        "ita": "ITA countdown",
+        "draw": "Latest draw",
+        "cnp": "NOC/CNP lookup"
+      },
+      "Services": {
+        "consultation": "Private consultation",
+        "accompagnement": "End-to-end support",
+        "verification": "Document review",
+        "tcf": "TCF Express Academy",
+        "ede": "EDE — WES & IQUAS"
       },
       "content": {
         "blog": "Blog",
-        "faq": "FAQ",
-        "tiktok": "TikTok"
+        "tiktok": "TikTok @stanzycanada"
       },
       "contact": {
-        "email": "Email us",
-        "phone": "Call us",
-        "region": "Yaoundé, Cameroon · Montréal, Canada",
+        "emailLabel": "EMAIL",
+        "emailValue": "contact@stanzy-immigration-consulting.com",
+        "phoneLabel": "PHONE",
+        "phoneValue": "+237 679 306 015",
+        "regionLabel": "LOCATION",
+        "regionValue": "Douala, Cameroon",
         "book": "Book a consultation"
       },
       "legal": {
-        "privacy": "Privacy",
-        "terms": "Terms",
-        "cookies": "Cookies"
+        "privacy": "Privacy policy",
+        "terms": "Legal notice",
+        "cookies": "Terms of use"
       },
-      "canadaBadge": "Proudly Canada-focused",
-      "copyright": "© {year} Stanzy. All rights reserved.",
+      "canadaBadge": "Canada",
+      "copyright": "© {year} Stanzy Immigration Consulting. All rights reserved.",
+      "madeWith": "Made with",
+      "madeWithTail": "for the French-speaking community.",
       "Social": {
         "facebook": "Facebook",
         "tiktok": "TikTok",
