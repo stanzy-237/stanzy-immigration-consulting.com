@@ -1,5 +1,13 @@
-import type { LucideIcon } from 'lucide-react';
-import { Camera, MessageCircle, Music2, Share2 } from 'lucide-react';
+import type { ComponentType, SVGProps } from 'react';
+
+import {
+  FacebookIcon,
+  InstagramIcon,
+  TikTokIcon,
+  WhatsAppIcon,
+} from '@/features/landing/components/brand-icons';
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 export type FooterLink = {
   key: string;
@@ -62,16 +70,16 @@ export const FOOTER_LEGAL_LINKS: ReadonlyArray<FooterLink> = [
 
 export type SocialLink = {
   key: 'facebook' | 'tiktok' | 'instagram' | 'whatsapp';
-  icon: LucideIcon;
+  icon: IconComponent;
   href: string;
 };
 
 // Placeholder social URLs — real handles land in a follow-up.
 export const FOOTER_SOCIALS: ReadonlyArray<SocialLink> = [
-  { key: 'facebook', icon: Share2, href: 'https://facebook.com/stanzycanada' },
-  { key: 'tiktok', icon: Music2, href: 'https://www.tiktok.com/@stanzycanada' },
-  { key: 'instagram', icon: Camera, href: 'https://instagram.com/stanzycanada' },
-  { key: 'whatsapp', icon: MessageCircle, href: 'https://wa.me/message/stanzycanada' },
+  { key: 'facebook', icon: FacebookIcon, href: 'https://facebook.com/stanzycanada' },
+  { key: 'tiktok', icon: TikTokIcon, href: 'https://www.tiktok.com/@stanzycanada' },
+  { key: 'instagram', icon: InstagramIcon, href: 'https://instagram.com/stanzycanada' },
+  { key: 'whatsapp', icon: WhatsAppIcon, href: 'https://wa.me/message/stanzycanada' },
 ] as const;
 
 // Contact details come from the MagicPath design.

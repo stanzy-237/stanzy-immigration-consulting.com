@@ -2,11 +2,11 @@ import {
   ArrowUpRight,
   CalendarCheck,
   Heart,
-  Leaf,
   Mail,
   MapPin,
   Phone,
 } from "lucide-react";
+import { CanadaFlagIcon } from "@/features/landing/components/brand-icons";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
@@ -47,12 +47,12 @@ export function SiteFooter() {
               aria-label={t("brandEyebrow")}
               className="inline-flex"
             >
-              <span className="relative inline-flex h-28 w-28 overflow-hidden rounded-full bg-white shadow-lg ring-4 ring-white/10">
+              <span className="relative inline-flex h-32 w-32 overflow-hidden rounded-full bg-white shadow-lg ring-4 ring-white/10">
                 <Image
                   src="/Logo-white-background.svg"
                   alt={t("brandEyebrow")}
                   fill
-                  className="object-contain p-2"
+                  className="scale-125 object-contain p-0"
                 />
               </span>
             </Link>
@@ -71,7 +71,7 @@ export function SiteFooter() {
                       aria-label={tSocial(s.key)}
                       className="hover:bg-white/10 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 transition-colors"
                     >
-                      <Icon aria-hidden className="h-4 w-4" />
+                      <Icon className="h-[18px] w-[18px]" />
                     </a>
                   </li>
                 );
@@ -167,11 +167,14 @@ export function SiteFooter() {
           </ul>
         </div>
 
-        <div className="-mt-2">
-          <span className="inline-flex items-center gap-1.5 text-xs text-white/60">
-            <Leaf aria-hidden className="text-rouge h-3.5 w-3.5" />
+        <div className="-mt-2 flex flex-col gap-3">
+          <span className="inline-flex items-center gap-1.5 self-start text-xs text-white/60">
+            <CanadaFlagIcon className="h-3.5 w-5 rounded-[2px]" />
             {t("canadaBadge")}
           </span>
+          <p className="text-white/50 text-xs max-w-3xl leading-relaxed">
+            {t("disclaimer")}
+          </p>
         </div>
       </div>
     </footer>

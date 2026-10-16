@@ -12,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Link } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 import {
@@ -34,6 +34,10 @@ export function SiteNav() {
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pathname = usePathname() ?? '/';
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const isGroupActive = (prefix: string) => pathname.startsWith(prefix);
 
   const clearCloseTimer = useCallback(() => {
     if (closeTimer.current) {
@@ -79,7 +83,7 @@ export function SiteNav() {
       aria-label={t('ariaLabel')}
       className="bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-surface/80"
     >
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-4 py-3 md:px-6">
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-4 py-2 md:px-6">
         <Link href="/" aria-label={t('brand')} className="inline-flex items-center">
           <Image
             src="/logo2.png"
@@ -87,23 +91,19 @@ export function SiteNav() {
             width={502}
             height={468}
             priority
-            className="h-9 w-auto"
+            className="h-14 w-auto md:h-16"
           />
         </Link>
 
         <ul className="hidden items-center gap-1 md:flex">
-          <li>
-            <Link
-              href="/"
-              className="text-navy-deep hover:bg-fog/40 rounded-md px-3 py-2 text-sm font-medium transition-colors"
-            >
-              {t('home')}
-            </Link>
-          </li>
+          <NavItem href="/" active={pathname === '/'}>
+            {t('home')}
+          </NavItem>
           <HoverDropdown
             id={toolsId}
             label={t('tools')}
             ariaLabel={t('toolsAriaLabel')}
+            active={isGroupActive('/outils')}
             open={openMenu === 'tools'}
             onOpen={() => openOnHover('tools')}
             onClose={scheduleClose}
@@ -122,18 +122,14 @@ export function SiteNav() {
               />
             }
           />
-          <li>
-            <Link
-              href="/blog"
-              className="text-navy-deep hover:bg-fog/40 rounded-md px-3 py-2 text-sm font-medium transition-colors"
-            >
-              {t('blog')}
-            </Link>
-          </li>
+          <NavItem href="/blog" active={isActive('/blog')}>
+            {t('blog')}
+          </NavItem>
           <HoverDropdown
             id={servicesId}
             label={t('services')}
             ariaLabel={t('servicesAriaLabel')}
+            active={isGroupActive('/services')}
             open={openMenu === 'services'}
             onOpen={() => openOnHover('services')}
             onClose={scheduleClose}
@@ -231,10 +227,49 @@ export function SiteNav() {
   );
 }
 
+function NavItem({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="relative">
+      <Link
+        href={href}
+        aria-current={active ? 'page' : undefined}
+        className={cn(
+          'text-navy-deep hover:bg-fog/40 inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+          active && 'text-navy-deep',
+        )}
+      >
+        {children}
+      </Link>
+      <ActiveBar visible={active} />
+    </li>
+  );
+}
+
+function ActiveBar({ visible }: { visible: boolean }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        'bg-rouge pointer-events-none absolute inset-x-3 -bottom-[9px] h-0.5 rounded-full transition-opacity',
+        visible ? 'opacity-100' : 'opacity-0',
+      )}
+    />
+  );
+}
+
 function HoverDropdown({
   id,
   label,
   ariaLabel,
+  active,
   open,
   onOpen,
   onClose,
@@ -244,6 +279,7 @@ function HoverDropdown({
   id: string;
   label: string;
   ariaLabel: string;
+  active: boolean;
   open: boolean;
   onOpen: () => void;
   onClose: () => void;
@@ -283,6 +319,7 @@ function HoverDropdown({
           )}
         />
       </button>
+      <ActiveBar visible={active} />
       {panel}
     </li>
   );
