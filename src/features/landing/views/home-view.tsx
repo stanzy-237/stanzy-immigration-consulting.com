@@ -1,10 +1,11 @@
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import { LocaleSwitcher } from '@/features/landing/components/locale-switcher';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 
-export function HomeView() {
+export function HomeView(): ReactNode {
   const t = useTranslations('Home');
   return (
     <>

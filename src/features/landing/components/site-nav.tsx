@@ -3,7 +3,15 @@
 import { ChevronDown, Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FocusEvent as ReactFocusEvent,
+  type ReactNode,
+} from 'react';
 
 import {
   Sheet,
@@ -27,20 +35,21 @@ type MenuKey = 'tools' | 'services';
 // Hover-intent delay from the MagicPath design (issue #12 Further Notes).
 const HOVER_CLOSE_DELAY_MS = 130;
 
-export function SiteNav() {
+export function SiteNav(): ReactNode {
   const t = useTranslations('Home.Nav');
   const tTools = useTranslations('Home.Nav.Tools');
   const tServices = useTranslations('Home.Nav.Services');
 
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pathname = usePathname() ?? '/';
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
-  const isGroupActive = (prefix: string) => pathname.startsWith(prefix);
+  const pathname: string = usePathname() ?? '/';
 
-  const clearCloseTimer = useCallback(() => {
+  const isActive = (href: string): boolean =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const isGroupActive = (prefix: string): boolean => pathname.startsWith(prefix);
+
+  const clearCloseTimer = useCallback((): void => {
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
       closeTimer.current = null;
@@ -48,36 +57,39 @@ export function SiteNav() {
   }, []);
 
   const openOnHover = useCallback(
-    (key: MenuKey) => {
+    (key: MenuKey): void => {
       clearCloseTimer();
       setOpenMenu(key);
     },
     [clearCloseTimer],
   );
 
-  const scheduleClose = useCallback(() => {
+  const scheduleClose = useCallback((): void => {
     clearCloseTimer();
-    closeTimer.current = setTimeout(() => {
+    closeTimer.current = setTimeout((): void => {
       setOpenMenu(null);
     }, HOVER_CLOSE_DELAY_MS);
   }, [clearCloseTimer]);
 
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
+  useEffect((): (() => void) => {
+    function onKey(e: KeyboardEvent): void {
       if (e.key === 'Escape') {
         setOpenMenu(null);
         setMobileOpen(false);
       }
     }
     document.addEventListener('keydown', onKey);
-    return () => {
+    return (): void => {
       document.removeEventListener('keydown', onKey);
       clearCloseTimer();
     };
   }, [clearCloseTimer]);
 
-  const toolsId = useId();
-  const servicesId = useId();
+  const toolsId: string = useId();
+  const servicesId: string = useId();
+
+  const closeDropdown = useCallback((): void => setOpenMenu(null), []);
+  const closeMobile = useCallback((): void => setMobileOpen(false), []);
 
   return (
     <nav
@@ -85,7 +97,11 @@ export function SiteNav() {
       className="bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-surface/80"
     >
       <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-4 py-2 md:px-6">
-        <Link href="/" aria-label={t('brand')} className="inline-flex items-center">
+        <Link
+          href="/"
+          aria-label={t('brand')}
+          className="inline-flex items-center"
+        >
           <Image
             src="/logo2.png"
             alt={t('brand')}
@@ -106,20 +122,22 @@ export function SiteNav() {
             ariaLabel={t('toolsAriaLabel')}
             active={isGroupActive('/outils')}
             open={openMenu === 'tools'}
-            onOpen={() => openOnHover('tools')}
+            onOpen={(): void => openOnHover('tools')}
             onClose={scheduleClose}
-            onToggle={() =>
-              setOpenMenu((v) => (v === 'tools' ? null : 'tools'))
+            onToggle={(): void =>
+              setOpenMenu((v: MenuKey | null): MenuKey | null =>
+                v === 'tools' ? null : 'tools',
+              )
             }
             panel={
               <DropdownPanel
                 id={toolsId}
                 open={openMenu === 'tools'}
                 entries={TOOL_ENTRIES}
-                getName={(e) => tTools(e.labelKey)}
-                getDesc={(e) => tTools(e.descKey)}
+                getName={(e: NavMenuEntry): string => tTools(e.labelKey)}
+                getDesc={(e: NavMenuEntry): string => tTools(e.descKey)}
                 mapleLabel={t('liveMarker')}
-                onNavigate={() => setOpenMenu(null)}
+                onNavigate={closeDropdown}
               />
             }
           />
@@ -132,19 +150,21 @@ export function SiteNav() {
             ariaLabel={t('servicesAriaLabel')}
             active={isGroupActive('/services')}
             open={openMenu === 'services'}
-            onOpen={() => openOnHover('services')}
+            onOpen={(): void => openOnHover('services')}
             onClose={scheduleClose}
-            onToggle={() =>
-              setOpenMenu((v) => (v === 'services' ? null : 'services'))
+            onToggle={(): void =>
+              setOpenMenu((v: MenuKey | null): MenuKey | null =>
+                v === 'services' ? null : 'services',
+              )
             }
             panel={
               <DropdownPanel
                 id={servicesId}
                 open={openMenu === 'services'}
                 entries={SERVICE_ENTRIES}
-                getName={(e) => tServices(e.labelKey)}
-                getDesc={(e) => tServices(e.descKey)}
-                onNavigate={() => setOpenMenu(null)}
+                getName={(e: NavMenuEntry): string => tServices(e.labelKey)}
+                getDesc={(e: NavMenuEntry): string => tServices(e.descKey)}
+                onNavigate={closeDropdown}
               />
             }
           />
@@ -173,7 +193,7 @@ export function SiteNav() {
                 aria-label={t('openMenu')}
                 className="text-navy-deep hover:bg-fog/40 inline-flex h-9 w-9 items-center justify-center rounded-md md:hidden"
               >
-                <Menu aria-hidden className="h-5 w-5" />
+                <Menu aria-hidden={true} className="h-5 w-5" />
               </button>
             }
           />
@@ -185,37 +205,37 @@ export function SiteNav() {
               <MobileSection
                 label={t('home')}
                 href="/"
-                onNavigate={() => setMobileOpen(false)}
+                onNavigate={closeMobile}
               />
               <MobileGroup
                 label={t('tools')}
                 entries={TOOL_ENTRIES}
-                getName={(e) => tTools(e.labelKey)}
-                onNavigate={() => setMobileOpen(false)}
+                getName={(e: NavMenuEntry): string => tTools(e.labelKey)}
+                onNavigate={closeMobile}
               />
               <MobileSection
                 label={t('blog')}
                 href="/blog"
-                onNavigate={() => setMobileOpen(false)}
+                onNavigate={closeMobile}
               />
               <MobileGroup
                 label={t('services')}
                 entries={SERVICE_ENTRIES}
-                getName={(e) => tServices(e.labelKey)}
-                onNavigate={() => setMobileOpen(false)}
+                getName={(e: NavMenuEntry): string => tServices(e.labelKey)}
+                onNavigate={closeMobile}
               />
               <div className="mt-4 flex flex-col gap-2 px-4">
                 <Link
                   href="/connexion"
                   className="text-navy-deep rounded-md border border-fog px-3 py-2 text-center text-sm font-medium"
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMobile}
                 >
                   {t('login')}
                 </Link>
                 <Link
                   href="/commencer"
                   className="bg-rouge rounded-md px-3 py-2 text-center text-sm font-semibold text-white"
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMobile}
                 >
                   {t('start')}
                 </Link>
@@ -228,15 +248,13 @@ export function SiteNav() {
   );
 }
 
-function NavItem({
-  href,
-  active,
-  children,
-}: {
+type NavItemProps = {
   href: string;
   active: boolean;
-  children: React.ReactNode;
-}) {
+  children: ReactNode;
+};
+
+function NavItem({ href, active, children }: NavItemProps): ReactNode {
   return (
     <li className="relative">
       <Link
@@ -254,10 +272,10 @@ function NavItem({
   );
 }
 
-function ActiveBar({ visible }: { visible: boolean }) {
+function ActiveBar({ visible }: { visible: boolean }): ReactNode {
   return (
     <span
-      aria-hidden
+      aria-hidden={true}
       className={cn(
         'bg-rouge pointer-events-none absolute inset-x-3 -bottom-[9px] h-0.5 rounded-full transition-opacity',
         visible ? 'opacity-100' : 'opacity-0',
@@ -265,6 +283,18 @@ function ActiveBar({ visible }: { visible: boolean }) {
     />
   );
 }
+
+type HoverDropdownProps = {
+  id: string;
+  label: string;
+  ariaLabel: string;
+  active: boolean;
+  open: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onToggle: () => void;
+  panel: ReactNode;
+};
 
 function HoverDropdown({
   id,
@@ -276,28 +306,20 @@ function HoverDropdown({
   onClose,
   onToggle,
   panel,
-}: {
-  id: string;
-  label: string;
-  ariaLabel: string;
-  active: boolean;
-  open: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-  onToggle: () => void;
-  panel: React.ReactNode;
-}) {
+}: HoverDropdownProps): ReactNode {
+  const handleBlur = (e: ReactFocusEvent<HTMLLIElement>): void => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+      onClose();
+    }
+  };
+
   return (
     <li
       className="relative"
       onMouseEnter={onOpen}
       onMouseLeave={onClose}
       onFocus={onOpen}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
-          onClose();
-        }
-      }}
+      onBlur={handleBlur}
     >
       <button
         type="button"
@@ -313,7 +335,7 @@ function HoverDropdown({
       >
         {label}
         <ChevronDown
-          aria-hidden
+          aria-hidden={true}
           className={cn(
             'h-3.5 w-3.5 transition-transform duration-150',
             open && 'rotate-180',
@@ -326,6 +348,16 @@ function HoverDropdown({
   );
 }
 
+type DropdownPanelProps = {
+  id: string;
+  open: boolean;
+  entries: ReadonlyArray<NavMenuEntry>;
+  getName: (entry: NavMenuEntry) => string;
+  getDesc: (entry: NavMenuEntry) => string;
+  mapleLabel?: string;
+  onNavigate: () => void;
+};
+
 function DropdownPanel({
   id,
   open,
@@ -334,18 +366,7 @@ function DropdownPanel({
   getDesc,
   mapleLabel,
   onNavigate,
-}: {
-  id: string;
-  open: boolean;
-  entries: ReadonlyArray<NavMenuEntry>;
-  getName: (e: NavMenuEntry) => string;
-  getDesc: (e: NavMenuEntry) => string;
-  mapleLabel?: string;
-  onNavigate: () => void;
-}) {
-  // The panel always renders so the left-to-right blur transition has a
-  // target to animate towards; `pointer-events-none` keeps it inert while
-  // closed and screen readers skip it via `aria-hidden`.
+}: DropdownPanelProps): ReactNode {
   return (
     <div
       id={id}
@@ -358,7 +379,7 @@ function DropdownPanel({
           : 'pointer-events-none opacity-0 blur-sm -translate-x-4',
       )}
     >
-      {entries.map((entry) => {
+      {entries.map((entry: NavMenuEntry): ReactNode => {
         const Icon = entry.icon;
         return (
           <Link
@@ -369,7 +390,7 @@ function DropdownPanel({
             className="hover:bg-fog/40 group flex items-start gap-3 rounded-lg px-3 py-2 transition-colors"
           >
             <span className="bg-rouge/10 text-rouge inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md">
-              <Icon aria-hidden className="h-4 w-4" />
+              <Icon aria-hidden={true} className="h-4 w-4" />
             </span>
             <span className="flex min-w-0 flex-col">
               <span className="text-navy-deep flex items-center gap-1.5 text-sm font-medium">
@@ -381,9 +402,7 @@ function DropdownPanel({
                   />
                 ) : null}
               </span>
-              <span className="text-navy-deep/60 text-xs">
-                {getDesc(entry)}
-              </span>
+              <span className="text-navy-deep/60 text-xs">{getDesc(entry)}</span>
             </span>
           </Link>
         );
@@ -392,15 +411,17 @@ function DropdownPanel({
   );
 }
 
+type MobileSectionProps = {
+  label: string;
+  href: string;
+  onNavigate: () => void;
+};
+
 function MobileSection({
   label,
   href,
   onNavigate,
-}: {
-  label: string;
-  href: string;
-  onNavigate: () => void;
-}) {
+}: MobileSectionProps): ReactNode {
   return (
     <Link
       href={href}
@@ -412,34 +433,38 @@ function MobileSection({
   );
 }
 
+type MobileGroupProps = {
+  label: string;
+  entries: ReadonlyArray<NavMenuEntry>;
+  getName: (entry: NavMenuEntry) => string;
+  onNavigate: () => void;
+};
+
 function MobileGroup({
   label,
   entries,
   getName,
   onNavigate,
-}: {
-  label: string;
-  entries: ReadonlyArray<NavMenuEntry>;
-  getName: (e: NavMenuEntry) => string;
-  onNavigate: () => void;
-}) {
+}: MobileGroupProps): ReactNode {
   return (
     <details className="border-b border-fog/70">
       <summary className="text-navy-deep cursor-pointer px-4 py-3 text-sm font-semibold">
         {label}
       </summary>
       <ul className="bg-fog/20 pb-2">
-        {entries.map((entry) => (
-          <li key={entry.href}>
-            <Link
-              href={entry.href}
-              onClick={onNavigate}
-              className="text-navy-deep block px-6 py-2 text-sm"
-            >
-              {getName(entry)}
-            </Link>
-          </li>
-        ))}
+        {entries.map(
+          (entry: NavMenuEntry): ReactNode => (
+            <li key={entry.href}>
+              <Link
+                href={entry.href}
+                onClick={onNavigate}
+                className="text-navy-deep block px-6 py-2 text-sm"
+              >
+                {getName(entry)}
+              </Link>
+            </li>
+          ),
+        )}
       </ul>
     </details>
   );
