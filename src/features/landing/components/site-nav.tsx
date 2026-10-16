@@ -1,9 +1,17 @@
 'use client';
 
-import { ChevronDown, Leaf, Menu, X } from 'lucide-react';
+import { ChevronDown, Leaf, Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +23,9 @@ import {
 
 type MenuKey = 'tools' | 'services';
 
+// Hover-intent delay from the MagicPath design (issue #12 Further Notes).
+const HOVER_CLOSE_DELAY_MS = 130;
+
 export function SiteNav() {
   const t = useTranslations('Home.Nav');
   const tTools = useTranslations('Home.Nav.Tools');
@@ -22,9 +33,29 @@ export function SiteNav() {
 
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navRef = useRef<HTMLElement | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const closeMenus = useCallback(() => setOpenMenu(null), []);
+  const clearCloseTimer = useCallback(() => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }, []);
+
+  const openOnHover = useCallback(
+    (key: MenuKey) => {
+      clearCloseTimer();
+      setOpenMenu(key);
+    },
+    [clearCloseTimer],
+  );
+
+  const scheduleClose = useCallback(() => {
+    clearCloseTimer();
+    closeTimer.current = setTimeout(() => {
+      setOpenMenu(null);
+    }, HOVER_CLOSE_DELAY_MS);
+  }, [clearCloseTimer]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -33,37 +64,31 @@ export function SiteNav() {
         setMobileOpen(false);
       }
     }
-    function onPointer(e: MouseEvent) {
-      if (!navRef.current) return;
-      if (!navRef.current.contains(e.target as Node)) {
-        setOpenMenu(null);
-      }
-    }
     document.addEventListener('keydown', onKey);
-    document.addEventListener('mousedown', onPointer);
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.removeEventListener('mousedown', onPointer);
+      clearCloseTimer();
     };
-  }, []);
+  }, [clearCloseTimer]);
 
   const toolsId = useId();
   const servicesId = useId();
-  const mobileId = useId();
 
   return (
     <nav
-      ref={navRef}
       aria-label={t('ariaLabel')}
       className="bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-surface/80"
     >
       <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-4 py-3 md:px-6">
-        <Link
-          href="/"
-          className="font-heading text-navy-deep text-xl font-bold tracking-tight"
-          onClick={closeMenus}
-        >
-          {t('brand')}
+        <Link href="/" aria-label={t('brand')} className="inline-flex items-center">
+          <Image
+            src="/logo2.png"
+            alt={t('brand')}
+            width={502}
+            height={468}
+            priority
+            className="h-9 w-auto"
+          />
         </Link>
 
         <ul className="hidden items-center gap-1 md:flex">
@@ -75,27 +100,28 @@ export function SiteNav() {
               {t('home')}
             </Link>
           </li>
-          <li>
-            <DropdownTrigger
-              id={toolsId}
-              label={t('tools')}
-              ariaLabel={t('toolsAriaLabel')}
-              open={openMenu === 'tools'}
-              onToggle={() =>
-                setOpenMenu((v) => (v === 'tools' ? null : 'tools'))
-              }
-            />
-            {openMenu === 'tools' ? (
+          <HoverDropdown
+            id={toolsId}
+            label={t('tools')}
+            ariaLabel={t('toolsAriaLabel')}
+            open={openMenu === 'tools'}
+            onOpen={() => openOnHover('tools')}
+            onClose={scheduleClose}
+            onToggle={() =>
+              setOpenMenu((v) => (v === 'tools' ? null : 'tools'))
+            }
+            panel={
               <DropdownPanel
                 id={toolsId}
+                open={openMenu === 'tools'}
                 entries={TOOL_ENTRIES}
                 getName={(e) => tTools(e.labelKey)}
                 getDesc={(e) => tTools(e.descKey)}
                 mapleLabel={t('liveMarker')}
-                onNavigate={closeMenus}
+                onNavigate={() => setOpenMenu(null)}
               />
-            ) : null}
-          </li>
+            }
+          />
           <li>
             <Link
               href="/blog"
@@ -104,26 +130,27 @@ export function SiteNav() {
               {t('blog')}
             </Link>
           </li>
-          <li>
-            <DropdownTrigger
-              id={servicesId}
-              label={t('services')}
-              ariaLabel={t('servicesAriaLabel')}
-              open={openMenu === 'services'}
-              onToggle={() =>
-                setOpenMenu((v) => (v === 'services' ? null : 'services'))
-              }
-            />
-            {openMenu === 'services' ? (
+          <HoverDropdown
+            id={servicesId}
+            label={t('services')}
+            ariaLabel={t('servicesAriaLabel')}
+            open={openMenu === 'services'}
+            onOpen={() => openOnHover('services')}
+            onClose={scheduleClose}
+            onToggle={() =>
+              setOpenMenu((v) => (v === 'services' ? null : 'services'))
+            }
+            panel={
               <DropdownPanel
                 id={servicesId}
+                open={openMenu === 'services'}
                 entries={SERVICE_ENTRIES}
                 getName={(e) => tServices(e.labelKey)}
                 getDesc={(e) => tServices(e.descKey)}
-                onNavigate={closeMenus}
+                onNavigate={() => setOpenMenu(null)}
               />
-            ) : null}
-          </li>
+            }
+          />
         </ul>
 
         <div className="hidden items-center gap-2 md:flex">
@@ -141,103 +168,129 @@ export function SiteNav() {
           </Link>
         </div>
 
-        <button
-          type="button"
-          aria-label={mobileOpen ? t('closeMenu') : t('openMenu')}
-          aria-expanded={mobileOpen}
-          aria-controls={mobileId}
-          className="text-navy-deep hover:bg-fog/40 inline-flex h-9 w-9 items-center justify-center rounded-md md:hidden"
-          onClick={() => setMobileOpen((v) => !v)}
-        >
-          {mobileOpen ? (
-            <X aria-hidden className="h-5 w-5" />
-          ) : (
-            <Menu aria-hidden className="h-5 w-5" />
-          )}
-        </button>
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetTrigger
+            render={
+              <button
+                type="button"
+                aria-label={t('openMenu')}
+                className="text-navy-deep hover:bg-fog/40 inline-flex h-9 w-9 items-center justify-center rounded-md md:hidden"
+              >
+                <Menu aria-hidden className="h-5 w-5" />
+              </button>
+            }
+          />
+          <SheetContent side="right" className="bg-surface w-80 p-0">
+            <SheetHeader>
+              <SheetTitle>{t('brand')}</SheetTitle>
+            </SheetHeader>
+            <nav aria-label={t('ariaLabel')} className="flex flex-col pb-4">
+              <MobileSection
+                label={t('home')}
+                href="/"
+                onNavigate={() => setMobileOpen(false)}
+              />
+              <MobileGroup
+                label={t('tools')}
+                entries={TOOL_ENTRIES}
+                getName={(e) => tTools(e.labelKey)}
+                onNavigate={() => setMobileOpen(false)}
+              />
+              <MobileSection
+                label={t('blog')}
+                href="/blog"
+                onNavigate={() => setMobileOpen(false)}
+              />
+              <MobileGroup
+                label={t('services')}
+                entries={SERVICE_ENTRIES}
+                getName={(e) => tServices(e.labelKey)}
+                onNavigate={() => setMobileOpen(false)}
+              />
+              <div className="mt-4 flex flex-col gap-2 px-4">
+                <Link
+                  href="/connexion"
+                  className="text-navy-deep rounded-md border border-fog px-3 py-2 text-center text-sm font-medium"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {t('login')}
+                </Link>
+                <Link
+                  href="/commencer"
+                  className="bg-rouge rounded-md px-3 py-2 text-center text-sm font-semibold text-white"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {t('start')}
+                </Link>
+              </div>
+            </nav>
+          </SheetContent>
+        </Sheet>
       </div>
-
-      {mobileOpen ? (
-        <div
-          id={mobileId}
-          className="border-fog bg-surface border-t md:hidden"
-        >
-          <MobileSection label={t('home')} href="/" onNavigate={() => setMobileOpen(false)} />
-          <MobileGroup
-            label={t('tools')}
-            entries={TOOL_ENTRIES}
-            getName={(e) => tTools(e.labelKey)}
-            onNavigate={() => setMobileOpen(false)}
-          />
-          <MobileSection label={t('blog')} href="/blog" onNavigate={() => setMobileOpen(false)} />
-          <MobileGroup
-            label={t('services')}
-            entries={SERVICE_ENTRIES}
-            getName={(e) => tServices(e.labelKey)}
-            onNavigate={() => setMobileOpen(false)}
-          />
-          <div className="border-fog flex flex-col gap-2 border-t px-4 py-4">
-            <Link
-              href="/connexion"
-              className="text-navy-deep rounded-md border border-fog px-3 py-2 text-center text-sm font-medium"
-              onClick={() => setMobileOpen(false)}
-            >
-              {t('login')}
-            </Link>
-            <Link
-              href="/commencer"
-              className="bg-rouge rounded-md px-3 py-2 text-center text-sm font-semibold text-white"
-              onClick={() => setMobileOpen(false)}
-            >
-              {t('start')}
-            </Link>
-          </div>
-        </div>
-      ) : null}
     </nav>
   );
 }
 
-function DropdownTrigger({
+function HoverDropdown({
   id,
   label,
   ariaLabel,
   open,
+  onOpen,
+  onClose,
   onToggle,
+  panel,
 }: {
   id: string;
   label: string;
   ariaLabel: string;
   open: boolean;
+  onOpen: () => void;
+  onClose: () => void;
   onToggle: () => void;
+  panel: React.ReactNode;
 }) {
   return (
-    <button
-      type="button"
-      aria-label={ariaLabel}
-      aria-haspopup="menu"
-      aria-expanded={open}
-      aria-controls={id}
-      onClick={onToggle}
-      className={cn(
-        'text-navy-deep hover:bg-fog/40 inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-        open && 'bg-fog/40',
-      )}
+    <li
+      className="relative"
+      onMouseEnter={onOpen}
+      onMouseLeave={onClose}
+      onFocus={onOpen}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+          onClose();
+        }
+      }}
     >
-      {label}
-      <ChevronDown
-        aria-hidden
+      <button
+        type="button"
+        aria-label={ariaLabel}
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={onToggle}
         className={cn(
-          'h-3.5 w-3.5 transition-transform',
-          open && 'rotate-180',
+          'text-navy-deep hover:bg-fog/40 inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+          open && 'bg-fog/40',
         )}
-      />
-    </button>
+      >
+        {label}
+        <ChevronDown
+          aria-hidden
+          className={cn(
+            'h-3.5 w-3.5 transition-transform duration-150',
+            open && 'rotate-180',
+          )}
+        />
+      </button>
+      {panel}
+    </li>
   );
 }
 
 function DropdownPanel({
   id,
+  open,
   entries,
   getName,
   getDesc,
@@ -245,17 +298,27 @@ function DropdownPanel({
   onNavigate,
 }: {
   id: string;
+  open: boolean;
   entries: ReadonlyArray<NavMenuEntry>;
   getName: (e: NavMenuEntry) => string;
   getDesc: (e: NavMenuEntry) => string;
   mapleLabel?: string;
   onNavigate: () => void;
 }) {
+  // The panel always renders so the left-to-right blur transition has a
+  // target to animate towards; `pointer-events-none` keeps it inert while
+  // closed and screen readers skip it via `aria-hidden`.
   return (
     <div
       id={id}
-      role="menu"
-      className="border-fog bg-surface absolute left-4 right-4 top-full z-50 mt-1 grid gap-1 rounded-xl border p-2 shadow-lg md:left-auto md:right-auto md:w-[32rem] md:grid-cols-2"
+      aria-hidden={!open}
+      className={cn(
+        'absolute left-0 top-full z-50 mt-1 w-[32rem] origin-left rounded-xl border border-fog bg-surface p-2 shadow-lg transition-[opacity,filter,transform] duration-200 ease-out',
+        'grid gap-1 md:grid-cols-2',
+        open
+          ? 'pointer-events-auto opacity-100 blur-0 translate-x-0'
+          : 'pointer-events-none opacity-0 blur-sm -translate-x-4',
+      )}
     >
       {entries.map((entry) => {
         const Icon = entry.icon;
@@ -263,7 +326,7 @@ function DropdownPanel({
           <Link
             key={entry.href}
             href={entry.href}
-            role="menuitem"
+            tabIndex={open ? 0 : -1}
             onClick={onNavigate}
             className="hover:bg-fog/40 group flex items-start gap-3 rounded-lg px-3 py-2 transition-colors"
           >

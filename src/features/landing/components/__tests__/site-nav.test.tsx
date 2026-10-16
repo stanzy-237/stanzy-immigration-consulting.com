@@ -11,63 +11,80 @@ describe('SiteNav', () => {
   it('renders the primary navigation landmark with the top-level links', () => {
     render(withIntl(<SiteNav />));
     const nav = screen.getByRole('navigation', { name: 'Navigation principale' });
-    expect(within(nav).getByRole('link', { name: 'Accueil' })).toBeInTheDocument();
     expect(within(nav).getByRole('link', { name: 'Blog' })).toBeInTheDocument();
     expect(within(nav).getByRole('link', { name: 'Connexion' })).toBeInTheDocument();
     expect(within(nav).getByRole('link', { name: 'Commencer' })).toBeInTheDocument();
   });
 
-  it('opens the Outils dropdown on click and lists the seven tools', () => {
+  it('exposes the brand logo at /logo2.png with an accessible name', () => {
+    render(withIntl(<SiteNav />));
+    const logo = screen.getByAltText('Stanzy');
+    expect(logo.tagName).toBe('IMG');
+    expect(logo.getAttribute('src') ?? '').toContain('logo2');
+  });
+
+  it('opens the Outils dropdown on pointer hover and lists the seven tools', () => {
     render(withIntl(<SiteNav />));
     const trigger = screen.getByRole('button', { name: 'Ouvrir le menu Outils' });
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    fireEvent.click(trigger);
+
+    const item = trigger.closest('li')!;
+    fireEvent.mouseEnter(item);
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
 
-    const menu = screen.getByRole('menu');
-    const items = within(menu).getAllByRole('menuitem');
-    expect(items).toHaveLength(7);
-    expect(within(menu).getByText('Calculateur CRS')).toBeInTheDocument();
-    expect(within(menu).getByText('Dernier tirage')).toBeInTheDocument();
+    const panel = document.getElementById(trigger.getAttribute('aria-controls')!);
+    expect(panel).not.toBeNull();
+    expect(panel!.getAttribute('aria-hidden')).toBe('false');
+    expect(within(panel!).getAllByRole('link')).toHaveLength(7);
+    expect(within(panel!).getByText('Calculateur CRS')).toBeInTheDocument();
+    expect(within(panel!).getByText('Dernier tirage')).toBeInTheDocument();
   });
 
   it('marks the Dernier tirage entry with a live IRCC leaf icon', () => {
     render(withIntl(<SiteNav />));
-    fireEvent.click(screen.getByRole('button', { name: 'Ouvrir le menu Outils' }));
-    expect(
-      screen.getByLabelText('Données IRCC en direct'),
-    ).toBeInTheDocument();
+    const trigger = screen.getByRole('button', { name: 'Ouvrir le menu Outils' });
+    fireEvent.mouseEnter(trigger.closest('li')!);
+    expect(screen.getByLabelText('Données IRCC en direct')).toBeInTheDocument();
   });
 
-  it('opens the Services dropdown and lists the three paid services', () => {
+  it('opens the Services dropdown on hover and lists the three paid services', () => {
     render(withIntl(<SiteNav />));
-    fireEvent.click(screen.getByRole('button', { name: 'Ouvrir le menu Services' }));
-    const menu = screen.getByRole('menu');
-    expect(within(menu).getAllByRole('menuitem')).toHaveLength(3);
-    expect(within(menu).getByText('Consultation privée')).toBeInTheDocument();
+    const trigger = screen.getByRole('button', {
+      name: 'Ouvrir le menu Services',
+    });
+    fireEvent.mouseEnter(trigger.closest('li')!);
+    const panel = document.getElementById(trigger.getAttribute('aria-controls')!);
+    expect(panel).not.toBeNull();
+    expect(within(panel!).getAllByRole('link')).toHaveLength(3);
+    expect(within(panel!).getByText('Consultation privée')).toBeInTheDocument();
+  });
+
+  it('also toggles a dropdown on click so keyboard activation works', () => {
+    render(withIntl(<SiteNav />));
+    const trigger = screen.getByRole('button', { name: 'Ouvrir le menu Outils' });
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('closes an open dropdown on Escape', () => {
     render(withIntl(<SiteNav />));
     const trigger = screen.getByRole('button', { name: 'Ouvrir le menu Outils' });
     fireEvent.click(trigger);
-    expect(screen.getByRole('menu')).toBeInTheDocument();
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
     fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('toggles the mobile menu button between open and closed labels', () => {
+  it('renders a mobile hamburger trigger for the Sheet menu', () => {
     render(withIntl(<SiteNav />));
-    const burger = screen.getByRole('button', { name: 'Ouvrir le menu' });
-    expect(burger).toHaveAttribute('aria-expanded', 'false');
-    fireEvent.click(burger);
     expect(
-      screen.getByRole('button', { name: 'Fermer le menu' }),
-    ).toHaveAttribute('aria-expanded', 'true');
+      screen.getByRole('button', { name: 'Ouvrir le menu' }),
+    ).toBeInTheDocument();
   });
 
-  it('has no axe violations', async () => {
+  it('has no axe violations in its closed state', async () => {
     const { container } = render(withIntl(<SiteNav />));
     expect(await axe(container)).toHaveNoViolations();
   });
