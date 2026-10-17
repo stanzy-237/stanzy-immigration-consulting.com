@@ -41,6 +41,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install ffmpeg (needed for thumbnail conversion + mp4 remux)
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
       - name: Install yt-dlp (latest) + curl-cffi impersonation
         # curl-cffi lets yt-dlp mimic a real browser's TLS fingerprint,
         # which TikTok's edge now requires on anonymous requests.
