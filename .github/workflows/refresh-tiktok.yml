@@ -27,11 +27,14 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install upload-script dependency
+        # The upload script only needs @vercel/blob; skip the full `npm ci`
+        # (which pulls dev deps + is sensitive to lockfile drift) and
+        # install the one package into a scratch node_modules.
+        run: npm install --no-save --prefix . @vercel/blob
 
       - name: Set up Python
         uses: actions/setup-python@v5
