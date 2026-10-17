@@ -1,12 +1,10 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, Eye, Play } from 'lucide-react';
+import { Eye, Play } from 'lucide-react';
 import Image from 'next/image';
 import {
   useCallback,
   useEffect,
-  useId,
-  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -36,19 +34,20 @@ const CARD_RADII: ReadonlyArray<string> = [
   'rounded-[20px_60px_20px_20px]',
 ] as const;
 
+// Active card advances every N ms once the carousel sits in the viewport.
+const AUTO_ADVANCE_MS = 5000;
+
 export function TikTokCarousel({
   videos,
   spinText,
   viewsLabel,
-  prevLabel,
-  nextLabel,
 }: TikTokCarouselProps): ReactNode {
   const scroller = useRef<HTMLUListElement | null>(null);
   const items = useRef<Array<HTMLLIElement | null>>([]);
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const groupId = useId();
+  const [inView, setInView] = useState<boolean>(false);
 
-  // Scroll the carousel so the given index is the leftmost card.
+  // Scroll the carousel so the given index becomes the active (centred) card.
   const scrollToIndex = useCallback((i: number): void => {
     const el = items.current[i];
     const container = scroller.current;
@@ -71,15 +70,17 @@ export function TikTokCarousel({
         const centre = container.scrollLeft + container.clientWidth / 2;
         let best = 0;
         let bestDist = Infinity;
-        items.current.forEach((el: HTMLLIElement | null, i: number): void => {
-          if (!el) return;
-          const mid = el.offsetLeft + el.offsetWidth / 2;
-          const d = Math.abs(mid - centre);
-          if (d < bestDist) {
-            bestDist = d;
-            best = i;
-          }
-        });
+        items.current.forEach(
+          (el: HTMLLIElement | null, i: number): void => {
+            if (!el) return;
+            const mid = el.offsetLeft + el.offsetWidth / 2;
+            const d = Math.abs(mid - centre);
+            if (d < bestDist) {
+              bestDist = d;
+              best = i;
+            }
+          },
+        );
         setActiveIndex(best);
       });
     };
@@ -90,84 +91,101 @@ export function TikTokCarousel({
     };
   }, []);
 
-  const prev = (): void => scrollToIndex(Math.max(0, activeIndex - 1));
-  const next = (): void => scrollToIndex(Math.min(videos.length - 1, activeIndex + 1));
+  // Only play / auto-advance while the carousel is in view.
+  useEffect(() => {
+    const container = scroller.current;
+    if (!container || typeof IntersectionObserver === 'undefined') {
+      setInView(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries): void => {
+        const entry = entries[0];
+        if (entry) setInView(entry.isIntersecting);
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(container);
+    return (): void => io.disconnect();
+  }, []);
 
-  const navDisabled = useMemo(
-    (): { prev: boolean; next: boolean } => ({
-      prev: activeIndex === 0,
-      next: activeIndex >= videos.length - 1,
-    }),
-    [activeIndex, videos.length],
-  );
+  // Auto-advance the active card every AUTO_ADVANCE_MS while visible.
+  useEffect(() => {
+    if (!inView || videos.length < 2) return;
+    const id = window.setInterval((): void => {
+      const nextIndex = (activeIndex + 1) % videos.length;
+      scrollToIndex(nextIndex);
+    }, AUTO_ADVANCE_MS);
+    return (): void => window.clearInterval(id);
+  }, [activeIndex, inView, scrollToIndex, videos.length]);
 
   return (
     <div className="relative">
-      {/* Controls */}
-      <div className="pointer-events-none absolute inset-y-0 -left-2 z-20 flex items-center max-md:hidden">
-        <button
-          type="button"
-          onClick={prev}
-          disabled={navDisabled.prev}
-          aria-label={prevLabel}
-          aria-controls={groupId}
-          className="bg-navy-deep text-white pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition-opacity disabled:opacity-30"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-      </div>
-      <div className="pointer-events-none absolute inset-y-0 -right-2 z-20 flex items-center max-md:hidden">
-        <button
-          type="button"
-          onClick={next}
-          disabled={navDisabled.next}
-          aria-label={nextLabel}
-          aria-controls={groupId}
-          className="bg-navy-deep text-white pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition-opacity disabled:opacity-30"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-      </div>
+      {/* Blurred edge masks on the left and right of the carousel. */}
+      <div
+        aria-hidden={true}
+        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 backdrop-blur-md"
+        style={{
+          WebkitMaskImage:
+            'linear-gradient(to right, black 0%, black 55%, transparent 100%)',
+          maskImage:
+            'linear-gradient(to right, black 0%, black 55%, transparent 100%)',
+        }}
+      />
+      <div
+        aria-hidden={true}
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 backdrop-blur-md"
+        style={{
+          WebkitMaskImage:
+            'linear-gradient(to left, black 0%, black 55%, transparent 100%)',
+          maskImage:
+            'linear-gradient(to left, black 0%, black 55%, transparent 100%)',
+        }}
+      />
 
       <ul
-        id={groupId}
         ref={scroller}
         aria-live="polite"
         className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
-        {videos.map((v: TikTokVideoMeta, i: number): ReactNode => (
-          <li
-            key={v.key}
-            ref={(el: HTMLLIElement | null): void => {
-              items.current[i] = el;
-            }}
-            className="snap-center shrink-0 basis-full sm:basis-1/2 lg:basis-[calc(33.333%-11px)]"
-          >
-            <TikTokCard
-              video={v}
-              active={i === activeIndex}
-              radiusClass={CARD_RADII[i] ?? CARD_RADII[0]}
-              spinText={spinText}
-              viewsLabel={viewsLabel}
-            />
-          </li>
-        ))}
+        {videos.map(
+          (v: TikTokVideoMeta, i: number): ReactNode => (
+            <li
+              key={v.key}
+              ref={(el: HTMLLIElement | null): void => {
+                items.current[i] = el;
+              }}
+              className="snap-center shrink-0 basis-full sm:basis-1/2 lg:basis-[calc(33.333%-11px)]"
+            >
+              <TikTokCard
+                video={v}
+                active={i === activeIndex}
+                shouldPlay={i === activeIndex && inView}
+                radiusClass={CARD_RADII[i] ?? CARD_RADII[0]}
+                spinText={spinText}
+                viewsLabel={viewsLabel}
+              />
+            </li>
+          ),
+        )}
       </ul>
 
       {/* Mobile dot indicators */}
-      <div className="mt-5 flex justify-center gap-1.5 md:hidden">
-        {videos.map((v: TikTokVideoMeta, i: number): ReactNode => (
-          <button
-            key={v.key}
-            type="button"
-            onClick={(): void => scrollToIndex(i)}
-            aria-label={`${i + 1}`}
-            className={cn(
-              'h-1.5 rounded-full transition-all',
-              i === activeIndex ? 'bg-rouge w-6' : 'bg-navy-deep/20 w-2',
-            )}
-          />
-        ))}
+      <div className="mt-5 flex justify-center gap-1.5">
+        {videos.map(
+          (v: TikTokVideoMeta, i: number): ReactNode => (
+            <button
+              key={v.key}
+              type="button"
+              onClick={(): void => scrollToIndex(i)}
+              aria-label={`${i + 1}`}
+              className={cn(
+                'h-1.5 rounded-full transition-all',
+                i === activeIndex ? 'bg-rouge w-6' : 'bg-navy-deep/20 w-2',
+              )}
+            />
+          ),
+        )}
       </div>
     </div>
   );
@@ -176,6 +194,7 @@ export function TikTokCarousel({
 type TikTokCardProps = {
   video: TikTokVideoMeta;
   active: boolean;
+  shouldPlay: boolean;
   radiusClass: string;
   spinText: string;
   viewsLabel: string;
@@ -184,37 +203,30 @@ type TikTokCardProps = {
 function TikTokCard({
   video,
   active,
+  shouldPlay,
   radiusClass,
   spinText,
   viewsLabel,
 }: TikTokCardProps): ReactNode {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Play the active card with sound; mute and pause the rest. Browsers
-  // block unmuted autoplay without a user gesture, so we fall back to
-  // muted autoplay and expose a mute toggle on the card.
+  // Always muted on load; the active in-view card plays, the rest pause.
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
-    if (active) {
-      el.muted = false;
+    el.muted = true;
+    if (shouldPlay) {
       const started = el.play();
       if (started && typeof started.catch === 'function') {
         started.catch((): void => {
-          // Unmuted autoplay refused — retry muted so at least the frames play.
-          el.muted = true;
-          const muted = el.play();
-          if (muted && typeof muted.catch === 'function') {
-            muted.catch((): void => {});
-          }
+          // Autoplay refused — leave the poster showing.
         });
       }
     } else {
-      el.muted = true;
       el.pause();
       el.currentTime = 0;
     }
-  }, [active]);
+  }, [shouldPlay]);
 
   const views = formatViews(video.views);
   const title = video.title || video.description || 'TikTok';
@@ -237,10 +249,10 @@ function TikTokCard({
           ref={videoRef}
           src={video.playUrl}
           poster={video.cover}
-          muted={!active}
+          muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
@@ -253,7 +265,6 @@ function TikTokCard({
           className="object-cover"
         />
       )}
-
       <div
         aria-hidden={true}
         className="absolute inset-0 bg-gradient-to-t from-navy-deep/[0.88] via-navy-deep/20 to-transparent"

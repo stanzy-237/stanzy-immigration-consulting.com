@@ -32,4 +32,18 @@ if (typeof window !== 'undefined') {
     }
     (window as unknown as { ResizeObserver: typeof RO }).ResizeObserver = RO;
   }
+  if (!('IntersectionObserver' in window)) {
+    class IO {
+      observe(): void {}
+      unobserve(): void {}
+      disconnect(): void {}
+      takeRecords(): IntersectionObserverEntry[] {
+        return [];
+      }
+      root = null;
+      rootMargin = '';
+      thresholds = [];
+    }
+    (window as unknown as { IntersectionObserver: typeof IO }).IntersectionObserver = IO;
+  }
 }

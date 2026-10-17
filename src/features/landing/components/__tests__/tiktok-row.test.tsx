@@ -47,7 +47,7 @@ describe('TikTokCarousel', () => {
     expect(metas).toHaveLength(6);
   });
 
-  it('exposes Prev / Next controls that are keyboard reachable', () => {
+  it('exposes a dot indicator per video that scrolls to it on click', () => {
     render(
       <TikTokCarousel
         videos={metas}
@@ -57,12 +57,10 @@ describe('TikTokCarousel', () => {
         nextLabel="Next"
       />,
     );
-    const next = screen.getByRole('button', { name: 'Next' });
-    const prev = screen.getByRole('button', { name: 'Previous' });
-    expect(next).toBeInTheDocument();
-    expect(prev).toBeInTheDocument();
-    // Clicking Next should not throw even when scrollTo is unavailable in jsdom.
-    expect(() => fireEvent.click(next)).not.toThrow();
+    for (let i = 0; i < metas.length; i += 1) {
+      const dot = screen.getByRole('button', { name: `${i + 1}` });
+      expect(() => fireEvent.click(dot)).not.toThrow();
+    }
   });
 
   it('autoplays the active card by rendering an inline muted <video>', () => {
