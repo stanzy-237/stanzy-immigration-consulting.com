@@ -148,7 +148,7 @@ export function TikTokCarousel({
         )}
       </ul>
 
-      {/* Mobile dot indicators */}
+      {/* Dot indicators; the active one fills gradually across 5s. */}
       <div className="mt-5 flex justify-center gap-1.5">
         {videos.map(
           (v: TikTokVideoMeta, i: number): ReactNode => (
@@ -158,13 +158,30 @@ export function TikTokCarousel({
               onClick={(): void => scrollToIndex(i)}
               aria-label={`${i + 1}`}
               className={cn(
-                'h-1.5 rounded-full transition-all',
-                i === activeIndex ? 'bg-rouge w-6' : 'bg-navy-deep/20 w-2',
+                'bg-navy-deep/20 relative h-1.5 overflow-hidden rounded-full transition-all',
+                i === activeIndex ? 'w-6' : 'w-2',
               )}
-            />
+            >
+              {i === activeIndex ? (
+                <span
+                  key={`fill-${activeIndex}`}
+                  aria-hidden={true}
+                  className="bg-rouge absolute inset-y-0 left-0 origin-left"
+                  style={{
+                    width: '100%',
+                    animation: inView
+                      ? `tt-dot-fill ${AUTO_ADVANCE_MS}ms linear forwards`
+                      : 'none',
+                    transform: 'scaleX(0)',
+                  }}
+                />
+              ) : null}
+            </button>
           ),
         )}
       </div>
+
+      <style>{`@keyframes tt-dot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }`}</style>
     </div>
   );
 }
