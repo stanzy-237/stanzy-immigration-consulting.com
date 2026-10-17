@@ -121,28 +121,6 @@ export function TikTokCarousel({
 
   return (
     <div className="relative">
-      {/* Blurred edge masks on the left and right of the carousel. */}
-      <div
-        aria-hidden={true}
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 backdrop-blur-md"
-        style={{
-          WebkitMaskImage:
-            'linear-gradient(to right, black 0%, black 55%, transparent 100%)',
-          maskImage:
-            'linear-gradient(to right, black 0%, black 55%, transparent 100%)',
-        }}
-      />
-      <div
-        aria-hidden={true}
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 backdrop-blur-md"
-        style={{
-          WebkitMaskImage:
-            'linear-gradient(to left, black 0%, black 55%, transparent 100%)',
-          maskImage:
-            'linear-gradient(to left, black 0%, black 55%, transparent 100%)',
-        }}
-      />
-
       <ul
         ref={scroller}
         aria-live="polite"
@@ -210,21 +188,28 @@ function TikTokCard({
 }: TikTokCardProps): ReactNode {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Always muted on load; the active in-view card plays, the rest pause.
+  // Loads muted; the active in-view card unmutes and plays, the rest
+  // pause and re-mute. If the browser refuses unmuted autoplay (no user
+  // gesture yet), fall back to muted autoplay so the frames still play.
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
-    el.muted = true;
     if (shouldPlay) {
+      el.muted = false;
       const started = el.play();
       if (started && typeof started.catch === 'function') {
         started.catch((): void => {
-          // Autoplay refused — leave the poster showing.
+          el.muted = true;
+          const retry = el.play();
+          if (retry && typeof retry.catch === 'function') {
+            retry.catch((): void => {});
+          }
         });
       }
     } else {
       el.pause();
       el.currentTime = 0;
+      el.muted = true;
     }
   }, [shouldPlay]);
 

@@ -36,10 +36,7 @@ export async function TikTokRow(): Promise<ReactNode> {
     : await loadFallbackMetas();
 
   return (
-    <section
-      aria-labelledby="tiktok-title"
-      className="bg-[#F7F8FC] px-7 py-20"
-    >
+    <section aria-labelledby="tiktok-title" className="px-7 py-20">
       <div className="mx-auto max-w-[1280px]">
         <header className="mb-14 flex items-start justify-between gap-10 max-lg:flex-col">
           <div className="basis-[55%]">
