@@ -58,7 +58,7 @@ export async function fetchTikTokMetadata(
     key: video.key,
     href: video.href,
     videoId: video.href.split('/').pop() ?? '',
-    cover: '',
+    cover: video.thumbnail,
     playUrl: null,
     title: '',
     description: '',

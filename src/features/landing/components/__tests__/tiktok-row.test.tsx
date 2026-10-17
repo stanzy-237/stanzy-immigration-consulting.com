@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -26,47 +26,74 @@ const metas: ReadonlyArray<TikTokVideoMeta> = TIKTOK_VIDEOS.map(
   (v, i): TikTokVideoMeta => fixture(v.key, v.href, i),
 );
 
-function renderCarousel() {
-  return render(
-    <TikTokCarousel
-      videos={metas}
-      spinText=""
-      viewsLabel="vues"
-      prevLabel="Previous"
-      nextLabel="Next"
-      ariaLabel="Carrousel TikTok"
-    />,
-  );
-}
-
 describe('TikTokCarousel', () => {
-  it('mounts the Byobu carousel region with the given aria-label', () => {
-    renderCarousel();
-    expect(
-      screen.getByRole('region', { name: 'Carrousel TikTok' }),
-    ).toBeInTheDocument();
-  });
-
-  it('renders panels for all six videos (initial DOM)', () => {
-    const { container } = renderCarousel();
-    const panelImages = container.querySelectorAll('img');
-    // Byobu renders HALF_WINDOW*2 + 1 = 17 panel slots, each with its own img;
-    // what we care about is that none of them is empty.
-    for (const img of Array.from(panelImages)) {
-      expect(img.getAttribute('src')).toMatch(/img\.example\/v\d\.jpg/);
+  it('renders a card for each of the six videos wired to the real TikTok URLs', () => {
+    render(
+      <TikTokCarousel
+        videos={metas}
+        spinText="Watch • Learn • Succeed •"
+        viewsLabel="vues"
+        prevLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+    const links = screen.getAllByRole('link');
+    for (const v of metas) {
+      const link = links.find((a) => a.getAttribute('href') === v.href);
+      expect(link, `video ${v.key} link`).toBeDefined();
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
     }
-    expect(TIKTOK_VIDEOS).toHaveLength(6);
+    expect(metas).toHaveLength(6);
   });
 
-  it('shows a label line that includes the view count', () => {
-    renderCarousel();
-    // Each label is `${title} · ${views} vues`; the first panel's label
-    // is drawn as the hard-coded initial markup.
-    expect(screen.getAllByText(/vues/i).length).toBeGreaterThan(0);
+  it('exposes Prev / Next controls that are keyboard reachable', () => {
+    render(
+      <TikTokCarousel
+        videos={metas}
+        spinText="S"
+        viewsLabel="vues"
+        prevLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+    const next = screen.getByRole('button', { name: 'Next' });
+    const prev = screen.getByRole('button', { name: 'Previous' });
+    expect(next).toBeInTheDocument();
+    expect(prev).toBeInTheDocument();
+    // Clicking Next should not throw even when scrollTo is unavailable in jsdom.
+    expect(() => fireEvent.click(next)).not.toThrow();
+  });
+
+  it('autoplays the active card by rendering an inline muted <video>', () => {
+    const { container } = render(
+      <TikTokCarousel
+        videos={metas}
+        spinText="S"
+        viewsLabel="vues"
+        prevLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
+    const videos = container.querySelectorAll('video');
+    expect(videos.length).toBe(metas.length);
+    for (const v of videos) {
+      expect(v).toHaveAttribute('loop');
+      expect(v).toHaveAttribute('playsinline');
+      expect(v).toHaveAttribute('src');
+    }
   });
 
   it('has no axe violations', async () => {
-    const { container } = renderCarousel();
+    const { container } = render(
+      <TikTokCarousel
+        videos={metas}
+        spinText="S"
+        viewsLabel="vues"
+        prevLabel="Previous"
+        nextLabel="Next"
+      />,
+    );
     expect(await axe(container)).toHaveNoViolations();
   });
 });

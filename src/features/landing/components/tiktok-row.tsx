@@ -89,7 +89,6 @@ export async function TikTokRow(): Promise<ReactNode> {
           viewsLabel={t('viewsLabel')}
           prevLabel={t('prev')}
           nextLabel={t('next')}
-          ariaLabel={t('eyebrow')}
         />
       </div>
     </section>
