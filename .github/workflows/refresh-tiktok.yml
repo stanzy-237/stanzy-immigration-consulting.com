@@ -41,13 +41,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install yt-dlp (latest)
-        run: pip install --upgrade yt-dlp
+      - name: Install yt-dlp (latest) + curl-cffi impersonation
+        # curl-cffi lets yt-dlp mimic a real browser's TLS fingerprint,
+        # which TikTok's edge now requires on anonymous requests.
+        run: pip install --upgrade "yt-dlp[default,curl-cffi]"
 
       - name: Download 6 latest videos + metadata
         run: |
           mkdir -p "$DUMP_DIR"
           yt-dlp \
+            --impersonate chrome \
             --playlist-items 1-6 \
             --write-info-json \
             --write-thumbnail \
