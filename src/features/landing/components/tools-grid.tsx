@@ -73,26 +73,28 @@ function ToolCard({
         <ArrowUpRight className="h-4 w-4 text-white" strokeWidth={2.5} />
       </span>
 
-      {/* "Gratuit" pill — top-right corner, hidden on featured and on hover
-          (the arrow puck takes its place). */}
-      {!isFeatured ? (
-        <span className="absolute right-5.5 top-5.5 rounded-full border border-[#EE8A93] bg-[#FCEDEF] px-2 py-0.75 font-sans text-[10px] font-bold uppercase tracking-[0.1em] text-rouge transition-opacity duration-150 group-hover:opacity-0">
-          {freeLabel}
+      {/* Icon + pill share a row: icon vertically centered on the left,
+          Gratuit pill flush to the top on the right. Pill fades on hover so
+          the arrow puck can take its place. Featured cards drop the pill
+          (arrow is always on) but keep the row for a stable icon rhythm. */}
+      <div className="mb-[18px] flex items-start justify-between">
+        <span
+          aria-hidden={true}
+          className={
+            'flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-xl transition-colors duration-200 ' +
+            (isFeatured
+              ? 'bg-rouge text-white group-hover:bg-rouge'
+              : 'bg-[#E8EDF5] text-navy-deep group-hover:bg-navy-deep group-hover:text-white')
+          }
+        >
+          <Icon className="h-[22px] w-[22px]" strokeWidth={2} />
         </span>
-      ) : null}
-
-      {/* Icon tile — colour swaps per state. */}
-      <span
-        aria-hidden={true}
-        className={
-          "mt-10 mb-[18px] flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 " +
-          (isFeatured
-            ? "bg-rouge text-white group-hover:bg-rouge"
-            : "bg-[#E8EDF5] text-navy-deep group-hover:bg-navy-deep group-hover:text-white")
-        }
-      >
-        <Icon className="h-[22px] w-[22px]" strokeWidth={2} />
-      </span>
+        {!isFeatured ? (
+          <span className="rounded-full border border-[#EE8A93] bg-[#FCEDEF] px-2 py-0.75 font-sans text-[10px] font-bold uppercase tracking-[0.1em] text-rouge transition-opacity duration-150 group-hover:opacity-0">
+            {freeLabel}
+          </span>
+        ) : null}
+      </div>
 
       {/* Name. Extra right padding reserves room for the arrow puck. */}
       <p
