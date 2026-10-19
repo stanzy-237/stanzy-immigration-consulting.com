@@ -3,6 +3,11 @@
     "title": "Stanzy — Canadian Immigration Consulting",
     "description": "Free Express Entry tools, a blog, and Canadian immigration consulting services."
   },
+  "ToolPlaceholder": {
+    "status": "In development",
+    "description": "This tool is on its way. We're polishing it so it genuinely delivers — hang tight, it'll be worth it.",
+    "back": "Back to home"
+  },
   "Home": {
     "title": "Stanzy",
     "tagline": "Your journey to Canada, guided.",

@@ -73,9 +73,10 @@ function ToolCard({
         <ArrowUpRight className="h-4 w-4 text-white" strokeWidth={2.5} />
       </span>
 
-      {/* "Gratuit" pill — hidden on featured. */}
+      {/* "Gratuit" pill — top-right corner, hidden on featured and on hover
+          (the arrow puck takes its place). */}
       {!isFeatured ? (
-        <span className="absolute left-5.5 top-5.5 rounded-full border border-[#EE8A93] bg-[#FCEDEF] px-2 py-0.75 font-sans text-[10px] font-bold uppercase tracking-[0.1em] text-rouge">
+        <span className="absolute right-5.5 top-5.5 rounded-full border border-[#EE8A93] bg-[#FCEDEF] px-2 py-0.75 font-sans text-[10px] font-bold uppercase tracking-[0.1em] text-rouge transition-opacity duration-150 group-hover:opacity-0">
           {freeLabel}
         </span>
       ) : null}

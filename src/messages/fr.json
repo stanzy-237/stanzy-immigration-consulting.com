@@ -3,6 +3,11 @@
     "title": "Stanzy — Conseil en immigration canadienne",
     "description": "Outils gratuits Entrée Express, blog et services de conseil en immigration canadienne."
   },
+  "ToolPlaceholder": {
+    "status": "En développement",
+    "description": "Cet outil arrive bientôt. Nous le polissons pour qu'il tienne vraiment ses promesses — un peu de patience, ça vaudra le coup.",
+    "back": "Retour à l'accueil"
+  },
   "Home": {
     "title": "Stanzy",
     "tagline": "Votre parcours vers le Canada, accompagné.",
