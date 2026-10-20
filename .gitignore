@@ -35,3 +35,9 @@ yarn-error.log*
 
 # prisma
 /prisma/*.db
+
+# Content creation workspace (drafts, visuals, blog ideation)
+/content/
+
+# Video engine build output for tracked examples
+/tools/video-engine/examples/*/build/

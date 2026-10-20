@@ -1,0 +1,18 @@
+{
+  "name": "stanzy-video-engine",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local engine that renders Stanzy animated 1080x1920 explainer videos from script.json + scenes.js + config.json",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node cli/check.js",
+    "preview": "node cli/preview.js",
+    "voice": "node cli/voice.js",
+    "video": "node cli/video.js",
+    "poses": "node cli/poses.js",
+    "test": "node --test \"test/**/*.test.js\" && python3 -m unittest discover -s python -p \"test_*.py\""
+  }
+}

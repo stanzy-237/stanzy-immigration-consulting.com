@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>{{FONTS}}</style>
+<style>{{STYLES}}</style>
+<style>
+  html, body { margin: 0; background: #1b2238; height: 100%; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; font-family: 'Inter', system-ui, sans-serif; }
+  #viewport { position: relative; overflow: hidden; flex-shrink: 0; }
+  #stage { transform-origin: 0 0; position: absolute; left: 0; top: 0; }
+  #controls { display: flex; align-items: center; gap: 12px; height: 62px; padding: 0 16px; color: #e8edf5; font-size: 14px; }
+  #controls button { background: #cc1627; color: #fff; border: 0; border-radius: 8px; padding: 8px 12px; font-weight: 700; cursor: pointer; min-width: 36px; }
+  #scene-jumps button { background: #1a3065; margin-right: 4px; }
+  #scrub { width: 320px; accent-color: #cc1627; }
+  body.frozen { background: transparent; }
+  body.frozen #controls, body.capture #controls { display: none; }
+  body.capture { background: transparent; overflow: hidden; }
+  body.capture #viewport { width: 1080px; height: 1920px; }
+</style>
+</head>
+<body class="{{BODY_CLASS}}">
+<div id="viewport">
+  <div id="stage">
+    <svg id="doodles" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+    <div id="scenes"></div>
+    <div id="cast"></div>
+    <div id="mascot"></div>
+    <div id="subs"></div>
+    <div id="signature"></div>
+  </div>
+</div>
+<div id="controls">
+  <button id="play">▶</button>
+  <input id="scrub" type="range" min="0" step="0.01" value="0">
+  <span id="time"></span>
+  <span id="scene-jumps"></span>
+</div>
+<audio id="voice" preload="auto"{{AUDIO_SRC}}></audio>
+<script>window.__PROJECT = {{PROJECT}};</script>
+<script>{{SCRIPTS}}</script>
+</body>
+</html>
