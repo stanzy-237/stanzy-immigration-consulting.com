@@ -4,7 +4,9 @@ import nextTypescript from 'eslint-config-next/typescript';
 /** @type {import('eslint').Linter.Config[]} */
 const eslintConfig = [
   {
-    ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'coverage/**'],
+    // tools/video-engine is a standalone package with its own tests (ADR 0003);
+    // content/ is the gitignored authoring workspace.
+    ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'coverage/**', 'tools/video-engine/**', 'content/**'],
   },
   ...nextCoreWebVitals,
   ...nextTypescript,

@@ -1,0 +1,14 @@
+{
+  "title": "Démo moteur — Entrée express",
+  "draft": true,
+  "voice": {"name": "fr-CA-ThierryNeural", "rate": "+6%"},
+  "pron": {},
+  "tags": {
+    "1": ["Le changement"],
+    "2": ["Ce qui change"],
+    "3": ["Votre plan"],
+    "4": ["À vous !", "#cc1627", "#ffffff"]
+  },
+  "poses": {"a": "wave", "b": "point", "c": "thumbs", "d": "shrug", "e": "think", "f": "point", "g": "both", "h": "wave"},
+  "music": {"mood": "upbeat", "volume": 0.22}
+}

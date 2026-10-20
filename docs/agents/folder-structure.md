@@ -28,6 +28,8 @@ src/
 └─ proxy.ts
 ```
 
+**Outside `src/`:** `tools/video-engine/` is a standalone content-production tool, not product code ([ADR 0003](../adr/0003-video-engine-as-standalone-tool.md)). Read its `AUTHORING.md` before writing a video.
+
 ## Feature folder
 
 Each product capability (landing page, CRS calculator, 67-points calculator, timeline, draws, blog, services, auth, …) is one feature folder:
