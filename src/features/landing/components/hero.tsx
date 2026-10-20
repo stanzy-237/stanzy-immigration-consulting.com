@@ -12,7 +12,8 @@ import { FloatingScoreCard } from '@/features/landing/components/floating-score-
 import { StatTile } from '@/features/landing/components/stat-tile';
 import { HERO_STATS, type HeroStat } from '@/features/landing/data/hero-stats';
 
-const WHATSAPP_HREF: string = 'https://wa.me/message/stanzycanada';
+const WHATSAPP_HREF: string =
+  'https://whatsapp.com/channel/0029Vb2Xp2F1CYoJfufA4c2R';
 const CONSULTATION_HREF: string = '/services/consultation';
 // Pixel-perfect hero image taken from the MagicPath design.
 const HERO_IMAGE_SRC: string =
