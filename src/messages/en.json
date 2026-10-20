@@ -3,6 +3,19 @@
     "title": "Stanzy — Canadian Immigration Consulting",
     "description": "Free Express Entry tools, a blog, and Canadian immigration consulting services."
   },
+  "BlogPlaceholder": {
+    "status": "In development",
+    "title": "The blog is on its way",
+    "listingDescription": "We're preparing clear, practical, no-jargon articles to walk you through every step of your Express Entry. Check back soon.",
+    "articleDescription": "This article is being written. We're polishing it so it genuinely delivers — hang tight, it'll be worth it.",
+    "unknownSlug": "The URL “{slug}” doesn't match any article yet.",
+    "back": "Back to home"
+  },
+  "ToolPlaceholder": {
+    "status": "In development",
+    "description": "This tool is on its way. We're polishing it so it genuinely delivers — hang tight, it'll be worth it.",
+    "back": "Back to home"
+  },
   "Home": {
     "title": "Stanzy",
     "tagline": "Your journey to Canada, guided.",
@@ -60,6 +73,221 @@
       "prev": "Previous video",
       "next": "Next video"
     },
+    "ToolsGrid": {
+      "eyebrow": "Free Tools",
+      "titleLead": "Your immigration tools.",
+      "titleAccent": "100% free.",
+      "subtitle": "Seven tools built to simplify your Express Entry journey. No sign-up required.",
+      "footerLead": "7 tools",
+      "footerTail": " available · No sign-up · 100% free",
+      "cardAriaLabel": "Open the {name} tool",
+      "Items": {
+        "timelineName": "Immigration Timeline",
+        "timelineDesc": "Visualise every step of your journey to Permanent Residence. From profile to ITA, including the draw.",
+        "cloudsName": "Clouds",
+        "cloudsDesc": "Cloud-style analysis of your profile. Spot your strengths and areas to improve to maximise your CRS score.",
+        "itaName": "ITA countdown",
+        "itaDesc": "Got your ITA? You have 60 days. Our countdown walks you through every step so you miss nothing.",
+        "fswName": "67-point calculator",
+        "fswDesc": "Instantly assess your eligibility for the Federal Skilled Worker Program. Enter your age, education, experience and language scores to see your score.",
+        "crsName": "CRS calculator",
+        "crsDesc": "Compute your Comprehensive Ranking System score. Compare it to the latest draws and estimate your chances of an invitation.",
+        "drawName": "Latest Express Entry draw",
+        "drawDesc": "Live results from the latest IRCC draw. Minimum score, invitation count, category and comparison with your profile.",
+        "cnpName": "NOC code lookup",
+        "cnpDesc": "Find the occupation code that matches your job. Essential for any Canadian immigration file."
+      },
+      "Badges": {
+        "free": "Free",
+        "freeLive": "Live",
+        "badgeExpressEntry": "Express Entry",
+        "badgeRpCanada": "Canadian PR",
+        "badgeCrsProfile": "CRS Profile",
+        "badgeAnalysis": "Analysis",
+        "badge60Days": "60 Days",
+        "badgeIta": "ITA",
+        "badgeFswp": "FSWP",
+        "badgeEligibility": "Eligibility",
+        "badgeInstantScore": "Instant score",
+        "badgeCrs": "CRS",
+        "badgeDraw": "Draw",
+        "badgeIrccLive": "IRCC Live",
+        "badgeCompare": "Compare",
+        "badgeMapleExpressEntry": "🍁 Express Entry",
+        "badgeCnp2021": "NOC 2021",
+        "badgeTeer": "TEER"
+      }
+    },
+    "BlogRow": {
+      "eyebrow": "Blog & Resources",
+      "titleLead": "Expert advice,",
+      "titleAccent": "no jargon.",
+      "seeAll": "See all articles",
+      "readFull": "Read the article",
+      "read": "Read",
+      "readingMinutes": "{minutes} min read",
+      "readingMinutesShort": "{minutes} min",
+      "cardAriaLabel": "Open article: {title}",
+      "Categories": {
+        "catExpressEntry": "Express Entry",
+        "catDocuments": "Documents",
+        "catStrategy": "Strategy",
+        "catLanguage": "Language",
+        "catWes": "WES",
+        "catAdvice": "Advice"
+      },
+      "Articles": {
+        "article1Title": "How to maximise your CRS score in 90 days: the full 2024 guide",
+        "article1Excerpt": "Your CRS score drives your chances of landing an invitation. See the proven strategies to pick up points fast: language, studies, work, adaptability.",
+        "article1Alt": "Express Entry 2024",
+        "article2Title": "The 10 must-have documents for your ITA file",
+        "article2Alt": "Immigration documents",
+        "article3Title": "PNP vs Express Entry: which path in 2024?",
+        "article3Alt": "Canada visa",
+        "article4Title": "IELTS or TEF: which test for immigration?",
+        "article4Alt": "IELTS preparation",
+        "article5Title": "WES credential evaluation: process and timing",
+        "article5Alt": "WES evaluation",
+        "article6Title": "5 mistakes that get an Express Entry file rejected",
+        "article6Alt": "Mistakes to avoid"
+      }
+    },
+    "Draws": {
+      "eyebrow": "Official IRCC Draws",
+      "titleLead": "Latest Express Entry",
+      "titleRest": "draws",
+      "live": "Live data",
+      "subtitle": "Official results refreshed after each IRCC round.",
+      "ctaScore": "See the latest draws",
+      "latest": "Latest draw",
+      "roundLabel": "Round",
+      "stats": {
+        "invitations": "invitations",
+        "crsMin": "minimum CRS score",
+        "date": "draw date"
+      },
+      "tracker": {
+        "label": "Your score vs minimum",
+        "note": "72% of the minimum score",
+        "cta": "Improve my score →"
+      },
+      "cardStats": {
+        "crsMin": "CRS min.",
+        "invitations": "invitations"
+      },
+      "cardCta": "See details →",
+      "cat": {
+        "catAll": "All categories",
+        "catStem": "STEM",
+        "catCanExp": "Can. experience",
+        "catTransport": "Transport"
+      }
+    },
+    "ConsultationCta": {
+      "eyebrow": "Private consultation",
+      "titleLead": "Your file,",
+      "titleAccent": "our priority.",
+      "description": "A one-on-one session with a Stanzy expert to analyse your CRS profile, surface your strengths and define the best Express Entry strategy.",
+      "ctaBook": "Book a consultation",
+      "note": "About 2 minutes · 60-min video call · Confidential",
+      "noteBold": "2 minutes",
+      "imageAlt": "Stanzy immigration expert",
+      "badge": {
+        "title": "120+ supported",
+        "sub": "80% success rate",
+        "more": "+117"
+      }
+    },
+    "ServicesGrid": {
+      "eyebrow": "Our Services",
+      "titleLead": "Guidance at every",
+      "titleAccent": "stage.",
+      "subtitle": "Tailored services to maximise your chances of success, from prep to submission.",
+      "cardAriaLabel": "Open service: {name}",
+      "Items": {
+        "consultationName": "Private consultation",
+        "consultationDesc": "60 minutes with a Stanzy expert to analyse your CRS profile and set the best strategy.",
+        "accompagnementName": "Express Entry support",
+        "accompagnementDesc": "End-to-end support for your Express Entry application, from profile creation through to your Permanent Resident status.",
+        "verificationName": "Document review & submission",
+        "verificationDesc": "Full review and submission of your IRCC file. Every document checked before sending — zero errors, zero delay.",
+        "tcfName": "TCF Canada preparation",
+        "tcfDesc": "Prepare for the TCF Canada on our dedicated TCF Express Academy platform. Exercises, mock exams and personalised coaching.",
+        "tcfExternal": "tcf-express-academy.com",
+        "edeName": "Foreign credential evaluation",
+        "edeDesc": "Support for the official recognition of your diplomas in Canada. WES and IQUAS — available for candidates in Cameroon."
+      },
+      "Tags": {
+        "tagFollowUp": "Full follow-up",
+        "tagProfileToRp": "Profile → PR",
+        "tagDuration": "3-6 months",
+        "tagIrccReview": "IRCC review",
+        "tagZeroError": "Zero errors",
+        "tagSubmit": "Submission",
+        "tagTcf": "TCF Canada",
+        "tagOnline": "Online",
+        "tagTcfDomain": "tcf-express-academy.com",
+        "tagWes": "WES",
+        "tagIquas": "IQUAS",
+        "tagCameroonOnly": "🇨🇲 Cameroon only"
+      }
+    },
+    "WhyStanzy": {
+      "eyebrow": "Why Stanzy",
+      "title": "Why choose us?",
+      "subtitle": "Three reasons that set your immigration journey apart.",
+      "Items": {
+        "expertsName": "Experts, not interns",
+        "expertsDesc": "Every file is handled by a Stanzy expert who knows Express Entry inside out. No learning on your file — we know the IRCC rules cold.",
+        "expertsProof": "80% success rate",
+        "contactName": "One point of contact, start to finish",
+        "contactDesc": "You never explain your situation three times to three people. One expert carries your file from first consultation to ITA.",
+        "toolsName": "Free tools, always on",
+        "toolsDesc": "CRS calculator, ITA countdown, NOC lookup — all free, 24/7. No freemium, no catch."
+      }
+    },
+    "Subscribe": {
+      "eyebrow": "Stay in the loop",
+      "titleLead": "Get the latest",
+      "titleRest": "draws & articles.",
+      "body": "Stay on top of new blog posts and the latest Express Entry draws. No spam — only what matters for your file.",
+      "benefit1": "Live Express Entry draw alerts",
+      "benefit2": "New articles & guides every week",
+      "benefit3": "Strategic tips to lift your CRS",
+      "emailLabel": "Your email address",
+      "emailPlaceholder": "example@email.com",
+      "submit": "Get alerts →",
+      "or": "or",
+      "whatsappTitle": "Join the WhatsApp channel",
+      "whatsappSub": "Instant updates",
+      "privacy": "Your data stays private. One-click unsubscribe."
+    },
+    "Faq": {
+      "eyebrow": "FAQ",
+      "titleLead": "Your questions,",
+      "titleAccent": "our answers.",
+      "contactDesc": "Can't find the answer you're after? Reach out to us directly.",
+      "ctaContact": "Ask a question",
+      "Items": {
+        "q1": "What is Express Entry?",
+        "a1": "Express Entry is the online system Canada uses to manage permanent-residence applications through three programs: Federal Skilled Worker, Canadian Experience Class, and Federal Skilled Trades. Candidates are ranked by CRS score; the top ones receive an Invitation to Apply (ITA).",
+        "q2": "How is my CRS score calculated?",
+        "a2": "The CRS (Comprehensive Ranking System) score is based on your age, language level (French and/or English), education, work experience and family situation. Use our free CRS calculator to estimate it.",
+        "q3": "How long does Express Entry take?",
+        "a3": "Once you receive an ITA you have 60 days to submit a complete file. IRCC processing typically takes 6 months. The overall timeline depends on your upfront prep — our Timeline helps you plan every step.",
+        "q4": "Are Stanzy's services actually free?",
+        "a4": "Yes! All our online tools (CRS calculator, ITA countdown, 67-point calculator, NOC lookup, Timeline) are 100% free, no sign-up. Personal support, document review and consultation are paid.",
+        "q5": "What is WES and do I need it?",
+        "a5": "WES (World Education Services) is an organisation that officially evaluates and recognises foreign credentials in Canada. It is generally required for Federal Skilled Worker. We help you through the process, including IQUAS for candidates in Cameroon.",
+        "q6": "How do I prepare for TCF Canada?",
+        "a6": "TCF Canada measures your French in listening, reading, speaking and writing. Each score maps to NCLC levels that feed directly into your CRS. Our TCF Express Academy platform gets you ready with mock exams and personalised coaching."
+      }
+    },
+    "ServicePlaceholder": {
+      "status": "In development",
+      "description": "This service is being finalised. We're polishing it so it genuinely delivers — in the meantime, reach out to discuss.",
+      "back": "Back to home"
+    },
     "Hero": {
       "eyebrow": "Express Entry · Canada",
       "headlineLead": "Move to Canada",
@@ -67,7 +295,7 @@
       "headlineAccent": "Confidence.",
       "subtitle": "Access free tools, expert content and personal support to maximise your chances of success in Express Entry.",
       "ctaBook": "Book a consultation",
-      "ctaWhatsapp": "Join WhatsApp",
+      "ctaWhatsapp": "WhatsApp channel",
       "imageAlt": "Canadian immigration candidate celebrating success",
       "Stats": {
         "tools": "free tools",

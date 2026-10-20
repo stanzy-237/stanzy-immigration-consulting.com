@@ -275,29 +275,29 @@ function TikTokCard({
       {/* Top-left TikTok badge */}
       <span
         aria-hidden={true}
-        className="absolute left-3 top-3 flex h-[22px] w-[22px] items-center justify-center rounded-md bg-black/85 text-white"
+        className="absolute left-3 top-3 flex h-5 w-5 items-center justify-center rounded-md bg-black/85 text-white"
       >
-        <TikTokGlyph className="h-[13px] w-[13px]" />
+        <TikTokGlyph className="h-3.5 w-3.5" />
       </span>
 
       {/* Spinning badge only on the active playing card */}
       {active ? <SpinningBadge text={spinText} /> : null}
 
       {/* Bottom caption */}
-      <div className="absolute inset-x-0 bottom-0 px-[18px] pb-[18px] pt-4">
+      <div className="absolute inset-x-0 bottom-0 px-5 pb-5 pt-4">
         {views ? (
           <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-2.5 py-1 backdrop-blur-md">
             <Eye className="h-2.5 w-2.5 text-white" />
-            <span className="text-[11px] font-semibold text-white">
+            <span className="text-xs font-semibold text-white">
               {views} {viewsLabel}
             </span>
           </div>
         ) : null}
-        <p className="line-clamp-2 text-[14px] font-semibold leading-[1.35] text-white">
+        <p className="line-clamp-2 text-sm font-semibold leading-snug text-white">
           {title}
         </p>
         {tagList ? (
-          <p className="mt-1 text-[11px] text-white/60">{tagList}</p>
+          <p className="mt-1 text-xs text-white/60">{tagList}</p>
         ) : null}
       </div>
     </a>
@@ -308,11 +308,11 @@ function SpinningBadge({ text }: { text: string }): ReactNode {
   return (
     <span
       aria-hidden={true}
-      className="pointer-events-none absolute right-3.5 top-3.5 h-[72px] w-[72px]"
+      className="pointer-events-none absolute right-3.5 top-3.5 h-20 w-20"
     >
       <svg
         viewBox="0 0 72 72"
-        className="h-[72px] w-[72px]"
+        className="h-20 w-20"
         style={{ animation: 'tt-spin-text 10s linear infinite' }}
       >
         <defs>

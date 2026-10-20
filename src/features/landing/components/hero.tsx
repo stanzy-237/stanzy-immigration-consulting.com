@@ -12,7 +12,8 @@ import { FloatingScoreCard } from '@/features/landing/components/floating-score-
 import { StatTile } from '@/features/landing/components/stat-tile';
 import { HERO_STATS, type HeroStat } from '@/features/landing/data/hero-stats';
 
-const WHATSAPP_HREF: string = 'https://wa.me/message/stanzycanada';
+const WHATSAPP_HREF: string =
+  'https://whatsapp.com/channel/0029Vb2Xp2F1CYoJfufA4c2R';
 const CONSULTATION_HREF: string = '/services/consultation';
 // Pixel-perfect hero image taken from the MagicPath design.
 const HERO_IMAGE_SRC: string =
@@ -45,22 +46,22 @@ export function Hero(): ReactNode {
 
   return (
     <section aria-label={t('eyebrow')} className="bg-white px-7">
-      <div className="mx-auto flex min-h-[620px] max-w-[1280px] items-center gap-[60px] py-[60px] max-lg:flex-col max-lg:items-stretch max-lg:py-12">
+      <div className="mx-auto flex min-h-[620px] max-w-7xl items-center gap-16 py-16 max-lg:flex-col max-lg:items-stretch max-lg:py-12">
         {/* LEFT */}
         <div className="flex basis-[55%] flex-col max-lg:basis-auto">
           {/* Eyebrow pill */}
-          <div className="border-[#EE8A93] bg-[#FCEDEF] inline-flex w-fit items-center gap-2 rounded-full border px-3.5 py-[5px]">
+          <div className="border-rose bg-blush inline-flex w-fit items-center gap-2 rounded-full border px-3.5 py-1.5">
             <span
               aria-hidden={true}
-              className="bg-rouge h-1 w-[18px] shrink-0 rounded-full"
+              className="bg-rouge h-1 w-4 shrink-0 rounded-full"
             />
-            <span className="text-rouge text-[11px] font-semibold uppercase tracking-[0.13em]">
+            <span className="text-rouge text-xs font-semibold uppercase tracking-widest">
               {t('eyebrow')}
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="font-heading text-navy-deep mt-5 text-[clamp(38px,4.5vw,56px)] font-bold leading-[1.05] tracking-[-0.03em]">
+          <h1 className="font-heading text-navy-deep mt-5 text-[clamp(38px,4.5vw,56px)] font-bold leading-none tracking-tight">
             {t('headlineLead')}
             <br />
             {t('headlineRest')}{' '}
@@ -68,7 +69,7 @@ export function Hero(): ReactNode {
           </h1>
 
           {/* Subtitle */}
-          <p className="mt-4 max-w-[460px] text-[18px] leading-[1.65] text-[#4A5568]">
+          <p className="mt-4 max-w-md text-lg leading-relaxed text-slate">
             {t('subtitle')}
           </p>
 
@@ -77,12 +78,12 @@ export function Hero(): ReactNode {
             <Link
               href={CONSULTATION_HREF}
               onClick={handleBook}
-              className="bg-rouge hover:bg-[#D93344] inline-flex h-12 items-center gap-2.5 rounded-full pl-6 pr-2.5 font-heading text-[15px] font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(204,22,39,0.38)]"
+              className="bg-rouge hover:bg-crimson inline-flex h-12 items-center gap-2.5 rounded-full pl-6 pr-2.5 font-heading text-base font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(204,22,39,0.38)]"
             >
               {t('ctaBook')}
               <span
                 aria-hidden={true}
-                className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-white/[0.22]"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.22]"
               >
                 <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
               </span>
@@ -92,7 +93,7 @@ export function Hero(): ReactNode {
               target="_blank"
               rel="noopener noreferrer"
               onClick={handleWhatsapp}
-              className="border-[#CBD5E0] text-navy-deep hover:border-navy-deep inline-flex h-12 items-center gap-2 rounded-full border-[1.5px] bg-transparent px-[22px] text-[14px] font-semibold transition-all hover:bg-[#F7F8FC]"
+              className="border-fog text-navy-deep hover:border-navy-deep inline-flex h-12 items-center gap-2 rounded-full border-2 bg-transparent px-5 text-sm font-semibold transition-all hover:bg-off-white"
             >
               <WhatsAppGlyph />
               {t('ctaWhatsapp')}
@@ -106,7 +107,7 @@ export function Hero(): ReactNode {
                 {i > 0 ? (
                   <li
                     aria-hidden={true}
-                    className="mx-0 h-10 w-px shrink-0 bg-[#E2E8F0]"
+                    className="mx-0 h-10 w-px shrink-0 bg-fog-light"
                   />
                 ) : null}
                 <li

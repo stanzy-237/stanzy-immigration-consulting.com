@@ -97,7 +97,7 @@ export function SiteNav(): ReactNode {
       aria-label={t('ariaLabel')}
       className="bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-surface/80"
     >
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-4 py-2 md:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 md:px-6">
         <Link
           href="/"
           aria-label={t('brand')}
@@ -201,7 +201,15 @@ export function SiteNav(): ReactNode {
           />
           <SheetContent side="right" className="bg-surface w-80 p-0">
             <SheetHeader>
-              <SheetTitle>{t('brand')}</SheetTitle>
+              <SheetTitle className="flex items-center">
+                <Image
+                  src="/logo2.png"
+                  alt={t('brand')}
+                  width={502}
+                  height={468}
+                  className="h-10 w-auto"
+                />
+              </SheetTitle>
             </SheetHeader>
             <nav aria-label={t('ariaLabel')} className="flex flex-col pb-4">
               <MobileSection
@@ -283,7 +291,7 @@ function ActiveBar({ visible }: { visible: boolean }): ReactNode {
     <span
       aria-hidden={true}
       className={cn(
-        'bg-rouge pointer-events-none absolute inset-x-3 -bottom-[9px] h-0.5 rounded-full transition-opacity',
+        'bg-rouge pointer-events-none absolute inset-x-3 -bottom-2 h-0.5 rounded-full transition-opacity',
         visible ? 'opacity-100' : 'opacity-0',
       )}
     />

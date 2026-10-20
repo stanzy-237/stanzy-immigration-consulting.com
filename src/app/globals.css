@@ -29,8 +29,14 @@
   --white: #ffffff;
   --off-white: #f7f8fc;
   --fog: #cbd5e0;
+  --fog-light: #e2e8f0; /* soft borders */
   --slate: #4a5568;
+  --slate-mute: #9ca3af; /* placeholder-foreground */
   --ink: #0d1f4e;
+  --ink-deep: #080f26; /* footer chrome */
+
+  /* Third-party brand marks (used only on their own CTAs). */
+  --whatsapp: #25d366;
 
   --success: #2f855a;
   --success-foreground: #ffffff;
@@ -93,8 +99,12 @@
   --color-ice-blue: var(--ice-blue);
   --color-off-white: var(--off-white);
   --color-fog: var(--fog);
+  --color-fog-light: var(--fog-light);
   --color-slate: var(--slate);
+  --color-slate-mute: var(--slate-mute);
   --color-ink: var(--ink);
+  --color-ink-deep: var(--ink-deep);
+  --color-whatsapp: var(--whatsapp);
 
   /* Legacy brand aliases kept for existing scaffold code. */
   --color-bleu: var(--navy-deep);

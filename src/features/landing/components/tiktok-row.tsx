@@ -37,20 +37,20 @@ export async function TikTokRow(): Promise<ReactNode> {
 
   return (
     <section aria-labelledby="tiktok-title" className="px-7 py-20">
-      <div className="mx-auto max-w-[1280px]">
+      <div className="mx-auto max-w-7xl">
         <header className="mb-14 flex items-start justify-between gap-10 max-lg:flex-col">
           <div className="basis-[55%]">
-            <div className="mb-[18px] inline-flex items-center gap-[7px]">
+            <div className="mb-4 inline-flex items-center gap-2">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] bg-black text-white">
                 <TikTokGlyph className="h-4 w-4" />
               </span>
-              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#4A5568]">
+              <span className="text-xs font-semibold uppercase tracking-widest text-slate">
                 {t('eyebrow')}
               </span>
             </div>
             <h2
               id="tiktok-title"
-              className="font-heading text-navy-deep text-[clamp(32px,4vw,52px)] font-bold leading-[1.05] tracking-[-0.03em]"
+              className="font-heading text-navy-deep text-[clamp(32px,4vw,52px)] font-bold leading-none tracking-tight"
             >
               {t('titleLead')}{' '}
               <span className="text-rouge">{t('titleAccent')}</span>
@@ -59,16 +59,16 @@ export async function TikTokRow(): Promise<ReactNode> {
             </h2>
           </div>
           <div className="flex flex-1 flex-col items-start justify-end gap-5 pt-2">
-            <p className="max-w-[380px] text-[17px] leading-[1.65] text-[#4A5568]">
+            <p className="max-w-sm text-lg leading-relaxed text-slate">
               {t('subtitle')}
             </p>
             <a
               href={CHANNEL_HREF}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-navy-deep hover:bg-navy-80 inline-flex h-[46px] items-center gap-2.5 rounded-full pl-5 pr-2.5 font-heading text-[14px] font-bold text-white shadow-[0_4px_14px_rgba(13,31,78,0.2)] transition-all hover:-translate-y-[1px]"
+              className="bg-navy-deep hover:bg-navy-80 inline-flex h-11 items-center gap-2.5 rounded-full pl-5 pr-2.5 font-heading text-sm font-bold text-white shadow-[0_4px_14px_rgba(13,31,78,0.2)] transition-all hover:-translate-y-px"
             >
-              <TikTokGlyph className="h-[18px] w-[18px]" />
+              <TikTokGlyph className="h-4 w-4" />
               <span>{t('cta')}</span>
               <span
                 aria-hidden={true}

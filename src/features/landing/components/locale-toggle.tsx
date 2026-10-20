@@ -44,7 +44,7 @@ export function LocaleToggle({
               locale={locale}
               aria-current={isActive ? 'true' : undefined}
               className={cn(
-                'inline-flex min-w-[2.25rem] items-center justify-center rounded-full px-3 py-1 transition-colors',
+                'inline-flex min-w-9 items-center justify-center rounded-full px-3 py-1 transition-colors',
                 isActive
                   ? 'bg-navy-deep text-white'
                   : 'text-navy-deep/70 hover:text-navy-deep',

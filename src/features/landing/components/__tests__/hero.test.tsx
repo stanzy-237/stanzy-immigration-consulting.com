@@ -23,10 +23,13 @@ describe('Hero', () => {
     const book = screen.getByRole('link', { name: /Réserver une consultation/i });
     expect(book).toHaveAttribute('href', expect.stringContaining('/services/consultation'));
 
-    const whatsapp = screen.getByRole('link', { name: /Rejoindre WhatsApp/i });
+    const whatsapp = screen.getByRole('link', { name: /Cha[îi]ne WhatsApp/i });
     expect(whatsapp).toHaveAttribute('target', '_blank');
     expect(whatsapp).toHaveAttribute('rel', expect.stringContaining('noopener'));
-    expect(whatsapp).toHaveAttribute('href', expect.stringContaining('wa.me'));
+    expect(whatsapp).toHaveAttribute(
+      'href',
+      expect.stringContaining('whatsapp.com/channel/'),
+    );
   });
 
   it('fires analytics events when the CTAs are clicked', () => {
@@ -34,7 +37,7 @@ describe('Hero', () => {
     render(withIntl(<Hero />));
 
     fireEvent.click(screen.getByRole('link', { name: /Réserver une consultation/i }));
-    fireEvent.click(screen.getByRole('link', { name: /Rejoindre WhatsApp/i }));
+    fireEvent.click(screen.getByRole('link', { name: /Cha[îi]ne WhatsApp/i }));
 
     expect(spy).toHaveBeenCalledWith('hero.cta.book');
     expect(spy).toHaveBeenCalledWith('hero.cta.whatsapp');
