@@ -30,6 +30,7 @@ function LargeCard({
   cardAriaLabel,
   imageAlt,
 }: LargeCardProps): ReactNode {
+  
   return (
     <Link
       href={`/blog/${article.slug}`}
