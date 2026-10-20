@@ -14,7 +14,7 @@ export function WhyStanzy(): ReactNode {
   return (
     <section
       aria-labelledby="why-stanzy-title"
-      className="bg-[#F7F8FC] px-7 py-[88px]"
+      className="bg-white px-7 py-[88px]"
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="mb-10 max-w-[640px]">

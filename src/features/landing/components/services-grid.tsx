@@ -21,12 +21,12 @@ export function ServicesGrid(): ReactNode {
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="mb-12 max-w-[640px]">
-          <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#CBD5E0] bg-[#E8EDF5] px-3.5 py-[5px]">
+          <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#EE8A93] bg-[#FCEDEF] px-3.5 py-[5px]">
             <span
               aria-hidden={true}
-              className="h-1 w-[18px] shrink-0 self-center rounded-full bg-navy-deep"
+              className="h-1 w-[18px] shrink-0 self-center rounded-full bg-rouge"
             />
-            <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-navy-deep">
+            <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-rouge">
               {t('eyebrow')}
             </span>
           </div>

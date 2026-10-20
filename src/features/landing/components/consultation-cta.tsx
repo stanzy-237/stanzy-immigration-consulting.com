@@ -22,74 +22,78 @@ export function ConsultationCta(): ReactNode {
   return (
     <section
       aria-labelledby="consultation-cta-title"
-      className="bg-white px-7 py-[88px]"
+      className="bg-[#F7F8FC] px-7 py-[72px]"
     >
       <div className="mx-auto max-w-[1280px]">
-        <div className="relative grid overflow-hidden rounded-[28px] bg-navy-deep shadow-[0_18px_48px_rgba(13,31,78,0.18)] lg:grid-cols-2">
-          {/* Left */}
-          <div className="relative z-10 flex flex-col justify-center px-8 py-12 lg:px-14 lg:py-16">
-            <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3.5 py-[5px]">
+        {/* Card: 1fr + 420px columns on lg, stacked below.
+            White bg, soft shadow, 1.5px border, 24px radius — matches
+            `.sn-consult-card` in the MagicPath design. */}
+        <div className="grid overflow-hidden rounded-3xl border-[1.5px] border-[#E2E8F0] bg-white shadow-[0_4px_32px_rgba(13,31,78,0.09)] lg:grid-cols-[1fr_420px]">
+          {/* Left — copy + CTA */}
+          <div className="flex flex-col justify-center gap-0 px-7 py-9 md:px-14 md:py-14">
+            <div className="mb-5 inline-flex w-fit items-center gap-2">
               <span
                 aria-hidden={true}
-                className="h-1 w-[18px] shrink-0 rounded-full bg-rouge"
+                className="h-1 w-5 shrink-0 rounded-full bg-rouge"
               />
-              <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-white">
+              <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.15em] text-rouge">
                 {t('eyebrow')}
               </span>
             </div>
             <h2
               id="consultation-cta-title"
-              className="font-heading text-[clamp(34px,4vw,52px)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
+              className="font-heading text-[clamp(28px,3.5vw,44px)] font-bold leading-[1.08] tracking-[-0.03em] text-navy-deep"
             >
               {t('titleLead')}
               <br />
               <span className="text-rouge">{t('titleAccent')}</span>
             </h2>
-            <p className="mt-4 max-w-[480px] text-[16px] leading-[1.6] text-white/75">
+            <p className="mt-3.5 max-w-[440px] text-[16px] leading-[1.65] text-[#4A5568]">
               {t('description')}
             </p>
             <Link
               href="/services/consultation"
               onClick={handleBook}
-              className="mt-7 inline-flex h-12 w-fit items-center gap-3 rounded-full bg-rouge pl-6 pr-2.5 font-heading text-[15px] font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.35)] transition-all hover:-translate-y-[1px] hover:bg-[#D93344]"
+              className="mt-7 inline-flex h-[52px] w-fit items-center gap-2.5 rounded-full bg-rouge pl-[26px] pr-2.5 font-heading text-[15px] font-bold text-white shadow-[0_4px_16px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[2px] hover:bg-[#D93344] hover:shadow-[0_8px_24px_rgba(204,22,39,0.38)]"
             >
               {t('ctaBook')}
               <span
                 aria-hidden={true}
-                className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white/22"
+                className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white/22"
               >
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </span>
             </Link>
-            <p className="mt-5 text-[13px] text-white/60">{t('note')}</p>
+            <p className="mt-3.5 text-[13px] text-[#4A5568]">
+              {t('note')}
+            </p>
           </div>
 
-          {/* Right (image + badge) */}
-          <div className="relative hidden min-h-[420px] lg:block">
+          {/* Right — 420px image column with soft gradient bg behind + badge */}
+          <div className="relative min-h-[260px] overflow-hidden bg-[linear-gradient(135deg,#E8EDF5_0%,#FCEDEF_100%)] lg:min-h-full">
             <Image
               src={CONSULT_IMAGE_SRC}
               alt={t('imageAlt')}
               fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
+              sizes="(min-width: 1024px) 420px, 100vw"
+              className="object-cover object-top"
               unoptimized
             />
             <div
               aria-hidden={true}
-              className="absolute inset-0 bg-gradient-to-l from-transparent via-navy-deep/15 to-navy-deep/80"
+              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.15)_0%,transparent_40%)]"
             />
-            <div className="absolute bottom-7 right-7 rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-md">
-              <p className="font-heading text-[18px] font-bold text-white">
+            {/* Badge */}
+            <div className="absolute bottom-6 left-6 flex flex-col gap-1 rounded-xl bg-white/92 px-4 py-3 shadow-[0_4px_20px_rgba(13,31,78,0.15)] backdrop-blur-md">
+              <p className="font-heading text-[13px] font-bold text-navy-deep">
                 {tBadge('title')}
               </p>
-              <p className="mt-1 text-[13px] text-white/80">
-                {tBadge('sub')}
-              </p>
-              <div className="mt-3 flex items-center gap-[-10px]">
-                <span className="h-7 w-7 shrink-0 rounded-full border-2 border-white bg-[linear-gradient(135deg,#CC1627,#0D1F4E)]" />
-                <span className="-ml-2 h-7 w-7 shrink-0 rounded-full border-2 border-white bg-[linear-gradient(135deg,#0D1F4E,#CC1627)]" />
-                <span className="-ml-2 h-7 w-7 shrink-0 rounded-full border-2 border-white bg-[linear-gradient(135deg,#CC1627,#F59E0B)]" />
-                <span className="ml-2 text-[12px] font-semibold text-white/90">
+              <p className="text-[11px] text-[#4A5568]">{tBadge('sub')}</p>
+              <div className="mt-1.5 flex items-center">
+                <span className="h-[22px] w-[22px] rounded-full border-2 border-white bg-[linear-gradient(135deg,#0D1F4E,#CC1627)]" />
+                <span className="-ml-2 h-[22px] w-[22px] rounded-full border-2 border-white bg-[linear-gradient(135deg,#CC1627,#D93344)]" />
+                <span className="-ml-2 h-[22px] w-[22px] rounded-full border-2 border-white bg-[linear-gradient(135deg,#6B88B5,#0D1F4E)]" />
+                <span className="ml-1.5 self-center font-sans text-[10px] font-semibold text-[#4A5568]">
                   {tBadge('more')}
                 </span>
               </div>

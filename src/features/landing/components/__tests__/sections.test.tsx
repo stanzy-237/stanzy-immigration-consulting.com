@@ -19,10 +19,13 @@ describe('Draws', () => {
     expect(screen.getByText(/Tirage #343/)).toBeInTheDocument();
     expect(screen.getByText(/Tirage #342/)).toBeInTheDocument();
   });
-  it('exposes "Calculer mon score" linking to the CRS tool', () => {
+  it('exposes "Calculer mon score" linking to the latest draw tool', () => {
     render(withIntl(<Draws />));
     const link = screen.getByRole('link', { name: /Calculer mon score/i });
-    expect(link).toHaveAttribute('href', expect.stringContaining('/outils/crs'));
+    expect(link).toHaveAttribute(
+      'href',
+      expect.stringContaining('/outils/dernier-tirage'),
+    );
   });
 });
 
