@@ -24,13 +24,13 @@ export function Subscribe(): ReactNode {
   return (
     <section
       aria-labelledby="subscribe-title"
-      className="bg-[#F7F8FC] px-5 py-14 md:px-7 md:py-[88px]"
+      className="bg-off-white px-5 py-14 md:px-7 md:py-[88px]"
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           {/* Left: copy + benefits */}
           <div>
-            <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#CBD5E0] bg-[#E8EDF5] px-3.5 py-[5px]">
+            <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-fog bg-ice-blue px-3.5 py-[5px]">
               <span
                 aria-hidden={true}
                 className="h-1 w-[18px] shrink-0 self-center rounded-full bg-navy-deep"
@@ -47,7 +47,7 @@ export function Subscribe(): ReactNode {
               <br />
               <span className="text-rouge">{t('titleRest')}</span>
             </h2>
-            <p className="mt-4 max-w-[520px] text-[15px] leading-[1.65] text-[#4A5568]">
+            <p className="mt-4 max-w-[520px] text-[15px] leading-[1.65] text-slate">
               {t('body')}
             </p>
             <ul className="mt-6 space-y-2.5">
@@ -59,7 +59,7 @@ export function Subscribe(): ReactNode {
                   >
                     <span
                       aria-hidden={true}
-                      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#E8EDF5]"
+                      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ice-blue"
                     >
                       <Check
                         className="h-3 w-3 text-navy-deep"
@@ -74,7 +74,7 @@ export function Subscribe(): ReactNode {
           </div>
 
           {/* Right: form card */}
-          <div className="rounded-[24px] border-[1.5px] border-[#E2E8F0] bg-[#F7F8FC] p-8 shadow-[0_12px_32px_rgba(13,31,78,0.08)]">
+          <div className="rounded-[24px] border-[1.5px] border-fog-light bg-off-white p-8 shadow-[0_12px_32px_rgba(13,31,78,0.08)]">
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <label
                 htmlFor="subscribe-email"
@@ -89,20 +89,20 @@ export function Subscribe(): ReactNode {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('emailPlaceholder')}
-                className="h-12 rounded-full border-[1.5px] border-[#CBD5E0] bg-white px-5 text-[14px] text-navy-deep placeholder:text-[#9CA3AF] focus:border-navy-deep focus:outline-hidden"
+                className="h-12 rounded-full border-[1.5px] border-fog bg-white px-5 text-[14px] text-navy-deep placeholder:text-slate-mute focus:border-navy-deep focus:outline-hidden"
               />
               <button
                 type="submit"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-rouge px-5 font-heading text-[14px] font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[1px] hover:bg-[#D93344]"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-rouge px-5 font-heading text-[14px] font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[1px] hover:bg-crimson"
               >
                 {t('submit')}
               </button>
             </form>
 
-            <div className="my-5 flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#4A5568]">
-              <span className="h-px flex-1 bg-[#E2E8F0]" />
+            <div className="my-5 flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-slate">
+              <span className="h-px flex-1 bg-fog-light" />
               {t('or')}
-              <span className="h-px flex-1 bg-[#E2E8F0]" />
+              <span className="h-px flex-1 bg-fog-light" />
             </div>
 
             <a
@@ -129,7 +129,7 @@ export function Subscribe(): ReactNode {
                 <span className="block font-heading text-[14px] font-bold text-navy-deep">
                   {t('whatsappTitle')}
                 </span>
-                <span className="block text-[12px] text-[#4A5568]">
+                <span className="block text-[12px] text-slate">
                   {t('whatsappSub')}
                 </span>
               </span>
@@ -138,7 +138,7 @@ export function Subscribe(): ReactNode {
                 strokeWidth={2.5}
               />
             </a>
-            <p className="mt-4 text-[12px] text-[#4A5568]">{t('privacy')}</p>
+            <p className="mt-4 text-[12px] text-slate">{t('privacy')}</p>
           </div>
         </div>
       </div>

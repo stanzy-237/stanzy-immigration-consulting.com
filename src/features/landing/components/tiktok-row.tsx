@@ -44,7 +44,7 @@ export async function TikTokRow(): Promise<ReactNode> {
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] bg-black text-white">
                 <TikTokGlyph className="h-4 w-4" />
               </span>
-              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#4A5568]">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-slate">
                 {t('eyebrow')}
               </span>
             </div>
@@ -59,7 +59,7 @@ export async function TikTokRow(): Promise<ReactNode> {
             </h2>
           </div>
           <div className="flex flex-1 flex-col items-start justify-end gap-5 pt-2">
-            <p className="max-w-[380px] text-[17px] leading-[1.65] text-[#4A5568]">
+            <p className="max-w-[380px] text-[17px] leading-[1.65] text-slate">
               {t('subtitle')}
             </p>
             <a

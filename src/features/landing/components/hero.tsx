@@ -50,7 +50,7 @@ export function Hero(): ReactNode {
         {/* LEFT */}
         <div className="flex basis-[55%] flex-col max-lg:basis-auto">
           {/* Eyebrow pill */}
-          <div className="border-[#EE8A93] bg-[#FCEDEF] inline-flex w-fit items-center gap-2 rounded-full border px-3.5 py-[5px]">
+          <div className="border-rose bg-blush inline-flex w-fit items-center gap-2 rounded-full border px-3.5 py-[5px]">
             <span
               aria-hidden={true}
               className="bg-rouge h-1 w-[18px] shrink-0 rounded-full"
@@ -69,7 +69,7 @@ export function Hero(): ReactNode {
           </h1>
 
           {/* Subtitle */}
-          <p className="mt-4 max-w-[460px] text-[18px] leading-[1.65] text-[#4A5568]">
+          <p className="mt-4 max-w-[460px] text-[18px] leading-[1.65] text-slate">
             {t('subtitle')}
           </p>
 
@@ -78,7 +78,7 @@ export function Hero(): ReactNode {
             <Link
               href={CONSULTATION_HREF}
               onClick={handleBook}
-              className="bg-rouge hover:bg-[#D93344] inline-flex h-12 items-center gap-2.5 rounded-full pl-6 pr-2.5 font-heading text-[15px] font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(204,22,39,0.38)]"
+              className="bg-rouge hover:bg-crimson inline-flex h-12 items-center gap-2.5 rounded-full pl-6 pr-2.5 font-heading text-[15px] font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(204,22,39,0.38)]"
             >
               {t('ctaBook')}
               <span
@@ -93,7 +93,7 @@ export function Hero(): ReactNode {
               target="_blank"
               rel="noopener noreferrer"
               onClick={handleWhatsapp}
-              className="border-[#CBD5E0] text-navy-deep hover:border-navy-deep inline-flex h-12 items-center gap-2 rounded-full border-[1.5px] bg-transparent px-[22px] text-[14px] font-semibold transition-all hover:bg-[#F7F8FC]"
+              className="border-fog text-navy-deep hover:border-navy-deep inline-flex h-12 items-center gap-2 rounded-full border-[1.5px] bg-transparent px-[22px] text-[14px] font-semibold transition-all hover:bg-off-white"
             >
               <WhatsAppGlyph />
               {t('ctaWhatsapp')}
@@ -107,7 +107,7 @@ export function Hero(): ReactNode {
                 {i > 0 ? (
                   <li
                     aria-hidden={true}
-                    className="mx-0 h-10 w-px shrink-0 bg-[#E2E8F0]"
+                    className="mx-0 h-10 w-px shrink-0 bg-fog-light"
                   />
                 ) : null}
                 <li

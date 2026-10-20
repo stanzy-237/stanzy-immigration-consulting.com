@@ -38,7 +38,7 @@ export function SiteFooter(): ReactNode {
   return (
     <footer
       aria-label={t("ariaLabel")}
-      className="bg-[#080F26] text-white w-full border-t border-white/10"
+      className="bg-ink-deep text-white w-full border-t border-white/10"
     >
       <div className="mx-auto flex max-w-[1280px] flex-col gap-12 px-4 py-16 md:px-6">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12">

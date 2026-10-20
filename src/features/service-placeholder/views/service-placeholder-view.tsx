@@ -25,10 +25,10 @@ export function ServicePlaceholderView({
       <main>
         <section
           aria-labelledby="service-placeholder-title"
-          className="bg-[#F7F8FC] px-7 py-[120px]"
+          className="bg-off-white px-7 py-[120px]"
         >
           <div className="mx-auto flex max-w-[640px] flex-col items-center text-center">
-            <div className="mb-7 inline-flex items-center gap-[7px] rounded-full border-[1.5px] border-[#EE8A93] bg-[#FCEDEF] px-3.5 py-[5px]">
+            <div className="mb-7 inline-flex items-center gap-[7px] rounded-full border-[1.5px] border-rose bg-blush px-3.5 py-[5px]">
               <Hammer className="h-3 w-3 text-rouge" strokeWidth={2.5} />
               <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-rouge">
                 {t('status')}
@@ -46,7 +46,7 @@ export function ServicePlaceholderView({
             >
               {tItems(nameKey)}
             </h1>
-            <p className="mt-4 max-w-[520px] text-[17px] leading-[1.6] text-[#4A5568]">
+            <p className="mt-4 max-w-[520px] text-[17px] leading-[1.6] text-slate">
               {t('description')}
             </p>
             <Link

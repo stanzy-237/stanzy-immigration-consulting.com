@@ -11,7 +11,7 @@ function cardClasses(variant: Tool["variant"]): string {
   // (white bg, rounded 20px, 1.5px border #E2E8F0, 28px pad, hover lift).
   const base =
     "group relative isolate flex flex-col overflow-hidden rounded-[20px] bg-white p-7 no-underline transition-all duration-200 ease-out " +
-    "border-[1.5px] border-[#E2E8F0] " +
+    "border-[1.5px] border-fog-light " +
     "hover:-translate-y-1 hover:border-navy-deep hover:border-2 hover:shadow-[0_12px_36px_rgba(13,31,78,0.13)]";
   if (variant === "featured") {
     return (
@@ -84,13 +84,13 @@ function ToolCard({
             'flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-xl transition-colors duration-200 ' +
             (isFeatured
               ? 'bg-rouge text-white group-hover:bg-rouge'
-              : 'bg-[#E8EDF5] text-navy-deep group-hover:bg-navy-deep group-hover:text-white')
+              : 'bg-ice-blue text-navy-deep group-hover:bg-navy-deep group-hover:text-white')
           }
         >
           <Icon className="h-[22px] w-[22px]" strokeWidth={2} />
         </span>
         {!isFeatured ? (
-          <span className="rounded-full border border-[#EE8A93] bg-[#FCEDEF] px-2 py-0.75 font-sans text-[10px] font-bold uppercase tracking-[0.1em] text-rouge transition-opacity duration-150 group-hover:opacity-0">
+          <span className="rounded-full border border-rose bg-blush px-2 py-0.75 font-sans text-[10px] font-bold uppercase tracking-[0.1em] text-rouge transition-opacity duration-150 group-hover:opacity-0">
             {freeLabel}
           </span>
         ) : null}
@@ -109,7 +109,7 @@ function ToolCard({
       {/* Description. */}
       <p
         className={
-          "mt-2.5 flex-1 text-[14px] leading-[1.65] text-[#4A5568] " +
+          "mt-2.5 flex-1 text-[14px] leading-[1.65] text-slate " +
           (tool.variant === "wide" ? "max-w-[480px]" : "")
         }
       >
@@ -126,7 +126,7 @@ function ToolCard({
                 "inline-flex h-[26px] items-center gap-[5px] rounded-full px-2.5 font-sans text-[11px] font-semibold text-navy-deep transition-colors duration-150 " +
                 (isFeatured
                   ? "border border-[rgba(13,31,78,0.15)] bg-[rgba(13,31,78,0.07)]"
-                  : "border border-[#CBD5E0] bg-[#E8EDF5] group-hover:bg-[#F7F8FC]")
+                  : "border border-fog bg-ice-blue group-hover:bg-off-white")
               }
             >
               <span
@@ -150,11 +150,11 @@ export function ToolsGrid(): ReactNode {
   return (
     <section
       aria-labelledby="tools-grid-title"
-      className="bg-[#F7F8FC] px-5 py-14 md:px-7 md:py-[88px]"
+      className="bg-off-white px-5 py-14 md:px-7 md:py-[88px]"
     >
       <div className="mx-auto max-w-[1280px]">
         {/* Eyebrow pill — matches the Hero marker (short rouge line, vertically centered). */}
-        <div className="mb-[22px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#EE8A93] bg-[#FCEDEF] px-3.5 py-[5px]">
+        <div className="mb-[22px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-rose bg-blush px-3.5 py-[5px]">
           <span
             aria-hidden={true}
             className="h-1 w-[18px] shrink-0 self-center rounded-full bg-rouge"
@@ -175,7 +175,7 @@ export function ToolsGrid(): ReactNode {
         </h2>
 
         {/* Subtitle */}
-        <p className="mb-[52px] max-w-[520px] text-[17px] leading-[1.6] text-[#4A5568]">
+        <p className="mb-[52px] max-w-[520px] text-[17px] leading-[1.6] text-slate">
           {t("subtitle")}
         </p>
 
@@ -205,8 +205,8 @@ export function ToolsGrid(): ReactNode {
         </ul>
 
         {/* Footer line */}
-        <div className="mt-10 flex items-center justify-center border-t border-[#E2E8F0] pt-8 text-center">
-          <p className="text-[15px] text-[#4A5568]">
+        <div className="mt-10 flex items-center justify-center border-t border-fog-light pt-8 text-center">
+          <p className="text-[15px] text-slate">
             <strong className="font-semibold text-navy-deep">
               {t("footerLead")}
             </strong>

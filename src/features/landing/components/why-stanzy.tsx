@@ -35,7 +35,7 @@ export function WhyStanzy(): ReactNode {
           >
             {t('title')}
           </h2>
-          <p className="mt-3 text-[15px] leading-[1.6] text-[#4A5568]">
+          <p className="mt-3 text-[15px] leading-[1.6] text-slate">
             {t('subtitle')}
           </p>
         </div>
@@ -51,7 +51,7 @@ export function WhyStanzy(): ReactNode {
                     'flex h-full flex-col rounded-[20px] p-7 ' +
                     (featured
                       ? 'bg-navy-deep text-white shadow-[0_12px_32px_rgba(13,31,78,0.18)]'
-                      : 'border-[1.5px] border-[#E2E8F0] bg-white text-navy-deep')
+                      : 'border-[1.5px] border-fog-light bg-white text-navy-deep')
                   }
                 >
                   <span
@@ -60,7 +60,7 @@ export function WhyStanzy(): ReactNode {
                       'mb-5 flex h-14 w-14 items-center justify-center rounded-2xl ' +
                       (featured
                         ? 'bg-rouge/18 text-rouge'
-                        : 'bg-[#E8EDF5] text-navy-deep')
+                        : 'bg-ice-blue text-navy-deep')
                     }
                   >
                     <Icon className="h-7 w-7" strokeWidth={1.75} />
@@ -76,7 +76,7 @@ export function WhyStanzy(): ReactNode {
                   <p
                     className={
                       'mt-3 text-[14px] leading-[1.65] ' +
-                      (featured ? 'text-white/75' : 'text-[#4A5568]')
+                      (featured ? 'text-white/75' : 'text-slate')
                     }
                   >
                     {tItems(prop.descKey)}

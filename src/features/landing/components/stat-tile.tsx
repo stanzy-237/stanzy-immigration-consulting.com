@@ -28,7 +28,7 @@ export function StatTile({
       >
         {value}
       </span>
-      <span className="text-[0.8125rem] font-normal leading-tight text-[#4A5568]">
+      <span className="text-[0.8125rem] font-normal leading-tight text-slate">
         {label}
       </span>
     </div>

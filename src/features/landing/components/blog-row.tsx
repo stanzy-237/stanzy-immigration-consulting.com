@@ -36,7 +36,7 @@ function LargeCard({
       href={`/blog/${article.slug}`}
       aria-label={cardAriaLabel}
       className={
-        'group relative flex h-full w-full flex-col overflow-hidden rounded-[20px] border-[1.5px] border-[#E2E8F0] bg-white no-underline transition-all duration-200 ease-out ' +
+        'group relative flex h-full w-full flex-col overflow-hidden rounded-[20px] border-[1.5px] border-fog-light bg-white no-underline transition-all duration-200 ease-out ' +
         'hover:-translate-y-[3px] hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.10)]'
       }
     >
@@ -85,12 +85,12 @@ function LargeCard({
       >
         {/* Meta */}
         <div className="mb-3 flex items-center gap-2.5">
-          <span className="text-[12px] text-[#4A5568]">{article.date}</span>
+          <span className="text-[12px] text-slate">{article.date}</span>
           <span
             aria-hidden={true}
-            className="h-[3px] w-[3px] shrink-0 rounded-full bg-[#CBD5E0]"
+            className="h-[3px] w-[3px] shrink-0 rounded-full bg-fog"
           />
-          <span className="text-[12px] text-[#4A5568]">{reading}</span>
+          <span className="text-[12px] text-slate">{reading}</span>
         </div>
         {/* Title */}
         <h3
@@ -104,12 +104,12 @@ function LargeCard({
         {/* Excerpt — featured only, and hidden on mobile to match the
             compact rhythm of the other two large cards. */}
         {featured && excerpt ? (
-          <p className="mt-2.5 hidden flex-1 text-[14px] leading-[1.65] text-[#4A5568] md:block">
+          <p className="mt-2.5 hidden flex-1 text-[14px] leading-[1.65] text-slate md:block">
             {excerpt}
           </p>
         ) : null}
         {/* Footer */}
-        <div className="mt-[18px] flex items-center justify-between border-t border-[#E8EDF5] pt-4">
+        <div className="mt-[18px] flex items-center justify-between border-t border-ice-blue pt-4">
           <div className="flex items-center gap-2">
             <span
               aria-hidden={true}
@@ -117,7 +117,7 @@ function LargeCard({
             >
               {article.authorInitials}
             </span>
-            <span className="text-[12px] font-medium text-[#4A5568]">
+            <span className="text-[12px] font-medium text-slate">
               {article.authorName}
             </span>
           </div>
@@ -149,7 +149,7 @@ function SmallCard({
   return (
     <Link
       href={`/blog/${article.slug}`}
-      className="group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border-[1.5px] border-[#E2E8F0] bg-white p-4 no-underline transition-all duration-200 ease-out hover:-translate-y-[2px] hover:border-navy-deep hover:shadow-[0_8px_24px_rgba(13,31,78,0.09)]"
+      className="group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border-[1.5px] border-fog-light bg-white p-4 no-underline transition-all duration-200 ease-out hover:-translate-y-[2px] hover:border-navy-deep hover:shadow-[0_8px_24px_rgba(13,31,78,0.09)]"
     >
       {/* Left accent bar on hover */}
       <span
@@ -173,7 +173,7 @@ function SmallCard({
         <p className="mt-1 truncate text-[13px] font-semibold leading-[1.35] text-navy-deep transition-colors duration-150 group-hover:text-rouge">
           {title}
         </p>
-        <p className="mt-1 text-[11px] text-[#4A5568]">
+        <p className="mt-1 text-[11px] text-slate">
           {article.date} · {reading}
         </p>
       </div>
@@ -198,7 +198,7 @@ export function BlogRow(): ReactNode {
         {/* Header: eyebrow + title on the left, "See all" button on the right. */}
         <div className="mb-12 flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
           <div className="flex-1">
-            <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#CBD5E0] bg-[#E8EDF5] px-3.5 py-[5px]">
+            <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-fog bg-ice-blue px-3.5 py-[5px]">
               <span
                 aria-hidden={true}
                 className="h-1 w-[18px] shrink-0 self-center rounded-full bg-navy-deep"
@@ -219,7 +219,7 @@ export function BlogRow(): ReactNode {
           <div className="shrink-0 pb-1.5">
             <Link
               href="/blog"
-              className="group inline-flex h-[42px] items-center gap-2 rounded-full border-[1.5px] border-[#CBD5E0] bg-transparent pl-[18px] pr-2.5 font-sans text-[13px] font-semibold text-navy-deep no-underline transition-all duration-200 hover:border-navy-deep hover:bg-[#F7F8FC]"
+              className="group inline-flex h-[42px] items-center gap-2 rounded-full border-[1.5px] border-fog bg-transparent pl-[18px] pr-2.5 font-sans text-[13px] font-semibold text-navy-deep no-underline transition-all duration-200 hover:border-navy-deep hover:bg-off-white"
             >
               {t('seeAll')}
               <span

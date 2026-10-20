@@ -29,11 +29,11 @@ export function ToolPlaceholderView({
       <main>
         <section
           aria-labelledby="tool-placeholder-title"
-          className="bg-[#F7F8FC] px-7 py-[120px]"
+          className="bg-off-white px-7 py-[120px]"
         >
           <div className="mx-auto flex max-w-[640px] flex-col items-center text-center">
             {/* Status pill */}
-            <div className="mb-7 inline-flex items-center gap-[7px] rounded-full border-[1.5px] border-[#EE8A93] bg-[#FCEDEF] px-3.5 py-[5px]">
+            <div className="mb-7 inline-flex items-center gap-[7px] rounded-full border-[1.5px] border-rose bg-blush px-3.5 py-[5px]">
               <Hammer className="h-3 w-3 text-rouge" strokeWidth={2.5} />
               <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-rouge">
                 {t('status')}
@@ -60,12 +60,12 @@ export function ToolPlaceholderView({
             </h1>
 
             {/* Explainer copy */}
-            <p className="mt-4 max-w-[520px] text-[17px] leading-[1.6] text-[#4A5568]">
+            <p className="mt-4 max-w-[520px] text-[17px] leading-[1.6] text-slate">
               {t('description')}
             </p>
 
             {/* Tool-specific teaser */}
-            <p className="mt-3 max-w-[520px] text-[15px] italic leading-[1.6] text-[#4A5568]">
+            <p className="mt-3 max-w-[520px] text-[15px] italic leading-[1.6] text-slate">
               {tItems(tool.descKey)}
             </p>
 

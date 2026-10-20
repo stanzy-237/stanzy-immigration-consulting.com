@@ -21,7 +21,7 @@ export function ServicesGrid(): ReactNode {
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="mb-12 max-w-[640px]">
-          <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#EE8A93] bg-[#FCEDEF] px-3.5 py-[5px]">
+          <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-rose bg-blush px-3.5 py-[5px]">
             <span
               aria-hidden={true}
               className="h-1 w-[18px] shrink-0 self-center rounded-full bg-rouge"
@@ -38,7 +38,7 @@ export function ServicesGrid(): ReactNode {
             <br />
             <span className="text-rouge">{t('titleAccent')}</span>
           </h2>
-          <p className="mt-3 text-[15px] leading-[1.6] text-[#4A5568]">
+          <p className="mt-3 text-[15px] leading-[1.6] text-slate">
             {t('subtitle')}
           </p>
         </div>
@@ -58,7 +58,7 @@ export function ServicesGrid(): ReactNode {
             const content = (
               <>
                 {external && service.externalLabelKey ? (
-                  <span className="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full border border-[#CBD5E0] bg-[#F7F8FC] px-2 py-[3px] font-sans text-[10px] font-semibold text-[#4A5568]">
+                  <span className="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full border border-fog bg-off-white px-2 py-[3px] font-sans text-[10px] font-semibold text-slate">
                     <ExternalLink className="h-3 w-3" strokeWidth={2} />
                     {tItems(service.externalLabelKey)}
                   </span>
@@ -75,14 +75,14 @@ export function ServicesGrid(): ReactNode {
                 )}
                 <span
                   aria-hidden={true}
-                  className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#E8EDF5] text-navy-deep transition-colors duration-200 group-hover:bg-navy-deep group-hover:text-white"
+                  className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-ice-blue text-navy-deep transition-colors duration-200 group-hover:bg-navy-deep group-hover:text-white"
                 >
                   <Icon className="h-6 w-6" strokeWidth={2} />
                 </span>
                 <h3 className="font-heading text-[18px] font-bold leading-[1.3] text-navy-deep">
                   {name}
                 </h3>
-                <p className="mt-2.5 flex-1 text-[14px] leading-[1.65] text-[#4A5568]">
+                <p className="mt-2.5 flex-1 text-[14px] leading-[1.65] text-slate">
                   {tItems(service.descKey)}
                 </p>
                 <ul className="mt-5 flex flex-wrap items-center gap-1.5">
@@ -92,8 +92,8 @@ export function ServicesGrid(): ReactNode {
                       className={
                         'inline-flex h-[26px] items-center gap-[5px] rounded-full px-2.5 font-sans text-[11px] font-semibold ' +
                         (tag.variant === 'regional'
-                          ? 'border border-[#EE8A93] bg-[#FCEDEF] text-rouge'
-                          : 'border border-[#CBD5E0] bg-[#E8EDF5] text-navy-deep')
+                          ? 'border border-rose bg-blush text-rouge'
+                          : 'border border-fog bg-ice-blue text-navy-deep')
                       }
                     >
                       <span
@@ -107,7 +107,7 @@ export function ServicesGrid(): ReactNode {
               </>
             );
             const baseClass =
-              'group relative flex h-full flex-col overflow-hidden rounded-[20px] border-[1.5px] border-[#E2E8F0] bg-white p-7 no-underline transition-all duration-200 hover:-translate-y-1 hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.1)]';
+              'group relative flex h-full flex-col overflow-hidden rounded-[20px] border-[1.5px] border-fog-light bg-white p-7 no-underline transition-all duration-200 hover:-translate-y-1 hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.1)]';
             return (
               <li key={service.slug}>
                 {linkProps ? (

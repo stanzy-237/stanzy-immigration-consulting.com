@@ -11,7 +11,7 @@ import { Link } from '@/i18n/navigation';
 function categoryClasses(color: DrawCategoryColor): string {
   switch (color) {
     case 'red':
-      return 'bg-rouge/20 border-rouge/40 text-[#EE8A93]';
+      return 'bg-rouge/20 border-rouge/40 text-rose';
     case 'blue':
       return 'bg-[#3B82F6]/20 border-[#3B82F6]/40 text-[#93C5FD]';
     case 'green':
@@ -80,7 +80,7 @@ export function Draws(): ReactNode {
           </div>
           <Link
             href="/outils/dernier-tirage"
-            className="inline-flex h-11 shrink-0 items-center rounded-full bg-rouge px-5 font-heading text-[14px] font-bold text-white transition-colors hover:bg-[#D93344]"
+            className="inline-flex h-11 shrink-0 items-center rounded-full bg-rouge px-5 font-heading text-[14px] font-bold text-white transition-colors hover:bg-crimson"
           >
             {t('ctaScore')}
           </Link>

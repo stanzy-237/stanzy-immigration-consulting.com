@@ -42,7 +42,7 @@ export function Faq(): ReactNode {
           </p>
           <Link
             href="/services/consultation"
-            className="mt-6 inline-flex h-11 items-center gap-2 rounded-full border-[1.5px] border-rouge bg-rouge px-5 font-heading text-[14px] font-semibold text-white transition-all hover:-translate-y-[1px] hover:bg-[#D93344]"
+            className="mt-6 inline-flex h-11 items-center gap-2 rounded-full border-[1.5px] border-rouge bg-rouge px-5 font-heading text-[14px] font-semibold text-white transition-all hover:-translate-y-[1px] hover:bg-crimson"
           >
             {t('ctaContact')}
             <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
