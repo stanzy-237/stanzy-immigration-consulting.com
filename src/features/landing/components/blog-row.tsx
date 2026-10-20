@@ -100,9 +100,10 @@ function LargeCard({
         >
           {title}
         </h3>
-        {/* Excerpt — featured only. */}
+        {/* Excerpt — featured only, and hidden on mobile to match the
+            compact rhythm of the other two large cards. */}
         {featured && excerpt ? (
-          <p className="mt-2.5 flex-1 text-[14px] leading-[1.65] text-[#4A5568]">
+          <p className="mt-2.5 hidden flex-1 text-[14px] leading-[1.65] text-[#4A5568] md:block">
             {excerpt}
           </p>
         ) : null}
