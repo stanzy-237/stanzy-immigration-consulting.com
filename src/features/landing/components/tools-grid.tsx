@@ -153,11 +153,11 @@ export function ToolsGrid(): ReactNode {
       className="bg-[#F7F8FC] px-7 py-[88px]"
     >
       <div className="mx-auto max-w-[1280px]">
-        {/* Eyebrow pill */}
-        <div className="mb-[22px] inline-flex items-center gap-[7px] rounded-full border-[1.5px] border-[#EE8A93] bg-[#FCEDEF] px-3.5 py-[5px]">
+        {/* Eyebrow pill — matches the Hero marker (short rouge line, vertically centered). */}
+        <div className="mb-[22px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#EE8A93] bg-[#FCEDEF] px-3.5 py-[5px]">
           <span
             aria-hidden={true}
-            className="h-[7px] w-[7px] shrink-0 rounded-full bg-rouge"
+            className="h-1 w-[18px] shrink-0 self-center rounded-full bg-rouge"
           />
           <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-rouge">
             {t("eyebrow")}
