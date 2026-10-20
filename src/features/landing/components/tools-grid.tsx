@@ -10,7 +10,7 @@ function cardClasses(variant: Tool["variant"]): string {
   // Shared card chrome: pulled from `.sn-tc` in the MagicPath design
   // (white bg, rounded 20px, 1.5px border #E2E8F0, 28px pad, hover lift).
   const base =
-    "group relative isolate flex flex-col overflow-hidden rounded-2xl bg-white p-7 no-underline transition-all duration-200 ease-out " +
+    "group relative isolate flex h-full flex-col overflow-hidden rounded-2xl bg-white p-7 no-underline transition-all duration-200 ease-out " +
     "border-2 border-fog-light " +
     "hover:-translate-y-1 hover:border-navy-deep hover:border-2 hover:shadow-[0_12px_36px_rgba(13,31,78,0.13)]";
   if (variant === "featured") {
@@ -150,9 +150,9 @@ export function ToolsGrid(): ReactNode {
   return (
     <section
       aria-labelledby="tools-grid-title"
-      className="bg-off-white px-5 py-14 md:px-7 md:py-24"
+      className="bg-off-white px-5 py-14 md:px-7 md:py-24 lg:flex lg:min-h-screen lg:items-center lg:py-14"
     >
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl lg:flex lg:min-h-[calc(100vh-7rem)] lg:w-full lg:flex-col">
         {/* Eyebrow pill — matches the Hero marker (short rouge line, vertically centered). */}
         <div className="mb-5 inline-flex items-center gap-2 rounded-full border-2 border-rose bg-blush px-3.5 py-1.5">
           <span
@@ -175,17 +175,17 @@ export function ToolsGrid(): ReactNode {
         </h2>
 
         {/* Subtitle */}
-        <p className="mb-12 max-w-lg text-lg leading-relaxed text-slate">
+        <p className="mb-12 max-w-lg lg:mb-8 text-lg leading-relaxed text-slate">
           {t("subtitle")}
         </p>
 
         {/* Mosaic grid: 3-col desktop, 2-col ≥md, 1-col mobile. Wide cards span 2 cols at md+. */}
-        <ul className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:flex-1 lg:auto-rows-fr lg:grid-cols-3">
           {TOOLS.map(
             (tool: Tool): ReactNode => (
               <li
                 key={tool.slug}
-                className={tool.variant === "wide" ? "md:col-span-2" : ""}
+                className={tool.variant === "wide" ? "md:col-span-2 lg:h-full" : "lg:h-full"}
               >
                 <ToolCard
                   tool={tool}
@@ -205,7 +205,7 @@ export function ToolsGrid(): ReactNode {
         </ul>
 
         {/* Footer line */}
-        <div className="mt-10 flex items-center justify-center border-t border-fog-light pt-8 text-center">
+        <div className="mt-10 flex items-center justify-center border-t border-fog-light pt-8 lg:mt-8 lg:pt-6 text-center">
           <p className="text-base text-slate">
             <strong className="font-semibold text-navy-deep">
               {t("footerLead")}

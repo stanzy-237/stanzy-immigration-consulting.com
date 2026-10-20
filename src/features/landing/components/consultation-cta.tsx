@@ -28,10 +28,10 @@ export function ConsultationCta(): ReactNode {
         {/* Card: 1fr + 420px columns on lg, stacked below.
             White bg, soft shadow, 1.5px border, 24px radius — matches
             `.sn-consult-card` in the MagicPath design. */}
-        <div className="grid overflow-hidden rounded-3xl border-2 border-fog-light bg-white shadow-[0_4px_32px_rgba(13,31,78,0.09)] lg:grid-cols-[1fr_420px]">
+        <div className="grid overflow-hidden rounded-3xl border-2 border-fog-light bg-white shadow-[0_4px_32px_rgba(13,31,78,0.09)] lg:min-h-[600px] lg:grid-cols-[1fr_460px]">
           {/* Left — copy + CTA. On mobile: tighter padding, smaller CTA, centered note. */}
-          <div className="flex flex-col justify-center px-5 py-7 md:px-14 md:py-14">
-            <div className="mb-4 inline-flex w-fit items-center gap-2">
+          <div className="flex flex-col justify-center px-5 py-7 md:px-14 md:py-14 lg:px-16 lg:py-20">
+            <div className="mb-4 inline-flex w-fit items-center gap-2 lg:mb-7">
               <span
                 aria-hidden={true}
                 className="h-1 w-5 shrink-0 rounded-full bg-rouge"
@@ -42,19 +42,19 @@ export function ConsultationCta(): ReactNode {
             </div>
             <h2
               id="consultation-cta-title"
-              className="font-heading text-[clamp(26px,3.5vw,44px)] font-bold leading-none tracking-tight text-navy-deep"
+              className="font-heading text-[clamp(26px,3.5vw,44px)] font-bold leading-none tracking-tight text-navy-deep lg:leading-[1.08]"
             >
               {t('titleLead')}
               <br />
               <span className="text-rouge">{t('titleAccent')}</span>
             </h2>
-            <p className="mt-3 max-w-md text-base leading-relaxed text-slate md:text-base md:leading-relaxed">
+            <p className="mt-3 max-w-md text-base leading-relaxed text-slate md:text-base md:leading-relaxed lg:mt-7 lg:max-w-lg lg:text-lg lg:leading-loose">
               {t('description')}
             </p>
             <Link
               href="/services/consultation"
               onClick={handleBook}
-              className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-rouge px-5 font-heading text-sm font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-0.5 hover:bg-crimson hover:shadow-[0_8px_24px_rgba(204,22,39,0.38)] sm:w-fit sm:gap-2.5 sm:pl-6 sm:pr-2.5 md:h-12 md:text-base"
+              className="mt-6 lg:mt-10 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-rouge px-5 font-heading text-sm font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-0.5 hover:bg-crimson hover:shadow-[0_8px_24px_rgba(204,22,39,0.38)] sm:w-fit sm:gap-2.5 sm:pl-6 sm:pr-2.5 md:h-12 md:text-base"
             >
               {t('ctaBook')}
               <span
@@ -64,7 +64,7 @@ export function ConsultationCta(): ReactNode {
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </span>
             </Link>
-            <p className="mt-3 text-center text-xs leading-normal text-slate md:mt-3.5 md:text-left md:text-sm">
+            <p className="mt-3 text-center text-xs leading-normal text-slate md:mt-3.5 md:text-left md:text-sm lg:mt-5">
               {t('note')}
             </p>
           </div>
@@ -75,7 +75,7 @@ export function ConsultationCta(): ReactNode {
               src={CONSULT_IMAGE_SRC}
               alt={t('imageAlt')}
               fill
-              sizes="(min-width: 1024px) 420px, 100vw"
+              sizes="(min-width: 1024px) 460px, 100vw"
               className="object-cover object-top"
               unoptimized
             />
