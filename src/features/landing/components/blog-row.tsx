@@ -35,9 +35,8 @@ function LargeCard({
       href={`/blog/${article.slug}`}
       aria-label={cardAriaLabel}
       className={
-        'group relative flex flex-col overflow-hidden rounded-[20px] border-[1.5px] border-[#E2E8F0] bg-white no-underline transition-all duration-200 ease-out ' +
-        'hover:-translate-y-[3px] hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.10)] ' +
-        (featured ? 'lg:row-span-2' : '')
+        'group relative flex h-full w-full flex-col overflow-hidden rounded-[20px] border-[1.5px] border-[#E2E8F0] bg-white no-underline transition-all duration-200 ease-out ' +
+        'hover:-translate-y-[3px] hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.10)]'
       }
     >
       {/* Gradient top bar on hover */}
@@ -45,10 +44,11 @@ function LargeCard({
         aria-hidden={true}
         className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[3px] rounded-t-[20px] bg-[linear-gradient(90deg,#CC1627,#0D1F4E)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
       />
-      {/* Image wrap */}
+      {/* Image wrap — shrink-0 so the body gets any extra height the card
+          absorbs from the 2-row span. */}
       <div
         className={
-          'relative w-full overflow-hidden ' +
+          'relative w-full shrink-0 overflow-hidden ' +
           (featured ? 'h-[280px]' : 'h-[160px]')
         }
       >
