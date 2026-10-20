@@ -25,7 +25,7 @@ export function FloatingScoreCard(): ReactNode {
       style={{ animation: 'sn-float 4s ease-in-out infinite' }}
     >
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate">
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate">
           {t('tag')}
         </span>
         <span className="bg-blush text-rouge rounded-full px-2 py-0.5 text-[10px] font-semibold">
@@ -33,26 +33,26 @@ export function FloatingScoreCard(): ReactNode {
         </span>
       </div>
       <div className="mt-2 flex items-baseline gap-1">
-        <span className="font-heading text-navy-deep text-[32px] font-bold leading-none">
+        <span className="font-heading text-navy-deep text-3xl font-bold leading-none">
           {STUB_SCORE}
         </span>
-        <span className="text-[16px] font-medium text-slate mb-[2px]">
+        <span className="text-base font-medium text-slate mb-0.5">
           {t('unit')}
         </span>
       </div>
-      <p className="mt-[3px] text-xs text-slate">{t('sub')}</p>
+      <p className="mt-0.5 text-xs text-slate">{t('sub')}</p>
       <div className="my-2.5 h-px bg-ice-blue" aria-hidden={true} />
-      <div className="text-navy-deep flex items-center gap-1.5 text-[13px] font-medium">
+      <div className="text-navy-deep flex items-center gap-1.5 text-sm font-medium">
         <span
           aria-hidden={true}
-          className="h-2 w-2 shrink-0 rounded-full bg-[#22C55E]"
+          className="h-2 w-2 shrink-0 rounded-full bg-green-500"
         />
         {t('status')}
       </div>
       <Link
         href="/outils/crs"
         onClick={handleClick}
-        className="bg-navy-deep hover:bg-navy-80 mt-2.5 block w-full rounded-full px-4 py-2.5 text-center text-[13px] font-semibold text-white transition-colors"
+        className="bg-navy-deep hover:bg-navy-80 mt-2.5 block w-full rounded-full px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors"
       >
         {t('cta')}
       </Link>

@@ -22,13 +22,13 @@ export function ConsultationCta(): ReactNode {
   return (
     <section
       aria-labelledby="consultation-cta-title"
-      className="bg-off-white px-5 py-14 md:px-7 md:py-[72px]"
+      className="bg-off-white px-5 py-14 md:px-7 md:py-20"
     >
-      <div className="mx-auto max-w-[1280px]">
+      <div className="mx-auto max-w-7xl">
         {/* Card: 1fr + 420px columns on lg, stacked below.
             White bg, soft shadow, 1.5px border, 24px radius — matches
             `.sn-consult-card` in the MagicPath design. */}
-        <div className="grid overflow-hidden rounded-3xl border-[1.5px] border-fog-light bg-white shadow-[0_4px_32px_rgba(13,31,78,0.09)] lg:grid-cols-[1fr_420px]">
+        <div className="grid overflow-hidden rounded-3xl border-2 border-fog-light bg-white shadow-[0_4px_32px_rgba(13,31,78,0.09)] lg:grid-cols-[1fr_420px]">
           {/* Left — copy + CTA. On mobile: tighter padding, smaller CTA, centered note. */}
           <div className="flex flex-col justify-center px-5 py-7 md:px-14 md:py-14">
             <div className="mb-4 inline-flex w-fit items-center gap-2">
@@ -36,35 +36,35 @@ export function ConsultationCta(): ReactNode {
                 aria-hidden={true}
                 className="h-1 w-5 shrink-0 rounded-full bg-rouge"
               />
-              <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.15em] text-rouge">
+              <span className="font-sans text-xs font-semibold uppercase tracking-widest text-rouge">
                 {t('eyebrow')}
               </span>
             </div>
             <h2
               id="consultation-cta-title"
-              className="font-heading text-[clamp(26px,3.5vw,44px)] font-bold leading-[1.08] tracking-[-0.03em] text-navy-deep"
+              className="font-heading text-[clamp(26px,3.5vw,44px)] font-bold leading-none tracking-tight text-navy-deep"
             >
               {t('titleLead')}
               <br />
               <span className="text-rouge">{t('titleAccent')}</span>
             </h2>
-            <p className="mt-3 max-w-[440px] text-[15px] leading-[1.6] text-slate md:text-[16px] md:leading-[1.65]">
+            <p className="mt-3 max-w-md text-base leading-relaxed text-slate md:text-base md:leading-relaxed">
               {t('description')}
             </p>
             <Link
               href="/services/consultation"
               onClick={handleBook}
-              className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-rouge px-5 font-heading text-[13px] font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[2px] hover:bg-crimson hover:shadow-[0_8px_24px_rgba(204,22,39,0.38)] sm:w-fit sm:gap-2.5 sm:pl-[26px] sm:pr-2.5 md:h-[52px] md:text-[15px]"
+              className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-rouge px-5 font-heading text-sm font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-0.5 hover:bg-crimson hover:shadow-[0_8px_24px_rgba(204,22,39,0.38)] sm:w-fit sm:gap-2.5 sm:pl-6 sm:pr-2.5 md:h-12 md:text-base"
             >
               {t('ctaBook')}
               <span
                 aria-hidden={true}
-                className="hidden h-[30px] w-[30px] items-center justify-center rounded-full bg-white/22 sm:flex md:h-[34px] md:w-[34px]"
+                className="hidden h-7 w-7 items-center justify-center rounded-full bg-white/22 sm:flex md:h-9 md:w-9"
               >
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </span>
             </Link>
-            <p className="mt-3 text-center text-[11px] leading-[1.5] text-slate md:mt-3.5 md:text-left md:text-[13px]">
+            <p className="mt-3 text-center text-xs leading-normal text-slate md:mt-3.5 md:text-left md:text-sm">
               {t('note')}
             </p>
           </div>
@@ -85,14 +85,14 @@ export function ConsultationCta(): ReactNode {
             />
             {/* Badge */}
             <div className="absolute bottom-6 left-6 flex flex-col gap-1 rounded-xl bg-white/92 px-4 py-3 shadow-[0_4px_20px_rgba(13,31,78,0.15)] backdrop-blur-md">
-              <p className="font-heading text-[13px] font-bold text-navy-deep">
+              <p className="font-heading text-sm font-bold text-navy-deep">
                 {tBadge('title')}
               </p>
-              <p className="text-[11px] text-slate">{tBadge('sub')}</p>
+              <p className="text-xs text-slate">{tBadge('sub')}</p>
               <div className="mt-1.5 flex items-center">
-                <span className="h-[22px] w-[22px] rounded-full border-2 border-white bg-[linear-gradient(135deg,#0D1F4E,#CC1627)]" />
-                <span className="-ml-2 h-[22px] w-[22px] rounded-full border-2 border-white bg-[linear-gradient(135deg,#CC1627,#D93344)]" />
-                <span className="-ml-2 h-[22px] w-[22px] rounded-full border-2 border-white bg-[linear-gradient(135deg,#6B88B5,#0D1F4E)]" />
+                <span className="h-5 w-5 rounded-full border-2 border-white bg-[linear-gradient(135deg,#0D1F4E,#CC1627)]" />
+                <span className="-ml-2 h-5 w-5 rounded-full border-2 border-white bg-[linear-gradient(135deg,#CC1627,#D93344)]" />
+                <span className="-ml-2 h-5 w-5 rounded-full border-2 border-white bg-[linear-gradient(135deg,#6B88B5,#0D1F4E)]" />
                 <span className="ml-1.5 self-center font-sans text-[10px] font-semibold text-slate">
                   {tBadge('more')}
                 </span>

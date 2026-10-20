@@ -40,7 +40,7 @@ export function SiteFooter(): ReactNode {
       aria-label={t("ariaLabel")}
       className="bg-ink-deep text-white w-full border-t border-white/10"
     >
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-12 px-4 py-16 md:px-6">
+      <div className="mx-auto flex max-w-7xl flex-col gap-12 px-4 py-16 md:px-6">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12">
           {/* Brand column */}
           <div className="lg:col-span-4 flex flex-col gap-6">
@@ -204,7 +204,7 @@ type EyebrowProps = {
 
 function Eyebrow({ children, as: Tag = "h3" }: EyebrowProps): ReactNode {
   return (
-    <Tag className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/90">
+    <Tag className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-white/90">
       <span aria-hidden={true} className="bg-rouge h-0.5 w-6" />
       {children}
     </Tag>
@@ -277,7 +277,7 @@ function ContactRow({
 }: ContactRowProps): ReactNode {
   const body: ReactNode = (
     <div className="flex flex-col">
-      <span className="text-[0.68rem] font-semibold uppercase tracking-wider text-white/50">
+      <span className="text-xs font-semibold uppercase tracking-wider text-white/50">
         {label}
       </span>
       <span className="text-white/85 break-all">{value}</span>

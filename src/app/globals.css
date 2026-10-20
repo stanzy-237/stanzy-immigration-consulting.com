@@ -35,6 +35,9 @@
   --ink: #0d1f4e;
   --ink-deep: #080f26; /* footer chrome */
 
+  /* Third-party brand marks (used only on their own CTAs). */
+  --whatsapp: #25d366;
+
   --success: #2f855a;
   --success-foreground: #ffffff;
   --warning: #b7791f;
@@ -101,6 +104,7 @@
   --color-slate-mute: var(--slate-mute);
   --color-ink: var(--ink);
   --color-ink-deep: var(--ink-deep);
+  --color-whatsapp: var(--whatsapp);
 
   /* Legacy brand aliases kept for existing scaffold code. */
   --color-bleu: var(--navy-deep);

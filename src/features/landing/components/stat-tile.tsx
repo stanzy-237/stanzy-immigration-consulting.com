@@ -22,13 +22,13 @@ export function StatTile({
     <div className={cn('flex flex-col gap-1', className)}>
       <span
         className={cn(
-          'font-heading text-[2.25rem] font-bold leading-none tracking-tight',
+          'font-heading text-4xl font-bold leading-none tracking-tight',
           highlight ? 'text-rouge' : 'text-navy-deep',
         )}
       >
         {value}
       </span>
-      <span className="text-[0.8125rem] font-normal leading-tight text-slate">
+      <span className="text-sm font-normal leading-tight text-slate">
         {label}
       </span>
     </div>

@@ -24,30 +24,30 @@ export function Subscribe(): ReactNode {
   return (
     <section
       aria-labelledby="subscribe-title"
-      className="bg-off-white px-5 py-14 md:px-7 md:py-[88px]"
+      className="bg-off-white px-5 py-14 md:px-7 md:py-24"
     >
-      <div className="mx-auto max-w-[1280px]">
+      <div className="mx-auto max-w-7xl">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           {/* Left: copy + benefits */}
           <div>
-            <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-fog bg-ice-blue px-3.5 py-[5px]">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-fog bg-ice-blue px-3.5 py-1.5">
               <span
                 aria-hidden={true}
-                className="h-1 w-[18px] shrink-0 self-center rounded-full bg-navy-deep"
+                className="h-1 w-4 shrink-0 self-center rounded-full bg-navy-deep"
               />
-              <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-navy-deep">
+              <span className="font-sans text-xs font-semibold uppercase tracking-widest text-navy-deep">
                 {t('eyebrow')}
               </span>
             </div>
             <h2
               id="subscribe-title"
-              className="font-heading text-[clamp(30px,3.6vw,46px)] font-bold leading-[1.08] tracking-[-0.03em] text-navy-deep"
+              className="font-heading text-[clamp(30px,3.6vw,46px)] font-bold leading-none tracking-tight text-navy-deep"
             >
               {t('titleLead')}
               <br />
               <span className="text-rouge">{t('titleRest')}</span>
             </h2>
-            <p className="mt-4 max-w-[520px] text-[15px] leading-[1.65] text-slate">
+            <p className="mt-4 max-w-lg text-base leading-relaxed text-slate">
               {t('body')}
             </p>
             <ul className="mt-6 space-y-2.5">
@@ -55,7 +55,7 @@ export function Subscribe(): ReactNode {
                 (key: string): ReactNode => (
                   <li
                     key={key}
-                    className="flex items-start gap-2.5 text-[14px] text-navy-deep"
+                    className="flex items-start gap-2.5 text-sm text-navy-deep"
                   >
                     <span
                       aria-hidden={true}
@@ -74,11 +74,11 @@ export function Subscribe(): ReactNode {
           </div>
 
           {/* Right: form card */}
-          <div className="rounded-[24px] border-[1.5px] border-fog-light bg-off-white p-8 shadow-[0_12px_32px_rgba(13,31,78,0.08)]">
+          <div className="rounded-3xl border-2 border-fog-light bg-off-white p-8 shadow-[0_12px_32px_rgba(13,31,78,0.08)]">
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <label
                 htmlFor="subscribe-email"
-                className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-navy-deep"
+                className="font-sans text-xs font-semibold uppercase tracking-widest text-navy-deep"
               >
                 {t('emailLabel')}
               </label>
@@ -89,17 +89,17 @@ export function Subscribe(): ReactNode {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('emailPlaceholder')}
-                className="h-12 rounded-full border-[1.5px] border-fog bg-white px-5 text-[14px] text-navy-deep placeholder:text-slate-mute focus:border-navy-deep focus:outline-hidden"
+                className="h-12 rounded-full border-2 border-fog bg-white px-5 text-sm text-navy-deep placeholder:text-slate-mute focus:border-navy-deep focus:outline-hidden"
               />
               <button
                 type="submit"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-rouge px-5 font-heading text-[14px] font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[1px] hover:bg-crimson"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-rouge px-5 font-heading text-sm font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-px hover:bg-crimson"
               >
                 {t('submit')}
               </button>
             </form>
 
-            <div className="my-5 flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-slate">
+            <div className="my-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-widest text-slate">
               <span className="h-px flex-1 bg-fog-light" />
               {t('or')}
               <span className="h-px flex-1 bg-fog-light" />
@@ -110,11 +110,11 @@ export function Subscribe(): ReactNode {
               target="_blank"
               rel="noopener noreferrer"
               onClick={handleWhatsapp}
-              className="group flex items-center gap-3 rounded-2xl border-[1.5px] border-[#25D366] bg-white p-4 text-navy-deep no-underline transition-all hover:-translate-y-[1px] hover:bg-[#F0FDF4]"
+              className="group flex items-center gap-3 rounded-2xl border-2 border-whatsapp bg-white p-4 text-navy-deep no-underline transition-all hover:-translate-y-px hover:bg-green-50"
             >
               <span
                 aria-hidden={true}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-whatsapp text-white"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -126,10 +126,10 @@ export function Subscribe(): ReactNode {
                 </svg>
               </span>
               <span className="flex-1">
-                <span className="block font-heading text-[14px] font-bold text-navy-deep">
+                <span className="block font-heading text-sm font-bold text-navy-deep">
                   {t('whatsappTitle')}
                 </span>
-                <span className="block text-[12px] text-slate">
+                <span className="block text-xs text-slate">
                   {t('whatsappSub')}
                 </span>
               </span>
@@ -138,7 +138,7 @@ export function Subscribe(): ReactNode {
                 strokeWidth={2.5}
               />
             </a>
-            <p className="mt-4 text-[12px] text-slate">{t('privacy')}</p>
+            <p className="mt-4 text-xs text-slate">{t('privacy')}</p>
           </div>
         </div>
       </div>

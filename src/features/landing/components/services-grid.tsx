@@ -17,28 +17,28 @@ export function ServicesGrid(): ReactNode {
   return (
     <section
       aria-labelledby="services-grid-title"
-      className="bg-white px-5 py-14 md:px-7 md:py-[88px]"
+      className="bg-white px-5 py-14 md:px-7 md:py-24"
     >
-      <div className="mx-auto max-w-[1280px]">
-        <div className="mb-12 max-w-[640px]">
-          <div className="mb-[18px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-rose bg-blush px-3.5 py-[5px]">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-12 max-w-2xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-rose bg-blush px-3.5 py-1.5">
             <span
               aria-hidden={true}
-              className="h-1 w-[18px] shrink-0 self-center rounded-full bg-rouge"
+              className="h-1 w-4 shrink-0 self-center rounded-full bg-rouge"
             />
-            <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-rouge">
+            <span className="font-sans text-xs font-semibold uppercase tracking-widest text-rouge">
               {t('eyebrow')}
             </span>
           </div>
           <h2
             id="services-grid-title"
-            className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-[1.05] tracking-[-0.03em] text-navy-deep"
+            className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-none tracking-tight text-navy-deep"
           >
             {t('titleLead')}
             <br />
             <span className="text-rouge">{t('titleAccent')}</span>
           </h2>
-          <p className="mt-3 text-[15px] leading-[1.6] text-slate">
+          <p className="mt-3 text-base leading-relaxed text-slate">
             {t('subtitle')}
           </p>
         </div>
@@ -58,14 +58,14 @@ export function ServicesGrid(): ReactNode {
             const content = (
               <>
                 {external && service.externalLabelKey ? (
-                  <span className="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full border border-fog bg-off-white px-2 py-[3px] font-sans text-[10px] font-semibold text-slate">
+                  <span className="absolute right-5 top-5 inline-flex items-center gap-1 rounded-full border border-fog bg-off-white px-2 py-0.5 font-sans text-[10px] font-semibold text-slate">
                     <ExternalLink className="h-3 w-3" strokeWidth={2} />
                     {tItems(service.externalLabelKey)}
                   </span>
                 ) : (
                   <span
                     aria-hidden={true}
-                    className="absolute right-[22px] top-[22px] flex h-[34px] w-[34px] scale-[0.6] -rotate-45 items-center justify-center rounded-full bg-navy-deep opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:rotate-0 group-hover:bg-rouge group-hover:opacity-100"
+                    className="absolute right-5 top-5 flex h-9 w-9 scale-[0.6] -rotate-45 items-center justify-center rounded-full bg-navy-deep opacity-0 transition-all duration-200 group-hover:scale-100 group-hover:rotate-0 group-hover:bg-rouge group-hover:opacity-100"
                   >
                     <ArrowUpRight
                       className="h-4 w-4 text-white"
@@ -79,10 +79,10 @@ export function ServicesGrid(): ReactNode {
                 >
                   <Icon className="h-6 w-6" strokeWidth={2} />
                 </span>
-                <h3 className="font-heading text-[18px] font-bold leading-[1.3] text-navy-deep">
+                <h3 className="font-heading text-lg font-bold leading-snug text-navy-deep">
                   {name}
                 </h3>
-                <p className="mt-2.5 flex-1 text-[14px] leading-[1.65] text-slate">
+                <p className="mt-2.5 flex-1 text-sm leading-relaxed text-slate">
                   {tItems(service.descKey)}
                 </p>
                 <ul className="mt-5 flex flex-wrap items-center gap-1.5">
@@ -90,7 +90,7 @@ export function ServicesGrid(): ReactNode {
                     <li
                       key={tag.labelKey}
                       className={
-                        'inline-flex h-[26px] items-center gap-[5px] rounded-full px-2.5 font-sans text-[11px] font-semibold ' +
+                        'inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 font-sans text-xs font-semibold ' +
                         (tag.variant === 'regional'
                           ? 'border border-rose bg-blush text-rouge'
                           : 'border border-fog bg-ice-blue text-navy-deep')
@@ -98,7 +98,7 @@ export function ServicesGrid(): ReactNode {
                     >
                       <span
                         aria-hidden={true}
-                        className="h-[5px] w-[5px] shrink-0 rounded-full bg-rouge"
+                        className="h-1 w-1 shrink-0 rounded-full bg-rouge"
                       />
                       {tTags(tag.labelKey)}
                     </li>
@@ -107,7 +107,7 @@ export function ServicesGrid(): ReactNode {
               </>
             );
             const baseClass =
-              'group relative flex h-full flex-col overflow-hidden rounded-[20px] border-[1.5px] border-fog-light bg-white p-7 no-underline transition-all duration-200 hover:-translate-y-1 hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.1)]';
+              'group relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-fog-light bg-white p-7 no-underline transition-all duration-200 hover:-translate-y-1 hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.1)]';
             return (
               <li key={service.slug}>
                 {linkProps ? (

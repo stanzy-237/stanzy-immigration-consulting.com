@@ -10,8 +10,8 @@ function cardClasses(variant: Tool["variant"]): string {
   // Shared card chrome: pulled from `.sn-tc` in the MagicPath design
   // (white bg, rounded 20px, 1.5px border #E2E8F0, 28px pad, hover lift).
   const base =
-    "group relative isolate flex flex-col overflow-hidden rounded-[20px] bg-white p-7 no-underline transition-all duration-200 ease-out " +
-    "border-[1.5px] border-fog-light " +
+    "group relative isolate flex flex-col overflow-hidden rounded-2xl bg-white p-7 no-underline transition-all duration-200 ease-out " +
+    "border-2 border-fog-light " +
     "hover:-translate-y-1 hover:border-navy-deep hover:border-2 hover:shadow-[0_12px_36px_rgba(13,31,78,0.13)]";
   if (variant === "featured") {
     return (
@@ -77,7 +77,7 @@ function ToolCard({
           Gratuit pill flush to the top on the right. Pill fades on hover so
           the arrow puck can take its place. Featured cards drop the pill
           (arrow is always on) but keep the row for a stable icon rhythm. */}
-      <div className="mb-[18px] flex items-start justify-between">
+      <div className="mb-4 flex items-start justify-between">
         <span
           aria-hidden={true}
           className={
@@ -87,10 +87,10 @@ function ToolCard({
               : 'bg-ice-blue text-navy-deep group-hover:bg-navy-deep group-hover:text-white')
           }
         >
-          <Icon className="h-[22px] w-[22px]" strokeWidth={2} />
+          <Icon className="h-5 w-5" strokeWidth={2} />
         </span>
         {!isFeatured ? (
-          <span className="rounded-full border border-rose bg-blush px-2 py-0.75 font-sans text-[10px] font-bold uppercase tracking-[0.1em] text-rouge transition-opacity duration-150 group-hover:opacity-0">
+          <span className="rounded-full border border-rose bg-blush px-2 py-0.75 font-sans text-[10px] font-bold uppercase tracking-widest text-rouge transition-opacity duration-150 group-hover:opacity-0">
             {freeLabel}
           </span>
         ) : null}
@@ -99,8 +99,8 @@ function ToolCard({
       {/* Name. Extra right padding reserves room for the arrow puck. */}
       <p
         className={
-          "font-heading text-[17px] font-bold leading-[1.25] text-navy-deep " +
-          (isFeatured ? "pr-[50px]" : "pr-11")
+          "font-heading text-lg font-bold leading-tight text-navy-deep " +
+          (isFeatured ? "pr-12" : "pr-11")
         }
       >
         {nameLabel}
@@ -109,21 +109,21 @@ function ToolCard({
       {/* Description. */}
       <p
         className={
-          "mt-2.5 flex-1 text-[14px] leading-[1.65] text-slate " +
-          (tool.variant === "wide" ? "max-w-[480px]" : "")
+          "mt-2.5 flex-1 text-sm leading-relaxed text-slate " +
+          (tool.variant === "wide" ? "max-w-md" : "")
         }
       >
         {descLabel}
       </p>
 
       {/* Badges row. */}
-      <ul className="mt-[22px] flex flex-wrap items-center gap-1.5">
+      <ul className="mt-5 flex flex-wrap items-center gap-1.5">
         {badgeLabels.map(
           (label: string): ReactNode => (
             <li
               key={label}
               className={
-                "inline-flex h-[26px] items-center gap-[5px] rounded-full px-2.5 font-sans text-[11px] font-semibold text-navy-deep transition-colors duration-150 " +
+                "inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 font-sans text-xs font-semibold text-navy-deep transition-colors duration-150 " +
                 (isFeatured
                   ? "border border-[rgba(13,31,78,0.15)] bg-[rgba(13,31,78,0.07)]"
                   : "border border-fog bg-ice-blue group-hover:bg-off-white")
@@ -131,7 +131,7 @@ function ToolCard({
             >
               <span
                 aria-hidden={true}
-                className="h-[5px] w-[5px] shrink-0 rounded-full bg-rouge"
+                className="h-1 w-1 shrink-0 rounded-full bg-rouge"
               />
               {label}
             </li>
@@ -150,16 +150,16 @@ export function ToolsGrid(): ReactNode {
   return (
     <section
       aria-labelledby="tools-grid-title"
-      className="bg-off-white px-5 py-14 md:px-7 md:py-[88px]"
+      className="bg-off-white px-5 py-14 md:px-7 md:py-24"
     >
-      <div className="mx-auto max-w-[1280px]">
+      <div className="mx-auto max-w-7xl">
         {/* Eyebrow pill — matches the Hero marker (short rouge line, vertically centered). */}
-        <div className="mb-[22px] inline-flex items-center gap-2 rounded-full border-[1.5px] border-rose bg-blush px-3.5 py-[5px]">
+        <div className="mb-5 inline-flex items-center gap-2 rounded-full border-2 border-rose bg-blush px-3.5 py-1.5">
           <span
             aria-hidden={true}
-            className="h-1 w-[18px] shrink-0 self-center rounded-full bg-rouge"
+            className="h-1 w-4 shrink-0 self-center rounded-full bg-rouge"
           />
-          <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-rouge">
+          <span className="font-sans text-xs font-semibold uppercase tracking-widest text-rouge">
             {t("eyebrow")}
           </span>
         </div>
@@ -167,7 +167,7 @@ export function ToolsGrid(): ReactNode {
         {/* Title */}
         <h2
           id="tools-grid-title"
-          className="mb-2.5 font-heading text-[clamp(34px,4vw,52px)] font-bold leading-[1.05] tracking-[-0.03em] text-navy-deep"
+          className="mb-2.5 font-heading text-[clamp(34px,4vw,52px)] font-bold leading-none tracking-tight text-navy-deep"
         >
           {t("titleLead")}
           <br />
@@ -175,7 +175,7 @@ export function ToolsGrid(): ReactNode {
         </h2>
 
         {/* Subtitle */}
-        <p className="mb-[52px] max-w-[520px] text-[17px] leading-[1.6] text-slate">
+        <p className="mb-12 max-w-lg text-lg leading-relaxed text-slate">
           {t("subtitle")}
         </p>
 
@@ -206,7 +206,7 @@ export function ToolsGrid(): ReactNode {
 
         {/* Footer line */}
         <div className="mt-10 flex items-center justify-center border-t border-fog-light pt-8 text-center">
-          <p className="text-[15px] text-slate">
+          <p className="text-base text-slate">
             <strong className="font-semibold text-navy-deep">
               {t("footerLead")}
             </strong>

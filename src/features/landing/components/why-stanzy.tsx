@@ -14,28 +14,28 @@ export function WhyStanzy(): ReactNode {
   return (
     <section
       aria-labelledby="why-stanzy-title"
-      className="bg-white px-5 py-14 md:px-7 md:py-[88px]"
+      className="bg-white px-5 py-14 md:px-7 md:py-24"
     >
-      <div className="mx-auto max-w-[1280px]">
-        <div className="mb-10 max-w-[640px]">
-          <div className="mb-[18px] inline-flex items-center gap-2 rounded-full bg-navy-deep px-3.5 py-[6px]">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-10 max-w-2xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-navy-deep px-3.5 py-1.5">
             <span
               aria-hidden={true}
-              className="flex h-[14px] w-[14px] items-center justify-center rounded-full bg-rouge"
+              className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rouge"
             >
               <Plus className="h-2.5 w-2.5 text-white" strokeWidth={3} />
             </span>
-            <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-white">
+            <span className="font-sans text-xs font-semibold uppercase tracking-widest text-white">
               {t('eyebrow')}
             </span>
           </div>
           <h2
             id="why-stanzy-title"
-            className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-[1.05] tracking-[-0.03em] text-navy-deep"
+            className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-none tracking-tight text-navy-deep"
           >
             {t('title')}
           </h2>
-          <p className="mt-3 text-[15px] leading-[1.6] text-slate">
+          <p className="mt-3 text-base leading-relaxed text-slate">
             {t('subtitle')}
           </p>
         </div>
@@ -48,10 +48,10 @@ export function WhyStanzy(): ReactNode {
               <li key={prop.slug}>
                 <div
                   className={
-                    'flex h-full flex-col rounded-[20px] p-7 ' +
+                    'flex h-full flex-col rounded-2xl p-7 ' +
                     (featured
                       ? 'bg-navy-deep text-white shadow-[0_12px_32px_rgba(13,31,78,0.18)]'
-                      : 'border-[1.5px] border-fog-light bg-white text-navy-deep')
+                      : 'border-2 border-fog-light bg-white text-navy-deep')
                   }
                 >
                   <span
@@ -67,7 +67,7 @@ export function WhyStanzy(): ReactNode {
                   </span>
                   <h3
                     className={
-                      'font-heading text-[20px] font-bold leading-[1.3] ' +
+                      'font-heading text-xl font-bold leading-snug ' +
                       (featured ? 'text-white' : 'text-navy-deep')
                     }
                   >
@@ -75,19 +75,19 @@ export function WhyStanzy(): ReactNode {
                   </h3>
                   <p
                     className={
-                      'mt-3 text-[14px] leading-[1.65] ' +
+                      'mt-3 text-sm leading-relaxed ' +
                       (featured ? 'text-white/75' : 'text-slate')
                     }
                   >
                     {tItems(prop.descKey)}
                   </p>
                   {featured && prop.proofKey ? (
-                    <div className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-rouge/40 bg-rouge/15 px-3.5 py-[5px]">
+                    <div className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-rouge/40 bg-rouge/15 px-3.5 py-1.5">
                       <span
                         aria-hidden={true}
                         className="h-1.5 w-1.5 shrink-0 rounded-full bg-rouge"
                       />
-                      <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-white">
+                      <span className="font-sans text-xs font-semibold uppercase tracking-widest text-white">
                         {tItems(prop.proofKey)}
                       </span>
                     </div>
