@@ -28,7 +28,7 @@ src/
 └─ proxy.ts
 ```
 
-**Outside `src/`:** `tools/video-engine/` is a standalone content-production tool, not product code ([ADR 0003](../adr/0003-video-engine-as-standalone-tool.md)). Read its `AUTHORING.md` before writing a video.
+**Content production is not in this repo.** The video engine and the content workspace live in `../stanzy_content_studio` ([ADR 0004](../adr/0004-content-studio-separate-repo.md)).
 
 ## Feature folder
 

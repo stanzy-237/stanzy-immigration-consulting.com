@@ -1,5 +1,7 @@
 # Video engine lives in `tools/video-engine/`, outside the feature-folder layout
 
+Status: **superseded by [ADR 0004](0004-content-studio-separate-repo.md)**. The engine and the content workspace moved to their own repository.
+
 We need a local engine that turns three authored files (`script.json`, `scenes.js`, `config.json`) into 1080×1920 animated explainer MP4s for TikTok, Reels and WhatsApp. It is an offline content-production tool: a CLI plus headless Chrome, edge-tts and ffmpeg. It is not part of the Next.js product. Nothing in `src/` imports it, it never ships to users, and it has its own runtime (CommonJS Node, browser scripts, Python for TTS).
 
 `docs/agents/folder-structure.md` puts **all product code** under `src/features/<feature>/`. We deliberately deviate: the engine is a self-contained package at `tools/video-engine/`, with its own `package.json`, its own `node:test` suite and an authoring guide (`AUTHORING.md`). It is excluded from the site's ESLint and Vitest scope. Per-video projects and renders live in the gitignored `content/videos/<slug>/` workspace. A tracked example lives in `tools/video-engine/examples/`.
