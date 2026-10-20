@@ -378,15 +378,20 @@ def load_voice(path):
     return np.frombuffer(raw, dtype=np.float32).astype(np.float64)
 
 
-def duck_envelope(duration, phrases, depth=0.32, ramp=0.18, deep=(), deep_depth=0.2):
+def dip_envelope(duration, ranges, ramp=0.4):
+    """Music gain lowered to each range's "gain" (e.g. 0.5 = half) with soft ramps."""
     t = np.arange(int(duration * SR)) / SR
     g = np.ones_like(t)
-    for p in phrases:
-        s, e = p["start"] - 0.12, p["end"] + 0.2
-        d = deep_depth if p.get("who") in deep else depth
-        inside = np.clip(np.minimum((t - s) / ramp + 1, (e - t) / ramp + 1), 0, 1)
-        g = np.minimum(g, 1 - (1 - d) * inside)
+    for r in ranges:
+        inside = np.clip(np.minimum((t - r["from"]) / ramp + 1, (r["to"] - t) / ramp + 1), 0, 1)
+        g = np.minimum(g, 1 - (1 - r["gain"]) * inside)
     return g
+
+
+def duck_envelope(duration, phrases, depth=0.32, ramp=0.18, deep=(), deep_depth=0.2):
+    ranges = [{"from": p["start"] - 0.12, "to": p["end"] + 0.2, "gain": deep_depth if p.get("who") in deep else depth}
+              for p in phrases]
+    return dip_envelope(duration, ranges, ramp)
 
 
 def mute_envelope(duration, ranges, ramp=0.04):
@@ -395,16 +400,6 @@ def mute_envelope(duration, ranges, ramp=0.04):
     for r in ranges:
         inside = np.clip(np.minimum((t - r["from"]) / ramp, (r["to"] - t) / ramp), 0, 1)
         g = np.minimum(g, 1 - inside)
-    return g
-
-
-def dip_envelope(duration, ranges, ramp=0.4):
-    """Music gain lowered to each range's "gain" (e.g. 0.5 = half) with soft ramps."""
-    t = np.arange(int(duration * SR)) / SR
-    g = np.ones_like(t)
-    for r in ranges:
-        inside = np.clip(np.minimum((t - r["from"]) / ramp + 1, (r["to"] - t) / ramp + 1), 0, 1)
-        g = np.minimum(g, 1 - (1 - r["gain"]) * inside)
     return g
 
 
