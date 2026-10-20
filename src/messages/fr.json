@@ -110,6 +110,40 @@
         "badgeTeer": "TEER"
       }
     },
+    "BlogRow": {
+      "eyebrow": "Blog & Ressources",
+      "titleLead": "Conseils d'experts,",
+      "titleAccent": "sans jargon.",
+      "seeAll": "Voir tous les articles",
+      "readFull": "Lire l'article",
+      "read": "Lire",
+      "readingMinutes": "{minutes} min de lecture",
+      "readingMinutesShort": "{minutes} min",
+      "cardAriaLabel": "Ouvrir l'article : {title}",
+      "Categories": {
+        "catExpressEntry": "Entrée Express",
+        "catDocuments": "Documents",
+        "catStrategy": "Stratégie",
+        "catLanguage": "Langue",
+        "catWes": "WES",
+        "catAdvice": "Conseils"
+      },
+      "Articles": {
+        "article1Title": "Comment maximiser votre score CRS en 90 jours : le guide complet 2024",
+        "article1Excerpt": "Le score CRS détermine vos chances de recevoir une invitation à présenter une demande. Découvrez les stratégies prouvées pour gagner des points rapidement : langue, études, emploi, adaptabilité.",
+        "article1Alt": "Entrée Express 2024",
+        "article2Title": "Les 10 documents indispensables pour votre dossier ITA",
+        "article2Alt": "Documents immigration",
+        "article3Title": "PNP vs Entrée Express : quelle voie choisir en 2024 ?",
+        "article3Alt": "Visa Canada",
+        "article4Title": "IELTS ou TEF : lequel choisir pour l'immigration ?",
+        "article4Alt": "Préparation IELTS",
+        "article5Title": "Évaluation de diplôme WES : procédure et délais",
+        "article5Alt": "Évaluation WES",
+        "article6Title": "5 erreurs qui font rejeter un dossier Entrée Express",
+        "article6Alt": "Erreurs à éviter"
+      }
+    },
     "Hero": {
       "eyebrow": "Entrée Express · Canada",
       "headlineLead": "Immigrez au Canada",

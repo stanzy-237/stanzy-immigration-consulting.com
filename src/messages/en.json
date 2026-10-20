@@ -110,6 +110,40 @@
         "badgeTeer": "TEER"
       }
     },
+    "BlogRow": {
+      "eyebrow": "Blog & Resources",
+      "titleLead": "Expert advice,",
+      "titleAccent": "no jargon.",
+      "seeAll": "See all articles",
+      "readFull": "Read the article",
+      "read": "Read",
+      "readingMinutes": "{minutes} min read",
+      "readingMinutesShort": "{minutes} min",
+      "cardAriaLabel": "Open article: {title}",
+      "Categories": {
+        "catExpressEntry": "Express Entry",
+        "catDocuments": "Documents",
+        "catStrategy": "Strategy",
+        "catLanguage": "Language",
+        "catWes": "WES",
+        "catAdvice": "Advice"
+      },
+      "Articles": {
+        "article1Title": "How to maximise your CRS score in 90 days: the full 2024 guide",
+        "article1Excerpt": "Your CRS score drives your chances of landing an invitation. See the proven strategies to pick up points fast: language, studies, work, adaptability.",
+        "article1Alt": "Express Entry 2024",
+        "article2Title": "The 10 must-have documents for your ITA file",
+        "article2Alt": "Immigration documents",
+        "article3Title": "PNP vs Express Entry: which path in 2024?",
+        "article3Alt": "Canada visa",
+        "article4Title": "IELTS or TEF: which test for immigration?",
+        "article4Alt": "IELTS preparation",
+        "article5Title": "WES credential evaluation: process and timing",
+        "article5Alt": "WES evaluation",
+        "article6Title": "5 mistakes that get an Express Entry file rejected",
+        "article6Alt": "Mistakes to avoid"
+      }
+    },
     "Hero": {
       "eyebrow": "Express Entry · Canada",
       "headlineLead": "Move to Canada",
