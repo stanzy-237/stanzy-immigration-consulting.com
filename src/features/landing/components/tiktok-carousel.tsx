@@ -124,7 +124,7 @@ export function TikTokCarousel({
       <ul
         ref={scroller}
         aria-live="polite"
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {videos.map(
           (v: TikTokVideoMeta, i: number): ReactNode => (
