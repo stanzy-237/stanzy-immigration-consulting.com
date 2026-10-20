@@ -3,6 +3,14 @@
     "title": "Stanzy — Conseil en immigration canadienne",
     "description": "Outils gratuits Entrée Express, blog et services de conseil en immigration canadienne."
   },
+  "BlogPlaceholder": {
+    "status": "En développement",
+    "title": "Le blog arrive bientôt",
+    "listingDescription": "Nous préparons des articles clairs, pratiques et sans jargon pour vous accompagner à chaque étape de votre Entrée Express. Revenez très bientôt.",
+    "articleDescription": "Cet article est en cours de rédaction. Nous le polissons pour qu'il tienne vraiment ses promesses — un peu de patience, ça vaudra le coup.",
+    "unknownSlug": "L'adresse « {slug} » ne correspond à aucun article pour l'instant.",
+    "back": "Retour à l'accueil"
+  },
   "ToolPlaceholder": {
     "status": "En développement",
     "description": "Cet outil arrive bientôt. Nous le polissons pour qu'il tienne vraiment ses promesses — un peu de patience, ça vaudra le coup.",

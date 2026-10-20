@@ -3,6 +3,14 @@
     "title": "Stanzy — Canadian Immigration Consulting",
     "description": "Free Express Entry tools, a blog, and Canadian immigration consulting services."
   },
+  "BlogPlaceholder": {
+    "status": "In development",
+    "title": "The blog is on its way",
+    "listingDescription": "We're preparing clear, practical, no-jargon articles to walk you through every step of your Express Entry. Check back soon.",
+    "articleDescription": "This article is being written. We're polishing it so it genuinely delivers — hang tight, it'll be worth it.",
+    "unknownSlug": "The URL “{slug}” doesn't match any article yet.",
+    "back": "Back to home"
+  },
   "ToolPlaceholder": {
     "status": "In development",
     "description": "This tool is on its way. We're polishing it so it genuinely delivers — hang tight, it'll be worth it.",
