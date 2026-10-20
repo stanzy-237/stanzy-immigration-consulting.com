@@ -50,7 +50,7 @@ export function SiteFooter(): ReactNode {
               aria-label={t("brandEyebrow")}
               className="inline-flex"
             >
-              <span className="relative inline-flex h-32 w-32 overflow-hidden rounded-full bg-white shadow-lg ring-4 ring-white/10">
+              <span className="relative inline-flex h-20 w-20 overflow-hidden rounded-full bg-white shadow-lg ring-4 ring-white/10 md:h-32 md:w-32">
                 <Image
                   src="/Logo-white-background.svg"
                   alt={t("brandEyebrow")}

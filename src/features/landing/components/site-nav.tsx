@@ -201,7 +201,15 @@ export function SiteNav(): ReactNode {
           />
           <SheetContent side="right" className="bg-surface w-80 p-0">
             <SheetHeader>
-              <SheetTitle>{t('brand')}</SheetTitle>
+              <SheetTitle className="flex items-center">
+                <Image
+                  src="/logo2.png"
+                  alt={t('brand')}
+                  width={502}
+                  height={468}
+                  className="h-10 w-auto"
+                />
+              </SheetTitle>
             </SheetHeader>
             <nav aria-label={t('ariaLabel')} className="flex flex-col pb-4">
               <MobileSection
