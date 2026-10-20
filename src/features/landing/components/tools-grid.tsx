@@ -150,7 +150,7 @@ export function ToolsGrid(): ReactNode {
   return (
     <section
       aria-labelledby="tools-grid-title"
-      className="bg-[#F7F8FC] px-7 py-[88px]"
+      className="bg-[#F7F8FC] px-5 py-14 md:px-7 md:py-[88px]"
     >
       <div className="mx-auto max-w-[1280px]">
         {/* Eyebrow pill — matches the Hero marker (short rouge line, vertically centered). */}

@@ -24,7 +24,7 @@ export function Subscribe(): ReactNode {
   return (
     <section
       aria-labelledby="subscribe-title"
-      className="bg-[#F7F8FC] px-7 py-[88px]"
+      className="bg-[#F7F8FC] px-5 py-14 md:px-7 md:py-[88px]"
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">

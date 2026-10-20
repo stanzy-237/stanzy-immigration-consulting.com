@@ -192,7 +192,7 @@ export function BlogRow(): ReactNode {
   return (
     <section
       aria-labelledby="blog-row-title"
-      className="bg-white px-7 py-[88px]"
+      className="bg-white px-5 py-14 md:px-7 md:py-[88px]"
     >
       <div className="mx-auto max-w-[1280px]">
         {/* Header: eyebrow + title on the left, "See all" button on the right. */}

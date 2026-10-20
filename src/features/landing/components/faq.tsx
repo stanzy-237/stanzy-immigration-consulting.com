@@ -15,7 +15,7 @@ export function Faq(): ReactNode {
   return (
     <section
       aria-labelledby="faq-title"
-      className="bg-navy-deep px-7 py-[88px] text-white"
+      className="bg-navy-deep px-5 py-14 md:px-7 md:py-[88px] text-white"
     >
       <div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         {/* Left column */}

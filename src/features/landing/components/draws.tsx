@@ -37,7 +37,7 @@ export function Draws(): ReactNode {
   return (
     <section
       aria-labelledby="draws-title"
-      className="bg-navy-deep px-7 py-[88px] text-white"
+      className="bg-navy-deep px-5 py-14 md:px-7 md:py-[88px] text-white"
     >
       <div className="mx-auto max-w-[1280px]">
         {/* Header */}
@@ -86,22 +86,22 @@ export function Draws(): ReactNode {
           </Link>
         </div>
 
-        {/* Featured draw */}
-        <article className="mt-10 rounded-[20px] border border-white/12 bg-white/6 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.18)] backdrop-blur-md">
-          <div className="grid gap-8 md:grid-cols-[1fr_1.1fr_1fr] md:items-center">
+        {/* Featured draw — stacks on mobile with wrapping stats + tracker. */}
+        <article className="mt-8 rounded-2xl border border-white/12 bg-white/6 p-5 shadow-[0_8px_32px_rgba(0,0,0,0.18)] backdrop-blur-md md:mt-10 md:rounded-[20px] md:p-8">
+          <div className="grid gap-6 md:grid-cols-[1fr_1.1fr_1fr] md:items-center md:gap-8">
             {/* Round + tags */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.15em] text-white/40">
                 {t('latest')}
               </p>
-              <div className="mt-1 flex items-start gap-1.5 font-heading text-[clamp(48px,5vw,72px)] font-bold leading-none text-white">
+              <div className="flex items-start gap-1.5 font-heading text-[44px] font-bold leading-none text-white sm:text-[56px] md:text-[clamp(48px,5vw,72px)]">
                 #{featured.round}
                 <Star
                   className="mt-1 h-4 w-4 fill-rouge text-rouge"
                   strokeWidth={0}
                 />
               </div>
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-1 flex flex-wrap gap-2">
                 <span
                   className={
                     'inline-flex h-7 items-center rounded-full border px-2.5 font-sans text-[11px] font-semibold uppercase tracking-[0.08em] ' +
@@ -116,37 +116,29 @@ export function Draws(): ReactNode {
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="flex items-center gap-6">
+            {/* Stats — 3-up grid on mobile with hairline separators between. */}
+            <div className="grid grid-cols-3 items-start gap-3 border-y border-white/10 py-4 md:border-x md:border-y-0 md:gap-6 md:px-6 md:py-0">
               <div className="flex flex-col gap-1">
-                <span className="font-heading text-[clamp(28px,2.8vw,36px)] font-bold leading-none text-white">
+                <span className="font-heading text-[22px] font-bold leading-none text-white sm:text-[26px] md:text-[clamp(28px,2.8vw,36px)]">
                   {featured.invitations.toLocaleString('fr-FR')}
                 </span>
-                <span className="text-[13px] text-white/55">
+                <span className="text-[11px] text-white/55 md:text-[13px]">
                   {tStats('invitations')}
                 </span>
               </div>
-              <span
-                aria-hidden={true}
-                className="h-12 w-px shrink-0 bg-white/10"
-              />
-              <div className="flex flex-col gap-1">
-                <span className="font-heading text-[clamp(28px,2.8vw,36px)] font-bold leading-none text-rouge">
+              <div className="flex flex-col gap-1 border-x border-white/10 px-3 md:border-0 md:px-0">
+                <span className="font-heading text-[22px] font-bold leading-none text-rouge sm:text-[26px] md:text-[clamp(28px,2.8vw,36px)]">
                   {featured.crsMin}
                 </span>
-                <span className="text-[13px] text-white/55">
+                <span className="text-[11px] text-white/55 md:text-[13px]">
                   {tStats('crsMin')}
                 </span>
               </div>
-              <span
-                aria-hidden={true}
-                className="h-12 w-px shrink-0 bg-white/10"
-              />
               <div className="flex flex-col gap-1">
-                <span className="font-heading text-[clamp(28px,2.8vw,36px)] font-bold leading-none text-white">
+                <span className="font-heading text-[18px] font-bold leading-none text-white sm:text-[22px] md:text-[clamp(28px,2.8vw,36px)]">
                   {featured.date.split(' ').slice(0, 2).join(' ')}
                 </span>
-                <span className="text-[13px] text-white/55">
+                <span className="text-[11px] text-white/55 md:text-[13px]">
                   {tStats('date')}
                 </span>
               </div>
@@ -157,7 +149,7 @@ export function Draws(): ReactNode {
               <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.15em] text-white/40">
                 {tTracker('label')}
               </p>
-              <div className="relative mt-1 h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-white/10">
+              <div className="relative h-1.5 w-full max-w-[260px] overflow-hidden rounded-full bg-white/10">
                 <div
                   aria-hidden={true}
                   className="h-full w-[72%] rounded-full bg-[linear-gradient(90deg,#CC1627,#EE8A93)]"
@@ -174,56 +166,39 @@ export function Draws(): ReactNode {
           </div>
         </article>
 
-        {/* Secondary draws grid */}
+        {/* Past draws — thin horizontal cards, same rhythm as the small blog cards. */}
         <ul className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
           {rest.map(
             (draw: Draw): ReactNode => (
               <li key={draw.round}>
                 <Link
                   href="/outils/dernier-tirage"
-                  className="group flex h-full flex-col rounded-2xl border border-white/9 bg-white/4 p-5 no-underline transition-all duration-200 hover:-translate-y-[2px] hover:border-white/18 hover:bg-white/8"
+                  className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/4 p-4 no-underline transition-all duration-200 hover:-translate-y-[2px] hover:border-white/20 hover:bg-white/8"
                 >
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-heading text-[15px] font-semibold text-white">
-                      {t('roundLabel')} #{draw.round}
-                    </h3>
-                    <time className="text-[12px] text-white/40">
-                      {draw.date}
-                    </time>
-                  </div>
+                  {/* Left thumbnail — round-number badge in the slot where the
+                      blog small card has its image. */}
                   <span
-                    className={
-                      'mt-4 inline-flex h-6 w-fit items-center rounded-full border px-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.08em] ' +
-                      categoryClasses(draw.categoryColor)
-                    }
+                    aria-hidden={true}
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/8 font-heading text-[15px] font-bold text-white"
                   >
-                    {tCat(draw.categoryKey)}
+                    #{draw.round}
                   </span>
-                  <div className="mt-5 flex items-center gap-5">
-                    <div className="flex flex-col">
-                      <span className="font-heading text-[26px] font-bold leading-none text-white">
-                        {draw.crsMin}
-                      </span>
-                      <span className="mt-1 text-[11px] text-white/50">
-                        {tCardStats('crsMin')}
-                      </span>
-                    </div>
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <span
-                      aria-hidden={true}
-                      className="h-8 w-px shrink-0 bg-white/10"
-                    />
-                    <div className="flex flex-col">
-                      <span className="font-heading text-[26px] font-bold leading-none text-white">
-                        {draw.invitations.toLocaleString('fr-FR')}
-                      </span>
-                      <span className="mt-1 text-[11px] text-white/50">
-                        {tCardStats('invitations')}
-                      </span>
-                    </div>
+                      className={
+                        'inline-flex h-5 w-fit items-center rounded-full border px-2 font-sans text-[9px] font-semibold uppercase tracking-[0.08em] ' +
+                        categoryClasses(draw.categoryColor)
+                      }
+                    >
+                      {tCat(draw.categoryKey)}
+                    </span>
+                    <p className="truncate font-heading text-[14px] font-semibold text-white transition-colors group-hover:text-rouge">
+                      {draw.crsMin} {tCardStats('crsMin')} ·{' '}
+                      {draw.invitations.toLocaleString('fr-FR')}{' '}
+                      {tCardStats('invitations')}
+                    </p>
+                    <p className="text-[11px] text-white/40">{draw.date}</p>
                   </div>
-                  <span className="mt-5 border-t border-white/8 pt-3.5 text-[12px] text-white/40 transition-colors group-hover:text-white/70">
-                    {t('cardCta')}
-                  </span>
                 </Link>
               </li>
             ),

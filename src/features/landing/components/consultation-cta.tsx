@@ -22,16 +22,16 @@ export function ConsultationCta(): ReactNode {
   return (
     <section
       aria-labelledby="consultation-cta-title"
-      className="bg-[#F7F8FC] px-7 py-[72px]"
+      className="bg-[#F7F8FC] px-5 py-14 md:px-7 md:py-[72px]"
     >
       <div className="mx-auto max-w-[1280px]">
         {/* Card: 1fr + 420px columns on lg, stacked below.
             White bg, soft shadow, 1.5px border, 24px radius — matches
             `.sn-consult-card` in the MagicPath design. */}
         <div className="grid overflow-hidden rounded-3xl border-[1.5px] border-[#E2E8F0] bg-white shadow-[0_4px_32px_rgba(13,31,78,0.09)] lg:grid-cols-[1fr_420px]">
-          {/* Left — copy + CTA */}
-          <div className="flex flex-col justify-center gap-0 px-7 py-9 md:px-14 md:py-14">
-            <div className="mb-5 inline-flex w-fit items-center gap-2">
+          {/* Left — copy + CTA. On mobile: tighter padding, smaller CTA, centered note. */}
+          <div className="flex flex-col justify-center px-5 py-7 md:px-14 md:py-14">
+            <div className="mb-4 inline-flex w-fit items-center gap-2">
               <span
                 aria-hidden={true}
                 className="h-1 w-5 shrink-0 rounded-full bg-rouge"
@@ -42,29 +42,29 @@ export function ConsultationCta(): ReactNode {
             </div>
             <h2
               id="consultation-cta-title"
-              className="font-heading text-[clamp(28px,3.5vw,44px)] font-bold leading-[1.08] tracking-[-0.03em] text-navy-deep"
+              className="font-heading text-[clamp(26px,3.5vw,44px)] font-bold leading-[1.08] tracking-[-0.03em] text-navy-deep"
             >
               {t('titleLead')}
               <br />
               <span className="text-rouge">{t('titleAccent')}</span>
             </h2>
-            <p className="mt-3.5 max-w-[440px] text-[16px] leading-[1.65] text-[#4A5568]">
+            <p className="mt-3 max-w-[440px] text-[15px] leading-[1.6] text-[#4A5568] md:text-[16px] md:leading-[1.65]">
               {t('description')}
             </p>
             <Link
               href="/services/consultation"
               onClick={handleBook}
-              className="mt-7 inline-flex h-[52px] w-fit items-center gap-2.5 rounded-full bg-rouge pl-[26px] pr-2.5 font-heading text-[15px] font-bold text-white shadow-[0_4px_16px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[2px] hover:bg-[#D93344] hover:shadow-[0_8px_24px_rgba(204,22,39,0.38)]"
+              className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-rouge px-5 font-heading text-[13px] font-bold text-white shadow-[0_4px_14px_rgba(204,22,39,0.28)] transition-all hover:-translate-y-[2px] hover:bg-[#D93344] hover:shadow-[0_8px_24px_rgba(204,22,39,0.38)] sm:w-fit sm:gap-2.5 sm:pl-[26px] sm:pr-2.5 md:h-[52px] md:text-[15px]"
             >
               {t('ctaBook')}
               <span
                 aria-hidden={true}
-                className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white/22"
+                className="hidden h-[30px] w-[30px] items-center justify-center rounded-full bg-white/22 sm:flex md:h-[34px] md:w-[34px]"
               >
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </span>
             </Link>
-            <p className="mt-3.5 text-[13px] text-[#4A5568]">
+            <p className="mt-3 text-center text-[11px] leading-[1.5] text-[#4A5568] md:mt-3.5 md:text-left md:text-[13px]">
               {t('note')}
             </p>
           </div>

@@ -17,7 +17,7 @@ export function ServicesGrid(): ReactNode {
   return (
     <section
       aria-labelledby="services-grid-title"
-      className="bg-white px-7 py-[88px]"
+      className="bg-white px-5 py-14 md:px-7 md:py-[88px]"
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="mb-12 max-w-[640px]">

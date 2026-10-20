@@ -14,14 +14,16 @@ import { withIntl } from './test-utils';
 describe('Draws', () => {
   it('shows the featured round and three secondary rounds', () => {
     render(withIntl(<Draws />));
-    expect(screen.getByText('#345')).toBeInTheDocument();
-    expect(screen.getByText(/Tirage #344/)).toBeInTheDocument();
-    expect(screen.getByText(/Tirage #343/)).toBeInTheDocument();
-    expect(screen.getByText(/Tirage #342/)).toBeInTheDocument();
+    expect(screen.getByText(/#345/)).toBeInTheDocument();
+    expect(screen.getByText('#344')).toBeInTheDocument();
+    expect(screen.getByText('#343')).toBeInTheDocument();
+    expect(screen.getByText('#342')).toBeInTheDocument();
   });
-  it('exposes "Calculer mon score" linking to the latest draw tool', () => {
+  it('exposes a "latest draws" CTA linking to the dernier-tirage tool', () => {
     render(withIntl(<Draws />));
-    const link = screen.getByRole('link', { name: /Calculer mon score/i });
+    const link = screen.getByRole('link', {
+      name: /Voir les derniers tirages/i,
+    });
     expect(link).toHaveAttribute(
       'href',
       expect.stringContaining('/outils/dernier-tirage'),
