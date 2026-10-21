@@ -12,6 +12,7 @@ function callerWithStubContext() {
   const ctx = {
     prisma: {} as TRPCContext['prisma'],
     headers: new Headers(),
+    session: null,
   } satisfies TRPCContext;
   return createCaller(ctx);
 }

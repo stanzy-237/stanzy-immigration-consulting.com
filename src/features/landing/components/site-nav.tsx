@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, Menu } from 'lucide-react';
+import { ChevronDown, LogOut, Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
@@ -14,13 +14,20 @@ import {
 } from 'react';
 
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Link, usePathname } from '@/i18n/navigation';
+import { authClient } from '@/features/auth/lib/auth-client';
+import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 import { MapleLeafIcon } from '@/features/landing/components/brand-icons';
@@ -45,6 +52,15 @@ export function SiteNav(): ReactNode {
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname: string = usePathname() ?? '/';
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const accountName: string | null = session?.user.name ?? null;
+
+  const signOut = useCallback(async (): Promise<void> => {
+    await authClient.signOut();
+    router.push('/');
+    router.refresh();
+  }, [router]);
 
   const isActive = (href: string): boolean =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
@@ -173,12 +189,21 @@ export function SiteNav(): ReactNode {
 
         <div className="hidden items-center gap-3 md:flex">
           <LocaleToggle ariaLabel={t('localeToggle')} />
-          <Link
-            href="/connexion"
-            className="text-navy-deep hover:bg-fog/40 rounded-md px-3 py-2 text-sm font-medium transition-colors"
-          >
-            {t('login')}
-          </Link>
+          {accountName ? (
+            <AccountMenu
+              name={accountName}
+              triggerLabel={t('account', { name: accountName })}
+              signOutLabel={t('signOut')}
+              onSignOut={signOut}
+            />
+          ) : (
+            <Link
+              href="/connexion"
+              className="text-navy-deep hover:bg-fog/40 rounded-md px-3 py-2 text-sm font-medium transition-colors"
+            >
+              {t('login')}
+            </Link>
+          )}
           <Link
             href="/commencer"
             className="bg-rouge rounded-md px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-rouge/90"
@@ -239,13 +264,26 @@ export function SiteNav(): ReactNode {
                   ariaLabel={t('localeToggle')}
                   className="self-start"
                 />
-                <Link
-                  href="/connexion"
-                  className="text-navy-deep rounded-md border border-fog px-3 py-2 text-center text-sm font-medium"
-                  onClick={closeMobile}
-                >
-                  {t('login')}
-                </Link>
+                {accountName ? (
+                  <button
+                    type="button"
+                    className="text-navy-deep rounded-md border border-fog px-3 py-2 text-center text-sm font-medium"
+                    onClick={(): void => {
+                      closeMobile();
+                      void signOut();
+                    }}
+                  >
+                    {t('signOut')}
+                  </button>
+                ) : (
+                  <Link
+                    href="/connexion"
+                    className="text-navy-deep rounded-md border border-fog px-3 py-2 text-center text-sm font-medium"
+                    onClick={closeMobile}
+                  >
+                    {t('login')}
+                  </Link>
+                )}
                 <Link
                   href="/commencer"
                   className="bg-rouge rounded-md px-3 py-2 text-center text-sm font-semibold text-white"
@@ -259,6 +297,44 @@ export function SiteNav(): ReactNode {
         </Sheet>
       </div>
     </nav>
+  );
+}
+
+type AccountMenuProps = {
+  name: string;
+  triggerLabel: string;
+  signOutLabel: string;
+  onSignOut: () => Promise<void>;
+};
+
+function AccountMenu({
+  name,
+  triggerLabel,
+  signOutLabel,
+  onSignOut,
+}: AccountMenuProps): ReactNode {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={triggerLabel}
+        className="text-navy-deep hover:bg-fog/40 inline-flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium transition-colors"
+      >
+        <span
+          aria-hidden={true}
+          className="bg-navy-deep inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold text-white"
+        >
+          {name.trim().charAt(0).toUpperCase()}
+        </span>
+        <span className="max-w-32 truncate">{name}</span>
+        <ChevronDown aria-hidden={true} className="h-3.5 w-3.5" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onClick={(): void => void onSignOut()}>
+          <LogOut aria-hidden={true} />
+          {signOutLabel}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

@@ -20,6 +20,7 @@ for the hard-to-reverse decisions. The v1 spec is epic **#1**.
 npm install
 cp .env.example .env   # then fill in your Neon connection strings
 npm run db:generate    # generate the Prisma client
+./scripts/setup-auth.sh  # auth secret, Resend, Vercel env, migration (guided)
 npm run dev            # http://localhost:3000 → redirects to /fr
 ```
 
@@ -46,18 +47,22 @@ npm run dev            # http://localhost:3000 → redirects to /fr
 src/
   app/
     [locale]/            # locale-scoped routes (layout, home, locale switcher)
+    api/auth/[...all]/   # Better Auth HTTP handler
     api/trpc/[trpc]/     # tRPC HTTP handler
     manifest.ts          # PWA web manifest (/manifest.webmanifest)
     service-worker-register.tsx
     globals.css          # Tailwind + brand tokens
   i18n/                  # next-intl routing / request / navigation config
   messages/              # fr.json, en.json message catalogs
+  features/auth/         # Inscription / Connexion / Vérification, auth client
   server/
+    auth/                # Better Auth instance (createAuth) + session lookup
     db/client.ts         # Prisma client singleton
+    email/mailer.ts      # Resend transactional mailer
     trpc/                # tRPC init, context, routers
   trpc/react.tsx         # client-side tRPC + React Query provider
   lib/env.ts             # validated environment variables
-prisma/schema.prisma     # Prisma ↔ Neon (models arrive with auth, #4)
+prisma/schema.prisma     # Prisma ↔ Neon (Account, Session, AuthIdentity, …)
 public/sw.js             # service worker
 tests/                   # Vitest
 ```
@@ -72,6 +77,8 @@ This is a one-time human setup (requires account credentials):
 3. Add Vercel environment variables:
    - `DATABASE_URL` — Neon **pooled** connection string
    - `DIRECT_URL` — Neon **direct** connection string
+   - `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `RESEND_API_KEY`, `EMAIL_FROM` —
+     `./scripts/setup-auth.sh` walks through these
 4. Deploy. `prisma generate` runs on `postinstall`; the app boots and `/fr` /
-   `/en` resolve. Run migrations with `npm run db:deploy` once domain models exist.
+   `/en` resolve. Apply migrations with `npm run db:deploy`.
 ```

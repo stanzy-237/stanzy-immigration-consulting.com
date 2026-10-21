@@ -19,6 +19,15 @@ const schema = z.object({
   DATABASE_URL: z.string().url(),
   // Direct Neon connection string, used by Prisma for migrations.
   DIRECT_URL: z.string().url().optional(),
+  // Signs session cookies and verification tokens. `openssl rand -base64 32`.
+  BETTER_AUTH_SECRET: z.string().min(32),
+  // Public origin of the app. Optional: on Vercel previews it is derived from
+  // VERCEL_URL, and otherwise from the incoming request.
+  BETTER_AUTH_URL: z.string().url().optional(),
+  // Resend API key. Without it, emails are logged to the console instead.
+  RESEND_API_KEY: z.string().min(1).optional(),
+  // Sender for transactional email; must be on a domain verified in Resend.
+  EMAIL_FROM: z.string().min(3).default('Stanzy Immigration <onboarding@resend.dev>'),
 });
 
 export type Env = z.infer<typeof schema>;
