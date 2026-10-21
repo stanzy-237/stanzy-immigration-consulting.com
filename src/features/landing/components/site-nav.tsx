@@ -207,7 +207,7 @@ export function SiteNav(): ReactNode {
             </Link>
           )}
           <Link
-            href="/commencer"
+            href="/inscription"
             className="bg-rouge rounded-md px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-rouge/90"
           >
             {t('start')}
@@ -292,7 +292,7 @@ export function SiteNav(): ReactNode {
                   </Link>
                 )}
                 <Link
-                  href="/commencer"
+                  href="/inscription"
                   className="bg-rouge rounded-md px-3 py-2 text-center text-sm font-semibold text-white"
                   onClick={closeMobile}
                 >

@@ -39,6 +39,15 @@ describe('SiteNav', () => {
     expect(within(nav).getByRole('link', { name: 'Commencer' })).toBeInTheDocument();
   });
 
+  it('sends Commencer to account creation', () => {
+    render(withIntl(<SiteNav />));
+    const nav = screen.getByRole('navigation', { name: 'Navigation principale' });
+    expect(within(nav).getByRole('link', { name: 'Commencer' })).toHaveAttribute(
+      'href',
+      '/fr/inscription',
+    );
+  });
+
   it('exposes the brand logo at /logo2.png with an accessible name', () => {
     render(withIntl(<SiteNav />));
     const logo = screen.getByAltText('Stanzy');

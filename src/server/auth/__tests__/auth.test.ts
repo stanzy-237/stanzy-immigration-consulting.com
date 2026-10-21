@@ -190,6 +190,16 @@ describe('email/password sign-up, verification and sign-in', () => {
     expect(statuses.slice(0, 5)).toEqual([401, 401, 401, 401, 401]);
     expect(statuses[5]).toBe(429);
   });
+
+  it('never rate-limits the session check every page makes', async () => {
+    const h = await verifiedAccount();
+    const statuses = new Set<number>();
+    // Better Auth's default limit is 100 requests / 10 s per address.
+    for (let i = 0; i < 120; i++) {
+      statuses.add((await h.request('/get-session', { ip: '192.0.2.60' })).status);
+    }
+    expect([...statuses]).toEqual([200]);
+  });
 });
 
 describe('verification email language', () => {

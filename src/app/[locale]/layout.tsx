@@ -68,9 +68,13 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
+    // suppressHydrationWarning: browser extensions (e.g. LanguageTool) add
+    // attributes to <html> before React hydrates. It only covers <html>'s own
+    // attributes, not its children.
     <html
       lang={locale}
       className={`${syne.variable} ${workSans.variable} ${plusJakarta.variable}`}
+      suppressHydrationWarning
     >
       <body>
         <NextIntlClientProvider>

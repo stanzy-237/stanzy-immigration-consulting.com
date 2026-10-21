@@ -76,7 +76,16 @@ export function createAuth(deps: AuthDeps) {
         '/sign-in/email': { window: 60, max: 5 },
         '/sign-up/email': { window: 60, max: 3 },
         '/send-verification-email': { window: 60, max: 3 },
+        // Every page's nav reads the session; limiting a read protects
+        // nothing and costs several database round trips per page view.
+        '/get-session': false,
       },
+    },
+    session: {
+      // Keep the session in a signed cookie for 5 minutes so most session
+      // reads skip the database. Trade-off: a session revoked elsewhere stays
+      // usable here for up to 5 minutes.
+      cookieCache: { enabled: true, maxAge: 5 * 60 },
     },
   });
 }
