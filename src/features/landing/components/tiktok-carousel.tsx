@@ -241,7 +241,7 @@ function TikTokCard({
       rel="noopener noreferrer"
       aria-label={title}
       className={cn(
-        'group relative block aspect-[9/14] h-full w-full overflow-hidden shadow-[0_8px_24px_rgba(13,31,78,0.08)] transition-all hover:shadow-[0_20px_48px_rgba(13,31,78,0.22)]',
+        'group relative block aspect-9/14 h-full w-full overflow-hidden shadow-[0_8px_24px_rgba(13,31,78,0.08)] transition-all hover:shadow-[0_20px_48px_rgba(13,31,78,0.22)]',
         radiusClass,
         active ? 'scale-100' : 'scale-[0.97] opacity-80',
       )}
@@ -269,7 +269,7 @@ function TikTokCard({
       )}
       <div
         aria-hidden={true}
-        className="absolute inset-0 bg-gradient-to-t from-navy-deep/[0.88] via-navy-deep/20 to-transparent"
+        className="absolute inset-0 bg-linear-to-t from-navy-deep/88 via-navy-deep/20 to-transparent"
       />
 
       {/* Top-left TikTok badge */}

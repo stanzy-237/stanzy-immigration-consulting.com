@@ -81,10 +81,10 @@ function ToolCard({
         <span
           aria-hidden={true}
           className={
-            'flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-xl transition-colors duration-200 ' +
+            "flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-xl transition-colors duration-200 " +
             (isFeatured
-              ? 'bg-rouge text-white group-hover:bg-rouge'
-              : 'bg-ice-blue text-navy-deep group-hover:bg-navy-deep group-hover:text-white')
+              ? "bg-rouge text-white group-hover:bg-rouge"
+              : "bg-ice-blue text-navy-deep group-hover:bg-navy-deep group-hover:text-white")
           }
         >
           <Icon className="h-5 w-5" strokeWidth={2} />
@@ -154,7 +154,7 @@ export function ToolsGrid(): ReactNode {
     >
       <div className="mx-auto max-w-7xl lg:flex lg:min-h-[calc(100vh-7rem)] lg:w-full lg:flex-col">
         {/* Eyebrow pill — matches the Hero marker (short rouge line, vertically centered). */}
-        <div className="mb-5 inline-flex items-center gap-2 rounded-full border-2 border-rose bg-blush px-3.5 py-1.5">
+        <div className="mb-5 inline-flex items-center gap-2 rounded-full border-2 border-rose bg-blush px-3.5 py-1.5 w-fit">
           <span
             aria-hidden={true}
             className="h-1 w-4 shrink-0 self-center rounded-full bg-rouge"
@@ -185,7 +185,11 @@ export function ToolsGrid(): ReactNode {
             (tool: Tool): ReactNode => (
               <li
                 key={tool.slug}
-                className={tool.variant === "wide" ? "md:col-span-2 lg:h-full" : "lg:h-full"}
+                className={
+                  tool.variant === "wide"
+                    ? "md:col-span-2 lg:h-full"
+                    : "lg:h-full"
+                }
               >
                 <ToolCard
                   tool={tool}

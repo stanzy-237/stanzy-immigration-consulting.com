@@ -185,7 +185,7 @@ export function SiteFooter(): ReactNode {
 
         <div className="-mt-2 flex flex-col gap-3">
           <span className="inline-flex items-center gap-1.5 self-start text-xs text-white/60">
-            <CanadaFlagIcon className="h-3.5 w-5 rounded-[2px]" />
+            <CanadaFlagIcon className="h-3.5 w-5 rounded-xs" />
             {t("canadaBadge")}
           </span>
           <p className="text-white/50 text-xs max-w-3xl leading-relaxed">

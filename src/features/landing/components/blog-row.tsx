@@ -1,11 +1,11 @@
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import Image from 'next/image';
-import type { ReactNode } from 'react';
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import type { ReactNode } from "react";
 
-import { Link } from '@/i18n/navigation';
+import { Link } from "@/i18n/navigation";
 
-import { ARTICLES, type Article } from '@/features/landing/data/articles';
+import { ARTICLES, type Article } from "@/features/landing/data/articles";
 
 type LargeCardProps = {
   article: Article;
@@ -30,27 +30,26 @@ function LargeCard({
   cardAriaLabel,
   imageAlt,
 }: LargeCardProps): ReactNode {
-  
   return (
     <Link
       href={`/blog/${article.slug}`}
       aria-label={cardAriaLabel}
       className={
-        'group relative flex h-full w-full flex-col overflow-hidden rounded-2xl border-2 border-fog-light bg-white no-underline transition-all duration-200 ease-out ' +
-        'hover:-translate-y-0.5 hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.10)]'
+        "group relative flex h-full w-full flex-col overflow-hidden rounded-2xl border-2 border-fog-light bg-white no-underline transition-all duration-200 ease-out " +
+        "hover:-translate-y-0.5 hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.10)]"
       }
     >
       {/* Gradient top bar on hover */}
       <span
         aria-hidden={true}
-        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[3px] rounded-t-2xl bg-[linear-gradient(90deg,#CC1627,#0D1F4E)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.75 rounded-t-2xl bg-[linear-gradient(90deg,#CC1627,#0D1F4E)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
       />
       {/* Image wrap — shrink-0 so the body gets any extra height the card
           absorbs from the 2-row span. */}
       <div
         className={
-          'relative w-full shrink-0 overflow-hidden ' +
-          (featured ? 'h-[280px]' : 'h-[160px]')
+          "relative w-full shrink-0 overflow-hidden " +
+          (featured ? "h-70" : "h-40")
         }
       >
         <Image
@@ -58,7 +57,7 @@ function LargeCard({
           alt={imageAlt}
           fill
           sizes="(min-width: 1024px) 55vw, 100vw"
-          className="object-cover transition-transform duration-[380ms] ease-out group-hover:scale-105"
+          className="object-cover transition-transform duration-380 ease-out group-hover:scale-105"
           unoptimized
         />
         {/* Darkening overlay for category pill contrast */}
@@ -79,8 +78,8 @@ function LargeCard({
       {/* Body */}
       <div
         className={
-          'flex flex-1 flex-col ' +
-          (featured ? 'px-6 pb-6 pt-5' : 'px-5 pb-5 pt-5')
+          "flex flex-1 flex-col " +
+          (featured ? "px-6 pb-6 pt-5" : "px-5 pb-5 pt-5")
         }
       >
         {/* Meta */}
@@ -88,15 +87,15 @@ function LargeCard({
           <span className="text-xs text-slate">{article.date}</span>
           <span
             aria-hidden={true}
-            className="h-[3px] w-[3px] shrink-0 rounded-full bg-fog"
+            className="h-0.75 w-0.75  shrink-0 rounded-full bg-fog"
           />
           <span className="text-xs text-slate">{reading}</span>
         </div>
         {/* Title */}
         <h3
           className={
-            'font-heading font-bold leading-snug text-navy-deep transition-colors duration-150 group-hover:text-rouge ' +
-            (featured ? 'text-lg' : 'text-base')
+            "font-heading font-bold leading-snug text-navy-deep transition-colors duration-150 group-hover:text-rouge " +
+            (featured ? "text-lg" : "text-base")
           }
         >
           {title}
@@ -154,7 +153,7 @@ function SmallCard({
       {/* Left accent bar on hover */}
       <span
         aria-hidden={true}
-        className="pointer-events-none absolute inset-y-0 left-0 w-[3px] rounded-l-2xl bg-[linear-gradient(to_bottom,#CC1627,#0D1F4E)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-y-0 left-0 w-0.75 rounded-l-2xl bg-[linear-gradient(to_bottom,#CC1627,#0D1F4E)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
       />
       <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl">
         <Image
@@ -182,12 +181,12 @@ function SmallCard({
 }
 
 export function BlogRow(): ReactNode {
-  const t = useTranslations('Home.BlogRow');
-  const tCat = useTranslations('Home.BlogRow.Categories');
-  const tArt = useTranslations('Home.BlogRow.Articles');
+  const t = useTranslations("Home.BlogRow");
+  const tCat = useTranslations("Home.BlogRow.Categories");
+  const tArt = useTranslations("Home.BlogRow.Articles");
 
-  const large = ARTICLES.filter((a: Article): boolean => a.size === 'lg');
-  const small = ARTICLES.filter((a: Article): boolean => a.size === 'sm');
+  const large = ARTICLES.filter((a: Article): boolean => a.size === "lg");
+  const small = ARTICLES.filter((a: Article): boolean => a.size === "sm");
 
   return (
     <section
@@ -204,16 +203,16 @@ export function BlogRow(): ReactNode {
                 className="h-1 w-4 shrink-0 self-center rounded-full bg-navy-deep"
               />
               <span className="font-sans text-xs font-semibold uppercase tracking-widest text-navy-deep">
-                {t('eyebrow')}
+                {t("eyebrow")}
               </span>
             </div>
             <h2
               id="blog-row-title"
               className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-none tracking-tight text-navy-deep"
             >
-              {t('titleLead')}
+              {t("titleLead")}
               <br />
-              <span className="text-rouge">{t('titleAccent')}</span>
+              <span className="text-rouge">{t("titleAccent")}</span>
             </h2>
           </div>
           <div className="shrink-0 pb-1.5">
@@ -221,12 +220,15 @@ export function BlogRow(): ReactNode {
               href="/blog"
               className="group inline-flex h-11 items-center gap-2 rounded-full border-2 border-fog bg-transparent pl-5 pr-2.5 font-sans text-sm font-semibold text-navy-deep no-underline transition-all duration-200 hover:border-navy-deep hover:bg-off-white"
             >
-              {t('seeAll')}
+              {t("seeAll")}
               <span
                 aria-hidden={true}
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy-deep transition-all duration-200 group-hover:rotate-45 group-hover:bg-rouge"
               >
-                <ArrowUpRight className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
+                <ArrowUpRight
+                  className="h-3.5 w-3.5 text-white"
+                  strokeWidth={2.5}
+                />
               </span>
             </Link>
           </div>
@@ -236,30 +238,25 @@ export function BlogRow(): ReactNode {
         <ul className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr] lg:grid-rows-2">
           {large.map(
             (article: Article, i: number): ReactNode => (
-              <li
-                key={article.slug}
-                className={i === 0 ? 'lg:row-span-2' : ''}
-              >
+              <li key={article.slug} className={i === 0 ? "lg:row-span-2" : ""}>
                 <LargeCard
                   article={article}
                   featured={i === 0}
                   title={tArt(article.titleKey)}
-                  excerpt={
-                    article.excerptKey ? tArt(article.excerptKey) : null
-                  }
+                  excerpt={article.excerptKey ? tArt(article.excerptKey) : null}
                   category={tCat(article.categoryKey)}
                   reading={
                     i === 0
-                      ? t('readingMinutes', {
+                      ? t("readingMinutes", {
                           minutes: article.readingMinutes,
                         })
-                      : t('readingMinutesShort', {
+                      : t("readingMinutesShort", {
                           minutes: article.readingMinutes,
                         })
                   }
-                  cta={i === 0 ? t('readFull') : t('read')}
+                  cta={i === 0 ? t("readFull") : t("read")}
                   imageAlt={tArt(article.imageAltKey)}
-                  cardAriaLabel={t('cardAriaLabel', {
+                  cardAriaLabel={t("cardAriaLabel", {
                     title: tArt(article.titleKey),
                   })}
                 />
@@ -277,7 +274,7 @@ export function BlogRow(): ReactNode {
                   article={article}
                   title={tArt(article.titleKey)}
                   category={tCat(article.categoryKey)}
-                  reading={t('readingMinutesShort', {
+                  reading={t("readingMinutesShort", {
                     minutes: article.readingMinutes,
                   })}
                   imageAlt={tArt(article.imageAltKey)}
