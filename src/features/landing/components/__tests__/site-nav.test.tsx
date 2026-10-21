@@ -132,6 +132,12 @@ describe('SiteNav', () => {
       ).toBeInTheDocument();
     });
 
+    it('hides Commencer, since the Account already exists', () => {
+      signedInAs('Aminata Diallo');
+      render(withIntl(<SiteNav />));
+      expect(screen.queryByRole('link', { name: 'Commencer' })).toBeNull();
+    });
+
     it('signs out from the account menu', async () => {
       signedInAs('Aminata Diallo');
       vi.mocked(authClient.signOut).mockResolvedValue({ data: {}, error: null } as never);

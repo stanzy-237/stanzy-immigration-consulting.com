@@ -206,12 +206,14 @@ export function SiteNav(): ReactNode {
               {t('login')}
             </Link>
           )}
-          <Link
-            href="/inscription"
-            className="bg-rouge rounded-md px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-rouge/90"
-          >
-            {t('start')}
-          </Link>
+          {accountName ? null : (
+            <Link
+              href="/inscription"
+              className="bg-rouge rounded-md px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-rouge/90"
+            >
+              {t('start')}
+            </Link>
+          )}
         </div>
 
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -291,13 +293,15 @@ export function SiteNav(): ReactNode {
                     {t('login')}
                   </Link>
                 )}
-                <Link
-                  href="/inscription"
-                  className="bg-rouge rounded-md px-3 py-2 text-center text-sm font-semibold text-white"
-                  onClick={closeMobile}
-                >
-                  {t('start')}
-                </Link>
+                {accountName ? null : (
+                  <Link
+                    href="/inscription"
+                    className="bg-rouge rounded-md px-3 py-2 text-center text-sm font-semibold text-white"
+                    onClick={closeMobile}
+                  >
+                    {t('start')}
+                  </Link>
+                )}
               </div>
             </nav>
           </SheetContent>
