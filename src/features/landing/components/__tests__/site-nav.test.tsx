@@ -1,19 +1,51 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { authClient } from '@/features/auth/lib/auth-client';
 import { SiteNav } from '@/features/landing/components/site-nav';
 
 import { withIntl } from './test-utils';
 
+vi.mock('@/i18n/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/i18n/navigation')>()),
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}));
+vi.mock('@/features/auth/lib/auth-client', () => ({
+  authClient: { useSession: vi.fn(), signOut: vi.fn() },
+}));
+
+const useSession = vi.mocked(authClient.useSession);
+
+function signedInAs(name: string) {
+  useSession.mockReturnValue({
+    data: { user: { name, email: 'aminata@example.com' }, session: {} },
+    isPending: false,
+  } as never);
+}
+
 describe('SiteNav', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useSession.mockReturnValue({ data: null, isPending: false } as never);
+  });
+
   it('renders the primary navigation landmark with the top-level links', () => {
     render(withIntl(<SiteNav />));
     const nav = screen.getByRole('navigation', { name: 'Navigation principale' });
     expect(within(nav).getByRole('link', { name: 'Blog' })).toBeInTheDocument();
     expect(within(nav).getByRole('link', { name: 'Connexion' })).toBeInTheDocument();
     expect(within(nav).getByRole('link', { name: 'Commencer' })).toBeInTheDocument();
+  });
+
+  it('sends Commencer to account creation', () => {
+    render(withIntl(<SiteNav />));
+    const nav = screen.getByRole('navigation', { name: 'Navigation principale' });
+    expect(within(nav).getByRole('link', { name: 'Commencer' })).toHaveAttribute(
+      'href',
+      '/fr/inscription',
+    );
   });
 
   it('exposes the brand logo at /logo2.png with an accessible name', () => {
@@ -87,5 +119,40 @@ describe('SiteNav', () => {
   it('has no axe violations in its closed state', async () => {
     const { container } = render(withIntl(<SiteNav />));
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  describe('when signed in', () => {
+    it('replaces Connexion with an account menu named after the Account', () => {
+      signedInAs('Aminata Diallo');
+      render(withIntl(<SiteNav />));
+      const nav = screen.getByRole('navigation', { name: 'Navigation principale' });
+      expect(within(nav).queryByRole('link', { name: 'Connexion' })).toBeNull();
+      expect(
+        within(nav).getByRole('button', { name: 'Mon compte : Aminata Diallo' }),
+      ).toBeInTheDocument();
+    });
+
+    it('hides Commencer, since the Account already exists', () => {
+      signedInAs('Aminata Diallo');
+      render(withIntl(<SiteNav />));
+      expect(screen.queryByRole('link', { name: 'Commencer' })).toBeNull();
+    });
+
+    it('signs out from the account menu', async () => {
+      signedInAs('Aminata Diallo');
+      vi.mocked(authClient.signOut).mockResolvedValue({ data: {}, error: null } as never);
+      render(withIntl(<SiteNav />));
+
+      fireEvent.click(screen.getByRole('button', { name: 'Mon compte : Aminata Diallo' }));
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Déconnexion' }));
+
+      await waitFor(() => expect(authClient.signOut).toHaveBeenCalled());
+    });
+
+    it('has no axe violations', async () => {
+      signedInAs('Aminata Diallo');
+      const { container } = render(withIntl(<SiteNav />));
+      expect(await axe(container)).toHaveNoViolations();
+    });
   });
 });

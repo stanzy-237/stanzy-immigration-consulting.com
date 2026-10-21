@@ -13,6 +13,13 @@ export const routing = defineRouting({
 
 export type Locale = (typeof routing.locales)[number];
 
+/** Narrows any value (a stored preference, a query param) to a supported locale. */
+export function toLocale(value: unknown): Locale {
+  return routing.locales.includes(value as Locale)
+    ? (value as Locale)
+    : routing.defaultLocale;
+}
+
 /**
  * Shape of the `[locale]` route segment params. The segment arrives as a raw
  * string (it is validated against `routing.locales` in the layout); this alias

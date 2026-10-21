@@ -59,7 +59,9 @@
         "accompagnementDesc": "Suivi de A à Z pour votre dossier Entrée Express",
         "verificationName": "Vérification de documents",
         "verificationDesc": "Nous relisons votre dossier avant soumission"
-      }
+      },
+      "account": "Mon compte : {name}",
+      "signOut": "Déconnexion"
     },
     "TikTok": {
       "eyebrow": "Stanzy sur TikTok",
@@ -364,6 +366,69 @@
         "tiktok": "TikTok",
         "instagram": "Instagram",
         "whatsapp": "WhatsApp"
+      }
+    }
+  },
+  "Auth": {
+    "Shell": {
+      "backHome": "Retour à l’accueil Stanzy"
+    },
+    "Fields": {
+      "name": "Nom complet",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "passwordHint": "{min} caractères minimum"
+    },
+    "Errors": {
+      "generic": "Une erreur est survenue. Réessayez.",
+      "tooManyAttempts": "Trop de tentatives. Réessayez dans une minute.",
+      "invalidCredentials": "E-mail ou mot de passe incorrect.",
+      "invalidEmail": "Cette adresse e-mail n’est pas valide.",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 10 caractères.",
+      "emailNotVerified": "Confirmez d’abord votre adresse e-mail grâce au lien que nous vous avons envoyé."
+    },
+    "Inscription": {
+      "metaTitle": "Créer un compte",
+      "title": "Créer votre compte",
+      "subtitle": "Gratuit. Sauvegardez votre progression dans les outils Stanzy.",
+      "submit": "Créer mon compte",
+      "submitting": "Création du compte…",
+      "haveAccount": "Déjà un compte ?",
+      "signIn": "Se connecter"
+    },
+    "Connexion": {
+      "metaTitle": "Connexion",
+      "title": "Connexion",
+      "subtitle": "Heureux de vous revoir. Connectez-vous à votre compte Stanzy.",
+      "submit": "Se connecter",
+      "submitting": "Connexion…",
+      "noAccount": "Pas encore de compte ?",
+      "signUp": "Créer un compte",
+      "resend": "Renvoyer l’e-mail de confirmation",
+      "resent": "E-mail envoyé. Vérifiez votre boîte de réception."
+    },
+    "Verification": {
+      "metaTitle": "Vérification de l’e-mail",
+      "pendingTitle": "Vérifiez votre boîte de réception",
+      "pendingBody": "Nous avons envoyé un lien de confirmation à {email}. Cliquez dessus pour activer votre compte.",
+      "pendingBodyNoEmail": "Nous vous avons envoyé un lien de confirmation. Cliquez dessus pour activer votre compte.",
+      "resend": "Renvoyer l’e-mail",
+      "resent": "E-mail renvoyé. Pensez à vérifier vos courriers indésirables.",
+      "verifiedTitle": "Adresse confirmée",
+      "verifiedBody": "Votre compte est actif et vous êtes connecté.",
+      "continue": "Continuer",
+      "errorTitle": "Lien invalide ou expiré",
+      "errorBody": "Ce lien de confirmation n’est plus valide. Connectez-vous pour en recevoir un nouveau.",
+      "goToSignIn": "Aller à la connexion"
+    },
+    "Emails": {
+      "Verification": {
+        "subject": "Confirmez votre adresse e-mail — Stanzy",
+        "greeting": "Bonjour {name},",
+        "body": "Merci pour votre inscription sur Stanzy Immigration Consulting. Confirmez votre adresse e-mail pour activer votre compte :",
+        "cta": "Confirmer mon adresse",
+        "expiry": "Ce lien expire dans 1 heure.",
+        "ignore": "Si vous n’êtes pas à l’origine de cette inscription, ignorez simplement cet e-mail."
       }
     }
   }
