@@ -4,6 +4,10 @@
 
 Issues and specs live as GitHub issues, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
+### Branching (mandatory)
+
+Every feature or issue gets its own branch (`feat/<name>`, `fix/<name>`, `docs/<name>`, `chore/<name>`), cut from up-to-date `main` before the first edit. Push that branch and land it on `main` through a PR. `main` is branch-protected on GitHub (PR required, admins included, no force-push), so a direct push to `main` is rejected.
+
 ### Triage labels
 
 Default canonical labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
