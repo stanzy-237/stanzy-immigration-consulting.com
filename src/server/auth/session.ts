@@ -1,7 +1,5 @@
-import { toLocale } from '@/features/auth/lib/emails';
-import type { Locale } from '@/i18n/routing';
-
-import { auth } from './auth';
+import { toLocale, type Locale } from '@/i18n/routing';
+import { auth } from '@/server/auth/auth';
 
 /**
  * The signed-in Account and its session, as the rest of the app sees them.

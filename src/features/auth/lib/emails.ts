@@ -1,18 +1,11 @@
 import { createTranslator } from 'next-intl';
 
-import { routing, type Locale } from '@/i18n/routing';
+import { toLocale } from '@/i18n/routing';
 import en from '@/messages/en.json';
 import fr from '@/messages/fr.json';
 import type { EmailMessage } from '@/server/email/mailer';
 
 const MESSAGES = { fr, en } as const;
-
-/** Narrows whatever locale an Account carries to one we have emails for. */
-export function toLocale(value: unknown): Locale {
-  return routing.locales.includes(value as Locale)
-    ? (value as Locale)
-    : routing.defaultLocale;
-}
 
 function escapeHtml(value: string): string {
   return value

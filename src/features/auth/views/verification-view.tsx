@@ -1,31 +1,40 @@
 'use client';
 
 import { MailCheck } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
-import { useState, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { AuthShell } from '@/features/auth/components/auth-shell';
-import { authClient } from '@/features/auth/lib/auth-client';
+import { useResendVerification } from '@/features/auth/hooks/use-resend-verification';
 import { Link } from '@/i18n/navigation';
 
-type VerificationViewProps = {
-  /** Set on the "check your inbox" step straight after sign-up. */
-  email?: string;
-  /** `verified` once Better Auth has accepted the link and signed the person in. */
-  status?: string;
-  /** Set by Better Auth when the link is invalid or expired. */
-  error?: string;
-};
+/**
+ * The page's query string. Read here rather than in the route so the route
+ * stays a thin shell:
+ * - `email`: set on the "check your inbox" step straight after sign-up;
+ * - `status=verified`: Better Auth accepted the link and signed the person in;
+ * - `error`: Better Auth rejected the link (invalid or expired).
+ */
+export type VerificationSearchParams = Record<string, string | string[] | undefined>;
+
+const first = (value: string | string[] | undefined): string | undefined =>
+  Array.isArray(value) ? value[0] : value;
 
 const ctaClass =
   'bg-rouge hover:bg-rouge/90 inline-flex h-11 w-full items-center justify-center rounded-lg text-sm font-semibold text-white';
 
 /** Vérification: the steps around confirming an Account's email address. */
-export function VerificationView({ email, status, error }: VerificationViewProps): ReactNode {
+export function VerificationView({
+  searchParams,
+}: {
+  searchParams: VerificationSearchParams;
+}): ReactNode {
   const t = useTranslations('Auth.Verification');
-  const locale = useLocale();
-  const [resent, setResent] = useState(false);
+  const email = first(searchParams.email);
+  const verified = first(searchParams.status) === 'verified';
+  const error = first(searchParams.error);
+  const { resent, resend } = useResendVerification(email);
 
   if (error) {
     return (
@@ -37,7 +46,7 @@ export function VerificationView({ email, status, error }: VerificationViewProps
     );
   }
 
-  if (status === 'verified') {
+  if (verified) {
     return (
       <AuthShell title={t('verifiedTitle')} subtitle={t('verifiedBody')}>
         <Link href="/" className={ctaClass}>
@@ -45,15 +54,6 @@ export function VerificationView({ email, status, error }: VerificationViewProps
         </Link>
       </AuthShell>
     );
-  }
-
-  async function onResend(): Promise<void> {
-    if (!email) return;
-    const { error: resendError } = await authClient.sendVerificationEmail({
-      email,
-      callbackURL: `/${locale}/verification?status=verified`,
-    });
-    if (!resendError) setResent(true);
   }
 
   return (
@@ -71,7 +71,7 @@ export function VerificationView({ email, status, error }: VerificationViewProps
               {t('resent')}
             </p>
           ) : (
-            <Button type="button" variant="outline" onClick={onResend} className="h-11 w-full">
+            <Button type="button" variant="outline" onClick={(): void => void resend()} className="h-11 w-full">
               {t('resend')}
             </Button>
           )

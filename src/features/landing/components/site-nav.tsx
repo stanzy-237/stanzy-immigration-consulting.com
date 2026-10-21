@@ -26,7 +26,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { authClient } from '@/features/auth/lib/auth-client';
+import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
@@ -53,14 +53,16 @@ export function SiteNav(): ReactNode {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname: string = usePathname() ?? '/';
   const router = useRouter();
-  const { data: session } = authClient.useSession();
-  const accountName: string | null = session?.user.name ?? null;
+  // Read client-side (not passed down as a prop) so every page that renders
+  // the nav stays statically rendered; see #26.
+  const { account, signOut: endSession } = useCurrentAccount();
+  const accountName: string | null = account?.name ?? null;
 
   const signOut = useCallback(async (): Promise<void> => {
-    await authClient.signOut();
+    await endSession();
     router.push('/');
     router.refresh();
-  }, [router]);
+  }, [endSession, router]);
 
   const isActive = (href: string): boolean =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
@@ -264,6 +266,11 @@ export function SiteNav(): ReactNode {
                   ariaLabel={t('localeToggle')}
                   className="self-start"
                 />
+                {accountName ? (
+                  <p className="text-navy-deep truncate text-sm font-semibold">
+                    {accountName}
+                  </p>
+                ) : null}
                 {accountName ? (
                   <button
                     type="button"

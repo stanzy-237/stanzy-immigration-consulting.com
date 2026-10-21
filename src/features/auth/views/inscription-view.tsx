@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { AuthShell } from '@/features/auth/components/auth-shell';
 import { authErrorKey, type AuthErrorKey } from '@/features/auth/lib/auth-errors';
 import { authClient } from '@/features/auth/lib/auth-client';
+import { verifiedCallbackURL } from '@/features/auth/lib/verification';
 import { MIN_PASSWORD_LENGTH } from '@/features/auth/lib/password';
 import { Link, useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -44,7 +45,7 @@ export function InscriptionView(): ReactNode {
       email,
       password,
       locale,
-      callbackURL: `/${locale}/verification?status=verified`,
+      callbackURL: verifiedCallbackURL(locale),
     });
     setPending(false);
 

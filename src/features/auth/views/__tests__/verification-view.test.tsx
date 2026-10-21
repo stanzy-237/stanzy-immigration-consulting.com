@@ -20,7 +20,7 @@ describe('VerificationView', () => {
 
   it('after sign-up, tells the person which inbox to check and can resend the link', async () => {
     resend.mockResolvedValue({ data: { status: true }, error: null } as never);
-    render(withIntl(<VerificationView email="aminata@example.com" />));
+    render(withIntl(<VerificationView searchParams={{ email: 'aminata@example.com' }} />));
 
     expect(
       screen.getByRole('heading', { name: 'Vérifiez votre boîte de réception' }),
@@ -38,13 +38,13 @@ describe('VerificationView', () => {
   });
 
   it('confirms a followed link and lets the signed-in person continue', () => {
-    render(withIntl(<VerificationView status="verified" />));
+    render(withIntl(<VerificationView searchParams={{ status: 'verified' }} />));
     expect(screen.getByRole('heading', { name: 'Adresse confirmée' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Continuer' })).toHaveAttribute('href', '/');
   });
 
   it('explains an invalid or expired link and points to Connexion', () => {
-    render(withIntl(<VerificationView error="token_expired" />));
+    render(withIntl(<VerificationView searchParams={{ error: 'token_expired' }} />));
     expect(
       screen.getByRole('heading', { name: 'Lien invalide ou expiré' }),
     ).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe('VerificationView', () => {
   });
 
   it('has no axe violations', async () => {
-    const { container } = render(withIntl(<VerificationView email="a@example.com" />));
+    const { container } = render(withIntl(<VerificationView searchParams={{ email: 'a@example.com' }} />));
     expect(await axe(container)).toHaveNoViolations();
   });
 });

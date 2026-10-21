@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useState, type FormEvent, type ReactNode } from 'react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { AuthShell } from '@/features/auth/components/auth-shell';
+import { useResendVerification } from '@/features/auth/hooks/use-resend-verification';
 import { authErrorKey, type AuthErrorKey } from '@/features/auth/lib/auth-errors';
 import { authClient } from '@/features/auth/lib/auth-client';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -17,13 +18,12 @@ export function ConnexionView(): ReactNode {
   const t = useTranslations('Auth.Connexion');
   const tFields = useTranslations('Auth.Fields');
   const tErrors = useTranslations('Auth.Errors');
-  const locale = useLocale();
   const router = useRouter();
 
   const [email, setEmail] = useState('');
   const [error, setError] = useState<AuthErrorKey | null>(null);
   const [pending, setPending] = useState(false);
-  const [resent, setResent] = useState(false);
+  const { resent, resend, reset: resetResent } = useResendVerification(email);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
@@ -31,7 +31,7 @@ export function ConnexionView(): ReactNode {
 
     setPending(true);
     setError(null);
-    setResent(false);
+    resetResent();
     const { error: signInError } = await authClient.signIn.email({
       email,
       password: String(form.get('password')),
@@ -47,15 +47,8 @@ export function ConnexionView(): ReactNode {
   }
 
   async function onResend(): Promise<void> {
-    const { error: resendError } = await authClient.sendVerificationEmail({
-      email,
-      callbackURL: `/${locale}/verification?status=verified`,
-    });
-    if (resendError) {
-      setError(authErrorKey(resendError));
-      return;
-    }
-    setResent(true);
+    const resendError = await resend();
+    if (resendError) setError(authErrorKey(resendError));
   }
 
   return (

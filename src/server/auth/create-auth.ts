@@ -1,7 +1,8 @@
 import { betterAuth, type BetterAuthOptions } from 'better-auth';
 
-import { toLocale, verificationEmail } from '@/features/auth/lib/emails';
+import { verificationEmail } from '@/features/auth/lib/emails';
 import { MIN_PASSWORD_LENGTH } from '@/features/auth/lib/password';
+import { toLocale } from '@/i18n/routing';
 import type { Mailer } from '@/server/email/mailer';
 
 export type AuthDeps = {

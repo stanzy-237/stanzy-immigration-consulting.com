@@ -21,13 +21,30 @@ const schema = z.object({
   DIRECT_URL: z.string().url().optional(),
   // Signs session cookies and verification tokens. `openssl rand -base64 32`.
   BETTER_AUTH_SECRET: z.string().min(32),
-  // Public origin of the app. Optional: on Vercel previews it is derived from
-  // VERCEL_URL, and otherwise from the incoming request.
+  // Public origin of the app. Required in Vercel production (VERCEL_ENV), where
+  // VERCEL_URL is the per-deployment *.vercel.app host, not the real domain.
+  // Previews and local dev fall back to VERCEL_URL / localhost.
   BETTER_AUTH_URL: z.string().url().optional(),
   // Resend API key. Without it, emails are logged to the console instead.
   RESEND_API_KEY: z.string().min(1).optional(),
   // Sender for transactional email; must be on a domain verified in Resend.
-  EMAIL_FROM: z.string().min(3).default('Stanzy Immigration <onboarding@resend.dev>'),
+  // Required whenever RESEND_API_KEY is set.
+  EMAIL_FROM: z.string().min(3).optional(),
+}).superRefine((value, ctx) => {
+  if (process.env.VERCEL_ENV === 'production' && !value.BETTER_AUTH_URL) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['BETTER_AUTH_URL'],
+      message: 'Required in production (the public URL, e.g. https://your-domain.com)',
+    });
+  }
+  if (value.RESEND_API_KEY && !value.EMAIL_FROM) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['EMAIL_FROM'],
+      message: 'Required when RESEND_API_KEY is set (a sender on your verified domain)',
+    });
+  }
 });
 
 export type Env = z.infer<typeof schema>;
