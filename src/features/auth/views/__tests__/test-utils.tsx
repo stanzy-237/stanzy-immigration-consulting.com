@@ -13,7 +13,7 @@ export function withIntl(children: ReactNode): ReactElement {
 }
 
 /** The locale-aware router the views navigate with; reset per test. */
-export const router = { push: vi.fn(), replace: vi.fn(), refresh: vi.fn() };
+export const router = { push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), back: vi.fn() };
 
 /**
  * Stand-in for `@/i18n/navigation`. Use with

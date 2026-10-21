@@ -55,9 +55,12 @@ export async function generateMetadata({
 
 export default async function LocaleLayout({
   children,
+  modal,
   params,
 }: {
   children: React.ReactNode;
+  /** Parallel route: Connexion / Inscription opened as dialogs (see @modal). */
+  modal: React.ReactNode;
   params: LocaleParams;
 }) {
   const { locale } = await params;
@@ -78,7 +81,10 @@ export default async function LocaleLayout({
     >
       <body>
         <NextIntlClientProvider>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <TRPCReactProvider>
+            {children}
+            {modal}
+          </TRPCReactProvider>
         </NextIntlClientProvider>
         <ServiceWorkerRegister />
       </body>
