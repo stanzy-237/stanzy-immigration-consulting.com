@@ -42,7 +42,7 @@ describe('ConnexionView', () => {
         password: 'correct-horse-battery',
       }),
     );
-    expect(router.refresh).toHaveBeenCalled();
+    expect(router.refresh).not.toHaveBeenCalled();
   });
 
   it('shows one generic message for a wrong email or password', async () => {

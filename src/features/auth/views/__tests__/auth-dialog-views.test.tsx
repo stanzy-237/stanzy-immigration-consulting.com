@@ -52,7 +52,8 @@ describe('ConnexionDialogView', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Se connecter' }));
 
     await waitFor(() => expect(router.back).toHaveBeenCalled());
-    expect(router.refresh).toHaveBeenCalled();
+    // No server re-render: the nav picks up the new session on its own.
+    expect(router.refresh).not.toHaveBeenCalled();
     expect(router.push).not.toHaveBeenCalled();
   });
 

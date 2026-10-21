@@ -25,12 +25,7 @@ export function ConnexionView(): ReactNode {
         </>
       }
     >
-      <ConnexionForm
-        onSignedIn={(): void => {
-          router.push('/');
-          router.refresh();
-        }}
-      />
+      <ConnexionForm onSignedIn={(): void => router.push('/')} />
     </AuthShell>
   );
 }

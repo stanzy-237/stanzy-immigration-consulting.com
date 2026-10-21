@@ -28,12 +28,9 @@ export function ConnexionDialogView(): ReactNode {
         </>
       }
     >
-      <ConnexionForm
-        onSignedIn={(): void => {
-          router.back();
-          router.refresh();
-        }}
-      />
+      {/* No router.refresh(): pages are static and the nav updates from the
+          session on its own; a refresh would re-render the page underneath. */}
+      <ConnexionForm onSignedIn={(): void => router.back()} />
     </AuthDialog>
   );
 }
