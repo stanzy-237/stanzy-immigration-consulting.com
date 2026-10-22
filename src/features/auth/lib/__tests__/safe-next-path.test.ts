@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { safeNextPath } from '@/features/auth/lib/safe-next-path';
+import { localizedNextPath, safeNextPath } from '@/features/auth/lib/safe-next-path';
 
 /**
  * Seam: the `next` sanitizer. Whatever arrives in `?next=` is attacker
@@ -70,4 +70,14 @@ describe('safeNextPath', () => {
       expect(safeNextPath(next)).toBe('/');
     },
   );
+});
+
+describe('localizedNextPath', () => {
+  it('prefixes a safe next with the locale, for full-page redirects like Google', () => {
+    expect(localizedNextPath('fr', '/en/compte?tab=securite')).toBe('/fr/compte?tab=securite');
+  });
+
+  it.each([undefined, '/', '//evil.com'])('is the locale home for %j', (next) => {
+    expect(localizedNextPath('en', next)).toBe('/en');
+  });
 });

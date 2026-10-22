@@ -1,11 +1,12 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { AuthShell } from '@/features/auth/components/auth-shell';
 import { ConnexionForm } from '@/features/auth/components/connexion-form';
-import { safeNextPath, withNext, type NextParam } from '@/features/auth/lib/safe-next-path';
+import { GoogleSignIn } from '@/features/auth/components/google-sign-in';
+import { localizedNextPath, safeNextPath, withNext, type NextParam } from '@/features/auth/lib/safe-next-path';
 import { Link, useRouter } from '@/i18n/navigation';
 
 /**
@@ -15,6 +16,7 @@ import { Link, useRouter } from '@/i18n/navigation';
  */
 export function ConnexionView({ next }: { next?: NextParam }): ReactNode {
   const t = useTranslations('Auth.Connexion');
+  const locale = useLocale();
   const router = useRouter();
 
   return (
@@ -30,6 +32,7 @@ export function ConnexionView({ next }: { next?: NextParam }): ReactNode {
         </>
       }
     >
+      <GoogleSignIn callbackURL={localizedNextPath(locale, next)} />
       <ConnexionForm onSignedIn={(): void => router.push(safeNextPath(next))} />
     </AuthShell>
   );

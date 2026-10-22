@@ -88,3 +88,12 @@ export function withNext(pathname: string, next: unknown): string {
   const safe = safeNextPath(next);
   return safe === HOME ? pathname : `${pathname}?${new URLSearchParams({ next: safe })}`;
 }
+
+/**
+ * `safeNextPath` with the locale put back, for redirects that bypass the
+ * locale-aware router (e.g. the Google round-trip's `callbackURL`).
+ */
+export function localizedNextPath(locale: string, next: unknown): string {
+  const safe = safeNextPath(next);
+  return safe === HOME ? `/${locale}` : `/${locale}${safe}`;
+}

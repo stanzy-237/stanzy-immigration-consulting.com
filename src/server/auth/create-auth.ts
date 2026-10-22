@@ -10,6 +10,9 @@ import {
 import { toLocale } from '@/i18n/routing';
 import type { Mailer } from '@/server/email/mailer';
 
+/** A Google OAuth client from Google Cloud Console. */
+export type GoogleOAuthClient = { clientId: string; clientSecret: string };
+
 export type AuthDeps = {
   database: BetterAuthOptions['database'];
   mailer: Mailer;
@@ -22,6 +25,8 @@ export type AuthDeps = {
    * than one for an unknown address. Tests leave it out to see the email.
    */
   runInBackground?: (task: Promise<unknown>) => void;
+  /** Google OAuth client. Without it, "Continuer avec Google" is off. */
+  google?: GoogleOAuthClient;
 };
 
 /**
@@ -70,7 +75,27 @@ export function createAuth(deps: AuthDeps) {
         locale: { type: 'string', required: false, defaultValue: 'fr', input: true },
       },
     },
-    account: { modelName: 'authIdentity' },
+    account: {
+      modelName: 'authIdentity',
+      accountLinking: {
+        enabled: true,
+        // A Google sign-in whose email matches an existing Account joins it
+        // instead of creating a second one. Better Auth still refuses when the
+        // existing Account's email was never verified, so nobody can pre-claim
+        // an address with a password and wait for its owner to use Google.
+        trustedProviders: ['google'],
+      },
+    },
+    socialProviders: deps.google
+      ? {
+          google: {
+            clientId: deps.google.clientId,
+            clientSecret: deps.google.clientSecret,
+            // Let people with several Google accounts pick the right one.
+            prompt: 'select_account',
+          },
+        }
+      : {},
     emailAndPassword: {
       enabled: true,
       // Also makes sign-up answer identically for new and existing emails, so

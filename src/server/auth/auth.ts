@@ -36,11 +36,18 @@ export const auth = createAuth({
     apiKey: env.RESEND_API_KEY,
     from: env.EMAIL_FROM ?? 'Stanzy Immigration <onboarding@resend.dev>',
   }),
-  baseURL: env.BETTER_AUTH_URL ?? vercelOrigin ?? 'http://localhost:3000',
+  // On previews, the branch alias: it is where people open the preview, and
+  // it stays the same across pushes, so Google's redirect URI for it (which
+  // Better Auth derives from baseURL) only has to be registered once.
+  baseURL: env.BETTER_AUTH_URL ?? vercelBranchOrigin ?? vercelOrigin ?? 'http://localhost:3000',
   secret: env.BETTER_AUTH_SECRET,
   // Send auth emails after responding, so response time never reveals
   // whether an address has an Account.
   runInBackground: (task) => after(task),
+  google:
+    env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ? { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET }
+      : undefined,
   trustedOrigins: [
     ...(env.BETTER_AUTH_URL ? withWwwVariant(env.BETTER_AUTH_URL) : []),
     ...[vercelOrigin, vercelBranchOrigin].filter((origin): origin is string => Boolean(origin)),

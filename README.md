@@ -21,6 +21,7 @@ npm install
 cp .env.example .env   # then fill in your Neon connection strings
 npm run db:generate    # generate the Prisma client
 ./scripts/setup-auth.sh  # auth secret, Resend, Vercel env, migration (guided)
+./scripts/setup-google-sign-in.sh  # Google OAuth client (optional)
 npm run dev            # http://localhost:3000 → redirects to /fr
 ```
 
@@ -79,6 +80,8 @@ This is a one-time human setup (requires account credentials):
    - `DIRECT_URL` — Neon **direct** connection string
    - `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `RESEND_API_KEY`, `EMAIL_FROM` —
      `./scripts/setup-auth.sh` walks through these
+   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (optional; enables Google sign-in) —
+     `./scripts/setup-google-sign-in.sh` walks through these
 4. Deploy. `prisma generate` runs on `postinstall`; the app boots and `/fr` /
    `/en` resolve. Apply migrations with `npm run db:deploy`.
 ```
