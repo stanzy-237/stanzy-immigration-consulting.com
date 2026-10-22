@@ -51,8 +51,12 @@ Stanzy, the one person who runs the practice and administers the platform. Being
 _Avoid_: "admin", "staff".
 
 **Partner**:
-An outside professional the consultant outsources part of a Client's work to. The consultant adds each Partner and assigns them to specific Clients or documents; a Partner sees only what they are assigned, never the rest of the practice.
+An outside professional the consultant outsources part of a Client's work to. The consultant adds each Partner and gives them Missions; a Partner sees only their Missions, never a whole Client or the rest of the practice.
 _Avoid_: "subcontractor", "freelancer", "agent".
+
+**Mission**:
+One document the consultant outsources to a Partner within a Client's Dossier (e.g. a certificat de police, a preuve de fonds, an attestation CNPS). It follows À faire → En cours → Livré, can be sent back as Retour → Modif en cours → Livré, and carries a comment thread between the consultant and the Partner.
+_Avoid_: "task", "assignment", "job".
 
 **Dossier**:
 The case file for a Client's engagement — what the consultant tracks and works through.
