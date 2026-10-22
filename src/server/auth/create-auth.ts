@@ -40,6 +40,20 @@ export function createAuth(deps: AuthDeps) {
   // `after` hook below can sign that person in.
   const passwordResetFor = new WeakMap<Request, User>();
 
+  /** Emails `user` a link, in the language their Account signed up in. */
+  const sendLinkEmail =
+    (build: typeof verificationEmail) =>
+    async ({ user, url }: { user: User; url: string }): Promise<void> => {
+      await deps.mailer.send(
+        build({
+          to: user.email,
+          name: user.name,
+          url,
+          locale: (user as { locale?: unknown }).locale,
+        }),
+      );
+    };
+
   return betterAuth({
     appName: 'Stanzy Immigration Consulting',
     baseURL: deps.baseURL,
@@ -69,16 +83,7 @@ export function createAuth(deps: AuthDeps) {
       revokeSessionsOnPasswordReset: true,
       // The reset email tells the person the link lasts 1 hour.
       resetPasswordTokenExpiresIn: RESET_PASSWORD_LINK_TTL_SECONDS,
-      async sendResetPassword({ user, url }) {
-        await deps.mailer.send(
-          resetPasswordEmail({
-            to: user.email,
-            name: user.name,
-            url,
-            locale: (user as { locale?: unknown }).locale,
-          }),
-        );
-      },
+      sendResetPassword: sendLinkEmail(resetPasswordEmail),
       async onPasswordReset({ user }, request) {
         if (request) passwordResetFor.set(request, user);
       },
@@ -94,6 +99,9 @@ export function createAuth(deps: AuthDeps) {
         const account = user.emailVerified
           ? user
           : await ctx.context.internalAdapter.updateUser(user.id, { emailVerified: true });
+        // TOTP (#4, stories 27-28): once an Account can enable 2FA, this must
+        // not mint a full session for it; send it through the 2FA challenge
+        // instead, or an emailed link alone would bypass the second factor.
         const session = await ctx.context.internalAdapter.createSession(account.id);
         await setSessionCookie(ctx, { session, user: account });
       }),
@@ -101,16 +109,7 @@ export function createAuth(deps: AuthDeps) {
     emailVerification: {
       sendOnSignUp: true,
       autoSignInAfterVerification: true,
-      async sendVerificationEmail({ user, url }) {
-        await deps.mailer.send(
-          verificationEmail({
-            to: user.email,
-            name: user.name,
-            url,
-            locale: (user as { locale?: unknown }).locale,
-          }),
-        );
-      },
+      sendVerificationEmail: sendLinkEmail(verificationEmail),
     },
     databaseHooks: {
       user: {
