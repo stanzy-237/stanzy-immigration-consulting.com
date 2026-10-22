@@ -102,6 +102,14 @@ describe('InscriptionView', () => {
     );
   });
 
+  it('carries next across to Connexion', () => {
+    render(withIntl(<InscriptionView next="/compte" />));
+    expect(screen.getByRole('link', { name: 'Se connecter' })).toHaveAttribute(
+      'href',
+      '/connexion?next=%2Fcompte',
+    );
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(withIntl(<InscriptionView />));
     expect(await axe(container)).toHaveNoViolations();

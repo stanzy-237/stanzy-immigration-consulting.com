@@ -57,6 +57,23 @@ describe('ConnexionDialogView', () => {
     expect(router.push).not.toHaveBeenCalled();
   });
 
+  it('goes on to next once signed in, when Connexion was opened with one', async () => {
+    vi.mocked(authClient.signIn.email).mockResolvedValue({ data: {}, error: null } as never);
+    render(withIntl(<ConnexionDialogView next="/compte" />));
+    const dialog = await screen.findByRole('dialog');
+
+    fireEvent.change(within(dialog).getByLabelText('Adresse e-mail'), {
+      target: { value: 'aminata@example.com' },
+    });
+    fireEvent.change(within(dialog).getByLabelText('Mot de passe'), {
+      target: { value: 'correct-horse-battery' },
+    });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Se connecter' }));
+
+    await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/compte'));
+    expect(router.back).not.toHaveBeenCalled();
+  });
+
   it('has no axe violations', async () => {
     render(withIntl(<ConnexionDialogView />));
     expect(await axe(await screen.findByRole('dialog'))).toHaveNoViolations();

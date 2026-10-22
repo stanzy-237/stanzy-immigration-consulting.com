@@ -421,6 +421,13 @@
       "errorBody": "Ce lien de confirmation n’est plus valide. Connectez-vous pour en recevoir un nouveau.",
       "goToSignIn": "Aller à la connexion"
     },
+    "Compte": {
+      "metaTitle": "Mon compte",
+      "title": "Mon compte",
+      "signedInAs": "Connecté en tant que {name} ({email}).",
+      "comingSoon": "Votre espace personnel arrive bientôt : sécurité du compte, Coffre-fort et suivi de vos démarches.",
+      "backHome": "Retour à l’accueil"
+    },
     "Emails": {
       "Verification": {
         "subject": "Confirmez votre adresse e-mail — Stanzy",

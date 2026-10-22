@@ -421,6 +421,13 @@
       "errorBody": "This confirmation link is no longer valid. Log in to get a new one.",
       "goToSignIn": "Go to log in"
     },
+    "Compte": {
+      "metaTitle": "My account",
+      "title": "My account",
+      "signedInAs": "Signed in as {name} ({email}).",
+      "comingSoon": "Your personal space is coming soon: account security, the Coffre-fort and tracking for your applications.",
+      "backHome": "Back to home"
+    },
     "Emails": {
       "Verification": {
         "subject": "Confirm your email address — Stanzy",
