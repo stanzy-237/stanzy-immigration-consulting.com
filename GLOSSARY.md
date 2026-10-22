@@ -55,7 +55,11 @@ An outside professional the consultant outsources part of a Client's work to. Th
 _Avoid_: "subcontractor", "freelancer", "agent".
 
 **Mission**:
-One document the consultant outsources to a Partner within a Client's Dossier (e.g. a certificat de police, a preuve de fonds, an attestation CNPS). It follows À faire → En cours → Livré, can be sent back as Retour → Modif en cours → Livré, and carries a comment thread between the consultant and the Partner.
+One document the consultant outsources to a Partner within a Client's Dossier (e.g. a certificat de police, a preuve de fonds, an attestation CNPS). It follows À faire → En cours → Mouture → Livré: the Mouture is the first draft, which the consultant and the Client review and can send back as Modif en cours until it is right. It carries a comment thread.
+
+**Mouture** (Draft):
+The reviewable draft of a Mission's document, before the final version is delivered.
+_Avoid_: "version", "brouillon".
 _Avoid_: "task", "assignment", "job".
 
 **Dossier**:
