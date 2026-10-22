@@ -385,7 +385,8 @@
       "invalidCredentials": "Incorrect email or password.",
       "invalidEmail": "This email address isn’t valid.",
       "passwordTooShort": "Your password must be at least 10 characters.",
-      "emailNotVerified": "Please confirm your email address first, using the link we sent you."
+      "emailNotVerified": "Please confirm your email address first, using the link we sent you.",
+      "invalidResetLink": "This reset link has already been used or has expired."
     },
     "Inscription": {
       "metaTitle": "Create an account",
@@ -405,7 +406,8 @@
       "noAccount": "No account yet?",
       "signUp": "Create an account",
       "resend": "Resend the confirmation email",
-      "resent": "Email sent. Check your inbox."
+      "resent": "Email sent. Check your inbox.",
+      "forgotPassword": "Forgot your password?"
     },
     "Verification": {
       "metaTitle": "Email verification",
@@ -436,7 +438,40 @@
         "cta": "Confirm my address",
         "expiry": "This link expires in 1 hour.",
         "ignore": "If you didn’t sign up, you can safely ignore this email."
+      },
+      "ResetPassword": {
+        "subject": "Reset your password — Stanzy",
+        "greeting": "Hello {name},",
+        "body": "You asked to reset the password of your Stanzy account. Choose a new one with this link:",
+        "cta": "Choose a new password",
+        "expiry": "This link expires in 1 hour and works only once.",
+        "ignore": "If you didn’t ask for this, ignore this email: your password stays the same."
       }
+    },
+    "MotDePasseOublie": {
+      "metaTitle": "Forgot password",
+      "title": "Forgot your password?",
+      "subtitle": "Enter the email address of your account. We’ll send you a link to choose a new password.",
+      "submit": "Send the link",
+      "submitting": "Sending…",
+      "sentTitle": "Check your inbox",
+      "sentBody": "If a Stanzy account exists for {email}, you’ll receive a reset link within a few minutes. It expires in 1 hour.",
+      "backToSignIn": "Back to log in",
+      "remembered": "Remembered it?",
+      "signIn": "Log in"
+    },
+    "ReinitialiserMotDePasse": {
+      "metaTitle": "Reset password",
+      "title": "Reset your password",
+      "subtitle": "Choose a new password. You’ll be logged in and your other sessions will be logged out.",
+      "newPassword": "New password",
+      "submit": "Save and log in",
+      "submitting": "Saving…",
+      "vaultTitle": "This does not recover your Coffre-fort passphrase",
+      "vaultBody": "Your Coffre-fort is encrypted with a passphrase only you know. Changing your password doesn’t change it and can’t recover it: if you’ve forgotten it, no one, not even Stanzy, can reopen its contents.",
+      "invalidTitle": "Invalid or expired link",
+      "invalidBody": "This reset link has already been used or has expired. Request a new one: it arrives within a few minutes.",
+      "requestNew": "Request a new link"
     }
   }
 }

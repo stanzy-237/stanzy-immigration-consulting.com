@@ -1,5 +1,5 @@
 import { memoryAdapter } from 'better-auth/adapters/memory';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createAuth } from '@/server/auth/create-auth';
 import type { EmailMessage, Mailer } from '@/server/email/mailer';
@@ -32,49 +32,62 @@ function createHarness() {
     secret: 'test-secret-test-secret-test-secret-32',
   });
 
-  let cookie = '';
+  /**
+   * One browser: its own cookie jar against the shared server. The harness
+   * itself is the first browser; `browser()` opens another (a second device).
+   */
+  function browser() {
+    let cookie = '';
 
-  async function request(
-    path: string,
-    init: { method?: string; body?: unknown; ip?: string } = {},
-  ): Promise<Response> {
-    const url = path.startsWith('http') ? path : `${BASE_URL}/api/auth${path}`;
-    const headers = new Headers({
-      origin: BASE_URL,
-      'x-forwarded-for': init.ip ?? '203.0.113.7',
-    });
-    if (init.body !== undefined) headers.set('content-type', 'application/json');
-    if (cookie) headers.set('cookie', cookie);
-    const res = await auth.handler(
-      new Request(url, {
-        method: init.method ?? (init.body === undefined ? 'GET' : 'POST'),
-        headers,
-        body: init.body === undefined ? undefined : JSON.stringify(init.body),
-      }),
-    );
-    const setCookies = res.headers.getSetCookie();
-    if (setCookies.length > 0) {
-      const jar = new Map(
-        cookie
-          .split('; ')
-          .filter(Boolean)
-          .map((c) => c.split('=') as [string, string]),
+    async function request(
+      path: string,
+      init: { method?: string; body?: unknown; ip?: string } = {},
+    ): Promise<Response> {
+      const url = path.startsWith('http') ? path : `${BASE_URL}/api/auth${path}`;
+      const headers = new Headers({
+        origin: BASE_URL,
+        'x-forwarded-for': init.ip ?? '203.0.113.7',
+      });
+      if (init.body !== undefined) headers.set('content-type', 'application/json');
+      if (cookie) headers.set('cookie', cookie);
+      const res = await auth.handler(
+        new Request(url, {
+          method: init.method ?? (init.body === undefined ? 'GET' : 'POST'),
+          headers,
+          body: init.body === undefined ? undefined : JSON.stringify(init.body),
+        }),
       );
-      for (const c of setCookies) {
-        const [pair] = c.split(';');
-        const [name, ...rest] = pair!.split('=');
-        const value = rest.join('=');
-        if (value === '' || /max-age=0/i.test(c)) jar.delete(name!);
-        else jar.set(name!, value);
+      const setCookies = res.headers.getSetCookie();
+      if (setCookies.length > 0) {
+        const jar = new Map(
+          cookie
+            .split('; ')
+            .filter(Boolean)
+            .map((c) => c.split('=') as [string, string]),
+        );
+        for (const c of setCookies) {
+          const [pair] = c.split(';');
+          const [name, ...rest] = pair!.split('=');
+          const value = rest.join('=');
+          if (value === '' || /max-age=0/i.test(c)) jar.delete(name!);
+          else jar.set(name!, value);
+        }
+        cookie = [...jar].map(([n, v]) => `${n}=${v}`).join('; ');
       }
-      cookie = [...jar].map(([n, v]) => `${n}=${v}`).join('; ');
+      return res;
     }
-    return res;
-  }
 
-  async function currentSession(): Promise<{ user: { email: string } } | null> {
-    const res = await request('/get-session');
-    return (await res.json()) as { user: { email: string } } | null;
+    /** `fresh` skips the 5-minute session cookie cache and asks the database. */
+    async function currentSession(
+      fresh = false,
+    ): Promise<{ user: { email: string } } | null> {
+      const res = await request(
+        fresh ? '/get-session?disableCookieCache=true' : '/get-session',
+      );
+      return (await res.json()) as { user: { email: string } } | null;
+    }
+
+    return { request, currentSession };
   }
 
   function lastLinkTo(email: string): string {
@@ -85,7 +98,7 @@ function createHarness() {
     return match[0];
   }
 
-  return { auth, sent, request, currentSession, lastLinkTo };
+  return { auth, sent, ...browser(), browser, lastLinkTo };
 }
 
 const AMINATA = {
@@ -93,6 +106,164 @@ const AMINATA = {
   email: 'aminata@example.com',
   password: 'correct-horse-battery',
 };
+
+/** A harness holding Aminata's verified Account, signed out, inbox emptied. */
+async function verifiedAccount(...args: Parameters<typeof createHarness>) {
+  const h = createHarness(...args);
+  await h.request('/sign-up/email', { body: AMINATA });
+  await h.request(h.lastLinkTo(AMINATA.email));
+  await h.request('/sign-out', { body: {} });
+  h.sent.length = 0;
+  return h;
+}
+
+describe('Mot de passe oublié', () => {
+  const RESET_PAGE = '/fr/reinitialiser-mot-de-passe';
+
+  it('answers the same whether or not the email has an Account, and only emails a real one', async () => {
+    const h = await verifiedAccount();
+
+    const known = await h.request('/request-password-reset', {
+      body: { email: AMINATA.email, redirectTo: RESET_PAGE },
+    });
+    const unknown = await h.request('/request-password-reset', {
+      body: { email: 'nobody@example.com', redirectTo: RESET_PAGE },
+    });
+
+    expect(known.status).toBe(200);
+    expect(unknown.status).toBe(200);
+    expect(await known.json()).toEqual(await unknown.json());
+    expect(h.sent.map((m) => m.to)).toEqual([AMINATA.email]);
+  });
+
+  /** Requests a reset, follows the emailed link, returns where it landed. */
+  async function followResetLink(h: Awaited<ReturnType<typeof verifiedAccount>>) {
+    await h.request('/request-password-reset', {
+      body: { email: AMINATA.email, redirectTo: RESET_PAGE },
+    });
+    const res = await h.request(h.lastLinkTo(AMINATA.email));
+    return new URL(res.headers.get('location') ?? '', BASE_URL);
+  }
+
+  it('lands on Réinitialiser le mot de passe, sets the new password and signs the person in', async () => {
+    const h = await verifiedAccount();
+
+    const landing = await followResetLink(h);
+    expect(landing.pathname).toBe(RESET_PAGE);
+    const token = landing.searchParams.get('token');
+    expect(token).toBeTruthy();
+
+    const reset = await h.request('/reset-password', {
+      body: { token, newPassword: 'a-brand-new-password' },
+    });
+    expect(reset.status).toBe(200);
+    expect((await h.currentSession())?.user.email).toBe(AMINATA.email);
+
+    await h.request('/sign-out', { body: {} });
+    const oldPassword = await h.request('/sign-in/email', {
+      body: { email: AMINATA.email, password: AMINATA.password },
+    });
+    expect(oldPassword.status).toBe(401);
+    const newPassword = await h.request('/sign-in/email', {
+      body: { email: AMINATA.email, password: 'a-brand-new-password' },
+    });
+    expect(newPassword.status).toBe(200);
+  });
+
+  it('also signs in an Account that never followed its verification link', async () => {
+    const h = createHarness();
+    await h.request('/sign-up/email', { body: AMINATA });
+
+    const token = (await followResetLink(h)).searchParams.get('token');
+    await h.request('/reset-password', { body: { token, newPassword: 'a-brand-new-password' } });
+
+    expect((await h.currentSession())?.user.email).toBe(AMINATA.email);
+
+    // The emailed link proved the address, so it now counts as verified.
+    await h.request('/sign-out', { body: {} });
+    const signIn = await h.request('/sign-in/email', {
+      body: { email: AMINATA.email, password: 'a-brand-new-password' },
+    });
+    expect(signIn.status).toBe(200);
+  });
+
+  it('works only once: the used link lands on the error, and its token is refused', async () => {
+    const h = await verifiedAccount();
+    const token = (await followResetLink(h)).searchParams.get('token');
+    await h.request('/reset-password', { body: { token, newPassword: 'a-brand-new-password' } });
+
+    const again = await h.request('/reset-password', {
+      body: { token, newPassword: 'yet-another-password' },
+    });
+    expect(again.status).toBe(400);
+    expect(((await again.json()) as { code: string }).code).toBe('INVALID_TOKEN');
+
+    const relanding = await h.request(h.lastLinkTo(AMINATA.email));
+    const location = new URL(relanding.headers.get('location') ?? '', BASE_URL);
+    expect(location.pathname).toBe(RESET_PAGE);
+    expect(location.searchParams.get('error')).toBe('INVALID_TOKEN');
+  });
+
+  it('signs out every other session once the password is reset', async () => {
+    const h = await verifiedAccount();
+    const otherDevice = h.browser();
+    await otherDevice.request('/sign-in/email', {
+      body: { email: AMINATA.email, password: AMINATA.password },
+    });
+    expect((await otherDevice.currentSession(true))?.user.email).toBe(AMINATA.email);
+
+    const token = (await followResetLink(h)).searchParams.get('token');
+    await h.request('/reset-password', { body: { token, newPassword: 'a-brand-new-password' } });
+
+    expect(await otherDevice.currentSession(true)).toBeNull();
+    expect((await h.currentSession(true))?.user.email).toBe(AMINATA.email);
+  });
+
+  it('writes the reset email in the language the Account signed up in', async () => {
+    const fr = await verifiedAccount();
+    await fr.request('/request-password-reset', { body: { email: AMINATA.email } });
+    expect(fr.sent[0]?.subject).toBe('Réinitialisez votre mot de passe — Stanzy');
+    expect(fr.sent[0]?.text).toContain('Bonjour Aminata Diallo,');
+
+    const en = createHarness();
+    await en.request('/sign-up/email', { body: { ...AMINATA, locale: 'en' } });
+    await en.request('/request-password-reset', { body: { email: AMINATA.email } });
+    expect(en.sent.at(-1)?.subject).toBe('Reset your password — Stanzy');
+  });
+
+  it('rate-limits reset requests from one address', async () => {
+    const h = await verifiedAccount();
+    const statuses: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const res = await h.request('/request-password-reset', {
+        body: { email: AMINATA.email, redirectTo: RESET_PAGE },
+        ip: '192.0.2.70',
+      });
+      statuses.push(res.status);
+    }
+    expect(statuses).toEqual([200, 200, 200, 429]);
+    expect(h.sent).toHaveLength(3);
+  });
+
+  it('expires after an hour', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const h = await verifiedAccount();
+      const token = (await followResetLink(h)).searchParams.get('token');
+
+      vi.setSystemTime(Date.now() + 61 * 60 * 1000);
+
+      const late = await h.request('/reset-password', {
+        body: { token, newPassword: 'a-brand-new-password' },
+      });
+      expect(late.status).toBe(400);
+      expect(((await late.json()) as { code: string }).code).toBe('INVALID_TOKEN');
+      expect(await h.currentSession()).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
 
 describe('email/password sign-up, verification and sign-in', () => {
   it('emails a verification link on sign-up and refuses sign-in until it is followed', async () => {
@@ -114,14 +285,6 @@ describe('email/password sign-up, verification and sign-in', () => {
     await h.request(h.lastLinkTo(AMINATA.email));
     expect((await h.currentSession())?.user.email).toBe(AMINATA.email);
   });
-
-  async function verifiedAccount() {
-    const h = createHarness();
-    await h.request('/sign-up/email', { body: AMINATA });
-    await h.request(h.lastLinkTo(AMINATA.email));
-    await h.request('/sign-out', { body: {} });
-    return h;
-  }
 
   it('signs out, then signs back in with the right password', async () => {
     const h = await verifiedAccount();

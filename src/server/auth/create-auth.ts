@@ -1,7 +1,12 @@
-import { betterAuth, type BetterAuthOptions } from 'better-auth';
+import { betterAuth, type BetterAuthOptions, type User } from 'better-auth';
+import { createAuthMiddleware } from 'better-auth/api';
+import { setSessionCookie } from 'better-auth/cookies';
 
-import { verificationEmail } from '@/features/auth/lib/emails';
-import { MIN_PASSWORD_LENGTH } from '@/features/auth/lib/password';
+import { resetPasswordEmail, verificationEmail } from '@/features/auth/lib/emails';
+import {
+  MIN_PASSWORD_LENGTH,
+  RESET_PASSWORD_LINK_TTL_SECONDS,
+} from '@/features/auth/lib/password';
 import { toLocale } from '@/i18n/routing';
 import type { Mailer } from '@/server/email/mailer';
 
@@ -11,6 +16,12 @@ export type AuthDeps = {
   baseURL: string;
   secret: string;
   trustedOrigins?: string[];
+  /**
+   * Runs a task (sending an auth email) after the response. Without it the
+   * email is awaited, so a request for a registered address answers slower
+   * than one for an unknown address. Tests leave it out to see the email.
+   */
+  runInBackground?: (task: Promise<unknown>) => void;
 };
 
 /**
@@ -24,12 +35,20 @@ export type AuthDeps = {
  * never get confused.
  */
 export function createAuth(deps: AuthDeps) {
+  // Better Auth resets the password but issues no session. The Account whose
+  // password a request just reset is remembered here (per request) so the
+  // `after` hook below can sign that person in.
+  const passwordResetFor = new WeakMap<Request, User>();
+
   return betterAuth({
     appName: 'Stanzy Immigration Consulting',
     baseURL: deps.baseURL,
     secret: deps.secret,
     trustedOrigins: deps.trustedOrigins,
     database: deps.database,
+    advanced: deps.runInBackground
+      ? { backgroundTasks: { handler: deps.runInBackground } }
+      : undefined,
     user: {
       modelName: 'account',
       additionalFields: {
@@ -44,6 +63,40 @@ export function createAuth(deps: AuthDeps) {
       // the response never confirms that an address is registered.
       requireEmailVerification: true,
       minPasswordLength: MIN_PASSWORD_LENGTH,
+      // Whoever knew the old password is signed out everywhere. The cookie
+      // cache below can keep a revoked device's session readable for up to
+      // 5 minutes; the database no longer accepts it.
+      revokeSessionsOnPasswordReset: true,
+      // The reset email tells the person the link lasts 1 hour.
+      resetPasswordTokenExpiresIn: RESET_PASSWORD_LINK_TTL_SECONDS,
+      async sendResetPassword({ user, url }) {
+        await deps.mailer.send(
+          resetPasswordEmail({
+            to: user.email,
+            name: user.name,
+            url,
+            locale: (user as { locale?: unknown }).locale,
+          }),
+        );
+      },
+      async onPasswordReset({ user }, request) {
+        if (request) passwordResetFor.set(request, user);
+      },
+    },
+    hooks: {
+      after: createAuthMiddleware(async (ctx) => {
+        if (ctx.path !== '/reset-password' || !ctx.request) return;
+        const user = passwordResetFor.get(ctx.request);
+        if (!user) return;
+        // Following a link sent to the address proves it as well as the
+        // verification link would, so an unverified Account is verified here
+        // rather than signed in half-way.
+        const account = user.emailVerified
+          ? user
+          : await ctx.context.internalAdapter.updateUser(user.id, { emailVerified: true });
+        const session = await ctx.context.internalAdapter.createSession(account.id);
+        await setSessionCookie(ctx, { session, user: account });
+      }),
     },
     emailVerification: {
       sendOnSignUp: true,
@@ -76,6 +129,8 @@ export function createAuth(deps: AuthDeps) {
         '/sign-in/email': { window: 60, max: 5 },
         '/sign-up/email': { window: 60, max: 3 },
         '/send-verification-email': { window: 60, max: 3 },
+        // Mot de passe oublié: each request sends an email.
+        '/request-password-reset': { window: 60, max: 3 },
         // Every page's nav reads the session; limiting a read protects
         // nothing and costs several database round trips per page view.
         '/get-session': false,

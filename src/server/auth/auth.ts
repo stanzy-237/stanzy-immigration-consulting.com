@@ -1,4 +1,5 @@
 import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { after } from 'next/server';
 
 import { env } from '@/lib/env';
 import { prisma } from '@/server/db/client';
@@ -37,6 +38,9 @@ export const auth = createAuth({
   }),
   baseURL: env.BETTER_AUTH_URL ?? vercelOrigin ?? 'http://localhost:3000',
   secret: env.BETTER_AUTH_SECRET,
+  // Send auth emails after responding, so response time never reveals
+  // whether an address has an Account.
+  runInBackground: (task) => after(task),
   trustedOrigins: [
     ...(env.BETTER_AUTH_URL ? withWwwVariant(env.BETTER_AUTH_URL) : []),
     ...[vercelOrigin, vercelBranchOrigin].filter((origin): origin is string => Boolean(origin)),
