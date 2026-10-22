@@ -385,8 +385,7 @@
       "invalidCredentials": "Incorrect email or password.",
       "invalidEmail": "This email address isn’t valid.",
       "passwordTooShort": "Your password must be at least 10 characters.",
-      "emailNotVerified": "Please confirm your email address first, using the link we sent you.",
-      "invalidResetLink": "This reset link has already been used or has expired."
+      "emailNotVerified": "Please confirm your email address first, using the link we sent you."
     },
     "Inscription": {
       "metaTitle": "Create an account",

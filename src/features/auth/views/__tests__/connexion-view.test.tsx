@@ -133,6 +133,14 @@ describe('ConnexionView', () => {
     );
   });
 
+  it('links to Mot de passe oublié', () => {
+    render(withIntl(<ConnexionView />));
+    expect(screen.getByRole('link', { name: 'Mot de passe oublié ?' })).toHaveAttribute(
+      'href',
+      '/mot-de-passe-oublie',
+    );
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(withIntl(<ConnexionView />));
     expect(await axe(container)).toHaveNoViolations();

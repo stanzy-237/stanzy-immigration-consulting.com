@@ -2,11 +2,17 @@ import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement, ReactNode } from 'react';
 import { vi } from 'vitest';
 
-import messages from '@/messages/fr.json';
+import en from '@/messages/en.json';
+import fr from '@/messages/fr.json';
 
-export function withIntl(children: ReactNode): ReactElement {
+const MESSAGES = { fr, en } as const;
+
+export function withIntl(
+  children: ReactNode,
+  locale: keyof typeof MESSAGES = 'fr',
+): ReactElement {
   return (
-    <NextIntlClientProvider locale="fr" messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={MESSAGES[locale]}>
       {children}
     </NextIntlClientProvider>
   );
