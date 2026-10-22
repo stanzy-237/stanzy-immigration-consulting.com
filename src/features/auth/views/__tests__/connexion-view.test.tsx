@@ -45,6 +45,34 @@ describe('ConnexionView', () => {
     expect(router.refresh).not.toHaveBeenCalled();
   });
 
+  it('returns the person to next once signed in', async () => {
+    signIn.mockResolvedValue({ data: {}, error: null } as never);
+    render(withIntl(<ConnexionView next="/compte/securite?onglet=2fa" />));
+
+    submit();
+
+    await waitFor(() =>
+      expect(router.push).toHaveBeenCalledWith('/compte/securite?onglet=2fa'),
+    );
+  });
+
+  it('takes the person home instead of to an off-site next', async () => {
+    signIn.mockResolvedValue({ data: {}, error: null } as never);
+    render(withIntl(<ConnexionView next="//evil.com" />));
+
+    submit();
+
+    await waitFor(() => expect(router.push).toHaveBeenCalledWith('/'));
+  });
+
+  it('carries next across to Inscription', () => {
+    render(withIntl(<ConnexionView next="/compte" />));
+    expect(screen.getByRole('link', { name: 'Créer un compte' })).toHaveAttribute(
+      'href',
+      '/inscription?next=%2Fcompte',
+    );
+  });
+
   it('shows one generic message for a wrong email or password', async () => {
     signIn.mockResolvedValue({
       data: null,
