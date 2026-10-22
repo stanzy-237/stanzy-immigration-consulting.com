@@ -214,11 +214,11 @@ PROD_HOST="${PROD_URL#*://}"
 if [[ "$PROD_HOST" == www.* ]]; then ALT_HOST="${PROD_HOST#www.}"; else ALT_HOST="www.$PROD_HOST"; fi
 ALT_URL="https://$ALT_HOST"
 say ""
-say "For the manual check you need ONE preview deployment URL (Google has no wildcards)."
-step "Vercel → project → Deployments → open the preview of this branch."
-step "Copy its own deployment domain (…-<hash>-<team>.vercel.app), NOT the '…-git-<branch>-…' alias."
-note "Previews sign in on that exact host (it is VERCEL_URL); the branch alias would fail with a state mismatch."
-ask PREVIEW_URL "Preview deployment URL (Enter to skip previews for now):" || true
+say "For the manual check you need the preview's branch URL (Google has no wildcards)."
+step "Vercel → project → Deployments → open the preview of the branch to test."
+step "Copy its branch alias: https://<project>-git-<branch>-<team>.vercel.app"
+note "Previews run sign-in on that alias, and it stays the same across pushes to the branch."
+ask PREVIEW_URL "Preview branch URL (Enter to skip previews for now):" || true
 PREVIEW_URL="${PREVIEW_URL:-}"; PREVIEW_URL="${PREVIEW_URL%/}"
 pause
 
@@ -270,10 +270,6 @@ step "Open the stanzy-immigration-consulting project → Settings → Environmen
 step "Add GOOGLE_CLIENT_ID (the value you just pasted), scope Production + Preview."
 step "Add GOOGLE_CLIENT_SECRET, mark it Sensitive, scope Production + Preview."
 step "Redeploy production and the preview: the button's visibility is decided at build time."
-if [[ -n "$PREVIEW_URL" ]]; then
-  warn "A redeploy gives the preview a NEW deployment URL. Add that one to the OAuth client too"
-  note "(origin + /api/auth/callback/google), or test on the deployment that was built after the vars were set."
-fi
 pause "Press Enter when both variables are saved and the redeploys are running"
 
 # ── 6. Local smoke test ──────────────────────────────────────────────────
@@ -291,8 +287,9 @@ stage "Manual check on the Vercel preview"
 if [[ -n "$PREVIEW_URL" ]]; then
   open_url "$PREVIEW_URL/fr/connexion"
 else
-  step "Open the preview deployment URL (not the branch alias) at /fr/connexion."
+  step "Open the preview's branch URL at /fr/connexion."
 fi
+note "Testing another branch later? Add its branch URL (origin + /api/auth/callback/google) to the client."
 step "Click 'Continuer avec Google' and finish the Google screens: you return signed in."
 step "Repeat from the installed PWA on a phone (Add to Home Screen first): Google opens,"
 step "then you come back into the app signed in. Note in the PR whether it did."

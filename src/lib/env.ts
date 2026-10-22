@@ -8,7 +8,9 @@ import { z } from 'zod';
  *
  * Framework/build-time variables that Next and the runtime set themselves —
  * `NODE_ENV`, `VERCEL_URL`, `PORT` — are read directly from `process.env` at
- * their point of use and are intentionally not part of this schema.
+ * their point of use and are intentionally not part of this schema. So is
+ * `GOOGLE_SIGN_IN_ENABLED`, which `next.config.ts` derives from the Google
+ * vars at build time so the browser bundle knows whether to show the button.
  *
  * Validation is skipped when `SKIP_ENV_VALIDATION` is set, which lets CI run
  * lint/typecheck and Docker-style build steps without a live database.

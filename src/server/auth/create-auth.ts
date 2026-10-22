@@ -10,6 +10,9 @@ import {
 import { toLocale } from '@/i18n/routing';
 import type { Mailer } from '@/server/email/mailer';
 
+/** A Google OAuth client from Google Cloud Console. */
+export type GoogleOAuthClient = { clientId: string; clientSecret: string };
+
 export type AuthDeps = {
   database: BetterAuthOptions['database'];
   mailer: Mailer;
@@ -23,7 +26,7 @@ export type AuthDeps = {
    */
   runInBackground?: (task: Promise<unknown>) => void;
   /** Google OAuth client. Without it, "Continuer avec Google" is off. */
-  google?: { clientId: string; clientSecret: string };
+  google?: GoogleOAuthClient;
 };
 
 /**

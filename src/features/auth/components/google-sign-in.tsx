@@ -61,9 +61,7 @@ export function GoogleSignIn({ callbackURL }: { callbackURL: string }): ReactNod
   return (
     <div className="mb-6 flex flex-col gap-6">
       {error ? (
-        <Alert variant="destructive">
-          <AlertDescription>{t(`errors.${error}`)}</AlertDescription>
-        </Alert>
+        <GoogleErrorAlert error={error} />
       ) : (
         // useSearchParams needs a Suspense boundary on statically rendered pages.
         <Suspense fallback={null}>
@@ -87,13 +85,16 @@ export function GoogleSignIn({ callbackURL }: { callbackURL: string }): ReactNod
 
 /** The `?error=` Better Auth adds when the Google round-trip fails. */
 function ReturnedError(): ReactNode {
-  const t = useTranslations('Auth.Google');
   const code = useSearchParams()?.get('error');
   if (!code) return null;
-  const key: GoogleErrorKey = code === 'account_not_linked' ? 'accountNotLinked' : 'failed';
+  return <GoogleErrorAlert error={code === 'account_not_linked' ? 'accountNotLinked' : 'failed'} />;
+}
+
+function GoogleErrorAlert({ error }: { error: GoogleErrorKey }): ReactNode {
+  const t = useTranslations('Auth.Google');
   return (
     <Alert variant="destructive">
-      <AlertDescription>{t(`errors.${key}`)}</AlertDescription>
+      <AlertDescription>{t(`errors.${error}`)}</AlertDescription>
     </Alert>
   );
 }
