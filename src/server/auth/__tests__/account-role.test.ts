@@ -48,4 +48,14 @@ describe('Account status and role', () => {
 
     expect(account).toMatchObject({ status: 'USER', role: 'MEMBER' });
   });
+
+  it('refuses a signed-in Account that tries to change its own status or role', async () => {
+    const h = createHarness();
+    await signUpAndVerify(h, { name: 'Mallory', email: 'mallory@example.com' });
+
+    const res = await h.request('/update-user', { body: { status: 'CLIENT', role: 'CONSULTANT' } });
+
+    expect(res.status).toBe(400);
+    expect((await h.currentSession(true))?.user).toMatchObject({ status: 'USER', role: 'MEMBER' });
+  });
 });

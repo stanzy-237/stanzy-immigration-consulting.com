@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { describe, expect, it } from 'vitest';
 
+import { sessionFor } from '@/server/auth/__tests__/fixtures';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 import {
@@ -26,19 +27,7 @@ function callerAs(session: CurrentSession | null) {
   return createCallerFactory(router)(ctx);
 }
 
-const SIGNED_IN: CurrentSession = {
-  account: {
-    id: 'acc_1',
-    name: 'Aminata Diallo',
-    email: 'aminata@example.com',
-    emailVerified: true,
-    image: null,
-    locale: 'fr',
-    status: 'USER',
-    role: 'MEMBER',
-  },
-  session: { id: 'ses_1', expiresAt: new Date('2026-11-01T00:00:00Z') },
-};
+const SIGNED_IN = sessionFor();
 
 describe('protectedProcedure', () => {
   it('rejects a call without a session as UNAUTHORIZED', async () => {

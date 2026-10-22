@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { AccountRole, AccountStatus } from '@/features/auth/lib/account-status';
+import { sessionFor } from '@/server/auth/__tests__/fixtures';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 import {
@@ -15,7 +16,7 @@ import {
  * throwaway router the way a feature router would use them.
  */
 const router = createTRPCRouter({
-  adminOnly: consultantProcedure.query(() => 'ok'),
+  consultantOnly: consultantProcedure.query(() => 'ok'),
   leadsOnly: statusProcedure('LEAD').query(() => 'ok'),
   clientsOnly: statusProcedure('CLIENT').query(() => 'ok'),
 });
@@ -30,34 +31,22 @@ function callerAs(session: CurrentSession | null) {
 }
 
 function signedInAs(status: AccountStatus, role: AccountRole = 'MEMBER'): CurrentSession {
-  return {
-    account: {
-      id: 'acc_1',
-      name: 'Aminata Diallo',
-      email: 'aminata@example.com',
-      emailVerified: true,
-      image: null,
-      locale: 'fr',
-      status,
-      role,
-    },
-    session: { id: 'ses_1', expiresAt: new Date('2026-11-01T00:00:00Z') },
-  };
+  return sessionFor({ status, role });
 }
 
 describe('consultantProcedure', () => {
   it('rejects a signed-out call as UNAUTHORIZED', async () => {
-    await expect(callerAs(null).adminOnly()).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
+    await expect(callerAs(null).consultantOnly()).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
   });
 
   it('rejects a member, even a Client, as FORBIDDEN', async () => {
-    await expect(callerAs(signedInAs('CLIENT')).adminOnly()).rejects.toMatchObject({
+    await expect(callerAs(signedInAs('CLIENT')).consultantOnly()).rejects.toMatchObject({
       code: 'FORBIDDEN',
     });
   });
 
   it('lets the consultant through', async () => {
-    expect(await callerAs(signedInAs('USER', 'CONSULTANT')).adminOnly()).toBe('ok');
+    expect(await callerAs(signedInAs('USER', 'CONSULTANT')).consultantOnly()).toBe('ok');
   });
 });
 

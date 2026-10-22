@@ -29,8 +29,8 @@ export type AuthDeps = {
   /** Google OAuth client. Without it, "Continuer avec Google" is off. */
   google?: GoogleOAuthClient;
   /**
-   * Emails (lower-case) whose Account gets the consultant role when created.
-   * The only way to become consultant (ADR 0002: a single consultant).
+   * Lower-case emails whose Account gets the consultant role when created.
+   * The only way to become consultant; normally a single address.
    */
   consultantEmails?: string[];
 };
@@ -50,7 +50,7 @@ export function createAuth(deps: AuthDeps) {
   // password a request just reset is remembered here (per request) so the
   // `after` hook below can sign that person in.
   const passwordResetFor = new WeakMap<Request, User>();
-  const consultantEmails = new Set(deps.consultantEmails?.map((email) => email.toLowerCase()));
+  const consultantEmails = new Set(deps.consultantEmails);
 
   /** Emails `user` a link, in the language their Account signed up in. */
   const sendLinkEmail =
@@ -162,13 +162,13 @@ export function createAuth(deps: AuthDeps) {
       user: {
         create: {
           async before(user) {
+            // Covers every way an Account is created, Google included.
             const isConsultant = consultantEmails.has(user.email.toLowerCase());
             return {
               data: {
                 ...user,
                 locale: toLocale(user.locale),
-                status: 'USER',
-                role: isConsultant ? 'CONSULTANT' : 'MEMBER',
+                ...(isConsultant && { role: 'CONSULTANT' }),
               },
             };
           },

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { sessionFor } from '@/server/auth/__tests__/fixtures';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 import { createCaller } from '@/server/trpc/root';
@@ -17,19 +18,7 @@ function callerAs(session: CurrentSession | null) {
   return createCaller(ctx);
 }
 
-const SIGNED_IN: CurrentSession = {
-  account: {
-    id: 'acc_1',
-    name: 'Aminata Diallo',
-    email: 'aminata@example.com',
-    emailVerified: true,
-    image: null,
-    locale: 'fr',
-    status: 'USER',
-    role: 'MEMBER',
-  },
-  session: { id: 'ses_1', expiresAt: new Date('2026-11-01T00:00:00Z') },
-};
+const SIGNED_IN = sessionFor();
 
 describe('auth.me', () => {
   it('returns null when nobody is signed in', async () => {
@@ -57,10 +46,6 @@ describe('auth.consultantCheck', () => {
   });
 
   it('confirms the consultant', async () => {
-    const consultant: CurrentSession = {
-      ...SIGNED_IN,
-      account: { ...SIGNED_IN.account, role: 'CONSULTANT' },
-    };
-    expect(await callerAs(consultant).auth.consultantCheck()).toEqual({ consultant: true });
+    expect(await callerAs(sessionFor({ role: 'CONSULTANT' })).auth.consultantCheck()).toEqual({ consultant: true });
   });
 });

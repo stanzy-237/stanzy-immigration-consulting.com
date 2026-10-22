@@ -33,7 +33,7 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   return next({ ctx: { ...ctx, session: ctx.session } });
 });
 
-/** The consultant only (ADR 0002). Members get `FORBIDDEN`, even Clients. */
+/** The consultant only. Everyone else gets `FORBIDDEN`, even Clients. */
 export const consultantProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.session.account.role !== 'CONSULTANT') throw new TRPCError({ code: 'FORBIDDEN' });
   return next();

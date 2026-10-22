@@ -24,27 +24,26 @@ export type AccountStatusStore = {
  * status. Throws `InvalidStatusTransitionError` for a transition the rule
  * refuses, including when another request changed the status first (the
  * save only matches the status that was read). Called by #14 and #16.
+ *
+ * The Account's own session keeps its old status for up to 5 minutes (the
+ * session cookie cache), so a new Client may briefly still fail
+ * `statusProcedure('CLIENT')`.
  */
 export async function transitionAccountStatus(
   db: AccountStatusStore,
   accountId: string,
   event: StatusEvent,
 ): Promise<AccountStatus> {
-  const { status } = await db.account.findUniqueOrThrow({
-    where: { id: accountId },
-    select: { status: true },
-  });
+  const readStatus = async (): Promise<AccountStatus> =>
+    (await db.account.findUniqueOrThrow({ where: { id: accountId }, select: { status: true } }))
+      .status;
+
+  const status = await readStatus();
   const next = nextStatus(status, event);
   const { count } = await db.account.updateMany({
     where: { id: accountId, status },
     data: { status: next },
   });
-  if (count === 0) {
-    const { status: current } = await db.account.findUniqueOrThrow({
-      where: { id: accountId },
-      select: { status: true },
-    });
-    throw new InvalidStatusTransitionError(current, event);
-  }
+  if (count === 0) throw new InvalidStatusTransitionError(await readStatus(), event);
   return next;
 }

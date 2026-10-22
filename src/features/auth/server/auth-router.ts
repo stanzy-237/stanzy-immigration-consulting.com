@@ -10,7 +10,7 @@ export const authRouter = createTRPCRouter({
 
   /**
    * Consultant-only: answers only when the role check passes. Proves the
-   * role guard end to end until the admin dashboard (#16) uses it for real.
+   * role guard end to end until the consultant's dashboard (#16) uses it.
    */
   consultantCheck: consultantProcedure.query(() => ({ consultant: true as const })),
 });

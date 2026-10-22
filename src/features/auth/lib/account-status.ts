@@ -5,7 +5,7 @@
 export const ACCOUNT_STATUSES = ['USER', 'LEAD', 'CLIENT'] as const;
 export type AccountStatus = (typeof ACCOUNT_STATUSES)[number];
 
-/** An Account's access level. Only configuration grants CONSULTANT (ADR 0002). */
+/** An Account's access level. Only configuration grants CONSULTANT. */
 export const ACCOUNT_ROLES = ['MEMBER', 'CONSULTANT'] as const;
 export type AccountRole = (typeof ACCOUNT_ROLES)[number];
 

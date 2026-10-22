@@ -36,8 +36,8 @@ export async function getCurrentSession(
       emailVerified: user.emailVerified,
       image: user.image ?? null,
       locale: toLocale(user.locale),
-      status: user.status as AccountStatus,
-      role: user.role as AccountRole,
+      status: user.status ?? 'USER',
+      role: user.role ?? 'MEMBER',
     },
     session: { id: session.id, expiresAt: session.expiresAt },
   };
