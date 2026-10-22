@@ -21,6 +21,8 @@ const SIGNED_IN: CurrentSession = {
     emailVerified: true,
     image: null,
     locale: 'fr',
+    status: 'USER',
+    role: 'MEMBER',
   },
   session: { id: 'ses_1', expiresAt: new Date('2026-11-01T00:00:00Z') },
 };

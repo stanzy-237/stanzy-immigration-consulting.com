@@ -25,6 +25,8 @@ const SIGNED_IN: CurrentSession = {
     emailVerified: true,
     image: null,
     locale: 'fr',
+    status: 'USER',
+    role: 'MEMBER',
   },
   session: { id: 'ses_1', expiresAt: new Date('2026-11-01T00:00:00Z') },
 };
@@ -41,6 +43,24 @@ describe('auth.me', () => {
       email: 'aminata@example.com',
       image: null,
       locale: 'fr',
+      status: 'USER',
+      role: 'MEMBER',
     });
+  });
+});
+
+describe('auth.consultantCheck', () => {
+  it('refuses a member', async () => {
+    await expect(callerAs(SIGNED_IN).auth.consultantCheck()).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    });
+  });
+
+  it('confirms the consultant', async () => {
+    const consultant: CurrentSession = {
+      ...SIGNED_IN,
+      account: { ...SIGNED_IN.account, role: 'CONSULTANT' },
+    };
+    expect(await callerAs(consultant).auth.consultantCheck()).toEqual({ consultant: true });
   });
 });

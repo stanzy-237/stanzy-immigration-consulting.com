@@ -1,3 +1,4 @@
+import type { AccountRole, AccountStatus } from '@/features/auth/lib/account-status';
 import { toLocale, type Locale } from '@/i18n/routing';
 import { auth } from '@/server/auth/auth';
 
@@ -14,6 +15,8 @@ export type CurrentSession = {
     emailVerified: boolean;
     image: string | null;
     locale: Locale;
+    status: AccountStatus;
+    role: AccountRole;
   };
   session: { id: string; expiresAt: Date };
 };
@@ -33,6 +36,8 @@ export async function getCurrentSession(
       emailVerified: user.emailVerified,
       image: user.image ?? null,
       locale: toLocale(user.locale),
+      status: user.status as AccountStatus,
+      role: user.role as AccountRole,
     },
     session: { id: session.id, expiresAt: session.expiresAt },
   };

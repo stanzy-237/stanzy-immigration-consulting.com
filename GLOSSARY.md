@@ -46,6 +46,10 @@ A paid, booked appointment between a User and the consultant, and the primary fu
 A Lead who has purchased Accompagnement. A Client has one or more Dossiers.
 _Avoid_: "customer" in product-facing French; use Client.
 
+**Consultant**:
+Stanzy, the one person who runs the practice and administers the platform. Being the consultant is an access level an Account holds, separate from its User → Lead → Client status: the consultant is never "a Client". Nobody can make themselves consultant; it is set by configuration.
+_Avoid_: "admin", "staff".
+
 **Dossier**:
 The case file for a Client's engagement — what the consultant tracks and works through.
 

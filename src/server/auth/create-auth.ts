@@ -2,6 +2,7 @@ import { betterAuth, type BetterAuthOptions, type User } from 'better-auth';
 import { createAuthMiddleware } from 'better-auth/api';
 import { setSessionCookie } from 'better-auth/cookies';
 
+import { ACCOUNT_ROLES, ACCOUNT_STATUSES } from '@/features/auth/lib/account-status';
 import { resetPasswordEmail, verificationEmail } from '@/features/auth/lib/emails';
 import {
   MIN_PASSWORD_LENGTH,
@@ -27,6 +28,11 @@ export type AuthDeps = {
   runInBackground?: (task: Promise<unknown>) => void;
   /** Google OAuth client. Without it, "Continuer avec Google" is off. */
   google?: GoogleOAuthClient;
+  /**
+   * Emails (lower-case) whose Account gets the consultant role when created.
+   * The only way to become consultant (ADR 0002: a single consultant).
+   */
+  consultantEmails?: string[];
 };
 
 /**
@@ -44,6 +50,7 @@ export function createAuth(deps: AuthDeps) {
   // password a request just reset is remembered here (per request) so the
   // `after` hook below can sign that person in.
   const passwordResetFor = new WeakMap<Request, User>();
+  const consultantEmails = new Set(deps.consultantEmails?.map((email) => email.toLowerCase()));
 
   /** Emails `user` a link, in the language their Account signed up in. */
   const sendLinkEmail =
@@ -73,6 +80,21 @@ export function createAuth(deps: AuthDeps) {
       additionalFields: {
         // The language the Account signed up in; drives email copy.
         locale: { type: 'string', required: false, defaultValue: 'fr', input: true },
+        // Status and role are server-owned (`input: false`): sign-up can't set
+        // them. Status moves via `transitionAccountStatus`; role comes only
+        // from `consultantEmails`.
+        status: {
+          type: [...ACCOUNT_STATUSES],
+          required: false,
+          defaultValue: 'USER',
+          input: false,
+        },
+        role: {
+          type: [...ACCOUNT_ROLES],
+          required: false,
+          defaultValue: 'MEMBER',
+          input: false,
+        },
       },
     },
     account: {
@@ -140,7 +162,15 @@ export function createAuth(deps: AuthDeps) {
       user: {
         create: {
           async before(user) {
-            return { data: { ...user, locale: toLocale(user.locale) } };
+            const isConsultant = consultantEmails.has(user.email.toLowerCase());
+            return {
+              data: {
+                ...user,
+                locale: toLocale(user.locale),
+                status: 'USER',
+                role: isConsultant ? 'CONSULTANT' : 'MEMBER',
+              },
+            };
           },
         },
       },

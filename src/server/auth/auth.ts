@@ -1,6 +1,7 @@
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { after } from 'next/server';
 
+import { parseConsultantEmails } from '@/features/auth/lib/consultant-emails';
 import { env } from '@/lib/env';
 import { prisma } from '@/server/db/client';
 import { createAuth } from '@/server/auth/create-auth';
@@ -48,6 +49,7 @@ export const auth = createAuth({
     env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
       ? { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET }
       : undefined,
+  consultantEmails: parseConsultantEmails(env.CONSULTANT_EMAILS).emails,
   trustedOrigins: [
     ...(env.BETTER_AUTH_URL ? withWwwVariant(env.BETTER_AUTH_URL) : []),
     ...[vercelOrigin, vercelBranchOrigin].filter((origin): origin is string => Boolean(origin)),

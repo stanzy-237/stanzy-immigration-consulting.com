@@ -32,12 +32,28 @@ model Account {
   image         String?
   /// Language the Account signed up in; drives email copy. `fr` | `en`.
   locale        String         @default("fr")
+  /// Commercial journey; moves forward only (src/features/auth/lib/account-status.ts).
+  status        AccountStatus  @default(USER)
+  /// Access level; CONSULTANT comes only from CONSULTANT_EMAILS (ADR 0002).
+  role          AccountRole    @default(MEMBER)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   sessions      Session[]
   identities    AuthIdentity[]
 
   @@map("account")
+}
+
+/// GLOSSARY: User → Lead → Client.
+enum AccountStatus {
+  USER
+  LEAD
+  CLIENT
+}
+
+enum AccountRole {
+  MEMBER
+  CONSULTANT
 }
 
 model Session {
