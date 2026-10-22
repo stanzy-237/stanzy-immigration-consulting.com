@@ -408,6 +408,15 @@
       "resent": "Email sent. Check your inbox.",
       "forgotPassword": "Forgot your password?"
     },
+    "Google": {
+      "continue": "Continue with Google",
+      "redirecting": "Redirecting to Google…",
+      "or": "or",
+      "errors": {
+        "failed": "Google sign-in failed. Please try again.",
+        "accountNotLinked": "An unconfirmed account already uses this address. Confirm it with the link we emailed you, then try Google again."
+      }
+    },
     "Verification": {
       "metaTitle": "Email verification",
       "pendingTitle": "Check your inbox",

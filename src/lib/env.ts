@@ -30,6 +30,17 @@ const schema = z.object({
   // Sender for transactional email; must be on a domain verified in Resend.
   // Required whenever RESEND_API_KEY is set.
   EMAIL_FROM: z.string().min(3).optional(),
+  // Google OAuth client for "Continuer avec Google" (scripts/setup-google-sign-in.sh).
+  // Optional: without it the Google button is hidden and email/password still
+  // works, so a deploy never breaks for lack of it. Set both or neither.
+  GOOGLE_CLIENT_ID: z
+    .string()
+    .regex(
+      /\.apps\.googleusercontent\.com$/,
+      'Expected a Google OAuth client ID (…apps.googleusercontent.com)',
+    )
+    .optional(),
+  GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
 }).superRefine((value, ctx) => {
   if (process.env.VERCEL_ENV === 'production' && !value.BETTER_AUTH_URL) {
     ctx.addIssue({
@@ -44,6 +55,18 @@ const schema = z.object({
       path: ['EMAIL_FROM'],
       message: 'Required when RESEND_API_KEY is set (a sender on your verified domain)',
     });
+  }
+  for (const [key, other] of [
+    ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'],
+    ['GOOGLE_CLIENT_SECRET', 'GOOGLE_CLIENT_ID'],
+  ] as const) {
+    if (value[other] && !value[key]) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [key],
+        message: `Required when ${other} is set (both come from the same Google OAuth client)`,
+      });
+    }
   }
 });
 

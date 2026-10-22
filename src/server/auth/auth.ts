@@ -41,6 +41,10 @@ export const auth = createAuth({
   // Send auth emails after responding, so response time never reveals
   // whether an address has an Account.
   runInBackground: (task) => after(task),
+  google:
+    env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ? { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET }
+      : undefined,
   trustedOrigins: [
     ...(env.BETTER_AUTH_URL ? withWwwVariant(env.BETTER_AUTH_URL) : []),
     ...[vercelOrigin, vercelBranchOrigin].filter((origin): origin is string => Boolean(origin)),

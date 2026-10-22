@@ -408,6 +408,15 @@
       "resent": "E-mail envoyé. Vérifiez votre boîte de réception.",
       "forgotPassword": "Mot de passe oublié ?"
     },
+    "Google": {
+      "continue": "Continuer avec Google",
+      "redirecting": "Redirection vers Google…",
+      "or": "ou",
+      "errors": {
+        "failed": "La connexion avec Google a échoué. Réessayez.",
+        "accountNotLinked": "Un compte non confirmé utilise déjà cette adresse. Confirmez-la avec le lien reçu par e-mail, puis réessayez avec Google."
+      }
+    },
     "Verification": {
       "metaTitle": "Vérification de l’e-mail",
       "pendingTitle": "Vérifiez votre boîte de réception",
