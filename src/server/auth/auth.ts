@@ -6,6 +6,11 @@ import { createAuth } from '@/server/auth/create-auth';
 import { createMailer } from '@/server/email/mailer';
 
 const vercelOrigin = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined;
+// Previews are opened from the branch alias (`…-git-<branch>-….vercel.app`),
+// not the per-deployment `VERCEL_URL`, so trust it too.
+const vercelBranchOrigin = process.env.VERCEL_BRANCH_URL
+  ? `https://${process.env.VERCEL_BRANCH_URL}`
+  : undefined;
 
 /**
  * The site answers on both the apex and `www` hosts, so trust both variants of
@@ -34,6 +39,6 @@ export const auth = createAuth({
   secret: env.BETTER_AUTH_SECRET,
   trustedOrigins: [
     ...(env.BETTER_AUTH_URL ? withWwwVariant(env.BETTER_AUTH_URL) : []),
-    ...(vercelOrigin ? [vercelOrigin] : []),
+    ...[vercelOrigin, vercelBranchOrigin].filter((origin): origin is string => Boolean(origin)),
   ],
 });
