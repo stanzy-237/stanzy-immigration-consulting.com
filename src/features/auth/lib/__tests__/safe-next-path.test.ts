@@ -54,6 +54,12 @@ describe('safeNextPath', () => {
     ' //evil.com',
     '/%09/evil.com',
     '/%00',
+    // Only become `//evil.com` after dot-segment normalisation or once the
+    // locale prefix is dropped.
+    '/.//evil.com',
+    '/%2e//evil.com',
+    '/en/..//evil.com',
+    '/fr//evil.com',
   ])('falls back to home for %j', (next) => {
     expect(safeNextPath(next)).toBe('/');
   });

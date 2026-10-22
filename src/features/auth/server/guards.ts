@@ -1,9 +1,9 @@
 import { headers } from 'next/headers';
-import { redirect as redirectTo } from 'next/navigation';
+import { redirect as redirectToUrl } from 'next/navigation';
 
 import { connexionPathFor } from '@/features/auth/lib/protected-routes';
 import { safeNextPath, type NextParam } from '@/features/auth/lib/safe-next-path';
-import { redirect } from '@/i18n/navigation';
+import { redirect as redirectInLocale } from '@/i18n/navigation';
 import { getCurrentSession, type CurrentSession } from '@/server/auth/session';
 
 type GuardOptions = {
@@ -19,7 +19,7 @@ type GuardOptions = {
  */
 export async function requireSession({ locale, next }: GuardOptions): Promise<CurrentSession> {
   const session = await getCurrentSession(await headers());
-  if (!session) redirectTo(connexionPathFor(locale, safeNextPath(next)));
+  if (!session) redirectToUrl(connexionPathFor(locale, safeNextPath(next)));
   return session;
 }
 
@@ -29,5 +29,5 @@ export async function requireSession({ locale, next }: GuardOptions): Promise<Cu
  */
 export async function redirectIfSignedIn({ locale, next }: GuardOptions): Promise<void> {
   const session = await getCurrentSession(await headers());
-  if (session) redirect({ href: safeNextPath(next), locale });
+  if (session) redirectInLocale({ href: safeNextPath(next), locale });
 }

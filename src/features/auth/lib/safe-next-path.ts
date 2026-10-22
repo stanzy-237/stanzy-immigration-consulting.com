@@ -38,6 +38,9 @@ export function safeNextPath(next: unknown): string {
   if (url.origin !== BASE) return HOME;
 
   const pathname = stripLocale(url.pathname);
+  // Normalising dot segments or dropping the locale can surface a `//host`
+  // that wasn't visible in the raw value (`/fr//evil.com`, `/.//evil.com`).
+  if (!isPlainPath(pathname)) return HOME;
   if (GUEST_ONLY_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
     return HOME;
   }
