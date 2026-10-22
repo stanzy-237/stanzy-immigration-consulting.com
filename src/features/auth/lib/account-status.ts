@@ -5,8 +5,12 @@
 export const ACCOUNT_STATUSES = ['USER', 'LEAD', 'CLIENT'] as const;
 export type AccountStatus = (typeof ACCOUNT_STATUSES)[number];
 
-/** An Account's access level. Only configuration grants CONSULTANT. */
-export const ACCOUNT_ROLES = ['MEMBER', 'CONSULTANT'] as const;
+/**
+ * An Account's access level. Only configuration grants CONSULTANT; only the
+ * consultant makes someone a PARTNER (an outside professional they outsource
+ * work to). Nobody can give themselves a role.
+ */
+export const ACCOUNT_ROLES = ['MEMBER', 'PARTNER', 'CONSULTANT'] as const;
 export type AccountRole = (typeof ACCOUNT_ROLES)[number];
 
 /** What moves an Account forward. Each event is valid from exactly one status. */

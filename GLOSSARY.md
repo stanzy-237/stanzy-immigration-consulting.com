@@ -50,6 +50,10 @@ _Avoid_: "customer" in product-facing French; use Client.
 Stanzy, the one person who runs the practice and administers the platform. Being the consultant is an access level an Account holds, separate from its User → Lead → Client status: the consultant is never "a Client". Nobody can make themselves consultant; it is set by configuration.
 _Avoid_: "admin", "staff".
 
+**Partner**:
+An outside professional the consultant outsources part of a Client's work to. The consultant adds each Partner and assigns them to specific Clients or documents; a Partner sees only what they are assigned, never the rest of the practice.
+_Avoid_: "subcontractor", "freelancer", "agent".
+
 **Dossier**:
 The case file for a Client's engagement — what the consultant tracks and works through.
 

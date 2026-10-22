@@ -45,6 +45,12 @@ describe('consultantProcedure', () => {
     });
   });
 
+  it('rejects a partner as FORBIDDEN', async () => {
+    await expect(callerAs(signedInAs('USER', 'PARTNER')).consultantOnly()).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    });
+  });
+
   it('lets the consultant through', async () => {
     expect(await callerAs(signedInAs('USER', 'CONSULTANT')).consultantOnly()).toBe('ok');
   });
@@ -71,6 +77,12 @@ describe('statusProcedure', () => {
     ['clientsOnly', 'CLIENT'],
   ] as const)('%s lets a %s through', async (procedure, status) => {
     expect(await callerAs(signedInAs(status))[procedure]()).toBe('ok');
+  });
+
+  it('gives a partner no status privileges: a partner is not a Client', async () => {
+    await expect(callerAs(signedInAs('USER', 'PARTNER')).leadsOnly()).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    });
   });
 
   it('lets the consultant pass every status check, whatever their own status', async () => {
