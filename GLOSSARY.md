@@ -46,6 +46,22 @@ A paid, booked appointment between a User and the consultant, and the primary fu
 A Lead who has purchased Accompagnement. A Client has one or more Dossiers.
 _Avoid_: "customer" in product-facing French; use Client.
 
+**Consultant**:
+Stanzy, the one person who runs the practice and administers the platform. Being the consultant is an access level an Account holds, separate from its User → Lead → Client status: the consultant is never "a Client". Nobody can make themselves consultant; it is set by configuration.
+_Avoid_: "admin", "staff".
+
+**Partner**:
+An outside professional the consultant outsources part of a Client's work to. The consultant adds each Partner and gives them Missions; a Partner sees only their Missions, never a whole Client or the rest of the practice.
+_Avoid_: "subcontractor", "freelancer", "agent".
+
+**Mission**:
+One document the consultant outsources to a Partner within a Client's Dossier (e.g. a certificat de police, a preuve de fonds, an attestation CNPS). It follows À faire → En cours → Mouture → Livré: the Mouture is the first draft, which the consultant and the Client review and can send back as Modif en cours until it is right. It carries a comment thread.
+
+**Mouture** (Draft):
+The reviewable draft of a Mission's document, before the final version is delivered.
+_Avoid_: "version", "brouillon".
+_Avoid_: "task", "assignment", "job".
+
 **Dossier**:
 The case file for a Client's engagement — what the consultant tracks and works through.
 

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { parseConsultantEmails } from '@/features/auth/lib/consultant-emails';
+
 /**
  * Validated application configuration. For config this app depends on (e.g.
  * connection strings, API keys), import `env` instead of reading `process.env`
@@ -43,6 +45,15 @@ const schema = z.object({
     )
     .optional(),
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+  // Comma-separated emails whose Account gets the consultant role at creation
+  // (normally one). Optional: without it nobody is consultant.
+  CONSULTANT_EMAILS: z
+    .string()
+    .refine(
+      (raw) => parseConsultantEmails(raw).invalid.length === 0,
+      'Expected comma-separated email addresses',
+    )
+    .optional(),
 }).superRefine((value, ctx) => {
   if (process.env.VERCEL_ENV === 'production' && !value.BETTER_AUTH_URL) {
     ctx.addIssue({

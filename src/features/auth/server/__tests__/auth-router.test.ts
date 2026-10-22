@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { sessionFor } from '@/server/auth/__tests__/fixtures';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 import { createCaller } from '@/server/trpc/root';
@@ -17,17 +18,7 @@ function callerAs(session: CurrentSession | null) {
   return createCaller(ctx);
 }
 
-const SIGNED_IN: CurrentSession = {
-  account: {
-    id: 'acc_1',
-    name: 'Aminata Diallo',
-    email: 'aminata@example.com',
-    emailVerified: true,
-    image: null,
-    locale: 'fr',
-  },
-  session: { id: 'ses_1', expiresAt: new Date('2026-11-01T00:00:00Z') },
-};
+const SIGNED_IN = sessionFor();
 
 describe('auth.me', () => {
   it('returns null when nobody is signed in', async () => {
@@ -41,6 +32,20 @@ describe('auth.me', () => {
       email: 'aminata@example.com',
       image: null,
       locale: 'fr',
+      status: 'USER',
+      role: 'MEMBER',
     });
+  });
+});
+
+describe('auth.consultantCheck', () => {
+  it('refuses a member', async () => {
+    await expect(callerAs(SIGNED_IN).auth.consultantCheck()).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    });
+  });
+
+  it('confirms the consultant', async () => {
+    expect(await callerAs(sessionFor({ role: 'CONSULTANT' })).auth.consultantCheck()).toEqual({ consultant: true });
   });
 });

@@ -1,7 +1,7 @@
 import { memoryAdapter } from 'better-auth/adapters/memory';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createAuth } from '@/server/auth/create-auth';
+import { createAuth, type AuthDeps } from '@/server/auth/create-auth';
 import type { EmailMessage, Mailer } from '@/server/email/mailer';
 
 /**
@@ -61,7 +61,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function createHarness() {
+function createHarness(overrides: Partial<AuthDeps> = {}) {
   const sent: EmailMessage[] = [];
   const mailer: Mailer = {
     async send(message) {
@@ -81,6 +81,7 @@ function createHarness() {
     baseURL: BASE_URL,
     secret: 'test-secret-test-secret-test-secret-32',
     google: { clientId: 'test-google-client', clientSecret: 'test-google-secret' },
+    ...overrides,
   });
 
   let cookie = '';
@@ -118,7 +119,7 @@ function createHarness() {
   }
 
   async function currentSession(): Promise<{
-    user: { id: string; email: string; emailVerified: boolean };
+    user: { id: string; email: string; emailVerified: boolean; status: string; role: string };
   } | null> {
     return (await (await request('/get-session')).json()) as never;
   }
@@ -182,8 +183,17 @@ describe('Continuer avec Google', () => {
     const session = await h.currentSession();
     expect(session?.user.email).toBe(AMINATA.email);
     expect(session?.user.emailVerified).toBe(true);
+    expect(session?.user).toMatchObject({ status: 'USER', role: 'MEMBER' });
     expect(h.accounts()).toHaveLength(1);
     expect(h.sent).toEqual([]);
+  });
+
+  it('makes a first Google sign-in with a CONSULTANT_EMAILS address the consultant', async () => {
+    const h = createHarness({ consultantEmails: [AMINATA.email] });
+
+    await h.continueWithGoogle(AMINATA_ON_GOOGLE, { callbackURL: '/fr' });
+
+    expect((await h.currentSession())?.user).toMatchObject({ status: 'USER', role: 'CONSULTANT' });
   });
 
   async function verifiedPasswordAccount() {

@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { redirectIfSignedIn, requireSession } from '@/features/auth/server/guards';
-import { getCurrentSession, type CurrentSession } from '@/server/auth/session';
+import { sessionFor } from '@/server/auth/__tests__/fixtures';
+import { getCurrentSession } from '@/server/auth/session';
 
 /**
  * Seam: the page guards that layouts and pages call. The session lookup (the
@@ -13,17 +14,7 @@ vi.mock('@/server/auth/session', () => ({ getCurrentSession: vi.fn() }));
 
 const session = vi.mocked(getCurrentSession);
 
-const SIGNED_IN: CurrentSession = {
-  account: {
-    id: 'acc_1',
-    name: 'Aminata Diallo',
-    email: 'aminata@example.com',
-    emailVerified: true,
-    image: null,
-    locale: 'fr',
-  },
-  session: { id: 'ses_1', expiresAt: new Date('2026-11-01T00:00:00Z') },
-};
+const SIGNED_IN = sessionFor();
 
 /** Runs a guard and returns where it redirected to, or null if it didn't. */
 async function redirectedTo(guard: Promise<unknown>): Promise<string | null> {
