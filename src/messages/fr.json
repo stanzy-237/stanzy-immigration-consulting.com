@@ -405,7 +405,8 @@
       "noAccount": "Pas encore de compte ?",
       "signUp": "Créer un compte",
       "resend": "Renvoyer l’e-mail de confirmation",
-      "resent": "E-mail envoyé. Vérifiez votre boîte de réception."
+      "resent": "E-mail envoyé. Vérifiez votre boîte de réception.",
+      "forgotPassword": "Mot de passe oublié ?"
     },
     "Verification": {
       "metaTitle": "Vérification de l’e-mail",
@@ -436,7 +437,40 @@
         "cta": "Confirmer mon adresse",
         "expiry": "Ce lien expire dans 1 heure.",
         "ignore": "Si vous n’êtes pas à l’origine de cette inscription, ignorez simplement cet e-mail."
+      },
+      "ResetPassword": {
+        "subject": "Réinitialisez votre mot de passe — Stanzy",
+        "greeting": "Bonjour {name},",
+        "body": "Vous avez demandé à réinitialiser le mot de passe de votre compte Stanzy. Choisissez-en un nouveau grâce à ce lien :",
+        "cta": "Choisir un nouveau mot de passe",
+        "expiry": "Ce lien expire dans 1 heure et ne fonctionne qu’une seule fois.",
+        "ignore": "Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail : votre mot de passe reste inchangé."
       }
+    },
+    "MotDePasseOublie": {
+      "metaTitle": "Mot de passe oublié",
+      "title": "Mot de passe oublié ?",
+      "subtitle": "Indiquez l’adresse e-mail de votre compte. Nous vous enverrons un lien pour choisir un nouveau mot de passe.",
+      "submit": "Envoyer le lien",
+      "submitting": "Envoi…",
+      "sentTitle": "Vérifiez votre boîte de réception",
+      "sentBody": "Si un compte Stanzy existe pour {email}, vous recevrez un lien de réinitialisation dans quelques minutes. Il expire dans 1 heure.",
+      "backToSignIn": "Retour à la connexion",
+      "remembered": "Vous vous en souvenez ?",
+      "signIn": "Se connecter"
+    },
+    "ReinitialiserMotDePasse": {
+      "metaTitle": "Réinitialiser le mot de passe",
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe. Vous serez connecté et vos autres sessions seront déconnectées.",
+      "newPassword": "Nouveau mot de passe",
+      "submit": "Enregistrer et me connecter",
+      "submitting": "Enregistrement…",
+      "vaultTitle": "Cela ne récupère pas la phrase secrète du Coffre-fort",
+      "vaultBody": "Votre Coffre-fort est chiffré avec une phrase secrète que vous seul connaissez. Changer de mot de passe ne la modifie pas et ne permet pas de la retrouver : si vous l’avez oubliée, personne, pas même Stanzy, ne peut rouvrir son contenu.",
+      "invalidTitle": "Lien invalide ou expiré",
+      "invalidBody": "Ce lien de réinitialisation a déjà été utilisé ou a expiré. Demandez-en un nouveau : il arrive en quelques minutes.",
+      "requestNew": "Demander un nouveau lien"
     }
   }
 }

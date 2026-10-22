@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useResendVerification } from '@/features/auth/hooks/use-resend-verification';
 import { authErrorKey, type AuthErrorKey } from '@/features/auth/lib/auth-errors';
 import { authClient } from '@/features/auth/lib/auth-client';
+import { Link } from '@/i18n/navigation';
 
 /**
  * Email + password sign-in. Shared by the Connexion page and the Connexion
@@ -97,6 +98,11 @@ export function ConnexionForm({ onSignedIn }: { onSignedIn: () => void }): React
             required
             className="h-11"
           />
+          <p className="text-right text-sm">
+            <Link href="/mot-de-passe-oublie" className="text-rouge font-semibold hover:underline">
+              {t('forgotPassword')}
+            </Link>
+          </p>
         </Field>
         <Button
           type="submit"

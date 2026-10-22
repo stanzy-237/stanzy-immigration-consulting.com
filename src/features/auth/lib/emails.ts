@@ -15,18 +15,36 @@ function escapeHtml(value: string): string {
     .replaceAll('"', '&quot;');
 }
 
-/** The "confirm your email address" email sent after sign-up. */
-export function verificationEmail(opts: {
+type LinkEmailOptions = {
   to: string;
   name: string;
   url: string;
   locale: unknown;
-}): EmailMessage {
+};
+
+/** The "confirm your email address" email sent after sign-up. */
+export function verificationEmail(opts: LinkEmailOptions): EmailMessage {
+  return linkEmail('Verification', opts);
+}
+
+/** The "reset your password" email sent from Mot de passe oublié. */
+export function resetPasswordEmail(opts: LinkEmailOptions): EmailMessage {
+  return linkEmail('ResetPassword', opts);
+}
+
+/**
+ * A short email whose point is one link: greeting, body, button, expiry and
+ * "ignore this if it wasn't you". Copy comes from `Auth.Emails.<kind>`.
+ */
+function linkEmail(
+  kind: 'Verification' | 'ResetPassword',
+  opts: LinkEmailOptions,
+): EmailMessage {
   const locale = toLocale(opts.locale);
   const t = createTranslator({
     locale,
     messages: MESSAGES[locale],
-    namespace: 'Auth.Emails.Verification',
+    namespace: `Auth.Emails.${kind}`,
   });
   const greeting = t('greeting', { name: opts.name });
 
