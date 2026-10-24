@@ -613,7 +613,12 @@
       "saving": "Enregistrement…",
       "error": "L’enregistrement a échoué. Réessayez."
     },
-    "rulesHint": "Le 3 novembre 2026, IRCC remplace les points d’expérience canadienne par le facteur « intégration au marché du travail » et rétablit des points pour certaines offres d’emploi."
+    "rulesHint": "Le 3 novembre 2026, IRCC remplace les points d’expérience canadienne par le facteur « intégration au marché du travail » et rétablit des points pour certaines offres d’emploi.",
+    "guide": {
+      "title": "Un bon score CRS n’est que la première étape.",
+      "text": "Votre score CRS fixe votre classement dans le bassin Entrée Express ; l’invitation dépend ensuite des seuils de chaque tirage. Avant de créer votre profil, vérifiez que vous êtes admissible au Programme des travailleurs qualifiés (fédéral).",
+      "secondary": "Vérifier mon admissibilité (67 points)"
+    }
   },
   "Calculators": {
     "language": {
@@ -681,6 +686,21 @@
       "accompanyingYes": "Oui, il/elle m’accompagnera",
       "accompanyingNo": "Non",
       "citizenOrPR": "Mon époux(se) ou conjoint(e) est citoyen(ne) canadien(ne) ou résident(e) permanent(e)"
+    },
+    "guide": {
+      "eyebrow": "À savoir",
+      "needsIntro": "Pour présenter votre demande, vous devrez également fournir :",
+      "needs": {
+        "experience": "des preuves de votre expérience professionnelle qualifiée : lettres de référence détaillées, contrats de travail, relevés de paie ;",
+        "funds": "une preuve de fonds suffisants pour vous établir au Canada, sauf exemption."
+      },
+      "support": "Stanzy Immigration vous accompagne dans la constitution de ces preuves et la préparation de votre dossier, de l’admissibilité jusqu’à l’invitation.",
+      "consultation": "Réserver une consultation",
+      "fundsLink": "Montants exigés par IRCC",
+      "fundsUrl": "https://www.canada.ca/fr/immigration-refugies-citoyennete/services/immigrer-canada/entree-express/documents/preuve-fonds-suffisants.html",
+      "whatsappTitle": "Rejoignez notre chaîne WhatsApp",
+      "whatsappText": "Recevez les derniers tirages Entrée Express, les changements de règles d’IRCC et nos conseils, directement sur votre téléphone.",
+      "whatsappCta": "Rejoindre la chaîne WhatsApp"
     }
   },
   "Fsw": {
@@ -805,22 +825,9 @@
       "disclaimer": "Ce calcul est indicatif et ne remplace pas une évaluation professionnelle de votre dossier."
     },
     "guide": {
-      "eyebrow": "À savoir",
       "title": "Atteindre 67 points n’est que la première étape.",
       "text": "La grille des 67 points détermine votre admissibilité au Programme des travailleurs qualifiés (fédéral). Une fois votre profil Entrée Express créé, c’est votre score CRS qui fixe votre classement dans le bassin.",
-      "needsIntro": "Pour présenter votre demande, vous devrez également fournir :",
-      "needs": {
-        "experience": "des preuves de votre expérience professionnelle qualifiée : lettres de référence détaillées, contrats de travail, relevés de paie ;",
-        "funds": "une preuve de fonds suffisants pour vous établir au Canada, sauf exemption."
-      },
-      "support": "Stanzy Immigration vous accompagne dans la constitution de ces preuves et la préparation de votre dossier, de l’admissibilité jusqu’à l’invitation.",
-      "consultation": "Réserver une consultation",
-      "crs": "Calculer mon score CRS",
-      "fundsLink": "Montants exigés par IRCC",
-      "fundsUrl": "https://www.canada.ca/fr/immigration-refugies-citoyennete/services/immigrer-canada/entree-express/documents/preuve-fonds-suffisants.html",
-      "whatsappTitle": "Rejoignez notre chaîne WhatsApp",
-      "whatsappText": "Recevez les derniers tirages Entrée Express, les changements de règles d’IRCC et nos conseils, directement sur votre téléphone.",
-      "whatsappCta": "Rejoindre la chaîne WhatsApp"
+      "secondary": "Calculer mon score CRS"
     },
     "rulesHint": "Le 3 novembre 2026, IRCC supprime l’exigence d’une EIMT pour qu’une offre d’emploi admissible compte.",
     "reusedNotice": "Réponses reprises du Calculateur CRS. Vérifiez votre expérience de travail et l’adaptabilité : le Calculateur CRS ne donne que des tranches d’années, et vos études au Canada peuvent compter.",

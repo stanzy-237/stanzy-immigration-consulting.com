@@ -613,7 +613,12 @@
       "saving": "Saving…",
       "error": "Saving failed. Please try again."
     },
-    "rulesHint": "On November 3, 2026, IRCC replaces Canadian work experience points with the “labour market integration” factor and brings back points for some job offers."
+    "rulesHint": "On November 3, 2026, IRCC replaces Canadian work experience points with the “labour market integration” factor and brings back points for some job offers.",
+    "guide": {
+      "title": "A good CRS score is only the first step.",
+      "text": "Your CRS score sets your rank in the Express Entry pool; an invitation then depends on each draw’s cut-off. Before creating your profile, check that you are eligible for the Federal Skilled Worker Program.",
+      "secondary": "Check my eligibility (67 points)"
+    }
   },
   "Calculators": {
     "language": {
@@ -681,6 +686,21 @@
       "accompanyingYes": "Yes, they will come with me",
       "accompanyingNo": "No",
       "citizenOrPR": "My spouse or common-law partner is a Canadian citizen or permanent resident"
+    },
+    "guide": {
+      "eyebrow": "Good to know",
+      "needsIntro": "To apply, you will also need to provide:",
+      "needs": {
+        "experience": "proof of your skilled work experience: detailed reference letters, employment contracts, pay slips;",
+        "funds": "proof of enough money to settle in Canada, unless exempt."
+      },
+      "support": "Stanzy Immigration helps you gather this proof and prepare your file, from eligibility to the invitation.",
+      "consultation": "Book a consultation",
+      "fundsLink": "IRCC’s required amounts",
+      "fundsUrl": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/proof-funds.html",
+      "whatsappTitle": "Join our WhatsApp channel",
+      "whatsappText": "Get the latest Express Entry draws, IRCC rule changes and our advice, straight to your phone.",
+      "whatsappCta": "Join the WhatsApp channel"
     }
   },
   "Fsw": {
@@ -805,22 +825,9 @@
       "disclaimer": "This result is indicative and does not replace a professional assessment of your file."
     },
     "guide": {
-      "eyebrow": "Good to know",
       "title": "Reaching 67 points is only the first step.",
       "text": "The 67-point grid decides your eligibility for the Federal Skilled Worker Program. Once your Express Entry profile is created, your CRS score sets your rank in the pool.",
-      "needsIntro": "To apply, you will also need to provide:",
-      "needs": {
-        "experience": "proof of your skilled work experience: detailed reference letters, employment contracts, pay slips;",
-        "funds": "proof of enough money to settle in Canada, unless exempt."
-      },
-      "support": "Stanzy Immigration helps you gather this proof and prepare your file, from eligibility to the invitation.",
-      "consultation": "Book a consultation",
-      "crs": "Compute my CRS score",
-      "fundsLink": "IRCC’s required amounts",
-      "fundsUrl": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/proof-funds.html",
-      "whatsappTitle": "Join our WhatsApp channel",
-      "whatsappText": "Get the latest Express Entry draws, IRCC rule changes and our advice, straight to your phone.",
-      "whatsappCta": "Join the WhatsApp channel"
+      "secondary": "Compute my CRS score"
     },
     "rulesHint": "On November 3, 2026, IRCC removes the LMIA requirement for a qualifying job offer to count.",
     "reusedNotice": "Answers reused from the CRS calculator. Check your work experience and adaptability: the CRS calculator only gives ranges of years, and your studies in Canada may count.",
