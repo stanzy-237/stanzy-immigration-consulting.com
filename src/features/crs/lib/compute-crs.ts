@@ -31,6 +31,7 @@ import {
   type LanguageResult,
 } from '@/features/shared/lib/language-levels';
 import { isPartnered, type MaritalStatus } from '@/features/shared/lib/marital-status';
+import { checkCandidate, levelsWithIssues, type CalculatorIssue } from '@/features/shared/lib/answer-checks';
 import type { RulesVersion } from '@/features/shared/lib/rules-version';
 
 export type SpouseProfile = {
@@ -64,11 +65,7 @@ export type CrsProfile = {
   highWageJobOffer: HighWageLevel;
 };
 
-export type CrsIssue = {
-  /** Dotted path to the answer to fix, e.g. `firstLanguage.speaking`. */
-  field: string;
-  code: 'SCORE_OUT_OF_RANGE' | 'SAME_LANGUAGE' | 'AGE_OUT_OF_RANGE';
-};
+export type CrsIssue = CalculatorIssue;
 
 export type CrsBreakdown = {
   rules: RulesVersion;
@@ -109,21 +106,6 @@ export type CrsResult = { ok: true; breakdown: CrsBreakdown } | { ok: false; iss
 const sum = (values: number[]): number => values.reduce((a, b) => a + b, 0);
 const capYears = (years: number, max: number): number => Math.min(Math.max(Math.floor(years), 0), max);
 
-/** Converts a set of results to levels, recording each impossible score as an issue. */
-function levelsFor(
-  result: LanguageResult | null | undefined,
-  field: string,
-  issues: CrsIssue[],
-): ClbLevels | null {
-  if (!result) return null;
-  const levels = {} as ClbLevels;
-  for (const ability of ABILITIES) {
-    const level = clbLevelFor(result.test, ability, result.scores[ability]);
-    if (level === null) issues.push({ field: `${field}.${ability}`, code: 'SCORE_OUT_OF_RANGE' });
-    levels[ability] = level ?? 0;
-  }
-  return levels;
-}
 
 const perAbility = (levels: ClbLevels | null, points: readonly number[]): number =>
   levels ? sum(ABILITIES.map((a) => points[levels[a]] ?? 0)) : 0;
@@ -167,18 +149,12 @@ function frenchPoints(tests: { result: LanguageResult | null; levels: ClbLevels 
  */
 export function computeCrs(profile: CrsProfile, options: { rules: RulesVersion }): CrsResult {
   const issues: CrsIssue[] = [];
-  if (!Number.isInteger(profile.age) || profile.age < 0 || profile.age > 120) {
-    issues.push({ field: 'age', code: 'AGE_OUT_OF_RANGE' });
-  }
-  const { firstLanguage: firstTest, secondLanguage: secondTest } = profile;
-  if (firstTest && secondTest && TEST_SPECS[firstTest.test].language === TEST_SPECS[secondTest.test].language) {
-    issues.push({ field: 'secondLanguage', code: 'SAME_LANGUAGE' });
-  }
+  checkCandidate(profile, issues);
   const partner = accompanyingSpouse(profile);
   const levels = {
-    first: levelsFor(profile.firstLanguage, 'firstLanguage', issues),
-    second: levelsFor(profile.secondLanguage, 'secondLanguage', issues),
-    spouse: partner ? levelsFor(partner.language, 'spouse.language', issues) : null,
+    first: levelsWithIssues(profile.firstLanguage, 'firstLanguage', issues),
+    second: levelsWithIssues(profile.secondLanguage, 'secondLanguage', issues),
+    spouse: partner ? levelsWithIssues(partner.language, 'spouse.language', issues) : null,
   };
   if (issues.length > 0) return { ok: false, issues };
 
