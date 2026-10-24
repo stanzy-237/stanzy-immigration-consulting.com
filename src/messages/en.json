@@ -680,5 +680,158 @@
         }
       }
     }
+  },
+  "Fsw": {
+    "eyebrow": "Free tool · Express Entry",
+    "title": "67-point",
+    "titleAccent": "calculator",
+    "lead": "Check your eligibility for the Federal Skilled Worker Program in a few minutes.",
+    "threshold": "Pass mark: 67 / 100",
+    "notCrs": "The 67-point grid checks eligibility; it is not your CRS score.",
+    "rulesNote": "Official criteria in force on {date}.",
+    "rulesChoice": {
+      "legend": "Rules applied",
+      "current": "Current rules",
+      "upcoming": "From November 3, 2026",
+      "hint": "On November 3, 2026, IRCC removes the LMIA requirement for a qualifying job offer to count."
+    },
+    "step": "Step {n}",
+    "points": "{points} / {max}",
+    "reuseCrs": "Reuse my CRS calculator answers",
+    "language": {
+      "title": "Language skills",
+      "subtitle": "First official language · max. 24 points",
+      "official": "Your first official language",
+      "officialOptions": {
+        "fr": "French (NCLC)",
+        "en": "English (CLB)"
+      },
+      "levelOptions": {
+        "9": "CLB/NCLC 9 or more (6 pts)",
+        "8": "CLB/NCLC 8 (5 pts)",
+        "7": "CLB/NCLC 7 (4 pts)",
+        "6": "Below CLB/NCLC 7 (not eligible)"
+      },
+      "converter": "I don’t know my CLB/NCLC — work it out from my results",
+      "second": "Second official language: CLB/NCLC 5 or more in all 4 abilities",
+      "secondNo": "No (0 pts)",
+      "secondYes": "Yes — 4 points"
+    },
+    "converter": {
+      "title": "Enter your test results",
+      "description": "We work out your CLB/NCLC levels with IRCC’s official charts.",
+      "cancel": "Cancel",
+      "apply": "Apply the levels"
+    },
+    "education": {
+      "title": "Education",
+      "label": "Your highest credential",
+      "options": {
+        "lessThanSecondary": "Less than secondary school (not eligible)",
+        "secondary": "Secondary diploma (5 pts)",
+        "oneYear": "One-year post-secondary program (15 pts)",
+        "twoYear": "Two-year post-secondary program (19 pts)",
+        "bachelors": "Bachelor’s degree or a program of 3+ years (21 pts)",
+        "twoOrMore": "Two or more credentials, one of 3+ years (22 pts)",
+        "masters": "Master’s or professional degree (23 pts)",
+        "doctorate": "Doctorate (25 pts)"
+      },
+      "hint": "Foreign credential: an Educational Credential Assessment (ECA) is required."
+    },
+    "work": {
+      "title": "Work experience",
+      "label": "Skilled work experience (last 10 years)",
+      "options": {
+        "0": "Less than a year (not eligible)",
+        "1": "1 year (9 pts)",
+        "2": "2 to 3 years (11 pts)",
+        "4": "4 to 5 years (13 pts)",
+        "6": "6 years or more (15 pts)"
+      },
+      "hint": "Paid, continuous work in a TEER 0, 1, 2 or 3 job in your primary occupation (1 year = 1,560 hours)."
+    },
+    "age": {
+      "title": "Age",
+      "label": "Your age",
+      "hint": "12 points from 18 to 35, then one point less per year; 0 from 47. Your age on the day IRCC receives your application.",
+      "invalid": "Enter a valid age."
+    },
+    "jobOffer": {
+      "title": "Arranged employment",
+      "label": "Do you have a job offer?",
+      "none": "No",
+      "valid": "Yes — full-time, non-seasonal, at least 1 year, TEER 0 to 3",
+      "situation": "Job offer situation",
+      "situations": {
+        "none": "None of these situations",
+        "lmiaWorkPermit": "I work in Canada on an LMIA-based work permit, for this employer",
+        "lmiaExemptWorkPermit": "I work in Canada in an LMIA-exempt job, for this employer for at least 1 year",
+        "lmiaOffer": "I have no work permit; the employer got an LMIA for this offer",
+        "lmiaOfferNewEmployer": "I work in an LMIA-exempt job; another employer got an LMIA for this offer"
+      },
+      "noLmia": "From November 3, 2026, no LMIA is needed for a qualifying job offer."
+    },
+    "adaptability": {
+      "title": "Adaptability",
+      "subtitle": "Tick what applies · capped at 10 points",
+      "marital": "Your marital status",
+      "maritalOptions": {
+        "single": "Never married / single",
+        "married": "Married",
+        "commonLaw": "Common-law",
+        "divorced": "Divorced",
+        "separated": "Legally separated",
+        "widowed": "Widowed",
+        "annulled": "Annulled marriage"
+      },
+      "accompanying": "Will your spouse or common-law partner come with you to Canada?",
+      "accompanyingYes": "Yes, they will come with me",
+      "accompanyingNo": "No",
+      "citizenOrPR": "My spouse or common-law partner is a Canadian citizen or permanent resident",
+      "items": {
+        "spouseLanguage": "My spouse or partner has CLB/NCLC 4 or more in all 4 abilities",
+        "studiedInCanada": "I studied in Canada full-time for at least 2 years",
+        "spouseStudiedInCanada": "My spouse or partner studied in Canada full-time for at least 2 years",
+        "workedInCanada": "I worked in Canada full-time for at least 1 year (TEER 0 to 3)",
+        "spouseWorkedInCanada": "My spouse or partner worked in Canada full-time for at least 1 year",
+        "relativeInCanada": "A relative of mine or my partner’s lives in Canada (citizen or PR, 18 or older)",
+        "arrangedEmployment": "Arranged employment (counted automatically)"
+      }
+    },
+    "result": {
+      "label": "Your result",
+      "outOf": "/ 100 points · pass mark: 67",
+      "eligible": "Eligible",
+      "notEligible": "Not eligible",
+      "reached": "You reach the 67-point pass mark and the minimum requirements.",
+      "short": "{points, plural, one {You are # point short of the pass mark.} other {You are # points short of the pass mark.}}",
+      "unmet": "Requirement not met:",
+      "requirements": {
+        "firstLanguageClb7": "CLB/NCLC 7 in all 4 abilities of the first official language",
+        "oneYearOfWork": "At least 1 year of skilled work experience",
+        "credential": "A secondary diploma or higher"
+      },
+      "factors": {
+        "language": "F1 · Language",
+        "education": "F2 · Education",
+        "work": "F3 · Experience",
+        "age": "F4 · Age",
+        "arrangedEmployment": "F5 · Job offer",
+        "adaptability": "F6 · Adaptab."
+      },
+      "reset": "Start over",
+      "invalid": "Fix the flagged answers to get your result.",
+      "disclaimer": "This result is indicative and does not replace a professional assessment of your file."
+    },
+    "guide": {
+      "eyebrow": "Good to know",
+      "title": "A score is only the start of the journey.",
+      "text": "The 67-point grid checks your eligibility for the Federal Skilled Worker Program. Once eligible, your Express Entry profile is ranked by your CRS score.",
+      "crs": "Compute my CRS score",
+      "consultation": "Book a consultation",
+      "funds": "You will also need to prove enough money to settle, unless exempt.",
+      "fundsLink": "See IRCC’s amounts",
+      "fundsUrl": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/proof-funds.html"
+    }
   }
 }

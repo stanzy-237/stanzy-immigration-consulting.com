@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { ToolPlaceholderView } from '@/features/tool-placeholder/views/tool-placeholder-view';
+import { FswView } from '@/features/fsw/views/fsw-view';
 import type { LocaleParams } from '@/i18n/routing';
 
 export async function generateMetadata({
@@ -23,5 +23,5 @@ export default async function Page({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ToolPlaceholderView slug="fsw" />;
+  return <FswView />;
 }
