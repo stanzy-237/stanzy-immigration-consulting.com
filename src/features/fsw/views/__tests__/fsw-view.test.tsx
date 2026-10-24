@@ -43,6 +43,10 @@ describe('FswView — À savoir', () => {
     expect(join).toHaveAttribute('href', expect.stringContaining('whatsapp.com/channel/'));
     expect(join).toHaveAttribute('target', '_blank');
     expect(join).toHaveAttribute('rel', expect.stringContaining('noopener'));
+    expect(within(guide()).getByRole('img', { name: 'WhatsApp' })).toHaveAttribute(
+      'src',
+      expect.stringContaining('whatsapp.svg'),
+    );
   });
 
   it('has no axe violations', async () => {
