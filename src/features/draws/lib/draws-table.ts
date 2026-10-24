@@ -1,5 +1,5 @@
-import type { DrawGroup } from '@/features/draws/lib/normalize-ircc-rounds';
-import type { DrawSummary } from '@/features/draws/server/draws-router';
+import type { DrawGroup } from '@/features/draws/lib/draw-type';
+import type { DrawSummary } from '@/features/draws/lib/draw-summary';
 
 export type SortField = 'round' | 'date' | 'type' | 'invitations' | 'crsMin';
 export type GroupFilter = DrawGroup | 'ALL';
@@ -43,7 +43,12 @@ export function tableReducer(state: TableState, action: TableAction): TableState
 }
 
 /** How a row reads on screen, so search matches what the visitor sees. */
-export type DrawText = { type: (draw: DrawSummary) => string; date: (draw: DrawSummary) => string };
+export type DrawText = {
+  type: (draw: DrawSummary) => string;
+  date: (draw: DrawSummary) => string;
+  /** The date without the year, for tight spots. */
+  shortDate: (draw: DrawSummary) => string;
+};
 
 function compare(sort: SortField, text: DrawText) {
   return (a: DrawSummary, b: DrawSummary): number => {

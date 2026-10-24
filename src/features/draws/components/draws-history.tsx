@@ -15,15 +15,15 @@ import {
   type GroupFilter,
   type SortField,
 } from '@/features/draws/lib/draws-table';
-import { DRAW_GROUPS } from '@/features/draws/lib/normalize-ircc-rounds';
-import type { DrawSummary } from '@/features/draws/server/draws-router';
+import { DRAW_GROUPS } from '@/features/draws/lib/draw-type';
+import type { DrawSummary } from '@/features/draws/lib/draw-summary';
 import { cn } from '@/lib/utils';
 
 const COLUMNS: SortField[] = ['round', 'date', 'type', 'invitations', 'crsMin'];
 const FILTERS: GroupFilter[] = ['ALL', ...DRAW_GROUPS];
 
 /** Cut-off colour: high is hard to reach, low is within reach. */
-const crsClass = (crs: number) => (crs >= 700 ? 'text-rouge' : crs >= 450 ? 'text-amber-600' : 'text-green-600');
+const crsClass = (crs: number) => (crs >= 700 ? 'text-rouge' : crs >= 450 ? 'text-warning' : 'text-success');
 
 const pageButton =
   'flex size-9 items-center justify-center rounded-lg border border-fog-light bg-white text-sm text-slate transition-colors hover:border-navy-deep disabled:cursor-not-allowed disabled:opacity-40';

@@ -1,12 +1,8 @@
 import { createIngestHandler } from '@/features/draws/server/ingest-handler';
-import { fetchIrccFeed, ingestDraws, type PushSender } from '@/features/draws/server/ingest-draws';
+import { fetchIrccFeed, ingestDraws } from '@/features/draws/server/ingest-draws';
 import { webPushSender } from '@/features/draws/server/web-push-sender';
 import { env } from '@/lib/env';
 import { prisma } from '@/server/db/client';
-
-const notConfigured: PushSender = async () => {
-  throw new Error('Alertes tirages are off: VAPID keys are not configured');
-};
 
 const sendPush =
   env.VAPID_PRIVATE_KEY && env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && env.VAPID_SUBJECT
@@ -15,7 +11,7 @@ const sendPush =
         publicKey: env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
         privateKey: env.VAPID_PRIVATE_KEY,
       })
-    : notConfigured;
+    : null;
 
 /** POST /api/cron/draws, called hourly by .github/workflows/ingest-draws.yml. */
 export const POST = createIngestHandler({

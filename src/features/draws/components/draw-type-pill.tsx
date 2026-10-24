@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react';
 
-import type { DrawGroup } from '@/features/draws/lib/normalize-ircc-rounds';
+import type { DrawGroup } from '@/features/draws/lib/draw-type';
 import { cn } from '@/lib/utils';
 
 /** Pill colours per Type de tirage, from the MagicPath design. */
 const GROUP_CLASSES: Record<DrawGroup, string> = {
-  PNP: 'border-indigo-200 bg-indigo-50 text-indigo-700',
-  CEC: 'border-green-300 bg-green-50 text-green-700',
+  PNP: 'border-iris-line bg-iris-tint text-iris',
+  CEC: 'border-leaf-line bg-leaf-tint text-leaf',
   FRENCH: 'border-rose bg-blush text-rouge',
-  CATEGORY: 'border-amber-300 bg-amber-100 text-amber-700',
+  CATEGORY: 'border-honey-line bg-honey-tint text-honey',
   GENERAL: 'border-fog bg-ice-blue text-navy-deep',
 };
 

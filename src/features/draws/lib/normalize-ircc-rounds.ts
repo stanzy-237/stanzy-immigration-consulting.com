@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-/** The stream a Tirage targeted, as the filter chips group them. */
-export const DRAW_GROUPS = ['GENERAL', 'PNP', 'CEC', 'FRENCH', 'CATEGORY'] as const;
-export type DrawGroup = (typeof DRAW_GROUPS)[number];
+import { groupFor, type DrawGroup } from '@/features/draws/lib/draw-type';
 
 /** One IRCC round, cleaned. `raw` is the feed's object for it, untouched. */
 export type NormalizedDraw = {
@@ -43,18 +41,6 @@ const roundSchema = z.object({
   drawCRS: count,
   drawNumberURL: z.string().optional(),
 });
-
-/** Ordered: the first matching rule wins. */
-const GROUP_RULES: ReadonlyArray<[RegExp, DrawGroup]> = [
-  [/provincial nominee/i, 'PNP'],
-  [/^canadian experience class$/i, 'CEC'],
-  [/french/i, 'FRENCH'],
-  [/^(no program specified|general|federal skilled (worker|trades))$/i, 'GENERAL'],
-];
-
-export function groupFor(typeLabel: string): DrawGroup {
-  return GROUP_RULES.find(([pattern]) => pattern.test(typeLabel.trim()))?.[1] ?? 'CATEGORY';
-}
 
 /**
  * The notice link inside IRCC's HTML anchor, made public. Newer rounds point

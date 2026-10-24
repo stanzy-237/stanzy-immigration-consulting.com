@@ -1,26 +1,14 @@
 import { z } from 'zod';
 
-import type { DrawGroup } from '@/features/draws/lib/normalize-ircc-rounds';
+import type { DrawGroup } from '@/features/draws/lib/draw-type';
+import { roundOrder, type DrawSummary } from '@/features/draws/lib/draw-summary';
 import { SYNC_ID } from '@/features/draws/server/ingest-draws';
 import { routing } from '@/i18n/routing';
 import { createTRPCRouter, publicProcedure } from '@/server/trpc/trpc';
 
-/** A Tirage as the page shows it; never the raw feed. */
-export type DrawSummary = {
-  round: string;
-  roundNumber: number;
-  /** `YYYY-MM-DD`. */
-  date: string;
-  typeLabel: string;
-  group: DrawGroup;
-  invitations: number;
-  crsMin: number;
-  irccUrl: string | null;
-  /** `crsMin` minus the previous Tirage of the same group; null for the first one. */
-  crsChange: number | null;
-};
+export type { DrawSummary };
 
-const NEWEST_FIRST = [{ date: 'desc' }, { roundNumber: 'desc' }, { round: 'desc' }] as const;
+const NEWEST_FIRST = roundOrder('desc');
 
 const SUMMARY = {
   round: true,

@@ -23,7 +23,7 @@ export function DrawsBoard(): ReactNode {
       <header className="bg-linear-135 from-navy-deep to-navy-80 py-10 sm:py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-7">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-rouge/30 bg-rouge/15 px-4 py-1.5 font-label font-semibold uppercase text-rose">
-            <span aria-hidden={true} className="size-1.5 animate-pulse rounded-full bg-emerald-300" />
+            <span aria-hidden={true} className="size-1.5 animate-pulse rounded-full bg-live" />
             {t('eyebrow')}
           </p>
           <h1 className="mb-2 font-heading text-4xl font-bold tracking-tight text-white sm:text-5xl">{t('title')}</h1>

@@ -166,7 +166,9 @@
       "stats": {
         "invitations": "invitations",
         "crsMin": "score CRS minimum",
-        "date": "date du tirage"
+        "date": "date du tirage",
+        "scoreMinShort": "Score min : {crs}",
+        "scoreMin": "Score minimum: {crs}"
       },
       "tracker": {
         "label": "Votre score vs minimum",

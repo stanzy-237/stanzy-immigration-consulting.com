@@ -58,7 +58,7 @@ export function CrsCompare({ crsMin }: { crsMin: number }): ReactNode {
           <span
             className={cn(
               'rounded-lg px-3 py-1.5 text-xs font-semibold',
-              gap >= 0 ? 'bg-green-100 text-green-700' : 'bg-blush text-rouge',
+              gap >= 0 ? 'bg-leaf-tint text-leaf' : 'bg-blush text-rouge',
             )}
           >
             {gap > 0 ? t('above', { points: gap }) : gap === 0 ? t('equal') : t('below', { points: -gap })}

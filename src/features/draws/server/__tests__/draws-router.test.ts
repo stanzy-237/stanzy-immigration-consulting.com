@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import feed from '@/features/draws/lib/__tests__/fixtures/ee-rounds.json';
 import { ingestDraws, type DrawAlert, type PushSender } from '@/features/draws/server/ingest-draws';
@@ -116,8 +116,8 @@ const feedBefore450 = (): Feed => ({ ...fullFeed(), rounds: fullFeed().rounds.sl
 const NOW = new Date('2026-10-24T14:00:00Z');
 const LATER = new Date('2026-10-24T15:00:00Z');
 
-function ingest(db: TRPCContext['prisma'], body: unknown, push = fakePush(), now = NOW) {
-  return ingestDraws({ db, fetchFeed: async () => body, sendPush: push.send, now });
+function ingest(db: TRPCContext['prisma'], body: unknown, push: { send: PushSender } | null = fakePush(), now = NOW) {
+  return ingestDraws({ db, fetchFeed: async () => body, sendPush: push?.send ?? null, now });
 }
 
 const callerAs = (db: TRPCContext['prisma'], session: CurrentSession | null = null) =>
@@ -177,6 +177,11 @@ describe('draws ingestion and router', () => {
       {
         endpoint: 'aminata',
         alert: {
+          round: '450',
+          typeLabel: 'French-Language proficiency 2026-Version 2',
+          invitations: 5000,
+          crsMin: 435,
+          locale: 'fr',
           title: 'Nouveau tirage #450',
           body: expect.stringMatching(/^Connaissance du français · 5\s000 invitations · CRS 435$/),
           url: '/fr/outils/dernier-tirage',
@@ -186,6 +191,11 @@ describe('draws ingestion and router', () => {
       {
         endpoint: 'visitor',
         alert: {
+          round: '450',
+          typeLabel: 'French-Language proficiency 2026-Version 2',
+          invitations: 5000,
+          crsMin: 435,
+          locale: 'en',
           title: 'New draw #450',
           body: 'French-Language proficiency 2026-Version 2 · 5,000 invitations · CRS 435',
           url: '/en/outils/dernier-tirage',
@@ -214,7 +224,8 @@ describe('draws ingestion and router', () => {
     expect(push.sent).toEqual([]);
   });
 
-  it('keeps the good rounds and reports a corrupted one', async () => {
+  it('keeps the good rounds, and reports and logs a corrupted one', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const db = fakeDatabase();
     const broken = fullFeed();
     broken.rounds[3]!.drawCRS = '';
@@ -222,6 +233,76 @@ describe('draws ingestion and router', () => {
     const report = await ingest(db, broken);
 
     expect(report).toMatchObject({ inserted: 24, skipped: [{ index: 3, reason: expect.any(String) }] });
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('skipped 1 malformed round'), report.skipped);
+    warn.mockRestore();
+  });
+
+  it('never alerts an old round that only reaches the table late', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const db = fakeDatabase();
+    // Round 441 (4 Sept.) is malformed during the first load, then IRCC fixes it.
+    const broken = fullFeed();
+    broken.rounds[5]!.drawCRS = '';
+    await ingest(db, broken);
+    await callerAs(db).draws.subscribe({ subscription: subscription('phone'), locale: 'fr' });
+    const push = fakePush();
+
+    const report = await ingest(db, fullFeed(), push, LATER);
+
+    expect(report).toMatchObject({ inserted: 1, alerted: 0 });
+    expect((await callerAs(db).draws.list()).map((d) => d.round)).toContain('441');
+    expect(push.sent).toEqual([]);
+  });
+
+  it('stores new rounds but keeps their alerts, and fails loudly, while push is not configured', async () => {
+    const db = fakeDatabase();
+    await ingest(db, feedBefore450());
+    await callerAs(db).draws.subscribe({ subscription: subscription('phone'), locale: 'fr' });
+
+    await expect(ingest(db, fullFeed(), null, LATER)).rejects.toThrow(/1 Alerte tirage waiting: push is not configured/);
+    expect((await callerAs(db).draws.list())[0]).toMatchObject({ round: '450' });
+
+    const push = fakePush();
+    await ingest(db, fullFeed(), push, LATER);
+    expect(push.sent.map((s) => s.alert.tag)).toEqual(['draw-450']);
+  });
+
+  it('retries an alert next run when no device could be reached at all', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const db = fakeDatabase();
+    await ingest(db, feedBefore450());
+    await callerAs(db).draws.subscribe({ subscription: subscription('phone'), locale: 'fr' });
+    const down: PushSender = async () => {
+      throw new Error('push service unavailable');
+    };
+
+    await expect(ingestDraws({ db, fetchFeed: async () => fullFeed(), sendPush: down, now: LATER })).rejects.toThrow(
+      /reached no device/,
+    );
+
+    const push = fakePush();
+    await ingest(db, fullFeed(), push, LATER);
+    expect(push.sent.map((s) => s.alert.tag)).toEqual(['draw-450']);
+  });
+
+  it('does not resend to the devices it reached when only some sends fail', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const db = fakeDatabase();
+    await ingest(db, feedBefore450());
+    await callerAs(db).draws.subscribe({ subscription: subscription('phone'), locale: 'fr' });
+    await callerAs(db).draws.subscribe({ subscription: subscription('flaky'), locale: 'fr' });
+    const first = fakePush();
+    const partly: PushSender = async (sub, alert) => {
+      if (sub.endpoint.endsWith('flaky')) throw new Error('timeout');
+      return first.send(sub, alert);
+    };
+
+    await ingestDraws({ db, fetchFeed: async () => fullFeed(), sendPush: partly, now: LATER });
+    const rerun = fakePush();
+    await ingest(db, fullFeed(), rerun, LATER);
+
+    expect(first.sent.map((s) => s.endpoint)).toEqual(['phone']);
+    expect(rerun.sent).toEqual([]);
   });
 
   it('fails without touching stored data when the feed is unreachable or malformed', async () => {

@@ -1,12 +1,15 @@
 'use client';
 
 import { Star } from 'lucide-react';
-import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
-import { drawTypeKey } from '@/features/draws/lib/draw-type';
-import type { DrawGroup } from '@/features/draws/lib/normalize-ircc-rounds';
-import type { DrawSummary } from '@/features/draws/server/draws-router';
+// Cross-feature on purpose (#49): this home section shows the Tirages the draws
+// feature stores, so it reads them through `api.draws` and words them with the
+// draws feature's own hook. No component crosses the boundary.
+import { useDrawText } from '@/features/draws/hooks/use-draw-text';
+import type { DrawSummary } from '@/features/draws/lib/draw-summary';
+import type { DrawGroup } from '@/features/draws/lib/draw-type';
 import { Link } from '@/i18n/navigation';
 import { api } from '@/trpc/react';
 
@@ -36,24 +39,11 @@ export function Draws(): ReactNode {
   const tStats = useTranslations('Home.Draws.stats');
   const tTracker = useTranslations('Home.Draws.tracker');
   const tCardStats = useTranslations('Home.Draws.cardStats');
-  const tTypes = useTranslations('Draws.types');
-  const locale = useLocale();
   const format = useFormatter();
+  const text = useDrawText();
   // The latest four Tirages IRCC published, as stored by the draws ingestion (#49).
   const latest = api.draws.latest.useQuery({ take: 4 });
   const [featured, ...rest] = latest.data?.draws ?? [];
-
-  const category = (draw: DrawSummary): string => {
-    const key = locale === 'fr' ? drawTypeKey(draw.typeLabel) : null;
-    return key && tTypes.has(key) ? tTypes(key) : draw.typeLabel;
-  };
-  const day = (draw: DrawSummary, withYear = true): string =>
-    format.dateTime(new Date(`${draw.date}T12:00:00Z`), {
-      day: 'numeric',
-      month: 'short',
-      ...(withYear ? { year: 'numeric' } : {}),
-      timeZone: 'UTC',
-    });
 
   return (
     <section
@@ -69,7 +59,7 @@ export function Draws(): ReactNode {
                 aria-hidden={true}
                 className="h-1 w-4 shrink-0 self-center rounded-full bg-rouge lg:hidden"
               />
-              <span className="font-sans text-xs font-semibold uppercase tracking-widest text-rouge lg:text-label lg:tracking-widest">
+              <span className="font-sans text-xs font-semibold uppercase tracking-widest text-rouge lg:text-label">
                 {t('eyebrow')}
               </span>
             </div>
@@ -115,7 +105,7 @@ export function Draws(): ReactNode {
               <div className="grid gap-6 md:grid-cols-3 md:items-center md:gap-8 lg:flex lg:items-center lg:justify-between lg:gap-8">
                 {/* Round + tags */}
                 <div className="flex flex-col gap-2.5 lg:gap-0">
-                  <p className="font-sans text-label font-semibold uppercase tracking-widest text-white/40 lg:tracking-widest">
+                  <p className="font-sans text-label font-semibold uppercase tracking-widest text-white/40">
                     {t('latest')}
                   </p>
                   <div className="flex items-start gap-1.5 font-heading text-5xl font-bold leading-none text-white sm:text-6xl md:text-[clamp(48px,5vw,72px)] lg:mt-2 lg:gap-0 lg:text-display">
@@ -132,11 +122,11 @@ export function Draws(): ReactNode {
                         categoryClasses(featured.group)
                       }
                     >
-                      {category(featured)}
+                      {text.type(featured)}
                     </span>
                     <span className="inline-flex h-7 items-center rounded-full border border-white/15 bg-white/10 px-2.5 font-sans text-xs font-medium text-white lg:h-auto lg:py-1.25 lg:text-label lg:font-semibold">
-                      Score min<span className="hidden lg:inline">imum</span>
-                      <span className="lg:hidden">&nbsp;</span>: {featured.crsMin}
+                      <span className="lg:hidden">{tStats('scoreMinShort', { crs: featured.crsMin })}</span>
+                      <span className="hidden lg:inline">{tStats('scoreMin', { crs: featured.crsMin })}</span>
                     </span>
                   </div>
                 </div>
@@ -148,7 +138,7 @@ export function Draws(): ReactNode {
                     <span className="font-heading text-xl font-bold leading-none text-white sm:text-2xl md:text-[clamp(28px,2.8vw,36px)] lg:text-4xl">
                       {format.number(featured.invitations)}
                     </span>
-                    <span className="text-xs text-white/55 md:text-sm lg:text-sm">
+                    <span className="text-xs text-white/55 md:text-sm">
                       {tStats('invitations')}
                     </span>
                   </div>
@@ -157,16 +147,16 @@ export function Draws(): ReactNode {
                     <span className="font-heading text-xl font-bold leading-none text-rouge sm:text-2xl md:text-[clamp(28px,2.8vw,36px)] lg:text-4xl">
                       {featured.crsMin}
                     </span>
-                    <span className="text-xs text-white/55 md:text-sm lg:text-sm">
+                    <span className="text-xs text-white/55 md:text-sm">
                       {tStats('crsMin')}
                     </span>
                   </div>
                   <span aria-hidden={true} className="hidden h-12 w-px bg-white/10 lg:block" />
                   <div className="flex flex-col gap-1 lg:min-w-25">
                     <span className="font-heading text-lg font-bold leading-none text-white sm:text-xl md:text-[clamp(28px,2.8vw,36px)] lg:text-4xl">
-                      {day(featured, false)}
+                      {text.shortDate(featured)}
                     </span>
-                    <span className="text-xs text-white/55 md:text-sm lg:text-sm">
+                    <span className="text-xs text-white/55 md:text-sm">
                       {tStats('date')}
                     </span>
                   </div>
@@ -174,7 +164,7 @@ export function Draws(): ReactNode {
 
                 {/* Tracker */}
                 <div className="flex min-w-0 flex-col gap-2 lg:min-w-50 lg:gap-0">
-                  <p className="font-sans text-label font-semibold uppercase tracking-widest text-white/40 lg:tracking-widest">
+                  <p className="font-sans text-label font-semibold uppercase tracking-widest text-white/40">
                     {tTracker('label')}
                   </p>
                   <div className="relative h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10 lg:mt-2.5 lg:w-50">
@@ -210,7 +200,7 @@ export function Draws(): ReactNode {
                           <h3 className="font-heading text-base font-semibold text-white">
                             {t('roundLabel')} #{draw.round}
                           </h3>
-                          <time dateTime={draw.date} className="text-xs text-white/40">{day(draw)}</time>
+                          <time dateTime={draw.date} className="text-xs text-white/40">{text.date(draw)}</time>
                         </div>
                         <span
                           className={
@@ -218,7 +208,7 @@ export function Draws(): ReactNode {
                             categoryClasses(draw.group)
                           }
                         >
-                          {category(draw)}
+                          {text.type(draw)}
                         </span>
                         <div className="mt-5 flex items-center gap-5">
                           <div className="flex flex-col gap-0.75">
@@ -259,14 +249,14 @@ export function Draws(): ReactNode {
                             categoryClasses(draw.group)
                           }
                         >
-                          {category(draw)}
+                          {text.type(draw)}
                         </span>
                         <p className="truncate font-heading text-sm font-semibold text-white transition-colors group-hover:text-rouge">
                           {draw.crsMin} {tCardStats('crsMin')} ·{' '}
                           {format.number(draw.invitations)}{' '}
                           {tCardStats('invitations')}
                         </p>
-                        <p className="text-xs text-white/40">{day(draw)}</p>
+                        <p className="text-xs text-white/40">{text.date(draw)}</p>
                       </div>
                     </Link>
                   </li>

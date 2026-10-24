@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { toLocale } from '@/i18n/routing';
 import { api } from '@/trpc/react';
@@ -23,7 +23,11 @@ function keyBytes(base64url: string): Uint8Array<ArrayBuffer> {
   return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
 }
 
-const isIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent);
+/** iPadOS Safari reports a Mac browser; a Mac with a touch screen is an iPad. */
+const isIos = () =>
+  /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+type SubscriptionJson = { endpoint: string; keys: { p256dh: string; auth: string } };
+
 const isStandalone = () =>
   (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches) ||
   (navigator as Navigator & { standalone?: boolean }).standalone === true;
@@ -46,6 +50,17 @@ export function useDrawAlerts() {
   const subscribe = api.draws.subscribe.useMutation();
   const unsubscribe = api.draws.unsubscribe.useMutation();
 
+  const sync = useCallback(
+    (subscription: PushSubscription) =>
+      subscribe.mutateAsync({ subscription: subscription.toJSON() as SubscriptionJson, locale }),
+    [subscribe, locale],
+  );
+  // The detection effect runs once; it reads the latest `sync` through a ref.
+  const syncRef = useRef(sync);
+  useEffect(() => {
+    syncRef.current = sync;
+  }, [sync]);
+
   useEffect(() => {
     if (!publicKey) return;
     let cancelled = false;
@@ -57,7 +72,12 @@ export function useDrawAlerts() {
     } else {
       registration(false)
         .then((reg) => reg?.pushManager.getSubscription())
-        .then((existing) => settle(existing ? 'on' : 'off'))
+        .then(async (existing) => {
+          // Re-register with the server: it may have dropped this device (an
+          // expired subscription, or a subscribe call that never arrived).
+          if (existing) await syncRef.current(existing);
+          settle(existing ? 'on' : 'off');
+        })
         .catch(() => settle('off'));
     }
     return () => {
@@ -78,15 +98,14 @@ export function useDrawAlerts() {
       const reg = await registration(true);
       if (!reg) throw new Error('No service worker');
       const created = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) });
-      const json = created.toJSON() as { endpoint: string; keys: { p256dh: string; auth: string } };
-      await subscribe.mutateAsync({ subscription: json, locale });
+      await sync(created);
       setStatus('on');
     } catch {
       setFailed(true);
     } finally {
       setBusy(false);
     }
-  }, [publicKey, locale, subscribe]);
+  }, [publicKey, sync]);
 
   const disable = useCallback(async () => {
     setBusy(true);

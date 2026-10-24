@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from '@prisma/client';
 import { createTranslator } from 'next-intl';
 
+import { roundOrder } from '@/features/draws/lib/draw-summary';
 import { drawTypeKey } from '@/features/draws/lib/draw-type';
 import { normalizeIrccRounds, type NormalizedDraw, type NormalizeResult } from '@/features/draws/lib/normalize-ircc-rounds';
 import { toLocale, type Locale } from '@/i18n/routing';
@@ -12,8 +13,22 @@ export const IRCC_FEED_URL = 'https://www.canada.ca/content/dam/ircc/documents/j
 /** The one DrawSync row. */
 export const SYNC_ID = 'ircc';
 
-/** What a device shows for an Alerte tirage. `tag` makes a repeat replace, not stack. */
-export type DrawAlert = { title: string; body: string; url: string; tag: string };
+/**
+ * The push payload for an Alerte tirage: the Tirage's facts, plus the title
+ * and body already written in the subscriber's language. `tag` makes a repeat
+ * replace the first notification instead of stacking.
+ */
+export type DrawAlert = {
+  round: string;
+  typeLabel: string;
+  invitations: number;
+  crsMin: number;
+  locale: Locale;
+  title: string;
+  body: string;
+  url: string;
+  tag: string;
+};
 
 export type StoredSubscription = { endpoint: string; p256dh: string; auth: string };
 
@@ -43,6 +58,11 @@ export function alertFor(draw: NormalizedDraw, locale: Locale): DrawAlert {
   const t = createTranslator({ locale, messages: MESSAGES[locale], namespace: 'Draws' });
   const key = locale === 'fr' ? drawTypeKey(draw.typeLabel) : null;
   return {
+    round: draw.round,
+    typeLabel: draw.typeLabel,
+    invitations: draw.invitations,
+    crsMin: draw.crsMin,
+    locale,
     title: t('alert.title', { round: draw.round }),
     body: t('alert.body', {
       type: key ? t(`types.${key}` as 'types.pnp') : draw.typeLabel,
@@ -76,6 +96,16 @@ const columns = (draw: NormalizedDraw) => ({
 });
 
 /**
+ * A round reaching the table later than this after its draw date (a round that
+ * was malformed in the feed and fixed by IRCC weeks on) is stored without an
+ * alert: nobody wants news of an old draw.
+ */
+const ALERT_WINDOW_DAYS = 14;
+
+/** Pushes at once per batch, so a few thousand devices fit in one function run. */
+const SEND_BATCH = 50;
+
+/**
  * Brings the Draw table in line with IRCC's feed, then sends one Alerte tirage
  * per new round to every subscribed device, whatever its owner's score.
  *
@@ -83,20 +113,29 @@ const columns = (draw: NormalizedDraw) => ({
  * written, and each alert is claimed (`notifiedAt`) before it goes out, so a
  * second or overlapping run never repeats one. The first run loads the whole
  * history already marked as notified, so it alerts nobody.
+ *
+ * Alerts are never dropped silently. Without a push sender (`sendPush: null`)
+ * new rounds are stored, their alerts stay waiting, and the run throws so the
+ * scheduled job goes red. When a send reaches no device at all, the claim is
+ * released for the next run, which is safe because nobody received it.
  */
 export async function ingestDraws(deps: {
   db: Db;
   fetchFeed: () => Promise<unknown>;
-  sendPush: PushSender;
+  sendPush: PushSender | null;
   now: Date;
 }): Promise<IngestReport> {
   const { db, sendPush, now } = deps;
   const { draws, skipped } = normalizeIrccRounds(await deps.fetchFeed());
+  if (skipped.length > 0) {
+    console.warn(`Draws ingestion skipped ${skipped.length} malformed round(s) from IRCC's feed`, skipped);
+  }
 
   const stored = new Map(
     (await db.draw.findMany({ select: { round: true, raw: true } })).map((row) => [row.round, stable(row.raw)]),
   );
   const backfill = stored.size === 0;
+  const alertSince = new Date(now.getTime() - ALERT_WINDOW_DAYS * 86_400_000).toISOString().slice(0, 10);
 
   const fresh = draws.filter((draw) => !stored.has(draw.round));
   const changed = draws.filter((draw) => stored.has(draw.round) && stored.get(draw.round) !== stable(draw.raw));
@@ -106,7 +145,7 @@ export async function ingestDraws(deps: {
       round: draw.round,
       ...columns(draw),
       firstSeenAt: now,
-      notifiedAt: backfill ? now : null,
+      notifiedAt: backfill || draw.date < alertSince ? now : null,
     })),
     skipDuplicates: true,
   });
@@ -115,16 +154,22 @@ export async function ingestDraws(deps: {
   }
   await db.drawSync.upsert({ where: { id: SYNC_ID }, create: { id: SYNC_ID, syncedAt: now }, update: { syncedAt: now } });
 
-  const alerted = await sendAlerts(db, draws, sendPush, now);
+  const pending = await db.draw.findMany({ where: { notifiedAt: null }, select: { round: true }, orderBy: [...roundOrder('asc')] });
+  if (pending.length > 0 && !sendPush) {
+    throw new Error(`${pending.length} Alerte tirage waiting: push is not configured (VAPID keys)`);
+  }
+
+  const alerted = sendPush ? await sendAlerts(db, pending, draws, sendPush, now) : 0;
   return { fetched: draws.length + skipped.length, inserted, updated: changed.length, skipped, alerted };
 }
 
-async function sendAlerts(db: Db, draws: NormalizedDraw[], sendPush: PushSender, now: Date): Promise<number> {
-  const pending = await db.draw.findMany({
-    where: { notifiedAt: null },
-    select: { round: true },
-    orderBy: [{ date: 'asc' }, { roundNumber: 'asc' }, { round: 'asc' }],
-  });
+async function sendAlerts(
+  db: Db,
+  pending: { round: string }[],
+  draws: NormalizedDraw[],
+  sendPush: PushSender,
+  now: Date,
+): Promise<number> {
   const byRound = new Map(draws.map((draw) => [draw.round, draw]));
   let alerted = 0;
 
@@ -134,18 +179,31 @@ async function sendAlerts(db: Db, draws: NormalizedDraw[], sendPush: PushSender,
     // Claim it first: of two overlapping runs, only one sends.
     const { count } = await db.draw.updateMany({ where: { round, notifiedAt: null }, data: { notifiedAt: now } });
     if (count === 0) continue;
-    alerted++;
 
     const subscriptions = await db.pushSubscription.findMany({ orderBy: [{ createdAt: 'asc' }] });
-    const gone: string[] = [];
-    for (const subscription of subscriptions) {
-      const result = await sendPush(subscription, alertFor(draw, toLocale(subscription.locale))).catch((error: unknown) => {
-        console.error(`Alerte tirage #${round} failed for a subscription`, error);
-        return 'failed' as const;
-      });
-      if (result === 'gone') gone.push(subscription.endpoint);
+    const results: ('sent' | 'gone' | 'failed')[] = [];
+    for (let i = 0; i < subscriptions.length; i += SEND_BATCH) {
+      const batch = subscriptions.slice(i, i + SEND_BATCH);
+      results.push(
+        ...(await Promise.all(
+          batch.map((subscription) =>
+            sendPush(subscription, alertFor(draw, toLocale(subscription.locale))).catch((error: unknown) => {
+              console.error(`Alerte tirage #${round} failed for a subscription`, error);
+              return 'failed' as const;
+            }),
+          ),
+        )),
+      );
     }
+
+    const gone = subscriptions.filter((_, i) => results[i] === 'gone').map((s) => s.endpoint);
     if (gone.length > 0) await db.pushSubscription.deleteMany({ where: { endpoint: { in: gone } } });
+
+    if (results.includes('failed') && !results.includes('sent')) {
+      await db.draw.updateMany({ where: { round }, data: { notifiedAt: null } });
+      throw new Error(`Alerte tirage #${round} reached no device; it will be retried on the next run`);
+    }
+    alerted++;
   }
   return alerted;
 }

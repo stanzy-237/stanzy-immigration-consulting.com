@@ -5,7 +5,10 @@ import { useMemo } from 'react';
 
 import { drawTypeKey } from '@/features/draws/lib/draw-type';
 import type { DrawText } from '@/features/draws/lib/draws-table';
-import type { DrawSummary } from '@/features/draws/server/draws-router';
+import type { DrawSummary } from '@/features/draws/lib/draw-summary';
+
+/** Noon UTC, so the calendar day is the same in every time zone. */
+const day = (draw: DrawSummary) => new Date(`${draw.date}T12:00:00Z`);
 
 /**
  * How a Tirage reads on this page: its type in French on /fr (IRCC's own
@@ -22,9 +25,8 @@ export function useDrawText(): DrawText {
         const key = locale === 'fr' ? drawTypeKey(draw.typeLabel) : null;
         return key && t.has(key) ? t(key) : draw.typeLabel;
       },
-      // Noon UTC, so the calendar day is the same in every time zone.
-      date: (draw: DrawSummary) =>
-        format.dateTime(new Date(`${draw.date}T12:00:00Z`), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }),
+      date: (draw: DrawSummary) => format.dateTime(day(draw), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }),
+      shortDate: (draw: DrawSummary) => format.dateTime(day(draw), { day: 'numeric', month: 'short', timeZone: 'UTC' }),
     }),
     [locale, format, t],
   );

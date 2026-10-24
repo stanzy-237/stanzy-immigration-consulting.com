@@ -15,6 +15,9 @@
 const CACHE_VERSION = 'v4';
 const SHELL_CACHE = `stanzy-shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `stanzy-assets-${CACHE_VERSION}`;
+// Derniers tirages data (tRPC `draws.*` queries), so the page still shows the
+// last loaded draws offline (#49).
+const DATA_CACHE = `stanzy-data-${CACHE_VERSION}`;
 
 // The calculators compute in the browser, so their pages are precached too:
 // once installed, they open and score offline (#5, #6).
@@ -50,7 +53,7 @@ self.addEventListener('activate', (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => ![SHELL_CACHE, ASSET_CACHE].includes(key))
+            .filter((key) => ![SHELL_CACHE, ASSET_CACHE, DATA_CACHE].includes(key))
             .map((key) => caches.delete(key)),
         ),
       )
@@ -77,9 +80,22 @@ self.addEventListener('fetch', (event) => {
 
   // Network-first for page navigations.
   if (request.mode === 'navigate') {
-    event.respondWith(networkFirst(request));
+    event.respondWith(networkFirst(request, SHELL_CACHE));
+    return;
+  }
+
+  // Network-first for the public draws queries, alone in their batch, so
+  // nothing tied to a signed-in Account is ever cached.
+  if (isDrawsQuery(url)) {
+    event.respondWith(networkFirst(request, DATA_CACHE));
   }
 });
+
+function isDrawsQuery(url) {
+  if (!url.pathname.startsWith('/api/trpc/')) return false;
+  const procedures = decodeURIComponent(url.pathname.slice('/api/trpc/'.length)).split(',');
+  return procedures.every((name) => /^draws\.(list|latest)$/.test(name));
+}
 
 async function cacheFirst(request) {
   const cache = await caches.open(ASSET_CACHE);
@@ -90,8 +106,8 @@ async function cacheFirst(request) {
   return response;
 }
 
-async function networkFirst(request) {
-  const cache = await caches.open(SHELL_CACHE);
+async function networkFirst(request, cacheName) {
+  const cache = await caches.open(cacheName);
   try {
     const response = await fetch(request);
     if (response.ok) cache.put(request, response.clone());
@@ -108,21 +124,23 @@ async function networkFirst(request) {
 // a repeated alert replace the first instead of stacking.
 
 self.addEventListener('push', (event) => {
-  let alert;
+  let alert = null;
   try {
     alert = event.data ? event.data.json() : null;
   } catch {
     alert = null;
   }
-  if (!alert || !alert.title) return;
+  // Every push must show something (userVisibleOnly): fall back to a plain
+  // "new draw" notice when the payload is unreadable.
+  const title = alert?.title || 'Stanzy · Nouveau tirage Entrée Express';
 
   event.waitUntil(
-    self.registration.showNotification(alert.title, {
-      body: alert.body,
-      tag: alert.tag,
+    self.registration.showNotification(title, {
+      body: alert?.body || '',
+      tag: alert?.tag || 'draw',
       icon: '/icons/icon-192.png',
       badge: '/icons/icon-192.png',
-      data: { url: alert.url || '/fr/outils/dernier-tirage' },
+      data: { url: alert?.url || '/fr/outils/dernier-tirage' },
     }),
   );
 });

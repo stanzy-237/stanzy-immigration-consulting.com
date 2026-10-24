@@ -7,7 +7,7 @@ import { authClient } from '@/features/auth/lib/auth-client';
 import { navigationMock, withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { CRS_DRAFT_KEY } from '@/features/crs/hooks/use-crs-draft';
 import { fromProfile } from '@/features/crs/lib/crs-form';
-import type { DrawGroup } from '@/features/draws/lib/normalize-ircc-rounds';
+import type { DrawGroup } from '@/features/draws/lib/draw-type';
 import type { DrawSummary } from '@/features/draws/server/draws-router';
 import { DrawsView } from '@/features/draws/views/draws-view';
 
@@ -313,6 +313,25 @@ describe('DrawsView — Alertes tirages', () => {
     await renderSettled();
 
     expect(await within(alerts()).findByText(/ajoutez d’abord Stanzy à votre écran d’accueil/)).toBeInTheDocument();
+  });
+
+  it('treats an iPad, which reports a Mac browser, like an iPhone', async () => {
+    vi.stubGlobal('navigator', {
+      ...navigator,
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15',
+      maxTouchPoints: 5,
+    });
+    await renderSettled();
+
+    expect(await within(alerts()).findByText(/ajoutez d’abord Stanzy à votre écran d’accueil/)).toBeInTheDocument();
+  });
+
+  it('re-registers a subscribed device with the server, so the toggle and the server agree', async () => {
+    const { json } = pushCapable({ permission: 'granted', existing: {} });
+    await renderSettled();
+
+    expect(await within(alerts()).findByText('Alertes tirages activées sur cet appareil')).toBeInTheDocument();
+    expect(subscribe).toHaveBeenCalledWith({ subscription: json, locale: 'fr' });
   });
 
   it('is hidden when the site has no push keys', async () => {

@@ -50,6 +50,14 @@ describe('Draws', () => {
     expect(screen.getAllByText('15 oct. 2026').length).toBeGreaterThan(0);
   });
 
+  it('labels the minimum score in English at /en', () => {
+    latest.data = { lastSyncedAt: new Date(), draws: [draw(450, 'French-Language proficiency 2026-Version 2', 'FRENCH', 435)] };
+    render(withIntl(<Draws />, 'en'));
+    expect(screen.queryByText(/Score min/)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Min(imum)? score/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('French-Language proficiency 2026-Version 2').length).toBeGreaterThan(0);
+  });
+
   it('shows only the header and link until the first rounds are stored', () => {
     latest.data = { lastSyncedAt: null, draws: [] };
     render(withIntl(<Draws />));

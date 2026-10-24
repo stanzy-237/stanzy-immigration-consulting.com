@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import { CrsCompare } from '@/features/draws/components/crs-compare';
 import { DrawTypePill } from '@/features/draws/components/draw-type-pill';
 import { useDrawText } from '@/features/draws/hooks/use-draw-text';
-import type { DrawSummary } from '@/features/draws/server/draws-router';
+import type { DrawSummary } from '@/features/draws/lib/draw-summary';
 import { cn } from '@/lib/utils';
 
 function Stat({ label, value, sub, accent = false }: { label: string; value: string; sub: string; accent?: boolean }): ReactNode {
