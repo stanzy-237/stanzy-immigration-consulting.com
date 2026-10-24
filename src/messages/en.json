@@ -865,7 +865,14 @@
       "previous": "Previous",
       "next": "Next",
       "pagination": "History pages",
-      "page": "Page {page}"
+      "page": "Page {page}",
+      "columnsShort": {
+        "round": "Draw",
+        "date": "Date",
+        "type": "Type",
+        "invitations": "Inv.",
+        "crsMin": "CRS"
+      }
     },
     "groups": {
       "ALL": "All",

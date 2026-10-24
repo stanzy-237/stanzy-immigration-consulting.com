@@ -12,13 +12,35 @@ const GROUP_CLASSES: Record<DrawGroup, string> = {
   GENERAL: 'border-fog bg-ice-blue text-navy-deep',
 };
 
-export function DrawTypePill({ group, label, title }: { group: DrawGroup; label: string; title?: string }): ReactNode {
+/**
+ * `shortLabel`, when given, replaces `label` on phones (e.g. "CEC" for
+ * "Catégorie de l’expérience canadienne"), so table rows stay one line.
+ */
+export function DrawTypePill({
+  group,
+  label,
+  shortLabel,
+  title,
+}: {
+  group: DrawGroup;
+  label: string;
+  shortLabel?: string;
+  title?: string;
+}): ReactNode {
+  const short = shortLabel !== undefined && shortLabel !== label;
   return (
     <span
       title={title}
-      className={cn('inline-block rounded-full border px-3 py-1.5 font-label font-semibold leading-tight', GROUP_CLASSES[group])}
+      className={cn('inline-block rounded-full border px-2.5 py-1 text-xs font-semibold leading-tight sm:px-3 sm:py-1.5', GROUP_CLASSES[group])}
     >
-      {label}
+      {short ? (
+        <>
+          <span className="sm:hidden">{shortLabel}</span>
+          <span className="hidden sm:inline">{label}</span>
+        </>
+      ) : (
+        label
+      )}
     </span>
   );
 }

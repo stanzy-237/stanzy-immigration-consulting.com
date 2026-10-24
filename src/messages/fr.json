@@ -865,7 +865,14 @@
       "previous": "Précédent",
       "next": "Suivant",
       "pagination": "Pages de l’historique",
-      "page": "Page {page}"
+      "page": "Page {page}",
+      "columnsShort": {
+        "round": "Tirage",
+        "date": "Date",
+        "type": "Type",
+        "invitations": "Invit.",
+        "crsMin": "CRS"
+      }
     },
     "groups": {
       "ALL": "Tous",
