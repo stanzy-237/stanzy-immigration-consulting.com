@@ -693,7 +693,6 @@
     "rulesNote": "Official criteria in force on {date}.",
     "step": "Step {n}",
     "points": "{points} / {max}",
-    "reuseCrs": "Reuse my CRS calculator answers",
     "language": {
       "title": "Language skills",
       "subtitle": "First official language · max. 24 points",
@@ -816,6 +815,12 @@
       "fundsUrl": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/proof-funds.html"
     },
     "rulesHint": "On November 3, 2026, IRCC removes the LMIA requirement for a qualifying job offer to count.",
-    "reusedNotice": "Answers reused from the CRS calculator. Check your work experience and adaptability: the CRS calculator only gives ranges of years, and your studies in Canada may count."
+    "reusedNotice": "Answers reused from the CRS calculator. Check your work experience and adaptability: the CRS calculator only gives ranges of years, and your studies in Canada may count.",
+    "reuse": {
+      "trigger": "Reuse a CRS simulation",
+      "inProgress": "CRS calculator answers in progress (this device)",
+      "saved": "My saved simulations",
+      "points": "{points} pts"
+    }
   }
 }

@@ -3,9 +3,10 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { authClient } from '@/features/auth/lib/auth-client';
 import { navigationMock, withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { CRS_DRAFT_KEY } from '@/features/crs/hooks/use-crs-draft';
-import { DEFAULT_FORM as CRS_DEFAULT } from '@/features/crs/lib/crs-form';
+import { DEFAULT_FORM as CRS_DEFAULT, toProfile as toCrsProfile } from '@/features/crs/lib/crs-form';
 import { FswCalculator } from '@/features/fsw/components/fsw-calculator';
 
 /**
@@ -15,6 +16,31 @@ import { FswCalculator } from '@/features/fsw/components/fsw-calculator';
  * 21, 2–3 years 11, age 30 12.
  */
 vi.mock('@/i18n/navigation', () => navigationMock);
+vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi.fn() } }));
+const fetchSaved = vi.fn();
+let saved: { id: string; name: string; total: number; rules: string; updatedAt: Date }[] = [];
+vi.mock('@/trpc/react', () => ({
+  api: {
+    useUtils: () => ({ crs: { get: { fetch: fetchSaved } } }),
+    crs: { list: { useQuery: (_input: unknown, opts?: { enabled?: boolean }) => ({ data: opts?.enabled === false ? undefined : saved }) } },
+  },
+}));
+
+const useSession = vi.mocked(authClient.useSession);
+const signedIn = () =>
+  useSession.mockReturnValue({
+    data: { user: { name: 'Aminata', email: 'aminata@example.com' }, session: {} },
+    isPending: false,
+  } as never);
+
+/** The CRS answers both reuse paths below carry: 29, NCLC 8, 2 yrs Canada, "3+" abroad. */
+const CRS_ANSWERS = {
+  ...CRS_DEFAULT,
+  age: '29',
+  canadianWorkYears: 2,
+  foreignWorkYears: 3,
+  firstLanguage: { test: 'NCLC' as const, scores: { speaking: '8', listening: '8', reading: '8', writing: '8' } },
+};
 
 /** Ten days before the 2026-11-03 rules. */
 const TODAY = new Date('2026-10-24T12:00:00-04:00');
@@ -31,6 +57,8 @@ function renderCalculator(locale: 'fr' | 'en' = 'fr') {
 beforeEach(() => {
   vi.clearAllMocks();
   window.localStorage.clear();
+  saved = [];
+  useSession.mockReturnValue({ data: null, isPending: false } as never);
 });
 
 describe('FswCalculator', () => {
@@ -107,27 +135,53 @@ describe('FswCalculator', () => {
     expect(stepPoints('Compétences linguistiques')).toHaveTextContent('16 / 28');
   });
 
-  it('reuses the answers of the Calculateur CRS on this device', () => {
-    window.localStorage.setItem(
-      CRS_DRAFT_KEY,
-      JSON.stringify({
-        ...CRS_DEFAULT,
-        age: '29',
-        canadianWorkYears: 2,
-        foreignWorkYears: 3,
-        firstLanguage: { test: 'NCLC', scores: { speaking: '8', listening: '8', reading: '8', writing: '8' } },
-      }),
-    );
+  it('picks one of my saved CRS simulations from a dropdown to fill the form', async () => {
+    signedIn();
+    saved = [
+      { id: 'sim_1', name: 'Avant TEF', total: 402, rules: '2025-03-25', updatedAt: new Date('2026-10-18T12:00:00Z') },
+      { id: 'sim_2', name: 'Après TEF', total: 471, rules: '2025-03-25', updatedAt: new Date('2026-10-20T12:00:00Z') },
+    ];
+    fetchSaved.mockResolvedValue({ profile: toCrsProfile(CRS_ANSWERS) });
     renderCalculator();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Reprendre mes réponses du Calculateur CRS' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reprendre une simulation CRS' }));
+    fireEvent.click(await screen.findByRole('menuitem', { name: /Après TEF/ }));
 
     // CRS work answers are ranges (2 yrs in Canada, "3+" abroad) that may overlap, so the safe
     // reading is the longer one: 3 yrs = 11. NCLC 8 ×4 = 20, bachelor's 21, age 29 = 12,
     // adaptability Canadian work 10 → 74.
+    await waitFor(() => expect(total()).toHaveTextContent('74'));
+    expect(fetchSaved).toHaveBeenCalledWith({ id: 'sim_2' });
     expect(screen.getByLabelText('Votre âge')).toHaveValue(29);
-    expect(total()).toHaveTextContent('74');
     expect(screen.getByText(/Vérifiez votre expérience de travail/)).toBeInTheDocument();
+  });
+
+  it('shows each saved simulation with its score and date in the dropdown', async () => {
+    signedIn();
+    saved = [
+      { id: 'sim_2', name: 'Après TEF', total: 471, rules: '2025-03-25', updatedAt: new Date('2026-10-20T12:00:00Z') },
+    ];
+    renderCalculator();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reprendre une simulation CRS' }));
+    const item = await screen.findByRole('menuitem', { name: /Après TEF/ });
+    expect(item).toHaveTextContent('471 pts');
+    expect(item).toHaveTextContent('20/10/2026');
+  });
+
+  it('also offers the CRS answers in progress on this device', async () => {
+    window.localStorage.setItem(CRS_DRAFT_KEY, JSON.stringify(CRS_ANSWERS));
+    renderCalculator();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reprendre une simulation CRS' }));
+    fireEvent.click(await screen.findByRole('menuitem', { name: /Réponses en cours/ }));
+
+    await waitFor(() => expect(total()).toHaveTextContent('74'));
+  });
+
+  it('offers nothing to reuse without saved simulations or CRS answers', () => {
+    renderCalculator();
+    expect(screen.queryByRole('button', { name: 'Reprendre une simulation CRS' })).not.toBeInTheDocument();
   });
 
   it('shows the arranged-employment adaptability points as a ticked item', () => {

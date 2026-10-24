@@ -4,9 +4,9 @@ import { Info, RotateCcw } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import { useCrsDraftValue } from '@/features/crs/hooks/use-crs-draft';
 import { ClbConverterDialog } from '@/features/fsw/components/clb-converter-dialog';
 import { FswResult } from '@/features/fsw/components/fsw-result';
+import { ReuseCrsMenu } from '@/features/fsw/components/reuse-crs-menu';
 import {
   ADAPTABILITY_MAX,
   ADAPTABILITY_POINTS,
@@ -72,7 +72,6 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
   const tLanguage = useTranslations('Calculators.language');
   const format = useFormatter();
   const [form, setForm] = useStoredForm(FSW_DRAFT_KEY, fswFormSchema, DEFAULT_FSW_FORM);
-  const crsAnswers = useCrsDraftValue();
   const inForce = rulesInForceOn(today);
   const [rules, setRules] = useState<RulesVersion>(inForce);
   const [converting, setConverting] = useState(false);
@@ -114,19 +113,12 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
           <p className="text-body-sm text-slate">
             {t('rulesNote', { date: format.dateTime(new Date(criteriaDate), { dateStyle: 'long', timeZone: 'UTC' }) })}
           </p>
-          {crsAnswers ? (
-            <button
-              type="button"
-              onClick={() => {
-                update(fromCrsAnswers(crsAnswers, form));
-                setReusedCrs(true);
-              }}
-              className="inline-flex items-center gap-2 rounded-full border border-fog bg-white px-4 py-2 text-body-sm font-semibold text-navy-deep transition-colors hover:bg-ice-blue"
-            >
-              <RotateCcw aria-hidden={true} className="size-4 text-rouge" />
-              {t('reuseCrs')}
-            </button>
-          ) : null}
+          <ReuseCrsMenu
+            onPick={(answers) => {
+              update(fromCrsAnswers(answers, form));
+              setReusedCrs(true);
+            }}
+          />
         </div>
         {reusedCrs ? (
           <p role="status" className="flex items-start gap-2 rounded-xl bg-ice-blue p-4 text-body-sm text-navy-deep">

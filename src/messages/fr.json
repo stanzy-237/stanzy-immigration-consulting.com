@@ -693,7 +693,6 @@
     "rulesNote": "Critères officiels en vigueur au {date}.",
     "step": "Étape {n}",
     "points": "{points} / {max}",
-    "reuseCrs": "Reprendre mes réponses du Calculateur CRS",
     "language": {
       "title": "Compétences linguistiques",
       "subtitle": "1re langue officielle · max. 24 points",
@@ -816,6 +815,12 @@
       "fundsUrl": "https://www.canada.ca/fr/immigration-refugies-citoyennete/services/immigrer-canada/entree-express/documents/preuve-fonds-suffisants.html"
     },
     "rulesHint": "Le 3 novembre 2026, IRCC supprime l’exigence d’une EIMT pour qu’une offre d’emploi admissible compte.",
-    "reusedNotice": "Réponses reprises du Calculateur CRS. Vérifiez votre expérience de travail et l’adaptabilité : le Calculateur CRS ne donne que des tranches d’années, et vos études au Canada peuvent compter."
+    "reusedNotice": "Réponses reprises du Calculateur CRS. Vérifiez votre expérience de travail et l’adaptabilité : le Calculateur CRS ne donne que des tranches d’années, et vos études au Canada peuvent compter.",
+    "reuse": {
+      "trigger": "Reprendre une simulation CRS",
+      "inProgress": "Réponses en cours du Calculateur CRS (cet appareil)",
+      "saved": "Mes simulations enregistrées",
+      "points": "{points} pts"
+    }
   }
 }
