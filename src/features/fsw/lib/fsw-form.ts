@@ -3,18 +3,22 @@ import { z } from 'zod';
 import type { CrsForm } from '@/features/crs/lib/crs-form';
 import type { FswProfile, LmiaSituation } from '@/features/fsw/lib/assess-fsw';
 import { EDUCATION_LEVELS, type EducationLevel } from '@/features/shared/data/education-levels';
-import { TEST_SPECS } from '@/features/shared/data/language-tests';
-import { parseScore, toLanguageResult } from '@/features/shared/lib/language-form';
+import { LANGUAGE_TESTS } from '@/features/shared/data/language-tests';
+import {
+  emptyLanguage,
+  parseScore,
+  toLanguageResult,
+  type LanguageForm,
+} from '@/features/shared/lib/language-form';
 import { ABILITIES, clbLevelFor, type Ability } from '@/features/shared/lib/language-levels';
 import { MARITAL_STATUSES, type MaritalStatus } from '@/features/shared/lib/marital-status';
 
 /**
- * The 67-points answers as the visitor picks them. First-language levels are
- * chosen per ability (9 means 9 or more, 6 means below 7); `toProfile` turns
- * the answers into the engine's profile.
+ * The 67-points answers as the visitor gives them. Languages are entered as
+ * in the Calculateur CRS (a test, then four results); `toProfile` turns the
+ * answers into the engine's profile.
  */
-export const LEVEL_CHOICES = [9, 8, 7, 6] as const;
-export type LevelChoice = (typeof LEVEL_CHOICES)[number];
+
 /** Years of skilled work: 0 = under a year, 1, 2 = 2–3, 4 = 4–5, 6 = 6 or more. */
 export const WORK_CHOICES = [0, 1, 2, 4, 6] as const;
 export const LMIA_SITUATIONS = [
@@ -26,10 +30,8 @@ export const LMIA_SITUATIONS = [
 ] as const satisfies readonly LmiaSituation[];
 
 export type FswForm = {
-  firstLanguageOfficial: 'fr' | 'en';
-  firstLevels: Record<Ability, LevelChoice>;
-  /** CLB/NCLC 5+ in all four abilities of the other official language. */
-  secondLanguage: boolean;
+  firstLanguage: LanguageForm;
+  secondLanguage: LanguageForm | null;
   education: EducationLevel;
   skilledWorkYears: (typeof WORK_CHOICES)[number];
   age: string;
@@ -49,11 +51,10 @@ export type FswForm = {
 const allAt = (level: number): Record<Ability, number> =>
   Object.fromEntries(ABILITIES.map((a) => [a, level])) as Record<Ability, number>;
 
-/** The design's starting answers: NCLC 9, bachelor's, 2–3 years, 30 — 68 points. */
+/** No test yet (as in the Calculateur CRS); bachelor's, 2–3 years, 30. */
 export const DEFAULT_FSW_FORM: FswForm = {
-  firstLanguageOfficial: 'fr',
-  firstLevels: allAt(9) as Record<Ability, LevelChoice>,
-  secondLanguage: false,
+  firstLanguage: emptyLanguage(),
+  secondLanguage: null,
   education: 'bachelors',
   skilledWorkYears: 2,
   age: '30',
@@ -71,7 +72,6 @@ export const DEFAULT_FSW_FORM: FswForm = {
 };
 
 export function toProfile(form: FswForm): FswProfile {
-  const fr = form.firstLanguageOfficial === 'fr';
   return {
     maritalStatus: form.maritalStatus,
     spouse: {
@@ -83,8 +83,8 @@ export function toProfile(form: FswForm): FswProfile {
     },
     age: parseScore(form.age),
     education: form.education,
-    firstLanguage: { test: fr ? 'NCLC' : 'CLB', scores: { ...form.firstLevels } },
-    secondLanguage: form.secondLanguage ? { test: fr ? 'CLB' : 'NCLC', scores: allAt(5) } : null,
+    firstLanguage: toLanguageResult(form.firstLanguage),
+    secondLanguage: toLanguageResult(form.secondLanguage),
     skilledWorkYears: form.skilledWorkYears,
     jobOffer: { valid: form.jobOffer === 'valid', lmiaSituation: form.lmiaSituation },
     studiedInCanada: form.studiedInCanada,
@@ -92,10 +92,6 @@ export function toProfile(form: FswForm): FswProfile {
     relativeInCanada: form.relativeInCanada,
   };
 }
-
-/** A CLB/NCLC level folded onto the choices: 9 or more, 8, 7, or below 7. */
-export const toLevelChoice = (level: number): LevelChoice =>
-  level >= 9 ? 9 : level >= 7 ? (level as 7 | 8) : 6;
 
 const workChoice = (years: number): FswForm['skilledWorkYears'] =>
   years >= 6 ? 6 : years >= 4 ? 4 : years >= 2 ? 2 : years >= 1 ? 1 : 0;
@@ -111,29 +107,22 @@ const workChoice = (years: number): FswForm['skilledWorkYears'] =>
  * asks the visitor to check it.
  */
 export function fromCrsAnswers(crs: CrsForm, base: FswForm): FswForm {
-  const first = toLanguageResult(crs.firstLanguage);
-  const levels = first
-    ? (Object.fromEntries(
-        ABILITIES.map((a) => [a, toLevelChoice(clbLevelFor(first.test, a, first.scores[a]) ?? 0)]),
-      ) as Record<Ability, LevelChoice>)
-    : base.firstLevels;
-  const second = toLanguageResult(crs.secondLanguage);
   const spouseLanguage = toLanguageResult(crs.spouseLanguage);
-  const allAtLeast = (result: typeof first, min: number): boolean =>
-    result !== null && ABILITIES.every((a) => (clbLevelFor(result.test, a, result.scores[a]) ?? 0) >= min);
+  const spouseClb4 =
+    spouseLanguage !== null &&
+    ABILITIES.every((a) => (clbLevelFor(spouseLanguage.test, a, spouseLanguage.scores[a]) ?? 0) >= 4);
 
   return {
     ...base,
-    firstLanguageOfficial: first ? TEST_SPECS[first.test].language : base.firstLanguageOfficial,
-    firstLevels: levels,
-    secondLanguage: allAtLeast(second, 5),
+    firstLanguage: crs.firstLanguage,
+    secondLanguage: crs.secondLanguage,
     education: crs.education,
     skilledWorkYears: workChoice(Math.max(crs.canadianWorkYears, crs.foreignWorkYears)),
     age: crs.age,
     maritalStatus: crs.maritalStatus,
     spouseAccompanying: crs.spouseAccompanying,
     spouseIsCanadianCitizenOrPR: crs.spouseIsCanadianCitizenOrPR,
-    spouseLanguageClb4: allAtLeast(spouseLanguage, 4),
+    spouseLanguageClb4: spouseClb4,
     spouseWorkedInCanada: crs.spouseCanadianWorkYears >= 1,
     workedInCanada: crs.canadianWorkYears >= 1,
     // A credential of 3+ years in Canada means at least 2 academic years of full-time study.
@@ -142,13 +131,15 @@ export function fromCrsAnswers(crs: CrsForm, base: FswForm): FswForm {
   };
 }
 
-const level = z.union([z.literal(9), z.literal(8), z.literal(7), z.literal(6)]);
+const languageForm = z.object({
+  test: z.enum([...LANGUAGE_TESTS, 'none']),
+  scores: z.object({ speaking: z.string(), listening: z.string(), reading: z.string(), writing: z.string() }),
+});
 
 /** Validates a draft read back from browser storage; anything else is discarded. */
 export const fswFormSchema = z.object({
-  firstLanguageOfficial: z.enum(['fr', 'en']),
-  firstLevels: z.object({ speaking: level, listening: level, reading: level, writing: level }),
-  secondLanguage: z.boolean(),
+  firstLanguage: languageForm,
+  secondLanguage: languageForm.nullable(),
   education: z.enum(EDUCATION_LEVELS),
   skilledWorkYears: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(4), z.literal(6)]),
   age: z.string().max(5),

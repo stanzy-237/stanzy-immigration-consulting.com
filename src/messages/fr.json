@@ -716,27 +716,7 @@
     "language": {
       "title": "Compétences linguistiques",
       "subtitle": "1re langue officielle · max. 24 points",
-      "official": "Votre 1re langue officielle",
-      "officialOptions": {
-        "fr": "Français (NCLC)",
-        "en": "Anglais (CLB)"
-      },
-      "levelOptions": {
-        "9": "NCLC/CLB 9 ou plus (6 pts)",
-        "8": "NCLC/CLB 8 (5 pts)",
-        "7": "NCLC/CLB 7 (4 pts)",
-        "6": "Moins de NCLC/CLB 7 (non admissible)"
-      },
-      "converter": "Je ne connais pas mon NCLC/CLB — calculer à partir de mes résultats",
-      "second": "2e langue officielle : NCLC/CLB 5 ou plus dans les 4 compétences",
-      "secondNo": "Non (0 pt)",
-      "secondYes": "Oui — 4 points"
-    },
-    "converter": {
-      "title": "Entrez vos résultats de test",
-      "description": "Nous calculons vos niveaux NCLC/CLB avec les tableaux officiels d’IRCC.",
-      "cancel": "Annuler",
-      "apply": "Appliquer les niveaux"
+      "second": "2e langue officielle : +4 points avec NCLC/CLB 5 ou plus dans les 4 compétences."
     },
     "education": {
       "title": "Niveau d’études",

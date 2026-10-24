@@ -716,27 +716,7 @@
     "language": {
       "title": "Language skills",
       "subtitle": "First official language · max. 24 points",
-      "official": "Your first official language",
-      "officialOptions": {
-        "fr": "French (NCLC)",
-        "en": "English (CLB)"
-      },
-      "levelOptions": {
-        "9": "CLB/NCLC 9 or more (6 pts)",
-        "8": "CLB/NCLC 8 (5 pts)",
-        "7": "CLB/NCLC 7 (4 pts)",
-        "6": "Below CLB/NCLC 7 (not eligible)"
-      },
-      "converter": "I don’t know my CLB/NCLC — work it out from my results",
-      "second": "Second official language: CLB/NCLC 5 or more in all 4 abilities",
-      "secondNo": "No (0 pts)",
-      "secondYes": "Yes — 4 points"
-    },
-    "converter": {
-      "title": "Enter your test results",
-      "description": "We work out your CLB/NCLC levels with IRCC’s official charts.",
-      "cancel": "Cancel",
-      "apply": "Apply the levels"
+      "second": "Second official language: +4 points with CLB/NCLC 5 or more in all 4 abilities."
     },
     "education": {
       "title": "Education",

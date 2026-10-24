@@ -1,10 +1,9 @@
 'use client';
 
-import { Info, RotateCcw } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import { ClbConverterDialog } from '@/features/fsw/components/clb-converter-dialog';
 import { FswResult } from '@/features/fsw/components/fsw-result';
 import { ReuseCrsMenu } from '@/features/fsw/components/reuse-crs-menu';
 import {
@@ -22,12 +21,10 @@ import {
   DEFAULT_FSW_FORM,
   fromCrsAnswers,
   fswFormSchema,
-  LEVEL_CHOICES,
   LMIA_SITUATIONS,
   toProfile,
   WORK_CHOICES,
   type FswForm,
-  type LevelChoice,
 } from '@/features/fsw/lib/fsw-form';
 import {
   CalculatorSection,
@@ -36,18 +33,19 @@ import {
   SelectField,
 } from '@/features/shared/components/calculator-fields';
 import { FamilyFields } from '@/features/shared/components/family-fields';
+import { LanguageFields } from '@/features/shared/components/language-fields';
 import { PhoneScoreBar } from '@/features/shared/components/phone-score-bar';
 import { RulesChoice } from '@/features/shared/components/rules-choice';
 import { EDUCATION_LEVELS } from '@/features/shared/data/education-levels';
 import { useCalculatorTracking } from '@/features/shared/hooks/use-calculator-tracking';
 import { useStoredForm } from '@/features/shared/hooks/use-stored-form';
-import { ABILITIES } from '@/features/shared/lib/language-levels';
+import { emptyLanguage } from '@/features/shared/lib/language-form';
 import { isPartnered } from '@/features/shared/lib/marital-status';
 import { rulesInForceOn, type RulesVersion } from '@/features/shared/lib/rules-version';
 import { track } from '@/lib/analytics';
 
 /** Versioned, so a later change to the form shape discards old drafts instead of breaking. */
-export const FSW_DRAFT_KEY = 'stanzy.fsw.draft.v1';
+export const FSW_DRAFT_KEY = 'stanzy.fsw.draft.v2';
 
 /** Adaptability items the visitor ticks, with their points from IRCC's grid. */
 const OWN_ITEMS = [
@@ -74,12 +72,12 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
   const [form, setForm] = useStoredForm(FSW_DRAFT_KEY, fswFormSchema, DEFAULT_FSW_FORM);
   const inForce = rulesInForceOn(today);
   const [rules, setRules] = useState<RulesVersion>(inForce);
-  const [converting, setConverting] = useState(false);
   const [reusedCrs, setReusedCrs] = useState(false);
 
   const result = useMemo(() => assessFsw(toProfile(form), { rules }), [form, rules]);
   const assessment = result.ok ? result.assessment : null;
   const ageInvalid = !result.ok && result.issues.some((i) => i.field === 'age');
+  const secondLanguageError = !result.ok && result.issues.some((i) => i.field === 'secondLanguage');
   const pts = (points: number | undefined, max: number): string =>
     t('points', { points: points ?? '—', max });
 
@@ -98,8 +96,6 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
 
   const spouseCounts =
     isPartnered(form.maritalStatus) && form.spouseAccompanying && !form.spouseIsCanadianCitizenOrPR;
-  const abilityName = (ability: (typeof ABILITIES)[number]): string =>
-    tLanguage(`abilitiesByTestLanguage.${form.firstLanguageOfficial}.${ability}`);
   const step = (n: number): string => t('step', { n: String(n).padStart(2, '0') });
   // Current rules: the date of IRCC's pages; upcoming rules: the day they take effect.
   const criteriaDate = rules === inForce ? FSW_CRITERIA_DATE : rules;
@@ -136,51 +132,25 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
           subtitle={t('language.subtitle')}
           points={pts(assessment?.factors.language, LANGUAGE_MAX)}
         >
-          <SelectField
-            label={t('language.official')}
-            value={form.firstLanguageOfficial}
-            options={(['fr', 'en'] as const).map((l) => ({ value: l, label: t(`language.officialOptions.${l}`) }))}
-            onChange={(v) => set('firstLanguageOfficial', v)}
-          />
-          <button
-            type="button"
-            onClick={() => setConverting(true)}
-            className="inline-flex items-center gap-2 text-body-sm font-semibold text-rouge hover:underline"
-          >
-            <RotateCcw aria-hidden={true} className="size-4" />
-            {t('language.converter')}
-          </button>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {ABILITIES.map((ability) => (
-              <SelectField
-                key={ability}
-                label={abilityName(ability)}
-                value={String(form.firstLevels[ability])}
-                options={LEVEL_CHOICES.map((l) => ({ value: String(l), label: t(`language.levelOptions.${l}`) }))}
-                onChange={(v) => set('firstLevels', { ...form.firstLevels, [ability]: Number(v) as LevelChoice })}
+          <LanguageFields slot="firstLanguage" value={form.firstLanguage} onChange={(v) => set('firstLanguage', v)} />
+          <div className="border-t border-fog pt-5">
+            <p className="mb-3 text-body-sm text-slate">{t('language.second')}</p>
+            {form.secondLanguage ? (
+              <LanguageFields
+                slot="secondLanguage"
+                value={form.secondLanguage}
+                onChange={(v) => set('secondLanguage', v)}
+                error={secondLanguageError ? tLanguage('sameLanguage') : undefined}
               />
-            ))}
+            ) : null}
+            <button
+              type="button"
+              onClick={() => set('secondLanguage', form.secondLanguage ? null : emptyLanguage())}
+              className="mt-4 rounded-full border border-fog bg-ice-blue px-4 py-2 text-body-sm font-semibold text-navy-deep transition-colors hover:bg-fog"
+            >
+              {form.secondLanguage ? tLanguage('removeSecond') : tLanguage('addSecond')}
+            </button>
           </div>
-          <fieldset className="border-t border-fog pt-5">
-            <legend className="mb-3 text-body-sm font-semibold text-navy-deep">{t('language.second')}</legend>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {([false, true] as const).map((yes) => (
-                <label
-                  key={String(yes)}
-                  className="flex cursor-pointer items-center gap-3 rounded-xl border border-fog px-4 py-3 text-body-sm font-medium text-navy-deep hover:border-rouge"
-                >
-                  <input
-                    type="radio"
-                    name="fsw-second-language"
-                    checked={form.secondLanguage === yes}
-                    onChange={() => set('secondLanguage', yes)}
-                    className="size-4 accent-rouge"
-                  />
-                  {yes ? t('language.secondYes') : t('language.secondNo')}
-                </label>
-              ))}
-            </div>
-          </fieldset>
         </CalculatorSection>
 
         <div className="grid gap-5 md:grid-cols-2">
@@ -286,15 +256,6 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
         <FswResult assessment={assessment} onReset={() => update(DEFAULT_FSW_FORM)} />
       </div>
 
-      {converting ? (
-        <ClbConverterDialog
-          onClose={() => setConverting(false)}
-          onApply={({ official, levels }) => {
-            update({ ...form, firstLanguageOfficial: official, firstLevels: levels });
-            setConverting(false);
-          }}
-        />
-      ) : null}
     </div>
   );
 }

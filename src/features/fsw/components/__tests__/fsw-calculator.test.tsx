@@ -54,6 +54,17 @@ function renderCalculator(locale: 'fr' | 'en' = 'fr') {
   return render(withIntl(<FswCalculator today={TODAY} />, locale));
 }
 
+const FRENCH = ['Expression orale', 'Compréhension orale', 'Compréhension écrite', 'Expression écrite'];
+
+/** Enters the first official language the way the CRS calculator does: a test, then four results. */
+function enterFirstLanguage(test: string, scores: readonly string[]) {
+  fireEvent.change(screen.getByLabelText('Test de la 1re langue officielle'), { target: { value: test } });
+  FRENCH.forEach((ability, i) =>
+    fireEvent.change(screen.getByLabelText(`1re langue — ${ability}`), { target: { value: scores[i] } }),
+  );
+}
+const nclc9 = () => enterFirstLanguage('NCLC', ['9', '9', '9', '9']);
+
 beforeEach(() => {
   vi.clearAllMocks();
   window.localStorage.clear();
@@ -62,9 +73,20 @@ beforeEach(() => {
 });
 
 describe('FswCalculator', () => {
-  it('starts at 68: NCLC 9 (24) + bachelor’s (21) + 2–3 years (11) + age 30 (12), éligible', () => {
+  it('starts with no language test: not eligible until the first official language is entered', () => {
     renderCalculator();
 
+    // Bachelor's 21 + 2–3 years 11 + age 30 12 = 44, and no first-language test.
+    expect(total()).toHaveTextContent('44');
+    expect(within(result()).getByText('Non éligible')).toBeInTheDocument();
+    expect(within(result()).getByText(/NCLC\/CLB 7 dans les 4 compétences/)).toBeInTheDocument();
+  });
+
+  it('scores 68 with NCLC 9 in all four abilities: éligible', () => {
+    renderCalculator();
+    nclc9();
+
+    // NCLC 9 ×4 = 24 + 21 + 11 + 12 = 68.
     expect(total()).toHaveTextContent('68');
     expect(within(result()).getByText('Éligible')).toBeInTheDocument();
     expect(stepPoints('Compétences linguistiques')).toHaveTextContent('24 / 28');
@@ -73,6 +95,7 @@ describe('FswCalculator', () => {
 
   it('shows the points missing below 67', () => {
     renderCalculator();
+    nclc9();
 
     fireEvent.change(screen.getByLabelText('Votre âge'), { target: { value: '37' } });
 
@@ -85,7 +108,7 @@ describe('FswCalculator', () => {
   it('names the requirement a candidate misses even with enough points', () => {
     renderCalculator();
     fireEvent.change(screen.getByLabelText('Votre plus haut diplôme'), { target: { value: 'doctorate' } });
-    fireEvent.change(screen.getByLabelText('Expression écrite'), { target: { value: '6' } });
+    enterFirstLanguage('NCLC', ['9', '9', '9', '6']);
 
     // 18 + 25 + 11 + 12 = 66 … but the point is the requirement: below NCLC 7 in writing.
     expect(within(result()).getByText('Non éligible')).toBeInTheDocument();
@@ -94,6 +117,7 @@ describe('FswCalculator', () => {
 
   it('gives arranged employment only in an LMIA situation under the current rules', () => {
     renderCalculator();
+    nclc9();
 
     fireEvent.change(screen.getByLabelText('Avez-vous une offre d’emploi ?'), { target: { value: 'valid' } });
     expect(total()).toHaveTextContent('68');
@@ -105,6 +129,7 @@ describe('FswCalculator', () => {
 
   it('asks about the spouse only when a married or common-law spouse comes along', () => {
     renderCalculator();
+    nclc9();
     expect(screen.queryByLabelText(/Mon époux\(se\) ou conjoint\(e\) a NCLC\/CLB 4/)).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText('Votre état matrimonial'), { target: { value: 'married' } });
@@ -118,21 +143,27 @@ describe('FswCalculator', () => {
     expect(total()).toHaveTextContent('73');
   });
 
-  it('converts raw test scores into levels from the converter dialog', async () => {
+  it('reads raw test results like the CRS calculator, showing each level', () => {
     renderCalculator();
-
-    fireEvent.click(screen.getByRole('button', { name: /Je ne connais pas mon NCLC\/CLB/ }));
-    const dialog = await screen.findByRole('dialog', { name: 'Entrez vos résultats de test' });
-    fireEvent.change(within(dialog).getByLabelText('Test de la 1re langue officielle'), { target: { value: 'TCF' } });
-    const scores = { 'Expression orale': '10', 'Compréhension orale': '458', 'Compréhension écrite': '453', 'Expression écrite': '10' };
-    for (const [ability, score] of Object.entries(scores)) {
-      fireEvent.change(within(dialog).getByLabelText(`1re langue — ${ability}`), { target: { value: score } });
-    }
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Appliquer les niveaux' }));
+    enterFirstLanguage('TCF', ['10', '458', '453', '10']);
 
     // TCF 10/458/453/10 = NCLC 7 ×4 = 16 → 16 + 21 + 11 + 12 = 60.
-    await waitFor(() => expect(total()).toHaveTextContent('60'));
+    expect(screen.getByTestId('level-firstLanguage-listening')).toHaveTextContent('NCLC/CLB 7');
+    expect(total()).toHaveTextContent('60');
     expect(stepPoints('Compétences linguistiques')).toHaveTextContent('16 / 28');
+  });
+
+  it('adds 4 points for a second official language at CLB 5+ in all four abilities', () => {
+    renderCalculator();
+    nclc9();
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter une 2e langue officielle' }));
+    fireEvent.change(screen.getByLabelText('Test de la 2e langue officielle'), { target: { value: 'CLB' } });
+    for (const ability of ['Speaking', 'Listening', 'Reading', 'Writing']) {
+      fireEvent.change(screen.getByLabelText(`2e langue — ${ability}`), { target: { value: '5' } });
+    }
+
+    // 68 + 4 = 72.
+    expect(total()).toHaveTextContent('72');
   });
 
   it('picks one of my saved CRS simulations from a dropdown to fill the form', async () => {
@@ -186,6 +217,7 @@ describe('FswCalculator', () => {
 
   it('shows the arranged-employment adaptability points as a ticked item', () => {
     renderCalculator();
+    nclc9();
     fireEvent.change(screen.getByLabelText('Avez-vous une offre d’emploi ?'), { target: { value: 'valid' } });
     fireEvent.change(screen.getByLabelText('Situation de l’offre'), { target: { value: 'lmiaOffer' } });
 
