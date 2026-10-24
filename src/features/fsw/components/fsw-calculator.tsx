@@ -1,17 +1,19 @@
 'use client';
 
-import { RotateCcw } from 'lucide-react';
+import { Info, RotateCcw } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import { useStoredDraft } from '@/features/crs/hooks/use-crs-draft';
+import { useCrsDraftValue } from '@/features/crs/hooks/use-crs-draft';
 import { ClbConverterDialog } from '@/features/fsw/components/clb-converter-dialog';
 import { FswResult } from '@/features/fsw/components/fsw-result';
 import {
   ADAPTABILITY_MAX,
+  ADAPTABILITY_POINTS,
   AGE_MAX,
   ARRANGED_EMPLOYMENT_POINTS,
   EDUCATION_MAX,
+  FSW_CRITERIA_DATE,
   LANGUAGE_MAX,
   WORK_MAX,
 } from '@/features/fsw/data/fsw-criteria';
@@ -33,23 +35,31 @@ import {
   NumberField,
   SelectField,
 } from '@/features/shared/components/calculator-fields';
+import { FamilyFields } from '@/features/shared/components/family-fields';
+import { PhoneScoreBar } from '@/features/shared/components/phone-score-bar';
+import { RulesChoice } from '@/features/shared/components/rules-choice';
 import { EDUCATION_LEVELS } from '@/features/shared/data/education-levels';
+import { useCalculatorTracking } from '@/features/shared/hooks/use-calculator-tracking';
 import { useStoredForm } from '@/features/shared/hooks/use-stored-form';
 import { ABILITIES } from '@/features/shared/lib/language-levels';
-import { isPartnered, MARITAL_STATUSES } from '@/features/shared/lib/marital-status';
+import { isPartnered } from '@/features/shared/lib/marital-status';
 import { rulesInForceOn, type RulesVersion } from '@/features/shared/lib/rules-version';
 import { track } from '@/lib/analytics';
 
 /** Versioned, so a later change to the form shape discards old drafts instead of breaking. */
 export const FSW_DRAFT_KEY = 'stanzy.fsw.draft.v1';
 
-type AdaptabilityItem =
-  | 'studiedInCanada'
-  | 'workedInCanada'
-  | 'relativeInCanada'
-  | 'spouseLanguageClb4'
-  | 'spouseStudiedInCanada'
-  | 'spouseWorkedInCanada';
+/** Adaptability items the visitor ticks, with their points from IRCC's grid. */
+const OWN_ITEMS = [
+  ['studiedInCanada', 'studiedInCanada', ADAPTABILITY_POINTS.studiedInCanada],
+  ['workedInCanada', 'workedInCanada', ADAPTABILITY_POINTS.workedInCanada],
+  ['relativeInCanada', 'relativeInCanada', ADAPTABILITY_POINTS.relativeInCanada],
+] as const;
+const SPOUSE_ITEMS = [
+  ['spouseLanguageClb4', 'spouseLanguage', ADAPTABILITY_POINTS.spouseLanguage],
+  ['spouseStudiedInCanada', 'spouseStudiedInCanada', ADAPTABILITY_POINTS.spouseStudiedInCanada],
+  ['spouseWorkedInCanada', 'spouseWorkedInCanada', ADAPTABILITY_POINTS.spouseWorkedInCanada],
+] as const;
 
 /**
  * The Calculateur 67 points: the six Federal Skilled Worker factors, scored
@@ -62,10 +72,11 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
   const tLanguage = useTranslations('Calculators.language');
   const format = useFormatter();
   const [form, setForm] = useStoredForm(FSW_DRAFT_KEY, fswFormSchema, DEFAULT_FSW_FORM);
-  const crsAnswers = useStoredDraft();
+  const crsAnswers = useCrsDraftValue();
   const inForce = rulesInForceOn(today);
   const [rules, setRules] = useState<RulesVersion>(inForce);
   const [converting, setConverting] = useState(false);
+  const [reusedCrs, setReusedCrs] = useState(false);
 
   const result = useMemo(() => assessFsw(toProfile(form), { rules }), [form, rules]);
   const assessment = result.ok ? result.assessment : null;
@@ -73,50 +84,43 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
   const pts = (points: number | undefined, max: number): string =>
     t('points', { points: points ?? '—', max });
 
-  // Analytics: one event per visit, one on the first answer. No answers are sent.
-  const started = useRef(false);
-  useEffect(() => track('fsw.viewed'), []);
+  const markStarted = useCalculatorTracking('fsw');
   const update = (next: FswForm): void => {
-    if (!started.current) {
-      started.current = true;
-      track('fsw.started');
-    }
+    markStarted();
     setForm(next);
   };
   const set = <K extends keyof FswForm>(key: K, value: FswForm[K]): void => update({ ...form, [key]: value });
+
+  // Analytics: the verdict each time it changes. No answers are sent.
+  const eligible = assessment?.eligible;
+  useEffect(() => {
+    if (eligible !== undefined) track('fsw.verdict', { eligible });
+  }, [eligible]);
 
   const spouseCounts =
     isPartnered(form.maritalStatus) && form.spouseAccompanying && !form.spouseIsCanadianCitizenOrPR;
   const abilityName = (ability: (typeof ABILITIES)[number]): string =>
     tLanguage(`abilitiesByTestLanguage.${form.firstLanguageOfficial}.${ability}`);
   const step = (n: number): string => t('step', { n: String(n).padStart(2, '0') });
-  const ownItems: AdaptabilityItem[] = ['studiedInCanada', 'workedInCanada', 'relativeInCanada'];
-  const spouseItems: AdaptabilityItem[] = ['spouseLanguageClb4', 'spouseStudiedInCanada', 'spouseWorkedInCanada'];
-  const itemKey = (item: AdaptabilityItem): string => (item === 'spouseLanguageClb4' ? 'spouseLanguage' : item);
+  // Current rules: the date of IRCC's pages; upcoming rules: the day they take effect.
+  const criteriaDate = rules === inForce ? FSW_CRITERIA_DATE : rules;
 
   return (
     <div className="grid grid-cols-1 items-start gap-7 pb-20 lg:grid-cols-3 lg:pb-0">
-      {/* Phones: the score stays in view while scrolling; the announced one is in the result card. */}
-      <div
-        aria-hidden={true}
-        className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-white/10 bg-navy-deep px-5 py-3 text-white shadow-lg lg:hidden"
-      >
-        <span className="font-label text-white/60">{t('result.label')}</span>
-        <span className="font-heading text-h3 font-bold">
-          {assessment?.total ?? '—'}
-          <span className="ml-1 text-body-sm font-normal text-white/60">/ 100</span>
-        </span>
-      </div>
+      <PhoneScoreBar label={t('result.label')} score={assessment?.total ?? null} outOf="/ 100" />
 
       <div className="min-w-0 space-y-5 lg:col-span-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-body-sm text-slate">
-            {t('rulesNote', { date: format.dateTime(new Date(rules), { dateStyle: 'long', timeZone: 'UTC' }) })}
+            {t('rulesNote', { date: format.dateTime(new Date(criteriaDate), { dateStyle: 'long', timeZone: 'UTC' }) })}
           </p>
           {crsAnswers ? (
             <button
               type="button"
-              onClick={() => update(fromCrsAnswers(crsAnswers, form))}
+              onClick={() => {
+                update(fromCrsAnswers(crsAnswers, form));
+                setReusedCrs(true);
+              }}
               className="inline-flex items-center gap-2 rounded-full border border-fog bg-white px-4 py-2 text-body-sm font-semibold text-navy-deep transition-colors hover:bg-ice-blue"
             >
               <RotateCcw aria-hidden={true} className="size-4 text-rouge" />
@@ -124,28 +128,14 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
             </button>
           ) : null}
         </div>
-
-        {inForce === '2025-03-25' ? (
-          <fieldset className="rounded-2xl border border-fog bg-white p-4">
-            <legend className="px-1 font-label text-slate">{t('rulesChoice.legend')}</legend>
-            <div className="flex flex-wrap gap-4">
-              {(['2025-03-25', '2026-11-03'] as const).map((version) => (
-                <label key={version} className="flex items-center gap-2 text-body-sm font-semibold text-navy-deep">
-                  <input
-                    type="radio"
-                    name="fsw-rules"
-                    value={version}
-                    checked={rules === version}
-                    onChange={() => setRules(version)}
-                    className="accent-rouge"
-                  />
-                  {version === '2025-03-25' ? t('rulesChoice.current') : t('rulesChoice.upcoming')}
-                </label>
-              ))}
-            </div>
-            <p className="mt-2 text-body-sm text-slate">{t('rulesChoice.hint')}</p>
-          </fieldset>
+        {reusedCrs ? (
+          <p role="status" className="flex items-start gap-2 rounded-xl bg-ice-blue p-4 text-body-sm text-navy-deep">
+            <Info aria-hidden={true} className="mt-0.5 size-4 shrink-0 text-steel-blue" />
+            {t('reusedNotice')}
+          </p>
         ) : null}
+
+        <RulesChoice name="fsw-rules" inForce={inForce} rules={rules} onChange={setRules} hint={t('rulesHint')} />
 
         <CalculatorSection
           id="fsw-language"
@@ -276,52 +266,32 @@ export function FswCalculator({ today = new Date() }: { today?: Date }): ReactNo
           subtitle={t('adaptability.subtitle')}
           points={pts(assessment?.factors.adaptability, ADAPTABILITY_MAX)}
         >
-          <SelectField
-            label={t('adaptability.marital')}
-            value={form.maritalStatus}
-            options={MARITAL_STATUSES.map((m) => ({ value: m, label: t(`adaptability.maritalOptions.${m}`) }))}
-            onChange={(v) => set('maritalStatus', v)}
-          />
-          {isPartnered(form.maritalStatus) ? (
-            <>
-              <SelectField
-                label={t('adaptability.accompanying')}
-                value={form.spouseAccompanying ? 'yes' : 'no'}
-                options={[
-                  { value: 'no', label: t('adaptability.accompanyingNo') },
-                  { value: 'yes', label: t('adaptability.accompanyingYes') },
-                ]}
-                onChange={(v) => set('spouseAccompanying', v === 'yes')}
-              />
-              <CheckField
-                label={t('adaptability.citizenOrPR')}
-                checked={form.spouseIsCanadianCitizenOrPR}
-                onChange={(v) => set('spouseIsCanadianCitizenOrPR', v)}
-              />
-            </>
-          ) : null}
+          <FamilyFields value={form} onChange={(family) => update({ ...form, ...family })} />
           <div className="grid gap-3">
-            {[...ownItems, ...(spouseCounts ? spouseItems : [])].map((item) => (
+            {[...OWN_ITEMS, ...(spouseCounts ? SPOUSE_ITEMS : [])].map(([field, copy, points]) => (
               <CheckField
-                key={item}
-                label={t(`adaptability.items.${itemKey(item)}`)}
-                points={`+${item === 'workedInCanada' ? 10 : 5}`}
-                checked={form[item]}
-                onChange={(v) => set(item, v)}
+                key={field}
+                label={t(`adaptability.items.${copy}`)}
+                points={`+${points}`}
+                checked={form[field]}
+                onChange={(v) => set(field, v)}
               />
             ))}
             {assessment && assessment.factors.arrangedEmployment > 0 ? (
-              <p className="text-body-sm font-semibold text-navy-deep">{t('adaptability.items.arrangedEmployment')} +5</p>
+              <CheckField
+                label={t('adaptability.items.arrangedEmployment')}
+                points={`+${ADAPTABILITY_POINTS.arrangedEmployment}`}
+                checked
+                disabled
+                onChange={() => undefined}
+              />
             ) : null}
           </div>
         </CalculatorSection>
       </div>
 
       <div className="lg:sticky-below-nav">
-        <FswResult
-          assessment={assessment}
-          onReset={() => update(DEFAULT_FSW_FORM)}
-        />
+        <FswResult assessment={assessment} onReset={() => update(DEFAULT_FSW_FORM)} />
       </div>
 
       {converting ? (

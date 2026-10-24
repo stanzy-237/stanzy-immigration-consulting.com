@@ -70,6 +70,8 @@ export type FswAssessment = {
   eligible: boolean;
   /** Points missing to reach 67 (0 once reached). */
   pointsShort: number;
+  /** The CLB/NCLC levels the engine derived from each set of results. */
+  levels: { first: ClbLevels | null; second: ClbLevels | null; spouse: ClbLevels | null };
 };
 
 export type FswResult = { ok: true; assessment: FswAssessment } | { ok: false; issues: CalculatorIssue[] };
@@ -166,6 +168,7 @@ export function assessFsw(profile: FswProfile, options: { rules: RulesVersion })
       requirements,
       eligible: total >= FSW_PASS_MARK && Object.values(requirements).every(Boolean),
       pointsShort: Math.max(0, FSW_PASS_MARK - total),
+      levels: { first, second, spouse: spouseLanguage },
     },
   };
 }

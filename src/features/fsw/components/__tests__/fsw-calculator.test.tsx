@@ -122,9 +122,27 @@ describe('FswCalculator', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Reprendre mes réponses du Calculateur CRS' }));
 
-    // NCLC 8 ×4 = 20, bachelor's 21, 2 + 3 = 5 yrs = 13, age 29 = 12, adaptability Canadian work 10 → 76.
+    // CRS work answers are ranges (2 yrs in Canada, "3+" abroad) that may overlap, so the safe
+    // reading is the longer one: 3 yrs = 11. NCLC 8 ×4 = 20, bachelor's 21, age 29 = 12,
+    // adaptability Canadian work 10 → 74.
     expect(screen.getByLabelText('Votre âge')).toHaveValue(29);
-    expect(total()).toHaveTextContent('76');
+    expect(total()).toHaveTextContent('74');
+    expect(screen.getByText(/Vérifiez votre expérience de travail/)).toBeInTheDocument();
+  });
+
+  it('shows the arranged-employment adaptability points as a ticked item', () => {
+    renderCalculator();
+    fireEvent.change(screen.getByLabelText('Avez-vous une offre d’emploi ?'), { target: { value: 'valid' } });
+    fireEvent.change(screen.getByLabelText('Situation de l’offre'), { target: { value: 'lmiaOffer' } });
+
+    const item = screen.getByLabelText(/Offre d’emploi réservée \(comptée automatiquement\)/);
+    expect(item).toBeChecked();
+    expect(item).toBeDisabled();
+  });
+
+  it('states the date of the official criteria it follows', () => {
+    renderCalculator();
+    expect(screen.getByText('Critères officiels en vigueur au 16 octobre 2026.')).toBeInTheDocument();
   });
 
   it('keeps the answers on this device across visits', () => {

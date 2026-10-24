@@ -490,12 +490,6 @@
     "titleAccent": "Entrée Express",
     "lead": "Le Système de classement global, calculé selon les critères officiels d’IRCC. Score maximum : 1 200 points.",
     "rulesNote": "Critères officiels en vigueur au {date}.",
-    "rulesChoice": {
-      "legend": "Règles appliquées",
-      "current": "Règles actuelles",
-      "upcoming": "À partir du 3 novembre 2026",
-      "hint": "Le 3 novembre 2026, IRCC remplace les points d’expérience canadienne par le facteur « intégration au marché du travail » et rétablit des points pour certaines offres d’emploi."
-    },
     "points": "{points} pts",
     "noneOption": "Aucune",
     "sections": {
@@ -509,20 +503,6 @@
       "spouse": "Facteurs du conjoint"
     },
     "family": {
-      "marital": "Votre état matrimonial",
-      "maritalOptions": {
-        "single": "Jamais marié(e) / célibataire",
-        "married": "Marié(e)",
-        "commonLaw": "Conjoint(e) de fait",
-        "divorced": "Divorcé(e)",
-        "separated": "Séparé(e) légalement",
-        "widowed": "Veuf / veuve",
-        "annulled": "Mariage annulé"
-      },
-      "accompanying": "Votre époux(se) ou conjoint(e) vous accompagnera-t-il/elle au Canada ?",
-      "accompanyingYes": "Oui, il/elle m’accompagnera",
-      "accompanyingNo": "Non",
-      "citizenOrPR": "Mon époux(se) ou conjoint(e) est citoyen(ne) canadien(ne) ou résident(e) permanent(e)",
       "note": "Les facteurs du conjoint ne comptent que s’il ou elle vous accompagne et n’est ni citoyen(ne) ni résident(e) permanent(e)."
     },
     "age": {
@@ -632,7 +612,8 @@
       "confirm": "Enregistrer",
       "saving": "Enregistrement…",
       "error": "L’enregistrement a échoué. Réessayez."
-    }
+    },
+    "rulesHint": "Le 3 novembre 2026, IRCC remplace les points d’expérience canadienne par le facteur « intégration au marché du travail » et rétablit des points pour certaines offres d’emploi."
   },
   "Calculators": {
     "language": {
@@ -679,6 +660,27 @@
           "writing": "Writing"
         }
       }
+    },
+    "rulesChoice": {
+      "legend": "Règles appliquées",
+      "current": "Règles actuelles",
+      "upcoming": "À partir du 3 novembre 2026"
+    },
+    "family": {
+      "marital": "Votre état matrimonial",
+      "maritalOptions": {
+        "single": "Jamais marié(e) / célibataire",
+        "married": "Marié(e)",
+        "commonLaw": "Conjoint(e) de fait",
+        "divorced": "Divorcé(e)",
+        "separated": "Séparé(e) légalement",
+        "widowed": "Veuf / veuve",
+        "annulled": "Mariage annulé"
+      },
+      "accompanying": "Votre époux(se) ou conjoint(e) vous accompagnera-t-il/elle au Canada ?",
+      "accompanyingYes": "Oui, il/elle m’accompagnera",
+      "accompanyingNo": "Non",
+      "citizenOrPR": "Mon époux(se) ou conjoint(e) est citoyen(ne) canadien(ne) ou résident(e) permanent(e)"
     }
   },
   "Fsw": {
@@ -689,12 +691,6 @@
     "threshold": "Seuil d’admissibilité : 67 / 100",
     "notCrs": "La grille des 67 points vérifie l’admissibilité ; ce n’est pas votre score CRS.",
     "rulesNote": "Critères officiels en vigueur au {date}.",
-    "rulesChoice": {
-      "legend": "Règles appliquées",
-      "current": "Règles actuelles",
-      "upcoming": "À partir du 3 novembre 2026",
-      "hint": "Le 3 novembre 2026, IRCC supprime l’exigence d’une EIMT pour qu’une offre d’emploi admissible compte."
-    },
     "step": "Étape {n}",
     "points": "{points} / {max}",
     "reuseCrs": "Reprendre mes réponses du Calculateur CRS",
@@ -774,20 +770,6 @@
     "adaptability": {
       "title": "Adaptabilité",
       "subtitle": "Cochez ce qui s’applique · plafonné à 10 points",
-      "marital": "Votre état matrimonial",
-      "maritalOptions": {
-        "single": "Jamais marié(e) / célibataire",
-        "married": "Marié(e)",
-        "commonLaw": "Conjoint(e) de fait",
-        "divorced": "Divorcé(e)",
-        "separated": "Séparé(e) légalement",
-        "widowed": "Veuf / veuve",
-        "annulled": "Mariage annulé"
-      },
-      "accompanying": "Votre époux(se) ou conjoint(e) vous accompagnera-t-il/elle au Canada ?",
-      "accompanyingYes": "Oui, il/elle m’accompagnera",
-      "accompanyingNo": "Non",
-      "citizenOrPR": "Mon époux(se) ou conjoint(e) est citoyen(ne) canadien(ne) ou résident(e) permanent(e)",
       "items": {
         "spouseLanguage": "Mon époux(se) ou conjoint(e) a NCLC/CLB 4 ou plus dans les 4 compétences",
         "studiedInCanada": "J’ai étudié au Canada au moins 2 ans à temps plein",
@@ -832,6 +814,8 @@
       "funds": "Vous devrez aussi prouver des fonds suffisants pour vous installer, sauf exemption.",
       "fundsLink": "Voir les montants d’IRCC",
       "fundsUrl": "https://www.canada.ca/fr/immigration-refugies-citoyennete/services/immigrer-canada/entree-express/documents/preuve-fonds-suffisants.html"
-    }
+    },
+    "rulesHint": "Le 3 novembre 2026, IRCC supprime l’exigence d’une EIMT pour qu’une offre d’emploi admissible compte.",
+    "reusedNotice": "Réponses reprises du Calculateur CRS. Vérifiez votre expérience de travail et l’adaptabilité : le Calculateur CRS ne donne que des tranches d’années, et vos études au Canada peuvent compter."
   }
 }

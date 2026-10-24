@@ -7,10 +7,10 @@ import { readStored, useStoredForm, useStoredValue } from '@/features/shared/hoo
 export const CRS_DRAFT_KEY = 'stanzy.crs.draft.v1';
 
 /** The CRS draft saved in this browser, or null. */
-export const readDraft = (): CrsForm | null => readStored(CRS_DRAFT_KEY, crsFormSchema);
+export const readCrsDraft = (): CrsForm | null => readStored(CRS_DRAFT_KEY, crsFormSchema);
 
 /** The CRS draft as a React value (null on the server and during hydration). */
-export const useStoredDraft = (): CrsForm | null => useStoredValue(CRS_DRAFT_KEY, crsFormSchema);
+export const useCrsDraftValue = (): CrsForm | null => useStoredValue(CRS_DRAFT_KEY, crsFormSchema);
 
 /**
  * The CRS calculator's answers, kept in this browser between visits (and

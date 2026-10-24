@@ -102,9 +102,13 @@ const workChoice = (years: number): FswForm['skilledWorkYears'] =>
 
 /**
  * Maps the Calculateur CRS answers onto the 67-points form: family, age,
- * education, languages, skilled work (Canadian and foreign together),
- * Canadian work and a sibling in Canada. Answers the CRS doesn't ask keep
- * their current value in `base`.
+ * education, languages, skilled work, Canadian work and studies, and a
+ * sibling in Canada. Answers the CRS doesn't ask keep their value in `base`.
+ *
+ * The CRS asks work in ranges ("1 à 2 ans", "3 ans ou plus", "5 ans ou plus")
+ * that may overlap in time, so skilled work is read as the longer of the two
+ * lower bounds: never more than the candidate has, possibly less. The page
+ * asks the visitor to check it.
  */
 export function fromCrsAnswers(crs: CrsForm, base: FswForm): FswForm {
   const first = toLanguageResult(crs.firstLanguage);
@@ -124,7 +128,7 @@ export function fromCrsAnswers(crs: CrsForm, base: FswForm): FswForm {
     firstLevels: levels,
     secondLanguage: allAtLeast(second, 5),
     education: crs.education,
-    skilledWorkYears: workChoice(crs.canadianWorkYears + crs.foreignWorkYears),
+    skilledWorkYears: workChoice(Math.max(crs.canadianWorkYears, crs.foreignWorkYears)),
     age: crs.age,
     maritalStatus: crs.maritalStatus,
     spouseAccompanying: crs.spouseAccompanying,
@@ -132,6 +136,8 @@ export function fromCrsAnswers(crs: CrsForm, base: FswForm): FswForm {
     spouseLanguageClb4: allAtLeast(spouseLanguage, 4),
     spouseWorkedInCanada: crs.spouseCanadianWorkYears >= 1,
     workedInCanada: crs.canadianWorkYears >= 1,
+    // A credential of 3+ years in Canada means at least 2 academic years of full-time study.
+    studiedInCanada: crs.canadianStudy === 'threePlusYears' || base.studiedInCanada,
     relativeInCanada: crs.siblingInCanada || base.relativeInCanada,
   };
 }

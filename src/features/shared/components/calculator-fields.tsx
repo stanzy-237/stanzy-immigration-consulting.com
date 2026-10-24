@@ -122,22 +122,27 @@ export function CheckField({
   checked,
   onChange,
   points,
+  disabled = false,
 }: {
   label: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
   points?: string;
+  /** Shown but set by another answer (e.g. counted automatically). */
+  disabled?: boolean;
 }): ReactNode {
   return (
     <label
       className={cn(
         'flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-body-sm font-semibold text-navy-deep transition-colors',
         checked ? 'border-navy-deep bg-ice-blue' : 'border-fog hover:border-slate-mute',
+        disabled && 'cursor-default opacity-80',
       )}
     >
       <input
         type="checkbox"
         checked={checked}
+        disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
         className="size-4 accent-navy-deep"
       />

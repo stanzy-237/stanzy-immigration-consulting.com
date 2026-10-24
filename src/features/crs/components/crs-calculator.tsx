@@ -1,33 +1,36 @@
 'use client';
 
 import { useFormatter, useTranslations } from 'next-intl';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { withNext } from '@/features/auth/lib/safe-next-path';
-import { HIGH_WAGE_LEVELS } from '@/features/crs/data/crs-criteria';
-import { EDUCATION_LEVELS } from '@/features/shared/data/education-levels';
-import { useCrsDraft } from '@/features/crs/hooks/use-crs-draft';
-import { computeCrs, type CrsProfile } from '@/features/crs/lib/compute-crs';
-import { isPartnered, MARITAL_STATUSES } from '@/features/shared/lib/marital-status';
-import { rulesInForceOn, type RulesVersion } from '@/features/shared/lib/rules-version';
-import {
-  DEFAULT_FORM,
-  fromProfile,
-  toProfile,
-  type CrsForm,
-} from '@/features/crs/lib/crs-form';
-import { emptyLanguage } from '@/features/shared/lib/language-form';
-import { track } from '@/lib/analytics';
-import { useRouter } from '@/i18n/navigation';
-import { api } from '@/trpc/react';
-
-import { CheckField, CalculatorSection, NumberField, SelectField } from '@/features/shared/components/calculator-fields';
-import { LanguageFields } from '@/features/shared/components/language-fields';
 import { SaveSimulationDialog } from '@/features/crs/components/save-simulation-dialog';
 import { SavedSimulations } from '@/features/crs/components/saved-simulations';
 import { ScoreAdvice } from '@/features/crs/components/score-advice';
 import { ScoreSummary } from '@/features/crs/components/score-summary';
+import { HIGH_WAGE_LEVELS } from '@/features/crs/data/crs-criteria';
+import { useCrsDraft } from '@/features/crs/hooks/use-crs-draft';
+import { computeCrs, type CrsProfile } from '@/features/crs/lib/compute-crs';
+import { DEFAULT_FORM, fromProfile, toProfile, type CrsForm } from '@/features/crs/lib/crs-form';
+import {
+  CalculatorSection,
+  CheckField,
+  NumberField,
+  SelectField,
+} from '@/features/shared/components/calculator-fields';
+import { FamilyFields } from '@/features/shared/components/family-fields';
+import { LanguageFields } from '@/features/shared/components/language-fields';
+import { PhoneScoreBar } from '@/features/shared/components/phone-score-bar';
+import { RulesChoice } from '@/features/shared/components/rules-choice';
+import { EDUCATION_LEVELS } from '@/features/shared/data/education-levels';
+import { useCalculatorTracking } from '@/features/shared/hooks/use-calculator-tracking';
+import { emptyLanguage } from '@/features/shared/lib/language-form';
+import { isPartnered } from '@/features/shared/lib/marital-status';
+import { rulesInForceOn, type RulesVersion } from '@/features/shared/lib/rules-version';
+import { useRouter } from '@/i18n/navigation';
+import { track } from '@/lib/analytics';
+import { api } from '@/trpc/react';
 
 const CANADIAN_YEARS = [0, 1, 2, 3, 4, 5] as const;
 /** 0 = none, 1 = 1 to 2 years, 3 = 3 years or more (the transferability rows). */
@@ -62,14 +65,9 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
   const pts = (points: number | undefined): string =>
     points === undefined ? '—' : t('points', { points });
 
-  // Analytics: one event per visit, one on the first answer. No answers are sent.
-  const started = useRef(false);
-  useEffect(() => track('crs.viewed'), []);
+  const markStarted = useCalculatorTracking('crs');
   const update = (next: CrsForm): void => {
-    if (!started.current) {
-      started.current = true;
-      track('crs.started');
-    }
+    markStarted();
     setForm(next);
   };
   const set = <K extends keyof CrsForm>(key: K, value: CrsForm[K]): void => update({ ...form, [key]: value });
@@ -109,69 +107,21 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
 
   return (
     <div className="grid grid-cols-1 items-start gap-7 pb-20 lg:grid-cols-3 lg:pb-0">
-      {/* Phones: the total stays in view while scrolling the questions. The
-          announced score is the one in the result card below. */}
-      <div
-        aria-hidden={true}
-        className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-white/10 bg-navy-deep px-5 py-3 text-white shadow-lg lg:hidden"
-      >
-        <span className="font-label text-white/60">{t('summary.total')}</span>
-        <span className="font-heading text-h3 font-bold">{breakdown?.total ?? '—'}</span>
-      </div>
+      <PhoneScoreBar label={t('summary.total')} score={breakdown?.total ?? null} />
       <div className="min-w-0 space-y-4 lg:col-span-2">
         <p className="text-body-sm text-slate">
           {t('rulesNote', { date: format.dateTime(new Date(rules), { dateStyle: 'long', timeZone: 'UTC' }) })}
         </p>
-        {inForce === '2025-03-25' ? (
-          <fieldset className="rounded-2xl border border-fog bg-white p-4">
-            <legend className="px-1 font-label text-slate">
-              {t('rulesChoice.legend')}
-            </legend>
-            <div className="flex flex-wrap gap-4">
-              {(['2025-03-25', '2026-11-03'] as const).map((version) => (
-                <label key={version} className="flex items-center gap-2 text-body-sm font-semibold text-navy-deep">
-                  <input
-                    type="radio"
-                    name="crs-rules"
-                    value={version}
-                    checked={rules === version}
-                    onChange={() => setRules(version)}
-                    className="accent-rouge"
-                  />
-                  {version === '2025-03-25' ? t('rulesChoice.current') : t('rulesChoice.upcoming')}
-                </label>
-              ))}
-            </div>
-            <p className="mt-2 text-body-sm text-slate">{t('rulesChoice.hint')}</p>
-          </fieldset>
-        ) : null}
+        <RulesChoice
+          name="crs-rules"
+          inForce={inForce}
+          rules={rules}
+          onChange={setRules}
+          hint={t('rulesHint')}
+        />
 
         <CalculatorSection id="family" title={t('sections.family')} accent="steel">
-          <SelectField
-            label={t('family.marital')}
-            value={form.maritalStatus}
-            options={MARITAL_STATUSES.map((m) => ({ value: m, label: t(`family.maritalOptions.${m}`) }))}
-            onChange={(maritalStatus) => set('maritalStatus', maritalStatus)}
-          />
-          {partnered ? (
-            <>
-              <SelectField
-                label={t('family.accompanying')}
-                value={form.spouseAccompanying ? 'yes' : 'no'}
-                options={[
-                  { value: 'no', label: t('family.accompanyingNo') },
-                  { value: 'yes', label: t('family.accompanyingYes') },
-                ]}
-                onChange={(v) => set('spouseAccompanying', v === 'yes')}
-              />
-              <CheckField
-                label={t('family.citizenOrPR')}
-                checked={form.spouseIsCanadianCitizenOrPR}
-                onChange={(v) => set('spouseIsCanadianCitizenOrPR', v)}
-              />
-              <p className="text-body-sm text-slate">{t('family.note')}</p>
-            </>
-          ) : null}
+          <FamilyFields value={form} onChange={(family) => update({ ...form, ...family })} note={t('family.note')} />
         </CalculatorSection>
 
         <CalculatorSection id="age" title={t('sections.age')} points={pts(breakdown?.core.age)} accent="rouge">

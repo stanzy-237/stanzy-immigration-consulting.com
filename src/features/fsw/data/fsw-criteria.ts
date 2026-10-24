@@ -12,6 +12,9 @@
 
 import type { EducationLevel } from '@/features/shared/data/education-levels';
 
+/** The day the transcribed IRCC pages were last modified; shown on the page. */
+export const FSW_CRITERIA_DATE = '2026-10-16';
+
 export const FSW_PASS_MARK = 67;
 export const FSW_MAX = 100;
 

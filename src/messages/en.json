@@ -490,12 +490,6 @@
     "titleAccent": "Express Entry",
     "lead": "The Comprehensive Ranking System, scored with IRCC’s official criteria. Maximum score: 1,200 points.",
     "rulesNote": "Official criteria in force on {date}.",
-    "rulesChoice": {
-      "legend": "Rules applied",
-      "current": "Current rules",
-      "upcoming": "From November 3, 2026",
-      "hint": "On November 3, 2026, IRCC replaces Canadian work experience points with the “labour market integration” factor and brings back points for some job offers."
-    },
     "points": "{points} pts",
     "noneOption": "None",
     "sections": {
@@ -509,20 +503,6 @@
       "spouse": "Spouse factors"
     },
     "family": {
-      "marital": "Your marital status",
-      "maritalOptions": {
-        "single": "Never married / single",
-        "married": "Married",
-        "commonLaw": "Common-law",
-        "divorced": "Divorced",
-        "separated": "Legally separated",
-        "widowed": "Widowed",
-        "annulled": "Annulled marriage"
-      },
-      "accompanying": "Will your spouse or common-law partner come with you to Canada?",
-      "accompanyingYes": "Yes, they will come with me",
-      "accompanyingNo": "No",
-      "citizenOrPR": "My spouse or common-law partner is a Canadian citizen or permanent resident",
       "note": "Spouse factors only count if they come with you and are neither a citizen nor a permanent resident."
     },
     "age": {
@@ -632,7 +612,8 @@
       "confirm": "Save",
       "saving": "Saving…",
       "error": "Saving failed. Please try again."
-    }
+    },
+    "rulesHint": "On November 3, 2026, IRCC replaces Canadian work experience points with the “labour market integration” factor and brings back points for some job offers."
   },
   "Calculators": {
     "language": {
@@ -679,6 +660,27 @@
           "writing": "Writing"
         }
       }
+    },
+    "rulesChoice": {
+      "legend": "Rules applied",
+      "current": "Current rules",
+      "upcoming": "From November 3, 2026"
+    },
+    "family": {
+      "marital": "Your marital status",
+      "maritalOptions": {
+        "single": "Never married / single",
+        "married": "Married",
+        "commonLaw": "Common-law",
+        "divorced": "Divorced",
+        "separated": "Legally separated",
+        "widowed": "Widowed",
+        "annulled": "Annulled marriage"
+      },
+      "accompanying": "Will your spouse or common-law partner come with you to Canada?",
+      "accompanyingYes": "Yes, they will come with me",
+      "accompanyingNo": "No",
+      "citizenOrPR": "My spouse or common-law partner is a Canadian citizen or permanent resident"
     }
   },
   "Fsw": {
@@ -689,12 +691,6 @@
     "threshold": "Pass mark: 67 / 100",
     "notCrs": "The 67-point grid checks eligibility; it is not your CRS score.",
     "rulesNote": "Official criteria in force on {date}.",
-    "rulesChoice": {
-      "legend": "Rules applied",
-      "current": "Current rules",
-      "upcoming": "From November 3, 2026",
-      "hint": "On November 3, 2026, IRCC removes the LMIA requirement for a qualifying job offer to count."
-    },
     "step": "Step {n}",
     "points": "{points} / {max}",
     "reuseCrs": "Reuse my CRS calculator answers",
@@ -774,20 +770,6 @@
     "adaptability": {
       "title": "Adaptability",
       "subtitle": "Tick what applies · capped at 10 points",
-      "marital": "Your marital status",
-      "maritalOptions": {
-        "single": "Never married / single",
-        "married": "Married",
-        "commonLaw": "Common-law",
-        "divorced": "Divorced",
-        "separated": "Legally separated",
-        "widowed": "Widowed",
-        "annulled": "Annulled marriage"
-      },
-      "accompanying": "Will your spouse or common-law partner come with you to Canada?",
-      "accompanyingYes": "Yes, they will come with me",
-      "accompanyingNo": "No",
-      "citizenOrPR": "My spouse or common-law partner is a Canadian citizen or permanent resident",
       "items": {
         "spouseLanguage": "My spouse or partner has CLB/NCLC 4 or more in all 4 abilities",
         "studiedInCanada": "I studied in Canada full-time for at least 2 years",
@@ -832,6 +814,8 @@
       "funds": "You will also need to prove enough money to settle, unless exempt.",
       "fundsLink": "See IRCC’s amounts",
       "fundsUrl": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/proof-funds.html"
-    }
+    },
+    "rulesHint": "On November 3, 2026, IRCC removes the LMIA requirement for a qualifying job offer to count.",
+    "reusedNotice": "Answers reused from the CRS calculator. Check your work experience and adaptability: the CRS calculator only gives ranges of years, and your studies in Canada may count."
   }
 }

@@ -18,7 +18,6 @@ import { isPartnered, MARITAL_STATUSES } from '@/features/shared/lib/marital-sta
  * numbers, so a half-typed "6," survives). `toProfile` turns them into the
  * engine's profile; `fromProfile` reopens a saved one.
  */
-
 export type CrsForm = {
   maritalStatus: CrsProfile['maritalStatus'];
   spouseAccompanying: boolean;
@@ -60,7 +59,6 @@ export const DEFAULT_FORM: CrsForm = {
   highWageWork: 'none',
   highWageJobOffer: 'none',
 };
-
 
 export function toProfile(form: CrsForm): CrsProfile {
   return {

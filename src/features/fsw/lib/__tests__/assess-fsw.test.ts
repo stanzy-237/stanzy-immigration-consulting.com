@@ -56,6 +56,18 @@ describe('assessFsw — eligibility', () => {
     expect(a.requirements).toEqual({ firstLanguageClb7: true, oneYearOfWork: true, credential: true });
     expect(a.eligible).toBe(true);
   });
+
+  it('reports the levels it derived from each set of results', () => {
+    // TCF 10/458/453/10 = NCLC 7 in all four.
+    const a = assessed(
+      profile({ firstLanguage: { test: 'TCF', scores: { speaking: 10, listening: 458, reading: 453, writing: 10 } } }),
+    );
+    expect(a.levels).toEqual({
+      first: { speaking: 7, listening: 7, reading: 7, writing: 7 },
+      second: null,
+      spouse: null,
+    });
+  });
 });
 
 describe('assessFsw — the 67-point pass mark', () => {

@@ -64,8 +64,6 @@ export type CrsProfile = {
   highWageJobOffer: HighWageLevel;
 };
 
-export type CrsIssue = CalculatorIssue;
-
 export type CrsBreakdown = {
   rules: RulesVersion;
   total: number;
@@ -100,11 +98,10 @@ export type CrsBreakdown = {
   levels: { first: ClbLevels | null; second: ClbLevels | null; spouse: ClbLevels | null };
 };
 
-export type CrsResult = { ok: true; breakdown: CrsBreakdown } | { ok: false; issues: CrsIssue[] };
+export type CrsResult = { ok: true; breakdown: CrsBreakdown } | { ok: false; issues: CalculatorIssue[] };
 
 const sum = (values: number[]): number => values.reduce((a, b) => a + b, 0);
 const capYears = (years: number, max: number): number => Math.min(Math.max(Math.floor(years), 0), max);
-
 
 const perAbility = (levels: ClbLevels | null, points: readonly number[]): number =>
   levels ? sum(ABILITIES.map((a) => points[levels[a]] ?? 0)) : 0;
@@ -147,7 +144,7 @@ function frenchPoints(tests: { result: LanguageResult | null; levels: ClbLevels 
  * factor that makes it up, or the answers that need fixing first.
  */
 export function computeCrs(profile: CrsProfile, options: { rules: RulesVersion }): CrsResult {
-  const issues: CrsIssue[] = [];
+  const issues: CalculatorIssue[] = [];
   checkCandidate(profile, issues);
   const partner = accompanyingSpouse(profile);
   const levels = {
