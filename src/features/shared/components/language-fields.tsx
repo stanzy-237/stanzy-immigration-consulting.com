@@ -1,11 +1,11 @@
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
-import { LANGUAGE_TESTS, TEST_SPECS } from '@/features/crs/data/language-tests';
-import { ABILITIES, clbLevelFor } from '@/features/crs/lib/compute-crs';
-import { parseScore, type LanguageForm } from '@/features/crs/lib/crs-form';
+import { LANGUAGE_TESTS, TEST_SPECS } from '@/features/shared/data/language-tests';
+import { ABILITIES, clbLevelFor } from '@/features/shared/lib/language-levels';
+import { parseScore, type LanguageForm } from '@/features/shared/lib/language-form';
 
-import { NumberField, SelectField } from '@/features/crs/components/crs-fields';
+import { NumberField, SelectField } from '@/features/shared/components/calculator-fields';
 
 export type LanguageSlot = 'firstLanguage' | 'secondLanguage' | 'spouse';
 
@@ -21,7 +21,7 @@ export function LanguageFields({
   onChange: (value: LanguageForm) => void;
   error?: string;
 }): ReactNode {
-  const t = useTranslations('Crs.language');
+  const t = useTranslations('Calculators.language');
   const short = t(`shortSlots.${slot}`);
   // Abilities carry the names printed on the test report: English for IELTS,
   // CELPIP, PTE Core and CLB; French for TEF, TCF and NCLC — in either UI language.

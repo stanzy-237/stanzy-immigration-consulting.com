@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  ABILITIES,
-  computeCrs,
-  type Ability,
-  type CrsProfile,
-  type LanguageResult,
-} from '@/features/crs/lib/compute-crs';
+import { computeCrs, type CrsProfile } from '@/features/crs/lib/compute-crs';
+import { ABILITIES, type Ability, type LanguageResult } from '@/features/shared/lib/language-levels';
 
 /**
  * Seam: the CRS engine, reading raw test results. Thresholds are the lowest

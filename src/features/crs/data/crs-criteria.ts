@@ -7,17 +7,7 @@
  * the engine tests and the rules version together.
  */
 
-export const EDUCATION_LEVELS = [
-  'lessThanSecondary',
-  'secondary',
-  'oneYear',
-  'twoYear',
-  'bachelors',
-  'twoOrMore',
-  'masters',
-  'doctorate',
-] as const;
-export type EducationLevel = (typeof EDUCATION_LEVELS)[number];
+import type { EducationLevel } from '@/features/shared/data/education-levels';
 
 /** Points by column: candidate with an accompanying spouse, or without. */
 export type WithSpouse<T> = { withSpouse: T; withoutSpouse: T };
@@ -134,7 +124,6 @@ export const CRS_MAX = 1200;
  * an accompanying spouse). IRCC had not yet republished the full CRS grid
  * when this was written; recheck the criteria page once it is.
  */
-export const LABOUR_MARKET_INTEGRATION_FROM = '2026-11-03';
 export const HIGH_WAGE_LEVELS = ['none', '1.3x', '1.5x', '2x'] as const;
 export type HighWageLevel = (typeof HIGH_WAGE_LEVELS)[number];
 /** 12+ months of Canadian work in an occupation at this multiple of the median wage. */

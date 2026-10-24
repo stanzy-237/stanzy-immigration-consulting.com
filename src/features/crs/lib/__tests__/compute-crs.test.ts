@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  computeCrs,
-  rulesInForceOn,
-  type CrsProfile,
-  type LanguageResult,
-} from '@/features/crs/lib/compute-crs';
+import { computeCrs, type CrsProfile } from '@/features/crs/lib/compute-crs';
+import { rulesInForceOn } from '@/features/shared/lib/rules-version';
+import type { LanguageResult } from '@/features/shared/lib/language-levels';
 
 /**
  * Seam: the CRS engine, one pure function from a profile to the breakdown.

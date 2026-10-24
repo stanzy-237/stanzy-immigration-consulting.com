@@ -148,7 +148,7 @@ export function CheckField({
 }
 
 /** One card of the calculator, named by its heading, with the points it earns. */
-export function CrsSection({
+export function CalculatorSection({
   id,
   title,
   points,

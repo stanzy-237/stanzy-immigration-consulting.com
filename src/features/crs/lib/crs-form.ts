@@ -1,22 +1,23 @@
 import { z } from 'zod';
 
-import { EDUCATION_LEVELS, HIGH_WAGE_LEVELS, type EducationLevel, type HighWageLevel } from '@/features/crs/data/crs-criteria';
-import { LANGUAGE_TESTS, type LanguageTest } from '@/features/crs/data/language-tests';
+import { HIGH_WAGE_LEVELS, type HighWageLevel } from '@/features/crs/data/crs-criteria';
+import { EDUCATION_LEVELS, type EducationLevel } from '@/features/shared/data/education-levels';
+import type { CrsProfile } from '@/features/crs/lib/compute-crs';
+import { LANGUAGE_TESTS } from '@/features/shared/data/language-tests';
 import {
-  ABILITIES,
-  isPartnered,
-  MARITAL_STATUSES,
-  type Ability,
-  type CrsProfile,
-  type LanguageResult,
-} from '@/features/crs/lib/compute-crs';
+  emptyLanguage,
+  fromLanguageResult,
+  parseScore,
+  toLanguageResult,
+  type LanguageForm,
+} from '@/features/shared/lib/language-form';
+import { isPartnered, MARITAL_STATUSES } from '@/features/shared/lib/marital-status';
 
 /**
  * The calculator's answers as the visitor types them (strings for typed
  * numbers, so a half-typed "6," survives). `toProfile` turns them into the
  * engine's profile; `fromProfile` reopens a saved one.
  */
-export type LanguageForm = { test: LanguageTest | 'none'; scores: Record<Ability, string> };
 
 export type CrsForm = {
   maritalStatus: CrsProfile['maritalStatus'];
@@ -39,9 +40,6 @@ export type CrsForm = {
   highWageJobOffer: HighWageLevel;
 };
 
-const emptyScores = (): Record<Ability, string> => ({ speaking: '', listening: '', reading: '', writing: '' });
-export const emptyLanguage = (): LanguageForm => ({ test: 'none', scores: emptyScores() });
-
 export const DEFAULT_FORM: CrsForm = {
   maritalStatus: 'single',
   spouseAccompanying: false,
@@ -63,16 +61,6 @@ export const DEFAULT_FORM: CrsForm = {
   highWageJobOffer: 'none',
 };
 
-/** A typed number, accepting a French decimal comma; NaN when blank or not a number. */
-export const parseScore = (raw: string): number => (raw.trim() === '' ? Number.NaN : Number(raw.trim().replace(',', '.')));
-
-/** A test counts once a test is chosen and all four results are typed. */
-function toLanguage(form: LanguageForm | null): LanguageResult | null {
-  if (!form || form.test === 'none') return null;
-  if (ABILITIES.some((a) => form.scores[a].trim() === '')) return null;
-  const scores = Object.fromEntries(ABILITIES.map((a) => [a, parseScore(form.scores[a])])) as Record<Ability, number>;
-  return { test: form.test, scores };
-}
 
 export function toProfile(form: CrsForm): CrsProfile {
   return {
@@ -83,13 +71,13 @@ export function toProfile(form: CrsForm): CrsProfile {
           isCanadianCitizenOrPR: form.spouseIsCanadianCitizenOrPR,
           education: form.spouseEducation,
           canadianWorkYears: form.spouseCanadianWorkYears,
-          language: toLanguage(form.spouseLanguage),
+          language: toLanguageResult(form.spouseLanguage),
         }
       : undefined,
     age: parseScore(form.age),
     education: form.education,
-    firstLanguage: toLanguage(form.firstLanguage),
-    secondLanguage: toLanguage(form.secondLanguage),
+    firstLanguage: toLanguageResult(form.firstLanguage),
+    secondLanguage: toLanguageResult(form.secondLanguage),
     canadianWorkYears: form.canadianWorkYears,
     foreignWorkYears: form.foreignWorkYears,
     certificateOfQualification: form.certificateOfQualification,
@@ -101,11 +89,6 @@ export function toProfile(form: CrsForm): CrsProfile {
   };
 }
 
-const fromLanguage = (result: LanguageResult | null | undefined): LanguageForm =>
-  result
-    ? { test: result.test, scores: Object.fromEntries(ABILITIES.map((a) => [a, String(result.scores[a])])) as Record<Ability, string> }
-    : emptyLanguage();
-
 export function fromProfile(profile: CrsProfile): CrsForm {
   return {
     ...DEFAULT_FORM,
@@ -114,11 +97,11 @@ export function fromProfile(profile: CrsProfile): CrsForm {
     spouseIsCanadianCitizenOrPR: profile.spouse?.isCanadianCitizenOrPR ?? false,
     spouseEducation: profile.spouse?.education ?? 'lessThanSecondary',
     spouseCanadianWorkYears: profile.spouse?.canadianWorkYears ?? 0,
-    spouseLanguage: fromLanguage(profile.spouse?.language),
+    spouseLanguage: fromLanguageResult(profile.spouse?.language),
     age: String(profile.age),
     education: profile.education,
-    firstLanguage: fromLanguage(profile.firstLanguage),
-    secondLanguage: profile.secondLanguage ? fromLanguage(profile.secondLanguage) : null,
+    firstLanguage: fromLanguageResult(profile.firstLanguage),
+    secondLanguage: profile.secondLanguage ? fromLanguageResult(profile.secondLanguage) : null,
     canadianWorkYears: profile.canadianWorkYears,
     foreignWorkYears: profile.foreignWorkYears,
     certificateOfQualification: profile.certificateOfQualification,

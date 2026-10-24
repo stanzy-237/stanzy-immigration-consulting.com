@@ -1,13 +1,8 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
-import {
-  computeCrs,
-  RULES_VERSIONS,
-  rulesInForceOn,
-  type CrsBreakdown,
-  type CrsProfile,
-} from '@/features/crs/lib/compute-crs';
+import { computeCrs, type CrsBreakdown, type CrsProfile } from '@/features/crs/lib/compute-crs';
+import { RULES_VERSIONS, rulesInForceOn } from '@/features/shared/lib/rules-version';
 import { crsProfileSchema } from '@/features/crs/lib/profile-schema';
 import { createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 

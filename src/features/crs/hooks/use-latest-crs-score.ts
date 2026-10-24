@@ -3,7 +3,8 @@
 import { useMemo } from 'react';
 
 import { useStoredDraft } from '@/features/crs/hooks/use-crs-draft';
-import { computeCrs, rulesInForceOn } from '@/features/crs/lib/compute-crs';
+import { computeCrs } from '@/features/crs/lib/compute-crs';
+import { rulesInForceOn } from '@/features/shared/lib/rules-version';
 import { toProfile } from '@/features/crs/lib/crs-form';
 
 /**

@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
-import { EDUCATION_LEVELS, HIGH_WAGE_LEVELS } from '@/features/crs/data/crs-criteria';
-import { LANGUAGE_TESTS } from '@/features/crs/data/language-tests';
-import { MARITAL_STATUSES, type CrsProfile } from '@/features/crs/lib/compute-crs';
+import { HIGH_WAGE_LEVELS } from '@/features/crs/data/crs-criteria';
+import { EDUCATION_LEVELS } from '@/features/shared/data/education-levels';
+import { LANGUAGE_TESTS } from '@/features/shared/data/language-tests';
+import { type CrsProfile } from '@/features/crs/lib/compute-crs';
+import { MARITAL_STATUSES } from '@/features/shared/lib/marital-status';
 
 /**
  * The shape of a CRS profile, for input that crosses a trust boundary (tRPC,

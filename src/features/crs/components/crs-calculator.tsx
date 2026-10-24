@@ -5,29 +5,25 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { withNext } from '@/features/auth/lib/safe-next-path';
-import { EDUCATION_LEVELS, HIGH_WAGE_LEVELS } from '@/features/crs/data/crs-criteria';
+import { HIGH_WAGE_LEVELS } from '@/features/crs/data/crs-criteria';
+import { EDUCATION_LEVELS } from '@/features/shared/data/education-levels';
 import { useCrsDraft } from '@/features/crs/hooks/use-crs-draft';
-import {
-  computeCrs,
-  isPartnered,
-  MARITAL_STATUSES,
-  rulesInForceOn,
-  type CrsProfile,
-  type RulesVersion,
-} from '@/features/crs/lib/compute-crs';
+import { computeCrs, type CrsProfile } from '@/features/crs/lib/compute-crs';
+import { isPartnered, MARITAL_STATUSES } from '@/features/shared/lib/marital-status';
+import { rulesInForceOn, type RulesVersion } from '@/features/shared/lib/rules-version';
 import {
   DEFAULT_FORM,
-  emptyLanguage,
   fromProfile,
   toProfile,
   type CrsForm,
 } from '@/features/crs/lib/crs-form';
+import { emptyLanguage } from '@/features/shared/lib/language-form';
 import { track } from '@/lib/analytics';
 import { useRouter } from '@/i18n/navigation';
 import { api } from '@/trpc/react';
 
-import { CheckField, CrsSection, NumberField, SelectField } from '@/features/crs/components/crs-fields';
-import { LanguageFields } from '@/features/crs/components/language-fields';
+import { CheckField, CalculatorSection, NumberField, SelectField } from '@/features/shared/components/calculator-fields';
+import { LanguageFields } from '@/features/shared/components/language-fields';
 import { SaveSimulationDialog } from '@/features/crs/components/save-simulation-dialog';
 import { SavedSimulations } from '@/features/crs/components/saved-simulations';
 import { ScoreAdvice } from '@/features/crs/components/score-advice';
@@ -48,6 +44,7 @@ const HIGH_WAGE_KEY = { none: 'none', '1.3x': 'x1_3', '1.5x': 'x1_5', '2x': 'x2'
  */
 export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNode {
   const t = useTranslations('Crs');
+  const tLanguage = useTranslations('Calculators.language');
   const format = useFormatter();
   const router = useRouter();
   const { account } = useCurrentAccount();
@@ -149,7 +146,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
           </fieldset>
         ) : null}
 
-        <CrsSection id="family" title={t('sections.family')} accent="steel">
+        <CalculatorSection id="family" title={t('sections.family')} accent="steel">
           <SelectField
             label={t('family.marital')}
             value={form.maritalStatus}
@@ -175,9 +172,9 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
               <p className="text-body-sm text-slate">{t('family.note')}</p>
             </>
           ) : null}
-        </CrsSection>
+        </CalculatorSection>
 
-        <CrsSection id="age" title={t('sections.age')} points={pts(breakdown?.core.age)} accent="rouge">
+        <CalculatorSection id="age" title={t('sections.age')} points={pts(breakdown?.core.age)} accent="rouge">
           <NumberField
             label={t('age.label')}
             value={form.age}
@@ -186,9 +183,9 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
             hint={t('age.hint')}
             error={issueFor('age') ? t('age.invalid') : undefined}
           />
-        </CrsSection>
+        </CalculatorSection>
 
-        <CrsSection id="education" title={t('sections.education')} points={pts(breakdown?.core.education)} accent="navy">
+        <CalculatorSection id="education" title={t('sections.education')} points={pts(breakdown?.core.education)} accent="navy">
           <SelectField
             label={t('education.label')}
             value={form.education}
@@ -196,31 +193,31 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
             onChange={(education) => set('education', education)}
             hint={t('education.hint')}
           />
-        </CrsSection>
+        </CalculatorSection>
 
-        <CrsSection id="first-language" title={t('sections.firstLanguage')} points={pts(breakdown?.core.firstLanguage)} accent="steel">
+        <CalculatorSection id="first-language" title={t('sections.firstLanguage')} points={pts(breakdown?.core.firstLanguage)} accent="steel">
           <LanguageFields slot="firstLanguage" value={form.firstLanguage} onChange={(v) => set('firstLanguage', v)} />
           <button
             type="button"
             onClick={() => set('secondLanguage', form.secondLanguage ? null : emptyLanguage())}
             className="rounded-full border border-fog bg-ice-blue px-4 py-2 text-body-sm font-semibold text-navy-deep transition-colors hover:bg-fog"
           >
-            {form.secondLanguage ? t('language.removeSecond') : t('language.addSecond')}
+            {form.secondLanguage ? tLanguage('removeSecond') : tLanguage('addSecond')}
           </button>
-        </CrsSection>
+        </CalculatorSection>
 
         {form.secondLanguage ? (
-          <CrsSection id="second-language" title={t('sections.secondLanguage')} points={pts(breakdown?.core.secondLanguage)} accent="steel">
+          <CalculatorSection id="second-language" title={t('sections.secondLanguage')} points={pts(breakdown?.core.secondLanguage)} accent="steel">
             <LanguageFields
               slot="secondLanguage"
               value={form.secondLanguage}
               onChange={(v) => set('secondLanguage', v)}
-              error={issueFor('secondLanguage') ? t('language.sameLanguage') : undefined}
+              error={issueFor('secondLanguage') ? tLanguage('sameLanguage') : undefined}
             />
-          </CrsSection>
+          </CalculatorSection>
         ) : null}
 
-        <CrsSection id="work" title={t('sections.work')} points={pts(breakdown?.core.canadianWork)} accent="navy">
+        <CalculatorSection id="work" title={t('sections.work')} points={pts(breakdown?.core.canadianWork)} accent="navy">
           <div className="grid gap-4 sm:grid-cols-2">
             <SelectField
               label={t('work.canadian')}
@@ -262,9 +259,9 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
             checked={form.certificateOfQualification}
             onChange={(v) => set('certificateOfQualification', v)}
           />
-        </CrsSection>
+        </CalculatorSection>
 
-        <CrsSection id="additional" title={t('sections.additional')} points={pts(breakdown?.additional.total)} accent="rouge">
+        <CalculatorSection id="additional" title={t('sections.additional')} points={pts(breakdown?.additional.total)} accent="rouge">
           <CheckField
             label={t('additional.nomination')}
             points="+600"
@@ -289,10 +286,10 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
             </p>
           ) : null}
           {rules === '2025-03-25' ? <p className="text-body-sm text-slate">{t('additional.jobOfferNote')}</p> : null}
-        </CrsSection>
+        </CalculatorSection>
 
         {spouseCounts ? (
-          <CrsSection id="spouse" title={t('sections.spouse')} points={pts(breakdown?.spouse.total)} accent="rouge">
+          <CalculatorSection id="spouse" title={t('sections.spouse')} points={pts(breakdown?.spouse.total)} accent="rouge">
             <SelectField
               label={t('spouse.education')}
               value={form.spouseEducation}
@@ -306,7 +303,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
               onChange={(v) => set('spouseCanadianWorkYears', Number(v))}
             />
             <LanguageFields slot="spouse" value={form.spouseLanguage} onChange={(v) => set('spouseLanguage', v)} />
-          </CrsSection>
+          </CalculatorSection>
         ) : null}
       </div>
 

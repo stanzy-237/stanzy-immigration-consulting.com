@@ -8,7 +8,6 @@ import {
   HIGH_WAGE_JOB_OFFER_POINTS,
   HIGH_WAGE_WORK_POINTS,
   LABOUR_MARKET_INTEGRATION_CAP,
-  LABOUR_MARKET_INTEGRATION_FROM,
   SECOND_LANGUAGE_CAP,
   SECOND_LANGUAGE_POINTS,
   SPOUSE_CANADIAN_WORK_POINTS,
@@ -21,24 +20,18 @@ import {
   TRANSFER_EDUCATION_ROW,
   TRANSFER_FOREIGN_WORK_POINTS,
   TRANSFER_GROUP_CAP,
-  type EducationLevel,
   type HighWageLevel,
 } from '@/features/crs/data/crs-criteria';
-import { TEST_SPECS, type LanguageTest } from '@/features/crs/data/language-tests';
-
-export const ABILITIES = ['speaking', 'listening', 'reading', 'writing'] as const;
-export type Ability = (typeof ABILITIES)[number];
-/** CLB/NCLC per ability: 10 means 10 or more, 0 means below 4. */
-export type ClbLevels = Record<Ability, number>;
-
-/**
- * Results of one official-language test, or levels entered directly (`CLB`
- * for English, `NCLC` for French).
- */
-export type LanguageResult = {
-  test: LanguageTest;
-  scores: Record<Ability, number>;
-};
+import type { EducationLevel } from '@/features/shared/data/education-levels';
+import { TEST_SPECS } from '@/features/shared/data/language-tests';
+import {
+  ABILITIES,
+  clbLevelFor,
+  type ClbLevels,
+  type LanguageResult,
+} from '@/features/shared/lib/language-levels';
+import { isPartnered, type MaritalStatus } from '@/features/shared/lib/marital-status';
+import type { RulesVersion } from '@/features/shared/lib/rules-version';
 
 export type SpouseProfile = {
   isCanadianCitizenOrPR: boolean;
@@ -48,21 +41,6 @@ export type SpouseProfile = {
   canadianWorkYears: number;
   language: LanguageResult | null;
 };
-
-export const MARITAL_STATUSES = [
-  'single',
-  'married',
-  'commonLaw',
-  'divorced',
-  'separated',
-  'widowed',
-  'annulled',
-] as const;
-export type MaritalStatus = (typeof MARITAL_STATUSES)[number];
-
-/** Only a married or common-law candidate can have spouse factors. */
-export const isPartnered = (status: MaritalStatus): boolean =>
-  status === 'married' || status === 'commonLaw';
 
 export type CrsProfile = {
   maritalStatus: MaritalStatus;
@@ -85,20 +63,6 @@ export type CrsProfile = {
   /** From 2026-11-03: a qualifying job offer in a high-wage occupation, by wage level. */
   highWageJobOffer: HighWageLevel;
 };
-
-/**
- * The CRS rules a score follows, named after the day they took effect:
- * `2025-03-25` (job-offer points removed) and `2026-11-03` (labour market
- * integration factor).
- */
-export const RULES_VERSIONS = ['2025-03-25', '2026-11-03'] as const;
-export type RulesVersion = (typeof RULES_VERSIONS)[number];
-
-/** The rules IRCC applies on `date`, read as a calendar day in Ottawa. */
-export function rulesInForceOn(date: Date): RulesVersion {
-  const day = date.toLocaleDateString('en-CA', { timeZone: 'America/Toronto' });
-  return day >= LABOUR_MARKET_INTEGRATION_FROM ? '2026-11-03' : '2025-03-25';
-}
 
 export type CrsIssue = {
   /** Dotted path to the answer to fix, e.g. `firstLanguage.speaking`. */
@@ -144,19 +108,6 @@ export type CrsResult = { ok: true; breakdown: CrsBreakdown } | { ok: false; iss
 
 const sum = (values: number[]): number => values.reduce((a, b) => a + b, 0);
 const capYears = (years: number, max: number): number => Math.min(Math.max(Math.floor(years), 0), max);
-const CLB_STEPS = [10, 9, 8, 7, 6, 5, 4] as const;
-
-/** One ability's CLB/NCLC level (0 below 4), or null when `score` isn't a possible result of `test`. */
-export function clbLevelFor(test: LanguageTest, ability: Ability, score: number): number | null {
-  const spec = TEST_SPECS[test];
-  const { min, max } = spec.range[ability];
-  const steps = (score - min) / spec.step;
-  if (!Number.isFinite(score) || score < min || score > max) return null;
-  if (Math.abs(steps - Math.round(steps)) > 1e-9) return null;
-  if (!spec.thresholds) return score >= 4 ? Math.min(score, 10) : 0;
-  const index = spec.thresholds[ability].findIndex((threshold) => score >= threshold);
-  return index === -1 ? 0 : CLB_STEPS[index]!;
-}
 
 /** Converts a set of results to levels, recording each impossible score as an issue. */
 function levelsFor(

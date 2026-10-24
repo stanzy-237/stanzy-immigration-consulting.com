@@ -544,51 +544,6 @@
       },
       "hint": "« Deux diplômes ou plus » : au moins deux diplômes postsecondaires, dont un d’un programme de 3 ans ou plus."
     },
-    "language": {
-      "test": "Test de la {slot}",
-      "slots": {
-        "firstLanguage": "1re langue officielle",
-        "secondLanguage": "2e langue officielle",
-        "spouse": "langue du conjoint"
-      },
-      "shortSlots": {
-        "firstLanguage": "1re langue",
-        "secondLanguage": "2e langue",
-        "spouse": "Conjoint"
-      },
-      "tests": {
-        "none": "Aucun test",
-        "TEF": "TEF Canada",
-        "TCF": "TCF Canada",
-        "IELTS": "IELTS General Training",
-        "CELPIP": "CELPIP-General",
-        "PTE_CORE": "PTE Core",
-        "NCLC": "Je connais mes niveaux NCLC (français)",
-        "CLB": "Je connais mes niveaux CLB (anglais)"
-      },
-      "field": "{slot} — {ability}",
-      "level": "NCLC/CLB {level}",
-      "belowFour": "Moins de NCLC/CLB 4",
-      "invalid": "Ce résultat n’existe pas pour ce test.",
-      "tefNote": "TEF Canada : entrez les résultats « Équivalence ancien score ».",
-      "addSecond": "Ajouter une 2e langue officielle",
-      "removeSecond": "Retirer la 2e langue officielle",
-      "sameLanguage": "La 2e langue officielle doit être l’autre langue (français ou anglais).",
-      "abilitiesByTestLanguage": {
-        "fr": {
-          "speaking": "Expression orale",
-          "listening": "Compréhension orale",
-          "reading": "Compréhension écrite",
-          "writing": "Expression écrite"
-        },
-        "en": {
-          "speaking": "Speaking",
-          "listening": "Listening",
-          "reading": "Reading",
-          "writing": "Writing"
-        }
-      }
-    },
     "work": {
       "canadian": "Expérience de travail qualifiée au Canada",
       "foreign": "Expérience de travail qualifiée à l’étranger",
@@ -677,6 +632,53 @@
       "confirm": "Enregistrer",
       "saving": "Enregistrement…",
       "error": "L’enregistrement a échoué. Réessayez."
+    }
+  },
+  "Calculators": {
+    "language": {
+      "test": "Test de la {slot}",
+      "slots": {
+        "firstLanguage": "1re langue officielle",
+        "secondLanguage": "2e langue officielle",
+        "spouse": "langue du conjoint"
+      },
+      "shortSlots": {
+        "firstLanguage": "1re langue",
+        "secondLanguage": "2e langue",
+        "spouse": "Conjoint"
+      },
+      "tests": {
+        "none": "Aucun test",
+        "TEF": "TEF Canada",
+        "TCF": "TCF Canada",
+        "IELTS": "IELTS General Training",
+        "CELPIP": "CELPIP-General",
+        "PTE_CORE": "PTE Core",
+        "NCLC": "Je connais mes niveaux NCLC (français)",
+        "CLB": "Je connais mes niveaux CLB (anglais)"
+      },
+      "field": "{slot} — {ability}",
+      "level": "NCLC/CLB {level}",
+      "belowFour": "Moins de NCLC/CLB 4",
+      "invalid": "Ce résultat n’existe pas pour ce test.",
+      "tefNote": "TEF Canada : entrez les résultats « Équivalence ancien score ».",
+      "addSecond": "Ajouter une 2e langue officielle",
+      "removeSecond": "Retirer la 2e langue officielle",
+      "sameLanguage": "La 2e langue officielle doit être l’autre langue (français ou anglais).",
+      "abilitiesByTestLanguage": {
+        "fr": {
+          "speaking": "Expression orale",
+          "listening": "Compréhension orale",
+          "reading": "Compréhension écrite",
+          "writing": "Expression écrite"
+        },
+        "en": {
+          "speaking": "Speaking",
+          "listening": "Listening",
+          "reading": "Reading",
+          "writing": "Writing"
+        }
+      }
     }
   }
 }
