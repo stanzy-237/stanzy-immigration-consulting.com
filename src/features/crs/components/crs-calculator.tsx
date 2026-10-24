@@ -1,18 +1,24 @@
 'use client';
 
 import { useFormatter, useTranslations } from 'next-intl';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { withNext } from '@/features/auth/lib/safe-next-path';
 import { EDUCATION_LEVELS, HIGH_WAGE_LEVELS } from '@/features/crs/data/crs-criteria';
 import { useCrsDraft } from '@/features/crs/hooks/use-crs-draft';
-import { computeCrs, rulesInForceOn, type CrsProfile, type RulesVersion } from '@/features/crs/lib/compute-crs';
+import {
+  computeCrs,
+  isPartnered,
+  MARITAL_STATUSES,
+  rulesInForceOn,
+  type CrsProfile,
+  type RulesVersion,
+} from '@/features/crs/lib/compute-crs';
 import {
   DEFAULT_FORM,
   emptyLanguage,
   fromProfile,
-  isPartnered,
   toProfile,
   type CrsForm,
 } from '@/features/crs/lib/crs-form';
@@ -20,16 +26,18 @@ import { track } from '@/lib/analytics';
 import { useRouter } from '@/i18n/navigation';
 import { api } from '@/trpc/react';
 
-import { CheckField, CrsSection, NumberField, SelectField } from './crs-fields';
-import { LanguageFields } from './language-fields';
-import { SavedSimulations } from './saved-simulations';
-import { ScoreSummary } from './score-summary';
+import { CheckField, CrsSection, NumberField, SelectField } from '@/features/crs/components/crs-fields';
+import { LanguageFields } from '@/features/crs/components/language-fields';
+import { SavedSimulations } from '@/features/crs/components/saved-simulations';
+import { ScoreHints } from '@/features/crs/components/score-hints';
+import { ScoreSummary } from '@/features/crs/components/score-summary';
 
-const MARITAL = ['single', 'married', 'commonLaw', 'divorced', 'separated', 'widowed', 'annulled'] as const;
 const CANADIAN_YEARS = [0, 1, 2, 3, 4, 5] as const;
 /** 0 = none, 1 = 1 to 2 years, 3 = 3 years or more (the transferability rows). */
 const FOREIGN_YEARS = [0, 1, 3] as const;
 const STUDY = ['none', 'oneOrTwoYears', 'threePlusYears'] as const;
+/** Message keys can't contain dots, so wage levels map to their own keys. */
+const HIGH_WAGE_KEY = { none: 'none', '1.3x': 'x1_3', '1.5x': 'x1_5', '2x': 'x2' } as const;
 
 /**
  * The Calculateur CRS: the official questions, scored by the engine as the
@@ -55,8 +63,18 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
   const pts = (points: number | undefined): string =>
     points === undefined ? '—' : t('points', { points });
 
-  const set = <K extends keyof CrsForm>(key: K, value: CrsForm[K]): void => setForm({ ...form, [key]: value });
-  const partnered = isPartnered(form);
+  // Analytics: one event per visit, one on the first answer. No answers are sent.
+  const started = useRef(false);
+  useEffect(() => track('crs.viewed'), []);
+  const update = (next: CrsForm): void => {
+    if (!started.current) {
+      started.current = true;
+      track('crs.started');
+    }
+    setForm(next);
+  };
+  const set = <K extends keyof CrsForm>(key: K, value: CrsForm[K]): void => update({ ...form, [key]: value });
+  const partnered = isPartnered(form.maritalStatus);
   const spouseCounts = partnered && form.spouseAccompanying && !form.spouseIsCanadianCitizenOrPR;
   const yearsOptions = (years: readonly number[], key: 'years' | 'foreignYears') =>
     years.map((y) => ({ value: String(y), label: t(`work.${key}`, { years: y }) }));
@@ -73,21 +91,29 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
     setOffline(false);
     const name = t('summary.defaultName', { date: format.dateTime(today, { dateStyle: 'medium' }) });
     save.mutate(
-      { name, profile: toProfile(form) },
+      { name, profile: toProfile(form), rules },
       {
         onSuccess: (saved) => {
           track('crs.saved', { total: saved.total });
           void utils.crs.list.invalidate();
-          void utils.crs.latest.invalidate();
         },
       },
     );
   };
 
-  const openSaved = (profile: CrsProfile): void => setForm(fromProfile(profile));
+  const openSaved = (profile: CrsProfile): void => update(fromProfile(profile));
 
   return (
-    <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-3">
+    <div className="grid grid-cols-1 items-start gap-7 pb-20 lg:grid-cols-3 lg:pb-0">
+      {/* Phones: the total stays in view while scrolling the questions. The
+          announced score is the one in the result card below. */}
+      <div
+        aria-hidden={true}
+        className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-white/10 bg-navy-deep px-5 py-3 text-white shadow-xl lg:hidden"
+      >
+        <span className="font-label text-xs uppercase tracking-widest text-white/60">{t('summary.total')}</span>
+        <span className="font-heading text-2xl font-bold">{breakdown?.total ?? '—'}</span>
+      </div>
       <div className="min-w-0 space-y-4 lg:col-span-2">
         <p className="text-sm text-slate">
           {t('rulesNote', { date: format.dateTime(new Date(rules), { dateStyle: 'long', timeZone: 'UTC' }) })}
@@ -120,7 +146,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
           <SelectField
             label={t('family.marital')}
             value={form.maritalStatus}
-            options={MARITAL.map((m) => ({ value: m, label: t(`family.maritalOptions.${m}`) }))}
+            options={MARITAL_STATUSES.map((m) => ({ value: m, label: t(`family.maritalOptions.${m}`) }))}
             onChange={(maritalStatus) => set('maritalStatus', maritalStatus)}
           />
           {partnered ? (
@@ -161,6 +187,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
             value={form.education}
             options={EDUCATION_LEVELS.map((e) => ({ value: e, label: t(`education.options.${e}`) }))}
             onChange={(education) => set('education', education)}
+            hint={t('education.hint')}
           />
         </CrsSection>
 
@@ -206,14 +233,14 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
               <SelectField
                 label={t('work.highWageWork')}
                 value={form.highWageWork}
-                options={HIGH_WAGE_LEVELS.map((l) => ({ value: l, label: t(`work.highWageOptions.${l}`) }))}
+                options={HIGH_WAGE_LEVELS.map((l) => ({ value: l, label: t(`work.highWageOptions.${HIGH_WAGE_KEY[l]}`) }))}
                 onChange={(v) => set('highWageWork', v)}
                 hint={t('work.highWageHint')}
               />
               <SelectField
                 label={t('work.highWageJobOffer')}
                 value={form.highWageJobOffer}
-                options={HIGH_WAGE_LEVELS.map((l) => ({ value: l, label: t(`work.highWageOptions.${l}`) }))}
+                options={HIGH_WAGE_LEVELS.map((l) => ({ value: l, label: t(`work.highWageOptions.${HIGH_WAGE_KEY[l]}`) }))}
                 onChange={(v) => set('highWageJobOffer', v)}
               />
               {breakdown?.core.labourMarketIntegration ? (
@@ -280,11 +307,12 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
         <ScoreSummary
           breakdown={breakdown}
           onSave={onSave}
-          onReset={() => setForm(DEFAULT_FORM)}
+          onReset={() => update(DEFAULT_FORM)}
           saving={save.isPending}
           saved={save.isSuccess}
           offline={offline}
         />
+        <ScoreHints profile={toProfile(form)} rules={rules} />
         {account ? <SavedSimulations onOpen={openSaved} /> : null}
       </div>
     </div>

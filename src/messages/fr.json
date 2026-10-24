@@ -541,7 +541,8 @@
         "twoOrMore": "Deux diplômes ou plus, dont un de 3 ans ou plus",
         "masters": "Maîtrise ou diplôme professionnel",
         "doctorate": "Doctorat (PhD)"
-      }
+      },
+      "hint": "« Deux diplômes ou plus » : au moins deux diplômes postsecondaires, dont un d’un programme de 3 ans ou plus."
     },
     "language": {
       "test": "Test de la {slot}",
@@ -590,9 +591,9 @@
       "highWageJobOffer": "Offre d’emploi admissible dans une profession à salaire élevé",
       "highWageOptions": {
         "none": "Non",
-        "1.3x": "Salaire médian au moins 1,3 fois la médiane canadienne",
-        "1.5x": "Au moins 1,5 fois la médiane",
-        "2x": "Au moins 2 fois la médiane"
+        "x1_3": "Salaire médian au moins 1,3 fois la médiane canadienne",
+        "x1_5": "Au moins 1,5 fois la médiane",
+        "x2": "Au moins 2 fois la médiane"
       },
       "highWageHint": "IRCC publie la liste des professions à salaire élevé et leur niveau.",
       "labourMarket": "Intégration au marché du travail : {points} pts (le meilleur entre l’expérience et l’offre d’emploi, sans cumul)"
@@ -630,7 +631,8 @@
       "defaultName": "Simulation du {date}",
       "reset": "Recommencer",
       "disclaimer": "Résultat indicatif selon les critères officiels d’IRCC. Vérifiez votre profil sur le site d’IRCC avant toute démarche.",
-      "consultation": "Réserver une consultation"
+      "consultation": "Réserver une consultation",
+      "max": "/ {max}"
     },
     "simulations": {
       "title": "Mes simulations",
@@ -640,6 +642,13 @@
       "renameLabel": "Nouveau nom pour {name}",
       "confirmRename": "Valider",
       "delete": "Supprimer"
+    },
+    "hints": {
+      "title": "Comment augmenter votre score",
+      "gain": "+{points} pts",
+      "firstLanguageClb9": "Atteindre NCLC/CLB 9 dans les 4 compétences de votre 1re langue officielle",
+      "frenchNclc7": "Obtenir NCLC 7 ou plus en français dans les 4 compétences",
+      "canadianWorkYear": "Une année d’expérience canadienne qualifiée de plus"
     }
   }
 }

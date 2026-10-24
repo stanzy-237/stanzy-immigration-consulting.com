@@ -4,6 +4,8 @@ import { EDUCATION_LEVELS, HIGH_WAGE_LEVELS, type EducationLevel, type HighWageL
 import { LANGUAGE_TESTS, type LanguageTest } from '@/features/crs/data/language-tests';
 import {
   ABILITIES,
+  isPartnered,
+  MARITAL_STATUSES,
   type Ability,
   type CrsProfile,
   type LanguageResult,
@@ -72,13 +74,10 @@ function toLanguage(form: LanguageForm | null): LanguageResult | null {
   return { test: form.test, scores };
 }
 
-export const isPartnered = (form: CrsForm): boolean =>
-  form.maritalStatus === 'married' || form.maritalStatus === 'commonLaw';
-
 export function toProfile(form: CrsForm): CrsProfile {
   return {
     maritalStatus: form.maritalStatus,
-    spouse: isPartnered(form)
+    spouse: isPartnered(form.maritalStatus)
       ? {
           accompanying: form.spouseAccompanying,
           isCanadianCitizenOrPR: form.spouseIsCanadianCitizenOrPR,
@@ -138,7 +137,7 @@ const languageForm = z.object({
 
 /** Validates a draft read back from browser storage; anything else is discarded. */
 export const crsFormSchema = z.object({
-  maritalStatus: z.enum(['single', 'married', 'commonLaw', 'divorced', 'separated', 'widowed', 'annulled']),
+  maritalStatus: z.enum(MARITAL_STATUSES),
   spouseAccompanying: z.boolean(),
   spouseIsCanadianCitizenOrPR: z.boolean(),
   spouseEducation: z.enum(EDUCATION_LEVELS),

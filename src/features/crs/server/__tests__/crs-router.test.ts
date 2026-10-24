@@ -113,6 +113,19 @@ describe('crs router', () => {
     });
   });
 
+  it('saves under the rules the visitor previewed, so the saved total matches the screen', async () => {
+    // Under 2026-11-03: A 354 + labour market integration (64 + 70 = 134);
+    // C: education 25 + 25 = 50, foreign work 50 + 50 → 50 → 100. Total 588.
+    const caller = callerAs(fakeDatabase(), AMINATA);
+    const saved = await caller.crs.save({
+      name: 'Après le 3 novembre',
+      profile: { ...PROFILE, canadianWorkYears: 3, highWageWork: '2x' },
+      rules: '2026-11-03',
+    });
+
+    expect(saved).toMatchObject({ total: 588, rules: '2026-11-03' });
+  });
+
   it('refuses a profile the engine cannot score as BAD_REQUEST', async () => {
     const bad = { ...PROFILE, age: 200 };
     await expect(
@@ -132,14 +145,6 @@ describe('crs router', () => {
 
     await caller.crs.delete({ id: second.id });
     expect((await caller.crs.list()).map((s) => s.id)).toEqual([first.id]);
-  });
-
-  it('gives the latest score for the hero card, or null', async () => {
-    const caller = callerAs(fakeDatabase(), AMINATA);
-    expect(await caller.crs.latest()).toBeNull();
-
-    await caller.crs.save({ name: 'Moi', profile: PROFILE });
-    expect(await caller.crs.latest()).toEqual({ total: 429 });
   });
 
   it("never shows or changes another Account's simulations", async () => {

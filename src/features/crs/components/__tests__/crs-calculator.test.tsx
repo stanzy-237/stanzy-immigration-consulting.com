@@ -19,7 +19,7 @@ vi.mock('@/features/auth/lib/auth-client', () => ({
 const save = vi.fn();
 vi.mock('@/trpc/react', () => ({
   api: {
-    useUtils: () => ({ crs: { list: { invalidate: vi.fn() }, latest: { invalidate: vi.fn() } } }),
+    useUtils: () => ({ crs: { list: { invalidate: vi.fn() } } }),
     crs: {
       save: { useMutation: () => ({ mutate: save, isPending: false, isSuccess: false }) },
       list: { useQuery: () => ({ data: [] }) },
@@ -114,6 +114,50 @@ describe('CrsCalculator', () => {
     fireEvent.click(screen.getByLabelText('Mon époux(se) ou conjoint(e) est citoyen(ne) canadien(ne) ou résident(e) permanent(e)'));
     expect(screen.queryByRole('region', { name: 'Facteurs du conjoint' })).not.toBeInTheDocument();
     expect(total()).toHaveTextContent('225');
+  });
+
+  it('previews the 2026-11-03 rules: high-wage experience joins the Canadian work points', () => {
+    renderCalculator();
+    expect(screen.queryByLabelText(/profession à salaire élevé/)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText('À partir du 3 novembre 2026'));
+    fireEvent.change(screen.getByLabelText('Expérience de travail qualifiée au Canada'), {
+      target: { value: '3' },
+    });
+    const highWage = screen.getByLabelText(
+      '12 mois ou plus d’expérience canadienne dans une profession à salaire élevé',
+    );
+    expect(within(highWage).getByRole('option', { name: 'Au moins 2 fois la médiane' })).toBeInTheDocument();
+    fireEvent.change(highWage, { target: { value: '2x' } });
+
+    // 225 + labour market integration (64 + 70 = 134) + bachelor's & 3 yrs Canada 25 = 384.
+    expect(total()).toHaveTextContent('384');
+  });
+
+  it('flags a second language in the same language as the first as an error', () => {
+    renderCalculator();
+    fireEvent.change(screen.getByLabelText('Test de la 1re langue officielle'), { target: { value: 'IELTS' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter une 2e langue officielle' }));
+    const second = screen.getByLabelText('Test de la 2e langue officielle');
+    fireEvent.change(second, { target: { value: 'CELPIP' } });
+    for (const skill of ['Expression orale', 'Compréhension orale', 'Compréhension écrite', 'Expression écrite']) {
+      fireEvent.change(screen.getByLabelText(`1re langue — ${skill}`), { target: { value: '7' } });
+      fireEvent.change(screen.getByLabelText(`2e langue — ${skill}`), { target: { value: '7' } });
+    }
+
+    expect(second).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByText(/doit être l’autre langue/)).toBeInTheDocument();
+  });
+
+  it('suggests what would raise the score most, with the points it would add', () => {
+    renderCalculator();
+    const hints = within(screen.getByRole('region', { name: 'Comment augmenter votre score' })).getAllByRole('listitem');
+
+    // CLB 9 everywhere: 31×4 = 124 + bachelor's & CLB 9 = 25 → +149.
+    expect(hints[0]).toHaveTextContent('NCLC/CLB 9');
+    expect(hints[0]).toHaveTextContent('+149');
+    // One year in Canada: 40 + bachelor's & 1 yr = 13 → +53.
+    expect(hints.some((h) => /expérience canadienne/.test(h.textContent ?? '') && /\+53/.test(h.textContent ?? ''))).toBe(true);
   });
 
   it('adds the provincial nomination', () => {

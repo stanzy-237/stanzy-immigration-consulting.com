@@ -41,12 +41,14 @@ export function SelectField<T extends string>({
   options,
   onChange,
   hint,
+  error,
 }: {
   label: string;
   value: T;
   options: readonly { value: T; label: string }[];
   onChange: (value: T) => void;
   hint?: ReactNode;
+  error?: ReactNode;
 }): ReactNode {
   const id = useId();
   return (
@@ -59,7 +61,8 @@ export function SelectField<T extends string>({
           id={id}
           className={cn(CONTROL, 'appearance-none pr-10')}
           value={value}
-          aria-describedby={describedBy(id, hint)}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy(id, hint, error)}
           onChange={(e) => onChange(e.target.value as T)}
         >
           {options.map((option) => (
@@ -73,7 +76,7 @@ export function SelectField<T extends string>({
           className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate"
         />
       </span>
-      <Described id={id} hint={hint} />
+      <Described id={id} hint={hint} error={error} />
     </div>
   );
 }

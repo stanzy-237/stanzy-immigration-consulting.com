@@ -25,10 +25,10 @@ export function ScoreSummary({
   const t = useTranslations('Crs.summary');
   const total = breakdown?.total ?? null;
   const parts = [
-    ['core', breakdown?.core.total],
-    ['spouse', breakdown?.spouse.total],
-    ['transferability', breakdown?.transferability.total],
-    ['additional', breakdown?.additional.total],
+    ['core', breakdown?.core.total, breakdown?.maxima.core],
+    ['spouse', breakdown?.spouse.total, breakdown?.maxima.spouse],
+    ['transferability', breakdown?.transferability.total, breakdown?.maxima.transferability],
+    ['additional', breakdown?.additional.total, breakdown?.maxima.additional],
   ] as const;
 
   return (
@@ -46,10 +46,15 @@ export function ScoreSummary({
           />
         </div>
         <dl className="grid grid-cols-2 gap-2">
-          {parts.map(([key, value]) => (
+          {parts.map(([key, value, max]) => (
             <div key={key} className="rounded-xl bg-white/5 p-3">
               <dt className="font-label text-xs uppercase tracking-wide text-white/50">{t(`parts.${key}`)}</dt>
-              <dd className="mt-1 font-heading text-xl font-bold">{value ?? '—'}</dd>
+              <dd className="mt-1 font-heading text-xl font-bold">
+                {value ?? '—'}
+                {max !== undefined ? (
+                  <span className="ml-1 font-body text-xs font-normal text-white/50">{t('max', { max })}</span>
+                ) : null}
+              </dd>
             </div>
           ))}
         </dl>

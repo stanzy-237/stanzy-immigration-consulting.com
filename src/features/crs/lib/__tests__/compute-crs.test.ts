@@ -299,3 +299,26 @@ describe('computeCrs — answers to fix', () => {
     });
   });
 });
+
+describe('computeCrs — maximums per part', () => {
+  it.each([
+    // IRCC: core/human capital max 500 without a spouse, 460 with one (+40 spouse factors).
+    ['without a spouse', profile(), { core: 500, spouse: 0, transferability: 100, additional: 600 }],
+    [
+      'with an accompanying spouse',
+      profile({
+        maritalStatus: 'married',
+        spouse: {
+          isCanadianCitizenOrPR: false,
+          accompanying: true,
+          education: 'secondary',
+          canadianWorkYears: 0,
+          language: null,
+        },
+      }),
+      { core: 460, spouse: 40, transferability: 100, additional: 600 },
+    ],
+  ])('reports the maximum of each part %s', (_case, p, maxima) => {
+    expect(scored(p).maxima).toEqual(maxima);
+  });
+});

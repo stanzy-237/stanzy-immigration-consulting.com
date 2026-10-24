@@ -49,8 +49,23 @@ export type SpouseProfile = {
   language: LanguageResult | null;
 };
 
+export const MARITAL_STATUSES = [
+  'single',
+  'married',
+  'commonLaw',
+  'divorced',
+  'separated',
+  'widowed',
+  'annulled',
+] as const;
+export type MaritalStatus = (typeof MARITAL_STATUSES)[number];
+
+/** Only a married or common-law candidate can have spouse factors. */
+export const isPartnered = (status: MaritalStatus): boolean =>
+  status === 'married' || status === 'commonLaw';
+
 export type CrsProfile = {
-  maritalStatus: 'single' | 'married' | 'commonLaw' | 'divorced' | 'separated' | 'widowed' | 'annulled';
+  maritalStatus: MaritalStatus;
   /** Only read when married or common-law. */
   spouse?: SpouseProfile;
   age: number;
@@ -76,7 +91,8 @@ export type CrsProfile = {
  * `2025-03-25` (job-offer points removed) and `2026-11-03` (labour market
  * integration factor).
  */
-export type RulesVersion = '2025-03-25' | '2026-11-03';
+export const RULES_VERSIONS = ['2025-03-25', '2026-11-03'] as const;
+export type RulesVersion = (typeof RULES_VERSIONS)[number];
 
 /** The rules IRCC applies on `date`, read as a calendar day in Ottawa. */
 export function rulesInForceOn(date: Date): RulesVersion {
@@ -118,6 +134,8 @@ export type CrsBreakdown = {
     french: number;
     total: number;
   };
+  /** The most each part can reach for this candidate under these rules. */
+  maxima: { core: number; spouse: number; transferability: number; additional: number };
   /** The CLB/NCLC levels the engine derived from each set of results. */
   levels: { first: ClbLevels | null; second: ClbLevels | null; spouse: ClbLevels | null };
 };
@@ -177,8 +195,7 @@ const pick = (grid: readonly number[], column: 0 | 1 | 2): number =>
 /** The spouse counts only when married or common-law, not a citizen or PR, and coming along. */
 function accompanyingSpouse(profile: CrsProfile): SpouseProfile | null {
   const { spouse } = profile;
-  const partnered = profile.maritalStatus === 'married' || profile.maritalStatus === 'commonLaw';
-  return partnered && spouse && spouse.accompanying && !spouse.isCanadianCitizenOrPR ? spouse : null;
+  return isPartnered(profile.maritalStatus) && spouse && spouse.accompanying && !spouse.isCanadianCitizenOrPR ? spouse : null;
 }
 
 /** D. French: NCLC 7+ on all four, plus 25 or 50 depending on English. */
@@ -307,6 +324,23 @@ export function computeCrs(profile: CrsProfile, options: { rules: RulesVersion }
       spouse,
       transferability,
       additional,
+      maxima: {
+        core:
+          Math.max(...Object.values(AGE_POINTS[column])) +
+          Math.max(...Object.values(EDUCATION_POINTS[column])) +
+          4 * Math.max(...FIRST_LANGUAGE_POINTS[column]) +
+          SECOND_LANGUAGE_CAP[column] +
+          (options.rules === '2026-11-03'
+            ? LABOUR_MARKET_INTEGRATION_CAP[column]
+            : Math.max(...CANADIAN_WORK_POINTS[column])),
+        spouse: partner
+          ? Math.max(...Object.values(SPOUSE_EDUCATION_POINTS)) +
+            SPOUSE_LANGUAGE_CAP +
+            Math.max(...SPOUSE_CANADIAN_WORK_POINTS)
+          : 0,
+        transferability: TRANSFER_CAP,
+        additional: ADDITIONAL_CAP,
+      },
       levels,
     },
   };

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { EDUCATION_LEVELS, HIGH_WAGE_LEVELS } from '@/features/crs/data/crs-criteria';
 import { LANGUAGE_TESTS } from '@/features/crs/data/language-tests';
-import type { CrsProfile } from '@/features/crs/lib/compute-crs';
+import { MARITAL_STATUSES, type CrsProfile } from '@/features/crs/lib/compute-crs';
 
 /**
  * The shape of a CRS profile, for input that crosses a trust boundary (tRPC,
@@ -23,15 +23,7 @@ const languageResult = z
 const years = z.number().int().min(0).max(50);
 
 export const crsProfileSchema = z.object({
-  maritalStatus: z.enum([
-    'single',
-    'married',
-    'commonLaw',
-    'divorced',
-    'separated',
-    'widowed',
-    'annulled',
-  ]),
+  maritalStatus: z.enum(MARITAL_STATUSES),
   spouse: z
     .object({
       isCanadianCitizenOrPR: z.boolean(),

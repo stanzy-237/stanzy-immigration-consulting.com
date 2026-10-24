@@ -5,7 +5,7 @@ import { LANGUAGE_TESTS } from '@/features/crs/data/language-tests';
 import { ABILITIES, clbLevelFor } from '@/features/crs/lib/compute-crs';
 import { parseScore, type LanguageForm } from '@/features/crs/lib/crs-form';
 
-import { NumberField, SelectField } from './crs-fields';
+import { NumberField, SelectField } from '@/features/crs/components/crs-fields';
 
 export type LanguageSlot = 'firstLanguage' | 'secondLanguage' | 'spouse';
 
@@ -31,7 +31,8 @@ export function LanguageFields({
         value={value.test}
         options={(['none', ...LANGUAGE_TESTS] as const).map((test) => ({ value: test, label: t(`tests.${test}`) }))}
         onChange={(test) => onChange({ ...value, test })}
-        hint={value.test === 'TEF' ? t('tefNote') : error}
+        hint={value.test === 'TEF' ? t('tefNote') : undefined}
+        error={error}
       />
       {value.test === 'none' ? null : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
