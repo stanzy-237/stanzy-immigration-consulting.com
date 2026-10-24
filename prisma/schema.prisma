@@ -25,23 +25,24 @@ datasource db {
 
 /// One person's login on the platform (GLOSSARY: Account).
 model Account {
-  id             String          @id
-  name           String
-  email          String          @unique
-  emailVerified  Boolean         @default(false)
-  image          String?
+  id                String             @id
+  name              String
+  email             String             @unique
+  emailVerified     Boolean            @default(false)
+  image             String?
   /// Language the Account signed up in; drives email copy. `fr` | `en`.
-  locale         String          @default("fr")
+  locale            String             @default("fr")
   /// Commercial journey; moves forward only (src/features/auth/lib/account-status.ts).
-  status         AccountStatus   @default(USER)
+  status            AccountStatus      @default(USER)
   /// Access level; CONSULTANT comes only from CONSULTANT_EMAILS, PARTNER only
   /// from the consultant.
-  role           AccountRole     @default(MEMBER)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  sessions       Session[]
-  identities     AuthIdentity[]
-  crsSimulations CrsSimulation[]
+  role              AccountRole        @default(MEMBER)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  sessions          Session[]
+  identities        AuthIdentity[]
+  crsSimulations    CrsSimulation[]
+  pushSubscriptions PushSubscription[]
 
   @@map("account")
 }
@@ -139,4 +140,61 @@ model CrsSimulation {
 
   @@index([accountId, updatedAt])
   @@map("crs_simulation")
+}
+
+// ─── Derniers tirages (#49) ──────────────────────────────────────────────────
+
+/// GLOSSARY: Type de tirage, as the filter chips group them.
+enum DrawGroup {
+  GENERAL
+  PNP
+  CEC
+  FRENCH
+  CATEGORY
+}
+
+/// One Entrée Express round from IRCC's feed (GLOSSARY: Tirage).
+model Draw {
+  /// IRCC's draw number as published: usually digits, once "91a"/"91b".
+  round       String    @id
+  roundNumber Int
+  date        DateTime  @db.Date
+  /// IRCC's drawName, as published (English).
+  typeLabel   String
+  group       DrawGroup
+  invitations Int
+  crsMin      Int
+  irccUrl     String?
+  /// The feed's object for this round, untouched.
+  raw         Json
+  firstSeenAt DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  /// Set once the Alerte tirage went out (or, for the backfill, never will).
+  notifiedAt  DateTime?
+
+  @@index([date(sort: Desc), roundNumber(sort: Desc)])
+  @@map("draw")
+}
+
+/// When ingestion last read IRCC's feed successfully. One row, id "ircc".
+model DrawSync {
+  id       String   @id
+  syncedAt DateTime
+
+  @@map("draw_sync")
+}
+
+/// One device opted in to Alertes tirages (Web Push).
+model PushSubscription {
+  endpoint  String   @id
+  p256dh    String
+  auth      String
+  /// Language the alert is written in. `fr` | `en`.
+  locale    String   @default("fr")
+  accountId String?
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([accountId])
+  @@map("push_subscription")
 }

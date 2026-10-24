@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { ToolPlaceholderView } from '@/features/tool-placeholder/views/tool-placeholder-view';
+import { DrawsView } from '@/features/draws/views/draws-view';
 import type { LocaleParams } from '@/i18n/routing';
 
 export async function generateMetadata({
@@ -9,11 +9,8 @@ export async function generateMetadata({
   params: LocaleParams;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({
-    locale,
-    namespace: 'Home.ToolsGrid.Items',
-  });
-  return { title: t('drawName') };
+  const t = await getTranslations({ locale, namespace: 'Draws' });
+  return { title: t('metaTitle') };
 }
 
 export default async function Page({
@@ -23,5 +20,5 @@ export default async function Page({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ToolPlaceholderView slug="draw" />;
+  return <DrawsView />;
 }

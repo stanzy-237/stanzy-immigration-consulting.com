@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { ConsultationCta } from '@/features/landing/components/consultation-cta';
 import { Draws } from '@/features/landing/components/draws';
@@ -11,13 +11,50 @@ import { WhyStanzy } from '@/features/landing/components/why-stanzy';
 
 import { withIntl } from './test-utils';
 
+const latest = vi.hoisted(() => ({
+  data: undefined as unknown,
+}));
+vi.mock('@/trpc/react', () => ({
+  api: { draws: { latest: { useQuery: () => latest } } },
+}));
+
+const draw = (round: number, typeLabel: string, group: string, crsMin: number) => ({
+  round: String(round),
+  roundNumber: round,
+  date: `2026-10-${round - 434}`,
+  typeLabel,
+  group,
+  invitations: 1500,
+  crsMin,
+  irccUrl: null,
+  crsChange: null,
+});
+
 describe('Draws', () => {
-  it('shows the featured round and three secondary rounds', () => {
+  it('shows the latest stored round and the three before it', () => {
+    latest.data = {
+      lastSyncedAt: new Date(),
+      draws: [
+        draw(450, 'French-Language proficiency 2026-Version 2', 'FRENCH', 435),
+        draw(449, 'Canadian Experience Class', 'CEC', 519),
+        draw(448, 'Provincial Nominee Program', 'PNP', 772),
+        draw(447, 'Trades Occupations, 2026-Version 3', 'CATEGORY', 476),
+      ],
+    };
     render(withIntl(<Draws />));
-    expect(screen.getByText(/#345/)).toBeInTheDocument();
-    expect(screen.getByText('#344')).toBeInTheDocument();
-    expect(screen.getByText('#343')).toBeInTheDocument();
-    expect(screen.getByText('#342')).toBeInTheDocument();
+    expect(screen.getByText(/#450/)).toBeInTheDocument();
+    expect(screen.getAllByText('Connaissance du français').length).toBeGreaterThan(0);
+    for (const round of ['449', '448', '447']) {
+      expect(screen.getByRole('heading', { name: `Tirage #${round}` })).toBeInTheDocument();
+    }
+    expect(screen.getAllByText('15 oct. 2026').length).toBeGreaterThan(0);
+  });
+
+  it('shows only the header and link until the first rounds are stored', () => {
+    latest.data = { lastSyncedAt: null, draws: [] };
+    render(withIntl(<Draws />));
+    expect(screen.queryByText(/#\d+/)).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Voir les derniers tirages/i })).toBeInTheDocument();
   });
   it('exposes a "latest draws" CTA linking to the dernier-tirage tool', () => {
     render(withIntl(<Draws />));

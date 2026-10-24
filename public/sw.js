@@ -12,7 +12,7 @@
  * own tickets; this is the shell they cache into.
  */
 
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const SHELL_CACHE = `stanzy-shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `stanzy-assets-${CACHE_VERSION}`;
 
@@ -25,6 +25,9 @@ const PRECACHE_URLS = [
   '/en/outils/crs',
   '/fr/outils/67-points',
   '/en/outils/67-points',
+  // Derniers tirages (#49): the last loaded page opens offline.
+  '/fr/outils/dernier-tirage',
+  '/en/outils/dernier-tirage',
   '/manifest.webmanifest',
 ];
 
@@ -99,3 +102,44 @@ async function networkFirst(request) {
     throw error;
   }
 }
+
+// ─── Alertes tirages (#49) ───────────────────────────────────────────────────
+// The server sends { title, body, url, tag } for each new Tirage. `tag` makes
+// a repeated alert replace the first instead of stacking.
+
+self.addEventListener('push', (event) => {
+  let alert;
+  try {
+    alert = event.data ? event.data.json() : null;
+  } catch {
+    alert = null;
+  }
+  if (!alert || !alert.title) return;
+
+  event.waitUntil(
+    self.registration.showNotification(alert.title, {
+      body: alert.body,
+      tag: alert.tag,
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      data: { url: alert.url || '/fr/outils/dernier-tirage' },
+    }),
+  );
+});
+
+// Tapping the alert focuses an open Stanzy window on the draws page, or opens one.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || '/fr/outils/dernier-tirage', self.location.origin);
+  if (target.origin !== self.location.origin) return;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+      const open = windows.find((client) => new URL(client.url).origin === target.origin);
+      if (open) {
+        return open.focus().then((client) => client.navigate(target.href));
+      }
+      return self.clients.openWindow(target.href);
+    }),
+  );
+});

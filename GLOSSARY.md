@@ -23,6 +23,13 @@ _Avoid_: "invitation" unqualified.
 **Tirage** (Draw / round of invitations):
 A periodic selection from the Entrée Express pool, with a date and a CRS cut-off. The "latest draw" tool reports the most recent one.
 
+**Type de tirage** (Draw type):
+What a Tirage targeted, as IRCC names it ("Provincial Nominee Program", "French-Language proficiency 2026-Version 2", …). Grouped for filtering into Général, PNP, CEC, Français and Catégorie (every category-based round: STEM, santé, métiers, transport, …).
+
+**Alerte tirage** (Draw alert):
+A push notification sent to every device that opted in, each time a new Tirage is published. Sent to everyone, whatever their CRS score: it tells people a round happened, not whether they were invited.
+_Avoid_: "ITA alert" (an ITA is the invitation a candidate receives, not the round).
+
 **CNP** (Classification nationale des professions / NOC):
 Canada's occupation classification. Each job maps to a CNP code, which determines Entrée Express eligibility. Subject of the code-search tool.
 _Avoid_: NOC in product-facing French copy; use CNP.
