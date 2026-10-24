@@ -12,11 +12,19 @@
  * own tickets; this is the shell they cache into.
  */
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const SHELL_CACHE = `stanzy-shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `stanzy-assets-${CACHE_VERSION}`;
 
-const PRECACHE_URLS = ['/fr', '/en', '/manifest.webmanifest'];
+// The CRS calculator computes in the browser, so its page is precached too:
+// once installed, it opens and scores offline (#5).
+const PRECACHE_URLS = [
+  '/fr',
+  '/en',
+  '/fr/outils/crs',
+  '/en/outils/crs',
+  '/manifest.webmanifest',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

@@ -12,6 +12,10 @@ Canada's federal online system for managing skilled-worker immigration applicati
 **CRS** (Comprehensive Ranking System / Système de classement global):
 The points score that ranks candidates in the Entrée Express pool. Subject of the main calculator tool.
 
+**Simulation**:
+A set of answers to the CRS questions and the score they give, which a person can save to their Account and compare with others (e.g. "après TEF").
+_Avoid_: "estimate", "profile" (IRCC's profile is the real one in the Entrée Express pool).
+
 **ITA** (Invitation to Apply / Invitation à présenter une demande):
 The invitation issued to a candidate after a draw, starting the clock to submit a full application.
 _Avoid_: "invitation" unqualified.

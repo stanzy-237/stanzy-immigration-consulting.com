@@ -310,7 +310,9 @@
         "unit": "pts",
         "sub": "Latest Express Entry draw",
         "status": "ITA likely",
-        "cta": "Compute my score →"
+        "cta": "Compute my score →",
+        "yourTag": "Your CRS score",
+        "yourSub": "Your latest simulation"
       }
     },
     "Footer": {
@@ -480,6 +482,173 @@
       "invalidTitle": "Invalid or expired link",
       "invalidBody": "This reset link has already been used or has expired. Request a new one: it arrives within a few minutes.",
       "requestNew": "Request a new link"
+    }
+  },
+  "Crs": {
+    "eyebrow": "Express Entry · free tool",
+    "title": "CRS calculator",
+    "titleAccent": "Express Entry",
+    "lead": "The Comprehensive Ranking System, scored with IRCC’s official criteria. Maximum score: 1,200 points.",
+    "rulesNote": "Official criteria in force on {date}.",
+    "rulesChoice": {
+      "legend": "Rules applied",
+      "current": "Current rules",
+      "upcoming": "From November 3, 2026",
+      "hint": "On November 3, 2026, IRCC replaces Canadian work experience points with the “labour market integration” factor and brings back points for some job offers."
+    },
+    "points": "{points} pts",
+    "noneOption": "None",
+    "sections": {
+      "family": "Family situation",
+      "age": "Age",
+      "education": "Education",
+      "firstLanguage": "First official language",
+      "secondLanguage": "Second official language",
+      "work": "Work experience",
+      "additional": "Additional points",
+      "spouse": "Spouse factors"
+    },
+    "family": {
+      "marital": "Your marital status",
+      "maritalOptions": {
+        "single": "Never married / single",
+        "married": "Married",
+        "commonLaw": "Common-law",
+        "divorced": "Divorced",
+        "separated": "Legally separated",
+        "widowed": "Widowed",
+        "annulled": "Annulled marriage"
+      },
+      "accompanying": "Will your spouse or common-law partner come with you to Canada?",
+      "accompanyingYes": "Yes, they will come with me",
+      "accompanyingNo": "No",
+      "citizenOrPR": "My spouse or common-law partner is a Canadian citizen or permanent resident",
+      "note": "Spouse factors only count if they come with you and are neither a citizen nor a permanent resident."
+    },
+    "age": {
+      "label": "Your age",
+      "hint": "Your age on the day you create your profile or get an invitation.",
+      "invalid": "Enter a valid age."
+    },
+    "education": {
+      "label": "Your highest level of education",
+      "options": {
+        "lessThanSecondary": "Less than secondary school",
+        "secondary": "Secondary diploma",
+        "oneYear": "One-year post-secondary program",
+        "twoYear": "Two-year post-secondary program",
+        "bachelors": "Bachelor’s degree or a program of 3+ years",
+        "twoOrMore": "Two or more credentials, one of 3+ years",
+        "masters": "Master’s or professional degree",
+        "doctorate": "Doctorate (PhD)"
+      },
+      "hint": "“Two or more credentials”: at least two post-secondary credentials, one of them from a program of 3 years or more."
+    },
+    "language": {
+      "test": "{slot} test",
+      "slots": {
+        "firstLanguage": "First official language",
+        "secondLanguage": "Second official language",
+        "spouse": "Spouse’s language"
+      },
+      "shortSlots": {
+        "firstLanguage": "First language",
+        "secondLanguage": "Second language",
+        "spouse": "Spouse"
+      },
+      "tests": {
+        "none": "No test",
+        "TEF": "TEF Canada",
+        "TCF": "TCF Canada",
+        "IELTS": "IELTS General Training",
+        "CELPIP": "CELPIP-General",
+        "PTE_CORE": "PTE Core",
+        "NCLC": "I know my NCLC levels (French)",
+        "CLB": "I know my CLB levels (English)"
+      },
+      "abilities": {
+        "speaking": "Speaking",
+        "listening": "Listening",
+        "reading": "Reading",
+        "writing": "Writing"
+      },
+      "field": "{slot} — {ability}",
+      "level": "CLB/NCLC {level}",
+      "belowFour": "Below CLB/NCLC 4",
+      "invalid": "This result does not exist for this test.",
+      "tefNote": "TEF Canada: enter the “Équivalence ancien score” results.",
+      "addSecond": "Add a second official language",
+      "removeSecond": "Remove the second official language",
+      "sameLanguage": "The second official language must be the other language (French or English)."
+    },
+    "work": {
+      "canadian": "Skilled work experience in Canada",
+      "foreign": "Skilled work experience outside Canada",
+      "years": "{years, plural, =0 {None} one {# year} =5 {5 years or more} other {# years}}",
+      "foreignYears": "{years, plural, =0 {None} =1 {1 to 2 years} other {3 years or more}}",
+      "certificate": "I hold a certificate of qualification from a province or territory (skilled trade)",
+      "highWageWork": "12+ months of Canadian experience in a high-wage occupation",
+      "highWageJobOffer": "Qualifying job offer in a high-wage occupation",
+      "highWageOptions": {
+        "none": "No",
+        "x1_3": "Median wage at least 1.3 times Canada’s median",
+        "x1_5": "At least 1.5 times the median",
+        "x2": "At least 2 times the median"
+      },
+      "highWageHint": "IRCC publishes the list of high-wage occupations and their level.",
+      "labourMarket": "Labour market integration: {points} pts (the better of experience and job offer, never both)"
+    },
+    "additional": {
+      "nomination": "Provincial or territorial nomination (PNP)",
+      "sibling": "Brother or sister in Canada, citizen or permanent resident, 18 or older",
+      "study": "Post-secondary studies in Canada",
+      "studyOptions": {
+        "none": "None",
+        "oneOrTwoYears": "One- or two-year program",
+        "threePlusYears": "Program of 3 years or more"
+      },
+      "french": "French bonus (NCLC 7+ in all 4 abilities): {points} pts",
+      "jobOfferNote": "Job offer points were removed on March 25, 2025."
+    },
+    "spouse": {
+      "education": "Spouse’s level of education",
+      "canadianWork": "Spouse’s work experience in Canada"
+    },
+    "summary": {
+      "label": "Your score",
+      "total": "Total CRS score",
+      "outOf": "out of 1,200 points",
+      "invalid": "Fix the flagged answers to get your score.",
+      "parts": {
+        "core": "A — Core / human capital",
+        "spouse": "B — Spouse",
+        "transferability": "C — Skill transferability",
+        "additional": "D — Additional points"
+      },
+      "save": "Save my simulation",
+      "saved": "Simulation saved",
+      "saveOffline": "Saving needs a connection. Your answers stay on this device.",
+      "defaultName": "Simulation of {date}",
+      "reset": "Start over",
+      "disclaimer": "Indicative result based on IRCC’s official criteria. Check your profile on IRCC’s website before taking any step.",
+      "consultation": "Book a consultation",
+      "max": "/ {max}"
+    },
+    "simulations": {
+      "title": "My simulations",
+      "empty": "No saved simulation yet.",
+      "open": "Open",
+      "rename": "Rename",
+      "renameLabel": "New name for {name}",
+      "confirmRename": "Confirm",
+      "delete": "Delete"
+    },
+    "hints": {
+      "title": "How to raise your score",
+      "gain": "+{points} pts",
+      "firstLanguageClb9": "Reach CLB/NCLC 9 in all 4 abilities of your first official language",
+      "frenchNclc7": "Get NCLC 7 or more in French in all 4 abilities",
+      "canadianWorkYear": "One more year of skilled Canadian work experience"
     }
   }
 }
