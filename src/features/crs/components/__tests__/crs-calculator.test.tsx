@@ -170,6 +170,21 @@ describe('CrsCalculator', () => {
     expect(hints.some((h) => /expérience canadienne/.test(h.textContent ?? '') && /\+53/.test(h.textContent ?? ''))).toBe(true);
   });
 
+  it('gathers the advice beneath the score in one card: hints, Pack Stanzy for the TCF, disclaimer', () => {
+    renderCalculator();
+    const advice = screen.getByRole('region', { name: 'Comment augmenter votre score' });
+
+    expect(within(advice).getAllByRole('listitem').length).toBeGreaterThan(0);
+    const pack = within(advice).getByRole('link', { name: /Pack Stanzy/ });
+    expect(pack).toHaveAttribute('href', 'https://tcf-express-academy.com');
+    expect(pack).toHaveAttribute('target', '_blank');
+    expect(pack).toHaveAttribute('rel', expect.stringContaining('noopener'));
+    expect(within(advice).getByText(/Résultat indicatif/)).toBeInTheDocument();
+    expect(within(advice).getByRole('link', { name: 'Réserver une consultation' })).toBeInTheDocument();
+    // The score card itself no longer carries the disclaimer.
+    expect(within(screen.getByRole('complementary', { name: 'Votre score' })).queryByText(/Résultat indicatif/)).toBeNull();
+  });
+
   it('adds the provincial nomination', () => {
     renderCalculator();
     fireEvent.click(screen.getByLabelText(/Désignation provinciale ou territoriale/));

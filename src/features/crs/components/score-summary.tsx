@@ -1,10 +1,9 @@
-import { RotateCcw, Save, Sparkles } from 'lucide-react';
+import { RotateCcw, Save } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { CRS_MAX } from '@/features/crs/data/crs-criteria';
 import type { CrsBreakdown } from '@/features/crs/lib/compute-crs';
-import { Link } from '@/i18n/navigation';
 
 /** The sticky result card: total, its four parts, save and start over. */
 export function ScoreSummary({
@@ -77,13 +76,6 @@ export function ScoreSummary({
           <RotateCcw aria-hidden={true} className="size-3.5" />
           {t('reset')}
         </button>
-      </div>
-      <div className="mt-3 rounded-xl border border-fog bg-ice-blue p-4 text-body-sm text-slate">
-        <Sparkles aria-hidden={true} className="mb-2 size-4 text-rouge" />
-        <p>{t('disclaimer')}</p>
-        <Link href="/services" className="mt-2 inline-block font-semibold text-rouge underline-offset-2 hover:underline">
-          {t('consultation')}
-        </Link>
       </div>
     </aside>
   );
