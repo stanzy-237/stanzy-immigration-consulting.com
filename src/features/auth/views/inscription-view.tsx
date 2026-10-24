@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { useGuestPage } from '@/features/auth/hooks/use-guest-page';
 import { AuthShell } from '@/features/auth/components/auth-shell';
 import { GoogleSignIn } from '@/features/auth/components/google-sign-in';
 import { InscriptionForm } from '@/features/auth/components/inscription-form';
@@ -10,7 +11,8 @@ import { localizedNextPath, withNext, type NextParam } from '@/features/auth/lib
 import { Link } from '@/i18n/navigation';
 
 /** Inscription as a full page: opened directly, or on refresh. */
-export function InscriptionView({ next }: { next?: NextParam }): ReactNode {
+export function InscriptionView({ next: nextProp }: { next?: NextParam }): ReactNode {
+  const { next } = useGuestPage(nextProp);
   const t = useTranslations('Auth.Inscription');
   const locale = useLocale();
   return (
@@ -27,7 +29,7 @@ export function InscriptionView({ next }: { next?: NextParam }): ReactNode {
       }
     >
       <GoogleSignIn callbackURL={localizedNextPath(locale, next)} />
-      <InscriptionForm />
+      <InscriptionForm next={next} />
     </AuthShell>
   );
 }

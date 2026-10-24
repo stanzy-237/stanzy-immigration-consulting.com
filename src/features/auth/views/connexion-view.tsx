@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { useGuestPage } from '@/features/auth/hooks/use-guest-page';
 import { AuthShell } from '@/features/auth/components/auth-shell';
 import { ConnexionForm } from '@/features/auth/components/connexion-form';
 import { GoogleSignIn } from '@/features/auth/components/google-sign-in';
@@ -14,7 +15,8 @@ import { Link, useRouter } from '@/i18n/navigation';
  * sent a signed-out visitor here. `next` (from `?next=`, untrusted) is where
  * they go once signed in; home when absent or unsafe.
  */
-export function ConnexionView({ next }: { next?: NextParam }): ReactNode {
+export function ConnexionView({ next: nextProp }: { next?: NextParam }): ReactNode {
+  const { next } = useGuestPage(nextProp);
   const t = useTranslations('Auth.Connexion');
   const locale = useLocale();
   const router = useRouter();

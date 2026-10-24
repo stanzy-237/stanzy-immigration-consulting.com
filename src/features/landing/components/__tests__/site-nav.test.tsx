@@ -8,9 +8,12 @@ import { SiteNav } from '@/features/landing/components/site-nav';
 
 import { withIntl } from './test-utils';
 
+const router = { push: vi.fn(), replace: vi.fn(), refresh: vi.fn() };
+let currentPath = '/';
 vi.mock('@/i18n/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/i18n/navigation')>()),
-  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  useRouter: () => router,
+  usePathname: () => currentPath,
 }));
 vi.mock('@/features/auth/lib/auth-client', () => ({
   authClient: { useSession: vi.fn(), signOut: vi.fn() },
@@ -28,6 +31,7 @@ function signedInAs(name: string) {
 describe('SiteNav', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    currentPath = '/';
     useSession.mockReturnValue({ data: null, isPending: false } as never);
   });
 
@@ -45,6 +49,21 @@ describe('SiteNav', () => {
     expect(within(nav).getByRole('link', { name: 'Commencer' })).toHaveAttribute(
       'href',
       '/fr/inscription',
+    );
+  });
+
+  it('links Connexion and Commencer back to the page the visitor is on', () => {
+    currentPath = '/outils/crs';
+    render(withIntl(<SiteNav />));
+    const nav = screen.getByRole('navigation', { name: 'Navigation principale' });
+
+    expect(within(nav).getByRole('link', { name: 'Connexion' })).toHaveAttribute(
+      'href',
+      '/fr/connexion?next=%2Foutils%2Fcrs',
+    );
+    expect(within(nav).getByRole('link', { name: 'Commencer' })).toHaveAttribute(
+      'href',
+      '/fr/inscription?next=%2Foutils%2Fcrs',
     );
   });
 
@@ -147,6 +166,19 @@ describe('SiteNav', () => {
       fireEvent.click(await screen.findByRole('menuitem', { name: 'Déconnexion' }));
 
       await waitFor(() => expect(authClient.signOut).toHaveBeenCalled());
+    });
+
+    it('stays on the current page after signing out, refreshing it', async () => {
+      currentPath = '/outils/67-points';
+      signedInAs('Aminata Diallo');
+      vi.mocked(authClient.signOut).mockResolvedValue({ data: {}, error: null } as never);
+      render(withIntl(<SiteNav />));
+
+      fireEvent.click(screen.getByRole('button', { name: 'Mon compte : Aminata Diallo' }));
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Déconnexion' }));
+
+      await waitFor(() => expect(router.refresh).toHaveBeenCalled());
+      expect(router.push).not.toHaveBeenCalled();
     });
 
     it('has no axe violations', async () => {

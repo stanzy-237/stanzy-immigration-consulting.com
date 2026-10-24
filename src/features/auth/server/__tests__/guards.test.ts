@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { redirectIfSignedIn, requireSession } from '@/features/auth/server/guards';
+import { requireSession } from '@/features/auth/server/guards';
 import { sessionFor } from '@/server/auth/__tests__/fixtures';
 import { getCurrentSession } from '@/server/auth/session';
 
@@ -41,29 +41,5 @@ describe('requireSession', () => {
   it('returns the session of a signed-in Account', async () => {
     session.mockResolvedValue(SIGNED_IN);
     await expect(requireSession({ locale: 'fr', next: '/compte' })).resolves.toBe(SIGNED_IN);
-  });
-});
-
-describe('redirectIfSignedIn', () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  it('lets a signed-out visitor see the page', async () => {
-    session.mockResolvedValue(null);
-    expect(await redirectedTo(redirectIfSignedIn({ locale: 'fr', next: '/compte' }))).toBeNull();
-  });
-
-  it('sends a signed-in Account on to next, in the current locale', async () => {
-    session.mockResolvedValue(SIGNED_IN);
-    expect(
-      await redirectedTo(redirectIfSignedIn({ locale: 'en', next: '/compte/securite' })),
-    ).toBe('/en/compte/securite');
-  });
-
-  it('sends a signed-in Account home when next is missing or unsafe', async () => {
-    session.mockResolvedValue(SIGNED_IN);
-    expect(await redirectedTo(redirectIfSignedIn({ locale: 'fr', next: undefined }))).toBe('/fr');
-    expect(
-      await redirectedTo(redirectIfSignedIn({ locale: 'fr', next: '//evil.com' })),
-    ).toBe('/fr');
   });
 });

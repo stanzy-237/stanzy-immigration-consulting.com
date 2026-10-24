@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { AuthShell } from '@/features/auth/components/auth-shell';
 import { useResendVerification } from '@/features/auth/hooks/use-resend-verification';
+import { safeNextPath, withNext } from '@/features/auth/lib/safe-next-path';
 import { Link } from '@/i18n/navigation';
 
 /**
@@ -14,7 +15,8 @@ import { Link } from '@/i18n/navigation';
  * stays a thin shell:
  * - `email`: set on the "check your inbox" step straight after sign-up;
  * - `status=verified`: Better Auth accepted the link and signed the person in;
- * - `error`: Better Auth rejected the link (invalid or expired).
+ * - `error`: Better Auth rejected the link (invalid or expired);
+ * - `next`: the page the person was on before signing up.
  */
 export type VerificationSearchParams = Record<string, string | string[] | undefined>;
 
@@ -34,12 +36,14 @@ export function VerificationView({
   const email = first(searchParams.email);
   const verified = first(searchParams.status) === 'verified';
   const error = first(searchParams.error);
-  const { resent, resend } = useResendVerification(email);
+  // The page the person was on before signing up, carried through the email.
+  const next = first(searchParams.next);
+  const { resent, resend } = useResendVerification(email, next);
 
   if (error) {
     return (
       <AuthShell title={t('errorTitle')} subtitle={t('errorBody')}>
-        <Link href="/connexion" className={ctaClass}>
+        <Link href={withNext('/connexion', next)} className={ctaClass}>
           {t('goToSignIn')}
         </Link>
       </AuthShell>
@@ -49,7 +53,7 @@ export function VerificationView({
   if (verified) {
     return (
       <AuthShell title={t('verifiedTitle')} subtitle={t('verifiedBody')}>
-        <Link href="/" className={ctaClass}>
+        <Link href={safeNextPath(next)} className={ctaClass}>
           {t('continue')}
         </Link>
       </AuthShell>

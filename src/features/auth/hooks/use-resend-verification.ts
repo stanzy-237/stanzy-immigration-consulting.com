@@ -8,10 +8,14 @@ import { authClient } from '@/features/auth/lib/auth-client';
 import { verifiedCallbackURL } from '@/features/auth/lib/verification';
 
 /**
- * Re-sends the verification email for `email`. `resent` flips to true once
+ * Re-sends the verification email for `email`, keeping the page the person
+ * came from (`next`). `resent` flips to true once
  * the email has gone out; `resend` resolves to the error, if any.
  */
-export function useResendVerification(email: string | undefined): {
+export function useResendVerification(
+  email: string | undefined,
+  next?: unknown,
+): {
   resent: boolean;
   resend: () => Promise<AuthClientError | null>;
   reset: () => void;
@@ -23,12 +27,12 @@ export function useResendVerification(email: string | undefined): {
     if (!email) return null;
     const { error } = await authClient.sendVerificationEmail({
       email,
-      callbackURL: verifiedCallbackURL(locale),
+      callbackURL: verifiedCallbackURL(locale, next),
     });
     if (error) return error;
     setResent(true);
     return null;
-  }, [email, locale]);
+  }, [email, locale, next]);
 
   const reset = useCallback((): void => setResent(false), []);
 

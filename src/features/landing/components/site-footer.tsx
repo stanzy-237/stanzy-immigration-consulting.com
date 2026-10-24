@@ -112,7 +112,7 @@ export function SiteFooter(): ReactNode {
               ),
             )}
             <li className="pt-4">
-              <Eyebrow as="h4">{t("columns.content")}</Eyebrow>
+              <Eyebrow as="h3">{t("columns.content")}</Eyebrow>
             </li>
             {FOOTER_CONTENT_LINKS.map(
               (link: FooterLink): ReactNode => (
@@ -199,10 +199,10 @@ export function SiteFooter(): ReactNode {
 
 type EyebrowProps = {
   children: ReactNode;
-  as?: "h3" | "h4";
+  as?: "h2" | "h3";
 };
 
-function Eyebrow({ children, as: Tag = "h3" }: EyebrowProps): ReactNode {
+function Eyebrow({ children, as: Tag = "h2" }: EyebrowProps): ReactNode {
   return (
     <Tag className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-white/90">
       <span aria-hidden={true} className="bg-rouge h-0.5 w-6" />

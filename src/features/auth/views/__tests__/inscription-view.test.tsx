@@ -10,7 +10,7 @@ import { router, withIntl } from './test-utils';
 
 vi.mock('@/i18n/navigation', async () => (await import('./test-utils')).navigationMock);
 vi.mock('@/features/auth/lib/auth-client', () => ({
-  authClient: { signUp: { email: vi.fn() } },
+  authClient: { signUp: { email: vi.fn() }, useSession: vi.fn(() => ({ data: null, isPending: false })) },
 }));
 
 const signUp = vi.mocked(authClient.signUp.email);
@@ -52,6 +52,22 @@ describe('InscriptionView', () => {
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/verification',
       query: { email: 'aminata@example.com' },
+    });
+  });
+
+  it('keeps the page the person came from through the verification email', async () => {
+    signUp.mockResolvedValue({ data: {}, error: null } as never);
+    render(withIntl(<InscriptionView next="/outils/crs" />));
+
+    fillAndSubmit();
+
+    await waitFor(() => expect(router.push).toHaveBeenCalled());
+    expect(signUp).toHaveBeenCalledWith(
+      expect.objectContaining({ callbackURL: '/fr/verification?status=verified&next=%2Foutils%2Fcrs' }),
+    );
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/verification',
+      query: { email: 'aminata@example.com', next: '/outils/crs' },
     });
   });
 

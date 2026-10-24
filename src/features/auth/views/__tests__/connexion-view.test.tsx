@@ -10,7 +10,18 @@ import { router, withIntl } from './test-utils';
 
 vi.mock('@/i18n/navigation', async () => (await import('./test-utils')).navigationMock);
 vi.mock('@/features/auth/lib/auth-client', () => ({
-  authClient: { signIn: { email: vi.fn() }, sendVerificationEmail: vi.fn() },
+  authClient: {
+    signIn: { email: vi.fn() },
+    sendVerificationEmail: vi.fn(),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
+  },
+}));
+
+// The pages are static, so `?next=` is read from the address in the browser.
+let searchParams = new URLSearchParams();
+vi.mock('next/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/navigation')>()),
+  useSearchParams: () => searchParams,
 }));
 
 const signIn = vi.mocked(authClient.signIn.email);
@@ -144,5 +155,34 @@ describe('ConnexionView', () => {
   it('has no axe violations', async () => {
     const { container } = render(withIntl(<ConnexionView />));
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe('ConnexionView — static page', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    searchParams = new URLSearchParams();
+  });
+
+  it('reads ?next= from the address and returns there after signing in', async () => {
+    searchParams = new URLSearchParams({ next: '/outils/crs' });
+    signIn.mockResolvedValue({ data: {}, error: null } as never);
+    render(withIntl(<ConnexionView />));
+
+    submit();
+
+    await waitFor(() => expect(router.push).toHaveBeenCalledWith('/outils/crs'));
+  });
+
+  it('sends a visitor who is already signed in straight on to next', async () => {
+    searchParams = new URLSearchParams({ next: '/outils/crs' });
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { name: 'Aminata', email: 'aminata@example.com' }, session: {} },
+      isPending: false,
+    } as never);
+    render(withIntl(<ConnexionView />));
+
+    await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/outils/crs'));
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never);
   });
 });

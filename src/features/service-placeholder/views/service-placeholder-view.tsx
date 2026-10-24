@@ -16,7 +16,7 @@ export function ServicePlaceholderView({
   nameKey,
   icon: Icon,
 }: ServicePlaceholderProps): ReactNode {
-  const t = useTranslations('ServicePlaceholder');
+  const t = useTranslations('Home.ServicePlaceholder');
   const tItems = useTranslations('Home.ServicesGrid.Items');
 
   return (
@@ -30,28 +30,28 @@ export function ServicePlaceholderView({
           <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border-2 border-rose bg-blush px-3.5 py-1.5">
               <Hammer className="h-3 w-3 text-rouge" strokeWidth={2.5} />
-              <span className="font-sans text-xs font-semibold uppercase tracking-widest text-rouge">
+              <span className="font-label text-rouge">
                 {t('status')}
               </span>
             </div>
             <span
               aria-hidden={true}
-              className="mb-7 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-[0_8px_28px_rgba(13,31,78,0.12)]"
+              className="mb-7 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-md"
             >
               <Icon className="h-8 w-8 text-navy-deep" strokeWidth={1.75} />
             </span>
             <h1
               id="service-placeholder-title"
-              className="font-heading text-[clamp(30px,4vw,46px)] font-bold leading-none tracking-tight text-navy-deep"
+              className="font-heading text-h3 font-bold leading-none text-navy-deep sm:text-h2"
             >
               {tItems(nameKey)}
             </h1>
-            <p className="mt-4 max-w-lg text-lg leading-relaxed text-slate">
+            <p className="mt-4 max-w-lg text-body-lg text-slate">
               {t('description')}
             </p>
             <Link
               href="/"
-              className="mt-10 inline-flex h-11 items-center gap-2 rounded-full border-2 border-navy-deep bg-navy-deep px-5 font-heading text-sm font-semibold text-white transition-all hover:-translate-y-px hover:border-rouge hover:bg-rouge"
+              className="mt-10 inline-flex h-11 items-center gap-2 rounded-full border-2 border-navy-deep bg-navy-deep px-5 font-heading text-body-sm font-semibold text-white transition-all hover:-translate-y-px hover:border-rouge hover:bg-rouge"
             >
               <ArrowLeft className="h-4 w-4" strokeWidth={2.5} />
               {t('back')}
