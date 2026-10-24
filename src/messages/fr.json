@@ -647,9 +647,20 @@
       "empty": "Aucune simulation enregistrée.",
       "open": "Ouvrir",
       "rename": "Renommer",
-      "renameLabel": "Nouveau nom pour {name}",
-      "confirmRename": "Valider",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "openLabel": "Ouvrir « {name} »",
+      "renameAction": "Renommer « {name} »",
+      "deleteLabel": "Supprimer « {name} »",
+      "renameLabel": "Nouveau nom pour « {name} »",
+      "confirmRename": "Valider le nouveau nom",
+      "cancelRename": "Annuler",
+      "savedOn": "Enregistrée le {date}",
+      "points": "pts",
+      "upcomingRules": "Règles du 3 nov. 2026",
+      "deleteTitle": "Supprimer « {name} » ?",
+      "deleteDescription": "Cette simulation sera définitivement supprimée.",
+      "cancelDelete": "Annuler",
+      "confirmDelete": "Supprimer"
     },
     "hints": {
       "title": "Comment augmenter votre score",

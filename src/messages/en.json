@@ -647,9 +647,20 @@
       "empty": "No saved simulation yet.",
       "open": "Open",
       "rename": "Rename",
-      "renameLabel": "New name for {name}",
-      "confirmRename": "Confirm",
-      "delete": "Delete"
+      "delete": "Delete",
+      "openLabel": "Open “{name}”",
+      "renameAction": "Rename “{name}”",
+      "deleteLabel": "Delete “{name}”",
+      "renameLabel": "New name for “{name}”",
+      "confirmRename": "Confirm the new name",
+      "cancelRename": "Cancel",
+      "savedOn": "Saved on {date}",
+      "points": "pts",
+      "upcomingRules": "Nov 3, 2026 rules",
+      "deleteTitle": "Delete “{name}”?",
+      "deleteDescription": "This simulation will be permanently deleted.",
+      "cancelDelete": "Cancel",
+      "confirmDelete": "Delete"
     },
     "hints": {
       "title": "How to raise your score",
