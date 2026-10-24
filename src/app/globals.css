@@ -38,6 +38,18 @@
   /* Third-party brand marks (used only on their own CTAs). */
   --whatsapp: #25d366;
 
+  /* Type de tirage pills (Derniers tirages, #49): ink, tint and line per group. */
+  --iris: #4338ca; /* PNP */
+  --iris-tint: #eef2ff;
+  --iris-line: #c7d2fe;
+  --leaf: #15803d; /* CEC */
+  --leaf-tint: #f0fdf4;
+  --leaf-line: #86efac;
+  --honey: #b45309; /* Catégorie */
+  --honey-tint: #fef3c7;
+  --honey-line: #fcd34d;
+  --live: #5ee39b; /* "live data" dot on navy */
+
   --success: #2f855a;
   --success-foreground: #ffffff;
   --warning: #b7791f;
@@ -105,6 +117,16 @@
   --color-ink: var(--ink);
   --color-ink-deep: var(--ink-deep);
   --color-whatsapp: var(--whatsapp);
+  --color-iris: var(--iris);
+  --color-iris-tint: var(--iris-tint);
+  --color-iris-line: var(--iris-line);
+  --color-leaf: var(--leaf);
+  --color-leaf-tint: var(--leaf-tint);
+  --color-leaf-line: var(--leaf-line);
+  --color-honey: var(--honey);
+  --color-honey-tint: var(--honey-tint);
+  --color-honey-line: var(--honey-line);
+  --color-live: var(--live);
 
   /* Legacy brand aliases kept for existing scaffold code. */
   --color-bleu: var(--navy-deep);

@@ -166,7 +166,9 @@
       "stats": {
         "invitations": "invitations",
         "crsMin": "score CRS minimum",
-        "date": "date du tirage"
+        "date": "date du tirage",
+        "scoreMinShort": "Score min : {crs}",
+        "scoreMin": "Score minimum: {crs}"
       },
       "tracker": {
         "label": "Votre score vs minimum",
@@ -177,13 +179,7 @@
         "crsMin": "CRS min.",
         "invitations": "invitations"
       },
-      "cardCta": "Voir détails →",
-      "cat": {
-        "catAll": "Toutes catégories",
-        "catStem": "STEM",
-        "catCanExp": "Exp. canadienne",
-        "catTransport": "Transport"
-      }
+      "cardCta": "Voir détails →"
     },
     "ConsultationCta": {
       "eyebrow": "Consultation Privée",
@@ -816,6 +812,102 @@
       "inProgress": "Réponses en cours du Calculateur CRS (cet appareil)",
       "saved": "Mes simulations enregistrées",
       "points": "{points} pts"
+    }
+  },
+  "Draws": {
+    "metaTitle": "Derniers tirages Entrée Express",
+    "eyebrow": "Express Entry · Données IRCC",
+    "title": "Les tirages, sans détour.",
+    "subtitle": "Suivez les derniers tirages Entrée express et trouvez le score qui vous concerne.",
+    "synced": "Mis à jour {when}",
+    "neverSynced": "Les tirages arrivent bientôt : la première mise à jour n’a pas encore eu lieu.",
+    "loading": "Chargement des tirages…",
+    "error": "Impossible de charger les tirages pour le moment. Réessayez dans un instant.",
+    "latest": {
+      "label": "Dernier tirage",
+      "irccLink": "Voir sur IRCC",
+      "invitations": "Invitations envoyées",
+      "invitationsSub": "candidats invités",
+      "crsMin": "Score CRS minimal",
+      "crsMinSub": "score de classement",
+      "change": "Variation du score",
+      "changeSub": "depuis le dernier tirage {group}",
+      "changeNone": "premier tirage de ce type"
+    },
+    "compare": {
+      "label": "Votre score CRS",
+      "button": "Comparer",
+      "above": "Vous dépassez de {points, plural, one {# point} other {# points}}",
+      "equal": "Vous êtes pile au score minimal",
+      "below": "Il vous manque {points, plural, one {# point} other {# points}}",
+      "invalid": "Entrez un score CRS entre 0 et 1200.",
+      "improve": "Améliorer mon score"
+    },
+    "history": {
+      "title": "Historique des tirages",
+      "count": "{count, plural, =0 {Aucun tirage trouvé} one {# tirage trouvé} other {# tirages trouvés}}",
+      "search": "Rechercher un tirage",
+      "searchPlaceholder": "Rechercher par numéro, type, date ou score…",
+      "filterLabel": "Filtrer par type",
+      "perPage": "Afficher",
+      "perPageLabel": "Nombre de lignes par page",
+      "columns": {
+        "round": "Tirage",
+        "date": "Date",
+        "type": "Type de tirage",
+        "invitations": "Invitations",
+        "crsMin": "Score CRS"
+      },
+      "new": "Nouveau",
+      "emptyTitle": "Aucun tirage trouvé",
+      "emptyText": "Essayez une autre recherche ou un autre filtre.",
+      "range": "Affichage de {from} à {to} sur {total}",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "pagination": "Pages de l’historique",
+      "page": "Page {page}"
+    },
+    "groups": {
+      "ALL": "Tous",
+      "GENERAL": "Général",
+      "PNP": "PNP",
+      "CEC": "CEC",
+      "FRENCH": "Français",
+      "CATEGORY": "Catégorie"
+    },
+    "types": {
+      "pnp": "Programme des candidats des provinces",
+      "cec": "Catégorie de l’expérience canadienne",
+      "french": "Connaissance du français",
+      "general": "Tirage général",
+      "fsw": "Travailleurs qualifiés (fédéral)",
+      "fst": "Métiers spécialisés (fédéral)",
+      "physicians": "Médecins avec expérience canadienne",
+      "seniorManagers": "Cadres supérieurs avec expérience canadienne",
+      "military": "Recrues militaires qualifiées",
+      "healthSocial": "Santé et services sociaux",
+      "health": "Professions de la santé",
+      "trades": "Métiers spécialisés",
+      "transport": "Professions du transport",
+      "stem": "Professions STIM",
+      "education": "Professions de l’enseignement",
+      "agriculture": "Agriculture et agroalimentaire"
+    },
+    "alerts": {
+      "title": "Alertes tirages",
+      "enable": "Activer les alertes tirages",
+      "disable": "Désactiver les alertes",
+      "enabled": "Alertes tirages activées sur cet appareil",
+      "pitch": "Recevez une notification sur votre téléphone dès qu’un nouveau tirage est publié.",
+      "denied": "Les notifications sont bloquées pour ce site. Autorisez-les dans les réglages de votre navigateur ou de votre téléphone, puis réessayez.",
+      "install": "Sur iPhone, ajoutez d’abord Stanzy à votre écran d’accueil (Partager → Sur l’écran d’accueil), puis ouvrez l’app pour activer les alertes.",
+      "unsupported": "Votre navigateur ne gère pas les notifications. Rejoignez notre chaîne WhatsApp pour être prévenu des nouveaux tirages.",
+      "whatsapp": "Rejoindre la chaîne WhatsApp",
+      "failed": "L’activation a échoué. Réessayez dans un instant."
+    },
+    "alert": {
+      "title": "Nouveau tirage #{round}",
+      "body": "{type} · {invitations} invitations · CRS {crsMin}"
     }
   }
 }

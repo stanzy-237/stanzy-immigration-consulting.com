@@ -1,5 +1,6 @@
 import { authRouter } from '@/features/auth/server/auth-router';
 import { crsRouter } from '@/features/crs/server/crs-router';
+import { drawsRouter } from '@/features/draws/server/draws-router';
 
 import { healthRouter } from './routers/health';
 import { createCallerFactory, createTRPCRouter } from './trpc';
@@ -10,6 +11,7 @@ import { createCallerFactory, createTRPCRouter } from './trpc';
 export const appRouter = createTRPCRouter({
   auth: authRouter,
   crs: crsRouter,
+  draws: drawsRouter,
   health: healthRouter,
 });
 

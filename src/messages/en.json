@@ -166,7 +166,9 @@
       "stats": {
         "invitations": "invitations",
         "crsMin": "minimum CRS score",
-        "date": "draw date"
+        "date": "draw date",
+        "scoreMinShort": "Min. score: {crs}",
+        "scoreMin": "Minimum score: {crs}"
       },
       "tracker": {
         "label": "Your score vs minimum",
@@ -177,13 +179,7 @@
         "crsMin": "CRS min.",
         "invitations": "invitations"
       },
-      "cardCta": "See details →",
-      "cat": {
-        "catAll": "All categories",
-        "catStem": "STEM",
-        "catCanExp": "Can. experience",
-        "catTransport": "Transport"
-      }
+      "cardCta": "See details →"
     },
     "ConsultationCta": {
       "eyebrow": "Private consultation",
@@ -816,6 +812,85 @@
       "inProgress": "CRS calculator answers in progress (this device)",
       "saved": "My saved simulations",
       "points": "{points} pts"
+    }
+  },
+  "Draws": {
+    "metaTitle": "Latest Express Entry draws",
+    "eyebrow": "Express Entry · IRCC data",
+    "title": "Draws, straight up.",
+    "subtitle": "Follow the latest Express Entry draws and find the score that matters to you.",
+    "synced": "Updated {when}",
+    "neverSynced": "Draws are on their way: the first update hasn’t run yet.",
+    "loading": "Loading draws…",
+    "error": "We can’t load the draws right now. Try again in a moment.",
+    "latest": {
+      "label": "Latest draw",
+      "irccLink": "View on IRCC",
+      "invitations": "Invitations sent",
+      "invitationsSub": "candidates invited",
+      "crsMin": "Minimum CRS score",
+      "crsMinSub": "ranking score",
+      "change": "Score change",
+      "changeSub": "since the last {group} draw",
+      "changeNone": "first draw of this type"
+    },
+    "compare": {
+      "label": "Your CRS score",
+      "button": "Compare",
+      "above": "You’re {points, plural, one {# point} other {# points}} above",
+      "equal": "You’re exactly at the cut-off",
+      "below": "You’re {points, plural, one {# point} other {# points}} short",
+      "invalid": "Enter a CRS score between 0 and 1200.",
+      "improve": "Improve my score"
+    },
+    "history": {
+      "title": "Draw history",
+      "count": "{count, plural, =0 {No draws found} one {# draw found} other {# draws found}}",
+      "search": "Search draws",
+      "searchPlaceholder": "Search by number, type, date or score…",
+      "filterLabel": "Filter by type",
+      "perPage": "Show",
+      "perPageLabel": "Rows per page",
+      "columns": {
+        "round": "Draw",
+        "date": "Date",
+        "type": "Draw type",
+        "invitations": "Invitations",
+        "crsMin": "CRS score"
+      },
+      "new": "New",
+      "emptyTitle": "No draws found",
+      "emptyText": "Try another search or filter.",
+      "range": "Showing {from} to {to} of {total}",
+      "previous": "Previous",
+      "next": "Next",
+      "pagination": "History pages",
+      "page": "Page {page}"
+    },
+    "groups": {
+      "ALL": "All",
+      "GENERAL": "General",
+      "PNP": "PNP",
+      "CEC": "CEC",
+      "FRENCH": "French",
+      "CATEGORY": "Category"
+    },
+    "types": {},
+    "alerts": {
+      "title": "Draw alerts",
+      "enable": "Turn on draw alerts",
+      "disable": "Turn off alerts",
+      "enabled": "Draw alerts are on for this device",
+      "pitch": "Get a notification on your phone as soon as a new draw is published.",
+      "denied": "Notifications are blocked for this site. Allow them in your browser or phone settings, then try again.",
+      "install": "On iPhone, first add Stanzy to your home screen (Share → Add to Home Screen), then open the app to turn on alerts.",
+      "unsupported": "Your browser doesn’t support notifications. Join our WhatsApp channel to hear about new draws.",
+      "whatsapp": "Join the WhatsApp channel",
+      "failed": "Couldn’t turn alerts on. Try again in a moment."
+    },
+    "alert": {
+      "title": "New draw #{round}",
+      "body": "{type} · {invitations} invitations · CRS {crsMin}"
     }
   }
 }

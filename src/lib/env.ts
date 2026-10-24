@@ -54,6 +54,17 @@ const schema = z.object({
       'Expected comma-separated email addresses',
     )
     .optional(),
+  // Shared with the scheduled GitHub Actions workflow that calls
+  // /api/cron/draws (#49). `openssl rand -base64 32`. Optional: without it the
+  // endpoint answers 503 and the draws are never refreshed.
+  CRON_SECRET: z.string().min(32).optional(),
+  // VAPID keys for Alertes tirages (Web Push, #49): `npx web-push
+  // generate-vapid-keys`. The public key is also read by the browser. Optional:
+  // without them the alert button is hidden. Set all three or none.
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().min(1).optional(),
+  VAPID_PRIVATE_KEY: z.string().min(1).optional(),
+  // Contact the push services can reach: `mailto:you@your-domain.com`.
+  VAPID_SUBJECT: z.string().regex(/^(mailto:|https:\/\/)/, 'Expected mailto:… or https://…').optional(),
 }).superRefine((value, ctx) => {
   if (process.env.VERCEL_ENV === 'production' && !value.BETTER_AUTH_URL) {
     ctx.addIssue({
@@ -68,6 +79,16 @@ const schema = z.object({
       path: ['EMAIL_FROM'],
       message: 'Required when RESEND_API_KEY is set (a sender on your verified domain)',
     });
+  }
+  const vapid = ['NEXT_PUBLIC_VAPID_PUBLIC_KEY', 'VAPID_PRIVATE_KEY', 'VAPID_SUBJECT'] as const;
+  if (vapid.some((key) => value[key])) {
+    for (const key of vapid.filter((k) => !value[k])) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [key],
+        message: 'Required when any VAPID variable is set (set all three or none)',
+      });
+    }
   }
   for (const [key, other] of [
     ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'],
