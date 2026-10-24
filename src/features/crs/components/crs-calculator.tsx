@@ -29,7 +29,7 @@ import { api } from '@/trpc/react';
 import { CheckField, CrsSection, NumberField, SelectField } from '@/features/crs/components/crs-fields';
 import { LanguageFields } from '@/features/crs/components/language-fields';
 import { SavedSimulations } from '@/features/crs/components/saved-simulations';
-import { ScoreHints } from '@/features/crs/components/score-hints';
+import { ScoreAdvice } from '@/features/crs/components/score-advice';
 import { ScoreSummary } from '@/features/crs/components/score-summary';
 
 const CANADIAN_YEARS = [0, 1, 2, 3, 4, 5] as const;
@@ -312,7 +312,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
           saved={save.isSuccess}
           offline={offline}
         />
-        <ScoreHints profile={toProfile(form)} rules={rules} />
+        <ScoreAdvice profile={toProfile(form)} rules={rules} />
         {account ? <SavedSimulations onOpen={openSaved} /> : null}
       </div>
     </div>

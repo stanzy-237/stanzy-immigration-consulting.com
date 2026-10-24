@@ -656,7 +656,9 @@
       "gain": "+{points} pts",
       "firstLanguageClb9": "Reach CLB/NCLC 9 in all 4 abilities of your first official language",
       "frenchNclc7": "Get NCLC 7 or more in French in all 4 abilities",
-      "canadianWorkYear": "One more year of skilled Canadian work experience"
+      "canadianWorkYear": "One more year of skilled Canadian work experience",
+      "packText": "You can raise your score by improving your TCF Canada results with the Pack Stanzy.",
+      "packCta": "Discover the Pack Stanzy"
     }
   }
 }
