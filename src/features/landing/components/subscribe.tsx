@@ -5,9 +5,9 @@ import { useTranslations } from 'next-intl';
 import { useState, type FormEvent, type ReactNode } from 'react';
 
 import { track } from '@/lib/analytics';
+import { WHATSAPP_CHANNEL_URL } from '@/features/shared/data/links';
 
-const WHATSAPP_CHANNEL_HREF =
-  'https://whatsapp.com/channel/0029Vb2Xp2F1CYoJfufA4c2R';
+const WHATSAPP_CHANNEL_HREF = WHATSAPP_CHANNEL_URL;
 
 export function Subscribe(): ReactNode {
   const t = useTranslations('Home.Subscribe');

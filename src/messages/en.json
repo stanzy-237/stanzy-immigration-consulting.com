@@ -806,13 +806,21 @@
     },
     "guide": {
       "eyebrow": "Good to know",
-      "title": "A score is only the start of the journey.",
-      "text": "The 67-point grid checks your eligibility for the Federal Skilled Worker Program. Once eligible, your Express Entry profile is ranked by your CRS score.",
-      "crs": "Compute my CRS score",
+      "title": "Reaching 67 points is only the first step.",
+      "text": "The 67-point grid decides your eligibility for the Federal Skilled Worker Program. Once your Express Entry profile is created, your CRS score sets your rank in the pool.",
+      "needsIntro": "To apply, you will also need to provide:",
+      "needs": {
+        "experience": "proof of your skilled work experience: detailed reference letters, employment contracts, pay slips;",
+        "funds": "proof of enough money to settle in Canada, unless exempt."
+      },
+      "support": "Stanzy Immigration helps you gather this proof and prepare your file, from eligibility to the invitation.",
       "consultation": "Book a consultation",
-      "funds": "You will also need to prove enough money to settle, unless exempt.",
-      "fundsLink": "See IRCC’s amounts",
-      "fundsUrl": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/proof-funds.html"
+      "crs": "Compute my CRS score",
+      "fundsLink": "IRCC’s required amounts",
+      "fundsUrl": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/proof-funds.html",
+      "whatsappTitle": "Join our WhatsApp channel",
+      "whatsappText": "Get the latest Express Entry draws, IRCC rule changes and our advice, straight to your phone.",
+      "whatsappCta": "Join the WhatsApp channel"
     },
     "rulesHint": "On November 3, 2026, IRCC removes the LMIA requirement for a qualifying job offer to count.",
     "reusedNotice": "Answers reused from the CRS calculator. Check your work experience and adaptability: the CRS calculator only gives ranges of years, and your studies in Canada may count.",

@@ -806,13 +806,21 @@
     },
     "guide": {
       "eyebrow": "À savoir",
-      "title": "Un score n’est que le début du voyage.",
-      "text": "La grille des 67 points vérifie votre admissibilité au Programme des travailleurs qualifiés (fédéral). Une fois admissible, votre profil Entrée Express est classé selon votre score CRS.",
-      "crs": "Calculer mon score CRS",
+      "title": "Atteindre 67 points n’est que la première étape.",
+      "text": "La grille des 67 points détermine votre admissibilité au Programme des travailleurs qualifiés (fédéral). Une fois votre profil Entrée Express créé, c’est votre score CRS qui fixe votre classement dans le bassin.",
+      "needsIntro": "Pour présenter votre demande, vous devrez également fournir :",
+      "needs": {
+        "experience": "des preuves de votre expérience professionnelle qualifiée : lettres de référence détaillées, contrats de travail, relevés de paie ;",
+        "funds": "une preuve de fonds suffisants pour vous établir au Canada, sauf exemption."
+      },
+      "support": "Stanzy Immigration vous accompagne dans la constitution de ces preuves et la préparation de votre dossier, de l’admissibilité jusqu’à l’invitation.",
       "consultation": "Réserver une consultation",
-      "funds": "Vous devrez aussi prouver des fonds suffisants pour vous installer, sauf exemption.",
-      "fundsLink": "Voir les montants d’IRCC",
-      "fundsUrl": "https://www.canada.ca/fr/immigration-refugies-citoyennete/services/immigrer-canada/entree-express/documents/preuve-fonds-suffisants.html"
+      "crs": "Calculer mon score CRS",
+      "fundsLink": "Montants exigés par IRCC",
+      "fundsUrl": "https://www.canada.ca/fr/immigration-refugies-citoyennete/services/immigrer-canada/entree-express/documents/preuve-fonds-suffisants.html",
+      "whatsappTitle": "Rejoignez notre chaîne WhatsApp",
+      "whatsappText": "Recevez les derniers tirages Entrée Express, les changements de règles d’IRCC et nos conseils, directement sur votre téléphone.",
+      "whatsappCta": "Rejoindre la chaîne WhatsApp"
     },
     "rulesHint": "Le 3 novembre 2026, IRCC supprime l’exigence d’une EIMT pour qu’une offre d’emploi admissible compte.",
     "reusedNotice": "Réponses reprises du Calculateur CRS. Vérifiez votre expérience de travail et l’adaptabilité : le Calculateur CRS ne donne que des tranches d’années, et vos études au Canada peuvent compter.",
