@@ -55,6 +55,22 @@ describe('InscriptionView', () => {
     });
   });
 
+  it('keeps the page the person came from through the verification email', async () => {
+    signUp.mockResolvedValue({ data: {}, error: null } as never);
+    render(withIntl(<InscriptionView next="/outils/crs" />));
+
+    fillAndSubmit();
+
+    await waitFor(() => expect(router.push).toHaveBeenCalled());
+    expect(signUp).toHaveBeenCalledWith(
+      expect.objectContaining({ callbackURL: '/fr/verification?status=verified&next=%2Foutils%2Fcrs' }),
+    );
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/verification',
+      query: { email: 'aminata@example.com', next: '/outils/crs' },
+    });
+  });
+
   it('shows the password rule live and blocks a too-short password before submitting', () => {
     render(withIntl(<InscriptionView />));
     expect(screen.getByText('10 caractères minimum')).toBeInTheDocument();

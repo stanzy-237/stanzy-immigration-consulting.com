@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { authErrorKey, type AuthErrorKey } from '@/features/auth/lib/auth-errors';
 import { authClient } from '@/features/auth/lib/auth-client';
 import { MIN_PASSWORD_LENGTH } from '@/features/auth/lib/password';
+import { safeNextPath, type NextParam } from '@/features/auth/lib/safe-next-path';
 import { verifiedCallbackURL } from '@/features/auth/lib/verification';
 import { useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -18,7 +19,8 @@ import { cn } from '@/lib/utils';
  * Create an Account with email + password, then go to Vérification ("check
  * your inbox"). Shared by the Inscription page and the Inscription dialog.
  */
-export function InscriptionForm(): ReactNode {
+/** `next` is the page the person was on; it survives the verification email. */
+export function InscriptionForm({ next }: { next?: NextParam }): ReactNode {
   const t = useTranslations('Auth.Inscription');
   const tFields = useTranslations('Auth.Fields');
   const tErrors = useTranslations('Auth.Errors');
@@ -47,7 +49,7 @@ export function InscriptionForm(): ReactNode {
       email,
       password,
       locale,
-      callbackURL: verifiedCallbackURL(locale),
+      callbackURL: verifiedCallbackURL(locale, next),
     });
     setPending(false);
 
@@ -55,7 +57,8 @@ export function InscriptionForm(): ReactNode {
       setError(authErrorKey(signUpError));
       return;
     }
-    router.push({ pathname: '/verification', query: { email } });
+    const back = safeNextPath(next);
+    router.push({ pathname: '/verification', query: back === '/' ? { email } : { email, next: back } });
   }
 
   return (

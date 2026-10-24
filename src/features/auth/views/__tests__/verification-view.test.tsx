@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -35,6 +35,25 @@ describe('VerificationView', () => {
       email: 'aminata@example.com',
       callbackURL: '/fr/verification?status=verified',
     });
+  });
+
+  it('keeps the page the person came from when resending the link', async () => {
+    resend.mockResolvedValue({ data: { status: true }, error: null } as never);
+    render(withIntl(<VerificationView searchParams={{ email: 'aminata@example.com', next: '/outils/crs' }} />));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Renvoyer l’e-mail' }));
+
+    await waitFor(() =>
+      expect(resend).toHaveBeenCalledWith({
+        email: 'aminata@example.com',
+        callbackURL: '/fr/verification?status=verified&next=%2Foutils%2Fcrs',
+      }),
+    );
+  });
+
+  it('continues to the page the person came from once the address is confirmed', () => {
+    render(withIntl(<VerificationView searchParams={{ status: 'verified', next: '/outils/crs' }} />));
+    expect(screen.getByRole('link', { name: 'Continuer' })).toHaveAttribute('href', '/outils/crs');
   });
 
   it('confirms a followed link and lets the signed-in person continue', () => {

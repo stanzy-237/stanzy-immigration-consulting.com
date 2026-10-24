@@ -30,7 +30,7 @@ export function InscriptionDialogView({ next }: { next?: NextParam }): ReactNode
       }
     >
       <GoogleSignIn callbackURL={localizedNextPath(locale, next)} />
-      <InscriptionForm />
+      <InscriptionForm next={next} />
     </AuthDialog>
   );
 }

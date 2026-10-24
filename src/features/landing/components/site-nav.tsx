@@ -27,6 +27,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
+import { withNext } from '@/features/auth/lib/safe-next-path';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
@@ -58,11 +59,15 @@ export function SiteNav(): ReactNode {
   const { account, signOut: endSession } = useCurrentAccount();
   const accountName: string | null = account?.name ?? null;
 
+  // Stay on the page: refreshing re-renders it signed out, and a protected
+  // page's own guard sends the visitor to Connexion with `next`.
   const signOut = useCallback(async (): Promise<void> => {
     await endSession();
-    router.push('/');
     router.refresh();
   }, [endSession, router]);
+  // Sign-in and sign-up bring the visitor back to the page they are on.
+  const loginHref: string = withNext('/connexion', pathname);
+  const signUpHref: string = withNext('/inscription', pathname);
 
   const isActive = (href: string): boolean =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
@@ -200,7 +205,7 @@ export function SiteNav(): ReactNode {
             />
           ) : (
             <Link
-              href="/connexion"
+              href={loginHref}
               className="text-navy-deep hover:bg-fog/40 rounded-md px-3 py-2 text-sm font-medium transition-colors"
             >
               {t('login')}
@@ -208,7 +213,7 @@ export function SiteNav(): ReactNode {
           )}
           {accountName ? null : (
             <Link
-              href="/inscription"
+              href={signUpHref}
               className="bg-rouge rounded-md px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-rouge/90"
             >
               {t('start')}
@@ -286,7 +291,7 @@ export function SiteNav(): ReactNode {
                   </button>
                 ) : (
                   <Link
-                    href="/connexion"
+                    href={loginHref}
                     className="text-navy-deep rounded-md border border-fog px-3 py-2 text-center text-sm font-medium"
                     onClick={closeMobile}
                   >
@@ -295,7 +300,7 @@ export function SiteNav(): ReactNode {
                 )}
                 {accountName ? null : (
                   <Link
-                    href="/inscription"
+                    href={signUpHref}
                     className="bg-rouge rounded-md px-3 py-2 text-center text-sm font-semibold text-white"
                     onClick={closeMobile}
                   >
