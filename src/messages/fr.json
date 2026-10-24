@@ -566,12 +566,6 @@
         "NCLC": "Je connais mes niveaux NCLC (français)",
         "CLB": "Je connais mes niveaux CLB (anglais)"
       },
-      "abilities": {
-        "speaking": "Expression orale",
-        "listening": "Compréhension orale",
-        "reading": "Compréhension écrite",
-        "writing": "Expression écrite"
-      },
       "field": "{slot} — {ability}",
       "level": "NCLC/CLB {level}",
       "belowFour": "Moins de NCLC/CLB 4",
@@ -579,7 +573,21 @@
       "tefNote": "TEF Canada : entrez les résultats « Équivalence ancien score ».",
       "addSecond": "Ajouter une 2e langue officielle",
       "removeSecond": "Retirer la 2e langue officielle",
-      "sameLanguage": "La 2e langue officielle doit être l’autre langue (français ou anglais)."
+      "sameLanguage": "La 2e langue officielle doit être l’autre langue (français ou anglais).",
+      "abilitiesByTestLanguage": {
+        "fr": {
+          "speaking": "Expression orale",
+          "listening": "Compréhension orale",
+          "reading": "Compréhension écrite",
+          "writing": "Expression écrite"
+        },
+        "en": {
+          "speaking": "Speaking",
+          "listening": "Listening",
+          "reading": "Reading",
+          "writing": "Writing"
+        }
+      }
     },
     "work": {
       "canadian": "Expérience de travail qualifiée au Canada",

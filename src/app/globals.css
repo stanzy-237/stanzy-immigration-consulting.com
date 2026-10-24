@@ -246,3 +246,12 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
 }
+
+/* A side panel that sticks below the sticky site nav and scrolls on its own
+   when taller than the screen (the CRS result column). */
+@utility sticky-below-nav {
+  position: sticky;
+  top: var(--spacing-24);
+  max-height: calc(100dvh - var(--spacing-24) - var(--spacing-6));
+  overflow-y: auto;
+}

@@ -74,7 +74,7 @@ describe('CrsCalculator', () => {
     fireEvent.change(screen.getByLabelText('Test de la 1re langue officielle'), {
       target: { value: 'CLB' },
     });
-    for (const skill of ['Expression orale', 'Compréhension orale', 'Compréhension écrite', 'Expression écrite']) {
+    for (const skill of ['Speaking', 'Listening', 'Reading', 'Writing']) {
       fireEvent.change(screen.getByLabelText(`1re langue — ${skill}`), { target: { value: '9' } });
     }
     // + CLB 9 ×4 = 124, + transferability bachelor's & CLB 9 = 25 → 379.
@@ -87,15 +87,15 @@ describe('CrsCalculator', () => {
     fireEvent.change(screen.getByLabelText('Test de la 1re langue officielle'), {
       target: { value: 'IELTS' },
     });
-    fireEvent.change(screen.getByLabelText('1re langue — Compréhension orale'), {
+    fireEvent.change(screen.getByLabelText('1re langue — Listening'), {
       target: { value: '8.5' },
     });
     expect(screen.getByTestId('level-firstLanguage-listening')).toHaveTextContent('NCLC/CLB 10');
 
-    fireEvent.change(screen.getByLabelText('1re langue — Expression orale'), {
+    fireEvent.change(screen.getByLabelText('1re langue — Speaking'), {
       target: { value: '9.5' },
     });
-    expect(screen.getByLabelText('1re langue — Expression orale')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('1re langue — Speaking')).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByText('Ce résultat n’existe pas pour ce test.')).toBeInTheDocument();
   });
 
@@ -134,13 +134,23 @@ describe('CrsCalculator', () => {
     expect(total()).toHaveTextContent('384');
   });
 
+  it.each([
+    ['IELTS', ['Speaking', 'Listening', 'Reading', 'Writing']],
+    ['TEF', ['Expression orale', 'Compréhension orale', 'Compréhension écrite', 'Expression écrite']],
+  ] as const)('names the four abilities as the %s test report does', (test, names) => {
+    renderCalculator();
+    fireEvent.change(screen.getByLabelText('Test de la 1re langue officielle'), { target: { value: test } });
+
+    for (const name of names) expect(screen.getByLabelText(`1re langue — ${name}`)).toBeInTheDocument();
+  });
+
   it('flags a second language in the same language as the first as an error', () => {
     renderCalculator();
     fireEvent.change(screen.getByLabelText('Test de la 1re langue officielle'), { target: { value: 'IELTS' } });
     fireEvent.click(screen.getByRole('button', { name: 'Ajouter une 2e langue officielle' }));
     const second = screen.getByLabelText('Test de la 2e langue officielle');
     fireEvent.change(second, { target: { value: 'CELPIP' } });
-    for (const skill of ['Expression orale', 'Compréhension orale', 'Compréhension écrite', 'Expression écrite']) {
+    for (const skill of ['Speaking', 'Listening', 'Reading', 'Writing']) {
       fireEvent.change(screen.getByLabelText(`1re langue — ${skill}`), { target: { value: '7' } });
       fireEvent.change(screen.getByLabelText(`2e langue — ${skill}`), { target: { value: '7' } });
     }

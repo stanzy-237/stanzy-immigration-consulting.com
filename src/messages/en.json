@@ -566,12 +566,6 @@
         "NCLC": "I know my NCLC levels (French)",
         "CLB": "I know my CLB levels (English)"
       },
-      "abilities": {
-        "speaking": "Speaking",
-        "listening": "Listening",
-        "reading": "Reading",
-        "writing": "Writing"
-      },
       "field": "{slot} — {ability}",
       "level": "CLB/NCLC {level}",
       "belowFour": "Below CLB/NCLC 4",
@@ -579,7 +573,21 @@
       "tefNote": "TEF Canada: enter the “Équivalence ancien score” results.",
       "addSecond": "Add a second official language",
       "removeSecond": "Remove the second official language",
-      "sameLanguage": "The second official language must be the other language (French or English)."
+      "sameLanguage": "The second official language must be the other language (French or English).",
+      "abilitiesByTestLanguage": {
+        "fr": {
+          "speaking": "Expression orale",
+          "listening": "Compréhension orale",
+          "reading": "Compréhension écrite",
+          "writing": "Expression écrite"
+        },
+        "en": {
+          "speaking": "Speaking",
+          "listening": "Listening",
+          "reading": "Reading",
+          "writing": "Writing"
+        }
+      }
     },
     "work": {
       "canadian": "Skilled work experience in Canada",

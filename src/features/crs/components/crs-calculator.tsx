@@ -109,23 +109,23 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
           announced score is the one in the result card below. */}
       <div
         aria-hidden={true}
-        className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-white/10 bg-navy-deep px-5 py-3 text-white shadow-xl lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-white/10 bg-navy-deep px-5 py-3 text-white shadow-lg lg:hidden"
       >
-        <span className="font-label text-xs uppercase tracking-widest text-white/60">{t('summary.total')}</span>
-        <span className="font-heading text-2xl font-bold">{breakdown?.total ?? '—'}</span>
+        <span className="font-label text-white/60">{t('summary.total')}</span>
+        <span className="font-heading text-h3 font-bold">{breakdown?.total ?? '—'}</span>
       </div>
       <div className="min-w-0 space-y-4 lg:col-span-2">
-        <p className="text-sm text-slate">
+        <p className="text-body-sm text-slate">
           {t('rulesNote', { date: format.dateTime(new Date(rules), { dateStyle: 'long', timeZone: 'UTC' }) })}
         </p>
         {inForce === '2025-03-25' ? (
           <fieldset className="rounded-2xl border border-fog bg-white p-4">
-            <legend className="px-1 font-label text-xs font-semibold uppercase tracking-widest text-slate">
+            <legend className="px-1 font-label text-slate">
               {t('rulesChoice.legend')}
             </legend>
             <div className="flex flex-wrap gap-4">
               {(['2025-03-25', '2026-11-03'] as const).map((version) => (
-                <label key={version} className="flex items-center gap-2 text-sm font-semibold text-navy-deep">
+                <label key={version} className="flex items-center gap-2 text-body-sm font-semibold text-navy-deep">
                   <input
                     type="radio"
                     name="crs-rules"
@@ -138,7 +138,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
                 </label>
               ))}
             </div>
-            <p className="mt-2 text-sm text-slate">{t('rulesChoice.hint')}</p>
+            <p className="mt-2 text-body-sm text-slate">{t('rulesChoice.hint')}</p>
           </fieldset>
         ) : null}
 
@@ -165,7 +165,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
                 checked={form.spouseIsCanadianCitizenOrPR}
                 onChange={(v) => set('spouseIsCanadianCitizenOrPR', v)}
               />
-              <p className="text-sm text-slate">{t('family.note')}</p>
+              <p className="text-body-sm text-slate">{t('family.note')}</p>
             </>
           ) : null}
         </CrsSection>
@@ -196,7 +196,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
           <button
             type="button"
             onClick={() => set('secondLanguage', form.secondLanguage ? null : emptyLanguage())}
-            className="rounded-full border border-fog bg-ice-blue px-4 py-2 text-sm font-semibold text-navy-deep transition-colors hover:bg-fog"
+            className="rounded-full border border-fog bg-ice-blue px-4 py-2 text-body-sm font-semibold text-navy-deep transition-colors hover:bg-fog"
           >
             {form.secondLanguage ? t('language.removeSecond') : t('language.addSecond')}
           </button>
@@ -244,7 +244,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
                 onChange={(v) => set('highWageJobOffer', v)}
               />
               {breakdown?.core.labourMarketIntegration ? (
-                <p className="text-sm font-semibold text-navy-deep">
+                <p className="text-body-sm font-semibold text-navy-deep">
                   {t('work.labourMarket', { points: breakdown.core.labourMarketIntegration.total })}
                 </p>
               ) : null}
@@ -277,11 +277,11 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
             onChange={(v) => set('canadianStudy', v)}
           />
           {breakdown && breakdown.additional.french > 0 ? (
-            <p className="text-sm font-semibold text-navy-deep">
+            <p className="text-body-sm font-semibold text-navy-deep">
               {t('additional.french', { points: breakdown.additional.french })}
             </p>
           ) : null}
-          {rules === '2025-03-25' ? <p className="text-sm text-slate">{t('additional.jobOfferNote')}</p> : null}
+          {rules === '2025-03-25' ? <p className="text-body-sm text-slate">{t('additional.jobOfferNote')}</p> : null}
         </CrsSection>
 
         {spouseCounts ? (
@@ -303,7 +303,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
         ) : null}
       </div>
 
-      <div>
+      <div className="space-y-4 lg:sticky-below-nav">
         <ScoreSummary
           breakdown={breakdown}
           onSave={onSave}

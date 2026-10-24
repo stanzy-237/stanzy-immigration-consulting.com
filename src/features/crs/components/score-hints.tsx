@@ -12,14 +12,14 @@ export function ScoreHints({ profile, rules }: { profile: CrsProfile; rules: Rul
   if (hints.length === 0) return null;
 
   return (
-    <section aria-labelledby="crs-hints-title" className="mt-4 rounded-2xl border border-fog bg-white p-5">
-      <h2 id="crs-hints-title" className="flex items-center gap-2 font-heading text-lg font-bold text-navy-deep">
+    <section aria-labelledby="crs-hints-title" className="rounded-2xl border border-fog bg-white p-5">
+      <h2 id="crs-hints-title" className="flex items-center gap-2 font-heading text-h4 font-bold text-navy-deep">
         <TrendingUp aria-hidden={true} className="size-4 text-rouge" />
         {t('title')}
       </h2>
       <ul className="mt-3 space-y-2">
         {hints.map((hint) => (
-          <li key={hint.kind} className="flex items-baseline justify-between gap-3 text-sm text-slate">
+          <li key={hint.kind} className="flex items-baseline justify-between gap-3 text-body-sm text-slate">
             <span>{t(hint.kind)}</span>
             <strong className="shrink-0 font-heading text-rouge">{t('gain', { points: hint.gain })}</strong>
           </li>
