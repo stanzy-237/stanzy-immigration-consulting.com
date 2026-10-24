@@ -7,8 +7,9 @@ import type { ReactNode } from 'react';
 import { useDrawAlerts } from '@/features/draws/hooks/use-draw-alerts';
 import { WHATSAPP_CHANNEL_URL } from '@/features/shared/data/links';
 
+// Full width under the text on phones, beside it from `sm` up.
 const button =
-  'inline-flex h-11 items-center gap-2 rounded-lg px-5 font-heading text-sm font-semibold transition-colors disabled:opacity-60';
+  'inline-flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-lg px-5 font-heading text-sm font-semibold transition-colors disabled:opacity-60 sm:h-11 sm:w-auto';
 
 /** "Activer les alertes tirages": opt this device in to a push notification for every new Tirage. */
 export function DrawAlerts(): ReactNode {
@@ -19,16 +20,21 @@ export function DrawAlerts(): ReactNode {
   return (
     <section
       aria-label={t('title')}
-      className="mx-auto mt-10 flex max-w-7xl flex-col gap-4 px-4 sm:px-7 md:flex-row md:items-center"
+      className="mx-auto mt-6 max-w-7xl px-4 sm:mt-10 sm:px-7"
     >
-      <div className="flex flex-1 items-start gap-4 rounded-xl border border-fog-light bg-white p-5 shadow-sm md:items-center">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-blush text-rouge">
-          {status === 'on' ? <BellRing aria-hidden={true} className="size-5" /> : <Bell aria-hidden={true} className="size-5" />}
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-fog-light bg-white p-4 shadow-sm sm:flex-nowrap sm:gap-4 sm:p-5">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-blush text-rouge sm:size-11">
+          {status === 'on' ? (
+            <BellRing aria-hidden={true} className="size-4 sm:size-5" />
+          ) : (
+            <Bell aria-hidden={true} className="size-4 sm:size-5" />
+          )}
         </span>
-        <div className="flex-1 text-sm text-slate">
-          <p className="font-heading text-base font-bold text-navy-deep">{t('title')}</p>
+        <div className="min-w-0 flex-1 text-xs text-slate sm:text-sm">
+          <p className="font-heading text-sm font-bold text-navy-deep sm:text-base">{t('title')}</p>
           {status === 'on' && <p>{t('enabled')}</p>}
-          {(status === 'off' || status === 'checking') && <p>{t('pitch')}</p>}
+          {/* The pitch is extra on a phone: the button says it all. */}
+          {(status === 'off' || status === 'checking') && <p className="hidden sm:block">{t('pitch')}</p>}
           {status === 'denied' && <p>{t('denied')}</p>}
           {status === 'needs-install' && <p>{t('install')}</p>}
           {status === 'unsupported' && <p>{t('unsupported')}</p>}

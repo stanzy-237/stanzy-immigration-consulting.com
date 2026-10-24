@@ -20,13 +20,18 @@ import type { DrawSummary } from '@/features/draws/lib/draw-summary';
 import { cn } from '@/lib/utils';
 
 const COLUMNS: SortField[] = ['round', 'date', 'type', 'invitations', 'crsMin'];
+
+/** Columns left out on phones: the date moves under the type, invitations go. */
+const DESKTOP_ONLY = new Set<SortField>(['date', 'invitations']);
 const FILTERS: GroupFilter[] = ['ALL', ...DRAW_GROUPS];
 
 /** Cut-off colour: high is hard to reach, low is within reach. */
 const crsClass = (crs: number) => (crs >= 700 ? 'text-rouge' : crs >= 450 ? 'text-warning' : 'text-success');
 
 const pageButton =
-  'flex size-9 items-center justify-center rounded-lg border border-fog-light bg-white text-sm text-slate transition-colors hover:border-navy-deep disabled:cursor-not-allowed disabled:opacity-40';
+  'flex size-8 items-center justify-center rounded-lg border border-fog-light bg-white text-xs text-slate transition-colors hover:border-navy-deep disabled:cursor-not-allowed disabled:opacity-40 sm:size-9 sm:text-sm';
+
+const cell = 'px-3 py-3 sm:px-5 sm:py-3.5';
 
 /** "Historique des tirages": every stored round, searchable, filterable, sortable and paged. */
 export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
@@ -40,15 +45,15 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
   const newest = draws[0]?.round;
 
   return (
-    <section aria-labelledby={titleId} className="mx-auto max-w-7xl px-4 py-10 sm:px-7">
-      <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-        <h2 id={titleId} className="font-heading text-2xl font-bold text-navy-deep">
+    <section aria-labelledby={titleId} className="mx-auto max-w-7xl px-4 py-6 sm:px-7 sm:py-10">
+      <div className="mb-4 flex items-baseline justify-between gap-3 sm:mb-5">
+        <h2 id={titleId} className="font-heading text-xl font-bold text-navy-deep sm:text-2xl">
           {t('title')}
         </h2>
-        <p className="text-sm text-slate">{t('count', { count: total })}</p>
+        <p className="shrink-0 text-xs text-slate sm:text-sm">{t('count', { count: total })}</p>
       </div>
 
-      <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center">
+      <div className="mb-4 flex flex-col gap-3 sm:mb-5 lg:flex-row lg:items-center">
         <label className="relative min-w-52 flex-1">
           <Search aria-hidden={true} className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate" />
           <input
@@ -57,10 +62,15 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
             placeholder={t('searchPlaceholder')}
             value={state.query}
             onChange={(event) => dispatch({ type: 'search', query: event.target.value })}
-            className="h-11 w-full rounded-lg border border-fog-light bg-white pl-11 pr-4 text-sm text-navy-deep outline-none placeholder:text-slate-mute focus:border-rouge focus:ring-3 focus:ring-rouge/10"
+            className="h-10 w-full rounded-lg border border-fog-light bg-white pl-11 pr-4 text-sm sm:h-11 text-navy-deep outline-none placeholder:text-slate-mute focus:border-rouge focus:ring-3 focus:ring-rouge/10"
           />
         </label>
-        <div role="group" aria-label={t('filterLabel')} className="flex flex-wrap gap-2">
+        {/* One sideways-scrolling row on phones; wraps from `sm` up. */}
+        <div
+          role="group"
+          aria-label={t('filterLabel')}
+          className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+        >
           {FILTERS.map((group) => (
             <button
               key={group}
@@ -68,7 +78,7 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
               aria-pressed={state.group === group}
               onClick={() => dispatch({ type: 'filter', group })}
               className={cn(
-                'h-9 rounded-full border-2 px-4 font-label font-medium transition-colors',
+                'h-8 shrink-0 rounded-full border-2 px-3 text-xs font-semibold transition-colors sm:h-9 sm:px-4',
                 state.group === group
                   ? 'border-navy-deep bg-navy-deep text-white'
                   : 'border-fog-light bg-white text-slate hover:border-navy-deep',
@@ -78,7 +88,7 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
             </button>
           ))}
         </div>
-        <label className="flex items-center gap-2 text-sm text-slate lg:ml-auto">
+        <label className="hidden items-center gap-2 text-sm text-slate sm:flex lg:ml-auto">
           <span aria-hidden={true}>{t('perPage')}</span>
           <select
             aria-label={t('perPageLabel')}
@@ -97,7 +107,7 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
 
       <div className="overflow-hidden rounded-xl border border-fog-light bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-xl border-collapse text-left">
+          <table className="w-full border-collapse text-left sm:min-w-xl">
             <thead className="border-b border-fog-light bg-off-white">
               <tr>
                 {COLUMNS.map((field) => {
@@ -107,12 +117,12 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
                       key={field}
                       scope="col"
                       aria-sort={active ? (state.dir === 'asc' ? 'ascending' : 'descending') : undefined}
-                      className="px-5 py-3.5"
+                      className={cn(cell, DESKTOP_ONLY.has(field) && 'hidden sm:table-cell')}
                     >
                       <button
                         type="button"
                         onClick={() => dispatch({ type: 'sort', field })}
-                        className="inline-flex items-center gap-1.5 whitespace-nowrap font-label font-semibold uppercase tracking-widest text-slate hover:text-navy-deep"
+                        className="inline-flex items-center gap-1.5 whitespace-nowrap text-label font-semibold uppercase tracking-wider text-slate hover:text-navy-deep"
                       >
                         {t(`columns.${field}`)}
                         <span aria-hidden={true} className="flex flex-col text-fog">
@@ -130,46 +140,60 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
                 const isNew = draw.round === newest;
                 return (
                   <tr key={draw.round} className={cn('border-b border-off-white', isNew ? 'bg-blush' : 'hover:bg-off-white')}>
-                    <td className="px-5 py-3.5 text-sm text-navy-deep">
+                    <td className={cn(cell, 'whitespace-nowrap text-sm text-navy-deep')}>
                       <span className="font-heading font-bold">#{draw.round}</span>
+                      {/* On phones the row's tint is enough to mark it. */}
                       {isNew && (
-                        <span className="ml-2 inline-block rounded-full border border-rose bg-blush px-2 py-0.5 font-label text-xs font-semibold text-rouge">
+                        <span className="ml-2 hidden rounded-full border border-rose bg-blush px-2 py-0.5 text-xs font-semibold text-rouge sm:inline-block">
                           {t('new')}
                         </span>
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-5 py-3.5 text-sm text-navy-deep">{text.date(draw)}</td>
-                    <td className="px-5 py-3.5">
-                      <DrawTypePill group={draw.group} label={text.type(draw)} title={draw.typeLabel} />
+                    <td className={cn(cell, 'hidden whitespace-nowrap text-sm text-navy-deep sm:table-cell')}>{text.date(draw)}</td>
+                    <td className={cell}>
+                      <DrawTypePill
+                        group={draw.group}
+                        label={text.type(draw)}
+                        // Category rounds keep their name: "Catégorie" alone says too little.
+                        shortLabel={draw.group === 'CATEGORY' ? text.type(draw) : tGroups(draw.group)}
+                        title={draw.typeLabel}
+                      />
+                      <span className="mt-1 block text-xs text-slate sm:hidden">{text.date(draw)}</span>
                     </td>
-                    <td className="px-5 py-3.5 text-sm font-semibold text-navy-deep">{format.number(draw.invitations)}</td>
-                    <td className={cn('px-5 py-3.5 font-heading text-base font-bold', crsClass(draw.crsMin))}>{draw.crsMin}</td>
+                    <td className={cn(cell, 'hidden text-sm font-semibold text-navy-deep sm:table-cell')}>
+                      {format.number(draw.invitations)}
+                    </td>
+                    <td className={cn(cell, 'font-heading text-sm font-bold sm:text-base', crsClass(draw.crsMin))}>{draw.crsMin}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
           {total === 0 && (
-            <div className="p-14 text-center">
-              <p className="font-heading text-lg font-bold text-navy-deep">{t('emptyTitle')}</p>
-              <p className="mt-1 text-sm text-slate">{t('emptyText')}</p>
+            <div className="p-8 text-center sm:p-14">
+              <p className="font-heading text-base font-bold text-navy-deep sm:text-lg">{t('emptyTitle')}</p>
+              <p className="mt-1 text-xs text-slate sm:text-sm">{t('emptyText')}</p>
             </div>
           )}
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-off-white px-5 py-4 text-sm text-slate">
+        <div className="flex flex-col items-center gap-3 border-t border-off-white px-3 py-3 text-xs text-slate sm:flex-row sm:justify-between sm:px-5 sm:py-4 sm:text-sm">
           <p>{t('range', { from: total === 0 ? 0 : start + 1, to: start + rows.length, total })}</p>
           <nav aria-label={t('pagination')} className="flex flex-wrap gap-1">
             <button
               type="button"
               disabled={page === 1}
               onClick={() => dispatch({ type: 'page', page: page - 1 })}
-              className={cn(pageButton, 'w-auto gap-1 px-2.5')}
+              aria-label={t('previous')}
+              className={cn(pageButton, 'sm:w-auto sm:gap-1 sm:px-2.5')}
             >
-              <ChevronLeft aria-hidden={true} className="size-3.5" /> {t('previous')}
+              <ChevronLeft aria-hidden={true} className="size-3.5" />
+              <span aria-hidden={true} className="hidden sm:inline">
+                {t('previous')}
+              </span>
             </button>
             {pageWindow(page, pageCount).map((n, i) =>
               n === null ? (
-                <span key={`gap-${i}`} aria-hidden={true} className="flex size-9 items-center justify-center">
+                <span key={`gap-${i}`} aria-hidden={true} className="flex size-8 items-center justify-center sm:size-9">
                   …
                 </span>
               ) : (
@@ -189,9 +213,13 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
               type="button"
               disabled={page === pageCount}
               onClick={() => dispatch({ type: 'page', page: page + 1 })}
-              className={cn(pageButton, 'w-auto gap-1 px-2.5')}
+              aria-label={t('next')}
+              className={cn(pageButton, 'sm:w-auto sm:gap-1 sm:px-2.5')}
             >
-              {t('next')} <ChevronRight aria-hidden={true} className="size-3.5" />
+              <span aria-hidden={true} className="hidden sm:inline">
+                {t('next')}
+              </span>
+              <ChevronRight aria-hidden={true} className="size-3.5" />
             </button>
           </nav>
         </div>

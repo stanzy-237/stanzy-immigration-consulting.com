@@ -269,6 +269,14 @@
   letter-spacing: 0.2em;
 }
 
+/* A row that scrolls sideways without showing a scrollbar (filter chips on phones). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* A side panel that sticks below the sticky site nav and scrolls on its own
    when taller than the screen (the CRS result column). */
 @utility sticky-below-nav {
