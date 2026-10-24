@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -21,7 +21,7 @@ vi.mock('@/trpc/react', () => ({
   api: {
     useUtils: () => ({ crs: { list: { invalidate: vi.fn() } } }),
     crs: {
-      save: { useMutation: () => ({ mutate: save, isPending: false, isSuccess: false }) },
+      save: { useMutation: () => ({ mutate: save, reset: vi.fn(), isPending: false, isSuccess: false, isError: false }) },
       list: { useQuery: () => ({ data: [] }) },
       get: { useQuery: () => ({ data: undefined }) },
       delete: { useMutation: () => ({ mutate: vi.fn() }) },
@@ -200,16 +200,40 @@ describe('CrsCalculator', () => {
     expect(save).not.toHaveBeenCalled();
   });
 
-  it('saves the answers for a signed-in Account', () => {
+  it('asks a signed-in Account to name the simulation, offering a default name', async () => {
     signedIn();
     renderCalculator();
 
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer ma simulation' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Nommer votre simulation' });
+    const name = within(dialog).getByLabelText('Nom de la simulation');
+    expect(name).toHaveValue('Simulation du 24 oct. 2026');
+    expect(save).not.toHaveBeenCalled();
+
+    fireEvent.change(name, { target: { value: 'Après TEF' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }));
 
     expect(save).toHaveBeenCalledWith(
-      expect.objectContaining({ profile: expect.objectContaining({ age: 30, education: 'bachelors' }) }),
+      expect.objectContaining({
+        name: 'Après TEF',
+        profile: expect.objectContaining({ age: 30, education: 'bachelors' }),
+      }),
       expect.anything(),
     );
+  });
+
+  it('saves nothing when the visitor cancels, and refuses an empty name', async () => {
+    signedIn();
+    renderCalculator();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer ma simulation' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Nommer votre simulation' });
+    fireEvent.change(within(dialog).getByLabelText('Nom de la simulation'), { target: { value: '   ' } });
+    expect(within(dialog).getByRole('button', { name: 'Enregistrer' })).toBeDisabled();
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Annuler' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(save).not.toHaveBeenCalled();
   });
 
   it('keeps the answers on this device across visits', () => {

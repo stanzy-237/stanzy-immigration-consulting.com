@@ -659,6 +659,15 @@
       "canadianWorkYear": "One more year of skilled Canadian work experience",
       "packText": "You can raise your score by improving your TCF Canada results with the Pack Stanzy.",
       "packCta": "Discover the Pack Stanzy"
+    },
+    "saveDialog": {
+      "title": "Name your simulation",
+      "description": "Give it a name to find it again in “My simulations”.",
+      "label": "Simulation name",
+      "cancel": "Cancel",
+      "confirm": "Save",
+      "saving": "Saving…",
+      "error": "Saving failed. Please try again."
     }
   }
 }
