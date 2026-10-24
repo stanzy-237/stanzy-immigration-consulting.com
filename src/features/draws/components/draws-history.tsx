@@ -31,7 +31,7 @@ const crsClass = (crs: number) => (crs >= 700 ? 'text-rouge' : crs >= 450 ? 'tex
 const pageButton =
   'flex size-8 items-center justify-center rounded-lg border border-fog-light bg-white text-xs text-slate transition-colors hover:border-navy-deep disabled:cursor-not-allowed disabled:opacity-40 sm:size-9 sm:text-sm';
 
-const cell = 'px-3 py-3 sm:px-5 sm:py-3.5';
+const cell = 'px-2.5 py-3 sm:px-5 sm:py-3.5';
 
 /** "Historique des tirages": every stored round, searchable, filterable, sortable and paged. */
 export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
@@ -122,9 +122,15 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
                       <button
                         type="button"
                         onClick={() => dispatch({ type: 'sort', field })}
-                        className="inline-flex items-center gap-1.5 whitespace-nowrap text-label font-semibold uppercase tracking-wider text-slate hover:text-navy-deep"
+                        aria-label={t(`columns.${field}`)}
+                        className="inline-flex items-center gap-1 whitespace-nowrap text-label font-semibold uppercase tracking-wider text-slate hover:text-navy-deep sm:gap-1.5"
                       >
-                        {t(`columns.${field}`)}
+                        <span aria-hidden={true} className="sm:hidden">
+                          {t(`columnsShort.${field}`)}
+                        </span>
+                        <span aria-hidden={true} className="hidden sm:inline">
+                          {t(`columns.${field}`)}
+                        </span>
                         <span aria-hidden={true} className="flex flex-col text-fog">
                           <ArrowUp className={cn('-mb-1 size-2.5', active && state.dir === 'asc' && 'text-navy-deep')} />
                           <ArrowDown className={cn('size-2.5', active && state.dir === 'desc' && 'text-navy-deep')} />
