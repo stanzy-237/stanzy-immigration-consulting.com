@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { authClient } from '@/features/auth/lib/auth-client';
 import { navigationMock, router, withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { CrsCalculator } from '@/features/crs/components/crs-calculator';
+import { DEFAULT_FORM, toProfile } from '@/features/crs/lib/crs-form';
 
 /**
  * Seam: the calculator as a visitor uses it — answering questions and reading
@@ -17,15 +18,18 @@ vi.mock('@/features/auth/lib/auth-client', () => ({
   authClient: { useSession: vi.fn() },
 }));
 const save = vi.fn();
+const remove = vi.fn();
+const rename = vi.fn();
+const fetchSaved = vi.fn();
+let saved: { id: string; name: string; total: number; rules: string; updatedAt: Date }[] = [];
 vi.mock('@/trpc/react', () => ({
   api: {
-    useUtils: () => ({ crs: { list: { invalidate: vi.fn() } } }),
+    useUtils: () => ({ crs: { list: { invalidate: vi.fn() }, get: { fetch: fetchSaved } } }),
     crs: {
-      save: { useMutation: () => ({ mutate: save, isPending: false, isSuccess: false }) },
-      list: { useQuery: () => ({ data: [] }) },
-      get: { useQuery: () => ({ data: undefined }) },
-      delete: { useMutation: () => ({ mutate: vi.fn() }) },
-      rename: { useMutation: () => ({ mutate: vi.fn() }) },
+      save: { useMutation: () => ({ mutate: save, reset: vi.fn(), isPending: false, isSuccess: false, isError: false }) },
+      list: { useQuery: () => ({ data: saved }) },
+      delete: { useMutation: () => ({ mutate: remove }) },
+      rename: { useMutation: () => ({ mutate: rename }) },
     },
   },
 }));
@@ -51,6 +55,7 @@ function renderCalculator(locale: 'fr' | 'en' = 'fr') {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  saved = [];
   window.localStorage.clear();
   signedOut();
 });
@@ -170,6 +175,21 @@ describe('CrsCalculator', () => {
     expect(hints.some((h) => /expérience canadienne/.test(h.textContent ?? '') && /\+53/.test(h.textContent ?? ''))).toBe(true);
   });
 
+  it('gathers the advice beneath the score in one card: hints, Pack Stanzy for the TCF, disclaimer', () => {
+    renderCalculator();
+    const advice = screen.getByRole('region', { name: 'Comment augmenter votre score' });
+
+    expect(within(advice).getAllByRole('listitem').length).toBeGreaterThan(0);
+    const pack = within(advice).getByRole('link', { name: /Pack Stanzy/ });
+    expect(pack).toHaveAttribute('href', 'https://tcf-express-academy.com');
+    expect(pack).toHaveAttribute('target', '_blank');
+    expect(pack).toHaveAttribute('rel', expect.stringContaining('noopener'));
+    expect(within(advice).getByText(/Résultat indicatif/)).toBeInTheDocument();
+    expect(within(advice).getByRole('link', { name: 'Réserver une consultation' })).toBeInTheDocument();
+    // The score card itself no longer carries the disclaimer.
+    expect(within(screen.getByRole('complementary', { name: 'Votre score' })).queryByText(/Résultat indicatif/)).toBeNull();
+  });
+
   it('adds the provincial nomination', () => {
     renderCalculator();
     fireEvent.click(screen.getByLabelText(/Désignation provinciale ou territoriale/));
@@ -185,16 +205,97 @@ describe('CrsCalculator', () => {
     expect(save).not.toHaveBeenCalled();
   });
 
-  it('saves the answers for a signed-in Account', () => {
+  it('asks a signed-in Account to name the simulation, offering a default name', async () => {
     signedIn();
     renderCalculator();
 
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer ma simulation' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Nommer votre simulation' });
+    const name = within(dialog).getByLabelText('Nom de la simulation');
+    expect(name).toHaveValue('Simulation du 24 oct. 2026');
+    expect(save).not.toHaveBeenCalled();
+
+    fireEvent.change(name, { target: { value: 'Après TEF' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }));
 
     expect(save).toHaveBeenCalledWith(
-      expect.objectContaining({ profile: expect.objectContaining({ age: 30, education: 'bachelors' }) }),
+      expect.objectContaining({
+        name: 'Après TEF',
+        profile: expect.objectContaining({ age: 30, education: 'bachelors' }),
+      }),
       expect.anything(),
     );
+  });
+
+  it('saves nothing when the visitor cancels, and refuses an empty name', async () => {
+    signedIn();
+    renderCalculator();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer ma simulation' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Nommer votre simulation' });
+    fireEvent.change(within(dialog).getByLabelText('Nom de la simulation'), { target: { value: '   ' } });
+    expect(within(dialog).getByRole('button', { name: 'Enregistrer' })).toBeDisabled();
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Annuler' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  describe('Mes simulations', () => {
+    beforeEach(() => {
+      signedIn();
+      saved = [
+        { id: 'sim_1', name: 'Après TEF', total: 471, rules: '2025-03-25', updatedAt: new Date('2026-10-20T12:00:00Z') },
+      ];
+    });
+
+    const card = () =>
+      within(screen.getByRole('region', { name: 'Mes simulations' })).getByRole('listitem');
+
+    it('shows each saved simulation with its name, score and date, and icon actions', () => {
+      renderCalculator();
+
+      expect(card()).toHaveTextContent('Après TEF');
+      expect(card()).toHaveTextContent('471');
+      expect(card()).toHaveTextContent('20/10/2026');
+      expect(card()).not.toHaveTextContent('Enregistrée');
+      for (const action of ['Ouvrir', 'Renommer', 'Supprimer']) {
+        expect(within(card()).getByRole('button', { name: `${action} « Après TEF »` })).toBeInTheDocument();
+      }
+    });
+
+    it('reopens a simulation in the calculator', async () => {
+      fetchSaved.mockResolvedValue({ profile: { ...toProfile(DEFAULT_FORM), age: 29 } });
+      renderCalculator();
+
+      fireEvent.click(within(card()).getByRole('button', { name: 'Ouvrir « Après TEF »' }));
+
+      await waitFor(() => expect(screen.getByLabelText('Votre âge')).toHaveValue(29));
+      expect(fetchSaved).toHaveBeenCalledWith({ id: 'sim_1' });
+    });
+
+    it('renames in place', () => {
+      renderCalculator();
+
+      fireEvent.click(within(card()).getByRole('button', { name: 'Renommer « Après TEF »' }));
+      fireEvent.change(within(card()).getByLabelText('Nouveau nom pour « Après TEF »'), {
+        target: { value: 'Après TEF 2' },
+      });
+      fireEvent.click(within(card()).getByRole('button', { name: 'Valider le nouveau nom' }));
+
+      expect(rename).toHaveBeenCalledWith({ id: 'sim_1', name: 'Après TEF 2' });
+    });
+
+    it('asks before deleting, and deletes only once confirmed', async () => {
+      renderCalculator();
+
+      fireEvent.click(within(card()).getByRole('button', { name: 'Supprimer « Après TEF »' }));
+      const confirm = await screen.findByRole('alertdialog', { name: 'Supprimer « Après TEF » ?' });
+      expect(remove).not.toHaveBeenCalled();
+
+      fireEvent.click(within(confirm).getByRole('button', { name: 'Supprimer' }));
+      expect(remove).toHaveBeenCalledWith({ id: 'sim_1' });
+    });
   });
 
   it('keeps the answers on this device across visits', () => {

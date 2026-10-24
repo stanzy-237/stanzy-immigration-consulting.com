@@ -28,8 +28,9 @@ import { api } from '@/trpc/react';
 
 import { CheckField, CrsSection, NumberField, SelectField } from '@/features/crs/components/crs-fields';
 import { LanguageFields } from '@/features/crs/components/language-fields';
+import { SaveSimulationDialog } from '@/features/crs/components/save-simulation-dialog';
 import { SavedSimulations } from '@/features/crs/components/saved-simulations';
-import { ScoreHints } from '@/features/crs/components/score-hints';
+import { ScoreAdvice } from '@/features/crs/components/score-advice';
 import { ScoreSummary } from '@/features/crs/components/score-summary';
 
 const CANADIAN_YEARS = [0, 1, 2, 3, 4, 5] as const;
@@ -54,6 +55,7 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
   const inForce = rulesInForceOn(today);
   const [rules, setRules] = useState<RulesVersion>(inForce);
   const [offline, setOffline] = useState(false);
+  const [naming, setNaming] = useState(false);
   const utils = api.useUtils();
   const save = api.crs.save.useMutation();
 
@@ -89,13 +91,18 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
       return;
     }
     setOffline(false);
-    const name = t('summary.defaultName', { date: format.dateTime(today, { dateStyle: 'medium' }) });
+    save.reset();
+    setNaming(true);
+  };
+
+  const saveAs = (name: string): void => {
     save.mutate(
       { name, profile: toProfile(form), rules },
       {
         onSuccess: (saved) => {
           track('crs.saved', { total: saved.total });
           void utils.crs.list.invalidate();
+          setNaming(false);
         },
       },
     );
@@ -312,8 +319,18 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
           saved={save.isSuccess}
           offline={offline}
         />
-        <ScoreHints profile={toProfile(form)} rules={rules} />
+        <ScoreAdvice profile={toProfile(form)} rules={rules} />
         {account ? <SavedSimulations onOpen={openSaved} /> : null}
+        {naming ? (
+          <SaveSimulationDialog
+            open
+            defaultName={t('summary.defaultName', { date: format.dateTime(today, { dateStyle: 'medium' }) })}
+            saving={save.isPending}
+            failed={save.isError}
+            onSave={saveAs}
+            onClose={() => setNaming(false)}
+          />
+        ) : null}
       </div>
     </div>
   );

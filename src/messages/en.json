@@ -647,16 +647,36 @@
       "empty": "No saved simulation yet.",
       "open": "Open",
       "rename": "Rename",
-      "renameLabel": "New name for {name}",
-      "confirmRename": "Confirm",
-      "delete": "Delete"
+      "delete": "Delete",
+      "openLabel": "Open “{name}”",
+      "renameAction": "Rename “{name}”",
+      "deleteLabel": "Delete “{name}”",
+      "renameLabel": "New name for “{name}”",
+      "confirmRename": "Confirm the new name",
+      "cancelRename": "Cancel",
+      "points": "pts",
+      "deleteTitle": "Delete “{name}”?",
+      "deleteDescription": "This simulation will be permanently deleted.",
+      "cancelDelete": "Cancel",
+      "confirmDelete": "Delete"
     },
     "hints": {
       "title": "How to raise your score",
       "gain": "+{points} pts",
       "firstLanguageClb9": "Reach CLB/NCLC 9 in all 4 abilities of your first official language",
       "frenchNclc7": "Get NCLC 7 or more in French in all 4 abilities",
-      "canadianWorkYear": "One more year of skilled Canadian work experience"
+      "canadianWorkYear": "One more year of skilled Canadian work experience",
+      "packText": "You can raise your score by improving your TCF Canada results with the Pack Stanzy.",
+      "packCta": "Discover the Pack Stanzy"
+    },
+    "saveDialog": {
+      "title": "Name your simulation",
+      "description": "Give it a name to find it again in “My simulations”.",
+      "label": "Simulation name",
+      "cancel": "Cancel",
+      "confirm": "Save",
+      "saving": "Saving…",
+      "error": "Saving failed. Please try again."
     }
   }
 }

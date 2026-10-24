@@ -647,16 +647,36 @@
       "empty": "Aucune simulation enregistrée.",
       "open": "Ouvrir",
       "rename": "Renommer",
-      "renameLabel": "Nouveau nom pour {name}",
-      "confirmRename": "Valider",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "openLabel": "Ouvrir « {name} »",
+      "renameAction": "Renommer « {name} »",
+      "deleteLabel": "Supprimer « {name} »",
+      "renameLabel": "Nouveau nom pour « {name} »",
+      "confirmRename": "Valider le nouveau nom",
+      "cancelRename": "Annuler",
+      "points": "pts",
+      "deleteTitle": "Supprimer « {name} » ?",
+      "deleteDescription": "Cette simulation sera définitivement supprimée.",
+      "cancelDelete": "Annuler",
+      "confirmDelete": "Supprimer"
     },
     "hints": {
       "title": "Comment augmenter votre score",
       "gain": "+{points} pts",
       "firstLanguageClb9": "Atteindre NCLC/CLB 9 dans les 4 compétences de votre 1re langue officielle",
       "frenchNclc7": "Obtenir NCLC 7 ou plus en français dans les 4 compétences",
-      "canadianWorkYear": "Une année d’expérience canadienne qualifiée de plus"
+      "canadianWorkYear": "Une année d’expérience canadienne qualifiée de plus",
+      "packText": "Vous pouvez augmenter votre score en améliorant vos résultats au TCF Canada avec le Pack Stanzy.",
+      "packCta": "Découvrir le Pack Stanzy"
+    },
+    "saveDialog": {
+      "title": "Nommer votre simulation",
+      "description": "Donnez-lui un nom pour la retrouver dans « Mes simulations ».",
+      "label": "Nom de la simulation",
+      "cancel": "Annuler",
+      "confirm": "Enregistrer",
+      "saving": "Enregistrement…",
+      "error": "L’enregistrement a échoué. Réessayez."
     }
   }
 }
