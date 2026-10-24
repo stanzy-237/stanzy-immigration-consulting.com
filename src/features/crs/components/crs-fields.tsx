@@ -5,9 +5,9 @@ import { cn } from '@/lib/utils';
 
 /** The calculator's form controls: a label above, an optional hint or error below. */
 const CONTROL =
-  'h-12 w-full rounded-xl border border-fog bg-white px-4 font-body text-base text-navy-deep outline-none transition-colors hover:border-slate-mute focus-visible:border-rouge focus-visible:ring-2 focus-visible:ring-rouge/20 aria-invalid:border-rouge';
+  'h-12 w-full rounded-xl border border-fog bg-white px-4 font-body text-body text-navy-deep outline-none transition-colors hover:border-slate-mute focus-visible:border-rouge focus-visible:ring-2 focus-visible:ring-rouge/20 aria-invalid:border-rouge';
 
-const LABEL = 'mb-2 block font-label text-xs font-semibold uppercase tracking-widest text-slate';
+const LABEL = 'mb-2 block font-label text-slate';
 
 function Described({
   id,
@@ -20,13 +20,13 @@ function Described({
 }): ReactNode {
   if (error) {
     return (
-      <p id={`${id}-error`} className="mt-2 text-sm font-medium text-rouge">
+      <p id={`${id}-error`} className="mt-2 text-body-sm font-medium text-rouge">
         {error}
       </p>
     );
   }
   return hint ? (
-    <p id={`${id}-hint`} className="mt-2 text-sm text-slate">
+    <p id={`${id}-hint`} className="mt-2 text-body-sm text-slate">
       {hint}
     </p>
   ) : null;
@@ -131,7 +131,7 @@ export function CheckField({
   return (
     <label
       className={cn(
-        'flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-sm font-semibold text-navy-deep transition-colors',
+        'flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-body-sm font-semibold text-navy-deep transition-colors',
         checked ? 'border-navy-deep bg-ice-blue' : 'border-fog hover:border-slate-mute',
       )}
     >
@@ -175,13 +175,13 @@ export function CrsSection({
         )}
       />
       <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 id={headingId} className="font-heading text-xl font-bold text-navy-deep">
+        <h2 id={headingId} className="font-heading text-h4 font-bold text-navy-deep">
           {title}
         </h2>
         {points !== undefined ? (
           <span
             data-testid="section-points"
-            className="rounded-full bg-ice-blue px-2.5 py-0.5 font-label text-xs font-bold text-navy-deep"
+            className="rounded-full bg-ice-blue px-2.5 py-0.5 font-label text-navy-deep"
           >
             {points}
           </span>

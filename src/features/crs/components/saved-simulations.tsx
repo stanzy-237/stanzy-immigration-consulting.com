@@ -20,12 +20,12 @@ export function SavedSimulations({ onOpen }: { onOpen: (profile: CrsProfile) => 
   };
 
   return (
-    <section aria-labelledby="crs-simulations-title" className="mt-4 rounded-2xl border border-fog bg-white p-5">
-      <h2 id="crs-simulations-title" className="font-heading text-lg font-bold text-navy-deep">
+    <section aria-labelledby="crs-simulations-title" className="rounded-2xl border border-fog bg-white p-5">
+      <h2 id="crs-simulations-title" className="font-heading text-h4 font-bold text-navy-deep">
         {t('title')}
       </h2>
       {simulations.length === 0 ? (
-        <p className="mt-2 text-sm text-slate">{t('empty')}</p>
+        <p className="mt-2 text-body-sm text-slate">{t('empty')}</p>
       ) : (
         <ul className="mt-3 divide-y divide-fog">
           {simulations.map((simulation) => (
@@ -41,30 +41,30 @@ export function SavedSimulations({ onOpen }: { onOpen: (profile: CrsProfile) => 
                 >
                   <input
                     aria-label={t('renameLabel', { name: simulation.name })}
-                    className="h-10 flex-1 rounded-lg border border-fog px-3 text-sm"
+                    className="h-10 flex-1 rounded-lg border border-fog px-3 text-body-sm"
                     value={renaming.name}
                     maxLength={80}
                     onChange={(e) => setRenaming({ ...renaming, name: e.target.value })}
                   />
-                  <button type="submit" className="rounded-lg bg-navy-deep px-3 text-sm font-semibold text-white">
+                  <button type="submit" className="rounded-lg bg-navy-deep px-3 text-body-sm font-semibold text-white">
                     {t('confirmRename')}
                   </button>
                 </form>
               ) : (
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="flex-1 text-sm font-semibold text-navy-deep">{simulation.name}</span>
-                  <span className="font-heading text-sm font-bold text-rouge">{simulation.total}</span>
-                  <button type="button" className="text-sm font-semibold text-steel-blue hover:underline" onClick={() => void open(simulation.id)}>
+                  <span className="flex-1 text-body-sm font-semibold text-navy-deep">{simulation.name}</span>
+                  <span className="font-heading text-body-sm font-bold text-rouge">{simulation.total}</span>
+                  <button type="button" className="text-body-sm font-semibold text-steel-blue hover:underline" onClick={() => void open(simulation.id)}>
                     {t('open')}
                   </button>
                   <button
                     type="button"
-                    className="text-sm font-semibold text-steel-blue hover:underline"
+                    className="text-body-sm font-semibold text-steel-blue hover:underline"
                     onClick={() => setRenaming({ id: simulation.id, name: simulation.name })}
                   >
                     {t('rename')}
                   </button>
-                  <button type="button" className="text-sm font-semibold text-rouge hover:underline" onClick={() => remove.mutate({ id: simulation.id })}>
+                  <button type="button" className="text-body-sm font-semibold text-rouge hover:underline" onClick={() => remove.mutate({ id: simulation.id })}>
                     {t('delete')}
                   </button>
                 </div>

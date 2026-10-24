@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
-import { LANGUAGE_TESTS } from '@/features/crs/data/language-tests';
+import { LANGUAGE_TESTS, TEST_SPECS } from '@/features/crs/data/language-tests';
 import { ABILITIES, clbLevelFor } from '@/features/crs/lib/compute-crs';
 import { parseScore, type LanguageForm } from '@/features/crs/lib/crs-form';
 
@@ -23,6 +23,9 @@ export function LanguageFields({
 }): ReactNode {
   const t = useTranslations('Crs.language');
   const short = t(`shortSlots.${slot}`);
+  // Abilities carry the names printed on the test report: English for IELTS,
+  // CELPIP, PTE Core and CLB; French for TEF, TCF and NCLC — in either UI language.
+  const reportLanguage = value.test === 'none' ? null : TEST_SPECS[value.test].language;
 
   return (
     <div className="space-y-4">
@@ -42,13 +45,13 @@ export function LanguageFields({
             return (
               <div key={ability}>
                 <NumberField
-                  label={t('field', { slot: short, ability: t(`abilities.${ability}`) })}
+                  label={t('field', { slot: short, ability: t(`abilitiesByTestLanguage.${reportLanguage ?? 'fr'}.${ability}`) })}
                   value={raw}
                   onChange={(next) => onChange({ ...value, scores: { ...value.scores, [ability]: next } })}
                   error={level === null ? t('invalid') : undefined}
                 />
                 {typeof level === 'number' ? (
-                  <p data-testid={`level-${slot}-${ability}`} className="mt-1 font-label text-xs font-semibold text-steel-blue">
+                  <p data-testid={`level-${slot}-${ability}`} className="mt-1 font-label text-steel-blue">
                     {level === 0 ? t('belowFour') : t('level', { level })}
                   </p>
                 ) : null}
