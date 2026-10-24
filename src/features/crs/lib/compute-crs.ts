@@ -128,8 +128,8 @@ const sum = (values: number[]): number => values.reduce((a, b) => a + b, 0);
 const capYears = (years: number, max: number): number => Math.min(Math.max(Math.floor(years), 0), max);
 const CLB_STEPS = [10, 9, 8, 7, 6, 5, 4] as const;
 
-/** One ability's CLB/NCLC level, or null when `score` isn't a possible result of `test`. */
-function levelFor(test: LanguageTest, ability: Ability, score: number): number | null {
+/** One ability's CLB/NCLC level (0 below 4), or null when `score` isn't a possible result of `test`. */
+export function clbLevelFor(test: LanguageTest, ability: Ability, score: number): number | null {
   const spec = TEST_SPECS[test];
   const { min, max } = spec.range[ability];
   const steps = (score - min) / spec.step;
@@ -149,7 +149,7 @@ function levelsFor(
   if (!result) return null;
   const levels = {} as ClbLevels;
   for (const ability of ABILITIES) {
-    const level = levelFor(result.test, ability, result.scores[ability]);
+    const level = clbLevelFor(result.test, ability, result.scores[ability]);
     if (level === null) issues.push({ field: `${field}.${ability}`, code: 'SCORE_OUT_OF_RANGE' });
     levels[ability] = level ?? 0;
   }

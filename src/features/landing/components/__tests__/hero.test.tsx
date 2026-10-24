@@ -3,6 +3,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { CRS_DRAFT_KEY } from '@/features/crs/hooks/use-crs-draft';
+import { DEFAULT_FORM } from '@/features/crs/lib/crs-form';
 import { Hero } from '@/features/landing/components/hero';
 import * as analytics from '@/lib/analytics';
 
@@ -75,5 +77,16 @@ describe('Hero', () => {
   it('has no axe violations', async () => {
     const { container } = render(withIntl(<Hero />));
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it("shows the visitor's own latest CRS score once they have used the calculator", () => {
+    // Single, 29, bachelor's: 110 + 120 = 230 (worked in the CRS engine tests).
+    window.localStorage.setItem(CRS_DRAFT_KEY, JSON.stringify({ ...DEFAULT_FORM, age: '29' }));
+    render(withIntl(<Hero />));
+
+    expect(screen.getByText('Votre score CRS')).toBeInTheDocument();
+    expect(screen.getByText('230')).toBeInTheDocument();
+    expect(screen.getByText('Votre dernière simulation')).toBeInTheDocument();
+    window.localStorage.clear();
   });
 });
