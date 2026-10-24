@@ -12,6 +12,7 @@ export const FOOTER_TOOL_LINKS: ReadonlyArray<FooterLink> = [
   { key: 'timeline', labelKey: 'timeline', href: '/outils/timeline' },
   { key: 'crs', labelKey: 'crs', href: '/outils/crs' },
   { key: 'fsw', labelKey: 'fsw', href: '/outils/67-points' },
+  { key: 'nclc', labelKey: 'nclc', href: '/outils/nclc-clb' },
   { key: 'ita', labelKey: 'ita', href: '/outils/compte-a-rebours-ita' },
   { key: 'draw', labelKey: 'draw', href: '/outils/dernier-tirage' },
   { key: 'cnp', labelKey: 'cnp', href: '/outils/cnp' },

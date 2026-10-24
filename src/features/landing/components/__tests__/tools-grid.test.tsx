@@ -21,7 +21,7 @@ describe('ToolsGrid', () => {
     render(withIntl(<ToolsGrid />));
     const expected: ReadonlyArray<[RegExp, string]> = [
       [/Timeline Immigration/i, '/outils/timeline'],
-      [/Clouds/i, '/outils/coffre-fort'],
+      [/Calculateur NCLC \/ CLB/i, '/outils/nclc-clb'],
       [/Compte à rebours ITA/i, '/outils/compte-a-rebours-ita'],
       [/Calculateur de 67 points/i, '/outils/67-points'],
       [/Calculateur CRS/i, '/outils/crs'],
@@ -32,6 +32,13 @@ describe('ToolsGrid', () => {
       const link = screen.getByRole('link', { name });
       expect(link).toHaveAttribute('href', expect.stringContaining(href));
     }
+  });
+
+  it('offers the NCLC / CLB calculator in place of the Clouds card', () => {
+    render(withIntl(<ToolsGrid />));
+    const card = screen.getByRole('link', { name: /Calculateur NCLC \/ CLB/i });
+    expect(within(card).getByText('NCLC · CLB')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Clouds/i })).not.toBeInTheDocument();
   });
 
   it('surfaces the live-data badge on the Dernier tirage card', () => {

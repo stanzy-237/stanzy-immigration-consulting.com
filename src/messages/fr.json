@@ -50,7 +50,9 @@
         "drawName": "Dernier tirage",
         "drawDesc": "Résultats du dernier tirage Entrée Express",
         "cnpName": "Recherche CNP",
-        "cnpDesc": "Trouvez votre code de profession canadien"
+        "cnpDesc": "Trouvez votre code de profession canadien",
+        "nclcName": "NCLC / CLB",
+        "nclcDesc": "Votre niveau de langue à partir de vos notes"
       },
       "Services": {
         "consultationName": "Consultation privée",
@@ -97,7 +99,9 @@
         "drawName": "Dernier tirage Entrée Express",
         "drawDesc": "Résultats en temps réel du dernier tirage IRCC. Score minimum, nombre d'invitations, catégorie visée et comparaison avec votre profil.",
         "cnpName": "Recherche code CNP",
-        "cnpDesc": "Trouvez le code professionnel qui correspond à votre métier. Indispensable pour tout dossier d'immigration au Canada."
+        "cnpDesc": "Trouvez le code professionnel qui correspond à votre métier. Indispensable pour tout dossier d'immigration au Canada.",
+        "nclcName": "Calculateur NCLC / CLB",
+        "nclcDesc": "Convertissez vos résultats TEF, TCF, IELTS, CELPIP ou PTE en niveaux NCLC/CLB, avec vos points CRS et votre admissibilité Entrée Express."
       },
       "Badges": {
         "free": "Gratuit",
@@ -117,7 +121,9 @@
         "badgeCompare": "Comparaison",
         "badgeMapleExpressEntry": "🍁 Entrée Express",
         "badgeCnp2021": "CNP 2021",
-        "badgeTeer": "TEER"
+        "badgeTeer": "TEER",
+        "badgeNclcClb": "NCLC · CLB",
+        "badgeLanguageTests": "TEF · TCF · IELTS"
       }
     },
     "BlogRow": {
@@ -327,7 +333,8 @@
         "fsw": "Calculateur 67 points",
         "ita": "Compte à rebours ITA",
         "draw": "Dernier tirage",
-        "cnp": "Recherche code CNP"
+        "cnp": "Recherche code CNP",
+        "nclc": "Calculateur NCLC / CLB"
       },
       "Services": {
         "consultation": "Consultation privée",
@@ -915,6 +922,74 @@
     "alert": {
       "title": "Nouveau tirage #{round}",
       "body": "{type} · {invitations} invitations · CRS {crsMin}"
+    }
+  },
+  "Nclc": {
+    "eyebrow": "Outil gratuit · Niveau linguistique",
+    "title": "Calculateur",
+    "titleAccent": "NCLC / CLB",
+    "lead": "Choisissez votre test, entrez vos notes et obtenez votre niveau NCLC (français) ou CLB (anglais), vos points CRS indicatifs et les programmes Entrée Express auxquels il vous rend admissible.",
+    "steps": {
+      "test": {
+        "step": "Étape 1",
+        "title": "Votre test de langue"
+      },
+      "scores": {
+        "step": "Étape 2",
+        "title": "Vos notes obtenues",
+        "subtitle": "Telles qu’elles figurent sur votre attestation de résultats."
+      }
+    },
+    "testLabel": "Quel test avez-vous passé ?",
+    "testHints": {
+      "TEF": "TEF Canada : entrez les résultats « Équivalence ancien score ».",
+      "TCF": "Administré par France Éducation international.",
+      "IELTS": "Seule la version General Training est acceptée.",
+      "CELPIP": "Seul le CELPIP-General est accepté (pas le General LS).",
+      "PTE_CORE": "Seul le PTE Core est accepté (pas le PTE Academic)."
+    },
+    "scoreLabel": "{ability} (sur {max})",
+    "result": {
+      "title": "Votre niveau",
+      "empty": "Entrez vos 4 notes pour voir votre niveau, vos points CRS et votre admissibilité.",
+      "language": {
+        "fr": "Français",
+        "en": "Anglais"
+      },
+      "columns": {
+        "skill": "Compétence",
+        "score": "Votre note",
+        "level": "Niveau {unit}"
+      },
+      "level": "{unit} {level}",
+      "belowFour": "Moins de {unit} 4",
+      "retained": "Niveau retenu (le plus faible)",
+      "crsLabel": "Points CRS indicatifs",
+      "crsValue": "{points} pts",
+      "crsNote": "Langue officielle principale, candidat sans conjoint.",
+      "frenchBonus": "+{alone} pts de bonus francophone ({withEnglish} pts avec CLB 5+ en anglais)",
+      "programsTitle": "Admissibilité Entrée Express",
+      "programs": {
+        "fsw": "Travailleurs qualifiés (fédéral) : {unit} 7 partout",
+        "cecTeer01": "Expérience canadienne, emploi TEER 0 ou 1 : {unit} 7 partout",
+        "cecTeer23": "Expérience canadienne, emploi TEER 2 ou 3 : {unit} 5 partout",
+        "fst": "Métiers spécialisés (fédéral) : {unit} 5 à l’oral, 4 à l’écrit"
+      },
+      "met": "Atteint",
+      "notMet": "Pas encore"
+    },
+    "legend": {
+      "title": "Les paliers à retenir",
+      "l4": "NCLC/CLB 4 : premier niveau reconnu par IRCC",
+      "l5": "NCLC/CLB 5 : Expérience canadienne (TEER 2-3) et Métiers spécialisés",
+      "l7": "NCLC/CLB 7 : Travailleurs qualifiés, Expérience canadienne (TEER 0-1) et, en français, bonus CRS",
+      "l9": "NCLC/CLB 9 : points de transférabilité maximaux au CRS"
+    },
+    "tip": "Le NCLC s’applique au français, le CLB à l’anglais. Chaque programme exige un minimum dans chacune des 4 compétences : c’est votre compétence la plus faible qui décide.",
+    "guide": {
+      "title": "Un bon niveau NCLC / CLB n’est que la première étape.",
+      "text": "Votre niveau linguistique pèse lourd dans votre score CRS et décide de votre admissibilité. Pour savoir où vous vous situez dans le bassin Entrée Express, calculez votre score CRS complet.",
+      "secondary": "Calculer mon score CRS"
     }
   }
 }

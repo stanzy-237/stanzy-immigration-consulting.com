@@ -38,6 +38,10 @@ _Avoid_: NOC in product-facing French copy; use CNP.
 The 100-point Federal Skilled Worker eligibility grid where 67 is the pass mark. Distinct from the CRS score — it is a pass/fail gate, not a ranking. Subject of its own calculator.
 _Avoid_: conflating with CRS.
 
+**NCLC / CLB** (Niveaux de compétence linguistique canadiens / Canadian Language Benchmarks):
+Canada's language levels, 1 to 12: NCLC for French, CLB for English. Each approved test's results convert to a level per skill (speaking, listening, reading, writing); a program's minimum applies to every skill, so the weakest one decides. Subject of its own calculator.
+_Avoid_: "score" for the level (the score is the test's own result, e.g. TCF 699).
+
 ### Platform concepts
 
 **Account**:

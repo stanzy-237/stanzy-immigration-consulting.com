@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Clock,
   Cloud,
+  Languages,
   Search,
   Timer,
   TrendingUp,
@@ -38,13 +39,13 @@ export const TOOLS: ReadonlyArray<Tool> = [
     freeKey: 'free',
   },
   {
-    slug: 'clouds',
-    icon: Cloud,
-    nameKey: 'cloudsName',
-    descKey: 'cloudsDesc',
-    href: '/outils/coffre-fort',
+    slug: 'nclc',
+    icon: Languages,
+    nameKey: 'nclcName',
+    descKey: 'nclcDesc',
+    href: '/outils/nclc-clb',
     variant: 'default',
-    badgeKeys: ['badgeCrsProfile', 'badgeAnalysis'],
+    badgeKeys: ['badgeNclcClb', 'badgeLanguageTests'],
     freeKey: 'free',
   },
   {
@@ -98,3 +99,20 @@ export const TOOLS: ReadonlyArray<Tool> = [
     freeKey: 'free',
   },
 ] as const;
+
+/**
+ * Tools that have a page but no card on the home grid. The Coffre-fort's
+ * card made way for the NCLC / CLB calculator; its placeholder page stays.
+ */
+export const UNLISTED_TOOLS: ReadonlyArray<Tool> = [
+  {
+    slug: 'clouds',
+    icon: Cloud,
+    nameKey: 'cloudsName',
+    descKey: 'cloudsDesc',
+    href: '/outils/coffre-fort',
+    variant: 'default',
+    badgeKeys: ['badgeCrsProfile', 'badgeAnalysis'],
+    freeKey: 'free',
+  },
+];
