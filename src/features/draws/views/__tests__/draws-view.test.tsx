@@ -300,6 +300,35 @@ describe('DrawsView — Alertes tirages', () => {
     expect(await within(alerts()).findByRole('button', { name: 'Activer les alertes tirages' })).toBeInTheDocument();
   });
 
+  it('turns alerts on by itself when the device already allows notifications', async () => {
+    const { pushManager, json } = pushCapable({ permission: 'granted' });
+    await renderSettled();
+
+    expect(pushManager.subscribe).toHaveBeenCalledWith(expect.objectContaining({ userVisibleOnly: true }));
+    expect(subscribe).toHaveBeenCalledWith({ subscription: json, locale: 'fr' });
+    expect(await within(alerts()).findByText('Alertes tirages activées sur cet appareil')).toBeInTheDocument();
+  });
+
+  it('stays off on later visits once the visitor turned alerts off', async () => {
+    pushCapable({ permission: 'granted', existing: {} });
+    let unmount = () => {};
+    await act(async () => {
+      ({ unmount } = render(withIntl(<DrawsView />)));
+    });
+    await act(async () => {
+      fireEvent.click(await within(alerts()).findByRole('button', { name: 'Désactiver les alertes' }));
+    });
+    unmount();
+    subscribe.mockClear();
+
+    const { pushManager } = pushCapable({ permission: 'granted' });
+    await renderSettled();
+
+    expect(pushManager.subscribe).not.toHaveBeenCalled();
+    expect(subscribe).not.toHaveBeenCalled();
+    expect(await within(alerts()).findByRole('button', { name: 'Activer les alertes tirages' })).toBeInTheDocument();
+  });
+
   it('explains how to unblock notifications once they were denied', async () => {
     pushCapable({ permission: 'denied' });
     await renderSettled();

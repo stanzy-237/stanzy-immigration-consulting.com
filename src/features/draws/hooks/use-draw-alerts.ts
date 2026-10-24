@@ -26,12 +26,35 @@ function keyBytes(base64url: string): Uint8Array<ArrayBuffer> {
 /** iPadOS Safari reports a Mac browser; a Mac with a touch screen is an iPad. */
 const isIos = () =>
   /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
-type SubscriptionJson = { endpoint: string; keys: { p256dh: string; auth: string } };
-
 const isStandalone = () =>
   (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches) ||
   (navigator as Navigator & { standalone?: boolean }).standalone === true;
 const canPush = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+
+type SubscriptionJson = { endpoint: string; keys: { p256dh: string; auth: string } };
+
+/**
+ * Set when the visitor turns alerts off, so a device that allows notifications
+ * isn't subscribed again on its next visit. Cleared when they turn alerts on.
+ */
+const OPTED_OUT_KEY = 'stanzy.drawAlerts.off';
+
+function optedOut(): boolean {
+  try {
+    return window.localStorage.getItem(OPTED_OUT_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function setOptedOut(off: boolean): void {
+  try {
+    if (off) window.localStorage.setItem(OPTED_OUT_KEY, '1');
+    else window.localStorage.removeItem(OPTED_OUT_KEY);
+  } catch {
+    // Storage unavailable (private mode): the choice lasts for this visit only.
+  }
+}
 
 /** This page's service worker registration, registering `/sw.js` when asked to. */
 async function registration(register: boolean): Promise<ServiceWorkerRegistration | undefined> {
@@ -39,6 +62,13 @@ async function registration(register: boolean): Promise<ServiceWorkerRegistratio
   if (existing || !register) return existing;
   await navigator.serviceWorker.register('/sw.js');
   return navigator.serviceWorker.ready;
+}
+
+/** A new push subscription for this device. Needs notification permission. */
+async function subscribeDevice(publicKey: string): Promise<PushSubscription> {
+  const reg = await registration(true);
+  if (!reg) throw new Error('No service worker');
+  return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) });
 }
 
 export function useDrawAlerts() {
@@ -73,10 +103,19 @@ export function useDrawAlerts() {
       registration(false)
         .then((reg) => reg?.pushManager.getSubscription())
         .then(async (existing) => {
-          // Re-register with the server: it may have dropped this device (an
-          // expired subscription, or a subscribe call that never arrived).
-          if (existing) await syncRef.current(existing);
-          settle(existing ? 'on' : 'off');
+          if (existing) {
+            // Re-register with the server: it may have dropped this device (an
+            // expired subscription, or a subscribe call that never arrived).
+            await syncRef.current(existing);
+            settle('on');
+          } else if (Notification.permission === 'granted' && !optedOut()) {
+            // The device already allows Stanzy's notifications: turn alerts
+            // on without asking, unless the visitor turned them off before.
+            await syncRef.current(await subscribeDevice(publicKey));
+            settle('on');
+          } else {
+            settle('off');
+          }
         })
         .catch(() => settle('off'));
     }
@@ -95,10 +134,8 @@ export function useDrawAlerts() {
         setStatus(permission === 'denied' ? 'denied' : 'off');
         return;
       }
-      const reg = await registration(true);
-      if (!reg) throw new Error('No service worker');
-      const created = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) });
-      await sync(created);
+      await sync(await subscribeDevice(publicKey));
+      setOptedOut(false);
       setStatus('on');
     } catch {
       setFailed(true);
@@ -116,6 +153,7 @@ export function useDrawAlerts() {
         await unsubscribe.mutateAsync({ endpoint: existing.endpoint });
         await existing.unsubscribe();
       }
+      setOptedOut(true);
       setStatus('off');
     } catch {
       setFailed(true);

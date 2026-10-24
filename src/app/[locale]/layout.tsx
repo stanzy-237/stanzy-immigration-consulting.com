@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { Plus_Jakarta_Sans, Syne, Work_Sans } from 'next/font/google';
 
 import { ServiceWorkerRegister } from '@/components/service-worker-register';
+import { DrawAlertsAuto } from '@/features/draws/components/draw-alerts-auto';
 import { routing, type LocaleParams } from '@/i18n/routing';
 import { TRPCReactProvider } from '@/trpc/react';
 
@@ -84,6 +85,7 @@ export default async function LocaleLayout({
           <TRPCReactProvider>
             {children}
             {modal}
+            <DrawAlertsAuto />
           </TRPCReactProvider>
         </NextIntlClientProvider>
         <ServiceWorkerRegister />

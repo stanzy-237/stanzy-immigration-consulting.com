@@ -27,7 +27,7 @@ A periodic selection from the Entrée Express pool, with a date and a CRS cut-of
 What a Tirage targeted, as IRCC names it ("Provincial Nominee Program", "French-Language proficiency 2026-Version 2", …). Grouped for filtering into Général, PNP, CEC, Français and Catégorie (every category-based round: STEM, santé, métiers, transport, …).
 
 **Alerte tirage** (Draw alert):
-A push notification sent to every device that opted in, each time a new Tirage is published. Sent to everyone, whatever their CRS score: it tells people a round happened, not whether they were invited.
+A push notification sent to every subscribed device each time a new Tirage is published, whatever the owner's CRS score: it tells people a round happened, not whether they were invited. A device is subscribed as soon as it allows Stanzy's notifications (the browser's own "Allow" can't be skipped), unless its visitor turned alerts off.
 _Avoid_: "ITA alert" (an ITA is the invitation a candidate receives, not the round).
 
 **CNP** (Classification nationale des professions / NOC):
