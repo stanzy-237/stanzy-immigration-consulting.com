@@ -32,8 +32,8 @@ describe('ServicePlaceholderView', () => {
     expect(screen.getByRole('link', { name: back })).toHaveAttribute('href', '/');
   });
 
-  it('has no axe violations in the page content', async () => {
-    render(withIntl(<ServicePlaceholderView nameKey="consultationName" icon={Video} />));
-    expect(await axe(screen.getByRole('main'))).toHaveNoViolations();
+  it('has no axe violations on the whole page, footer included', async () => {
+    const { container } = render(withIntl(<ServicePlaceholderView nameKey="consultationName" icon={Video} />));
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

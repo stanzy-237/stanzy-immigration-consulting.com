@@ -67,6 +67,14 @@ describe('SiteFooter', () => {
     expect(within(footer).getByText('Douala, Cameroun')).toBeInTheDocument();
   });
 
+  it('titles its columns as level-2 headings, so any page above it keeps a valid outline', () => {
+    render(withIntl(<SiteFooter />));
+    const footer = screen.getByRole('contentinfo');
+
+    expect(within(footer).queryAllByRole('heading', { level: 2 }).length).toBeGreaterThan(0);
+    expect(within(footer).queryAllByRole('heading', { level: 4 })).toHaveLength(0);
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(withIntl(<SiteFooter />));
     expect(await axe(container)).toHaveNoViolations();
