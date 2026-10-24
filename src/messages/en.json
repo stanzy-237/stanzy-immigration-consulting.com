@@ -490,12 +490,6 @@
     "titleAccent": "Express Entry",
     "lead": "The Comprehensive Ranking System, scored with IRCC’s official criteria. Maximum score: 1,200 points.",
     "rulesNote": "Official criteria in force on {date}.",
-    "rulesChoice": {
-      "legend": "Rules applied",
-      "current": "Current rules",
-      "upcoming": "From November 3, 2026",
-      "hint": "On November 3, 2026, IRCC replaces Canadian work experience points with the “labour market integration” factor and brings back points for some job offers."
-    },
     "points": "{points} pts",
     "noneOption": "None",
     "sections": {
@@ -509,20 +503,6 @@
       "spouse": "Spouse factors"
     },
     "family": {
-      "marital": "Your marital status",
-      "maritalOptions": {
-        "single": "Never married / single",
-        "married": "Married",
-        "commonLaw": "Common-law",
-        "divorced": "Divorced",
-        "separated": "Legally separated",
-        "widowed": "Widowed",
-        "annulled": "Annulled marriage"
-      },
-      "accompanying": "Will your spouse or common-law partner come with you to Canada?",
-      "accompanyingYes": "Yes, they will come with me",
-      "accompanyingNo": "No",
-      "citizenOrPR": "My spouse or common-law partner is a Canadian citizen or permanent resident",
       "note": "Spouse factors only count if they come with you and are neither a citizen nor a permanent resident."
     },
     "age": {
@@ -543,51 +523,6 @@
         "doctorate": "Doctorate (PhD)"
       },
       "hint": "“Two or more credentials”: at least two post-secondary credentials, one of them from a program of 3 years or more."
-    },
-    "language": {
-      "test": "{slot} test",
-      "slots": {
-        "firstLanguage": "First official language",
-        "secondLanguage": "Second official language",
-        "spouse": "Spouse’s language"
-      },
-      "shortSlots": {
-        "firstLanguage": "First language",
-        "secondLanguage": "Second language",
-        "spouse": "Spouse"
-      },
-      "tests": {
-        "none": "No test",
-        "TEF": "TEF Canada",
-        "TCF": "TCF Canada",
-        "IELTS": "IELTS General Training",
-        "CELPIP": "CELPIP-General",
-        "PTE_CORE": "PTE Core",
-        "NCLC": "I know my NCLC levels (French)",
-        "CLB": "I know my CLB levels (English)"
-      },
-      "field": "{slot} — {ability}",
-      "level": "CLB/NCLC {level}",
-      "belowFour": "Below CLB/NCLC 4",
-      "invalid": "This result does not exist for this test.",
-      "tefNote": "TEF Canada: enter the “Équivalence ancien score” results.",
-      "addSecond": "Add a second official language",
-      "removeSecond": "Remove the second official language",
-      "sameLanguage": "The second official language must be the other language (French or English).",
-      "abilitiesByTestLanguage": {
-        "fr": {
-          "speaking": "Expression orale",
-          "listening": "Compréhension orale",
-          "reading": "Compréhension écrite",
-          "writing": "Expression écrite"
-        },
-        "en": {
-          "speaking": "Speaking",
-          "listening": "Listening",
-          "reading": "Reading",
-          "writing": "Writing"
-        }
-      }
     },
     "work": {
       "canadian": "Skilled work experience in Canada",
@@ -677,6 +612,210 @@
       "confirm": "Save",
       "saving": "Saving…",
       "error": "Saving failed. Please try again."
+    },
+    "rulesHint": "On November 3, 2026, IRCC replaces Canadian work experience points with the “labour market integration” factor and brings back points for some job offers.",
+    "guide": {
+      "title": "A good CRS score is only the first step.",
+      "text": "Your CRS score sets your rank in the Express Entry pool; an invitation then depends on each draw’s cut-off. Before creating your profile, check that you are eligible for the Federal Skilled Worker Program.",
+      "secondary": "Check my eligibility (67 points)"
+    }
+  },
+  "Calculators": {
+    "language": {
+      "test": "{slot} test",
+      "slots": {
+        "firstLanguage": "First official language",
+        "secondLanguage": "Second official language",
+        "spouse": "Spouse’s language"
+      },
+      "shortSlots": {
+        "firstLanguage": "First language",
+        "secondLanguage": "Second language",
+        "spouse": "Spouse"
+      },
+      "tests": {
+        "none": "No test",
+        "TEF": "TEF Canada",
+        "TCF": "TCF Canada",
+        "IELTS": "IELTS General Training",
+        "CELPIP": "CELPIP-General",
+        "PTE_CORE": "PTE Core",
+        "NCLC": "I know my NCLC levels (French)",
+        "CLB": "I know my CLB levels (English)"
+      },
+      "field": "{slot} — {ability}",
+      "level": "CLB/NCLC {level}",
+      "belowFour": "Below CLB/NCLC 4",
+      "invalid": "This result does not exist for this test.",
+      "tefNote": "TEF Canada: enter the “Équivalence ancien score” results.",
+      "addSecond": "Add a second official language",
+      "removeSecond": "Remove the second official language",
+      "sameLanguage": "The second official language must be the other language (French or English).",
+      "abilitiesByTestLanguage": {
+        "fr": {
+          "speaking": "Expression orale",
+          "listening": "Compréhension orale",
+          "reading": "Compréhension écrite",
+          "writing": "Expression écrite"
+        },
+        "en": {
+          "speaking": "Speaking",
+          "listening": "Listening",
+          "reading": "Reading",
+          "writing": "Writing"
+        }
+      }
+    },
+    "rulesChoice": {
+      "legend": "Rules applied",
+      "current": "Current rules",
+      "upcoming": "From November 3, 2026"
+    },
+    "family": {
+      "marital": "Your marital status",
+      "maritalOptions": {
+        "single": "Never married / single",
+        "married": "Married",
+        "commonLaw": "Common-law",
+        "divorced": "Divorced",
+        "separated": "Legally separated",
+        "widowed": "Widowed",
+        "annulled": "Annulled marriage"
+      },
+      "accompanying": "Will your spouse or common-law partner come with you to Canada?",
+      "accompanyingYes": "Yes, they will come with me",
+      "accompanyingNo": "No",
+      "citizenOrPR": "My spouse or common-law partner is a Canadian citizen or permanent resident"
+    },
+    "guide": {
+      "eyebrow": "Good to know",
+      "needsIntro": "To apply, you will also need to provide:",
+      "needs": {
+        "experience": "proof of your skilled work experience: detailed reference letters, employment contracts, pay slips;",
+        "funds": "proof of enough money to settle in Canada, unless exempt."
+      },
+      "support": "Stanzy Immigration helps you gather this proof and prepare your file, from eligibility to the invitation.",
+      "consultation": "Book a consultation",
+      "fundsLink": "IRCC’s required amounts",
+      "fundsUrl": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/proof-funds.html",
+      "whatsappTitle": "Join our WhatsApp channel",
+      "whatsappText": "Get the latest Express Entry draws, IRCC rule changes and our advice, straight to your phone.",
+      "whatsappCta": "Join the WhatsApp channel"
+    }
+  },
+  "Fsw": {
+    "eyebrow": "Free tool · Express Entry",
+    "title": "67-point",
+    "titleAccent": "calculator",
+    "lead": "Check your eligibility for the Federal Skilled Worker Program in a few minutes.",
+    "threshold": "Pass mark: 67 / 100",
+    "notCrs": "The 67-point grid checks eligibility; it is not your CRS score.",
+    "rulesNote": "Official criteria in force on {date}.",
+    "step": "Step {n}",
+    "points": "{points} / {max}",
+    "language": {
+      "title": "Language skills",
+      "subtitle": "First official language · max. 24 points",
+      "second": "Second official language: +4 points with CLB/NCLC 5 or more in all 4 abilities."
+    },
+    "education": {
+      "title": "Education",
+      "label": "Your highest credential",
+      "options": {
+        "lessThanSecondary": "Less than secondary school (not eligible)",
+        "secondary": "Secondary diploma (5 pts)",
+        "oneYear": "One-year post-secondary program (15 pts)",
+        "twoYear": "Two-year post-secondary program (19 pts)",
+        "bachelors": "Bachelor’s degree or a program of 3+ years (21 pts)",
+        "twoOrMore": "Two or more credentials, one of 3+ years (22 pts)",
+        "masters": "Master’s or professional degree (23 pts)",
+        "doctorate": "Doctorate (25 pts)"
+      },
+      "hint": "Foreign credential: an Educational Credential Assessment (ECA) is required."
+    },
+    "work": {
+      "title": "Work experience",
+      "label": "Skilled work experience (last 10 years)",
+      "options": {
+        "0": "Less than a year (not eligible)",
+        "1": "1 year (9 pts)",
+        "2": "2 to 3 years (11 pts)",
+        "4": "4 to 5 years (13 pts)",
+        "6": "6 years or more (15 pts)"
+      },
+      "hint": "Paid, continuous work in a TEER 0, 1, 2 or 3 job in your primary occupation (1 year = 1,560 hours)."
+    },
+    "age": {
+      "title": "Age",
+      "label": "Your age",
+      "hint": "12 points from 18 to 35, then one point less per year; 0 from 47. Your age on the day IRCC receives your application.",
+      "invalid": "Enter a valid age."
+    },
+    "jobOffer": {
+      "title": "Arranged employment",
+      "label": "Do you have a job offer?",
+      "none": "No",
+      "valid": "Yes — full-time, non-seasonal, at least 1 year, TEER 0 to 3",
+      "situation": "Job offer situation",
+      "situations": {
+        "none": "None of these situations",
+        "lmiaWorkPermit": "I work in Canada on an LMIA-based work permit, for this employer",
+        "lmiaExemptWorkPermit": "I work in Canada in an LMIA-exempt job, for this employer for at least 1 year",
+        "lmiaOffer": "I have no work permit; the employer got an LMIA for this offer",
+        "lmiaOfferNewEmployer": "I work in an LMIA-exempt job; another employer got an LMIA for this offer"
+      },
+      "noLmia": "From November 3, 2026, no LMIA is needed for a qualifying job offer."
+    },
+    "adaptability": {
+      "title": "Adaptability",
+      "subtitle": "Tick what applies · capped at 10 points",
+      "items": {
+        "spouseLanguage": "My spouse or partner has CLB/NCLC 4 or more in all 4 abilities",
+        "studiedInCanada": "I studied in Canada full-time for at least 2 years",
+        "spouseStudiedInCanada": "My spouse or partner studied in Canada full-time for at least 2 years",
+        "workedInCanada": "I worked in Canada full-time for at least 1 year (TEER 0 to 3)",
+        "spouseWorkedInCanada": "My spouse or partner worked in Canada full-time for at least 1 year",
+        "relativeInCanada": "A relative of mine or my partner’s lives in Canada (citizen or PR, 18 or older)",
+        "arrangedEmployment": "Arranged employment (counted automatically)"
+      }
+    },
+    "result": {
+      "label": "Your result",
+      "outOf": "/ 100 points · pass mark: 67",
+      "eligible": "Eligible",
+      "notEligible": "Not eligible",
+      "reached": "You reach the 67-point pass mark and the minimum requirements.",
+      "short": "{points, plural, one {You are # point short of the pass mark.} other {You are # points short of the pass mark.}}",
+      "unmet": "Requirement not met:",
+      "requirements": {
+        "firstLanguageClb7": "CLB/NCLC 7 in all 4 abilities of the first official language",
+        "oneYearOfWork": "At least 1 year of skilled work experience",
+        "credential": "A secondary diploma or higher"
+      },
+      "factors": {
+        "language": "F1 · Language",
+        "education": "F2 · Education",
+        "work": "F3 · Experience",
+        "age": "F4 · Age",
+        "arrangedEmployment": "F5 · Job offer",
+        "adaptability": "F6 · Adaptab."
+      },
+      "reset": "Start over",
+      "invalid": "Fix the flagged answers to get your result.",
+      "disclaimer": "This result is indicative and does not replace a professional assessment of your file."
+    },
+    "guide": {
+      "title": "Reaching 67 points is only the first step.",
+      "text": "The 67-point grid decides your eligibility for the Federal Skilled Worker Program. Once your Express Entry profile is created, your CRS score sets your rank in the pool.",
+      "secondary": "Compute my CRS score"
+    },
+    "rulesHint": "On November 3, 2026, IRCC removes the LMIA requirement for a qualifying job offer to count.",
+    "reusedNotice": "Answers reused from the CRS calculator. Check your work experience and adaptability: the CRS calculator only gives ranges of years, and your studies in Canada may count.",
+    "reuse": {
+      "trigger": "Reuse a CRS simulation",
+      "inProgress": "CRS calculator answers in progress (this device)",
+      "saved": "My saved simulations",
+      "points": "{points} pts"
     }
   }
 }

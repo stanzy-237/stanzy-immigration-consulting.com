@@ -122,22 +122,27 @@ export function CheckField({
   checked,
   onChange,
   points,
+  disabled = false,
 }: {
   label: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
   points?: string;
+  /** Shown but set by another answer (e.g. counted automatically). */
+  disabled?: boolean;
 }): ReactNode {
   return (
     <label
       className={cn(
         'flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-body-sm font-semibold text-navy-deep transition-colors',
         checked ? 'border-navy-deep bg-ice-blue' : 'border-fog hover:border-slate-mute',
+        disabled && 'cursor-default opacity-80',
       )}
     >
       <input
         type="checkbox"
         checked={checked}
+        disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
         className="size-4 accent-navy-deep"
       />
@@ -147,41 +152,55 @@ export function CheckField({
   );
 }
 
-/** One card of the calculator, named by its heading, with the points it earns. */
-export function CrsSection({
+/**
+ * One card of a calculator, named by its heading, with the points it earns.
+ * `step` ("Étape 01") and `subtitle` sit around the heading; `accent` adds a
+ * coloured top bar.
+ */
+export function CalculatorSection({
   id,
   title,
   points,
   accent,
+  step,
+  subtitle,
   children,
 }: {
   id: string;
   title: string;
   points?: string;
-  accent: 'rouge' | 'navy' | 'steel';
+  accent?: 'rouge' | 'navy' | 'steel';
+  step?: string;
+  subtitle?: string;
   children: ReactNode;
 }): ReactNode {
-  const headingId = `crs-${id}-title`;
+  const headingId = `calculator-${id}-title`;
   return (
     <section
       aria-labelledby={headingId}
       className="relative overflow-hidden rounded-2xl border border-fog bg-white p-5 shadow-sm sm:p-6"
     >
-      <div
-        aria-hidden={true}
-        className={cn(
-          'absolute inset-x-0 top-0 h-1',
-          accent === 'rouge' ? 'bg-rouge' : accent === 'navy' ? 'bg-navy-deep' : 'bg-steel-blue',
-        )}
-      />
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 id={headingId} className="font-heading text-h4 font-bold text-navy-deep">
-          {title}
-        </h2>
+      {accent ? (
+        <div
+          aria-hidden={true}
+          className={cn(
+            'absolute inset-x-0 top-0 h-1',
+            accent === 'rouge' ? 'bg-rouge' : accent === 'navy' ? 'bg-navy-deep' : 'bg-steel-blue',
+          )}
+        />
+      ) : null}
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          {step ? <p className="mb-2 font-label text-rouge">{step}</p> : null}
+          <h2 id={headingId} className="font-heading text-h4 font-bold text-navy-deep">
+            {title}
+          </h2>
+          {subtitle ? <p className="mt-1 text-body-sm text-slate">{subtitle}</p> : null}
+        </div>
         {points !== undefined ? (
           <span
             data-testid="section-points"
-            className="rounded-full bg-ice-blue px-2.5 py-0.5 font-label text-navy-deep"
+            className="shrink-0 rounded-full bg-ice-blue px-2.5 py-0.5 font-label text-navy-deep"
           >
             {points}
           </span>

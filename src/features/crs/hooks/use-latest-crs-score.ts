@@ -2,8 +2,9 @@
 
 import { useMemo } from 'react';
 
-import { useStoredDraft } from '@/features/crs/hooks/use-crs-draft';
-import { computeCrs, rulesInForceOn } from '@/features/crs/lib/compute-crs';
+import { useCrsDraftValue } from '@/features/crs/hooks/use-crs-draft';
+import { computeCrs } from '@/features/crs/lib/compute-crs';
+import { rulesInForceOn } from '@/features/shared/lib/rules-version';
 import { toProfile } from '@/features/crs/lib/crs-form';
 
 /**
@@ -11,7 +12,7 @@ import { toProfile } from '@/features/crs/lib/crs-form';
  * answers), or null before they have used it.
  */
 export function useLatestCrsScore(): number | null {
-  const draft = useStoredDraft();
+  const draft = useCrsDraftValue();
   return useMemo(() => {
     if (!draft) return null;
     const result = computeCrs(toProfile(draft), { rules: rulesInForceOn(new Date()) });

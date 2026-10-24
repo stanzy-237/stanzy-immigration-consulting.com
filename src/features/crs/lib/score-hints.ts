@@ -1,12 +1,7 @@
-import { TEST_SPECS } from '@/features/crs/data/language-tests';
-import {
-  ABILITIES,
-  computeCrs,
-  type ClbLevels,
-  type CrsProfile,
-  type LanguageResult,
-  type RulesVersion,
-} from '@/features/crs/lib/compute-crs';
+import { TEST_SPECS } from '@/features/shared/data/language-tests';
+import { computeCrs, type CrsProfile } from '@/features/crs/lib/compute-crs';
+import { ABILITIES, type ClbLevels, type LanguageResult } from '@/features/shared/lib/language-levels';
+import type { RulesVersion } from '@/features/shared/lib/rules-version';
 
 export type ScoreHint = {
   kind: 'firstLanguageClb9' | 'frenchNclc7' | 'canadianWorkYear';

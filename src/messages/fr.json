@@ -490,12 +490,6 @@
     "titleAccent": "Entrée Express",
     "lead": "Le Système de classement global, calculé selon les critères officiels d’IRCC. Score maximum : 1 200 points.",
     "rulesNote": "Critères officiels en vigueur au {date}.",
-    "rulesChoice": {
-      "legend": "Règles appliquées",
-      "current": "Règles actuelles",
-      "upcoming": "À partir du 3 novembre 2026",
-      "hint": "Le 3 novembre 2026, IRCC remplace les points d’expérience canadienne par le facteur « intégration au marché du travail » et rétablit des points pour certaines offres d’emploi."
-    },
     "points": "{points} pts",
     "noneOption": "Aucune",
     "sections": {
@@ -509,20 +503,6 @@
       "spouse": "Facteurs du conjoint"
     },
     "family": {
-      "marital": "Votre état matrimonial",
-      "maritalOptions": {
-        "single": "Jamais marié(e) / célibataire",
-        "married": "Marié(e)",
-        "commonLaw": "Conjoint(e) de fait",
-        "divorced": "Divorcé(e)",
-        "separated": "Séparé(e) légalement",
-        "widowed": "Veuf / veuve",
-        "annulled": "Mariage annulé"
-      },
-      "accompanying": "Votre époux(se) ou conjoint(e) vous accompagnera-t-il/elle au Canada ?",
-      "accompanyingYes": "Oui, il/elle m’accompagnera",
-      "accompanyingNo": "Non",
-      "citizenOrPR": "Mon époux(se) ou conjoint(e) est citoyen(ne) canadien(ne) ou résident(e) permanent(e)",
       "note": "Les facteurs du conjoint ne comptent que s’il ou elle vous accompagne et n’est ni citoyen(ne) ni résident(e) permanent(e)."
     },
     "age": {
@@ -543,51 +523,6 @@
         "doctorate": "Doctorat (PhD)"
       },
       "hint": "« Deux diplômes ou plus » : au moins deux diplômes postsecondaires, dont un d’un programme de 3 ans ou plus."
-    },
-    "language": {
-      "test": "Test de la {slot}",
-      "slots": {
-        "firstLanguage": "1re langue officielle",
-        "secondLanguage": "2e langue officielle",
-        "spouse": "langue du conjoint"
-      },
-      "shortSlots": {
-        "firstLanguage": "1re langue",
-        "secondLanguage": "2e langue",
-        "spouse": "Conjoint"
-      },
-      "tests": {
-        "none": "Aucun test",
-        "TEF": "TEF Canada",
-        "TCF": "TCF Canada",
-        "IELTS": "IELTS General Training",
-        "CELPIP": "CELPIP-General",
-        "PTE_CORE": "PTE Core",
-        "NCLC": "Je connais mes niveaux NCLC (français)",
-        "CLB": "Je connais mes niveaux CLB (anglais)"
-      },
-      "field": "{slot} — {ability}",
-      "level": "NCLC/CLB {level}",
-      "belowFour": "Moins de NCLC/CLB 4",
-      "invalid": "Ce résultat n’existe pas pour ce test.",
-      "tefNote": "TEF Canada : entrez les résultats « Équivalence ancien score ».",
-      "addSecond": "Ajouter une 2e langue officielle",
-      "removeSecond": "Retirer la 2e langue officielle",
-      "sameLanguage": "La 2e langue officielle doit être l’autre langue (français ou anglais).",
-      "abilitiesByTestLanguage": {
-        "fr": {
-          "speaking": "Expression orale",
-          "listening": "Compréhension orale",
-          "reading": "Compréhension écrite",
-          "writing": "Expression écrite"
-        },
-        "en": {
-          "speaking": "Speaking",
-          "listening": "Listening",
-          "reading": "Reading",
-          "writing": "Writing"
-        }
-      }
     },
     "work": {
       "canadian": "Expérience de travail qualifiée au Canada",
@@ -677,6 +612,210 @@
       "confirm": "Enregistrer",
       "saving": "Enregistrement…",
       "error": "L’enregistrement a échoué. Réessayez."
+    },
+    "rulesHint": "Le 3 novembre 2026, IRCC remplace les points d’expérience canadienne par le facteur « intégration au marché du travail » et rétablit des points pour certaines offres d’emploi.",
+    "guide": {
+      "title": "Un bon score CRS n’est que la première étape.",
+      "text": "Votre score CRS fixe votre classement dans le bassin Entrée Express ; l’invitation dépend ensuite des seuils de chaque tirage. Avant de créer votre profil, vérifiez que vous êtes admissible au Programme des travailleurs qualifiés (fédéral).",
+      "secondary": "Vérifier mon admissibilité (67 points)"
+    }
+  },
+  "Calculators": {
+    "language": {
+      "test": "Test de la {slot}",
+      "slots": {
+        "firstLanguage": "1re langue officielle",
+        "secondLanguage": "2e langue officielle",
+        "spouse": "langue du conjoint"
+      },
+      "shortSlots": {
+        "firstLanguage": "1re langue",
+        "secondLanguage": "2e langue",
+        "spouse": "Conjoint"
+      },
+      "tests": {
+        "none": "Aucun test",
+        "TEF": "TEF Canada",
+        "TCF": "TCF Canada",
+        "IELTS": "IELTS General Training",
+        "CELPIP": "CELPIP-General",
+        "PTE_CORE": "PTE Core",
+        "NCLC": "Je connais mes niveaux NCLC (français)",
+        "CLB": "Je connais mes niveaux CLB (anglais)"
+      },
+      "field": "{slot} — {ability}",
+      "level": "NCLC/CLB {level}",
+      "belowFour": "Moins de NCLC/CLB 4",
+      "invalid": "Ce résultat n’existe pas pour ce test.",
+      "tefNote": "TEF Canada : entrez les résultats « Équivalence ancien score ».",
+      "addSecond": "Ajouter une 2e langue officielle",
+      "removeSecond": "Retirer la 2e langue officielle",
+      "sameLanguage": "La 2e langue officielle doit être l’autre langue (français ou anglais).",
+      "abilitiesByTestLanguage": {
+        "fr": {
+          "speaking": "Expression orale",
+          "listening": "Compréhension orale",
+          "reading": "Compréhension écrite",
+          "writing": "Expression écrite"
+        },
+        "en": {
+          "speaking": "Speaking",
+          "listening": "Listening",
+          "reading": "Reading",
+          "writing": "Writing"
+        }
+      }
+    },
+    "rulesChoice": {
+      "legend": "Règles appliquées",
+      "current": "Règles actuelles",
+      "upcoming": "À partir du 3 novembre 2026"
+    },
+    "family": {
+      "marital": "Votre état matrimonial",
+      "maritalOptions": {
+        "single": "Jamais marié(e) / célibataire",
+        "married": "Marié(e)",
+        "commonLaw": "Conjoint(e) de fait",
+        "divorced": "Divorcé(e)",
+        "separated": "Séparé(e) légalement",
+        "widowed": "Veuf / veuve",
+        "annulled": "Mariage annulé"
+      },
+      "accompanying": "Votre époux(se) ou conjoint(e) vous accompagnera-t-il/elle au Canada ?",
+      "accompanyingYes": "Oui, il/elle m’accompagnera",
+      "accompanyingNo": "Non",
+      "citizenOrPR": "Mon époux(se) ou conjoint(e) est citoyen(ne) canadien(ne) ou résident(e) permanent(e)"
+    },
+    "guide": {
+      "eyebrow": "À savoir",
+      "needsIntro": "Pour présenter votre demande, vous devrez également fournir :",
+      "needs": {
+        "experience": "des preuves de votre expérience professionnelle qualifiée : lettres de référence détaillées, contrats de travail, relevés de paie ;",
+        "funds": "une preuve de fonds suffisants pour vous établir au Canada, sauf exemption."
+      },
+      "support": "Stanzy Immigration vous accompagne dans la constitution de ces preuves et la préparation de votre dossier, de l’admissibilité jusqu’à l’invitation.",
+      "consultation": "Réserver une consultation",
+      "fundsLink": "Montants exigés par IRCC",
+      "fundsUrl": "https://www.canada.ca/fr/immigration-refugies-citoyennete/services/immigrer-canada/entree-express/documents/preuve-fonds-suffisants.html",
+      "whatsappTitle": "Rejoignez notre chaîne WhatsApp",
+      "whatsappText": "Recevez les derniers tirages Entrée Express, les changements de règles d’IRCC et nos conseils, directement sur votre téléphone.",
+      "whatsappCta": "Rejoindre la chaîne WhatsApp"
+    }
+  },
+  "Fsw": {
+    "eyebrow": "Outil gratuit · Entrée Express",
+    "title": "Calculateur",
+    "titleAccent": "67 points",
+    "lead": "Évaluez votre admissibilité au Programme des travailleurs qualifiés (fédéral) en quelques minutes.",
+    "threshold": "Seuil d’admissibilité : 67 / 100",
+    "notCrs": "La grille des 67 points vérifie l’admissibilité ; ce n’est pas votre score CRS.",
+    "rulesNote": "Critères officiels en vigueur au {date}.",
+    "step": "Étape {n}",
+    "points": "{points} / {max}",
+    "language": {
+      "title": "Compétences linguistiques",
+      "subtitle": "1re langue officielle · max. 24 points",
+      "second": "2e langue officielle : +4 points avec NCLC/CLB 5 ou plus dans les 4 compétences."
+    },
+    "education": {
+      "title": "Niveau d’études",
+      "label": "Votre plus haut diplôme",
+      "options": {
+        "lessThanSecondary": "Moins que le secondaire (non admissible)",
+        "secondary": "Diplôme d’études secondaires (5 pts)",
+        "oneYear": "Programme postsecondaire d’un an (15 pts)",
+        "twoYear": "Programme postsecondaire de deux ans (19 pts)",
+        "bachelors": "Baccalauréat ou programme de 3 ans ou plus (21 pts)",
+        "twoOrMore": "Deux diplômes ou plus, dont un de 3 ans ou plus (22 pts)",
+        "masters": "Maîtrise ou diplôme professionnel (23 pts)",
+        "doctorate": "Doctorat (25 pts)"
+      },
+      "hint": "Diplôme étranger : une évaluation des diplômes d’études (EDE) est requise."
+    },
+    "work": {
+      "title": "Expérience professionnelle",
+      "label": "Expérience de travail qualifiée (10 dernières années)",
+      "options": {
+        "0": "Moins d’un an (non admissible)",
+        "1": "1 an (9 pts)",
+        "2": "2 à 3 ans (11 pts)",
+        "4": "4 à 5 ans (13 pts)",
+        "6": "6 ans ou plus (15 pts)"
+      },
+      "hint": "Travail rémunéré, continu, dans une profession FEER 0, 1, 2 ou 3 de votre profession principale (1 an = 1 560 heures)."
+    },
+    "age": {
+      "title": "Âge",
+      "label": "Votre âge",
+      "hint": "12 points de 18 à 35 ans, puis 1 point de moins par année ; 0 à partir de 47 ans. Votre âge le jour où IRCC reçoit votre demande.",
+      "invalid": "Entrez un âge valide."
+    },
+    "jobOffer": {
+      "title": "Offre d’emploi réservée",
+      "label": "Avez-vous une offre d’emploi ?",
+      "none": "Non",
+      "valid": "Oui — temps plein, non saisonnière, au moins 1 an, FEER 0 à 3",
+      "situation": "Situation de l’offre",
+      "situations": {
+        "none": "Aucune de ces situations",
+        "lmiaWorkPermit": "Je travaille au Canada avec un permis fondé sur une EIMT, pour cet employeur",
+        "lmiaExemptWorkPermit": "Je travaille au Canada dans un emploi dispensé d’EIMT, depuis au moins 1 an chez cet employeur",
+        "lmiaOffer": "Je n’ai pas de permis de travail ; l’employeur a obtenu une EIMT pour cette offre",
+        "lmiaOfferNewEmployer": "J’occupe un emploi dispensé d’EIMT ; un autre employeur a obtenu une EIMT pour cette offre"
+      },
+      "noLmia": "À partir du 3 novembre 2026, aucune EIMT n’est requise pour une offre admissible."
+    },
+    "adaptability": {
+      "title": "Adaptabilité",
+      "subtitle": "Cochez ce qui s’applique · plafonné à 10 points",
+      "items": {
+        "spouseLanguage": "Mon époux(se) ou conjoint(e) a NCLC/CLB 4 ou plus dans les 4 compétences",
+        "studiedInCanada": "J’ai étudié au Canada au moins 2 ans à temps plein",
+        "spouseStudiedInCanada": "Mon époux(se) ou conjoint(e) a étudié au Canada au moins 2 ans à temps plein",
+        "workedInCanada": "J’ai travaillé au Canada au moins 1 an à temps plein (FEER 0 à 3)",
+        "spouseWorkedInCanada": "Mon époux(se) ou conjoint(e) a travaillé au Canada au moins 1 an à temps plein",
+        "relativeInCanada": "Un membre de ma famille ou de celle de mon conjoint vit au Canada (citoyen ou RP, 18 ans ou plus)",
+        "arrangedEmployment": "Offre d’emploi réservée (comptée automatiquement)"
+      }
+    },
+    "result": {
+      "label": "Votre résultat",
+      "outOf": "/ 100 points · seuil : 67",
+      "eligible": "Éligible",
+      "notEligible": "Non éligible",
+      "reached": "Vous atteignez le seuil de 67 points et les conditions minimales.",
+      "short": "{points, plural, one {Il vous manque # point pour atteindre le seuil.} other {Il vous manque # points pour atteindre le seuil.}}",
+      "unmet": "Condition non remplie :",
+      "requirements": {
+        "firstLanguageClb7": "NCLC/CLB 7 dans les 4 compétences de la 1re langue officielle",
+        "oneYearOfWork": "Au moins 1 an d’expérience de travail qualifiée",
+        "credential": "Un diplôme d’études secondaires ou plus"
+      },
+      "factors": {
+        "language": "F1 · Langue",
+        "education": "F2 · Études",
+        "work": "F3 · Expérience",
+        "age": "F4 · Âge",
+        "arrangedEmployment": "F5 · Emploi",
+        "adaptability": "F6 · Adaptab."
+      },
+      "reset": "Recommencer",
+      "invalid": "Corrigez les réponses signalées pour obtenir votre résultat.",
+      "disclaimer": "Ce calcul est indicatif et ne remplace pas une évaluation professionnelle de votre dossier."
+    },
+    "guide": {
+      "title": "Atteindre 67 points n’est que la première étape.",
+      "text": "La grille des 67 points détermine votre admissibilité au Programme des travailleurs qualifiés (fédéral). Une fois votre profil Entrée Express créé, c’est votre score CRS qui fixe votre classement dans le bassin.",
+      "secondary": "Calculer mon score CRS"
+    },
+    "rulesHint": "Le 3 novembre 2026, IRCC supprime l’exigence d’une EIMT pour qu’une offre d’emploi admissible compte.",
+    "reusedNotice": "Réponses reprises du Calculateur CRS. Vérifiez votre expérience de travail et l’adaptabilité : le Calculateur CRS ne donne que des tranches d’années, et vos études au Canada peuvent compter.",
+    "reuse": {
+      "trigger": "Reprendre une simulation CRS",
+      "inProgress": "Réponses en cours du Calculateur CRS (cet appareil)",
+      "saved": "Mes simulations enregistrées",
+      "points": "{points} pts"
     }
   }
 }

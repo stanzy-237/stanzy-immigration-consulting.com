@@ -12,17 +12,19 @@
  * own tickets; this is the shell they cache into.
  */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const SHELL_CACHE = `stanzy-shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `stanzy-assets-${CACHE_VERSION}`;
 
-// The CRS calculator computes in the browser, so its page is precached too:
-// once installed, it opens and scores offline (#5).
+// The calculators compute in the browser, so their pages are precached too:
+// once installed, they open and score offline (#5, #6).
 const PRECACHE_URLS = [
   '/fr',
   '/en',
   '/fr/outils/crs',
   '/en/outils/crs',
+  '/fr/outils/67-points',
+  '/en/outils/67-points',
   '/manifest.webmanifest',
 ];
 

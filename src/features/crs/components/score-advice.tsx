@@ -3,7 +3,8 @@ import { useTranslations } from "next-intl";
 import { useMemo, type ReactNode } from "react";
 
 import { TCF_EXPRESS_ACADEMY_URL } from "@/features/crs/data/links";
-import type { CrsProfile, RulesVersion } from "@/features/crs/lib/compute-crs";
+import type { CrsProfile } from "@/features/crs/lib/compute-crs";
+import type { RulesVersion } from "@/features/shared/lib/rules-version";
 import { scoreHints } from "@/features/crs/lib/score-hints";
 import { Link } from "@/i18n/navigation";
 
