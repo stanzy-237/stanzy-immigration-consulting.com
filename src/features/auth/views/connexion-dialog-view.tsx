@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { useGuestPage } from '@/features/auth/hooks/use-guest-page';
 import { AuthDialog } from '@/features/auth/components/auth-dialog';
 import { ConnexionForm } from '@/features/auth/components/connexion-form';
 import { localizedNextPath, safeNextPath, withNext, type NextParam } from '@/features/auth/lib/safe-next-path';
@@ -15,7 +16,8 @@ import { Link, useRouter } from '@/i18n/navigation';
  * or, when opened with `?next=` (e.g. a client-side visit to a protected
  * page), goes on to `next`.
  */
-export function ConnexionDialogView({ next }: { next?: NextParam }): ReactNode {
+export function ConnexionDialogView({ next: nextProp }: { next?: NextParam }): ReactNode {
+  const { next } = useGuestPage(nextProp);
   const t = useTranslations('Auth.Connexion');
   const locale = useLocale();
   const router = useRouter();

@@ -14,14 +14,16 @@ export type CurrentAccount = { name: string; email: string };
  */
 export function useCurrentAccount(): {
   account: CurrentAccount | null;
+  /** True until the browser knows whether someone is signed in. */
+  pending: boolean;
   signOut: () => Promise<void>;
 } {
-  const { data } = authClient.useSession();
+  const { data, isPending } = authClient.useSession();
   const account = data ? { name: data.user.name, email: data.user.email } : null;
 
   const signOut = useCallback(async (): Promise<void> => {
     await authClient.signOut();
   }, []);
 
-  return { account, signOut };
+  return { account, pending: isPending, signOut };
 }

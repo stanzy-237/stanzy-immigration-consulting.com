@@ -10,7 +10,7 @@ import { router, withIntl } from './test-utils';
 
 vi.mock('@/i18n/navigation', async () => (await import('./test-utils')).navigationMock);
 vi.mock('@/features/auth/lib/auth-client', () => ({
-  authClient: { signUp: { email: vi.fn() } },
+  authClient: { signUp: { email: vi.fn() }, useSession: vi.fn(() => ({ data: null, isPending: false })) },
 }));
 
 const signUp = vi.mocked(authClient.signUp.email);
