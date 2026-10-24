@@ -25,22 +25,23 @@ datasource db {
 
 /// One person's login on the platform (GLOSSARY: Account).
 model Account {
-  id            String         @id
-  name          String
-  email         String         @unique
-  emailVerified Boolean        @default(false)
-  image         String?
+  id             String          @id
+  name           String
+  email          String          @unique
+  emailVerified  Boolean         @default(false)
+  image          String?
   /// Language the Account signed up in; drives email copy. `fr` | `en`.
-  locale        String         @default("fr")
+  locale         String          @default("fr")
   /// Commercial journey; moves forward only (src/features/auth/lib/account-status.ts).
-  status        AccountStatus  @default(USER)
+  status         AccountStatus   @default(USER)
   /// Access level; CONSULTANT comes only from CONSULTANT_EMAILS, PARTNER only
   /// from the consultant.
-  role          AccountRole    @default(MEMBER)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  sessions      Session[]
-  identities    AuthIdentity[]
+  role           AccountRole     @default(MEMBER)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  sessions       Session[]
+  identities     AuthIdentity[]
+  crsSimulations CrsSimulation[]
 
   @@map("account")
 }
@@ -117,4 +118,25 @@ model RateLimit {
   lastRequest BigInt
 
   @@map("rate_limit")
+}
+
+// ─── Calculateur CRS (#5) ────────────────────────────────────────────────────
+
+/// A saved set of CRS answers and the score the server computed for it.
+model CrsSimulation {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name      String
+  /// The answers (CrsProfile); re-scored by the engine whenever it is saved.
+  profile   Json
+  total     Int
+  breakdown Json
+  /// CRS rules version the score follows, e.g. "2025-03-25".
+  rules     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([accountId, updatedAt])
+  @@map("crs_simulation")
 }
