@@ -257,7 +257,8 @@ describe('CrsCalculator', () => {
 
       expect(card()).toHaveTextContent('Après TEF');
       expect(card()).toHaveTextContent('471');
-      expect(card()).toHaveTextContent('20 oct. 2026');
+      expect(card()).toHaveTextContent('20/10/2026');
+      expect(card()).not.toHaveTextContent('Enregistrée');
       for (const action of ['Ouvrir', 'Renommer', 'Supprimer']) {
         expect(within(card()).getByRole('button', { name: `${action} « Après TEF »` })).toBeInTheDocument();
       }

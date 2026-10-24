@@ -119,10 +119,7 @@ export function SavedSimulations({ onOpen }: { onOpen: (profile: CrsProfile) => 
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body-sm font-semibold text-navy-deep">{simulation.name}</p>
                     <p className="mt-0.5 text-caption text-slate">
-                      {t('savedOn', { date: format.dateTime(simulation.updatedAt, { dateStyle: 'medium' }) })}
-                      {simulation.rules === '2026-11-03' ? (
-                        <span className="ml-2 rounded-full bg-ice-blue px-2 py-0.5 text-navy-deep">{t('upcomingRules')}</span>
-                      ) : null}
+                      {format.dateTime(simulation.updatedAt, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                     </p>
                   </div>
                   <p className="shrink-0 text-right">
