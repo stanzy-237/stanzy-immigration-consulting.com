@@ -26,7 +26,6 @@ import type { EducationLevel } from '@/features/shared/data/education-levels';
 import { TEST_SPECS } from '@/features/shared/data/language-tests';
 import {
   ABILITIES,
-  clbLevelFor,
   type ClbLevels,
   type LanguageResult,
 } from '@/features/shared/lib/language-levels';
