@@ -36,7 +36,16 @@ const PRECACHE_URLS = [
   '/manifest.webmanifest',
 ];
 
+// On a local `next dev` server nothing is cached: dev chunks keep the same URL
+// across edits, so cache-first would keep serving old code. The worker still
+// registers there (Alertes tirages need it), so pushes keep working.
+const IS_DEV_HOST = ['localhost', '127.0.0.1', '[::1]'].includes(self.location.hostname);
+
 self.addEventListener('install', (event) => {
+  if (IS_DEV_HOST) {
+    event.waitUntil(self.skipWaiting());
+    return;
+  }
   event.waitUntil(
     caches
       .open(SHELL_CACHE)
@@ -55,7 +64,7 @@ self.addEventListener('activate', (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => ![SHELL_CACHE, ASSET_CACHE, DATA_CACHE].includes(key))
+            .filter((key) => IS_DEV_HOST || ![SHELL_CACHE, ASSET_CACHE, DATA_CACHE].includes(key))
             .map((key) => caches.delete(key)),
         ),
       )
@@ -66,7 +75,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
-  if (request.method !== 'GET') return;
+  if (IS_DEV_HOST || request.method !== 'GET') return;
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
