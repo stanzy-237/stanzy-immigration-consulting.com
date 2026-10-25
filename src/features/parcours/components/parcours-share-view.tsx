@@ -63,12 +63,12 @@ export function ParcoursShareView({
           </DialogTitle>
           <p className="text-body-sm text-slate">{t('count', { count: etapes.length })}</p>
 
-          <div className="mt-5 flex items-center gap-2.5">
+          <div className="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
             <Switch id={notesId} checked={showNotes} onCheckedChange={setShowNotes} />
             <label htmlFor={notesId} className="text-body-sm text-slate">
               {t('share.showNotes')}
             </label>
-            <span className="ml-auto text-caption text-steel-blue">{t('share.hint')}</span>
+            <span className="basis-full text-caption text-steel-blue sm:ml-auto sm:basis-auto">{t('share.hint')}</span>
           </div>
 
           <div aria-hidden={true} className="my-7 h-px bg-fog-light" />

@@ -111,8 +111,8 @@ export function ParcoursJournal(): ReactNode {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-7xl items-start gap-8 px-5 pt-6 pb-24 sm:px-10 lg:grid-cols-3 lg:py-8">
-        <div className="lg:col-span-2">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-5 pt-6 pb-24 sm:px-10 lg:grid-cols-3 lg:py-8">
+        <div className="min-w-0 lg:col-span-2">
           <EtapeFeed etapes={etapes} onAdd={startAdding} onEdit={edit} />
         </div>
         <aside className="hidden flex-col gap-4 lg:sticky lg:top-20 lg:flex">
