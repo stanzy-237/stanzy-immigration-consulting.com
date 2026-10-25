@@ -21,6 +21,7 @@ describe('assessLanguageTest', () => {
         crsFirstLanguage: 125,
         // NCLC 7+ on all four: 25 alone, 50 with English CLB 5+.
         frenchBonus: { alone: 25, withEnglish: 50 },
+        programs: { fsw: true, cecTeer01: true, cecTeer23: true, fst: true },
         fswVerdict: { status: 'eligible', shortSkills: [] },
       },
     });
@@ -57,12 +58,12 @@ describe('assessLanguageTest', () => {
     });
   });
 
-  it('scores a CLB 5/4 profile, far from Travailleurs qualifiés', () => {
+  it('tells which programs a CLB 5/4 profile reaches: trades only', () => {
     const result = assessLanguageTest({ test: 'CELPIP', scores: { speaking: 5, listening: 5, reading: 4, writing: 4 } });
 
     expect(result).toMatchObject({
       ok: true,
-      assessment: { retained: 4, crsFirstLanguage: 24, fswVerdict: { status: 'notEligible' } },
+      assessment: { retained: 4, crsFirstLanguage: 24, programs: { fsw: false, cecTeer01: false, cecTeer23: false, fst: true } },
     });
   });
 
@@ -70,7 +71,7 @@ describe('assessLanguageTest', () => {
     const result = assessLanguageTest({ test: 'TEF', scores: { speaking: 349, listening: 280, reading: 233, writing: 300 } });
 
     // Writing 300 is NCLC 6 (310 is needed for 7).
-    expect(result).toMatchObject({ ok: true, assessment: { retained: 6, frenchBonus: null, fswVerdict: { status: 'close', shortSkills: ['writing'] } } });
+    expect(result).toMatchObject({ ok: true, assessment: { retained: 6, frenchBonus: null, programs: { fsw: false, cecTeer23: true } } });
   });
 
   it('reports a level below 4 as 0, which reaches nothing', () => {
@@ -78,7 +79,7 @@ describe('assessLanguageTest', () => {
 
     expect(result).toMatchObject({
       ok: true,
-      assessment: { levels: { speaking: 0 }, retained: 0, fswVerdict: { status: 'notEligible', shortSkills: ['speaking'] } },
+      assessment: { levels: { speaking: 0 }, retained: 0, programs: { fsw: false, cecTeer01: false, cecTeer23: false, fst: false } },
     });
   });
 

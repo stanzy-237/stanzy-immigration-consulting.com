@@ -948,7 +948,7 @@
       "level": "{unit} {level}",
       "belowFour": "Moins de {unit} 4",
       "retained": "Niveau retenu (le plus faible)",
-      "frenchBonus": " · +{alone} pts de bonus francophone ({withEnglish} avec CLB 5+ en anglais)",
+      "frenchBonus": "+{alone} pts de bonus francophone ({withEnglish} pts avec CLB 5+ en anglais)",
       "verdict": {
         "eligible": "Admissible aux Travailleurs qualifiés (fédéral) : {unit} 7 atteint dans les 4 compétences.",
         "close": "Presque : il vous manque 1 niveau en {skills} pour les Travailleurs qualifiés (fédéral), qui exigent {unit} 7 dans chaque compétence.",
@@ -956,7 +956,26 @@
         "prepare": "Préparer le TCF avec TCF Express Academy"
       },
       "testLine": "{test} · {language}",
-      "crs": "≈ {points} pts CRS en langue principale"
+      "crs": "≈ {points} pts CRS en langue principale",
+      "columns": {
+        "skill": "Compétence",
+        "score": "Votre note",
+        "level": "Niveau {unit}"
+      },
+      "crsLabel": "Points CRS indicatifs",
+      "crsValue": "{points} pts",
+      "crsNote": "Langue officielle principale, candidat sans conjoint.",
+      "programsTitle": "Admissibilité Entrée Express",
+      "programs": {
+        "fsw": "Travailleurs qualifiés (fédéral) : {unit} 7 partout",
+        "cecTeer01": "Expérience canadienne, emploi TEER 0 ou 1 : {unit} 7 partout",
+        "cecTeer23": "Expérience canadienne, emploi TEER 2 ou 3 : {unit} 5 partout",
+        "fst": "Métiers spécialisés (fédéral) : {unit} 5 à l’oral, 4 à l’écrit"
+      },
+      "met": "Atteint",
+      "notMet": "Pas encore",
+      "crsBonus": " · +{alone} pts de bonus francophone ({withEnglish} avec CLB 5+ en anglais)",
+      "skillsLabel": "Niveau par compétence"
     },
     "guide": {
       "title": "Un bon niveau NCLC / CLB n’est que la première étape.",
@@ -965,6 +984,25 @@
     },
     "form": {
       "title": "Vos résultats de test"
-    }
+    },
+    "steps": {
+      "test": {
+        "step": "Étape 1",
+        "title": "Votre test de langue"
+      },
+      "scores": {
+        "step": "Étape 2",
+        "title": "Vos notes obtenues",
+        "subtitle": "Telles qu’elles figurent sur votre attestation de résultats."
+      }
+    },
+    "legend": {
+      "title": "Les paliers à retenir",
+      "l4": "NCLC/CLB 4 : premier niveau reconnu par IRCC",
+      "l5": "NCLC/CLB 5 : Expérience canadienne (TEER 2-3) et Métiers spécialisés",
+      "l7": "NCLC/CLB 7 : Travailleurs qualifiés, Expérience canadienne (TEER 0-1) et, en français, bonus CRS",
+      "l9": "NCLC/CLB 9 : points de transférabilité maximaux au CRS"
+    },
+    "tip": "Le NCLC s’applique au français, le CLB à l’anglais. Chaque programme exige un minimum dans chacune des 4 compétences : c’est votre compétence la plus faible qui décide."
   }
 }

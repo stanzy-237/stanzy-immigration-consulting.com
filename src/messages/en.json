@@ -931,7 +931,7 @@
       "level": "{unit} {level}",
       "belowFour": "Below {unit} 4",
       "retained": "Level that counts (your lowest)",
-      "frenchBonus": " · +{alone} pts French-language bonus ({withEnglish} with English CLB 5+)",
+      "frenchBonus": "+{alone} pts French-language bonus ({withEnglish} pts with English CLB 5+)",
       "verdict": {
         "eligible": "Eligible for Federal Skilled Worker: {unit} 7 reached in all 4 skills.",
         "close": "Almost: you're 1 level short in {skills} for Federal Skilled Worker, which needs {unit} 7 in every skill.",
@@ -939,7 +939,26 @@
         "prepare": "Prepare for the TCF with TCF Express Academy"
       },
       "testLine": "{test} · {language}",
-      "crs": "≈ {points} CRS pts as first language"
+      "crs": "≈ {points} CRS pts as first language",
+      "columns": {
+        "skill": "Skill",
+        "score": "Your score",
+        "level": "{unit} level"
+      },
+      "crsLabel": "Indicative CRS points",
+      "crsValue": "{points} pts",
+      "crsNote": "First official language, candidate without a spouse.",
+      "programsTitle": "Express Entry eligibility",
+      "programs": {
+        "fsw": "Federal Skilled Worker: {unit} 7 in every skill",
+        "cecTeer01": "Canadian Experience Class, TEER 0 or 1 job: {unit} 7 in every skill",
+        "cecTeer23": "Canadian Experience Class, TEER 2 or 3 job: {unit} 5 in every skill",
+        "fst": "Federal Skilled Trades: {unit} 5 speaking and listening, 4 reading and writing"
+      },
+      "met": "Met",
+      "notMet": "Not yet",
+      "crsBonus": " · +{alone} pts French-language bonus ({withEnglish} with English CLB 5+)",
+      "skillsLabel": "Level by skill"
     },
     "guide": {
       "title": "A good CLB / NCLC level is only the first step.",
@@ -948,6 +967,25 @@
     },
     "form": {
       "title": "Your test results"
-    }
+    },
+    "steps": {
+      "test": {
+        "step": "Step 1",
+        "title": "Your language test"
+      },
+      "scores": {
+        "step": "Step 2",
+        "title": "Your scores",
+        "subtitle": "As shown on your test report."
+      }
+    },
+    "legend": {
+      "title": "Levels to remember",
+      "l4": "CLB/NCLC 4: the first level IRCC recognises",
+      "l5": "CLB/NCLC 5: Canadian Experience Class (TEER 2-3) and Federal Skilled Trades",
+      "l7": "CLB/NCLC 7: Federal Skilled Worker, Canadian Experience Class (TEER 0-1) and, in French, a CRS bonus",
+      "l9": "CLB/NCLC 9: maximum CRS skill transferability points"
+    },
+    "tip": "CLB applies to English, NCLC to French. Each program sets a minimum in every one of the 4 skills, so your weakest skill decides."
   }
 }
