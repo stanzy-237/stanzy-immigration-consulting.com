@@ -1121,7 +1121,7 @@
       "title": "Date limite de dépôt",
       "lastDay": "Dernier jour : {date}",
       "closes": "Fermeture le {date} à 00 h 00 UTC",
-      "local": "(soit le {time} à votre heure).",
+      "local": "Soit le {time} à votre heure.",
       "check": "La date et l’heure exactes figurent dans votre compte IRCC : ce sont elles qui font foi."
     },
     "urgency": {

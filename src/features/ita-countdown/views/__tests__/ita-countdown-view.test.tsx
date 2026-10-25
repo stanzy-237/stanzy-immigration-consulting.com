@@ -35,14 +35,15 @@ const DRAWS = [
   draw(375, '2026-09-10', 540, 1000),
 ];
 /** The signed-in User's Parcours; only read when someone is signed in. */
-const parcours = { etapes: [] as { id: string; code: string; date: string; label: string }[] };
+const parcours = { etapes: [] as { id: string; code: string; date: string; label: string }[], loading: false };
 vi.mock('@/trpc/react', () => ({
   api: {
     draws: { latest: { useQuery: ({ take }: { take: number }) => ({ data: { draws: DRAWS.slice(0, take), lastSyncedAt: null } }) } },
     parcours: {
       list: {
         useQuery: (_input: undefined, options?: { enabled?: boolean }) => ({
-          data: options?.enabled ? parcours.etapes : undefined,
+          data: options?.enabled && !parcours.loading ? parcours.etapes : undefined,
+          isPending: Boolean(options?.enabled) && parcours.loading,
         }),
       },
     },
@@ -59,12 +60,19 @@ beforeEach(() => {
   vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never);
   window.localStorage.clear();
   parcours.etapes = [];
+  parcours.loading = false;
 });
 afterEach(() => vi.useRealTimers());
 
 const itaDate = () => screen.getByLabelText('Date de votre ITA');
 const enterIta = (day: string) => fireEvent.change(itaDate(), { target: { value: day } });
 const timeLeft = () => screen.getByRole('region', { name: 'Temps restant' });
+/** What a screen reader reads of `element`: the flip tiles' drawn halves are aria-hidden. */
+const readText = (element: HTMLElement) => {
+  const copy = element.cloneNode(true) as HTMLElement;
+  copy.querySelectorAll('[aria-hidden="true"]').forEach((hidden) => hidden.remove());
+  return copy.textContent ?? '';
+};
 const deadline = () => screen.getByRole('region', { name: 'Date limite de dépôt' });
 
 describe('ItaCountdownView', () => {
@@ -75,10 +83,10 @@ describe('ItaCountdownView', () => {
     // ITA on 25 Oct: the 60 days are 26 Oct – 24 Dec; the window closes 25 Dec 00:00 UTC.
     enterIta('2026-10-25');
 
-    expect(timeLeft()).toHaveTextContent(/60\s*jours\s*09\s*heures\s*00\s*minutes\s*00\s*secondes/);
+    expect(readText(timeLeft())).toMatch(/60\s*jours\s*09\s*heures\s*00\s*minutes\s*00\s*secondes/);
     expect(deadline()).toHaveTextContent('Dernier jour : 24 décembre 2026');
     expect(deadline()).toHaveTextContent('Fermeture le 25 décembre 2026 à 00 h 00 UTC');
-    expect(deadline()).toHaveTextContent(/soit .+ à votre heure/);
+    expect(deadline()).toHaveTextContent(/Soit le .+ à votre heure\./);
     expect(deadline()).toHaveTextContent('La date et l’heure exactes figurent dans votre compte IRCC');
   });
 
@@ -88,7 +96,7 @@ describe('ItaCountdownView', () => {
 
     act(() => void vi.advanceTimersByTime(61_000));
 
-    expect(timeLeft()).toHaveTextContent(/60\s*jours\s*08\s*heures\s*58\s*minutes\s*59\s*secondes/);
+    expect(readText(timeLeft())).toMatch(/60\s*jours\s*08\s*heures\s*58\s*minutes\s*59\s*secondes/);
   });
 
   it.each([
@@ -101,7 +109,7 @@ describe('ItaCountdownView', () => {
     enterIta(day);
 
     expect(screen.getByRole('status')).toHaveTextContent(advice);
-    expect(screen.getByRole('timer')).toHaveTextContent(new RegExp(`^${days}\\s*jours\\s*restants$`));
+    expect(readText(timeLeft())).toMatch(new RegExp(`${String(days).padStart(2, '0')}\\s*jours`));
     expect(screen.getByRole('progressbar', { name: 'Part du délai restant' })).toHaveAttribute(
       'aria-valuenow',
       String(Math.round(((days * 24 + 9) / (60 * 24)) * 100)),
@@ -116,7 +124,6 @@ describe('ItaCountdownView', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Votre délai est écoulé');
     expect(screen.getByRole('alert')).toHaveTextContent('votre profil est retiré du bassin Entrée Express');
-    expect(screen.queryByRole('timer')).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Temps restant' })).not.toBeInTheDocument();
     expect(deadline()).toHaveTextContent('Dernier jour : 30 septembre 2026');
   });
@@ -128,7 +135,7 @@ describe('ItaCountdownView', () => {
 
     expect(screen.getByText('La date de l’ITA ne peut pas être dans le futur.')).toBeInTheDocument();
     expect(itaDate()).toHaveAttribute('aria-invalid', 'true');
-    expect(screen.queryByRole('timer')).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Temps restant' })).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Date limite de dépôt' })).not.toBeInTheDocument();
   });
 
@@ -203,6 +210,15 @@ describe('ItaCountdownView', () => {
       expect(deadline()).toHaveTextContent('Dernier jour : 7 décembre 2026');
       expect(screen.getByText(/Date reprise de votre parcours/)).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Voir mon parcours' })).toHaveAttribute('href', '/outils/timeline');
+    });
+
+    it('waits for the Parcours instead of flashing the date kept in this browser', () => {
+      parcours.loading = true;
+      window.localStorage.setItem('stanzy.ita-countdown.v1', JSON.stringify({ itaDay: '2026-10-22' }));
+      render(withIntl(<ItaCountdownView />));
+
+      expect(itaDate()).toHaveValue('');
+      expect(screen.queryByRole('region', { name: 'Date limite de dépôt' })).not.toBeInTheDocument();
     });
 
     it('lets the User count from another date on this page', () => {

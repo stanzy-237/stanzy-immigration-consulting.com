@@ -7,9 +7,9 @@ export function urgencyOf(daysLeft: number): Urgency {
   return 'urgent';
 }
 
-/** Text and ring colours per urgency (green, amber, rouge). */
-export const URGENCY_CLASSES: Record<Urgency, { text: string; stroke: string }> = {
-  calm: { text: 'text-leaf', stroke: 'stroke-leaf' },
-  soon: { text: 'text-honey', stroke: 'stroke-honey' },
-  urgent: { text: 'text-rouge', stroke: 'stroke-rouge' },
+/** Text colour, and the ring around the days tile, per urgency (green, amber, rouge). */
+export const URGENCY_CLASSES: Record<Urgency, { text: string; ring: string }> = {
+  calm: { text: 'text-leaf', ring: 'ring-leaf' },
+  soon: { text: 'text-honey', ring: 'ring-honey' },
+  urgent: { text: 'text-rouge', ring: 'ring-rouge' },
 };

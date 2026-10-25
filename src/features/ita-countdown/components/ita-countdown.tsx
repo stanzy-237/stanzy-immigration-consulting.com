@@ -6,9 +6,9 @@ import { useState, type ReactNode } from 'react';
 import { z } from 'zod';
 
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
-import { CountdownRing } from '@/features/ita-countdown/components/countdown-ring';
+import { FlipTile } from '@/features/ita-countdown/components/flip-tile';
 import { RecentDrawsPicker } from '@/features/ita-countdown/components/recent-draws-picker';
-import { itaDeadline, timeLeft, utcDate, utcToday } from '@/features/ita-countdown/lib/ita-deadline';
+import { ITA_WINDOW_DAYS, itaDeadline, timeLeft, utcDate, utcToday, type TimeLeft } from '@/features/ita-countdown/lib/ita-deadline';
 import { URGENCY_CLASSES, urgencyOf } from '@/features/ita-countdown/lib/urgency';
 import { useStoredForm } from '@/features/shared/hooks/use-stored-form';
 import { Link } from '@/i18n/navigation';
@@ -20,12 +20,44 @@ const storedSchema = z.object({ itaDay: z.string().regex(/^(\d{4}-\d{2}-\d{2})?$
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
-/** The date of the signed-in User's latest ITA Étape, or null (signed out, or none logged). */
-function useParcoursIta(): string | null {
-  const { account } = useCurrentAccount();
-  const { data: etapes } = api.parcours.list.useQuery(undefined, { enabled: account !== null });
+const UNITS = ['days', 'hours', 'minutes', 'seconds'] as const;
+
+/** Days, hours, minutes and seconds as flip-clock tiles; the days tile can wear the urgency ring. */
+function FlipBoard({
+  left,
+  daysRing,
+}: {
+  left: Pick<TimeLeft, (typeof UNITS)[number]>;
+  daysRing?: string;
+}): ReactNode {
+  const t = useTranslations('ItaCountdown.timeLeft');
+  return (
+    <div className="grid grid-cols-4 gap-2 sm:gap-3">
+      {UNITS.map((unit) => (
+        <div key={unit} className="flex flex-col items-center gap-2">
+          <FlipTile
+            text={pad(left[unit])}
+            className={`w-full ${unit === 'days' && daysRing ? `ring-4 ring-offset-2 ring-offset-off-white ${daysRing}` : ''}`}
+          />
+          <span className="font-label uppercase tracking-widest text-slate">{t(unit)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The date of the signed-in User's latest ITA Étape (null when signed out or
+ * none is logged), and whether that is still being looked up.
+ */
+function useParcoursIta(): { day: string | null; loading: boolean } {
+  const { account, pending } = useCurrentAccount();
+  const { data: etapes, isPending } = api.parcours.list.useQuery(undefined, { enabled: account !== null });
   const itas = (etapes ?? []).filter((etape) => etape.code === 'ITA').map((etape) => etape.date);
-  return itas.length > 0 ? itas.reduce((latest, day) => (day > latest ? day : latest)) : null;
+  return {
+    day: itas.length > 0 ? itas.reduce((latest, day) => (day > latest ? day : latest)) : null,
+    loading: pending || (account !== null && isPending),
+  };
 }
 
 /** The countdown itself: the ITA date in, the time left and the deadline out. */
@@ -36,10 +68,12 @@ export function ItaCountdown(): ReactNode {
   const [stored, store] = useStoredForm(ITA_DATE_KEY, storedSchema, { itaDay: '' });
   const parcoursIta = useParcoursIta();
   // The Parcours is the signed-in User's record of their ITA, so it wins over
-  // a date kept in this browser, until they type another one here.
+  // a date kept in this browser, until they type another one here. While it
+  // loads, nothing is counted rather than a date about to be replaced.
   const [typed, setTyped] = useState(false);
-  const fromParcours = !typed && parcoursIta !== null;
-  const itaDay = fromParcours ? parcoursIta : stored.itaDay;
+  const waiting = !typed && parcoursIta.loading;
+  const fromParcours = !typed && parcoursIta.day !== null;
+  const itaDay = waiting ? '' : fromParcours ? (parcoursIta.day ?? '') : stored.itaDay;
   const setItaDay = (day: string) => {
     setTyped(true);
     store({ itaDay: day });
@@ -56,41 +90,26 @@ export function ItaCountdown(): ReactNode {
     format.dateTime(date, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-6">
-      <CountdownRing left={left} />
-
-      {urgency && (
-        // Classes joined by hand here and below: `cn` drops custom sizes (text-body-sm, text-h3) next to a colour.
-        <p role="status" className={`text-center text-body-sm font-semibold ${URGENCY_CLASSES[urgency].text}`}>
-          {t(`urgency.${urgency}`)}
-        </p>
-      )}
-
-      {running && (
-        <section aria-labelledby="ita-time-left" className="grid grid-cols-4 gap-2.5">
+    <div className="mx-auto flex max-w-2xl flex-col gap-6">
+      {running ? (
+        <section aria-labelledby="ita-time-left">
           <h2 id="ita-time-left" className="sr-only">
             {t('timeLeft.title')}
           </h2>
-          {(
-            [
-              [running.days, 'days'],
-              [running.hours, 'hours'],
-              [running.minutes, 'minutes'],
-              [running.seconds, 'seconds'],
-            ] as const
-          ).map(([value, unit]) => (
-            <div key={unit} className="rounded-2xl border-2 border-fog-light bg-off-white px-1 pt-4 pb-3 text-center">
-              <strong
-                className={`block font-heading text-2xl font-bold leading-none sm:text-h3 ${
-                  unit === 'days' && urgency ? URGENCY_CLASSES[urgency].text : 'text-navy-deep'
-                }`}
-              >
-                {pad(value)}
-              </strong>
-              <span className="mt-1.5 block font-label uppercase tracking-widest text-slate">{t(`timeLeft.${unit}`)}</span>
-            </div>
-          ))}
+          <FlipBoard left={running} daysRing={urgency ? URGENCY_CLASSES[urgency].ring : undefined} />
         </section>
+      ) : (
+        // Nothing to count yet (or any more): the board at rest, for the eye only.
+        <div aria-hidden={true} className="opacity-40">
+          <FlipBoard left={left ?? { days: ITA_WINDOW_DAYS, hours: 0, minutes: 0, seconds: 0 }} />
+        </div>
+      )}
+
+      {urgency && (
+        // Classes joined by hand here and below: `cn` drops custom sizes (text-body-sm) next to a colour.
+        <p role="status" className={`text-center text-body-sm font-semibold ${URGENCY_CLASSES[urgency].text}`}>
+          {t(`urgency.${urgency}`)}
+        </p>
       )}
 
       {running && (
@@ -119,20 +138,25 @@ export function ItaCountdown(): ReactNode {
       {deadline && (
         <section
           aria-labelledby="ita-deadline"
-          className="flex items-start gap-3 rounded-2xl border border-rose bg-blush px-4.5 py-3.5"
+          className="rounded-2xl border border-rose bg-blush px-4 py-3.5 sm:px-4.5"
         >
-          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-rouge text-white">
-            <CalendarDays aria-hidden={true} className="size-4.5" />
-          </span>
-          <div>
-            <h2 id="ita-deadline" className="font-label font-semibold uppercase tracking-widest text-rouge/70">
-              {t('deadline.title')}
-            </h2>
-            <p className="mt-1 font-heading text-body font-bold text-rouge">
-              {t('deadline.lastDay', { date: longDate(utcDate(deadline.lastDay)) })}
-            </p>
+          {/* The icon sits beside the title only, so on phones the details below get the full width. */}
+          <div className="flex items-center gap-3">
+            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-rouge text-white">
+              <CalendarDays aria-hidden={true} className="size-4.5" />
+            </span>
+            <div className="min-w-0">
+              <h2 id="ita-deadline" className="font-label font-semibold uppercase tracking-widest text-rouge/70">
+                {t('deadline.title')}
+              </h2>
+              <p className="font-heading text-body font-bold text-rouge">
+                {t('deadline.lastDay', { date: longDate(utcDate(deadline.lastDay)) })}
+              </p>
+            </div>
+          </div>
+          <div className="mt-2.5 flex flex-col gap-0.5 sm:pl-12">
+            <p className="text-caption text-rouge/80">{t('deadline.closes', { date: longDate(deadline.closesAt) })}</p>
             <p className="text-caption text-rouge/80">
-              {t('deadline.closes', { date: longDate(deadline.closesAt) })}{' '}
               {t('deadline.local', {
                 time: format.dateTime(deadline.closesAt, {
                   day: 'numeric',
@@ -142,7 +166,7 @@ export function ItaCountdown(): ReactNode {
                 }),
               })}
             </p>
-            <p className="mt-2 text-caption text-slate">{t('deadline.check')}</p>
+            <p className="mt-1.5 border-t border-rose/60 pt-2 text-caption text-slate">{t('deadline.check')}</p>
           </div>
         </section>
       )}
@@ -188,7 +212,7 @@ export function ItaCountdown(): ReactNode {
         </div>
       </div>
 
-      {!itaDay && <p className="text-center text-body-sm text-slate">{t('empty')}</p>}
+      {!itaDay && !waiting && <p className="text-center text-body-sm text-slate">{t('empty')}</p>}
     </div>
   );
 }
