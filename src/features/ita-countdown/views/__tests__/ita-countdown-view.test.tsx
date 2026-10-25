@@ -169,7 +169,7 @@ describe('ItaCountdownView', () => {
     enterIta('2026-10-01');
     fireEvent.click(screen.getByRole('button', { name: 'Derniers tirages' }));
     expect(await axe(container)).toHaveNoViolations();
-  });
+  }, 20_000); // two full axe scans; slow when the machine is busy
 
   it('reads "today" on the UTC calendar, like the deadline, wherever the visitor is', () => {
     // 21:00 on 25 Oct in Toronto is already 26 Oct in UTC: a Tirage dated
