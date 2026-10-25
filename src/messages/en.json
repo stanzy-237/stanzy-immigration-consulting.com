@@ -959,7 +959,13 @@
         "fst": "Federal Skilled Trades: {unit} 5 speaking and listening, 4 reading and writing"
       },
       "met": "Met",
-      "notMet": "Not yet"
+      "notMet": "Not yet",
+      "verdict": {
+        "eligible": "Eligible for Federal Skilled Worker: {unit} 7 reached in all 4 skills.",
+        "close": "Almost: you're 1 level short in {skills} for Federal Skilled Worker, which needs {unit} 7 in every skill.",
+        "notEligible": "Not yet eligible for Federal Skilled Worker: {unit} 7 is needed in every skill. To work on: {skills}.",
+        "prepare": "Prepare for the TCF with TCF Express Academy"
+      }
     },
     "legend": {
       "title": "Levels to remember",

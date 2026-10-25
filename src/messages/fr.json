@@ -976,7 +976,13 @@
         "fst": "Métiers spécialisés (fédéral) : {unit} 5 à l’oral, 4 à l’écrit"
       },
       "met": "Atteint",
-      "notMet": "Pas encore"
+      "notMet": "Pas encore",
+      "verdict": {
+        "eligible": "Admissible aux Travailleurs qualifiés (fédéral) : {unit} 7 atteint dans les 4 compétences.",
+        "close": "Presque : il vous manque 1 niveau en {skills} pour les Travailleurs qualifiés (fédéral), qui exigent {unit} 7 dans chaque compétence.",
+        "notEligible": "Pas encore admissible aux Travailleurs qualifiés (fédéral) : {unit} 7 est exigé dans chaque compétence. À travailler : {skills}.",
+        "prepare": "Préparer le TCF avec TCF Express Academy"
+      }
     },
     "legend": {
       "title": "Les paliers à retenir",

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
-import { TOOLS, UNLISTED_TOOLS, type Tool } from '@/features/landing/data/tools';
+import { TOOLS, type Tool } from '@/features/landing/data/tools';
 import { Link } from '@/i18n/navigation';
 
 export type ToolPlaceholderProps = {
@@ -14,7 +14,7 @@ export type ToolPlaceholderProps = {
 export function ToolPlaceholderView({
   slug,
 }: ToolPlaceholderProps): ReactNode {
-  const tool = [...TOOLS, ...UNLISTED_TOOLS].find((entry: Tool): boolean => entry.slug === slug);
+  const tool = TOOLS.find((entry: Tool): boolean => entry.slug === slug);
   const t = useTranslations('ToolPlaceholder');
   const tItems = useTranslations('Home.ToolsGrid.Items');
 

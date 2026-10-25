@@ -22,7 +22,30 @@ describe('assessLanguageTest', () => {
         // NCLC 7+ on all four: 25 alone, 50 with English CLB 5+.
         frenchBonus: { alone: 25, withEnglish: 50 },
         programs: { fsw: true, cecTeer01: true, cecTeer23: true, fst: true },
+        fswVerdict: { status: 'eligible', shortSkills: [] },
       },
+    });
+  });
+
+  describe('Travailleurs qualifiés verdict', () => {
+    it('is « close » when the weakest skills sit at NCLC 6, naming them', () => {
+      // TCF: listening 458 → 7, reading 453 → 7, speaking 9 → 6, writing 7 → 6.
+      const result = assessLanguageTest({ test: 'TCF', scores: { listening: 458, reading: 453, speaking: 9, writing: 7 } });
+
+      expect(result).toMatchObject({
+        ok: true,
+        assessment: { retained: 6, fswVerdict: { status: 'close', shortSkills: ['speaking', 'writing'] } },
+      });
+    });
+
+    it('is « not eligible » below NCLC 6, naming every skill under 7', () => {
+      // TCF: listening 549 → 10, reading 406 → 6, speaking 6 → 5, writing 12 → 8.
+      const result = assessLanguageTest({ test: 'TCF', scores: { listening: 549, reading: 406, speaking: 6, writing: 12 } });
+
+      expect(result).toMatchObject({
+        ok: true,
+        assessment: { retained: 5, fswVerdict: { status: 'notEligible', shortSkills: ['speaking', 'reading'] } },
+      });
     });
   });
 

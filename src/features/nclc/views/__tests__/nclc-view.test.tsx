@@ -52,6 +52,16 @@ describe('NclcView', () => {
     expect(within(result()).getByText(/\+25 pts de bonus francophone/)).toBeInTheDocument();
   });
 
+  it('announces the result as it changes, like the other calculators', () => {
+    render(withIntl(<NclcView />));
+    const live = screen.getByRole('status');
+    expect(live).toHaveTextContent('Entrez vos 4 notes');
+
+    enterTcf();
+
+    expect(within(live).getByRole('region', { name: 'Votre niveau' })).toBeInTheDocument();
+  });
+
   it('says which Entrée Express programs the level reaches', () => {
     render(withIntl(<NclcView />));
     chooseTest('CELPIP');
@@ -65,6 +75,57 @@ describe('NclcView', () => {
     expect(programs.getByText(/Métiers spécialisés \(fédéral\)/).closest('li')).toHaveAttribute('data-met', 'true');
     expect(within(result()).getByText('Niveau retenu (le plus faible)').nextElementSibling).toHaveTextContent('CLB 4');
     expect(within(result()).queryByText(/bonus francophone/)).not.toBeInTheDocument();
+  });
+
+  describe('Travailleurs qualifiés verdict', () => {
+    const verdict = () => within(result()).getByRole('note');
+
+    it('says when the level meets Travailleurs qualifiés', () => {
+      render(withIntl(<NclcView />));
+      enterTcf();
+
+      expect(verdict()).toHaveTextContent('Admissible aux Travailleurs qualifiés (fédéral)');
+      expect(within(verdict()).queryByRole('link')).not.toBeInTheDocument();
+    });
+
+    it('says « presque » at NCLC 6, naming the skills to raise', () => {
+      render(withIntl(<NclcView />));
+      chooseTest('TCF');
+      type(/Compréhension orale \(sur 699\)/, '458');
+      type(/Compréhension écrite \(sur 699\)/, '453');
+      type(/Expression orale \(sur 20\)/, '9');
+      type(/Expression écrite \(sur 20\)/, '7');
+
+      expect(verdict()).toHaveAttribute('data-status', 'close');
+      expect(verdict()).toHaveTextContent('Presque');
+      expect(verdict()).toHaveTextContent('Expression orale et Expression écrite');
+    });
+
+    it('says « pas admissible » below NCLC 6 and offers TCF preparation', () => {
+      render(withIntl(<NclcView />));
+      chooseTest('TCF');
+      type(/Compréhension orale \(sur 699\)/, '549');
+      type(/Compréhension écrite \(sur 699\)/, '406');
+      type(/Expression orale \(sur 20\)/, '6');
+      type(/Expression écrite \(sur 20\)/, '12');
+
+      expect(verdict()).toHaveAttribute('data-status', 'notEligible');
+      expect(verdict()).toHaveTextContent('Pas encore admissible aux Travailleurs qualifiés (fédéral)');
+      expect(verdict()).toHaveTextContent('Expression orale et Compréhension écrite');
+      expect(within(verdict()).getByRole('link', { name: /Préparer le TCF/ })).toHaveAttribute(
+        'href',
+        'https://tcf-express-academy.com',
+      );
+    });
+
+    it('offers no French preparation for an English test', () => {
+      render(withIntl(<NclcView />));
+      chooseTest('CELPIP');
+      for (const field of [/Speaking/, /Listening/, /Reading/, /Writing/]) type(field, '4');
+
+      expect(verdict()).toHaveAttribute('data-status', 'notEligible');
+      expect(within(verdict()).queryByRole('link')).not.toBeInTheDocument();
+    });
   });
 
   it('flags a score the test cannot give, and shows no level', () => {

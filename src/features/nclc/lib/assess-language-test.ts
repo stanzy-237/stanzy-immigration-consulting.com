@@ -19,6 +19,17 @@ const PROGRAM_MINIMUMS = {
 } as const satisfies Record<string, Record<Ability, number>>;
 
 export type Program = keyof typeof PROGRAM_MINIMUMS;
+export const PROGRAMS = Object.keys(PROGRAM_MINIMUMS) as Program[];
+
+/**
+ * Where the visitor stands for Travailleurs qualifiés (FSW), the program
+ * Stanzy focuses on: `close` is one level short (weakest skill at 6),
+ * `notEligible` further away. `shortSkills` are the skills under 7.
+ */
+export type FswVerdict = { status: 'eligible' | 'close' | 'notEligible'; shortSkills: Ability[] };
+
+/** One level short of FSW's 7: the verdict says « presque » rather than « pas admissible ». */
+const FSW_CLOSE_LEVEL = 6;
 
 /** The CRS French-language bonus needs NCLC 7 or more on all four abilities. */
 const FRENCH_BONUS_LEVEL = 7;
@@ -34,6 +45,7 @@ export type LanguageAssessment = {
   /** CRS French bonus: alone, and with English CLB 5+ on all four; null below NCLC 7. */
   frenchBonus: { alone: number; withEnglish: number } | null;
   programs: Record<Program, boolean>;
+  fswVerdict: FswVerdict;
 };
 
 export type LanguageAssessmentResult =
@@ -58,6 +70,8 @@ export function assessLanguageTest(result: LanguageResult): LanguageAssessmentRe
   const retained = Math.min(...ABILITIES.map((a) => clb[a]));
   const language = TEST_SPECS[result.test].language;
   const points = FIRST_LANGUAGE_POINTS.withoutSpouse;
+  const fswMinimum = PROGRAM_MINIMUMS.fsw;
+  const shortSkills = ABILITIES.filter((a) => clb[a] < fswMinimum[a]);
 
   return {
     ok: true,
@@ -73,6 +87,10 @@ export function assessLanguageTest(result: LanguageResult): LanguageAssessmentRe
       programs: Object.fromEntries(
         Object.entries(PROGRAM_MINIMUMS).map(([program, minimum]) => [program, ABILITIES.every((a) => clb[a] >= minimum[a])]),
       ) as Record<Program, boolean>,
+      fswVerdict: {
+        status: shortSkills.length === 0 ? 'eligible' : retained >= FSW_CLOSE_LEVEL ? 'close' : 'notEligible',
+        shortSkills,
+      },
     },
   };
 }

@@ -22,6 +22,8 @@ export type Tool = {
   badgeKeys: ReadonlyArray<string>;
   // Freeness/badge pill shown in the top-left of non-featured cards.
   freeKey: string;
+  // false: the tool has a page but no card on the home grid.
+  listed?: false;
 };
 
 // Seven cards in the mosaic order from the MagicPath design
@@ -98,13 +100,8 @@ export const TOOLS: ReadonlyArray<Tool> = [
     badgeKeys: ['badgeCnp2021', 'badgeTeer'],
     freeKey: 'free',
   },
-] as const;
-
-/**
- * Tools that have a page but no card on the home grid. The Coffre-fort's
- * card made way for the NCLC / CLB calculator; its placeholder page stays.
- */
-export const UNLISTED_TOOLS: ReadonlyArray<Tool> = [
+  // The Coffre-fort's card made way for the NCLC / CLB calculator; its
+  // placeholder page stays.
   {
     slug: 'clouds',
     icon: Cloud,
@@ -114,5 +111,6 @@ export const UNLISTED_TOOLS: ReadonlyArray<Tool> = [
     variant: 'default',
     badgeKeys: ['badgeCrsProfile', 'badgeAnalysis'],
     freeKey: 'free',
+    listed: false,
   },
-];
+] as const;

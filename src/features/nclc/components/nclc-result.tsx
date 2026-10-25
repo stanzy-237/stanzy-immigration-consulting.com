@@ -1,13 +1,55 @@
-import { CircleCheck, CircleDashed, Lightbulb } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { ArrowUpRight, CircleAlert, CircleCheck, CircleDashed, Lightbulb, TriangleAlert } from 'lucide-react';
+import { useFormatter, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
-import type { LanguageAssessment, Program } from '@/features/nclc/lib/assess-language-test';
+import { PROGRAMS, type FswVerdict, type LanguageAssessment } from '@/features/nclc/lib/assess-language-test';
 import { SCORE_ORDER, type NclcTest } from '@/features/nclc/lib/nclc-form';
+import { TCF_ACADEMY_URL } from '@/features/shared/data/links';
 import type { Ability } from '@/features/shared/lib/language-levels';
 import { cn } from '@/lib/utils';
 
-const PROGRAMS: Program[] = ['fsw', 'cecTeer01', 'cecTeer23', 'fst'];
+const VERDICT_STYLES: Record<FswVerdict['status'], { box: string; Icon: typeof CircleCheck }> = {
+  eligible: { box: 'border-leaf-line bg-leaf-tint text-leaf', Icon: CircleCheck },
+  close: { box: 'border-honey-line bg-honey-tint text-honey', Icon: TriangleAlert },
+  notEligible: { box: 'border-rose bg-blush text-rouge', Icon: CircleAlert },
+};
+
+/**
+ * Travailleurs qualifiés first: whether the level meets FSW, and if not, which
+ * skills to raise, with TCF preparation for a French test.
+ */
+function FswVerdictNote({ assessment }: { assessment: LanguageAssessment }): ReactNode {
+  const t = useTranslations('Nclc.result.verdict');
+  const tLanguage = useTranslations('Calculators.language');
+  const format = useFormatter();
+  const { status, shortSkills } = assessment.fswVerdict;
+  const { box, Icon } = VERDICT_STYLES[status];
+  const unit = assessment.language === 'fr' ? 'NCLC' : 'CLB';
+  const skills = format.list(
+    shortSkills.map((a) => tLanguage(`abilitiesByTestLanguage.${assessment.language}.${a}`)),
+    { type: 'conjunction' },
+  );
+
+  return (
+    <div role="note" data-status={status} className={cn('mb-5 flex gap-3 rounded-xl border p-4 text-body-sm', box)}>
+      <Icon aria-hidden={true} className="mt-0.5 size-5 shrink-0" />
+      <div>
+        <p className="font-semibold">{t(status, { unit, skills })}</p>
+        {status !== 'eligible' && assessment.language === 'fr' ? (
+          <a
+            href={TCF_ACADEMY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1 font-semibold underline underline-offset-4"
+          >
+            {t('prepare')}
+            <ArrowUpRight aria-hidden={true} className="size-4" />
+          </a>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 /**
  * The result card: each skill's level, the level that counts, indicative CRS
@@ -35,6 +77,8 @@ export function NclcResult({
           {t(`language.${assessment.language}`)}
         </span>
       </div>
+
+      <FswVerdictNote assessment={assessment} />
 
       <div className="overflow-hidden rounded-xl border border-fog">
         <table className="w-full border-collapse text-left text-body-sm">

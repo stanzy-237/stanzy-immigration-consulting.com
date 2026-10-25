@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import type { LanguageTest } from '@/features/shared/data/language-tests';
 import type { Ability } from '@/features/shared/lib/language-levels';
-import { toLanguageResult, type LanguageForm } from '@/features/shared/lib/language-form';
 
 /** The tests this tool converts: the ones IRCC accepts, French first. */
 export const NCLC_TESTS = ['TCF', 'TEF', 'IELTS', 'CELPIP', 'PTE_CORE'] as const satisfies readonly LanguageTest[];
@@ -25,6 +24,3 @@ export const nclcFormSchema: z.ZodType<NclcForm> = z.object({
   test: z.enum(NCLC_TESTS),
   scores: z.object({ listening: score, reading: score, speaking: score, writing: score }),
 });
-
-/** The test as engine input once all four results are typed, else null. */
-export const toResult = (form: NclcForm) => toLanguageResult(form satisfies LanguageForm);

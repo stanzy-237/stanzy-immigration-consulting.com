@@ -5,11 +5,12 @@ import { useMemo, type ReactNode } from 'react';
 
 import { NclcLegend, NclcResult } from '@/features/nclc/components/nclc-result';
 import { assessLanguageTest } from '@/features/nclc/lib/assess-language-test';
-import { DEFAULT_NCLC_FORM, NCLC_TESTS, nclcFormSchema, SCORE_ORDER, toResult } from '@/features/nclc/lib/nclc-form';
+import { DEFAULT_NCLC_FORM, NCLC_TESTS, nclcFormSchema, SCORE_ORDER } from '@/features/nclc/lib/nclc-form';
 import { CalculatorSection, NumberField, SelectField } from '@/features/shared/components/calculator-fields';
 import { TEST_SPECS } from '@/features/shared/data/language-tests';
 import { useCalculatorTracking } from '@/features/shared/hooks/use-calculator-tracking';
 import { useStoredForm } from '@/features/shared/hooks/use-stored-form';
+import { toLanguageResult } from '@/features/shared/lib/language-form';
 
 /** Versioned, so a later change to the form shape discards old drafts instead of breaking. */
 export const NCLC_DRAFT_KEY = 'stanzy.nclc.draft.v1';
@@ -26,7 +27,7 @@ export function NclcCalculator(): ReactNode {
 
   const spec = TEST_SPECS[form.test];
   const result = useMemo(() => {
-    const input = toResult(form);
+    const input = toLanguageResult(form);
     return input ? assessLanguageTest(input) : null;
   }, [form]);
   const invalid = result && !result.ok ? result.invalid : [];
@@ -74,7 +75,8 @@ export function NclcCalculator(): ReactNode {
         </CalculatorSection>
       </div>
 
-      <div className="lg:sticky-below-nav lg:col-start-2 lg:row-span-2 lg:row-start-1">
+      {/* Announced as it changes, like the CRS and 67 points results. */}
+      <div role="status" className="lg:sticky-below-nav lg:col-start-2 lg:row-span-2 lg:row-start-1">
         {result?.ok ? (
           <NclcResult test={form.test} scores={form.scores} assessment={result.assessment} />
         ) : (
