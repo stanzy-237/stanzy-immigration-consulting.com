@@ -42,6 +42,7 @@ model Account {
   sessions          Session[]
   identities        AuthIdentity[]
   crsSimulations    CrsSimulation[]
+  parcoursEtapes    ParcoursEtape[]
   pushSubscriptions PushSubscription[]
 
   @@map("account")
@@ -197,4 +198,27 @@ model PushSubscription {
 
   @@index([accountId])
   @@map("push_subscription")
+}
+
+// ─── Parcours (#10) ──────────────────────────────────────────────────────────
+
+/// One dated milestone in an Account's Parcours (GLOSSARY: Étape).
+model ParcoursEtape {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  label     String
+  /// Short uppercase code shown on the pill, e.g. "ITA", "COPR".
+  code      String
+  emoji     String
+  /// Palette key (src/features/parcours/data/palette.ts), never a hex.
+  color     String
+  /// The calendar day the Étape happened; no time, no zone.
+  date      DateTime @db.Date
+  note      String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([accountId, date])
+  @@map("parcours_etape")
 }

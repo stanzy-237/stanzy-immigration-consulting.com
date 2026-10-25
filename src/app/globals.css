@@ -50,6 +50,16 @@
   --honey-line: #fcd34d;
   --live: #5ee39b; /* "live data" dot on navy */
 
+  /* Étape colours a User can pick in their Parcours (#10); Rouge Stanzy, Bleu
+     Stanzy and Ardoise reuse rouge, navy-deep and steel-blue. */
+  --etape-green: #22c55e;
+  --etape-amber: #f59e0b;
+  --etape-blue: #3b82f6;
+  --etape-pink: #ec4899;
+  --etape-purple: #8b5cf6;
+  --etape-teal: #14b8a6;
+  --etape-orange: #f97316;
+
   --success: #2f855a;
   --success-foreground: #ffffff;
   --warning: #b7791f;
@@ -127,6 +137,13 @@
   --color-honey-tint: var(--honey-tint);
   --color-honey-line: var(--honey-line);
   --color-live: var(--live);
+  --color-etape-green: var(--etape-green);
+  --color-etape-amber: var(--etape-amber);
+  --color-etape-blue: var(--etape-blue);
+  --color-etape-pink: var(--etape-pink);
+  --color-etape-purple: var(--etape-purple);
+  --color-etape-teal: var(--etape-teal);
+  --color-etape-orange: var(--etape-orange);
 
   /* Legacy brand aliases kept for existing scaffold code. */
   --color-bleu: var(--navy-deep);

@@ -987,5 +987,97 @@
       "l9": "CLB/NCLC 9: maximum CRS skill transferability points"
     },
     "tip": "CLB applies to English, NCLC to French. Each program sets a minimum in every one of the 4 skills, so your weakest skill decides."
+  },
+  "Parcours": {
+    "eyebrow": "Your journey",
+    "title": "Every step, dated.",
+    "lead": "ITA, AOR, biometrics, medical — log each milestone as your journey unfolds.",
+    "viewTimeline": "View timeline",
+    "feedTitle": "Saved steps",
+    "loading": "Loading your journey…",
+    "empty": {
+      "title": "No steps saved yet",
+      "text": "Add your first step to start tracking your journey.",
+      "cta": "Add a step"
+    },
+    "edit": "Edit {label}",
+    "daysSince": "{days, plural, one {day since} other {days since}}",
+    "count": "{count, plural, =0 {No steps saved} one {# step saved} other {# steps saved}}",
+    "summary": {
+      "title": "Your journey",
+      "recent": "{days, plural, =0 {today} one {# day ago} other {# days ago}}"
+    },
+    "form": {
+      "addTitle": "Add a step",
+      "editTitle": "Edit step",
+      "icon": "Icon",
+      "chooseIcon": "Choose the {emoji} icon",
+      "presets": "Choose a preset step",
+      "showAll": "Show all steps",
+      "showLess": "Show less",
+      "manual": "or enter it yourself",
+      "label": "Step name",
+      "labelPlaceholder": "E.g. ITA received, biometrics done…",
+      "date": "Date",
+      "color": "Colour",
+      "note": "Note (optional)",
+      "notePlaceholder": "Remarks, reference number, IRCC details…",
+      "submitAdd": "Add step",
+      "submitEdit": "Save changes",
+      "cancelEdit": "Cancel",
+      "closeSheet": "Close panel",
+      "delete": "Delete this step",
+      "errors": {
+        "label": "Give the step a name.",
+        "date": "Enter the step’s date.",
+        "future": "The date can’t be in the future.",
+        "save": "The step couldn’t be saved. Please try again.",
+        "limit": "You’ve reached the limit of 100 steps."
+      }
+    },
+    "fab": "Add a step",
+    "deleteConfirm": {
+      "title": "Delete this step?",
+      "text": "“{label}” will be removed from your journey. This can’t be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "share": {
+      "heading": "My immigration journey",
+      "eyebrow": "Saved on Stanzy Immigration",
+      "title": "My Express Entry journey",
+      "showNotes": "Show notes",
+      "hint": "Take a screenshot to share it.",
+      "close": "Close timeline",
+      "credit": "Made with Stanzy Immigration Consulting"
+    },
+    "colors": {
+      "stanzy-red": "Stanzy red",
+      "stanzy-blue": "Stanzy blue",
+      "green": "Green",
+      "amber": "Amber",
+      "blue": "Blue",
+      "pink": "Pink",
+      "purple": "Purple",
+      "slate": "Slate",
+      "teal": "Teal",
+      "orange": "Orange"
+    },
+    "Presets": {
+      "ita": "Invitation to Apply (ITA)",
+      "frais": "IRCC fees paid",
+      "depot": "Application submitted",
+      "aor": "Acknowledgement of receipt (AOR)",
+      "vm": "Medical exam (IME)",
+      "med": "Medical passed",
+      "ibio": "Biometrics requested",
+      "bio": "Biometrics done",
+      "secu": "Security screening",
+      "adr": "Additional documents (ADR)",
+      "ppr": "Passport request (PPR)",
+      "copr": "Confirmation of PR (COPR)",
+      "arrivee": "Arrival in Canada",
+      "autre": "Other step"
+    }
   }
 }

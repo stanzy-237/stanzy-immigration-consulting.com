@@ -1004,5 +1004,97 @@
       "l9": "NCLC/CLB 9 : points de transférabilité maximaux au CRS"
     },
     "tip": "Le NCLC s’applique au français, le CLB à l’anglais. Chaque programme exige un minimum dans chacune des 4 compétences : c’est votre compétence la plus faible qui décide."
+  },
+  "Parcours": {
+    "eyebrow": "Votre parcours",
+    "title": "Chaque étape, datée.",
+    "lead": "ITA, AOR, biométrie, médical — enregistrez chaque jalon au fil de votre parcours.",
+    "viewTimeline": "Voir la timeline",
+    "feedTitle": "Étapes enregistrées",
+    "loading": "Chargement de votre parcours…",
+    "empty": {
+      "title": "Aucune étape enregistrée",
+      "text": "Ajoutez votre première étape pour commencer à suivre votre parcours.",
+      "cta": "Ajouter une étape"
+    },
+    "edit": "Modifier {label}",
+    "daysSince": "{days, plural, one {jour depuis} other {jours depuis}}",
+    "count": "{count, plural, =0 {Aucune étape enregistrée} one {# étape enregistrée} other {# étapes enregistrées}}",
+    "summary": {
+      "title": "Votre parcours",
+      "recent": "{days, plural, =0 {aujourd’hui} one {il y a # jour} other {il y a # jours}}"
+    },
+    "form": {
+      "addTitle": "Ajouter une étape",
+      "editTitle": "Modifier l’étape",
+      "icon": "Icône",
+      "chooseIcon": "Choisir l’icône {emoji}",
+      "presets": "Choisir une étape prédéfinie",
+      "showAll": "Voir toutes les étapes",
+      "showLess": "Voir moins",
+      "manual": "ou entrer manuellement",
+      "label": "Nom de l’étape",
+      "labelPlaceholder": "Ex. : ITA reçue, biométrie complétée…",
+      "date": "Date",
+      "color": "Couleur",
+      "note": "Note (optionnel)",
+      "notePlaceholder": "Remarques, numéro de référence, détails IRCC…",
+      "submitAdd": "Ajouter l’étape",
+      "submitEdit": "Enregistrer les modifications",
+      "cancelEdit": "Annuler",
+      "closeSheet": "Fermer le panneau",
+      "delete": "Supprimer cette étape",
+      "errors": {
+        "label": "Donnez un nom à l’étape.",
+        "date": "Indiquez la date de l’étape.",
+        "future": "La date ne peut pas être dans le futur.",
+        "save": "L’étape n’a pas pu être enregistrée. Réessayez.",
+        "limit": "Vous avez atteint la limite de 100 étapes."
+      }
+    },
+    "fab": "Ajouter une étape",
+    "deleteConfirm": {
+      "title": "Supprimer cette étape ?",
+      "text": "« {label} » sera retirée de votre parcours. Cette action est définitive.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    },
+    "share": {
+      "heading": "Mon parcours Immigration",
+      "eyebrow": "Enregistré sur Stanzy Immigration",
+      "title": "Mon parcours Entrée Express",
+      "showNotes": "Afficher les notes",
+      "hint": "Faites une capture d’écran pour la partager.",
+      "close": "Fermer la timeline",
+      "credit": "Créé avec Stanzy Immigration Consulting"
+    },
+    "colors": {
+      "stanzy-red": "Rouge Stanzy",
+      "stanzy-blue": "Bleu Stanzy",
+      "green": "Vert",
+      "amber": "Ambre",
+      "blue": "Bleu",
+      "pink": "Rose",
+      "purple": "Violet",
+      "slate": "Ardoise",
+      "teal": "Sarcelle",
+      "orange": "Orange"
+    },
+    "Presets": {
+      "ita": "Invitation à présenter une demande (ITA)",
+      "frais": "Paiement des frais IRCC",
+      "depot": "Soumission de la demande",
+      "aor": "Accusé de réception (AOR)",
+      "vm": "Examen médical (VM)",
+      "med": "Médical complété",
+      "ibio": "Biométrie demandée (IBIO)",
+      "bio": "Biométrie complétée (BIO)",
+      "secu": "Enquête de sécurité",
+      "adr": "Documents additionnels (ADR)",
+      "ppr": "Demande de passeport (PPR)",
+      "copr": "Confirmation de RP (COPR)",
+      "arrivee": "Arrivée au Canada",
+      "autre": "Autre étape"
+    }
   }
 }

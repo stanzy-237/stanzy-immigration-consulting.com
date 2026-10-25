@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { ToolPlaceholderView } from '@/features/tool-placeholder/views/tool-placeholder-view';
+import { requireSession } from '@/features/auth/server/guards';
+import { ParcoursView } from '@/features/parcours/views/parcours-view';
 import type { LocaleParams } from '@/i18n/routing';
 
 export async function generateMetadata({
@@ -16,6 +17,7 @@ export async function generateMetadata({
   return { title: t('timelineName') };
 }
 
+// A Parcours is private to its Account (ADR 0005: one guard call in the shell).
 export default async function Page({
   params,
 }: {
@@ -23,5 +25,6 @@ export default async function Page({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ToolPlaceholderView slug="timeline" />;
+  await requireSession({ locale, next: '/outils/timeline' });
+  return <ParcoursView />;
 }
