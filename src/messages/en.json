@@ -1080,6 +1080,8 @@
     "lead": "When did you receive your ITA? Enter the date to see how much time you have left to submit your permanent residence application.",
     "dateLabel": "Your ITA date",
     "empty": "Enter your ITA date to start the countdown.",
+    "fromParcours": "Date taken from your journey.",
+    "openParcours": "View my journey",
     "ring": {
       "days": "{days, plural, one {day} other {days}}",
       "left": "left",

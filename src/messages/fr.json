@@ -1097,6 +1097,8 @@
     "lead": "Quand avez-vous reçu votre ITA ? Entrez la date : vous voyez le temps qu’il vous reste pour déposer votre demande de résidence permanente.",
     "dateLabel": "Date de votre ITA",
     "empty": "Entrez la date de votre ITA pour démarrer le compte à rebours.",
+    "fromParcours": "Date reprise de votre parcours.",
+    "openParcours": "Voir mon parcours",
     "ring": {
       "days": "{days, plural, one {jour} other {jours}}",
       "left": "restants",

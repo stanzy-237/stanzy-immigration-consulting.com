@@ -2,14 +2,17 @@
 
 import { CalendarDays, TriangleAlert } from 'lucide-react';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { z } from 'zod';
 
+import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { CountdownRing } from '@/features/ita-countdown/components/countdown-ring';
 import { RecentDrawsPicker } from '@/features/ita-countdown/components/recent-draws-picker';
 import { itaDeadline, timeLeft, utcDate, utcToday } from '@/features/ita-countdown/lib/ita-deadline';
 import { URGENCY_CLASSES, urgencyOf } from '@/features/ita-countdown/lib/urgency';
 import { useStoredForm } from '@/features/shared/hooks/use-stored-form';
+import { Link } from '@/i18n/navigation';
+import { api } from '@/trpc/react';
 
 /** The ITA date, kept in this browser between visits. */
 export const ITA_DATE_KEY = 'stanzy.ita-countdown.v1';
@@ -17,14 +20,30 @@ const storedSchema = z.object({ itaDay: z.string().regex(/^(\d{4}-\d{2}-\d{2})?$
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+/** The date of the signed-in User's latest ITA Étape, or null (signed out, or none logged). */
+function useParcoursIta(): string | null {
+  const { account } = useCurrentAccount();
+  const { data: etapes } = api.parcours.list.useQuery(undefined, { enabled: account !== null });
+  const itas = (etapes ?? []).filter((etape) => etape.code === 'ITA').map((etape) => etape.date);
+  return itas.length > 0 ? itas.reduce((latest, day) => (day > latest ? day : latest)) : null;
+}
+
 /** The countdown itself: the ITA date in, the time left and the deadline out. */
 export function ItaCountdown(): ReactNode {
   const t = useTranslations('ItaCountdown');
   const format = useFormatter();
   const now = useNow({ updateInterval: 1000 });
   const [stored, store] = useStoredForm(ITA_DATE_KEY, storedSchema, { itaDay: '' });
-  const itaDay = stored.itaDay;
-  const setItaDay = (day: string) => store({ itaDay: day });
+  const parcoursIta = useParcoursIta();
+  // The Parcours is the signed-in User's record of their ITA, so it wins over
+  // a date kept in this browser, until they type another one here.
+  const [typed, setTyped] = useState(false);
+  const fromParcours = !typed && parcoursIta !== null;
+  const itaDay = fromParcours ? parcoursIta : stored.itaDay;
+  const setItaDay = (day: string) => {
+    setTyped(true);
+    store({ itaDay: day });
+  };
 
   const today = utcToday(now);
   const inFuture = itaDay > today;
@@ -152,12 +171,21 @@ export function ItaCountdown(): ReactNode {
             className="h-12 min-w-0 flex-1 rounded-xl border-2 border-fog-light bg-white px-3.5 text-body text-navy-deep outline-none focus:border-rouge focus:ring-4 focus:ring-rouge/10"
           />
           <RecentDrawsPicker selected={itaDay} onPick={setItaDay} />
+          {/* In the row, so they sit under the field and above the opened Tirages list. */}
+          {inFuture && (
+            <p id="ita-date-error" className="basis-full text-caption text-crimson">
+              {t('errors.future')}
+            </p>
+          )}
+          {fromParcours && (
+            <p className="basis-full text-caption text-slate">
+              {t('fromParcours')}{' '}
+              <Link href="/outils/timeline" className="font-semibold text-rouge underline-offset-2 hover:underline">
+                {t('openParcours')}
+              </Link>
+            </p>
+          )}
         </div>
-        {inFuture && (
-          <p id="ita-date-error" className="mt-1.5 text-caption text-crimson">
-            {t('errors.future')}
-          </p>
-        )}
       </div>
 
       {!itaDay && <p className="text-center text-body-sm text-slate">{t('empty')}</p>}

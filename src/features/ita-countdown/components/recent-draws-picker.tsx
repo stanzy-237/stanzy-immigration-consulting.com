@@ -4,12 +4,13 @@ import { ChevronDown, Clock } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
+import { useDrawText } from '@/features/draws/hooks/use-draw-text';
 import { utcDate } from '@/features/ita-countdown/lib/ita-deadline';
 import { cn } from '@/lib/utils';
 import { api } from '@/trpc/react';
 
 /** How many recent Tirages the shortcut offers. */
-const DRAWS_SHOWN = 6;
+const DRAWS_SHOWN = 5;
 
 /**
  * « Derniers tirages »: ITAs go out on the day of a Tirage, so picking a
@@ -24,6 +25,7 @@ export function RecentDrawsPicker({
 }): ReactNode {
   const t = useTranslations('ItaCountdown.draws');
   const format = useFormatter();
+  const drawText = useDrawText();
   const [open, setOpen] = useState(false);
   const { data } = api.draws.latest.useQuery({ take: DRAWS_SHOWN });
   const draws = data?.draws ?? [];
@@ -75,6 +77,7 @@ export function RecentDrawsPicker({
                     }),
                   })}
                 </span>
+                <span className="text-caption font-medium text-steel-blue">{drawText.type(draw)}</span>
                 <span className="text-caption text-slate">{t('crs', { crs: draw.crsMin })}</span>
               </span>
               <strong className="font-heading text-body-sm font-bold whitespace-nowrap text-rouge">

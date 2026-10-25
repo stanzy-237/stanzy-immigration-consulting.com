@@ -14,26 +14,51 @@ vi.mock('@/i18n/navigation', async (importOriginal) => ({
 }));
 vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi.fn(), signOut: vi.fn() } }));
 
-const draw = (roundNumber: number, date: string, crsMin: number, invitations: number) => ({
+const draw = (roundNumber: number, date: string, crsMin: number, invitations: number, typeLabel = 'Canadian Experience Class') => ({
   round: String(roundNumber),
   roundNumber,
   date,
-  typeLabel: 'Canadian Experience Class',
+  typeLabel,
   group: 'CEC',
   invitations,
   crsMin,
   irccUrl: null,
   crsChange: null,
 });
-const latest = vi.fn(() => ({
-  data: { draws: [draw(380, '2026-10-22', 518, 3000), draw(379, '2026-10-08', 527, 2500)], lastSyncedAt: null },
+/** The newest Tirages, as `draws.latest` returns them: the server keeps the first `take`. */
+const DRAWS = [
+  draw(380, '2026-10-22', 518, 3000),
+  draw(379, '2026-10-08', 527, 2500, 'French-Language proficiency 2026-Version 2'),
+  draw(378, '2026-10-01', 401, 1800, 'Provincial Nominee Program'),
+  draw(377, '2026-09-24', 470, 2000, 'Healthcare and social services occupations 2026-Version 1'),
+  draw(376, '2026-09-17', 530, 1500, 'Trades Occupations, 2026-Version 3'),
+  draw(375, '2026-09-10', 540, 1000),
+];
+/** The signed-in User's Parcours; only read when someone is signed in. */
+const parcours = { etapes: [] as { id: string; code: string; date: string; label: string }[] };
+vi.mock('@/trpc/react', () => ({
+  api: {
+    draws: { latest: { useQuery: ({ take }: { take: number }) => ({ data: { draws: DRAWS.slice(0, take), lastSyncedAt: null } }) } },
+    parcours: {
+      list: {
+        useQuery: (_input: undefined, options?: { enabled?: boolean }) => ({
+          data: options?.enabled ? parcours.etapes : undefined,
+        }),
+      },
+    },
+  },
 }));
-vi.mock('@/trpc/react', () => ({ api: { draws: { latest: { useQuery: () => latest() } } } }));
+const signIn = () =>
+  vi.mocked(authClient.useSession).mockReturnValue({
+    data: { user: { name: 'Aminata Diallo', email: 'aminata@example.com' } },
+    isPending: false,
+  } as never);
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'], now: new Date('2026-10-25T15:00:00Z') });
   vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never);
   window.localStorage.clear();
+  parcours.etapes = [];
 });
 afterEach(() => vi.useRealTimers());
 
@@ -113,7 +138,10 @@ describe('ItaCountdownView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Derniers tirages' }));
     const draws = screen.getByRole('listbox', { name: 'Choisir la date d’un tirage récent' });
     const options = within(draws).getAllByRole('option');
-    expect(options[0]).toHaveTextContent(/Tirage n° 380 · 22 oct\. 2026.*Score minimum : 518.*3\s000 inv\./);
+    expect(options).toHaveLength(5);
+    expect(options[0]).toHaveTextContent(/Tirage n° 380 · 22 oct\. 2026.*Catégorie de l’expérience canadienne.*Score minimum : 518.*3\s000 inv\./);
+    expect(options[1]).toHaveTextContent('Connaissance du français');
+    expect(options[4]).toHaveTextContent('Métiers spécialisés');
 
     fireEvent.click(options[1]!);
 
@@ -155,5 +183,42 @@ describe('ItaCountdownView', () => {
     expect(screen.queryByText('La date de l’ITA ne peut pas être dans le futur.')).not.toBeInTheDocument();
     expect(deadline()).toHaveTextContent('Dernier jour : 25 décembre 2026');
     vi.unstubAllEnvs();
+  });
+
+  describe('for a signed-in User with a Parcours', () => {
+    beforeEach(() => {
+      signIn();
+      parcours.etapes = [
+        { id: 'e1', code: 'ITA', date: '2026-04-15', label: 'Première ITA' },
+        { id: 'e2', code: 'AOR', date: '2026-05-02', label: 'AOR reçu' },
+        { id: 'e3', code: 'ITA', date: '2026-10-08', label: 'ITA reçue' },
+      ];
+    });
+
+    it('starts from the most recent ITA Étape, over a date kept in this browser', () => {
+      window.localStorage.setItem('stanzy.ita-countdown.v1', JSON.stringify({ itaDay: '2026-10-22' }));
+      render(withIntl(<ItaCountdownView />));
+
+      expect(itaDate()).toHaveValue('2026-10-08');
+      expect(deadline()).toHaveTextContent('Dernier jour : 7 décembre 2026');
+      expect(screen.getByText(/Date reprise de votre parcours/)).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Voir mon parcours' })).toHaveAttribute('href', '/outils/timeline');
+    });
+
+    it('lets the User count from another date on this page', () => {
+      render(withIntl(<ItaCountdownView />));
+
+      enterIta('2026-10-22');
+
+      expect(itaDate()).toHaveValue('2026-10-22');
+      expect(screen.queryByText(/Date reprise de votre parcours/)).not.toBeInTheDocument();
+    });
+  });
+
+  it('never reads a Parcours when nobody is signed in', () => {
+    parcours.etapes = [{ id: 'e1', code: 'ITA', date: '2026-10-08', label: 'ITA reçue' }];
+    render(withIntl(<ItaCountdownView />));
+
+    expect(itaDate()).toHaveValue('');
   });
 });
