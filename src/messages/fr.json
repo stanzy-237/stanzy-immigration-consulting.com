@@ -1036,7 +1036,7 @@
       "submitAdd": "Ajouter l’étape",
       "submitEdit": "Enregistrer les modifications",
       "cancelEdit": "Annuler",
-      "closeSheet": "Fermer le panneau",
+      "closeDrawer": "Fermer le panneau",
       "delete": "Supprimer cette étape",
       "errors": {
         "label": "Donnez un nom à l’étape.",

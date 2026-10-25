@@ -14,13 +14,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { EtapeFeed } from '@/features/parcours/components/etape-feed';
 import { EtapeForm } from '@/features/parcours/components/etape-form';
-import { EtapeSheet } from '@/features/parcours/components/etape-sheet';
+import { EtapeDrawer } from '@/features/parcours/components/etape-drawer';
 import { ParcoursShareView } from '@/features/parcours/components/parcours-share-view';
 import { sortByDate } from '@/features/parcours/lib/calendar-day';
 import type { Etape, EtapeInput } from '@/features/parcours/lib/etape-schema';
 import { api } from '@/trpc/react';
 
-/** Below `lg` the form lives in a bottom sheet instead of the sidebar. */
+/** Below `lg` the form lives in a drawer instead of the sidebar. */
 const isPhone = () => window.matchMedia('(max-width: 1023px)').matches;
 
 /** The Parcours itself: hero, feed of Étapes, and the add/edit form. */
@@ -42,21 +42,21 @@ export function ParcoursJournal(): ReactNode {
   const [failure, setFailure] = useState<string>();
   const [deleting, setDeleting] = useState<Etape | null>(null);
   const [sharing, setSharing] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const done = () => {
     setEditing(null);
     setFailure(undefined);
     setFormKey((k) => k + 1);
-    setSheetOpen(false);
+    setDrawerOpen(false);
   };
   const startAdding = () => {
     done();
-    if (isPhone()) setSheetOpen(true);
+    if (isPhone()) setDrawerOpen(true);
   };
   const edit = (etape: Etape) => {
     setEditing(etape);
     setFailure(undefined);
-    if (isPhone()) setSheetOpen(true);
+    if (isPhone()) setDrawerOpen(true);
   };
 
   const failed = (error: { message: string }) =>
@@ -139,9 +139,9 @@ export function ParcoursJournal(): ReactNode {
       >
         {t('fab')}
       </button>
-      <EtapeSheet open={sheetOpen} onOpenChange={setSheetOpen} editing={editing !== null}>
+      <EtapeDrawer open={drawerOpen} onOpenChange={setDrawerOpen} editing={editing !== null}>
         {form}
-      </EtapeSheet>
+      </EtapeDrawer>
 
       <ParcoursShareView etapes={etapes} open={sharing} onOpenChange={setSharing} />
 

@@ -220,15 +220,15 @@ describe('ParcoursView', () => {
     });
     afterEach(() => vi.restoreAllMocks());
 
-    it('adds from the floating button in a bottom sheet', async () => {
+    it('adds from the floating button in a drawer', async () => {
       server.etapes = [ITA];
       render(withIntl(<ParcoursView />));
 
       fireEvent.click(screen.getByRole('button', { name: 'Ajouter une étape' }));
-      const sheet = await screen.findByRole('dialog', { name: 'Ajouter une étape' });
-      fireEvent.click(within(sheet).getByRole('button', { name: 'AOR' }));
-      type(within(sheet).getByLabelText('Date'), '2026-08-03');
-      fireEvent.click(within(sheet).getByRole('button', { name: 'Ajouter l’étape' }));
+      const drawer = await screen.findByRole('dialog', { name: 'Ajouter une étape' });
+      fireEvent.click(within(drawer).getByRole('button', { name: 'AOR' }));
+      type(within(drawer).getByLabelText('Date'), '2026-08-03');
+      fireEvent.click(within(drawer).getByRole('button', { name: 'Ajouter l’étape' }));
 
       expect(server.add.mutate).toHaveBeenCalledWith(
         expect.objectContaining({ code: 'AOR', date: '2026-08-03' }),
@@ -236,13 +236,13 @@ describe('ParcoursView', () => {
       );
     });
 
-    it('edits a tapped card in the bottom sheet', async () => {
+    it('edits a tapped card in the drawer', async () => {
       server.etapes = [ITA];
       render(withIntl(<ParcoursView />));
 
       fireEvent.click(screen.getByRole('button', { name: 'Modifier ITA reçue' }));
-      const sheet = await screen.findByRole('dialog', { name: 'Modifier l’étape' });
-      expect(within(sheet).getByLabelText('Nom de l’étape')).toHaveValue('ITA reçue');
+      const drawer = await screen.findByRole('dialog', { name: 'Modifier l’étape' });
+      expect(within(drawer).getByLabelText('Nom de l’étape')).toHaveValue('ITA reçue');
     });
   });
 });

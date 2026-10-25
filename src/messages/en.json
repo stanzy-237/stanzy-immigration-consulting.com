@@ -1019,7 +1019,7 @@
       "submitAdd": "Add step",
       "submitEdit": "Save changes",
       "cancelEdit": "Cancel",
-      "closeSheet": "Close panel",
+      "closeDrawer": "Close panel",
       "delete": "Delete this step",
       "errors": {
         "label": "Give the step a name.",

@@ -57,7 +57,7 @@ const input =
 
 /**
  * Adds or edits one Étape. The same form sits in the desktop sidebar and the
- * phone sheet; remount it (with a `key`) to start over.
+ * phone drawer; remount it (with a `key`) to start over.
  */
 export function EtapeForm({
   etape,
