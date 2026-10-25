@@ -113,11 +113,13 @@ export function ParcoursJournal(): ReactNode {
       </header>
 
       <div className="mx-auto grid max-w-7xl items-start gap-8 px-5 pt-6 pb-24 sm:px-10 lg:grid-cols-3 lg:py-8">
-        <div className="lg:col-span-2">
+        <div className="flex flex-col gap-6 lg:col-span-2">
+          <div className="hidden lg:block">
+            <ParcoursSummary etapes={etapes} />
+          </div>
           <EtapeFeed etapes={etapes} onAdd={startAdding} onEdit={edit} />
         </div>
         <aside className="hidden flex-col gap-4 lg:sticky lg:top-20 lg:flex">
-          <ParcoursSummary etapes={etapes} />
           <section aria-labelledby="parcours-form-title" className="rounded-2xl border-2 border-fog-light bg-white p-6">
             <div className="mb-4 flex items-center justify-between gap-3">
               <h2 id="parcours-form-title" className="font-heading text-body font-bold text-navy-deep">
