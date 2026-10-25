@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useMemo, type ReactNode } from 'react';
 
-import { NclcLegend, NclcResult } from '@/features/nclc/components/nclc-result';
+import { NclcResult } from '@/features/nclc/components/nclc-result';
 import { assessLanguageTest } from '@/features/nclc/lib/assess-language-test';
 import { DEFAULT_NCLC_FORM, NCLC_TESTS, nclcFormSchema, SCORE_ORDER } from '@/features/nclc/lib/nclc-form';
 import { CalculatorSection, NumberField, SelectField } from '@/features/shared/components/calculator-fields';
@@ -38,11 +38,9 @@ export function NclcCalculator(): ReactNode {
   };
 
   return (
-    // Phones read form → result → legend; from `lg` the result sits sticky on
-    // the right, beside the form and the legend.
     <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-      <div className="space-y-6 lg:col-start-1">
-        <CalculatorSection id="nclc-test" step={t('steps.test.step')} title={t('steps.test.title')} accent="rouge">
+      <CalculatorSection id="nclc-form" title={t('form.title')} accent="rouge">
+        <div className="space-y-5">
           <SelectField
             label={t('testLabel')}
             value={form.test}
@@ -50,14 +48,6 @@ export function NclcCalculator(): ReactNode {
             onChange={(test) => update({ ...form, test })}
             hint={t(`testHints.${form.test}`)}
           />
-        </CalculatorSection>
-
-        <CalculatorSection
-          id="nclc-scores"
-          step={t('steps.scores.step')}
-          title={t('steps.scores.title')}
-          subtitle={t('steps.scores.subtitle')}
-        >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {SCORE_ORDER.map((ability) => (
               <NumberField
@@ -72,20 +62,16 @@ export function NclcCalculator(): ReactNode {
               />
             ))}
           </div>
-        </CalculatorSection>
-      </div>
+        </div>
+      </CalculatorSection>
 
       {/* Announced as it changes, like the CRS and 67 points results. */}
-      <div role="status" className="lg:sticky-below-nav lg:col-start-2 lg:row-span-2 lg:row-start-1">
+      <div role="status" className="lg:sticky-below-nav">
         {result?.ok ? (
-          <NclcResult test={form.test} scores={form.scores} assessment={result.assessment} />
+          <NclcResult test={form.test} assessment={result.assessment} />
         ) : (
           <p className="rounded-2xl border border-dashed border-fog bg-white p-6 text-body-sm text-slate">{t('result.empty')}</p>
         )}
-      </div>
-
-      <div className="lg:col-start-1">
-        <NclcLegend />
       </div>
     </div>
   );

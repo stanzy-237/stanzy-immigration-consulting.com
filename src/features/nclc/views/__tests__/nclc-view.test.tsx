@@ -26,7 +26,8 @@ const chooseTest = (label: string) =>
 const type = (field: RegExp, value: string) =>
   fireEvent.change(screen.getByRole('textbox', { name: field }), { target: { value } });
 const result = () => screen.getByRole('region', { name: 'Votre niveau' });
-const levelOf = (skill: string) => within(within(result()).getByRole('row', { name: new RegExp(skill) })).getAllByRole('cell').at(-1)!.textContent;
+const levelOf = (skill: string) => within(result()).getByText(skill).closest('li');
+const retained = () => within(result()).getByText('Niveau retenu (le plus faible)').nextElementSibling;
 
 function enterTcf() {
   chooseTest('TCF');
@@ -43,13 +44,11 @@ describe('NclcView', () => {
 
     enterTcf();
 
-    expect(within(result()).getByRole('heading', { name: 'TCF Canada' })).toBeInTheDocument();
-    expect(within(result()).getByText('Français')).toBeInTheDocument();
-    expect(levelOf('Compréhension orale')).toBe('NCLC 10');
-    expect(levelOf('Expression écrite')).toBe('NCLC 8');
-    expect(within(result()).getByText('Niveau retenu (le plus faible)').nextElementSibling).toHaveTextContent('NCLC 8');
-    expect(within(result()).getByText('125 pts')).toBeInTheDocument();
-    expect(within(result()).getByText(/\+25 pts de bonus francophone/)).toBeInTheDocument();
+    expect(within(result()).getByText('TCF Canada · Français')).toBeInTheDocument();
+    expect(retained()).toHaveTextContent('NCLC 8');
+    expect(levelOf('Compréhension orale')).toHaveTextContent('NCLC 10');
+    expect(levelOf('Expression écrite')).toHaveTextContent('NCLC 8');
+    expect(within(result()).getByText(/125 pts CRS/)).toHaveTextContent('+25 pts de bonus francophone');
   });
 
   it('announces the result as it changes, like the other calculators', () => {
@@ -62,7 +61,7 @@ describe('NclcView', () => {
     expect(within(live).getByRole('region', { name: 'Votre niveau' })).toBeInTheDocument();
   });
 
-  it('says which Entrée Express programs the level reaches', () => {
+  it('scores an English test in CLB, with no French bonus', () => {
     render(withIntl(<NclcView />));
     chooseTest('CELPIP');
     type(/Speaking \(sur 12\)/, '5');
@@ -70,11 +69,18 @@ describe('NclcView', () => {
     type(/Reading \(sur 12\)/, '4');
     type(/Writing \(sur 12\)/, '4');
 
-    const programs = within(screen.getByRole('list', { name: 'Admissibilité Entrée Express' }));
-    expect(programs.getByText(/Travailleurs qualifiés \(fédéral\)/).closest('li')).toHaveAttribute('data-met', 'false');
-    expect(programs.getByText(/Métiers spécialisés \(fédéral\)/).closest('li')).toHaveAttribute('data-met', 'true');
-    expect(within(result()).getByText('Niveau retenu (le plus faible)').nextElementSibling).toHaveTextContent('CLB 4');
-    expect(within(result()).queryByText(/bonus francophone/)).not.toBeInTheDocument();
+    expect(retained()).toHaveTextContent('CLB 4');
+    expect(levelOf('Speaking')).toHaveTextContent('CLB 5');
+    expect(within(result()).getByText(/24 pts CRS/)).not.toHaveTextContent('bonus');
+  });
+
+  it('keeps the form to one card: the test, then the four scores', () => {
+    render(withIntl(<NclcView />));
+    const form = screen.getByRole('region', { name: 'Vos résultats de test' });
+
+    expect(within(form).getByRole('combobox', { name: 'Quel test avez-vous passé ?' })).toBeInTheDocument();
+    expect(within(form).getAllByRole('textbox')).toHaveLength(4);
+    expect(screen.queryByText(/Étape/)).not.toBeInTheDocument();
   });
 
   describe('Travailleurs qualifiés verdict', () => {
@@ -148,7 +154,7 @@ describe('NclcView', () => {
     render(withIntl(<NclcView />));
 
     expect(screen.getByRole('textbox', { name: /Expression écrite \(sur 20\)/ })).toHaveValue('12');
-    expect(levelOf('Expression écrite')).toBe('NCLC 8');
+    expect(levelOf('Expression écrite')).toHaveTextContent('NCLC 8');
   });
 
   it('ends with the « À savoir » band pointing to the CRS calculator', () => {
