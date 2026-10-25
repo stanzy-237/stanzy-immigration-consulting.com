@@ -1013,8 +1013,6 @@
       "icon": "Icon",
       "chooseIcon": "Choose the {emoji} icon",
       "presets": "Choose a preset step",
-      "showAll": "Show all steps",
-      "showLess": "Show less",
       "manual": "or enter it yourself",
       "label": "Step name",
       "labelPlaceholder": "E.g. ITA received, biometrics done…",

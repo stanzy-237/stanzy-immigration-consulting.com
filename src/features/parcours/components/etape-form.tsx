@@ -4,7 +4,7 @@ import { useNow, useTranslations } from 'next-intl';
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
 import { DaysSince } from '@/features/parcours/components/days-since';
-import { ETAPE_EMOJIS, ETAPE_PRESETS, PRESETS_SHOWN, type EtapePreset } from '@/features/parcours/data/etapes';
+import { ETAPE_EMOJIS, ETAPE_PRESETS, type EtapePreset } from '@/features/parcours/data/etapes';
 import { ETAPE_COLORS } from '@/features/parcours/data/palette';
 import { daysSince, todayOf } from '@/features/parcours/lib/calendar-day';
 import { codeFromLabel } from '@/features/parcours/lib/etape-code';
@@ -36,6 +36,9 @@ const draftOf = (etape: Etape | null): Draft =>
       }
     : BLANK;
 
+/** Two rows and a peek of the third; the rest scrolls. */
+const scrollBox = 'max-h-28 overflow-y-auto overscroll-contain p-0.5 pr-1';
+
 const fieldLabel = 'mb-2 block font-label font-semibold uppercase tracking-widest text-slate';
 const input =
   'w-full rounded-xl border-2 border-fog-light bg-white px-3.5 text-body text-navy-deep outline-none transition focus:border-rouge focus:ring-4 focus:ring-rouge/10';
@@ -63,7 +66,6 @@ export function EtapeForm({
   const id = useId();
   const now = useNow();
   const [draft, setDraft] = useState<Draft>(() => draftOf(etape));
-  const [showAll, setShowAll] = useState(false);
   const [problems, setProblems] = useState<{ label?: string; date?: string }>({});
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
 
@@ -94,13 +96,12 @@ export function EtapeForm({
   };
 
   const previewCode = draft.code || (draft.label.trim() ? codeFromLabel(draft.label) : 'ETAPE');
-  const presets = showAll ? ETAPE_PRESETS : ETAPE_PRESETS.slice(0, PRESETS_SHOWN);
 
   return (
     <form onSubmit={submit} noValidate className="flex flex-col gap-4">
       <fieldset>
         <legend className={fieldLabel}>{t('form.icon')}</legend>
-        <div className="flex max-h-26 flex-wrap gap-2 overflow-y-auto py-0.5">
+        <div className={cn('flex flex-wrap gap-2', scrollBox)}>
           {ETAPE_EMOJIS.map((emoji) => (
             <button
               key={emoji}
@@ -121,8 +122,8 @@ export function EtapeForm({
 
       <fieldset>
         <legend className={fieldLabel}>{t('form.presets')}</legend>
-        <div className="grid grid-cols-2 gap-2">
-          {presets.map((preset) => (
+        <div className={cn('grid grid-cols-2 gap-2 lg:grid-cols-3', scrollBox)}>
+          {ETAPE_PRESETS.map((preset) => (
             <button
               key={preset.code}
               type="button"
@@ -130,7 +131,7 @@ export function EtapeForm({
               aria-pressed={draft.code === preset.code}
               onClick={() => pick(preset)}
               className={cn(
-                'flex min-w-0 items-center gap-2 rounded-lg border-2 border-fog-light bg-white px-3 py-2.5 text-left',
+                'flex h-10 min-w-0 items-center gap-2 rounded-lg border-2 border-fog-light bg-white px-3 text-left',
                 draft.code === preset.code && 'border-navy-deep bg-ice-blue',
               )}
             >
@@ -139,13 +140,6 @@ export function EtapeForm({
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => setShowAll((v) => !v)}
-          className="mt-3 text-caption font-semibold text-rouge"
-        >
-          {showAll ? t('form.showLess') : t('form.showAll')}
-        </button>
       </fieldset>
 
       <p className="flex items-center gap-2.5 font-label uppercase tracking-wider text-steel-blue before:h-px before:flex-1 before:bg-fog-light after:h-px after:flex-1 after:bg-fog-light">

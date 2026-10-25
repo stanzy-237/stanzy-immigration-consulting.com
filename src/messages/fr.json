@@ -1030,8 +1030,6 @@
       "icon": "Icône",
       "chooseIcon": "Choisir l’icône {emoji}",
       "presets": "Choisir une étape prédéfinie",
-      "showAll": "Voir toutes les étapes",
-      "showLess": "Voir moins",
       "manual": "ou entrer manuellement",
       "label": "Nom de l’étape",
       "labelPlaceholder": "Ex. : ITA reçue, biométrie complétée…",

@@ -35,8 +35,5 @@ export const ETAPE_PRESETS: readonly EtapePreset[] = [
   { code: 'AUTRE', labelKey: 'autre', emoji: '⭐', color: 'slate' },
 ];
 
-/** How many presets show before « Voir toutes les étapes ». */
-export const PRESETS_SHOWN = 8;
-
 /** Most Étapes one Account can hold. */
 export const MAX_ETAPES = 100;
