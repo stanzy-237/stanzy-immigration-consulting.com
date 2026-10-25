@@ -28,6 +28,12 @@ describe('proxy', () => {
     expect(target?.searchParams.get('next')).toBe('/compte');
   });
 
+  it('sends a signed-out visitor from the Parcours to Connexion with next', async () => {
+    const target = redirectTarget(await visit('/fr/outils/timeline'));
+    expect(target?.pathname).toBe('/fr/connexion');
+    expect(target?.searchParams.get('next')).toBe('/outils/timeline');
+  });
+
   it('keeps the locale, sub-path and query string in the redirect', async () => {
     const target = redirectTarget(await visit('/en/compte/securite?onglet=2fa'));
     expect(target?.pathname).toBe('/en/connexion');
