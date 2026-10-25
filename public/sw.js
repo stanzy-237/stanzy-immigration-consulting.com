@@ -12,7 +12,7 @@
  * own tickets; this is the shell they cache into.
  */
 
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const SHELL_CACHE = `stanzy-shell-${CACHE_VERSION}`;
 const ASSET_CACHE = `stanzy-assets-${CACHE_VERSION}`;
 // Derniers tirages data (tRPC `draws.*` queries), so the page still shows the
@@ -28,6 +28,8 @@ const PRECACHE_URLS = [
   '/en/outils/crs',
   '/fr/outils/67-points',
   '/en/outils/67-points',
+  '/fr/outils/nclc-clb',
+  '/en/outils/nclc-clb',
   // Derniers tirages (#49): the last loaded page opens offline.
   '/fr/outils/dernier-tirage',
   '/en/outils/dernier-tirage',

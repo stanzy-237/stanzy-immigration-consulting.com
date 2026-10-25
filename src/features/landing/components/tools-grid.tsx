@@ -181,7 +181,7 @@ export function ToolsGrid(): ReactNode {
 
         {/* Mosaic grid: 3-col desktop, 2-col ≥md, 1-col mobile. Wide cards span 2 cols at md+. */}
         <ul className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:flex-1 lg:auto-rows-fr lg:grid-cols-3">
-          {TOOLS.map(
+          {TOOLS.filter((tool: Tool): boolean => tool.listed !== false).map(
             (tool: Tool): ReactNode => (
               <li
                 key={tool.slug}

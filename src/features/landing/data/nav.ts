@@ -6,6 +6,7 @@ import {
   FileCheck,
   GanttChartSquare,
   Hourglass,
+  Languages,
   Leaf,
   ListChecks,
   Users,
@@ -45,6 +46,12 @@ export const TOOL_ENTRIES: ReadonlyArray<NavMenuEntry> = [
     labelKey: 'fswName',
     descKey: 'fswDesc',
     href: '/outils/67-points',
+  },
+  {
+    icon: Languages,
+    labelKey: 'nclcName',
+    descKey: 'nclcDesc',
+    href: '/outils/nclc-clb',
   },
   {
     icon: Calculator,
