@@ -1090,5 +1090,63 @@
       "arrivee": "Arrivée au Canada",
       "autre": "Autre étape"
     }
+  },
+  "ItaCountdown": {
+    "eyebrow": "ITA 60 jours",
+    "title": "Compte à rebours ITA",
+    "lead": "Quand avez-vous reçu votre ITA ? Entrez la date : vous voyez le temps qu’il vous reste pour déposer votre demande de résidence permanente.",
+    "dateLabel": "Date de votre ITA",
+    "empty": "Entrez la date de votre ITA pour démarrer le compte à rebours.",
+    "fromParcours": "Date reprise de votre parcours.",
+    "openParcours": "Voir mon parcours",
+    "ring": {
+      "days": "{days, plural, one {jour} other {jours}}",
+      "left": "restants",
+      "expired": "Expiré"
+    },
+    "timeLeft": {
+      "title": "Temps restant",
+      "days": "jours",
+      "hours": "heures",
+      "minutes": "minutes",
+      "seconds": "secondes"
+    },
+    "progress": {
+      "name": "Part du délai restant",
+      "label": "{percent} % du délai restant",
+      "start": "Jour 0",
+      "end": "Date limite"
+    },
+    "deadline": {
+      "title": "Date limite de dépôt",
+      "lastDay": "Dernier jour : {date}",
+      "closes": "Fermeture le {date} à 00 h 00 UTC",
+      "local": "Soit le {time} à votre heure.",
+      "check": "La date et l’heure exactes figurent dans votre compte IRCC : ce sont elles qui font foi."
+    },
+    "urgency": {
+      "calm": "Vous avez du temps : rassemblez vos documents et vos preuves dès maintenant.",
+      "soon": "Moins de deux semaines : finalisez vos documents et payez les frais.",
+      "urgent": "Moins d’une semaine : déposez votre demande au plus vite."
+    },
+    "expired": {
+      "title": "Votre délai est écoulé",
+      "text": "Sans demande déposée, l’invitation expire et votre profil est retiré du bassin Entrée Express. Pour être invité à nouveau, créez un nouveau profil. Un conseiller Stanzy peut vous aider."
+    },
+    "errors": {
+      "future": "La date de l’ITA ne peut pas être dans le futur."
+    },
+    "draws": {
+      "button": "Derniers tirages",
+      "label": "Choisir la date d’un tirage récent",
+      "item": "Tirage n° {round} · {date}",
+      "crs": "Score minimum : {crs}",
+      "invitations": "{count} inv."
+    },
+    "guide": {
+      "title": "Après l’ITA, chaque jour compte.",
+      "text": "Preuves d’expérience, de fonds, certificats de police, examen médical : une demande incomplète peut être refusée. Stanzy vous aide à tout réunir et à déposer à temps. Suivez aussi chaque étape de votre dossier dans votre parcours.",
+      "secondary": "Suivre mon parcours"
+    }
   }
 }

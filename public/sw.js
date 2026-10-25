@@ -30,6 +30,9 @@ const PRECACHE_URLS = [
   '/en/outils/67-points',
   '/fr/outils/nclc-clb',
   '/en/outils/nclc-clb',
+  // Compte à rebours ITA (#8): counts down offline once the date is entered.
+  '/fr/outils/compte-a-rebours-ita',
+  '/en/outils/compte-a-rebours-ita',
   // Derniers tirages (#49): the last loaded page opens offline.
   '/fr/outils/dernier-tirage',
   '/en/outils/dernier-tirage',

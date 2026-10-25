@@ -1073,5 +1073,63 @@
       "arrivee": "Arrival in Canada",
       "autre": "Other step"
     }
+  },
+  "ItaCountdown": {
+    "eyebrow": "ITA 60 days",
+    "title": "ITA countdown",
+    "lead": "When did you receive your ITA? Enter the date to see how much time you have left to submit your permanent residence application.",
+    "dateLabel": "Your ITA date",
+    "empty": "Enter your ITA date to start the countdown.",
+    "fromParcours": "Date taken from your journey.",
+    "openParcours": "View my journey",
+    "ring": {
+      "days": "{days, plural, one {day} other {days}}",
+      "left": "left",
+      "expired": "Expired"
+    },
+    "timeLeft": {
+      "title": "Time left",
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes",
+      "seconds": "seconds"
+    },
+    "progress": {
+      "name": "Share of the window left",
+      "label": "{percent}% of the window left",
+      "start": "Day 0",
+      "end": "Deadline"
+    },
+    "deadline": {
+      "title": "Submission deadline",
+      "lastDay": "Last day: {date}",
+      "closes": "Closes on {date} at 00:00 UTC",
+      "local": "That is {time} your time.",
+      "check": "The exact date and time are in your IRCC account: those are the ones that count."
+    },
+    "urgency": {
+      "calm": "You have time: start gathering your documents and proofs now.",
+      "soon": "Less than two weeks: finalise your documents and pay the fees.",
+      "urgent": "Less than a week: submit your application as soon as possible."
+    },
+    "expired": {
+      "title": "Your deadline has passed",
+      "text": "With no application submitted, the invitation expires and your profile is removed from the Express Entry pool. To be invited again, create a new profile. A Stanzy consultant can help."
+    },
+    "errors": {
+      "future": "The ITA date can’t be in the future."
+    },
+    "draws": {
+      "button": "Latest draws",
+      "label": "Pick the date of a recent draw",
+      "item": "Draw #{round} · {date}",
+      "crs": "Minimum score: {crs}",
+      "invitations": "{count} inv."
+    },
+    "guide": {
+      "title": "After the ITA, every day counts.",
+      "text": "Proof of work experience and funds, police certificates, the medical exam: an incomplete application can be refused. Stanzy helps you gather everything and submit on time. You can also track each step of your file in your journey.",
+      "secondary": "Track my journey"
+    }
   }
 }
