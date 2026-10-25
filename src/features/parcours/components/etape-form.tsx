@@ -36,8 +36,8 @@ const draftOf = (etape: Etape | null): Draft =>
       }
     : BLANK;
 
-/** Two rows and a peek of the third; the rest scrolls. */
-const scrollBox = 'max-h-28 overflow-y-auto overscroll-contain p-0.5 pr-1';
+/** Exactly two rows of 40px buttons (2 × 40 + 8 gap + 4 padding); the rest scrolls. */
+const scrollBox = 'max-h-23 overflow-y-auto overscroll-contain p-0.5 pr-1';
 
 const fieldLabel = 'mb-2 block font-label font-semibold uppercase tracking-widest text-slate';
 const input =
