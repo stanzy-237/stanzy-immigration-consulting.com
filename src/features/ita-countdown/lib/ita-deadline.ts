@@ -10,6 +10,15 @@ const utcDay = (day: string): number => {
 
 const toDay = (ms: number): string => new Date(ms).toISOString().slice(0, 10);
 
+/**
+ * ITA days are UTC calendar days, like the deadline: `YYYY-MM-DD` as the
+ * Date at its 00:00 UTC, for formatting with `timeZone: 'UTC'`.
+ */
+export const utcDate = (day: string): Date => new Date(utcDay(day));
+
+/** Today on the UTC calendar: the latest day an ITA can carry. */
+export const utcToday = (now: Date): string => toDay(now.getTime());
+
 export type ItaDeadline = {
   /** The last of the 60 days, `YYYY-MM-DD`. */
   lastDay: string;

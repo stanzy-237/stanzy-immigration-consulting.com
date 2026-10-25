@@ -142,4 +142,18 @@ describe('ItaCountdownView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Derniers tirages' }));
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  it('reads "today" on the UTC calendar, like the deadline, wherever the visitor is', () => {
+    // 21:00 on 25 Oct in Toronto is already 26 Oct in UTC: a Tirage dated
+    // 26 Oct has happened, and its ITA must count.
+    vi.stubEnv('TZ', 'America/Toronto');
+    vi.setSystemTime(new Date('2026-10-26T01:00:00Z'));
+    render(withIntl(<ItaCountdownView />));
+
+    enterIta('2026-10-26');
+
+    expect(screen.queryByText('La date de l’ITA ne peut pas être dans le futur.')).not.toBeInTheDocument();
+    expect(deadline()).toHaveTextContent('Dernier jour : 25 décembre 2026');
+    vi.unstubAllEnvs();
+  });
 });

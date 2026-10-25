@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { CountdownRing } from '@/features/ita-countdown/components/countdown-ring';
 import { RecentDrawsPicker } from '@/features/ita-countdown/components/recent-draws-picker';
-import { itaDeadline, timeLeft } from '@/features/ita-countdown/lib/ita-deadline';
+import { itaDeadline, timeLeft, utcDate, utcToday } from '@/features/ita-countdown/lib/ita-deadline';
 import { URGENCY_CLASSES, urgencyOf } from '@/features/ita-countdown/lib/urgency';
 import { useStoredForm } from '@/features/shared/hooks/use-stored-form';
 
@@ -16,9 +16,6 @@ export const ITA_DATE_KEY = 'stanzy.ita-countdown.v1';
 const storedSchema = z.object({ itaDay: z.string().regex(/^(\d{4}-\d{2}-\d{2})?$/) });
 
 const pad = (n: number) => String(n).padStart(2, '0');
-
-/** The visitor's today as `YYYY-MM-DD`, on their own calendar. */
-const todayOf = (now: Date) => `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 
 /** The countdown itself: the ITA date in, the time left and the deadline out. */
 export function ItaCountdown(): ReactNode {
@@ -29,7 +26,7 @@ export function ItaCountdown(): ReactNode {
   const itaDay = stored.itaDay;
   const setItaDay = (day: string) => store({ itaDay: day });
 
-  const today = todayOf(now);
+  const today = utcToday(now);
   const inFuture = itaDay > today;
   const deadline = itaDay && !inFuture ? itaDeadline(itaDay) : null;
   const left = deadline ? timeLeft(deadline.closesAt, now) : null;
@@ -113,7 +110,7 @@ export function ItaCountdown(): ReactNode {
               {t('deadline.title')}
             </h2>
             <p className="mt-1 font-heading text-body font-bold text-rouge">
-              {t('deadline.lastDay', { date: longDate(new Date(`${deadline.lastDay}T00:00:00Z`)) })}
+              {t('deadline.lastDay', { date: longDate(utcDate(deadline.lastDay)) })}
             </p>
             <p className="text-caption text-rouge/80">
               {t('deadline.closes', { date: longDate(deadline.closesAt) })}{' '}

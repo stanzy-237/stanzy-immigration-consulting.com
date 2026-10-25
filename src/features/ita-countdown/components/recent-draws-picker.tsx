@@ -4,6 +4,7 @@ import { ChevronDown, Clock } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
+import { utcDate } from '@/features/ita-countdown/lib/ita-deadline';
 import { cn } from '@/lib/utils';
 import { api } from '@/trpc/react';
 
@@ -66,7 +67,7 @@ export function RecentDrawsPicker({
                 <span className="text-body-sm font-medium text-navy-deep">
                   {t('item', {
                     round: draw.round,
-                    date: format.dateTime(new Date(`${draw.date}T00:00:00Z`), {
+                    date: format.dateTime(utcDate(draw.date), {
                       day: 'numeric',
                       month: 'short',
                       year: 'numeric',
