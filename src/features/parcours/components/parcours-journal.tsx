@@ -16,7 +16,6 @@ import { EtapeFeed } from '@/features/parcours/components/etape-feed';
 import { EtapeForm } from '@/features/parcours/components/etape-form';
 import { EtapeSheet } from '@/features/parcours/components/etape-sheet';
 import { ParcoursShareView } from '@/features/parcours/components/parcours-share-view';
-import { ParcoursSummary } from '@/features/parcours/components/parcours-summary';
 import { sortByDate } from '@/features/parcours/lib/calendar-day';
 import type { Etape, EtapeInput } from '@/features/parcours/lib/etape-schema';
 import { api } from '@/trpc/react';
@@ -113,10 +112,7 @@ export function ParcoursJournal(): ReactNode {
       </header>
 
       <div className="mx-auto grid max-w-7xl items-start gap-8 px-5 pt-6 pb-24 sm:px-10 lg:grid-cols-3 lg:py-8">
-        <div className="flex flex-col gap-6 lg:col-span-2">
-          <div className="hidden lg:block">
-            <ParcoursSummary etapes={etapes} />
-          </div>
+        <div className="lg:col-span-2">
           <EtapeFeed etapes={etapes} onAdd={startAdding} onEdit={edit} />
         </div>
         <aside className="hidden flex-col gap-4 lg:sticky lg:top-20 lg:flex">

@@ -87,15 +87,6 @@ describe('ParcoursView', () => {
     expect(cards[1]).toHaveTextContent(/1\s*jour depuis\s*AOR/);
   });
 
-  it('sums up the Parcours: how many Étapes and the most recent one', () => {
-    server.etapes = [ITA, AOR];
-    render(withIntl(<ParcoursView />));
-
-    const summary = screen.getByRole('region', { name: 'Votre parcours' });
-    expect(summary).toHaveTextContent('2 étapes enregistrées');
-    expect(summary).toHaveTextContent(/AOR reçu\s*il y a 1 jour/);
-  });
-
   it('adds a preset Étape with its label, code, icon and colour', () => {
     render(withIntl(<ParcoursView />));
 
