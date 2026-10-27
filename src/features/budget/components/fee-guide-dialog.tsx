@@ -1,12 +1,29 @@
 'use client';
 
-import { ExternalLink, Info, MessageCircle, XIcon } from 'lucide-react';
+import { ArrowRight, ExternalLink, Info, MessageCircle, XIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { FEE_GUIDES, type GuideBlock, type GuideKey } from '@/features/budget/data/fee-guides';
+import { Link } from '@/i18n/navigation';
 import { toLocale } from '@/i18n/routing';
+
+/** A page of this site (`/…`) opens in the visitor's language; anything else in a new tab. */
+function GuideLink({ href, className, children }: { href: string; className: string; children: ReactNode }): ReactNode {
+  if (href.startsWith('/')) {
+    return (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a href={href} target="_blank" rel="noreferrer" className={className}>
+      {children}
+    </a>
+  );
+}
 
 function Block({ block }: { block: GuideBlock }): ReactNode {
   switch (block.kind) {
@@ -32,27 +49,29 @@ function Block({ block }: { block: GuideBlock }): ReactNode {
       );
     case 'link':
       return (
-        <a
+        <GuideLink
           href={block.href}
-          target="_blank"
-          rel="noreferrer"
           className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-navy-deep underline underline-offset-2 hover:text-rouge"
         >
           {block.label}
-          <ExternalLink aria-hidden={true} className="size-3.5" />
-        </a>
+          {!block.href.startsWith('/') && <ExternalLink aria-hidden={true} className="size-3.5" />}
+        </GuideLink>
       );
     case 'cta':
       return (
-        <a
+        <GuideLink
           href={block.href}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-whatsapp px-5 font-heading text-body-sm font-bold text-white hover:opacity-90"
+          className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-center font-heading text-body-sm font-bold text-white hover:opacity-90 ${
+            block.tone === 'whatsapp' ? 'bg-whatsapp' : 'bg-rouge'
+          }`}
         >
-          <MessageCircle aria-hidden={true} className="size-4" />
+          {block.tone === 'whatsapp' ? (
+            <MessageCircle aria-hidden={true} className="size-4 shrink-0" />
+          ) : (
+            <ArrowRight aria-hidden={true} className="size-4 shrink-0" />
+          )}
           {block.label}
-        </a>
+        </GuideLink>
       );
   }
 }

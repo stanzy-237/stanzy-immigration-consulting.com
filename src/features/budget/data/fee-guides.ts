@@ -1,4 +1,5 @@
 import { BIOMETRICS_FAMILY_CAP, OFFICIAL_FEES } from '@/features/budget/data/fees';
+import { TCF_ACADEMY_URL } from '@/features/shared/data/links';
 import type { Locale } from '@/i18n/routing';
 
 /**
@@ -15,9 +16,10 @@ export type GuideBlock =
   | { kind: 'list'; title?: string; items: string[] }
   /** Highlighted, e.g. a warning or Stanzy's own offer. */
   | { kind: 'note'; text: string }
+  /** `href` starting with « / » is a page of this site, in the visitor's language. */
   | { kind: 'link'; label: string; href: string }
-  /** A button, e.g. « Me contacter sur WhatsApp ». */
-  | { kind: 'cta'; label: string; href: string };
+  /** A button, e.g. « Me contacter sur WhatsApp » (tone `whatsapp`) or a Stanzy service. */
+  | { kind: 'cta'; label: string; href: string; tone?: 'whatsapp' };
 
 export type FeeGuide = {
   blocks: GuideBlock[];
@@ -30,6 +32,8 @@ export const GUIDE_FOR = {
   childProcessing: 'processing',
   rprf: 'rprf',
   biometrics: 'biometrics',
+  eca: 'eca',
+  languageTest: 'languageTest',
   medical: 'medical',
   police: 'police',
   passport: 'passport',
@@ -42,6 +46,16 @@ const BIOMETRICS_FR = 'https://www.canada.ca/fr/immigration-refugies-citoyennete
 const BIOMETRICS_EN = 'https://www.canada.ca/en/immigration-refugees-citizenship/campaigns/biometrics.html';
 const PANEL_PHYSICIANS_FR = 'https://secure.cic.gc.ca/PanelPhysicianMedecinDesigne/fr/Accueil';
 const PANEL_PHYSICIANS_EN = 'https://secure.cic.gc.ca/PanelPhysicianMedecinDesigne/en/Home';
+
+/** Cameroon: the IOM runs the immigration medicals; booking is online. */
+const IOM_MEDICAL_BOOKING = 'https://mymedical.iom.int/apps/omas/#_frmHomeV2';
+/** Cameroon: biometrics are collected at VFS Global; booking is online. */
+const VFS_BIOMETRICS_BOOKING =
+  'https://www.vfsglobal.ca/IRCC-AppointmentWave1/Account/RegisteredLogin?q=shSA0YnE4pLF9Xzwon/x/CQ1P0LBKn66dLdNUfueK+z6PKDIRlw2IQmnt5xZX+Fo2ufIrALrv2nK6ON1FZloVg==';
+/** Stanzy's EDE service (WES, IQAS) page. */
+const EDE_SERVICE = '/services/ede';
+/** The Cameroonian state universities whose graduates Stanzy's EDE service covers. */
+const EDE_UNIVERSITIES = ['Dschang', 'Yaoundé I', 'Yaoundé II', 'Buea', 'Bamenda', 'Maroua', 'Ngaoundéré'];
 
 /** Stanzy's WhatsApp, with the police-certificate request typed in. */
 const WHATSAPP_POLICE = `https://wa.me/message/H3LTKVCVL6GAL1?text=${encodeURIComponent(
@@ -118,8 +132,9 @@ export const FEE_GUIDES: Record<Locale, Record<GuideKey, FeeGuide>> = {
         },
         {
           kind: 'note',
-          text: 'Au Cameroun, la collecte se fait à Yaoundé (à vérifier sur votre lettre d’instructions\u202f: l’adresse peut changer).',
+          text: 'Au Cameroun, la collecte se fait au centre VFS Global\u202f: prenez rendez-vous en ligne, votre lettre d’instructions en main.',
         },
+        { kind: 'cta', label: 'Prendre rendez-vous pour la biométrie (VFS Global)', href: VFS_BIOMETRICS_BOOKING },
         { kind: 'link', label: 'Les données biométriques sur le site d’IRCC', href: BIOMETRICS_FR },
       ],
     },
@@ -155,8 +170,9 @@ export const FEE_GUIDES: Record<Locale, Record<GuideKey, FeeGuide>> = {
         },
         {
           kind: 'note',
-          text: 'Le prix est fixé par la clinique et varie d’un médecin à l’autre. Au Cameroun, il y a des médecins désignés à Yaoundé et à Douala.',
+          text: 'Au Cameroun, la visite médicale est assurée par l’OIM (Organisation internationale pour les migrations)\u202f: réservez votre rendez-vous en ligne. Ailleurs, le prix est fixé par la clinique et varie d’un médecin à l’autre.',
         },
+        { kind: 'cta', label: 'Réserver ma visite médicale (OIM)', href: IOM_MEDICAL_BOOKING },
         { kind: 'link', label: 'Trouver un médecin désigné (outil d’IRCC)', href: PANEL_PHYSICIANS_FR },
       ],
     },
@@ -183,7 +199,50 @@ export const FEE_GUIDES: Record<Locale, Record<GuideKey, FeeGuide>> = {
           title: 'Dossier à fournir',
           items: ['Acte de naissance', 'CNI (carte nationale d’identité)', `Bulletin n°${NBSP}3`, 'Passeport'],
         },
-        { kind: 'cta', label: 'Me contacter sur WhatsApp', href: WHATSAPP_POLICE },
+        { kind: 'cta', label: 'Me contacter sur WhatsApp', href: WHATSAPP_POLICE, tone: 'whatsapp' },
+      ],
+    },
+    eca: {
+      blocks: [
+        {
+          kind: 'text',
+          text: 'L’évaluation des diplômes d’études (EDE) prouve à IRCC que votre diplôme étranger vaut un diplôme canadien. Elle est faite par un organisme désigné, comme WES ou IQAS.',
+        },
+        {
+          kind: 'list',
+          title: 'Bon à savoir',
+          items: [
+            'Elle est exigée pour les Travailleurs qualifiés (fédéral) et pour compter vos études étrangères dans le score CRS.',
+            'Elle reste valide 5 ans à partir de sa date de délivrance.',
+            'Comptez plusieurs semaines\u202f: votre université doit envoyer elle-même vos relevés à l’organisme.',
+          ],
+        },
+        {
+          kind: 'note',
+          text: `Uniquement pour les candidats camerounais\u202f: je m’occupe de votre évaluation WES ou IQAS pour les diplômes des universités de ${EDE_UNIVERSITIES.slice(0, -1).join(', ')} et ${EDE_UNIVERSITIES.at(-1)}.`,
+        },
+        { kind: 'cta', label: 'Découvrir le service EDE', href: EDE_SERVICE },
+      ],
+    },
+    languageTest: {
+      blocks: [
+        {
+          kind: 'text',
+          text: 'IRCC n’accepte que certains tests\u202f: TEF Canada ou TCF Canada pour le français, IELTS General Training ou CELPIP-General pour l’anglais.',
+        },
+        {
+          kind: 'list',
+          title: 'Bon à savoir',
+          items: [
+            'Les résultats sont valides 2 ans\u202f: ils doivent l’être encore le jour où vous soumettez votre demande.',
+            'Chaque compétence (oral, écrit, compréhension, expression) compte\u202f: c’est la plus faible qui décide de votre admissibilité.',
+          ],
+        },
+        {
+          kind: 'note',
+          text: 'Vous passez le TCF Canada\u202f? Préparez-vous sur TCF Express Academy, notre plateforme\u202f: exercices, examens blancs et coaching personnalisé.',
+        },
+        { kind: 'cta', label: 'Me préparer sur TCF Express Academy', href: TCF_ACADEMY_URL },
       ],
     },
     passport: {
@@ -267,8 +326,9 @@ export const FEE_GUIDES: Record<Locale, Record<GuideKey, FeeGuide>> = {
         },
         {
           kind: 'note',
-          text: 'In Cameroon, collection is in Yaoundé (check the address on your instruction letter: it can change).',
+          text: 'In Cameroon, biometrics are collected at the VFS Global centre: book online, with your instruction letter at hand.',
         },
+        { kind: 'cta', label: 'Book a biometrics appointment (VFS Global)', href: VFS_BIOMETRICS_BOOKING },
         { kind: 'link', label: 'Biometrics on IRCC’s website', href: BIOMETRICS_EN },
       ],
     },
@@ -304,8 +364,9 @@ export const FEE_GUIDES: Record<Locale, Record<GuideKey, FeeGuide>> = {
         },
         {
           kind: 'note',
-          text: 'The clinic sets the price, and it varies from one physician to another. In Cameroon, there are panel physicians in Yaoundé and Douala.',
+          text: 'In Cameroon, the medical exam is done by the IOM (International Organization for Migration): book your appointment online. Elsewhere, the clinic sets the price, and it varies from one physician to another.',
         },
+        { kind: 'cta', label: 'Book my medical exam (IOM)', href: IOM_MEDICAL_BOOKING },
         { kind: 'link', label: 'Find a panel physician (IRCC tool)', href: PANEL_PHYSICIANS_EN },
       ],
     },
@@ -332,7 +393,50 @@ export const FEE_GUIDES: Record<Locale, Record<GuideKey, FeeGuide>> = {
           title: 'Documents to provide',
           items: ['Birth certificate (acte de naissance)', 'National ID card (CNI)', `Bulletin n°${NBSP}3`, 'Passport'],
         },
-        { kind: 'cta', label: 'Contact me on WhatsApp', href: WHATSAPP_POLICE },
+        { kind: 'cta', label: 'Contact me on WhatsApp', href: WHATSAPP_POLICE, tone: 'whatsapp' },
+      ],
+    },
+    eca: {
+      blocks: [
+        {
+          kind: 'text',
+          text: 'An educational credential assessment (ECA) shows IRCC what your foreign diploma is worth in Canada. A designated organisation does it, such as WES or IQAS.',
+        },
+        {
+          kind: 'list',
+          title: 'Good to know',
+          items: [
+            'It is required for the Federal Skilled Worker program and to count your foreign education in your CRS score.',
+            'It stays valid for 5 years from the date it was issued.',
+            'Allow several weeks: your university must send your transcripts to the organisation itself.',
+          ],
+        },
+        {
+          kind: 'note',
+          text: `For Cameroonian candidates only: I handle your WES or IQAS assessment for diplomas from the universities of ${EDE_UNIVERSITIES.slice(0, -1).join(', ')} and ${EDE_UNIVERSITIES.at(-1)}.`,
+        },
+        { kind: 'cta', label: 'See the EDE service', href: EDE_SERVICE },
+      ],
+    },
+    languageTest: {
+      blocks: [
+        {
+          kind: 'text',
+          text: 'IRCC accepts only certain tests: TEF Canada or TCF Canada for French, IELTS General Training or CELPIP-General for English.',
+        },
+        {
+          kind: 'list',
+          title: 'Good to know',
+          items: [
+            'Results are valid for 2 years: they must still be valid on the day you submit your application.',
+            'Every skill (listening, reading, speaking, writing) counts: the weakest one decides your eligibility.',
+          ],
+        },
+        {
+          kind: 'note',
+          text: 'Taking the TCF Canada? Prepare on TCF Express Academy, our platform: exercises, mock exams and personalised coaching.',
+        },
+        { kind: 'cta', label: 'Prepare on TCF Express Academy', href: TCF_ACADEMY_URL },
       ],
     },
     passport: {

@@ -139,7 +139,7 @@ describe('BudgetView', () => {
         return screen.findByRole('dialog', { name });
       };
 
-      it('is offered on the IRCC fees, biometrics, the medical, the police certificate and the passport, not elsewhere', () => {
+      it('is offered on every line but the photos', () => {
         renderView();
         answerCoupleWithChild();
 
@@ -148,15 +148,15 @@ describe('BudgetView', () => {
           'Frais de traitement IRCC (enfant à charge)',
           'Frais de résidence permanente (RPRF)',
           'Biométrie',
+          'Évaluation des diplômes (WES)',
+          'Test de langue',
           'Visite médicale',
           'Certificat de police',
           'Passeport',
         ]) {
           expect(learnMore(name)).toBeInTheDocument();
         }
-        for (const name of ['Évaluation des diplômes (WES)', 'Test de langue', 'Photos d’identité']) {
-          expect(within(line(name)).queryByRole('button', { name: /En savoir plus/ })).toBeNull();
-        }
+        expect(within(line('Photos d’identité')).queryByRole('button', { name: /En savoir plus/ })).toBeNull();
       });
 
       it('explains biometrics: the fee, paid when the application is submitted, and its validity', async () => {
@@ -195,6 +195,46 @@ describe('BudgetView', () => {
           'href',
           expect.stringMatching(/^https:\/\/wa\.me\/message\/H3LTKVCVL6GAL1/),
         );
+      });
+
+      it('sends Cameroonians to book their medical with the IOM and their biometrics with VFS Global', async () => {
+        renderView();
+        const medical = await openGuide('Visite médicale');
+        expect(medical).toHaveTextContent('Au Cameroun, la visite médicale est assurée par l’OIM');
+        expect(within(medical).getByRole('link', { name: /Réserver ma visite médicale/ })).toHaveAttribute(
+          'href',
+          'https://mymedical.iom.int/apps/omas/#_frmHomeV2',
+        );
+        fireEvent.keyDown(medical, { key: 'Escape' });
+
+        const biometrics = await openGuide('Biométrie');
+        expect(within(biometrics).getByRole('link', { name: /Prendre rendez-vous pour la biométrie/ })).toHaveAttribute(
+          'href',
+          expect.stringMatching(/^https:\/\/www\.vfsglobal\.ca\/IRCC-AppointmentWave1\/Account\/RegisteredLogin\?q=/),
+        );
+      });
+
+      it('recommends TCF Express Academy to prepare the TCF Canada', async () => {
+        renderView();
+        const guide = await openGuide('Test de langue');
+
+        expect(guide).toHaveTextContent('TCF Canada');
+        expect(within(guide).getByRole('link', { name: /TCF Express Academy/ })).toHaveAttribute(
+          'href',
+          'https://tcf-express-academy.com',
+        );
+      });
+
+      it('offers Stanzy’s WES or IQAS service to graduates of the seven Cameroonian state universities', async () => {
+        renderView();
+        const guide = await openGuide('Évaluation des diplômes (WES)');
+
+        for (const university of ['Dschang', 'Yaoundé I', 'Yaoundé II', 'Buea', 'Bamenda', 'Maroua', 'Ngaoundéré']) {
+          expect(guide).toHaveTextContent(university);
+        }
+        expect(guide).toHaveTextContent('IQAS');
+        // A page of this site, through the (mocked) locale-aware Link.
+        expect(within(guide).getByRole('link', { name: /service EDE/ })).toHaveAttribute('href', '/services/ede');
       });
 
       it('names the RPRF amount and that it is refunded if the application fails', async () => {
