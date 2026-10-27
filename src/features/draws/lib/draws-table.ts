@@ -48,6 +48,10 @@ export type DrawText = {
   date: (draw: DrawSummary) => string;
   /** The date without the year, for tight spots. */
   shortDate: (draw: DrawSummary) => string;
+  /** The type in a word or an acronym (« PCP », « Français »), for phones. */
+  shortType: (draw: DrawSummary) => string;
+  /** The tie-breaking rule as « 6 oct. 2026 à 21:31 UTC », or null. */
+  tieBreak: (draw: DrawSummary) => string | null;
 };
 
 function compare(sort: SortField, text: DrawText) {

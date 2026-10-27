@@ -16,10 +16,10 @@ const IRCC = 'https://www.canada.ca/en/immigration-refugees-citizenship/corporat
 const NOW = new Date('2026-10-24T14:00:00Z');
 
 const LATEST: DrawSummary[] = [
-  { round: '450', roundNumber: 450, date: '2026-10-16', typeLabel: 'French-Language proficiency 2026-Version 2', group: 'FRENCH', invitations: 5000, crsMin: 435, irccUrl: `${IRCC}?q=450`, crsChange: 36 },
-  { round: '449', roundNumber: 449, date: '2026-10-15', typeLabel: 'Canadian Experience Class', group: 'CEC', invitations: 2500, crsMin: 519, irccUrl: `${IRCC}?q=449`, crsChange: -2 },
-  { round: '448', roundNumber: 448, date: '2026-10-13', typeLabel: 'Provincial Nominee Program', group: 'PNP', invitations: 752, crsMin: 772, irccUrl: `${IRCC}?q=448`, crsChange: 7 },
-  { round: '447', roundNumber: 447, date: '2026-10-01', typeLabel: 'Trades Occupations, 2026-Version 3', group: 'CATEGORY', invitations: 3500, crsMin: 476, irccUrl: null, crsChange: null },
+  { round: '450', roundNumber: 450, date: '2026-10-16', typeLabel: 'French-Language proficiency 2026-Version 2', group: 'FRENCH', invitations: 5000, crsMin: 435, irccUrl: `${IRCC}?q=450`, crsChange: 36, tieBreakAt: null },
+  { round: '449', roundNumber: 449, date: '2026-10-15', typeLabel: 'Canadian Experience Class', group: 'CEC', invitations: 2500, crsMin: 519, irccUrl: `${IRCC}?q=449`, crsChange: -2, tieBreakAt: null },
+  { round: '448', roundNumber: 448, date: '2026-10-13', typeLabel: 'Provincial Nominee Program', group: 'PNP', invitations: 752, crsMin: 772, irccUrl: `${IRCC}?q=448`, crsChange: 7, tieBreakAt: null },
+  { round: '447', roundNumber: 447, date: '2026-10-01', typeLabel: 'Trades Occupations, 2026-Version 3', group: 'CATEGORY', invitations: 3500, crsMin: 476, irccUrl: null, crsChange: null, tieBreakAt: null },
 ];
 /** 22 older rounds, #446 down to #425, cycling PNP / CEC / GENERAL. */
 const OLDER: DrawSummary[] = Array.from({ length: 22 }, (_, i) => {
@@ -35,6 +35,7 @@ const OLDER: DrawSummary[] = Array.from({ length: 22 }, (_, i) => {
     crsMin: 500 + i,
     irccUrl: null,
     crsChange: null,
+    tieBreakAt: null,
   };
 });
 const ALL = [...LATEST, ...OLDER];

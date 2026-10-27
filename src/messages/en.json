@@ -169,17 +169,13 @@
       "ctaScore": "See the latest draws",
       "latest": "Latest draw",
       "roundLabel": "Round",
-      "stats": {
-        "invitations": "invitations",
-        "crsMin": "minimum CRS score",
-        "date": "draw date",
-        "scoreMinShort": "Min. score: {crs}",
-        "scoreMin": "Minimum score: {crs}"
-      },
-      "tracker": {
-        "label": "Your score vs minimum",
-        "note": "72% of the minimum score",
-        "cta": "Improve my score →"
+      "scoreLabel": "Minimum CRS score",
+      "facts": {
+        "category": "Category",
+        "invitations": "Invitations issued",
+        "date": "Draw date",
+        "tieBreak": "Tie-breaking rule",
+        "none": "—"
       },
       "cardStats": {
         "crsMin": "CRS min.",
@@ -890,6 +886,24 @@
       "CATEGORY": "Category"
     },
     "types": {},
+    "typesShort": {
+      "pnp": "PNP",
+      "cec": "CEC",
+      "french": "French",
+      "general": "General",
+      "fsw": "FSW",
+      "fst": "FST",
+      "physicians": "Physicians",
+      "seniorManagers": "Senior managers",
+      "military": "Military",
+      "healthSocial": "Health & social",
+      "health": "Healthcare",
+      "trades": "Trades",
+      "transport": "Transport",
+      "stem": "STEM",
+      "education": "Education",
+      "agriculture": "Agriculture"
+    },
     "alerts": {
       "title": "Draw alerts",
       "enable": "Turn on draw alerts",
@@ -905,7 +919,8 @@
     "alert": {
       "title": "New draw #{round}",
       "body": "{type} · {invitations} invitations · CRS {crsMin}"
-    }
+    },
+    "tieBreakValue": "{date} at {time} UTC"
   },
   "Nclc": {
     "eyebrow": "Free tool · Language level",

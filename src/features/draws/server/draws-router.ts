@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import type { DrawGroup } from '@/features/draws/lib/draw-type';
-import { roundOrder, type DrawSummary } from '@/features/draws/lib/draw-summary';
+import { irccInstant, roundOrder, type DrawSummary } from '@/features/draws/lib/draw-summary';
 import { SYNC_ID } from '@/features/draws/server/ingest-draws';
 import { routing } from '@/i18n/routing';
 import { createTRPCRouter, publicProcedure } from '@/server/trpc/trpc';
@@ -19,19 +19,26 @@ const SUMMARY = {
   invitations: true,
   crsMin: true,
   irccUrl: true,
+  // Read for the tie-breaking rule only; never sent to the browser.
+  raw: true,
 } as const;
 
-type Row = Omit<DrawSummary, 'date' | 'crsChange'> & { date: Date };
+type Row = Omit<DrawSummary, 'date' | 'crsChange' | 'tieBreakAt'> & { date: Date; raw: unknown };
 
 /** `rows` newest first; each gets its change from the next older row of its group. */
 function withCrsChange(rows: Row[]): DrawSummary[] {
   const older = new Map<DrawGroup, number>();
   return rows
     .toReversed()
-    .map((row) => {
+    .map(({ raw, ...row }) => {
       const previous = older.get(row.group);
       older.set(row.group, row.crsMin);
-      return { ...row, date: row.date.toISOString().slice(0, 10), crsChange: previous === undefined ? null : row.crsMin - previous };
+      return {
+        ...row,
+        date: row.date.toISOString().slice(0, 10),
+        crsChange: previous === undefined ? null : row.crsMin - previous,
+        tieBreakAt: irccInstant((raw as { drawCutOff?: unknown } | null)?.drawCutOff),
+      };
     })
     .toReversed();
 }

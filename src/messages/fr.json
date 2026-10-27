@@ -169,17 +169,13 @@
       "ctaScore": "Voir les derniers tirages",
       "latest": "Dernier tirage",
       "roundLabel": "Tirage",
-      "stats": {
-        "invitations": "invitations",
-        "crsMin": "score CRS minimum",
-        "date": "date du tirage",
-        "scoreMinShort": "Score min : {crs}",
-        "scoreMin": "Score minimum: {crs}"
-      },
-      "tracker": {
-        "label": "Votre score vs minimum",
-        "note": "72% du score minimum",
-        "cta": "Améliorer mon score →"
+      "scoreLabel": "Score CRS minimum",
+      "facts": {
+        "category": "Catégorie",
+        "invitations": "Invitations émises",
+        "date": "Date du tirage",
+        "tieBreak": "Règle de bris d’égalité",
+        "none": "—"
       },
       "cardStats": {
         "crsMin": "CRS min.",
@@ -907,6 +903,24 @@
       "education": "Professions de l’enseignement",
       "agriculture": "Agriculture et agroalimentaire"
     },
+    "typesShort": {
+      "pnp": "PCP",
+      "cec": "CEC",
+      "french": "Français",
+      "general": "Général",
+      "fsw": "TQF",
+      "fst": "MSF",
+      "physicians": "Médecins",
+      "seniorManagers": "Cadres",
+      "military": "Militaires",
+      "healthSocial": "Santé et social",
+      "health": "Santé",
+      "trades": "Métiers",
+      "transport": "Transport",
+      "stem": "STIM",
+      "education": "Enseignement",
+      "agriculture": "Agriculture"
+    },
     "alerts": {
       "title": "Alertes tirages",
       "enable": "Activer les alertes tirages",
@@ -922,7 +936,8 @@
     "alert": {
       "title": "Nouveau tirage #{round}",
       "body": "{type} · {invitations} invitations · CRS {crsMin}"
-    }
+    },
+    "tieBreakValue": "{date} à {time} UTC"
   },
   "Nclc": {
     "eyebrow": "Outil gratuit · Niveau linguistique",

@@ -363,6 +363,21 @@ describe('draws ingestion and router', () => {
     ]);
   });
 
+  it('gives each Tirage its tie-breaking rule, read as UTC, and still no raw feed', async () => {
+    const db = fakeDatabase();
+    await ingest(db, fullFeed());
+
+    const [french, cec, pnp] = (await callerAs(db).draws.latest({ take: 3 })).draws;
+
+    // "October 06, 2026 at 21:31:22 UTC"
+    expect(french).toMatchObject({ round: '450', tieBreakAt: '2026-10-06T21:31:22.000Z' });
+    // "September 21, 2026 at 19:00:47 UTC"
+    expect(cec).toMatchObject({ round: '449', tieBreakAt: '2026-09-21T19:00:47.000Z' });
+    // "July 15, 2026 at 13:57:33": IRCC left off "UTC"; its times are UTC.
+    expect(pnp).toMatchObject({ round: '448', tieBreakAt: '2026-07-15T13:57:33.000Z' });
+    expect(french).not.toHaveProperty('raw');
+  });
+
   it('refuses an endpoint that is not a known push service', async () => {
     const visitor = callerAs(fakeDatabase());
     for (const endpoint of ['http://fcm.googleapis.com/fcm/send/x', 'https://169.254.169.254/latest', 'https://evil.example/fcm.googleapis.com']) {
