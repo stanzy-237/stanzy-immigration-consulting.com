@@ -9,6 +9,7 @@ import {
   Search,
   Timer,
   TrendingUp,
+  Wallet,
 } from 'lucide-react';
 
 export type ToolVariant = 'default' | 'featured' | 'wide';
@@ -30,9 +31,9 @@ export type Tool = {
   comingSoon?: true;
 };
 
-// Seven cards in the mosaic order from the MagicPath design
+// Nine cards in four full rows of the MagicPath mosaic
 // ("Stanzy Immigration — Navigation", revision 460790112943476736):
-// row 1: [featured] [·] [·]   row 2: [wide] [·]   row 3: [wide] [·]
+// row 1: [featured] [·] [·]   rows 2–4: [wide] [·]
 // Tools not built yet (`comingSoon`) come last.
 export const TOOLS: ReadonlyArray<Tool> = [
   {
@@ -103,6 +104,16 @@ export const TOOLS: ReadonlyArray<Tool> = [
     href: '/outils/prochain-tirage',
     variant: 'default',
     badgeKeys: ['badgePrediction', 'badgeCrsRange'],
+    freeKey: 'free',
+  },
+  {
+    slug: 'budget',
+    icon: Wallet,
+    nameKey: 'budgetName',
+    descKey: 'budgetDesc',
+    href: '/outils/budget',
+    variant: 'wide',
+    badgeKeys: ['badgeBudget', 'badgeExpenses'],
     freeKey: 'free',
   },
   {
