@@ -45,11 +45,32 @@ export type IngestReport = {
 
 type Db = Pick<PrismaClient, 'draw' | 'pushSubscription' | 'drawSync'>;
 
-/** Reads IRCC's feed, fresh, with a timeout. */
+/** Per try: two fit the endpoint's 60 s. The feed is about 700 KB. */
+const FEED_TIMEOUT_MS = 25_000;
+
+/** Says who is asking, so canada.ca can tell the app apart from anonymous traffic. */
+const USER_AGENT = 'StanzyImmigration/1.0 (+https://stanzy-immigration-consulting.com)';
+
+/**
+ * Reads IRCC's feed, fresh. canada.ca can be slow on draw days, so a try that
+ * times out is made once more; an error answer is not retried.
+ */
 export async function fetchIrccFeed(): Promise<unknown> {
-  const response = await fetch(IRCC_FEED_URL, { cache: 'no-store', signal: AbortSignal.timeout(20_000) });
-  if (!response.ok) throw new Error(`IRCC feed answered ${response.status}`);
-  return response.json();
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const response = await fetch(IRCC_FEED_URL, {
+        cache: 'no-store',
+        headers: { accept: 'application/json', 'user-agent': USER_AGENT },
+        signal: AbortSignal.timeout(FEED_TIMEOUT_MS),
+      });
+      if (!response.ok) throw new Error(`IRCC feed answered ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      const timedOut = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+      if (!timedOut) throw error;
+      if (attempt === 2) throw new Error(`IRCC feed did not answer within ${FEED_TIMEOUT_MS / 1000} s, twice`);
+    }
+  }
 }
 
 const MESSAGES = { fr, en } as const;

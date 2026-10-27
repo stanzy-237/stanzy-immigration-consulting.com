@@ -22,8 +22,25 @@ jobs:
   ingest:
     name: POST /api/cron/draws
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
+      - name: Download IRCC's rounds feed
+        # canada.ca can be slow from Vercel's servers on draw days; the runner
+        # downloads the feed and sends it along. If this fails, the app reads
+        # the feed itself, as before.
+        continue-on-error: true
+        run: |
+          curl --silent --show-error --fail --compressed \
+            --retry 3 --retry-delay 15 --retry-all-errors \
+            --max-time 120 \
+            -H 'Accept: application/json' \
+            -A 'StanzyImmigration/1.0 (+https://stanzy-immigration-consulting.com)' \
+            -o feed.json \
+            'https://www.canada.ca/content/dam/ircc/documents/json/ee_rounds_123_en.json'
+          # Keep it only if it is JSON with rounds in it.
+          jq -e '.rounds | length > 0' feed.json > /dev/null || rm -f feed.json
+          ls -l feed.json 2>/dev/null || echo "No feed downloaded; the app will read it itself."
+
       - name: Trigger ingestion
         env:
           DRAWS_INGEST_URL: ${{ secrets.DRAWS_INGEST_URL }}
@@ -33,11 +50,16 @@ jobs:
             echo "::error::Set the DRAWS_INGEST_URL and CRON_SECRET repository secrets."
             exit 1
           fi
+          body=()
+          if [ -f feed.json ]; then
+            body=(-H 'Content-Type: application/json' --data-binary @feed.json)
+          fi
           # --fail-with-body: a non-2xx answer fails the run and prints why.
           curl --silent --show-error --fail-with-body \
             --retry 2 --retry-delay 20 --retry-all-errors \
             --max-time 90 \
             -X POST \
             -H "Authorization: Bearer $CRON_SECRET" \
+            "${body[@]}" \
             "$DRAWS_INGEST_URL"
           echo
