@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { AorCounter } from '@/features/parcours/components/aor-counter';
 import { EtapeFeed } from '@/features/parcours/components/etape-feed';
 import { EtapeForm } from '@/features/parcours/components/etape-form';
 import { EtapeDrawer } from '@/features/parcours/components/etape-drawer';
@@ -113,6 +114,11 @@ export function ParcoursJournal(): ReactNode {
 
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-5 pt-6 pb-24 sm:px-10 lg:grid-cols-3 lg:py-8">
         <div className="min-w-0 lg:col-span-2">
+          <AorCounter
+            etapes={etapes}
+            className="mb-6 rounded-2xl border-2 border-fog-light border-l-rouge bg-white p-5 shadow-sm"
+            sentenceClassName="block font-heading text-h4 font-bold tracking-tight text-navy-deep"
+          />
           <EtapeFeed etapes={etapes} onAdd={startAdding} onEdit={edit} />
         </div>
         <aside className="hidden flex-col gap-4 lg:sticky lg:top-20 lg:flex">

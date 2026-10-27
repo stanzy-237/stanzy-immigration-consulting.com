@@ -1112,6 +1112,14 @@
       "copr": "Confirmation de RP (COPR)",
       "arrivee": "Arrivée au Canada",
       "autre": "Autre étape"
+    },
+    "aorCounter": {
+      "months": "{months, plural, one {# mois} other {# mois}}",
+      "days": "{days, plural, one {# jour} other {# jours}}",
+      "monthsAndDays": "{months} et {days}",
+      "running": "{duration} depuis l’AOR",
+      "done": "Dossier traité en {duration} (AOR → COPR)",
+      "total": "soit {total, plural, one {# jour} other {# jours}}"
     }
   },
   "ItaCountdown": {
