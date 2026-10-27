@@ -7,6 +7,7 @@ import { useId, useState, type ReactNode } from 'react';
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
+import { AorCounter } from '@/features/parcours/components/aor-counter';
 import { DaysSince } from '@/features/parcours/components/days-since';
 import { dateOf, daysSince } from '@/features/parcours/lib/calendar-day';
 import { colorClasses } from '@/features/parcours/lib/etape-color';
@@ -62,6 +63,11 @@ export function ParcoursShareView({
             {t('share.title')}
           </DialogTitle>
           <p className="text-body-sm text-slate">{t('count', { count: etapes.length })}</p>
+          <AorCounter
+            etapes={etapes}
+            className="mt-4 border-l-4 border-rouge pl-3"
+            headlineSize="text-body"
+          />
 
           <div className="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
             <Switch id={notesId} checked={showNotes} onCheckedChange={setShowNotes} />

@@ -1095,6 +1095,14 @@
       "copr": "Confirmation of PR (COPR)",
       "arrivee": "Arrival in Canada",
       "autre": "Other step"
+    },
+    "aorCounter": {
+      "months": "{months, plural, one {# month} other {# months}}",
+      "days": "{days, plural, one {# day} other {# days}}",
+      "monthsAndDays": "{months} and {days}",
+      "running": "{duration} since AOR",
+      "done": "File processed in {duration} (AOR → COPR)",
+      "total": "that is {total, plural, one {# day} other {# days}}"
     }
   },
   "ItaCountdown": {

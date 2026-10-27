@@ -212,6 +212,117 @@ describe('ParcoursView', () => {
     expect(timeline).toHaveTextContent('Score CRS : 485 points');
   });
 
+  describe('AOR counter', () => {
+    const etape = (id: string, code: string, date: string): Etape => ({
+      id,
+      label: `${code} reçu`,
+      code,
+      emoji: '✅',
+      color: 'green',
+      date,
+      note: '',
+    });
+    const today = (day: string) => vi.setSystemTime(new Date(`${day}T15:00:00`));
+
+    it('counts the months and days since the AOR, and the days in total', () => {
+      today('2026-10-27');
+      server.etapes = [ITA, etape('a', 'AOR', '2026-06-15')];
+      render(withIntl(<ParcoursView />));
+
+      expect(screen.getByText('4 mois et 12 jours depuis l’AOR')).toBeInTheDocument();
+      expect(screen.getByText('soit 134 jours')).toBeInTheDocument();
+    });
+
+    it('is not shown without an AOR Étape', () => {
+      server.etapes = [ITA, etape('c', 'COPR', '2026-10-01')];
+      render(withIntl(<ParcoursView />));
+
+      expect(screen.queryByText(/depuis l’AOR|AOR → COPR/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/^soit /)).not.toBeInTheDocument();
+    });
+
+    it('counts from the most recent AOR Étape', () => {
+      today('2026-10-27');
+      server.etapes = [etape('a1', 'AOR', '2025-02-03'), ITA, etape('a2', 'AOR', '2026-06-15')];
+      render(withIntl(<ParcoursView />));
+
+      expect(screen.getByText('4 mois et 12 jours depuis l’AOR')).toBeInTheDocument();
+    });
+
+    it('stops at the COPR and shows the total processing time', () => {
+      today('2026-10-27');
+      server.etapes = [etape('a', 'AOR', '2026-01-10'), etape('c', 'COPR', '2026-09-13')];
+      render(withIntl(<ParcoursView />));
+
+      expect(screen.getByText('Dossier traité en 8 mois et 3 jours (AOR → COPR)')).toBeInTheDocument();
+      expect(screen.getByText('soit 246 jours')).toBeInTheDocument();
+      expect(screen.queryByText(/depuis l’AOR/)).not.toBeInTheDocument();
+    });
+
+    it('keeps running when the only COPR predates the latest AOR', () => {
+      today('2026-10-27');
+      server.etapes = [etape('c', 'COPR', '2025-12-01'), etape('a', 'AOR', '2026-06-15')];
+      render(withIntl(<ParcoursView />));
+
+      expect(screen.getByText('4 mois et 12 jours depuis l’AOR')).toBeInTheDocument();
+      expect(screen.queryByText(/Dossier traité/)).not.toBeInTheDocument();
+    });
+
+    it('says « N mois » alone when the AOR was exactly N months ago', () => {
+      server.etapes = [etape('a', 'AOR', '2026-07-15')];
+      render(withIntl(<ParcoursView />));
+
+      expect(screen.getByText('3 mois depuis l’AOR')).toBeInTheDocument();
+      expect(screen.getByText('soit 92 jours')).toBeInTheDocument();
+    });
+
+    it('says « 0 jour » on the day of the AOR', () => {
+      server.etapes = [etape('a', 'AOR', '2026-10-15')];
+      render(withIntl(<ParcoursView />));
+
+      expect(screen.getByText('0 jour depuis l’AOR')).toBeInTheDocument();
+      expect(screen.getByText('soit 0 jour')).toBeInTheDocument();
+    });
+
+    it('counts no whole month from 31 January to 28 February', () => {
+      today('2027-02-28');
+      server.etapes = [etape('a', 'AOR', '2027-01-31')];
+      render(withIntl(<ParcoursView />));
+
+      expect(screen.getByText('28 jours depuis l’AOR')).toBeInTheDocument();
+      expect(screen.getByText('soit 28 jours')).toBeInTheDocument();
+    });
+
+    it('counts one month and one day from 31 January to 1 March', () => {
+      today('2027-03-01');
+      server.etapes = [etape('a', 'AOR', '2027-01-31')];
+      render(withIntl(<ParcoursView />));
+
+      expect(screen.getByText('1 mois et 1 jour depuis l’AOR')).toBeInTheDocument();
+      expect(screen.getByText('soit 29 jours')).toBeInTheDocument();
+    });
+
+    it('speaks English', () => {
+      today('2026-10-27');
+      server.etapes = [etape('a', 'AOR', '2026-06-15')];
+      render(withIntl(<ParcoursView />, 'en'));
+
+      expect(screen.getByText('4 months and 12 days since AOR')).toBeInTheDocument();
+      expect(screen.getByText('that is 134 days')).toBeInTheDocument();
+    });
+
+    it('appears in the screenshot-ready timeline', async () => {
+      today('2026-10-27');
+      server.etapes = [ITA, etape('a', 'AOR', '2026-06-15')];
+      render(withIntl(<ParcoursView />));
+
+      fireEvent.click(screen.getByRole('button', { name: 'Voir la timeline' }));
+      const timeline = await screen.findByRole('dialog', { name: 'Mon parcours Entrée Express' });
+      expect(within(timeline).getByText('4 mois et 12 jours depuis l’AOR')).toBeInTheDocument();
+      expect(within(timeline).getByText('soit 134 jours')).toBeInTheDocument();
+    });
+  });
+
   describe('on a phone', () => {
     beforeEach(() => {
       vi.spyOn(window, 'matchMedia').mockImplementation(
