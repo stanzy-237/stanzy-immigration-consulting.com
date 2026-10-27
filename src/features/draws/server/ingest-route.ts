@@ -13,8 +13,13 @@ const sendPush =
       })
     : null;
 
-/** POST /api/cron/draws, called hourly by .github/workflows/ingest-draws.yml. */
+/**
+ * POST /api/cron/draws, called hourly by .github/workflows/ingest-draws.yml.
+ * The workflow sends IRCC's feed when it could download it; otherwise the app
+ * reads it from canada.ca itself.
+ */
 export const POST = createIngestHandler({
   secret: env.CRON_SECRET,
-  run: () => ingestDraws({ db: prisma, fetchFeed: fetchIrccFeed, sendPush, now: new Date() }),
+  run: (feed) =>
+    ingestDraws({ db: prisma, fetchFeed: feed ? async () => feed : fetchIrccFeed, sendPush, now: new Date() }),
 });
