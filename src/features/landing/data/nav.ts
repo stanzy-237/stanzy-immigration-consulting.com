@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+  CalendarClock,
   Calculator,
   ShieldCheck,
   FileSearch,
@@ -62,6 +63,12 @@ export const TOOL_ENTRIES: ReadonlyArray<NavMenuEntry> = [
     descKey: 'drawDesc',
     href: '/outils/dernier-tirage',
     maple: true,
+  },
+  {
+    icon: CalendarClock,
+    labelKey: 'predictionName',
+    descKey: 'predictionDesc',
+    href: '/outils/prochain-tirage',
   },
   {
     icon: Wallet,

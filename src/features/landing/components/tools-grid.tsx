@@ -188,7 +188,7 @@ export function ToolsGrid(): ReactNode {
 
         {/* Subtitle */}
         <p className="mb-12 max-w-lg lg:mb-8 text-lg leading-relaxed text-slate">
-          {t("subtitle")}
+          {t("subtitle", { count: AVAILABLE_TOOLS })}
         </p>
 
         {/* Mosaic grid: 3-col desktop, 2-col ≥md, 1-col mobile. Wide cards span 2 cols at md+. */}

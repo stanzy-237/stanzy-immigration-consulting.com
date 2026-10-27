@@ -30,6 +30,10 @@ What a Tirage targeted, as IRCC names it ("Provincial Nominee Program", "French-
 A push notification sent to every subscribed device each time a new Tirage is published, whatever the owner's CRS score: it tells people a round happened, not whether they were invited. A device is subscribed as soon as it allows Stanzy's notifications (the browser's own "Allow" can't be skipped), unless its visitor turned alerts off.
 _Avoid_: "ITA alert" (an ITA is the invitation a candidate receives, not the round).
 
+**Prédiction de tirage** (Draw prediction):
+The Prochain tirage tool's estimate of a group's next Tirage, from the Tirages Stanzy stored: a date window (from the usual gaps between the group's Tirages in the last 12 months), a CRS score range with its median (the group's last 5 cut-offs) and a one-sentence explanation. Always shown as an estimate, never as an announcement: IRCC publishes no schedule.
+_Avoid_: "forecast", "announcement", "next draw date" (it is a window, not a date).
+
 **CNP** (Classification nationale des professions / NOC):
 Canada's occupation classification. Each job maps to a CNP code, which determines Entrée Express eligibility. Subject of the code-search tool.
 _Avoid_: NOC in product-facing French copy; use CNP.

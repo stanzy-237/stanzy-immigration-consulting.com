@@ -54,6 +54,8 @@
         "cnpDesc": "Find your Canadian occupation code",
         "nclcName": "CLB / NCLC",
         "nclcDesc": "Your language level from your scores",
+        "predictionName": "Next draw",
+        "predictionDesc": "Prediction of the next Express Entry draw",
         "budgetName": "Budget & expenses",
         "budgetDesc": "Estimate your fees and track your expenses"
       },
@@ -84,7 +86,7 @@
       "eyebrow": "Free Tools",
       "titleLead": "Your immigration tools.",
       "titleAccent": "100% free.",
-      "subtitle": "Seven tools built to simplify your Express Entry journey. No sign-up required.",
+      "subtitle": "{count} free tools to simplify your path to Express Entry, most of them without signing up.",
       "footerLead": "{count, plural, one {# tool} other {# tools}}",
       "footerTail": " available · No sign-up · 100% free",
       "cardAriaLabel": "Open the {name} tool",
@@ -106,6 +108,8 @@
         "cnpDesc": "Find the occupation code that matches your job. Essential for any Canadian immigration file.",
         "nclcName": "CLB / NCLC calculator",
         "nclcDesc": "Turn your TEF, TCF, IELTS, CELPIP or PTE results into CLB/NCLC levels, with your CRS points and Express Entry eligibility.",
+        "predictionName": "Next draw prediction",
+        "predictionDesc": "When will the next draw come, of what type, at what score? A transparent estimate, group by group, drawn from past rounds.",
         "budgetName": "Budget & expenses",
         "budgetDesc": "Estimate what your Express Entry costs — IRCC fees, tests, WES, proof of funds — then log every expense in your currency."
       },
@@ -130,6 +134,8 @@
         "badgeTeer": "TEER",
         "badgeNclcClb": "CLB · NCLC",
         "badgeLanguageTests": "TEF · TCF · IELTS",
+        "badgePrediction": "Prediction",
+        "badgeCrsRange": "CRS range",
         "comingSoon": "Coming soon",
         "badgeBudget": "IRCC fees",
         "badgeExpenses": "Expense log"
@@ -934,7 +940,47 @@
       "title": "New draw #{round}",
       "body": "{type} · {invitations} invitations · CRS {crsMin}"
     },
-    "tieBreakValue": "{date} at {time} UTC"
+    "tieBreakValue": "{date} at {time} UTC",
+    "nextDraw": {
+      "label": "Likely next draw",
+      "lead": "Likely next draw:",
+      "summary": "{group}, {window}, {min}–{max}",
+      "link": "See the prediction"
+    }
+  },
+  "DrawPrediction": {
+    "metaTitle": "Next Express Entry draw: prediction",
+    "eyebrow": "Prediction",
+    "title": "Next draw",
+    "subtitle": "Prediction of the next Express Entry draw",
+    "synced": "Updated {when}",
+    "loading": "Loading draws…",
+    "error": "We can’t load the draws right now. Try again in a moment.",
+    "empty": "No prediction yet: the first draws update hasn’t run.",
+    "disclaimer": "An estimate, not a guarantee: IRCC doesn’t announce its draws. These figures are statistics on past rounds.",
+    "featured": {
+      "label": "Most likely next draw",
+      "window": "Likely window",
+      "score": "Expected CRS score",
+      "median": "median {median}"
+    },
+    "groups": {
+      "title": "By draw type",
+      "group": "Type",
+      "window": "Likely window",
+      "score": "CRS score",
+      "why": "Why"
+    },
+    "explain": {
+      "cadence": "The last {group} draw was on {date}; they usually come every {days, plural, one {# day} other {# days}}.",
+      "single": "Only one {group} draw in 12 months, on {date}: the window follows the other draws’ usual pace ({days, plural, one {# day} other {# days}}).",
+      "overdue": "The expected date has passed: the next one could come any day.",
+      "categoryAll": "The last {of} were {type} draws.",
+      "categorySome": "{count} of the last {of} were {type} draws.",
+      "categoryLatest": "The last one was a {type} draw."
+    },
+    "data": "{count, plural, one {# draw} other {# draws}} in 12 months · {scores, plural, one {last score} other {last # scores}}: {list}",
+    "window": "{span, select, day {on {end}} other {between {start} and {end}}}"
   },
   "Nclc": {
     "eyebrow": "Free tool · Language level",

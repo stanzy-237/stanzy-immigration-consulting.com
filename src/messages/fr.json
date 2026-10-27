@@ -54,6 +54,8 @@
         "cnpDesc": "Trouvez votre code de profession canadien",
         "nclcName": "NCLC / CLB",
         "nclcDesc": "Votre niveau de langue à partir de vos notes",
+        "predictionName": "Prochain tirage",
+        "predictionDesc": "Prédiction du prochain tirage Entrée Express",
         "budgetName": "Budget & dépenses",
         "budgetDesc": "Estimez vos frais et suivez vos dépenses"
       },
@@ -84,7 +86,7 @@
       "eyebrow": "Outils Gratuits",
       "titleLead": "Vos outils d'immigration.",
       "titleAccent": "100% gratuits.",
-      "subtitle": "Sept outils conçus pour simplifier votre parcours vers l'Entrée Express. Aucune inscription requise.",
+      "subtitle": "{count} outils gratuits pour simplifier votre parcours vers l'Entrée Express, la plupart sans inscription.",
       "footerLead": "{count, plural, one {# outil} other {# outils}}",
       "footerTail": " disponibles · Aucune inscription · 100% gratuits",
       "cardAriaLabel": "Ouvrir l'outil {name}",
@@ -106,6 +108,8 @@
         "cnpDesc": "Trouvez le code professionnel qui correspond à votre métier. Indispensable pour tout dossier d'immigration au Canada.",
         "nclcName": "Calculateur NCLC / CLB",
         "nclcDesc": "Convertissez vos résultats TEF, TCF, IELTS, CELPIP ou PTE en niveaux NCLC/CLB, avec vos points CRS et votre admissibilité Entrée Express.",
+        "predictionName": "Prédiction du prochain tirage",
+        "predictionDesc": "Quand viendra le prochain tirage, de quel type et à quel score ? Une estimation transparente, groupe par groupe, tirée des tirages passés.",
         "budgetName": "Budget & dépenses",
         "budgetDesc": "Estimez le coût de votre Entrée Express — frais IRCC, tests, WES, fonds à prouver — puis notez chaque dépense dans votre devise."
       },
@@ -130,6 +134,8 @@
         "badgeTeer": "TEER",
         "badgeNclcClb": "NCLC · CLB",
         "badgeLanguageTests": "TEF · TCF · IELTS",
+        "badgePrediction": "Prédiction",
+        "badgeCrsRange": "Fourchette CRS",
         "comingSoon": "Bientôt",
         "badgeBudget": "Frais IRCC",
         "badgeExpenses": "Journal de dépenses"
@@ -951,7 +957,47 @@
       "title": "Nouveau tirage #{round}",
       "body": "{type} · {invitations} invitations · CRS {crsMin}"
     },
-    "tieBreakValue": "{date} à {time} UTC"
+    "tieBreakValue": "{date} à {time} UTC",
+    "nextDraw": {
+      "label": "Prochain tirage probable",
+      "lead": "Prochain tirage probable :",
+      "summary": "{group}, {window}, {min}–{max}",
+      "link": "Voir la prédiction"
+    }
+  },
+  "DrawPrediction": {
+    "metaTitle": "Prochain tirage Entrée Express : prédiction",
+    "eyebrow": "Prédiction",
+    "title": "Prochain tirage",
+    "subtitle": "Prédiction du prochain tirage Entrée Express",
+    "synced": "Mis à jour {when}",
+    "loading": "Chargement des tirages…",
+    "error": "Impossible de charger les tirages pour le moment. Réessayez dans quelques instants.",
+    "empty": "Pas encore de prédiction : la première mise à jour des tirages n’a pas encore eu lieu.",
+    "disclaimer": "Estimation, pas une garantie : IRCC n’annonce pas ses tirages. Ces chiffres sont des statistiques sur les tirages passés.",
+    "featured": {
+      "label": "Prochain tirage le plus probable",
+      "window": "Fenêtre probable",
+      "score": "Score CRS attendu",
+      "median": "médiane {median}"
+    },
+    "groups": {
+      "title": "Par type de tirage",
+      "group": "Type",
+      "window": "Fenêtre probable",
+      "score": "Score CRS",
+      "why": "Pourquoi"
+    },
+    "explain": {
+      "cadence": "Le dernier tirage {group} date du {date} ; ils ont lieu en général tous les {days, plural, one {# jour} other {# jours}}.",
+      "single": "Un seul tirage {group} en 12 mois, le {date} : la fenêtre suit le rythme habituel des autres tirages ({days, plural, one {# jour} other {# jours}}).",
+      "overdue": "La date attendue est passée : le prochain peut tomber d’un jour à l’autre.",
+      "categoryAll": "Les {of} derniers étaient des tirages {type}.",
+      "categorySome": "{count} des {of} derniers étaient des tirages {type}.",
+      "categoryLatest": "Le dernier était un tirage {type}."
+    },
+    "data": "{count, plural, one {# tirage} other {# tirages}} en 12 mois · {scores, plural, one {dernier score} other {# derniers scores}} : {list}",
+    "window": "{span, select, day {le {end}} month {entre le {startDay} et le {end}} other {entre le {start} et le {end}}}"
   },
   "Nclc": {
     "eyebrow": "Outil gratuit · Niveau linguistique",

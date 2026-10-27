@@ -36,6 +36,9 @@ const PRECACHE_URLS = [
   // Derniers tirages (#49): the last loaded page opens offline.
   '/fr/outils/dernier-tirage',
   '/en/outils/dernier-tirage',
+  // Prochain tirage (#63): computed in the browser from the cached draws.list.
+  '/fr/outils/prochain-tirage',
+  '/en/outils/prochain-tirage',
   '/manifest.webmanifest',
 ];
 
