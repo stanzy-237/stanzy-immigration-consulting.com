@@ -1,4 +1,5 @@
 import type { Currency } from '@/features/budget/data/currencies';
+import { IOM_GRID_DAY, IOM_PRICE_FROM_15 } from '@/features/budget/data/iom-medical';
 
 export const LANGUAGE_TESTS = ['TEF', 'TCF', 'IELTS', 'CELPIP'] as const;
 
@@ -46,6 +47,8 @@ export const EDITABLE_LINES = ['eca', 'languageTest', 'medical', 'police', 'pass
 export type EditableLine = (typeof EDITABLE_LINES)[number];
 
 const STANZY_ESTIMATE: LineSource = { name: 'Estimation Stanzy' };
+const IOM: LineSource = { name: 'OIM (grille mensuelle)', url: 'https://mymedical.iom.int/apps/omas/#_frmHomeV2' };
+const POLICE_ESTIMATED_ON = '2026-10-28';
 const ESTIMATED_ON = '2026-10-27';
 
 /**
@@ -70,9 +73,13 @@ export const ESTIMATED_FEES = {
     checkedOn: ESTIMATED_ON,
   },
   /** No published price for a panel physician in Cameroon. */
-  medical: { amount: 100_000, currency: 'XAF', basis: 'person', source: STANZY_ESTIMATE, checkedOn: ESTIMATED_ON },
+  /**
+   * The IOM's monthly price from 15 (iom-medical.ts), for everyone: the
+   * estimator doesn't know children's ages, and younger ones cost less.
+   */
+  medical: { amount: IOM_PRICE_FROM_15, currency: 'XAF', basis: 'person', source: IOM, checkedOn: IOM_GRID_DAY },
   /** IRCC asks one from each family member aged 18 or over. */
-  police: { amount: 10_000, currency: 'XAF', basis: 'adult', source: STANZY_ESTIMATE, checkedOn: ESTIMATED_ON },
+  police: { amount: 25_000, currency: 'XAF', basis: 'adult', source: STANZY_ESTIMATE, checkedOn: POLICE_ESTIMATED_ON },
   passport: { amount: 110_000, currency: 'XAF', basis: 'person', source: STANZY_ESTIMATE, checkedOn: ESTIMATED_ON },
   photos: { amount: 5_000, currency: 'XAF', basis: 'person', source: STANZY_ESTIMATE, checkedOn: ESTIMATED_ON },
 } as const satisfies Record<EditableLine, FeeDefinition>;

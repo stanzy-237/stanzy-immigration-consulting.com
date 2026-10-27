@@ -1,4 +1,5 @@
 import { BIOMETRICS_FAMILY_CAP, OFFICIAL_FEES } from '@/features/budget/data/fees';
+import { IOM_MEDICAL_GRID, IOM_MEDICAL_PAYMENT } from '@/features/budget/data/iom-medical';
 import { TCF_ACADEMY_URL } from '@/features/shared/data/links';
 import type { Locale } from '@/i18n/routing';
 
@@ -49,29 +50,6 @@ const BIOMETRICS_EN = 'https://www.canada.ca/en/immigration-refugees-citizenship
 const PANEL_PHYSICIANS_FR = 'https://secure.cic.gc.ca/PanelPhysicianMedecinDesigne/fr/Accueil';
 const PANEL_PHYSICIANS_EN = 'https://secure.cic.gc.ca/PanelPhysicianMedecinDesigne/en/Home';
 
-// ─── To update every month ───────────────────────────────────────────────────
-/**
- * The IOM's price grid for the immigration medical in Cameroon, in FCFA. The
- * IOM publishes a new one each month (it follows the CAD rate): change
- * `month` (YYYY-MM) and the three prices.
- */
-export const IOM_MEDICAL_GRID = {
-  month: '2026-10',
-  prices: [
-    { ages: { fr: '0 à 10 ans', en: '0 to 10 years' }, xaf: 63_625 },
-    { ages: { fr: '11 à 14 ans', en: '11 to 14 years' }, xaf: 89_650 },
-    { ages: { fr: '15 ans et plus', en: '15 and over' }, xaf: 114_520 },
-  ],
-} as const;
-
-/** Where the IOM's medical is paid, in Cameroon. */
-export const IOM_MEDICAL_PAYMENT = {
-  accountNumber: '30830023091',
-  bankName: 'Ecobank - CAMEROON',
-  accountName: 'OIM',
-  reference: 'MH.0130',
-} as const;
-// ──────────────────────────────────────────────────────────────────────────────
 
 const monthName = (locale: Locale) =>
   new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(

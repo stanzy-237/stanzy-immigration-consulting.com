@@ -34,9 +34,10 @@ describe('estimateBudget', () => {
 
   it('never adds the proof of funds to the fees', () => {
     // Single applicant: 990 + 600 + 85 + 300 (WES) + 210 000 XAF / 440 (TEF) +
-    // 100 000 / 440 (medical) + 10 000 / 440 (police) + 110 000 / 440 (passport)
-    // + 5 000 / 440 (photos) = 1 975 + 477 + 227 + 23 + 250 + 11.
-    expect(inCad({}).feesTotal).toBe(2_963);
+    // 114 520 / 440 (medical, the IOM's price from 15) + 25 000 / 440 (police)
+    // + 110 000 / 440 (passport) + 5 000 / 440 (photos), each line rounded:
+    // 1 975 + 477 + 260 + 57 + 250 + 11.
+    expect(inCad({}).feesTotal).toBe(3_030);
     expect(inCad({}).fundsToProve).toMatchObject({ persons: 1, cad: 15_263 });
   });
 });

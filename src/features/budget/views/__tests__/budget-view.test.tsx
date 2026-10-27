@@ -13,8 +13,8 @@ import { BudgetView } from '@/features/budget/views/budget-view';
  * it. Only the browser auth client and the tRPC hooks are stubbed. Expected
  * amounts are worked by hand from IRCC's fee page (30 Apr 2026), its
  * proof-of-funds table (7 Jul 2025) and the spec's defaults (1 CAD = 440 XAF,
- * WES 300 CAD, test 210 000 XAF, medical 100 000, police 10 000, passport
- * 110 000, photos 5 000 XAF).
+ * WES 300 CAD, test 210 000 XAF, medical 114 520 — the IOM's October 2026
+ * price from 15 — police 25 000, passport 110 000, photos 5 000 XAF).
  */
 vi.mock('@/i18n/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/i18n/navigation')>()),
@@ -123,13 +123,14 @@ describe('BudgetView', () => {
       answerCoupleWithChild();
 
       // IRCC 3 450 CAD = 1 518 000; biometrics 170 CAD = 74 800; WES 300 CAD =
-      // 132 000; TEF × 2 = 420 000; medical × 3 = 300 000; police × 2 = 20 000;
+      // 132 000; TEF × 2 = 420 000; medical × 3 = 343 560; police × 2 = 50 000;
       // passport × 3 = 330 000; photos × 3 = 15 000.
       expect(line('Évaluation des diplômes (WES)')).toHaveTextContent('132 000 FCFA');
       expect(line('Test de langue')).toHaveTextContent('420 000 FCFA');
-      expect(line('Visite médicale')).toHaveTextContent('300 000 FCFA');
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 809 800 FCFA');
-      expect(line('Visite médicale')).toHaveTextContent('Source : Estimation Stanzy · vérifié le 27 octobre 2026');
+      expect(line('Visite médicale')).toHaveTextContent('343 560 FCFA');
+      expect(line('Certificat de police')).toHaveTextContent('50 000 FCFA');
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 883 360 FCFA');
+      expect(line('Visite médicale')).toHaveTextContent('Source : OIM (grille mensuelle) · vérifié le 1 octobre 2026');
     });
 
     describe('« En savoir plus »', () => {
@@ -276,7 +277,7 @@ describe('BudgetView', () => {
       // 3 persons: 23 360 CAD × 440.
       expect(funds()).toHaveTextContent('10 278 400 FCFA');
       expect(funds()).toHaveTextContent('Pour 3 personnes · soit 23 360 $CA');
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 809 800 FCFA');
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 883 360 FCFA');
 
       fireEvent.click(screen.getByLabelText('Je n’ai pas à prouver de fonds (CEC ou offre d’emploi valide)'));
       expect(funds()).toHaveTextContent('Vous n’avez pas à prouver de fonds');
@@ -288,13 +289,13 @@ describe('BudgetView', () => {
       answerCoupleWithChild();
 
       type(screen.getByLabelText('Prix par personne : Visite médicale (XAF)'), '150000');
-      // Medical 3 × 150 000 = 450 000 instead of 300 000.
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 959 800 FCFA');
+      // Medical 3 × 150 000 = 450 000 instead of 343 560: 2 883 360 − 343 560 + 450 000.
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 989 800 FCFA');
 
       type(screen.getByLabelText('Taux de conversion : 1 CAD en XAF'), '450');
       // CAD lines at 450: IRCC 1 552 500 + biometrics 76 500 + WES 135 000;
-      // XAF lines unchanged: 420 000 + 450 000 + 20 000 + 330 000 + 15 000.
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 999 000 FCFA');
+      // XAF lines unchanged: 420 000 + 450 000 + 50 000 + 330 000 + 15 000.
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('3 029 000 FCFA');
     });
 
     it('remembers the visitor’s estimate in this browser', () => {
@@ -306,7 +307,7 @@ describe('BudgetView', () => {
       renderView();
       expect(screen.getByLabelText('Mon époux ou conjoint de fait vient avec moi')).toBeChecked();
       expect(screen.getByLabelText('Prix par personne : Visite médicale (XAF)')).toHaveValue('150000');
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 959 800 FCFA');
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 989 800 FCFA');
       expect(screen.queryByRole('button', { name: 'Enregistrer dans mon compte' })).toBeNull();
     });
 
@@ -329,9 +330,9 @@ describe('BudgetView', () => {
       render(withIntl(<BudgetView />, 'en'));
 
       expect(screen.getByRole('tab', { name: 'Estimate my budget' })).toHaveAttribute('aria-selected', 'true');
-      // Single applicant, TEF and WES by default: 1 975 CAD × 440 + 435 000 XAF.
+      // Single applicant, TEF and WES by default: 1 975 CAD × 440 + 464 520 XAF.
       expect(within(screen.getByRole('region', { name: 'Fees to pay' })).getByTestId('fees-total')).toHaveTextContent(
-        'FCFA 1,304,000',
+        'FCFA 1,333,520',
       );
     });
 
@@ -406,8 +407,8 @@ describe('BudgetView', () => {
       expect(byMotif.getByRole('listitem', { name: 'Évaluation des diplômes (ECA)' })).toHaveTextContent('132 000 FCFA');
 
       // Single TEF + WES default estimate: 1 975 CAD × 440 = 869 000, plus
-      // 210 000 + 100 000 + 10 000 + 110 000 + 5 000 = 1 304 000 FCFA.
-      expect(region('Total dépensé')).toHaveTextContent('Dépensé 342 000 FCFA sur un budget estimé de 1 304 000 FCFA');
+      // 210 000 + 114 520 + 25 000 + 110 000 + 5 000 = 1 333 520 FCFA; 342 000 is 25.6 %.
+      expect(region('Total dépensé')).toHaveTextContent('Dépensé 342 000 FCFA sur un budget estimé de 1 333 520 FCFA');
       expect(screen.getByRole('progressbar', { name: 'Part du budget estimé dépensée' })).toHaveAttribute(
         'aria-valuenow',
         '26',
@@ -435,12 +436,12 @@ describe('BudgetView', () => {
         { name: 'Frais IRCC', motif: 'irccFees', amount: 699_600, date: '2026-10-20', note: '' },
         expect.anything(),
       );
-      // 210 000 + 699 600.
-      expect(region('Total dépensé')).toHaveTextContent('Dépensé 909 600 FCFA sur un budget estimé de 1 304 000 FCFA');
+      // 210 000 + 699 600 = 909 600, 68.2 % of 1 333 520.
+      expect(region('Total dépensé')).toHaveTextContent('Dépensé 909 600 FCFA sur un budget estimé de 1 333 520 FCFA');
       expect(within(region('Par motif')).getByRole('listitem', { name: 'Frais IRCC' })).toHaveTextContent('699 600 FCFA');
       expect(screen.getByRole('progressbar', { name: 'Part du budget estimé dépensée' })).toHaveAttribute(
         'aria-valuenow',
-        '70',
+        '68',
       );
     });
 
