@@ -831,12 +831,16 @@
     "error": "We can’t load the draws right now. Try again in a moment.",
     "latest": {
       "label": "Latest draw",
+      "round": "Round #{round}",
+      "scoreLabel": "Minimum CRS score",
+      "facts": {
+        "category": "Category",
+        "invitations": "Invitations issued",
+        "date": "Draw date",
+        "tieBreak": "Tie-breaking rule",
+        "none": "—"
+      },
       "irccLink": "View on IRCC",
-      "invitations": "Invitations sent",
-      "invitationsSub": "candidates invited",
-      "crsMin": "Minimum CRS score",
-      "crsMinSub": "ranking score",
-      "change": "Score change",
       "changeSub": "since the last {group} draw",
       "changeNone": "first draw of this type"
     },
@@ -865,6 +869,7 @@
         "crsMin": "CRS score"
       },
       "new": "New",
+      "phoneLine": "{date} · {count} inv.",
       "emptyTitle": "No draws found",
       "emptyText": "Try another search or filter.",
       "range": "Showing {from} to {to} of {total}",

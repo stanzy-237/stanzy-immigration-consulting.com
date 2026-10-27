@@ -16,7 +16,7 @@ const IRCC = 'https://www.canada.ca/en/immigration-refugees-citizenship/corporat
 const NOW = new Date('2026-10-24T14:00:00Z');
 
 const LATEST: DrawSummary[] = [
-  { round: '450', roundNumber: 450, date: '2026-10-16', typeLabel: 'French-Language proficiency 2026-Version 2', group: 'FRENCH', invitations: 5000, crsMin: 435, irccUrl: `${IRCC}?q=450`, crsChange: 36, tieBreakAt: null },
+  { round: '450', roundNumber: 450, date: '2026-10-16', typeLabel: 'French-Language proficiency 2026-Version 2', group: 'FRENCH', invitations: 5000, crsMin: 435, irccUrl: `${IRCC}?q=450`, crsChange: 36, tieBreakAt: '2026-10-06T21:31:22.000Z' },
   { round: '449', roundNumber: 449, date: '2026-10-15', typeLabel: 'Canadian Experience Class', group: 'CEC', invitations: 2500, crsMin: 519, irccUrl: `${IRCC}?q=449`, crsChange: -2, tieBreakAt: null },
   { round: '448', roundNumber: 448, date: '2026-10-13', typeLabel: 'Provincial Nominee Program', group: 'PNP', invitations: 752, crsMin: 772, irccUrl: `${IRCC}?q=448`, crsChange: 7, tieBreakAt: null },
   { round: '447', roundNumber: 447, date: '2026-10-01', typeLabel: 'Trades Occupations, 2026-Version 3', group: 'CATEGORY', invitations: 3500, crsMin: 476, irccUrl: null, crsChange: null, tieBreakAt: null },
@@ -102,13 +102,19 @@ describe('DrawsView — latest Tirage', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Les tirages, sans détour.' })).toBeInTheDocument();
     const card = within(latestCard());
-    expect(card.getByRole('heading', { name: '#450' })).toBeInTheDocument();
-    expect(card.getByText('16 oct. 2026')).toBeInTheDocument();
-    expect(card.getByText('Connaissance du français')).toBeInTheDocument();
-    expect(card.getByText(/^5\s000$/)).toBeInTheDocument();
-    expect(card.getByText('435')).toBeInTheDocument();
+    expect(card.getByRole('heading', { name: 'Tirage #450' })).toBeInTheDocument();
+    // The minimum score leads, with its change since the last round of the same type.
+    expect(card.getByText('435').nextElementSibling).toHaveTextContent('Score CRS minimum');
     expect(card.getByText('+36')).toBeInTheDocument();
     expect(card.getByText('depuis le dernier tirage Français')).toBeInTheDocument();
+    expect(
+      Object.fromEntries(card.getAllByRole('term').map((term) => [term.textContent, term.nextElementSibling?.textContent])),
+    ).toEqual({
+      Catégorie: 'Connaissance du français',
+      'Invitations émises': '5\u202f000', // French groups digits with a narrow no-break space
+      'Date du tirage': '16 oct. 2026',
+      'Règle de bris d’égalité': '6 oct. 2026 à 21:31 UTC',
+    });
     expect(card.getByRole('link', { name: /Voir sur IRCC/ })).toHaveAttribute('href', `${IRCC}?q=450`);
     expect(screen.getByText('Mis à jour il y a 2 heures')).toBeInTheDocument();
   });
@@ -175,6 +181,16 @@ describe('DrawsView — Historique des tirages', () => {
     expect(within(history()).getByText('26 tirages trouvés')).toBeInTheDocument();
     expect(firstCells()).toEqual(['#450Nouveau', '#449', '#448', '#447', '#446', '#445', '#444', '#443', '#442', '#441']);
     expect(within(history()).getByText('Affichage de 1 à 10 sur 26')).toBeInTheDocument();
+  });
+
+  it('on phones, gives each round its type in short, with its date and invitations under it', () => {
+    render(withIntl(<DrawsView />));
+    const [, cec, pnp, trades] = bodyRows();
+
+    expect(within(pnp!).getByText('PCP')).toBeInTheDocument();
+    expect(within(pnp!).getByText('13 oct. 2026 · 752 inv.')).toBeInTheDocument();
+    expect(within(cec!).getByText('CEC')).toBeInTheDocument();
+    expect(within(trades!).getByText('Métiers')).toBeInTheDocument();
   });
 
   it('searches by type, number, date or score', () => {

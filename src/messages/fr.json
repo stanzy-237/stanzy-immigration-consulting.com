@@ -831,12 +831,16 @@
     "error": "Impossible de charger les tirages pour le moment. Réessayez dans un instant.",
     "latest": {
       "label": "Dernier tirage",
+      "round": "Tirage #{round}",
+      "scoreLabel": "Score CRS minimum",
+      "facts": {
+        "category": "Catégorie",
+        "invitations": "Invitations émises",
+        "date": "Date du tirage",
+        "tieBreak": "Règle de bris d’égalité",
+        "none": "—"
+      },
       "irccLink": "Voir sur IRCC",
-      "invitations": "Invitations envoyées",
-      "invitationsSub": "candidats invités",
-      "crsMin": "Score CRS minimal",
-      "crsMinSub": "score de classement",
-      "change": "Variation du score",
       "changeSub": "depuis le dernier tirage {group}",
       "changeNone": "premier tirage de ce type"
     },
@@ -865,6 +869,7 @@
         "crsMin": "Score CRS"
       },
       "new": "Nouveau",
+      "phoneLine": "{date} · {count} inv.",
       "emptyTitle": "Aucun tirage trouvé",
       "emptyText": "Essayez une autre recherche ou un autre filtre.",
       "range": "Affichage de {from} à {to} sur {total}",
@@ -883,7 +888,7 @@
     "groups": {
       "ALL": "Tous",
       "GENERAL": "Général",
-      "PNP": "PNP",
+      "PNP": "PCP",
       "CEC": "CEC",
       "FRENCH": "Français",
       "CATEGORY": "Catégorie"
