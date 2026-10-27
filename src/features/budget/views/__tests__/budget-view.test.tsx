@@ -356,7 +356,7 @@ describe('BudgetView', () => {
       );
 
       fireEvent.click(edit.getByRole('button', { name: 'Supprimer cette dépense' }));
-      const confirm = await screen.findByRole('alertdialog', { name: 'Supprimer cette dépense ?' });
+      const confirm = await screen.findByRole('alertdialog', { name: 'Supprimer cette dépense ?' });
       expect(confirm).toHaveTextContent('« TEF Canada » sera retirée de votre journal.');
       expect(server.remove.mutate).not.toHaveBeenCalled();
       fireEvent.click(within(confirm).getByRole('button', { name: 'Supprimer' }));
