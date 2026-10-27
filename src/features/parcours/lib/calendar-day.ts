@@ -10,18 +10,16 @@ const parts = (day: string): [number, number, number] => {
   return [year, month, date];
 };
 
+const pad = (n: number) => String(n).padStart(2, '0');
+
 /** The User's today as a calendar day. */
 export function todayOf(now: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
 /** Whole days from `day` to the User's today, never below 0. */
 export function daysSince(day: string, now: Date): number {
-  const [year, month, date] = parts(day);
-  const then = Date.UTC(year, month - 1, date);
-  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  return Math.max(0, Math.round((today - then) / DAY_IN_MS));
+  return daysBetween(day, todayOf(now));
 }
 
 /** Midday on `day` in the User's zone, for formatting without a date shift. */
@@ -58,7 +56,6 @@ export function calendarDuration(from: string, to: string): { months: number; da
   const anchorYear = y1 + Math.floor((m1 - 1 + months) / 12);
   const anchorMonth = ((m1 - 1 + months) % 12) + 1;
   const lastDay = new Date(Date.UTC(anchorYear, anchorMonth, 0)).getUTCDate();
-  const pad = (n: number) => String(n).padStart(2, '0');
   const anchor = `${anchorYear}-${pad(anchorMonth)}-${pad(Math.min(d1, lastDay))}`;
   return { months, days: daysBetween(anchor, to), totalDays };
 }

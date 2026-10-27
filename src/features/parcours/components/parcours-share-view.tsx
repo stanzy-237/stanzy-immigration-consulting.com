@@ -66,7 +66,7 @@ export function ParcoursShareView({
           <AorCounter
             etapes={etapes}
             className="mt-4 border-l-4 border-rouge pl-3"
-            sentenceClassName="block font-heading text-body font-bold text-navy-deep"
+            headlineSize="text-body"
           />
 
           <div className="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">

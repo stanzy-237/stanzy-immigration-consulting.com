@@ -117,7 +117,7 @@ export function ParcoursJournal(): ReactNode {
           <AorCounter
             etapes={etapes}
             className="mb-6 rounded-2xl border-2 border-fog-light border-l-rouge bg-white p-5 shadow-sm"
-            sentenceClassName="block font-heading text-h4 font-bold tracking-tight text-navy-deep"
+            headlineSize="text-h4"
           />
           <EtapeFeed etapes={etapes} onAdd={startAdding} onEdit={edit} />
         </div>

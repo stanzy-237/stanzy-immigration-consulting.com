@@ -7,7 +7,7 @@ import { calendarDuration, todayOf } from '@/features/parcours/lib/calendar-day'
 import type { Etape } from '@/features/parcours/lib/etape-schema';
 
 /**
- * « 4 mois et 12 jours depuis l’AOR — soit 134 jours », counted from the
+ * « 4 mois et 12 jours depuis l’AOR, soit 134 jours », counted from the
  * latest AOR Étape; once a COPR Étape is dated on or after it, the frozen
  * total AOR → COPR. Nothing without an AOR Étape.
  *
@@ -17,11 +17,13 @@ import type { Etape } from '@/features/parcours/lib/etape-schema';
 export function AorCounter({
   etapes,
   className,
-  sentenceClassName,
+  headlineSize,
 }: {
   etapes: Etape[];
+  /** The card or frame around the counter. */
   className?: string;
-  sentenceClassName: string;
+  /** A text-size token for the headline sentence, e.g. `text-h4`. */
+  headlineSize: string;
 }): ReactNode {
   const t = useTranslations('Parcours.aorCounter');
   const now = useNow();
@@ -41,7 +43,11 @@ export function AorCounter({
   // One paragraph, so a screen reader reads the counter as one sentence.
   return (
     <p className={className}>
-      <strong className={sentenceClassName}>{copr ? t('done', { duration }) : t('running', { duration })}</strong>{' '}
+      {/* Joined without cn(): it would drop the custom text-size token. */}
+      <strong className={`block font-heading font-bold tracking-tight text-navy-deep ${headlineSize}`}>
+        {copr ? t('done', { duration }) : t('running', { duration })}
+      </strong>
+      <span className="sr-only">, </span>
       <span className="mt-1 block text-body-sm text-slate">{t('total', { total: totalDays })}</span>
     </p>
   );
