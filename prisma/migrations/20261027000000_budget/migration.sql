@@ -17,7 +17,7 @@ CREATE TABLE "budget_expense" (
 CREATE TABLE "budget_profile" (
     "id" TEXT NOT NULL,
     "accountId" TEXT NOT NULL,
-    "currency" TEXT NOT NULL DEFAULT 'XAF',
+    "currency" TEXT,
     "estimate" JSONB,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

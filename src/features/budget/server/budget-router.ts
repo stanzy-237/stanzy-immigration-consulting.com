@@ -2,8 +2,9 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { DEFAULT_CURRENCY } from '@/features/budget/data/currencies';
-import { BUDGET_LIMIT, MOTIFS } from '@/features/budget/data/motifs';
+import { MOTIFS } from '@/features/budget/data/motifs';
 import {
+  BUDGET_LIMIT,
   budgetAnswersSchema,
   currencySchema,
   expenseInputSchema,
@@ -77,12 +78,15 @@ const toEstimate = (json: unknown): BudgetAnswers | null => {
  */
 export const budgetRouter = createTRPCRouter({
   profile: createTRPCRouter({
-    /** The Account's currency and saved estimate, or null before either was set. */
+    /**
+     * The Account's currency (null until the User picks one) and saved
+     * estimate, or null before either was set.
+     */
     get: protectedProcedure.query(async ({ ctx }) => {
       const row = await ctx.prisma.budgetProfile.findUnique({ where: { accountId: ctx.session.account.id } });
       if (!row) return null;
       return {
-        currency: currencySchema.catch(DEFAULT_CURRENCY).parse(row.currency),
+        currency: row.currency === null ? null : currencySchema.catch(DEFAULT_CURRENCY).parse(row.currency),
         estimate: toEstimate(row.estimate),
       };
     }),
@@ -99,14 +103,14 @@ export const budgetRouter = createTRPCRouter({
         });
       }),
 
-    /** A first save also sets the Account's currency to the estimate's. */
+    /** Leaves the Account's currency alone: the User picks it in « Mes dépenses ». */
     saveEstimate: protectedProcedure
       .input(z.object({ estimate: budgetAnswersSchema }))
       .mutation(async ({ ctx, input }) => {
         const accountId = ctx.session.account.id;
         await ctx.prisma.budgetProfile.upsert({
           where: { accountId },
-          create: { accountId, currency: input.estimate.currency, estimate: input.estimate },
+          create: { accountId, estimate: input.estimate },
           update: { estimate: input.estimate },
         });
       }),

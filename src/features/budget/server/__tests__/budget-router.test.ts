@@ -26,7 +26,7 @@ type ExpenseRow = {
 type ProfileRow = {
   id: string;
   accountId: string;
-  currency: string;
+  currency: string | null;
   estimate: unknown;
   createdAt: Date;
   updatedAt: Date;
@@ -88,7 +88,7 @@ function fakeDatabase() {
       const found = profiles.find((p) => p.accountId === where.accountId);
       if (found) return Object.assign(found, update, { updatedAt: tick() });
       const now = tick();
-      const row = { currency: 'XAF', estimate: null, ...create, id: `prof_${profiles.length + 1}`, createdAt: now, updatedAt: now };
+      const row = { currency: null, estimate: null, ...create, id: `prof_${profiles.length + 1}`, createdAt: now, updatedAt: now };
       profiles.push(row);
       return row;
     },
@@ -227,7 +227,7 @@ describe('budget router', () => {
       ).rejects.toMatchObject({ code: 'BAD_REQUEST' });
     });
 
-    it('saves the estimate and reads it back, in the estimate’s currency for a new profile', async () => {
+    it('saves the estimate and reads it back, leaving the currency for the User to pick', async () => {
       const caller = callerAs(fakeDatabase(), AMINATA);
       const estimate = {
         ...DEFAULT_ANSWERS,
@@ -240,7 +240,7 @@ describe('budget router', () => {
 
       await caller.budget.profile.saveEstimate({ estimate });
 
-      expect(await caller.budget.profile.get()).toEqual({ currency: 'EUR', estimate });
+      expect(await caller.budget.profile.get()).toEqual({ currency: null, estimate });
     });
 
     it('keeps the Account’s currency when an estimate is saved later', async () => {

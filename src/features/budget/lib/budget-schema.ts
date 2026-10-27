@@ -58,6 +58,9 @@ export const DEFAULT_ANSWERS: BudgetAnswers = {
 /** A calendar day, `YYYY-MM-DD`. */
 const calendarDay = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
+/** The most Dépenses one Account can log. */
+export const BUDGET_LIMIT = 500;
+
 /** The largest amount one Dépense may hold, in minor units. */
 export const MAX_EXPENSE_AMOUNT = 1_000_000_000;
 

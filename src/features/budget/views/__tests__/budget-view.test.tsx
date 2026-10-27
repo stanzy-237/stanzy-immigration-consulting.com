@@ -25,7 +25,7 @@ vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi
 type Mutation = { mutate: ReturnType<typeof vi.fn>; isPending: boolean; isSuccess: boolean; reset: () => void };
 const mutation = (): Mutation => ({ mutate: vi.fn(), isPending: false, isSuccess: false, reset: vi.fn() });
 const server = {
-  profile: undefined as { currency: string; estimate: BudgetAnswers | null } | null | undefined,
+  profile: undefined as { currency: string | null; estimate: BudgetAnswers | null } | null | undefined,
   expenses: [] as Expense[],
   setCurrency: mutation(),
   saveEstimate: mutation(),
@@ -240,6 +240,15 @@ describe('BudgetView', () => {
       fireEvent.click(within(dialog).getByRole('button', { name: 'Valider' }));
 
       expect(server.setCurrency.mutate).toHaveBeenCalledWith({ currency: 'XOF' }, expect.anything());
+    });
+
+    it('still asks for a currency when the User only saved an estimate', async () => {
+      signedIn();
+      server.profile = { currency: null, estimate: DEFAULT_ANSWERS };
+      renderView();
+      openJournal();
+
+      expect(await screen.findByRole('dialog', { name: 'Choisissez votre devise' })).toBeInTheDocument();
     });
 
     it('lists Dépenses newest first with the total, subtotals by reason and the budget bar', () => {

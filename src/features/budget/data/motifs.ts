@@ -19,6 +19,3 @@ export const MOTIFS = [
 ] as const;
 
 export type Motif = (typeof MOTIFS)[number];
-
-/** The most Dépenses one Account can log. */
-export const BUDGET_LIMIT = 500;

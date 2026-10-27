@@ -252,9 +252,10 @@ model BudgetProfile {
   id        String   @id @default(cuid())
   accountId String   @unique
   account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  /// ISO code (src/features/budget/data/currencies.ts). Changing it never
-  /// converts the amounts already logged.
-  currency  String   @default("XAF")
+  /// ISO code (src/features/budget/data/currencies.ts), null until the User
+  /// picks one in « Mes dépenses ». Changing it never converts the amounts
+  /// already logged.
+  currency  String?
   /// The estimator's answers (budgetAnswersSchema), or null before one is saved.
   estimate  Json?
   createdAt DateTime @default(now())

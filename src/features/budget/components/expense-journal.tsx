@@ -19,7 +19,7 @@ import { CurrencyDialog } from '@/features/budget/components/currency-dialog';
 import { ExpenseDrawer } from '@/features/budget/components/expense-drawer';
 import { ExpenseForm } from '@/features/budget/components/expense-form';
 import { ExpenseSummary } from '@/features/budget/components/expense-summary';
-import type { Currency } from '@/features/budget/data/currencies';
+import { DEFAULT_CURRENCY, type Currency } from '@/features/budget/data/currencies';
 import { useFormatMoney } from '@/features/budget/hooks/use-format-money';
 import type { BudgetAnswers, Expense, ExpenseInput } from '@/features/budget/lib/budget-schema';
 import { estimateBudget, ratesFor } from '@/features/budget/lib/estimate-budget';
@@ -105,7 +105,7 @@ function Journal({ currency, estimate }: { currency: Currency | null; estimate: 
   const [deleting, setDeleting] = useState<Expense | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const shown = currency ?? 'XAF';
+  const shown = currency ?? DEFAULT_CURRENCY;
   const budget = useMemo(() => budgetIn(estimate, shown), [estimate, shown]);
 
   const done = () => {
