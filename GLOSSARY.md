@@ -87,6 +87,14 @@ _Avoid_: "timeline" (ambiguous with IRCC processing times), "stages" (implies a 
 **Étape** (Milestone):
 One dated entry in a Parcours. Comes from a preset catalogue (ITA, FRAIS/paiement IRCC, DÉPÔT, AOR, VM/MED, IBIO/BIO, SÉCU, ADR, PPR, COPR, ARRIVÉE) or a free-form "Autre étape". Presets currently run from ITA to arrival (the post-invitation application phase).
 
+**Estimation de budget** (Budget estimate):
+The answers a person gives the Budget & dépenses estimator (family, language tests, ECAs, currency and conversion rate) and the prices they edited, with the « Frais à payer » lines they produce. Kept in the browser, and in the Account once a User saves it. IRCC's settlement funds are shown beside it as « Fonds à prouver », never added to its total: that money is kept, not spent.
+_Avoid_: "devis", "budget" alone (ambiguous with what was actually spent).
+
+**Dépense** (Expense):
+One amount a User logged as spent on their procedure: a name, a motif from a fixed list (Test de langue, Frais IRCC, Biométrie, …), an amount in the Account's single currency, a date and an optional note. Private to the Account; changing the currency never converts Dépenses already logged.
+_Avoid_: "transaction", "paiement" (IRCC payments are one kind of Dépense).
+
 **Canal WhatsApp** (WhatsApp channel):
 WhatsApp is a first-class contact/community channel surfaced on the site (e.g. "Rejoindre WhatsApp"), reflecting the francophone-Africa audience. Integration depth TBD.
 

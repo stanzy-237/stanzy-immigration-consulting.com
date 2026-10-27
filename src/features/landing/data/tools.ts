@@ -8,6 +8,7 @@ import {
   Search,
   Timer,
   TrendingUp,
+  Wallet,
 } from 'lucide-react';
 
 export type ToolVariant = 'default' | 'featured' | 'wide';
@@ -93,6 +94,16 @@ export const TOOLS: ReadonlyArray<Tool> = [
     variant: 'wide',
     badgeKeys: ['badgeIrccLive', 'badgeCompare', 'badgeMapleExpressEntry'],
     freeKey: 'freeLive',
+  },
+  {
+    slug: 'budget',
+    icon: Wallet,
+    nameKey: 'budgetName',
+    descKey: 'budgetDesc',
+    href: '/outils/budget',
+    variant: 'default',
+    badgeKeys: ['badgeBudget', 'badgeExpenses'],
+    freeKey: 'free',
   },
   {
     slug: 'cnp',

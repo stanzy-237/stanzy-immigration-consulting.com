@@ -11,6 +11,7 @@ import {
   ListChecks,
   Users,
   Video,
+  Wallet,
 } from 'lucide-react';
 
 export type NavMenuEntry = {
@@ -61,6 +62,12 @@ export const TOOL_ENTRIES: ReadonlyArray<NavMenuEntry> = [
     descKey: 'drawDesc',
     href: '/outils/dernier-tirage',
     maple: true,
+  },
+  {
+    icon: Wallet,
+    labelKey: 'budgetName',
+    descKey: 'budgetDesc',
+    href: '/outils/budget',
   },
   // Not built yet: last, tagged « Bientôt ».
   {
