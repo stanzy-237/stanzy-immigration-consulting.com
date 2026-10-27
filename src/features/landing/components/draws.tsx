@@ -31,13 +31,15 @@ function categoryClasses(group: DrawGroup): string {
   }
 }
 
-// Desktop (lg+) values below are lifted 1:1 from the MagicPath design
-// (`.sn-draws-featured`, `.sn-draws-stat*`, `.sn-draws-card*`); everything
-// without an `lg:` prefix is the mobile/tablet layout and must stay as is.
+/**
+ * The home « Derniers tirages » section. The latest Tirage leads with its
+ * minimum CRS score, then the facts that matter (category, invitations, date,
+ * tie-breaking rule), after the inspiration the product owner shared; earlier
+ * Tirages show their score first, their type in short on phones.
+ */
 export function Draws(): ReactNode {
   const t = useTranslations('Home.Draws');
-  const tStats = useTranslations('Home.Draws.stats');
-  const tTracker = useTranslations('Home.Draws.tracker');
+  const tFacts = useTranslations('Home.Draws.facts');
   const tCardStats = useTranslations('Home.Draws.cardStats');
   const format = useFormatter();
   const text = useDrawText();
@@ -99,164 +101,116 @@ export function Draws(): ReactNode {
 
         {featured && (
           <>
-            {/* Featured draw — stacks on mobile with wrapping stats + tracker;
-                on desktop a single row: round | stats | tracker. */}
-            <article className="mt-8 rounded-2xl border border-white/12 bg-white/6 p-5 shadow-lg backdrop-blur-md md:mt-10 md:rounded-2xl md:p-8 lg:rounded-2xl lg:px-9 lg:py-8 lg:shadow-none">
-              <div className="grid gap-6 md:grid-cols-3 md:items-center md:gap-8 lg:flex lg:items-center lg:justify-between lg:gap-8">
-                {/* Round + tags */}
-                <div className="flex flex-col gap-2.5 lg:gap-0">
-                  <p className="font-sans text-label font-semibold uppercase tracking-widest text-white/40">
-                    {t('latest')}
-                  </p>
-                  <div className="flex items-start gap-1.5 font-heading text-5xl font-bold leading-none text-white sm:text-6xl md:text-[clamp(48px,5vw,72px)] lg:mt-2 lg:gap-0 lg:text-display">
-                    #{featured.round}
-                    <Star
-                      className="mt-1 h-4 w-4 fill-rouge text-rouge lg:ml-1.25 lg:mt-0.75 lg:h-4.5 lg:w-4.5"
-                      strokeWidth={0}
-                    />
-                  </div>
-                  <div className="mt-1 flex flex-wrap gap-2 lg:mt-3.5 lg:gap-1.75">
-                    <span
-                      className={
-                        'inline-flex h-7 items-center rounded-full border px-2.5 font-sans text-xs font-semibold uppercase tracking-wider lg:h-auto lg:py-1.25 lg:text-label lg:normal-case lg:tracking-normal ' +
-                        categoryClasses(featured.group)
-                      }
-                    >
-                      {text.type(featured)}
-                    </span>
-                    <span className="inline-flex h-7 items-center rounded-full border border-white/15 bg-white/10 px-2.5 font-sans text-xs font-medium text-white lg:h-auto lg:py-1.25 lg:text-label lg:font-semibold">
-                      <span className="lg:hidden">{tStats('scoreMinShort', { crs: featured.crsMin })}</span>
-                      <span className="hidden lg:inline">{tStats('scoreMin', { crs: featured.crsMin })}</span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Stats — 3-up grid on mobile with hairline separators between;
-                    flex row with 48px dividers on desktop. */}
-                <div className="grid grid-cols-3 items-start gap-3 border-y border-white/10 py-4 md:border-x md:border-y-0 md:gap-6 md:px-6 md:py-0 lg:flex lg:items-center lg:gap-7 lg:border-0 lg:p-0">
-                  <div className="flex flex-col gap-1 lg:min-w-25">
-                    <span className="font-heading text-xl font-bold leading-none text-white sm:text-2xl md:text-[clamp(28px,2.8vw,36px)] lg:text-4xl">
-                      {format.number(featured.invitations)}
-                    </span>
-                    <span className="text-xs text-white/55 md:text-sm">
-                      {tStats('invitations')}
-                    </span>
-                  </div>
-                  <span aria-hidden={true} className="hidden h-12 w-px bg-white/10 lg:block" />
-                  <div className="flex flex-col gap-1 border-x border-white/10 px-3 md:border-0 md:px-0 lg:min-w-25">
-                    <span className="font-heading text-xl font-bold leading-none text-rouge sm:text-2xl md:text-[clamp(28px,2.8vw,36px)] lg:text-4xl">
-                      {featured.crsMin}
-                    </span>
-                    <span className="text-xs text-white/55 md:text-sm">
-                      {tStats('crsMin')}
-                    </span>
-                  </div>
-                  <span aria-hidden={true} className="hidden h-12 w-px bg-white/10 lg:block" />
-                  <div className="flex flex-col gap-1 lg:min-w-25">
-                    <span className="font-heading text-lg font-bold leading-none text-white sm:text-xl md:text-[clamp(28px,2.8vw,36px)] lg:text-4xl">
-                      {text.shortDate(featured)}
-                    </span>
-                    <span className="text-xs text-white/55 md:text-sm">
-                      {tStats('date')}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Tracker */}
-                <div className="flex min-w-0 flex-col gap-2 lg:min-w-50 lg:gap-0">
-                  <p className="font-sans text-label font-semibold uppercase tracking-widest text-white/40">
-                    {tTracker('label')}
-                  </p>
-                  <div className="relative h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10 lg:mt-2.5 lg:w-50">
-                    <div
-                      aria-hidden={true}
-                      className="h-full w-18/25 rounded-full bg-linear-to-r from-rouge to-rose"
-                    />
-                  </div>
-                  <p className="text-xs text-white/50 lg:mt-2">{tTracker('note')}</p>
-                  <Link
-                    href="/outils/crs"
-                    className="mt-1 inline-flex w-fit items-center text-sm font-semibold text-rouge hover:underline lg:mt-3 lg:text-sm"
+            {/* Latest Tirage: a light card, so the rouge score reads at full
+                contrast. Score on top on phones; score left, facts right on desktop. */}
+            <article
+              aria-labelledby="draws-latest"
+              className="mt-8 rounded-3xl bg-white p-5 text-navy-deep shadow-lg sm:p-7 md:mt-10 lg:grid lg:grid-cols-5 lg:items-center lg:gap-10 lg:p-9"
+            >
+              <div className="lg:col-span-2">
+                <h3 id="draws-latest" className="font-label font-semibold uppercase tracking-widest text-slate">
+                  {t('latest')}
+                </h3>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-blush px-3 py-1 font-label font-bold uppercase tracking-wider text-rouge">
+                    <Star aria-hidden={true} className="size-3 fill-rouge text-rouge" strokeWidth={0} />
+                    {t('roundLabel')} #{featured.round}
+                  </span>
+                  <time
+                    dateTime={featured.date}
+                    className="rounded-full bg-off-white px-3 py-1 font-label font-semibold text-slate"
                   >
-                    {tTracker('cta')}
-                  </Link>
+                    {text.date(featured)}
+                  </time>
                 </div>
+                <p className="mt-6 flex flex-col items-center text-center lg:mt-8 lg:items-start lg:text-left">
+                  <span className="font-heading text-display font-bold leading-none tracking-tight text-rouge lg:text-8xl">
+                    {featured.crsMin}
+                  </span>
+                  <span className="mt-2 text-body-sm text-slate">{t('scoreLabel')}</span>
+                </p>
               </div>
+
+              <dl className="mt-6 grid gap-2.5 border-t border-fog-light pt-6 sm:grid-cols-2 lg:col-span-3 lg:mt-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10">
+                {(
+                  [
+                    ['category', text.type(featured)],
+                    ['invitations', format.number(featured.invitations)],
+                    ['date', text.date(featured)],
+                    ['tieBreak', text.tieBreak(featured) ?? tFacts('none')],
+                  ] as const
+                ).map(([fact, value]) => (
+                  <div key={fact} className="rounded-xl bg-off-white px-4 py-3">
+                    <dt className="font-label font-semibold uppercase tracking-widest text-slate">{tFacts(fact)}</dt>
+                    <dd className="mt-1 font-heading text-body font-bold text-navy-deep">{value}</dd>
+                  </div>
+                ))}
+              </dl>
             </article>
 
-            {/* Past draws — thin horizontal cards on mobile (same rhythm as the
-                small blog cards); full stat cards on desktop. */}
+            {/* Earlier Tirages: the score first. Phones get a slim row with the
+                type in short; wider screens a card with the type in full. */}
             <ul className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
               {rest.map(
                 (draw: DrawSummary): ReactNode => (
                   <li key={draw.round}>
                     <Link
                       href="/outils/dernier-tirage"
-                      className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/4 p-4 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/8 lg:block lg:h-full lg:border-white/9 lg:px-6 lg:py-5.5 lg:hover:border-white/18"
+                      className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-white/4 p-4 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/8 md:block md:h-full md:px-6 md:py-5.5"
                     >
-                      {/* Desktop card — head / category / stats / foot. */}
-                      <div className="hidden lg:block">
+                      {/* Wider screens — head / score / type / invitations. */}
+                      <div className="hidden md:block">
                         <div className="flex items-center justify-between gap-3">
                           <h3 className="font-heading text-base font-semibold text-white">
                             {t('roundLabel')} #{draw.round}
                           </h3>
-                          <time dateTime={draw.date} className="text-xs text-white/40">{text.date(draw)}</time>
+                          <time dateTime={draw.date} className="text-xs text-white/50">
+                            {text.date(draw)}
+                          </time>
                         </div>
+                        <p className="mt-4 flex items-baseline gap-2">
+                          <span className="font-heading text-h2 font-bold leading-none text-white">{draw.crsMin}</span>
+                          <span className="text-xs text-white/55">{tCardStats('crsMin')}</span>
+                        </p>
                         <span
                           className={
-                            'mt-4 inline-block rounded-full border px-2.25 py-1 font-sans text-label font-semibold ' +
+                            'mt-3 inline-block rounded-full border px-2.25 py-1 font-sans text-label font-semibold ' +
                             categoryClasses(draw.group)
                           }
                         >
                           {text.type(draw)}
                         </span>
-                        <div className="mt-5 flex items-center gap-5">
-                          <div className="flex flex-col gap-0.75">
-                            <span className="font-heading text-h3 font-bold leading-none text-white">
-                              {draw.crsMin}
-                            </span>
-                            <span className="text-label text-white/50">
-                              {tCardStats('crsMin')}
-                            </span>
-                          </div>
-                          <span aria-hidden={true} className="h-8.5 w-px bg-white/10" />
-                          <div className="flex flex-col gap-0.75">
-                            <span className="font-heading text-h3 font-bold leading-none text-white">
-                              {format.number(draw.invitations)}
-                            </span>
-                            <span className="text-label text-white/50">
-                              {tCardStats('invitations')}
-                            </span>
-                          </div>
-                        </div>
-                        <p className="mt-5 border-t border-white/8 pt-3.5 text-xs text-white/40">
-                          {t('cardCta')}
+                        <p className="mt-4 border-t border-white/8 pt-3.5 text-sm text-white/70">
+                          {format.number(draw.invitations)} {tCardStats('invitations')}
                         </p>
                       </div>
 
-                      {/* Left thumbnail — round-number badge in the slot where the
-                          blog small card has its image. */}
+                      {/* Phones — the score where the thumbnail would be. */}
                       <span
                         aria-hidden={true}
-                        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/8 font-heading text-base font-bold text-white lg:hidden"
+                        className="flex size-16 shrink-0 flex-col items-center justify-center rounded-xl bg-white/8 md:hidden"
                       >
-                        #{draw.round}
+                        <span className="font-heading text-xl font-bold leading-none text-white">{draw.crsMin}</span>
+                        <span className="mt-1 text-label text-white/55">CRS</span>
                       </span>
-                      <div className="flex min-w-0 flex-1 flex-col gap-1 lg:hidden">
-                        <span
-                          className={
-                            'inline-flex h-5 w-fit items-center rounded-full border px-2 font-sans text-label font-semibold uppercase tracking-wider ' +
-                            categoryClasses(draw.group)
-                          }
-                        >
-                          {text.type(draw)}
-                        </span>
-                        <p className="truncate font-heading text-sm font-semibold text-white transition-colors group-hover:text-rouge">
-                          {draw.crsMin} {tCardStats('crsMin')} ·{' '}
-                          {format.number(draw.invitations)}{' '}
-                          {tCardStats('invitations')}
+                      <div className="flex min-w-0 flex-1 flex-col gap-1 md:hidden">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={
+                              'inline-flex h-5 w-fit items-center rounded-full border px-2 font-sans text-label font-semibold uppercase tracking-wider ' +
+                              categoryClasses(draw.group)
+                            }
+                          >
+                            {text.shortType(draw)}
+                          </span>
+                          <span className="text-xs text-white/50">
+                            {t('roundLabel')} #{draw.round}
+                          </span>
+                        </div>
+                        <p className="truncate font-heading text-sm font-semibold text-white transition-colors group-hover:text-rose">
+                          {format.number(draw.invitations)} {tCardStats('invitations')}
                         </p>
-                        <p className="text-xs text-white/40">{text.date(draw)}</p>
+                        <p className="text-xs text-white/50">{text.date(draw)}</p>
                       </div>
                     </Link>
                   </li>

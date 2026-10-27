@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ConsultationCta } from '@/features/landing/components/consultation-cta';
@@ -18,17 +18,29 @@ vi.mock('@/trpc/react', () => ({
   api: { draws: { latest: { useQuery: () => latest } } },
 }));
 
-const draw = (round: number, typeLabel: string, group: string, crsMin: number) => ({
+const draw = (round: number, typeLabel: string, group: string, crsMin: number, invitations = 1500) => ({
   round: String(round),
   roundNumber: round,
   date: `2026-10-${round - 434}`,
   typeLabel,
   group,
-  invitations: 1500,
+  invitations,
   crsMin,
   irccUrl: null,
   crsChange: null,
+  tieBreakAt: '2026-10-06T21:31:22.000Z',
 });
+const FOUR = [
+  draw(450, 'French-Language proficiency 2026-Version 2', 'FRENCH', 435, 5000),
+  draw(449, 'Canadian Experience Class', 'CEC', 519),
+  draw(448, 'Provincial Nominee Program', 'PNP', 772, 752),
+  draw(447, 'Trades Occupations, 2026-Version 3', 'CATEGORY', 476),
+];
+/** The featured Tirage's facts, term → value, as its description list reads. */
+const factsOf = (card: HTMLElement) =>
+  Object.fromEntries(
+    within(card).getAllByRole('term').map((term) => [term.textContent, term.nextElementSibling?.textContent]),
+  );
 
 describe('Draws', () => {
   it('shows the latest stored round and the three before it', () => {
@@ -50,11 +62,39 @@ describe('Draws', () => {
     expect(screen.getAllByText('15 oct. 2026').length).toBeGreaterThan(0);
   });
 
+  it('leads the latest Tirage with its minimum score, then its category, invitations, date and tie-break', () => {
+    latest.data = { lastSyncedAt: new Date(), draws: FOUR };
+    render(withIntl(<Draws />));
+    const card = screen.getByRole('article', { name: 'Dernier tirage' });
+
+    expect(within(card).getByText('Tirage #450')).toBeInTheDocument();
+    expect(within(card).getByText('435').nextElementSibling).toHaveTextContent('Score CRS minimum');
+    expect(factsOf(card)).toEqual({
+      Catégorie: 'Connaissance du français',
+      'Invitations émises': '5\u202f000', // French groups digits with a narrow no-break space
+      'Date du tirage': '16 oct. 2026',
+      'Règle de bris d’égalité': '6 oct. 2026 à 21:31 UTC',
+    });
+    // The old « vs minimum » bar showed a made-up 72 %.
+    expect(screen.queryByText('Votre score vs minimum')).not.toBeInTheDocument();
+  });
+
+  it('shows each earlier Tirage by its score, its type in short for phones and in full for wider screens', () => {
+    latest.data = { lastSyncedAt: new Date(), draws: FOUR };
+    render(withIntl(<Draws />));
+    const pnp = screen.getByRole('heading', { name: 'Tirage #448' }).closest('a')!;
+
+    expect(within(pnp).getAllByText('772').length).toBeGreaterThan(0);
+    expect(within(pnp).getByText('PCP')).toBeInTheDocument();
+    expect(within(pnp).getByText('Programme des candidats des provinces')).toBeInTheDocument();
+    expect(within(pnp).getAllByText(/752/).length).toBeGreaterThan(0);
+  });
+
   it('labels the minimum score in English at /en', () => {
     latest.data = { lastSyncedAt: new Date(), draws: [draw(450, 'French-Language proficiency 2026-Version 2', 'FRENCH', 435)] };
     render(withIntl(<Draws />, 'en'));
     expect(screen.queryByText(/Score min/)).not.toBeInTheDocument();
-    expect(screen.getAllByText(/Min(imum)? score/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Min(imum)? (CRS )?score/).length).toBeGreaterThan(0);
     expect(screen.getAllByText('French-Language proficiency 2026-Version 2').length).toBeGreaterThan(0);
   });
 
