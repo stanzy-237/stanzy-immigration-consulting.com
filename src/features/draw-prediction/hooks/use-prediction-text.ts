@@ -53,7 +53,7 @@ export function usePredictionText() {
         }
         return sentences.join(' ');
       },
-      data: (p: GroupPrediction) =>
+      basis: (p: GroupPrediction) =>
         t('data', {
           count: p.countInYear,
           scores: p.scores.last.length,

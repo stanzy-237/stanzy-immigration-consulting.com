@@ -102,7 +102,7 @@ export const TOOLS: ReadonlyArray<Tool> = [
     descKey: 'predictionDesc',
     href: '/outils/prochain-tirage',
     variant: 'default',
-    badgeKeys: ['badgeForecast', 'badgeCrsRange'],
+    badgeKeys: ['badgePrediction', 'badgeCrsRange'],
     freeKey: 'free',
   },
   {

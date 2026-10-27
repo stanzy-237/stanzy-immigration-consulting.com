@@ -75,13 +75,14 @@ const predictionFor = (group: DrawGroup, draws = FIXTURE, now = NOW) =>
   predictNextDraws(draws, now).byGroup.find((p) => p.group === group);
 
 describe('predictNextDraws — cadence', () => {
-  it('puts the window between the lower and upper quartile gaps after the last Tirage', () => {
+  it('puts the window between the lower and upper quartile gaps after the last Tirage, at least median ± 2 days', () => {
     // CEC gaps sorted: 12, 14, 14, 16, 20 (the 2025-09-10 one is over 12 months old).
     // Median 14. Lower half 12, 14 → Q1 13; upper half 16, 20 → Q3 18.
-    // Window: 10-20 + 13 = 11-02, 10-20 + 18 = 11-07.
+    // Never narrower than 14 ± 2: start min(13, 12) = 12, end max(18, 16) = 18.
+    // Window: 10-20 + 12 = 11-01, 10-20 + 18 = 11-07.
     const cec = predictionFor('CEC')!;
     expect(cec).toMatchObject({
-      windowStart: '2026-11-02',
+      windowStart: '2026-11-01',
       windowEnd: '2026-11-07',
       gapDays: 14,
       fallback: false,
@@ -94,6 +95,20 @@ describe('predictNextDraws — cadence', () => {
   it('uses the median gap ± 2 days when there are too few gaps for quartiles', () => {
     // PNP gaps 14, 14, 14: median 14. Window 10-20 + 12 = 11-01, 10-20 + 16 = 11-05.
     expect(predictionFor('PNP')).toMatchObject({ windowStart: '2026-11-01', windowEnd: '2026-11-05', gapDays: 14, countInYear: 4 });
+  });
+
+  it('never gives a single day, even for a perfectly regular group', () => {
+    // GENERAL every 7 days, 4 gaps: Q1 = Q3 = 7, widened to 7 ± 2.
+    // Window: 10-22 + 5 = 10-27 to 10-22 + 9 = 10-31.
+    const draws = ['2026-09-24', '2026-10-01', '2026-10-08', '2026-10-15', '2026-10-22'].map((date) => draw('GENERAL', date, 480));
+    expect(predictionFor('GENERAL', draws)).toMatchObject({ windowStart: '2026-10-27', windowEnd: '2026-10-31' });
+  });
+
+  it('starts a window that is already under way today', () => {
+    // GENERAL 10-14, 10-21: gap 7 → 10-21 + 5 = 10-26 to 10-21 + 9 = 10-30.
+    // 10-26 is behind NOW (10-27): the window starts today and is not overdue.
+    const draws = [draw('GENERAL', '2026-10-21', 480), draw('GENERAL', '2026-10-14', 485)];
+    expect(predictionFor('GENERAL', draws)).toMatchObject({ windowStart: '2026-10-27', windowEnd: '2026-10-30', overdue: false });
   });
 
   it('shifts a window that has already passed so it starts today', () => {
@@ -139,7 +154,7 @@ describe('predictNextDraws — scores', () => {
 
 describe('predictNextDraws — featured', () => {
   it('features the group whose window starts first', () => {
-    // Starts: CATEGORY 10-27 (shifted), PNP 11-01, CEC 11-02, FRENCH 11-03.
+    // Starts: CATEGORY 10-27 (shifted), PNP 11-01, CEC 11-01, FRENCH 11-03.
     expect(predictNextDraws(FIXTURE, NOW).featured?.group).toBe('CATEGORY');
   });
 

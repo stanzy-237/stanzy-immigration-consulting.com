@@ -45,7 +45,7 @@ export function GroupPredictions({ predictions }: { predictions: GroupPrediction
                 </td>
                 <td className={`${cell} text-sm text-slate`}>
                   <p>{text.why(p)}</p>
-                  <p className="mt-1 text-xs">{text.data(p)}</p>
+                  <p className="mt-1 text-xs">{text.basis(p)}</p>
                 </td>
               </tr>
             ))}
@@ -65,7 +65,7 @@ export function GroupPredictions({ predictions }: { predictions: GroupPrediction
             </div>
             <p className="mt-1 text-sm font-semibold text-navy-deep">{text.window(p)}</p>
             <p className="mt-2 text-sm text-slate">{text.why(p)}</p>
-            <p className="mt-1 text-xs text-slate">{text.data(p)}</p>
+            <p className="mt-1 text-xs text-slate">{text.basis(p)}</p>
           </li>
         ))}
       </ul>

@@ -141,10 +141,11 @@ describe('DrawsView — Prochain tirage probable', () => {
     const preview = screen.getByRole('region', { name: 'Prochain tirage probable' });
 
     // Worked by hand from the fixture, on 2026-10-24: every group's window has
-    // passed (PNP: 9 Tirages, gaps mostly 3 days, last 10-13 → 10-16), so all
-    // move to today; the tie goes to PNP, with the most Tirages in 12 months.
+    // passed (PNP: 9 Tirages, median gap 3 days, last 10-13 → 3 ± 2 → 10-14
+    // to 10-18), so all move to start today; the tie goes to PNP, with the
+    // most Tirages in 12 months: 10-24 to 10-24 + 4 = 10-28.
     // Its last 5 cut-offs: 772, 500, 503, 506, 509.
-    expect(preview).toHaveTextContent('Prochain tirage probable : PCP, le 24 oct., 500–772');
+    expect(preview).toHaveTextContent('Prochain tirage probable : PCP, entre le 24 et le 28 oct., 500–772');
     expect(within(preview).getByRole('link', { name: /Voir la prédiction/ })).toHaveAttribute('href', '/outils/prochain-tirage');
   });
 });

@@ -47,7 +47,7 @@ export function FeaturedPrediction({ prediction }: { prediction: GroupPrediction
             </p>
           </div>
           <p className="mt-4 text-body-sm text-slate">{text.why(prediction)}</p>
-          <p className="mt-2 text-caption text-slate">{text.data(prediction)}</p>
+          <p className="mt-2 text-caption text-slate">{text.basis(prediction)}</p>
         </div>
       </article>
     </section>

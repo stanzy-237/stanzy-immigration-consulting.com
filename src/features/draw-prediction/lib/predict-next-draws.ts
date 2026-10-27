@@ -98,18 +98,23 @@ export function predictNextDraws(draws: DrawSummary[], now: Date): DrawPredictio
     const fallback = gaps.length === 0;
     const sortedGaps = ascending(gaps);
     const gapDays = fallback ? (pooledGaps.length ? median(pooledGaps) : DEFAULT_GAP_DAYS) : median(sortedGaps);
-    const [low, high] =
-      sortedGaps.length >= MIN_GAPS_FOR_QUARTILES ? quartiles(sortedGaps) : [Math.max(1, gapDays - SPREAD_DAYS), gapDays + SPREAD_DAYS];
+    // The quartiles when there are enough gaps, but never narrower than the
+    // median ± 2 days: a perfectly regular group would otherwise get one day.
+    const [q1, q3] = sortedGaps.length >= MIN_GAPS_FOR_QUARTILES ? quartiles(sortedGaps) : [gapDays, gapDays];
+    const low = Math.max(1, Math.min(q1, gapDays - SPREAD_DAYS));
+    const high = Math.max(q3, gapDays + SPREAD_DAYS);
     const overdue = last + high < today;
-    const shift = overdue ? today - (last + low) : 0;
+    // Passed: moved to start today. Under way: its past days are dropped.
+    const start = Math.max(last + low, today);
+    const end = overdue ? today + high - low : last + high;
 
     const last5 = all.slice(0, SCORE_SAMPLE).map((draw) => draw.crsMin);
     const sortedScores = ascending(last5);
 
     return {
       group,
-      windowStart: isoDay(last + low + shift),
-      windowEnd: isoDay(last + high + shift),
+      windowStart: isoDay(start),
+      windowEnd: isoDay(end),
       overdue,
       lastDraw,
       gapDays,

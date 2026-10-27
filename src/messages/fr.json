@@ -130,7 +130,7 @@
         "badgeTeer": "TEER",
         "badgeNclcClb": "NCLC · CLB",
         "badgeLanguageTests": "TEF · TCF · IELTS",
-        "badgeForecast": "Prédiction",
+        "badgePrediction": "Prédiction",
         "badgeCrsRange": "Fourchette CRS",
         "comingSoon": "Bientôt"
       }
@@ -956,8 +956,7 @@
       "label": "Prochain tirage probable",
       "lead": "Prochain tirage probable :",
       "summary": "{group}, {window}, {min}–{max}",
-      "link": "Voir la prédiction",
-      "window": "{span, select, day {le {end}} month {entre le {startDay} et le {end}} other {entre le {start} et le {end}}}"
+      "link": "Voir la prédiction"
     }
   },
   "DrawPrediction": {

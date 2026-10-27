@@ -16,13 +16,15 @@ import { Link } from '@/i18n/navigation';
 export function NextDrawPreview({ draws }: { draws: DrawSummary[] }): ReactNode {
   const t = useTranslations('Draws.nextDraw');
   const tGroups = useTranslations('Draws.groups');
+  // One wording for a window, shared with the Prochain tirage page.
+  const tPrediction = useTranslations('DrawPrediction');
   const format = useFormatter();
   const featured = useMemo(() => predictNextDraws(draws, new Date()).featured, [draws]);
   if (!featured) return null;
 
   const { start, end, span } = windowDays(featured);
   const dayMonth = (date: Date) => format.dateTime(date, { day: 'numeric', month: 'short', timeZone: 'UTC' });
-  const window = t('window', {
+  const window = tPrediction('window', {
     span,
     start: dayMonth(start),
     startDay: format.dateTime(start, { day: 'numeric', timeZone: 'UTC' }),

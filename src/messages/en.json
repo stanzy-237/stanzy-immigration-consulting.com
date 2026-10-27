@@ -130,7 +130,7 @@
         "badgeTeer": "TEER",
         "badgeNclcClb": "CLB · NCLC",
         "badgeLanguageTests": "TEF · TCF · IELTS",
-        "badgeForecast": "Prediction",
+        "badgePrediction": "Prediction",
         "badgeCrsRange": "CRS range",
         "comingSoon": "Coming soon"
       }
@@ -939,8 +939,7 @@
       "label": "Likely next draw",
       "lead": "Likely next draw:",
       "summary": "{group}, {window}, {min}–{max}",
-      "link": "See the prediction",
-      "window": "{span, select, day {on {end}} other {between {start} and {end}}}"
+      "link": "See the prediction"
     }
   },
   "DrawPrediction": {
