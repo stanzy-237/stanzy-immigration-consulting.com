@@ -53,7 +53,9 @@
         "cnpName": "Recherche CNP",
         "cnpDesc": "Trouvez votre code de profession canadien",
         "nclcName": "NCLC / CLB",
-        "nclcDesc": "Votre niveau de langue à partir de vos notes"
+        "nclcDesc": "Votre niveau de langue à partir de vos notes",
+        "budgetName": "Budget & dépenses",
+        "budgetDesc": "Estimez vos frais et suivez vos dépenses"
       },
       "Services": {
         "consultationName": "Consultation privée",
@@ -103,7 +105,9 @@
         "cnpName": "Recherche code CNP",
         "cnpDesc": "Trouvez le code professionnel qui correspond à votre métier. Indispensable pour tout dossier d'immigration au Canada.",
         "nclcName": "Calculateur NCLC / CLB",
-        "nclcDesc": "Convertissez vos résultats TEF, TCF, IELTS, CELPIP ou PTE en niveaux NCLC/CLB, avec vos points CRS et votre admissibilité Entrée Express."
+        "nclcDesc": "Convertissez vos résultats TEF, TCF, IELTS, CELPIP ou PTE en niveaux NCLC/CLB, avec vos points CRS et votre admissibilité Entrée Express.",
+        "budgetName": "Budget & dépenses",
+        "budgetDesc": "Estimez le coût de votre Entrée Express — frais IRCC, tests, WES, fonds à prouver — puis notez chaque dépense dans votre devise."
       },
       "Badges": {
         "free": "Gratuit",
@@ -126,7 +130,9 @@
         "badgeTeer": "TEER",
         "badgeNclcClb": "NCLC · CLB",
         "badgeLanguageTests": "TEF · TCF · IELTS",
-        "comingSoon": "Bientôt"
+        "comingSoon": "Bientôt",
+        "badgeBudget": "Frais IRCC",
+        "badgeExpenses": "Journal de dépenses"
       }
     },
     "BlogRow": {
@@ -1170,6 +1176,149 @@
       "title": "Après l’ITA, chaque jour compte.",
       "text": "Preuves d’expérience, de fonds, certificats de police, examen médical : une demande incomplète peut être refusée. Stanzy vous aide à tout réunir et à déposer à temps. Suivez aussi chaque étape de votre dossier dans votre parcours.",
       "secondary": "Suivre mon parcours"
+    }
+  },
+  "Budget": {
+    "eyebrow": "Budget & dépenses",
+    "title": "Combien coûte votre Entrée Express ?",
+    "lead": "Estimez vos frais avant de vous lancer, puis notez chaque dépense pour savoir ce que votre projet vous a vraiment coûté.",
+    "tabs": {
+      "label": "Budget & dépenses",
+      "estimate": "Estimer mon budget",
+      "expenses": "Mes dépenses"
+    },
+    "estimator": {
+      "family": "Votre famille",
+      "spouse": "Mon époux ou conjoint de fait vient avec moi",
+      "children": "Enfants à charge qui viennent avec moi",
+      "tests": "Tests et diplômes",
+      "test": "Votre test de langue",
+      "testDone": "Déjà passé",
+      "spouseTest": "Mon époux ou conjoint passe aussi un test",
+      "ecaPrincipal": "J’ai besoin d’une évaluation de mes diplômes (EDE, WES)",
+      "ecaSpouse": "Mon époux ou conjoint a besoin d’une EDE",
+      "fundsExempt": "Je n’ai pas à prouver de fonds (CEC ou offre d’emploi valide)",
+      "currencySection": "Votre devise",
+      "currency": "Devise d’affichage",
+      "rate": "Taux de conversion : 1 CAD en {currency}",
+      "rateHint": "Taux indicatif du {date}. Mettez celui de votre banque.",
+      "rateReset": "Revenir au taux indicatif",
+      "fees": "Frais à payer",
+      "feesLead": "Les frais IRCC sont officiels. Les autres lignes sont des estimations : adaptez-les aux prix de votre pays.",
+      "official": "Officiel",
+      "times": "{count} × {unit}",
+      "familyCap": "plafonné à 170 $ CA par famille",
+      "source": "Source : <src>{source}</src> · vérifié le {date}",
+      "price": "Prix par personne : {line} ({currency})",
+      "resetLine": "Rétablir le prix par défaut de {line}",
+      "feesTotal": "Total des frais",
+      "funds": "Fonds à prouver",
+      "fundsFor": "{persons, plural, one {Pour # personne} other {Pour # personnes}}",
+      "fundsInCad": "soit {cad}",
+      "fundsNote": "Ce n’est pas une dépense : c’est de l’argent que vous gardez et que vous montrez à IRCC. Il ne s’ajoute pas aux frais.",
+      "fundsExemptText": "Vous n’avez pas à prouver de fonds : c’est le cas des candidats CEC et des titulaires d’une offre d’emploi valide.",
+      "fundsSource": "Source : <src>{source}</src> · tableau en vigueur le {date}",
+      "save": "Enregistrer dans mon compte",
+      "saved": "Estimation enregistrée dans votre compte.",
+      "saveError": "L’estimation n’a pas pu être enregistrée. Réessayez.",
+      "keptHere": "Votre estimation est gardée dans ce navigateur."
+    },
+    "lines": {
+      "processing": "Frais de traitement IRCC (adulte)",
+      "rprf": "Frais de résidence permanente (RPRF)",
+      "childProcessing": "Frais de traitement IRCC (enfant à charge)",
+      "biometrics": "Biométrie",
+      "eca": "Évaluation des diplômes (WES)",
+      "languageTest": "Test de langue",
+      "medical": "Visite médicale",
+      "police": "Certificat de police",
+      "passport": "Passeport",
+      "photos": "Photos d’identité"
+    },
+    "currencies": {
+      "XAF": "Franc CFA BEAC (XAF)",
+      "XOF": "Franc CFA BCEAO (XOF)",
+      "CAD": "Dollar canadien (CAD)",
+      "EUR": "Euro (EUR)",
+      "USD": "Dollar américain (USD)",
+      "MAD": "Dirham marocain (MAD)",
+      "TND": "Dinar tunisien (TND)",
+      "DZD": "Dinar algérien (DZD)"
+    },
+    "motifs": {
+      "languageTest": "Test de langue",
+      "eca": "Évaluation des diplômes (ECA)",
+      "irccFees": "Frais IRCC",
+      "rprf": "Frais de RP (RPRF)",
+      "biometrics": "Biométrie",
+      "medical": "Visite médicale",
+      "police": "Certificat de police",
+      "translations": "Traductions",
+      "passport": "Passeport",
+      "courier": "Envoi / courrier",
+      "flight": "Billet d’avion",
+      "consultant": "Accompagnement / consultant",
+      "other": "Autre"
+    },
+    "journal": {
+      "signedOutTitle": "Connectez-vous pour tenir votre journal de dépenses",
+      "signedOutText": "Le journal garde chaque montant dans votre compte, en privé, pour le retrouver sur tous vos appareils. L’estimation, elle, reste gratuite et sans compte.",
+      "signIn": "Se connecter",
+      "loading": "Chargement de vos dépenses…",
+      "currencyLabel": "Devise du journal : {currency}",
+      "changeCurrency": "Changer de devise",
+      "total": "Total dépensé",
+      "progress": "Dépensé {spent} sur un budget estimé de {budget}",
+      "progressLabel": "Part du budget estimé dépensée",
+      "noEstimate": "Enregistrez une estimation dans votre compte pour suivre vos dépenses face à votre budget.",
+      "byMotif": "Par motif",
+      "listTitle": "Dépenses enregistrées",
+      "empty": {
+        "title": "Aucune dépense enregistrée",
+        "text": "Ajoutez votre première dépense : test de langue, WES, frais IRCC…"
+      },
+      "edit": "Modifier {name}",
+      "fab": "Ajouter une dépense"
+    },
+    "currencyDialog": {
+      "firstTitle": "Choisissez votre devise",
+      "firstText": "Tous les montants de votre journal seront dans cette devise.",
+      "changeTitle": "Changer de devise",
+      "warning": "Les montants déjà saisis ne sont pas convertis : ils garderont leurs chiffres dans la nouvelle devise.",
+      "currency": "Devise",
+      "confirm": "Valider",
+      "cancel": "Annuler",
+      "error": "La devise n’a pas pu être enregistrée. Réessayez."
+    },
+    "form": {
+      "addTitle": "Ajouter une dépense",
+      "editTitle": "Modifier la dépense",
+      "name": "Nom de la dépense",
+      "namePlaceholder": "Ex. : TEF Canada, WES, frais de RP…",
+      "motif": "Motif",
+      "amount": "Montant ({currency})",
+      "date": "Date",
+      "note": "Note (optionnel)",
+      "notePlaceholder": "Reçu, numéro de transaction, détails…",
+      "submitAdd": "Ajouter la dépense",
+      "submitEdit": "Enregistrer les modifications",
+      "cancelEdit": "Annuler",
+      "closeDrawer": "Fermer le panneau",
+      "delete": "Supprimer cette dépense",
+      "errors": {
+        "name": "Donnez un nom à la dépense.",
+        "amount": "Indiquez un montant supérieur à zéro.",
+        "date": "Indiquez la date de la dépense.",
+        "future": "La date ne peut pas être dans le futur.",
+        "save": "La dépense n’a pas pu être enregistrée. Réessayez.",
+        "limit": "Vous avez atteint la limite de 500 dépenses."
+      }
+    },
+    "deleteConfirm": {
+      "title": "Supprimer cette dépense ?",
+      "text": "« {name} » sera retirée de votre journal. Cette action est définitive.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
     }
   }
 }

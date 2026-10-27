@@ -53,7 +53,9 @@
         "cnpName": "NOC/CNP lookup",
         "cnpDesc": "Find your Canadian occupation code",
         "nclcName": "CLB / NCLC",
-        "nclcDesc": "Your language level from your scores"
+        "nclcDesc": "Your language level from your scores",
+        "budgetName": "Budget & expenses",
+        "budgetDesc": "Estimate your fees and track your expenses"
       },
       "Services": {
         "consultationName": "Private consultation",
@@ -103,7 +105,9 @@
         "cnpName": "NOC code lookup",
         "cnpDesc": "Find the occupation code that matches your job. Essential for any Canadian immigration file.",
         "nclcName": "CLB / NCLC calculator",
-        "nclcDesc": "Turn your TEF, TCF, IELTS, CELPIP or PTE results into CLB/NCLC levels, with your CRS points and Express Entry eligibility."
+        "nclcDesc": "Turn your TEF, TCF, IELTS, CELPIP or PTE results into CLB/NCLC levels, with your CRS points and Express Entry eligibility.",
+        "budgetName": "Budget & expenses",
+        "budgetDesc": "Estimate what your Express Entry costs — IRCC fees, tests, WES, proof of funds — then log every expense in your currency."
       },
       "Badges": {
         "free": "Free",
@@ -126,7 +130,9 @@
         "badgeTeer": "TEER",
         "badgeNclcClb": "CLB · NCLC",
         "badgeLanguageTests": "TEF · TCF · IELTS",
-        "comingSoon": "Coming soon"
+        "comingSoon": "Coming soon",
+        "badgeBudget": "IRCC fees",
+        "badgeExpenses": "Expense log"
       }
     },
     "BlogRow": {
@@ -1153,6 +1159,149 @@
       "title": "After the ITA, every day counts.",
       "text": "Proof of work experience and funds, police certificates, the medical exam: an incomplete application can be refused. Stanzy helps you gather everything and submit on time. You can also track each step of your file in your journey.",
       "secondary": "Track my journey"
+    }
+  },
+  "Budget": {
+    "eyebrow": "Budget & expenses",
+    "title": "What will your Express Entry cost?",
+    "lead": "Estimate your fees before you start, then log every expense to know what your project really cost.",
+    "tabs": {
+      "label": "Budget & expenses",
+      "estimate": "Estimate my budget",
+      "expenses": "My expenses"
+    },
+    "estimator": {
+      "family": "Your family",
+      "spouse": "My spouse or common-law partner comes with me",
+      "children": "Dependent children coming with me",
+      "tests": "Tests and credentials",
+      "test": "Your language test",
+      "testDone": "Already taken",
+      "spouseTest": "My spouse or partner also takes a test",
+      "ecaPrincipal": "I need an educational credential assessment (ECA, WES)",
+      "ecaSpouse": "My spouse or partner needs an ECA",
+      "fundsExempt": "I don’t have to prove funds (CEC or valid job offer)",
+      "currencySection": "Your currency",
+      "currency": "Display currency",
+      "rate": "Exchange rate: 1 CAD in {currency}",
+      "rateHint": "Indicative rate as of {date}. Use your bank’s.",
+      "rateReset": "Back to the indicative rate",
+      "fees": "Fees to pay",
+      "feesLead": "IRCC fees are official. The other lines are estimates: adjust them to prices in your country.",
+      "official": "Official",
+      "times": "{count} × {unit}",
+      "familyCap": "capped at CA$170 per family",
+      "source": "Source: <src>{source}</src> · checked {date}",
+      "price": "Price per person: {line} ({currency})",
+      "resetLine": "Restore the default price of {line}",
+      "feesTotal": "Total fees",
+      "funds": "Proof of funds",
+      "fundsFor": "{persons, plural, one {For # person} other {For # persons}}",
+      "fundsInCad": "i.e. {cad}",
+      "fundsNote": "This is not an expense: it is money you keep and show IRCC. It is not added to the fees.",
+      "fundsExemptText": "You don’t have to prove funds: that is the case for CEC candidates and holders of a valid job offer.",
+      "fundsSource": "Source: <src>{source}</src> · table in force since {date}",
+      "save": "Save to my account",
+      "saved": "Estimate saved to your account.",
+      "saveError": "The estimate could not be saved. Try again.",
+      "keptHere": "Your estimate is kept in this browser."
+    },
+    "lines": {
+      "processing": "IRCC processing fee (adult)",
+      "rprf": "Right of permanent residence fee (RPRF)",
+      "childProcessing": "IRCC processing fee (dependent child)",
+      "biometrics": "Biometrics",
+      "eca": "Credential assessment (WES)",
+      "languageTest": "Language test",
+      "medical": "Medical exam",
+      "police": "Police certificate",
+      "passport": "Passport",
+      "photos": "ID photos"
+    },
+    "currencies": {
+      "XAF": "Central African CFA franc (XAF)",
+      "XOF": "West African CFA franc (XOF)",
+      "CAD": "Canadian dollar (CAD)",
+      "EUR": "Euro (EUR)",
+      "USD": "US dollar (USD)",
+      "MAD": "Moroccan dirham (MAD)",
+      "TND": "Tunisian dinar (TND)",
+      "DZD": "Algerian dinar (DZD)"
+    },
+    "motifs": {
+      "languageTest": "Language test",
+      "eca": "Credential assessment (ECA)",
+      "irccFees": "IRCC fees",
+      "rprf": "PR fee (RPRF)",
+      "biometrics": "Biometrics",
+      "medical": "Medical exam",
+      "police": "Police certificate",
+      "translations": "Translations",
+      "passport": "Passport",
+      "courier": "Shipping / courier",
+      "flight": "Plane ticket",
+      "consultant": "Support / consultant",
+      "other": "Other"
+    },
+    "journal": {
+      "signedOutTitle": "Sign in to keep your expense log",
+      "signedOutText": "The log keeps every amount in your account, privately, on all your devices. The estimate stays free, no account needed.",
+      "signIn": "Sign in",
+      "loading": "Loading your expenses…",
+      "currencyLabel": "Log currency: {currency}",
+      "changeCurrency": "Change currency",
+      "total": "Total spent",
+      "progress": "Spent {spent} of an estimated budget of {budget}",
+      "progressLabel": "Share of the estimated budget spent",
+      "noEstimate": "Save an estimate to your account to track your expenses against your budget.",
+      "byMotif": "By reason",
+      "listTitle": "Logged expenses",
+      "empty": {
+        "title": "No expenses logged",
+        "text": "Add your first expense: language test, WES, IRCC fees…"
+      },
+      "edit": "Edit {name}",
+      "fab": "Add an expense"
+    },
+    "currencyDialog": {
+      "firstTitle": "Choose your currency",
+      "firstText": "Every amount in your log will be in this currency.",
+      "changeTitle": "Change currency",
+      "warning": "Amounts already entered are not converted: they keep their numbers in the new currency.",
+      "currency": "Currency",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "error": "The currency could not be saved. Try again."
+    },
+    "form": {
+      "addTitle": "Add an expense",
+      "editTitle": "Edit the expense",
+      "name": "Expense name",
+      "namePlaceholder": "E.g. TEF Canada, WES, PR fee…",
+      "motif": "Reason",
+      "amount": "Amount ({currency})",
+      "date": "Date",
+      "note": "Note (optional)",
+      "notePlaceholder": "Receipt, transaction number, details…",
+      "submitAdd": "Add the expense",
+      "submitEdit": "Save changes",
+      "cancelEdit": "Cancel",
+      "closeDrawer": "Close the panel",
+      "delete": "Delete this expense",
+      "errors": {
+        "name": "Give the expense a name.",
+        "amount": "Enter an amount above zero.",
+        "date": "Enter the date of the expense.",
+        "future": "The date can’t be in the future.",
+        "save": "The expense could not be saved. Try again.",
+        "limit": "You have reached the limit of 500 expenses."
+      }
+    },
+    "deleteConfirm": {
+      "title": "Delete this expense?",
+      "text": "“{name}” will be removed from your log. This cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
     }
   }
 }

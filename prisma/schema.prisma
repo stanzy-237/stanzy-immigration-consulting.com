@@ -44,6 +44,8 @@ model Account {
   crsSimulations    CrsSimulation[]
   parcoursEtapes    ParcoursEtape[]
   pushSubscriptions PushSubscription[]
+  budgetExpenses    BudgetExpense[]
+  budgetProfile     BudgetProfile?
 
   @@map("account")
 }
@@ -221,4 +223,42 @@ model ParcoursEtape {
 
   @@index([accountId, date])
   @@map("parcours_etape")
+}
+
+// ─── Budget & dépenses (#62) ─────────────────────────────────────────────────
+
+/// One amount an Account logged as spent on its procedure (GLOSSARY: Dépense).
+model BudgetExpense {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name      String
+  /// Reason key (src/features/budget/data/motifs.ts), never a label.
+  motif     String
+  /// In the Account's currency's smallest unit: cents, or whole francs CFA.
+  amount    Int
+  /// The calendar day the money was spent; no time, no zone.
+  date      DateTime @db.Date
+  note      String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([accountId, date])
+  @@map("budget_expense")
+}
+
+/// An Account's budget settings: its currency and its Estimation de budget.
+model BudgetProfile {
+  id        String   @id @default(cuid())
+  accountId String   @unique
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  /// ISO code (src/features/budget/data/currencies.ts). Changing it never
+  /// converts the amounts already logged.
+  currency  String   @default("XAF")
+  /// The estimator's answers (budgetAnswersSchema), or null before one is saved.
+  estimate  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("budget_profile")
 }
