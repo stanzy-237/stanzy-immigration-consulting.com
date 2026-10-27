@@ -24,11 +24,15 @@ export type Tool = {
   freeKey: string;
   // false: the tool has a page but no card on the home grid.
   listed?: false;
+  // The page is a placeholder: the card says « Bientôt » instead of its
+  // freeness pill. Keep these last.
+  comingSoon?: true;
 };
 
 // Seven cards in the mosaic order from the MagicPath design
 // ("Stanzy Immigration — Navigation", revision 460790112943476736):
 // row 1: [featured] [·] [·]   row 2: [wide] [·]   row 3: [wide] [·]
+// Tools not built yet (`comingSoon`) come last.
 export const TOOLS: ReadonlyArray<Tool> = [
   {
     slug: 'timeline',
@@ -99,6 +103,7 @@ export const TOOLS: ReadonlyArray<Tool> = [
     variant: 'default',
     badgeKeys: ['badgeCnp2021', 'badgeTeer'],
     freeKey: 'free',
+    comingSoon: true,
   },
   // The Coffre-fort's card made way for the NCLC / CLB calculator; its
   // placeholder page stays.
@@ -112,5 +117,6 @@ export const TOOLS: ReadonlyArray<Tool> = [
     badgeKeys: ['badgeCrsProfile', 'badgeAnalysis'],
     freeKey: 'free',
     listed: false,
+    comingSoon: true,
   },
 ] as const;

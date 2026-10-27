@@ -118,7 +118,7 @@ export function SiteNav(): ReactNode {
   return (
     <nav
       aria-label={t('ariaLabel')}
-      className="bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-surface/80"
+      className="bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-backdrop-filter:bg-surface/80"
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 md:px-6">
         <Link
@@ -161,6 +161,7 @@ export function SiteNav(): ReactNode {
                 getName={(e: NavMenuEntry): string => tTools(e.labelKey)}
                 getDesc={(e: NavMenuEntry): string => tTools(e.descKey)}
                 mapleLabel={t('liveMarker')}
+                comingSoonLabel={t('comingSoon')}
                 onNavigate={closeDropdown}
               />
             }
@@ -255,6 +256,7 @@ export function SiteNav(): ReactNode {
                 label={t('tools')}
                 entries={TOOL_ENTRIES}
                 getName={(e: NavMenuEntry): string => tTools(e.labelKey)}
+                comingSoonLabel={t('comingSoon')}
                 onNavigate={closeMobile}
               />
               <MobileSection
@@ -461,8 +463,18 @@ type DropdownPanelProps = {
   getName: (entry: NavMenuEntry) => string;
   getDesc: (entry: NavMenuEntry) => string;
   mapleLabel?: string;
+  comingSoonLabel?: string;
   onNavigate: () => void;
 };
+
+/** « Bientôt »: the tool's page is a placeholder for now. */
+function ComingSoonTag({ label }: { label: string }): ReactNode {
+  return (
+    <span className="rounded-full border border-fog bg-ice-blue px-1.5 py-0.5 font-label font-bold uppercase tracking-wider text-navy-deep">
+      {label}
+    </span>
+  );
+}
 
 function DropdownPanel({
   id,
@@ -471,6 +483,7 @@ function DropdownPanel({
   getName,
   getDesc,
   mapleLabel,
+  comingSoonLabel,
   onNavigate,
 }: DropdownPanelProps): ReactNode {
   return (
@@ -478,7 +491,7 @@ function DropdownPanel({
       id={id}
       aria-hidden={!open}
       className={cn(
-        'absolute left-0 top-full z-50 mt-1 w-[32rem] origin-left rounded-xl border border-fog bg-surface p-2 shadow-lg transition-[opacity,filter,transform] duration-200 ease-out',
+        'absolute left-0 top-full z-50 mt-1 w-128 origin-left rounded-xl border border-fog bg-surface p-2 shadow-lg transition duration-200 ease-out',
         'grid gap-1 md:grid-cols-2',
         open
           ? 'pointer-events-auto opacity-100 blur-0 translate-x-0'
@@ -506,6 +519,9 @@ function DropdownPanel({
                     aria-label={mapleLabel}
                     className="text-rouge h-3.5 w-3.5"
                   />
+                ) : null}
+                {entry.comingSoon && comingSoonLabel ? (
+                  <ComingSoonTag label={comingSoonLabel} />
                 ) : null}
               </span>
               <span className="text-navy-deep/60 text-xs">{getDesc(entry)}</span>
@@ -543,6 +559,7 @@ type MobileGroupProps = {
   label: string;
   entries: ReadonlyArray<NavMenuEntry>;
   getName: (entry: NavMenuEntry) => string;
+  comingSoonLabel?: string;
   onNavigate: () => void;
 };
 
@@ -550,6 +567,7 @@ function MobileGroup({
   label,
   entries,
   getName,
+  comingSoonLabel,
   onNavigate,
 }: MobileGroupProps): ReactNode {
   return (
@@ -564,9 +582,12 @@ function MobileGroup({
               <Link
                 href={entry.href}
                 onClick={onNavigate}
-                className="text-navy-deep block px-6 py-2 text-sm"
+                className="text-navy-deep flex items-center gap-2 px-6 py-2 text-sm"
               >
                 {getName(entry)}
+                {entry.comingSoon && comingSoonLabel ? (
+                  <ComingSoonTag label={comingSoonLabel} />
+                ) : null}
               </Link>
             </li>
           ),

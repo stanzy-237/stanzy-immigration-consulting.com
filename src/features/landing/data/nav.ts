@@ -20,6 +20,8 @@ export type NavMenuEntry = {
   href: string;
   maple?: boolean;
   separator?: boolean;
+  // The page is a placeholder: the entry is tagged « Bientôt ». Keep these last.
+  comingSoon?: true;
 };
 
 export const TOOL_ENTRIES: ReadonlyArray<NavMenuEntry> = [
@@ -28,12 +30,6 @@ export const TOOL_ENTRIES: ReadonlyArray<NavMenuEntry> = [
     labelKey: 'timelineName',
     descKey: 'timelineDesc',
     href: '/outils/timeline',
-  },
-  {
-    icon: ShieldCheck,
-    labelKey: 'cloudsName',
-    descKey: 'cloudsDesc',
-    href: '/outils/coffre-fort',
   },
   {
     icon: Hourglass,
@@ -66,11 +62,20 @@ export const TOOL_ENTRIES: ReadonlyArray<NavMenuEntry> = [
     href: '/outils/dernier-tirage',
     maple: true,
   },
+  // Not built yet: last, tagged « Bientôt ».
   {
     icon: FileSearch,
     labelKey: 'cnpName',
     descKey: 'cnpDesc',
     href: '/outils/cnp',
+    comingSoon: true,
+  },
+  {
+    icon: ShieldCheck,
+    labelKey: 'cloudsName',
+    descKey: 'cloudsDesc',
+    href: '/outils/coffre-fort',
+    comingSoon: true,
   },
 ] as const;
 

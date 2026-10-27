@@ -41,6 +41,17 @@ describe('ToolsGrid', () => {
     expect(screen.queryByRole('link', { name: /Clouds/i })).not.toBeInTheDocument();
   });
 
+  it('marks Recherche CNP as coming soon, last in the grid', () => {
+    render(withIntl(<ToolsGrid />));
+    const cards = screen.getAllByRole('link', { name: /^Ouvrir l'outil/ });
+    const cnp = screen.getByRole('link', { name: /Recherche code CNP — bientôt disponible/ });
+
+    expect(within(cnp).getByText('Bientôt')).toBeInTheDocument();
+    expect(within(cnp).queryByText('Gratuit')).not.toBeInTheDocument();
+    expect(cards.at(-1)).toBe(cnp);
+    for (const card of cards.slice(0, -1)) expect(within(card).queryByText('Bientôt')).toBeNull();
+  });
+
   it('surfaces the live-data badge on the Dernier tirage card', () => {
     render(withIntl(<ToolsGrid />));
     const drawLink = screen.getByRole('link', {
@@ -51,7 +62,8 @@ describe('ToolsGrid', () => {
 
   it('shows the footer tally line', () => {
     render(withIntl(<ToolsGrid />));
-    expect(screen.getByText(/7 outils/)).toBeInTheDocument();
+    // Recherche CNP is not built yet, so it is not counted.
+    expect(screen.getByText('6 outils')).toBeInTheDocument();
     expect(
       screen.getByText(/Aucune inscription · 100% gratuits/),
     ).toBeInTheDocument();
