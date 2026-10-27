@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { DrawAlerts } from '@/features/draws/components/draw-alerts';
 import { DrawsHistory } from '@/features/draws/components/draws-history';
 import { LatestDrawCard } from '@/features/draws/components/latest-draw-card';
+import { NextDrawPreview } from '@/features/draws/components/next-draw-preview';
 import { api } from '@/trpc/react';
 
 /** The Derniers tirages page body: hero with the latest Tirage, alerts, history. */
@@ -36,6 +37,7 @@ export function DrawsBoard(): ReactNode {
           {newest && <LatestDrawCard draw={newest} />}
         </div>
       </header>
+      {list.data && list.data.length > 0 && <NextDrawPreview draws={list.data} />}
       <DrawAlerts />
       {list.data && list.data.length > 0 && <DrawsHistory draws={list.data} />}
     </>

@@ -17,7 +17,7 @@ describe('ToolsGrid', () => {
     );
   });
 
-  it('renders all seven tools linking to their routes', () => {
+  it('renders every listed tool linking to its route', () => {
     render(withIntl(<ToolsGrid />));
     const expected: ReadonlyArray<[RegExp, string]> = [
       [/Timeline Immigration/i, '/outils/timeline'],
@@ -26,6 +26,7 @@ describe('ToolsGrid', () => {
       [/Calculateur de 67 points/i, '/outils/67-points'],
       [/Calculateur CRS/i, '/outils/crs'],
       [/Dernier tirage Entrée Express/i, '/outils/dernier-tirage'],
+      [/Prédiction du prochain tirage/i, '/outils/prochain-tirage'],
       [/Recherche code CNP/i, '/outils/cnp'],
     ];
     for (const [name, href] of expected) {
@@ -63,7 +64,7 @@ describe('ToolsGrid', () => {
   it('shows the footer tally line', () => {
     render(withIntl(<ToolsGrid />));
     // Recherche CNP is not built yet, so it is not counted.
-    expect(screen.getByText('6 outils')).toBeInTheDocument();
+    expect(screen.getByText('7 outils')).toBeInTheDocument();
     expect(
       screen.getByText(/Aucune inscription · 100% gratuits/),
     ).toBeInTheDocument();

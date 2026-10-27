@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
+  CalendarClock,
   ClipboardList,
   Clock,
   Cloud,
@@ -93,6 +94,16 @@ export const TOOLS: ReadonlyArray<Tool> = [
     variant: 'wide',
     badgeKeys: ['badgeIrccLive', 'badgeCompare', 'badgeMapleExpressEntry'],
     freeKey: 'freeLive',
+  },
+  {
+    slug: 'prediction',
+    icon: CalendarClock,
+    nameKey: 'predictionName',
+    descKey: 'predictionDesc',
+    href: '/outils/prochain-tirage',
+    variant: 'default',
+    badgeKeys: ['badgeForecast', 'badgeCrsRange'],
+    freeKey: 'free',
   },
   {
     slug: 'cnp',
