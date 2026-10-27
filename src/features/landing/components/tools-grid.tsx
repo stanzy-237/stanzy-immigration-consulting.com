@@ -6,16 +6,21 @@ import { Link } from "@/i18n/navigation";
 
 import { TOOLS, type Tool } from "@/features/landing/data/tools";
 
+/** Tools a visitor can use today: on the grid and not « Bientôt ». */
+const AVAILABLE_TOOLS = TOOLS.filter(
+  (tool: Tool): boolean => tool.listed !== false && !tool.comingSoon,
+).length;
+
 function cardClasses(variant: Tool["variant"]): string {
   // Shared card chrome: pulled from `.sn-tc` in the MagicPath design
   // (white bg, rounded 20px, 1.5px border #E2E8F0, 28px pad, hover lift).
   const base =
     "group relative isolate flex h-full flex-col overflow-hidden rounded-2xl bg-white p-7 no-underline transition-all duration-200 ease-out " +
     "border-2 border-fog-light " +
-    "hover:-translate-y-1 hover:border-navy-deep hover:border-2 hover:shadow-[0_12px_36px_rgba(13,31,78,0.13)]";
+    "hover:-translate-y-1 hover:border-navy-deep hover:border-2 hover:shadow-lg";
   if (variant === "featured") {
     return (
-      `${base} border-navy-deep border-2 shadow-[0_8px_28px_rgba(13,31,78,0.12)] ` +
+      `${base} border-navy-deep border-2 shadow-md ` +
       // Wide span on mobile breakpoints handled at grid level, not here.
       ""
     );
@@ -55,7 +60,7 @@ function ToolCard({
       <span
         aria-hidden={true}
         className={
-          "pointer-events-none absolute inset-x-0 top-0 h-1 rounded-t-2xl] bg-[linear-gradient(90deg,#CC1627,#0D1F4E)] transition-opacity duration-200 " +
+          "pointer-events-none absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-linear-to-r from-rouge to-navy-deep transition-opacity duration-200 " +
           (isFeatured ? "opacity-100" : "opacity-0 group-hover:opacity-100")
         }
       />
@@ -67,7 +72,7 @@ function ToolCard({
           "pointer-events-none absolute right-5.5 top-5.5 flex h-8.5 w-8.5 items-center justify-center rounded-full transition-all duration-200 " +
           (isFeatured
             ? "scale-100 rotate-0 opacity-100 bg-navy-deep group-hover:bg-rouge"
-            : "scale-[0.6] -rotate-45 opacity-0 bg-navy-deep group-hover:scale-100 group-hover:rotate-0 group-hover:opacity-100 group-hover:bg-rouge")
+            : "scale-60 -rotate-45 opacity-0 bg-navy-deep group-hover:scale-100 group-hover:rotate-0 group-hover:opacity-100 group-hover:bg-rouge")
         }
       >
         <ArrowUpRight className="h-4 w-4 text-white" strokeWidth={2.5} />
@@ -90,7 +95,14 @@ function ToolCard({
           <Icon className="h-5 w-5" strokeWidth={2} />
         </span>
         {!isFeatured ? (
-          <span className="rounded-full border border-rose bg-blush px-2 py-0.75 font-sans text-[10px] font-bold uppercase tracking-widest text-rouge transition-opacity duration-150 group-hover:opacity-0">
+          <span
+            className={
+              "rounded-full border px-2 py-0.75 font-sans text-label font-bold uppercase tracking-widest transition-opacity duration-150 group-hover:opacity-0 " +
+              (tool.comingSoon
+                ? "border-fog bg-ice-blue text-navy-deep"
+                : "border-rose bg-blush text-rouge")
+            }
+          >
             {freeLabel}
           </span>
         ) : null}
@@ -125,7 +137,7 @@ function ToolCard({
               className={
                 "inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 font-sans text-xs font-semibold text-navy-deep transition-colors duration-150 " +
                 (isFeatured
-                  ? "border border-[rgba(13,31,78,0.15)] bg-[rgba(13,31,78,0.07)]"
+                  ? "border border-navy-deep/15 bg-navy-deep/7"
                   : "border border-fog bg-ice-blue group-hover:bg-off-white")
               }
             >
@@ -195,13 +207,14 @@ export function ToolsGrid(): ReactNode {
                   tool={tool}
                   nameLabel={tItems(tool.nameKey)}
                   descLabel={tItems(tool.descKey)}
-                  freeLabel={tBadges(tool.freeKey)}
+                  freeLabel={tBadges(tool.comingSoon ? "comingSoon" : tool.freeKey)}
                   badgeLabels={tool.badgeKeys.map((k: string): string =>
                     tBadges(k),
                   )}
-                  cardAriaLabel={t("cardAriaLabel", {
-                    name: tItems(tool.nameKey),
-                  })}
+                  cardAriaLabel={t(
+                    tool.comingSoon ? "cardAriaLabelSoon" : "cardAriaLabel",
+                    { name: tItems(tool.nameKey) },
+                  )}
                 />
               </li>
             ),
@@ -212,7 +225,7 @@ export function ToolsGrid(): ReactNode {
         <div className="mt-10 flex items-center justify-center border-t border-fog-light pt-8 lg:mt-8 lg:pt-6 text-center">
           <p className="text-base text-slate">
             <strong className="font-semibold text-navy-deep">
-              {t("footerLead")}
+              {t("footerLead", { count: AVAILABLE_TOOLS })}
             </strong>
             {t("footerTail")}
           </p>

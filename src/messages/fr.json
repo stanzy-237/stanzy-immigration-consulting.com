@@ -35,6 +35,7 @@
       "openMenu": "Ouvrir le menu",
       "closeMenu": "Fermer le menu",
       "liveMarker": "Données IRCC en direct",
+      "comingSoon": "Bientôt",
       "localeToggle": "Changer de langue",
       "Tools": {
         "timelineName": "Mon Parcours",
@@ -82,9 +83,10 @@
       "titleLead": "Vos outils d'immigration.",
       "titleAccent": "100% gratuits.",
       "subtitle": "Sept outils conçus pour simplifier votre parcours vers l'Entrée Express. Aucune inscription requise.",
-      "footerLead": "7 outils",
+      "footerLead": "{count, plural, one {# outil} other {# outils}}",
       "footerTail": " disponibles · Aucune inscription · 100% gratuits",
       "cardAriaLabel": "Ouvrir l'outil {name}",
+      "cardAriaLabelSoon": "Ouvrir l'outil {name} — bientôt disponible",
       "Items": {
         "timelineName": "Timeline Immigration",
         "timelineDesc": "Visualisez chaque étape de votre parcours vers la Résidence Permanente. Du profil à l'ITA, en passant par le tirage.",
@@ -123,7 +125,8 @@
         "badgeCnp2021": "CNP 2021",
         "badgeTeer": "TEER",
         "badgeNclcClb": "NCLC · CLB",
-        "badgeLanguageTests": "TEF · TCF · IELTS"
+        "badgeLanguageTests": "TEF · TCF · IELTS",
+        "comingSoon": "Bientôt"
       }
     },
     "BlogRow": {

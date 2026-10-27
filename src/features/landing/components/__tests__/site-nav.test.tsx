@@ -92,6 +92,30 @@ describe('SiteNav', () => {
     expect(within(panel!).getByText('Dernier tirage')).toBeInTheDocument();
   });
 
+  it('lists the tools not built yet last in the Outils dropdown, marked Bientôt', () => {
+    render(withIntl(<SiteNav />));
+    const trigger = screen.getByRole('button', { name: 'Ouvrir le menu Outils' });
+    fireEvent.mouseEnter(trigger.closest('li')!);
+    const panel = document.getElementById(trigger.getAttribute('aria-controls')!)!;
+    const links = within(panel).getAllByRole('link');
+
+    const soon = links.filter((link) => within(link).queryByText('Bientôt'));
+    expect(soon.map((link) => link.getAttribute('href'))).toEqual(['/fr/outils/cnp', '/fr/outils/coffre-fort']);
+    expect(links.slice(-2)).toEqual(soon);
+  });
+
+  it('lists them last in the mobile menu too, marked Bientôt', async () => {
+    render(withIntl(<SiteNav />));
+    fireEvent.click(screen.getByRole('button', { name: 'Ouvrir le menu' }));
+    const menu = await screen.findByRole('dialog');
+    const tools = within(menu).getByText('Outils', { selector: 'summary' }).closest('details')!;
+    const links = within(tools).getAllByRole('link');
+
+    expect(links.slice(-2).map((link) => link.getAttribute('href'))).toEqual(['/fr/outils/cnp', '/fr/outils/coffre-fort']);
+    for (const link of links.slice(-2)) expect(within(link).getByText('Bientôt')).toBeInTheDocument();
+    for (const link of links.slice(0, -2)) expect(within(link).queryByText('Bientôt')).toBeNull();
+  });
+
   it('marks the Dernier tirage entry with a live IRCC leaf icon', () => {
     render(withIntl(<SiteNav />));
     const trigger = screen.getByRole('button', { name: 'Ouvrir le menu Outils' });
