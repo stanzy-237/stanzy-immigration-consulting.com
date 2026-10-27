@@ -5,6 +5,8 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 
 import { AmountInput } from '@/features/budget/components/amount-input';
+import { FeeGuideButton } from '@/features/budget/components/fee-guide-dialog';
+import { GUIDE_FOR } from '@/features/budget/data/fee-guides';
 import { BIOMETRICS_FAMILY_CAP, type EditableLine, type LineSource } from '@/features/budget/data/fees';
 import { useFormatMoney } from '@/features/budget/hooks/use-format-money';
 import { convert, type BudgetEstimate, type BudgetLine, type Rates } from '@/features/budget/lib/estimate-budget';
@@ -71,6 +73,9 @@ function FeeRow({
             {capped ? t('estimator.familyCap') : t('estimator.times', { count: line.count, unit: money(unit, line.currency, true) })}
           </p>
           <SourceNote source={line.source} checkedOn={line.checkedOn} message="source" />
+          {line.key in GUIDE_FOR && (
+            <FeeGuideButton guide={GUIDE_FOR[line.key as keyof typeof GUIDE_FOR]} label={label} />
+          )}
         </div>
         <p className="shrink-0 font-heading text-body font-bold text-navy-deep">{money(line.amount, line.currency, true)}</p>
       </div>

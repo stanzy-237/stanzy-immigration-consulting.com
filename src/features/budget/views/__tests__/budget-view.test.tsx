@@ -132,6 +132,80 @@ describe('BudgetView', () => {
       expect(line('Visite médicale')).toHaveTextContent('Source : Estimation Stanzy · vérifié le 27 octobre 2026');
     });
 
+    describe('« En savoir plus »', () => {
+      const learnMore = (name: string) => within(line(name)).getByRole('button', { name: `En savoir plus\u202f: ${name}` });
+      const openGuide = async (name: string) => {
+        fireEvent.click(learnMore(name));
+        return screen.findByRole('dialog', { name });
+      };
+
+      it('is offered on the IRCC fees, biometrics, the medical, the police certificate and the passport, not elsewhere', () => {
+        renderView();
+        answerCoupleWithChild();
+
+        for (const name of [
+          'Frais de traitement IRCC (adulte)',
+          'Frais de traitement IRCC (enfant à charge)',
+          'Frais de résidence permanente (RPRF)',
+          'Biométrie',
+          'Visite médicale',
+          'Certificat de police',
+          'Passeport',
+        ]) {
+          expect(learnMore(name)).toBeInTheDocument();
+        }
+        for (const name of ['Évaluation des diplômes (WES)', 'Test de langue', 'Photos d’identité']) {
+          expect(within(line(name)).queryByRole('button', { name: /En savoir plus/ })).toBeNull();
+        }
+      });
+
+      it('explains biometrics: the fee, paid when the application is submitted, and its validity', async () => {
+        renderView();
+        const guide = await openGuide('Biométrie');
+
+        expect(guide).toHaveTextContent('85 $ CA par personne');
+        expect(guide).toHaveTextContent('170 $ CA au maximum par famille');
+        expect(guide).toHaveTextContent('payés avec les frais de la demande, au moment de la soumission');
+        expect(guide).toHaveTextContent('10 ans');
+      });
+
+      it('explains the medical: after the application, a panel physician, 12 months of validity', async () => {
+        renderView();
+        const guide = await openGuide('Visite médicale');
+
+        expect(guide).toHaveTextContent('après la soumission');
+        expect(guide).toHaveTextContent('médecin désigné');
+        expect(guide).toHaveTextContent('12 mois');
+        // IRCC's own search tool for panel physicians.
+        expect(within(guide).getByRole('link', { name: /Trouver un médecin désigné/ })).toHaveAttribute(
+          'href',
+          'https://secure.cic.gc.ca/PanelPhysicianMedecinDesigne/fr/Accueil',
+        );
+      });
+
+      it('offers Stanzy’s help for the Cameroon police certificate, on WhatsApp', async () => {
+        renderView();
+        const guide = await openGuide('Certificat de police');
+
+        expect(guide).toHaveTextContent('Uniquement pour le Cameroun');
+        for (const piece of ['Acte de naissance', 'CNI', 'Bulletin n° 3', 'Passeport']) {
+          expect(within(guide).getByText(piece, { exact: false })).toBeInTheDocument();
+        }
+        expect(within(guide).getByRole('link', { name: /WhatsApp/ })).toHaveAttribute(
+          'href',
+          expect.stringMatching(/^https:\/\/wa\.me\/message\/H3LTKVCVL6GAL1/),
+        );
+      });
+
+      it('names the RPRF amount and that it is refunded if the application fails', async () => {
+        renderView();
+        const guide = await openGuide('Frais de résidence permanente (RPRF)');
+
+        expect(guide).toHaveTextContent('600 $ CA');
+        expect(guide).toHaveTextContent('remboursés');
+      });
+    });
+
     it('shows the proof of funds apart, never added to the fees, and says when the User is exempt', () => {
       renderView();
       answerCoupleWithChild();
