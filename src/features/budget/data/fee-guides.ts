@@ -19,7 +19,9 @@ export type GuideBlock =
   /** `href` starting with « / » is a page of this site, in the visitor's language. */
   | { kind: 'link'; label: string; href: string }
   /** A button, e.g. « Me contacter sur WhatsApp » (tone `whatsapp`) or a Stanzy service. */
-  | { kind: 'cta'; label: string; href: string; tone?: 'whatsapp' };
+  | { kind: 'cta'; label: string; href: string; tone?: 'whatsapp' }
+  /** Two columns; the first cell of each row heads it (e.g. an age bracket). */
+  | { kind: 'table'; caption: string; head?: [string, string]; rows: [string, string][] };
 
 export type FeeGuide = {
   blocks: GuideBlock[];
@@ -46,6 +48,61 @@ const BIOMETRICS_FR = 'https://www.canada.ca/fr/immigration-refugies-citoyennete
 const BIOMETRICS_EN = 'https://www.canada.ca/en/immigration-refugees-citizenship/campaigns/biometrics.html';
 const PANEL_PHYSICIANS_FR = 'https://secure.cic.gc.ca/PanelPhysicianMedecinDesigne/fr/Accueil';
 const PANEL_PHYSICIANS_EN = 'https://secure.cic.gc.ca/PanelPhysicianMedecinDesigne/en/Home';
+
+// ─── To update every month ───────────────────────────────────────────────────
+/**
+ * The IOM's price grid for the immigration medical in Cameroon, in FCFA. The
+ * IOM publishes a new one each month (it follows the CAD rate): change
+ * `month` (YYYY-MM) and the three prices.
+ */
+export const IOM_MEDICAL_GRID = {
+  month: '2026-10',
+  prices: [
+    { ages: { fr: '0 à 10 ans', en: '0 to 10 years' }, xaf: 63_625 },
+    { ages: { fr: '11 à 14 ans', en: '11 to 14 years' }, xaf: 89_650 },
+    { ages: { fr: '15 ans et plus', en: '15 and over' }, xaf: 114_520 },
+  ],
+} as const;
+
+/** Where the IOM's medical is paid, in Cameroon. */
+export const IOM_MEDICAL_PAYMENT = {
+  accountNumber: '30830023091',
+  bankName: 'Ecobank - CAMEROON',
+  accountName: 'OIM',
+  reference: 'MH.0130',
+} as const;
+// ──────────────────────────────────────────────────────────────────────────────
+
+const monthName = (locale: Locale) =>
+  new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+    new Date(`${IOM_MEDICAL_GRID.month}-01T00:00:00Z`),
+  );
+const fcfa = (locale: Locale, amount: number) => `${new Intl.NumberFormat(locale).format(amount)}${'\u00a0'}FCFA`;
+const iomGrid = (locale: Locale): GuideBlock => ({
+  kind: 'table',
+  caption:
+    locale === 'fr' ? `Grille tarifaire de l’OIM — ${monthName(locale)}` : `IOM price grid — ${monthName(locale)}`,
+  head: locale === 'fr' ? ['Âge', 'Prix'] : ['Age', 'Price'],
+  rows: IOM_MEDICAL_GRID.prices.map((row) => [row.ages[locale], fcfa(locale, row.xaf)]),
+});
+const iomPayment = (locale: Locale): GuideBlock => ({
+  kind: 'table',
+  caption: locale === 'fr' ? 'Paiement — virement bancaire' : 'Payment — bank transfer',
+  rows:
+    locale === 'fr'
+      ? [
+          ['Numéro de compte', IOM_MEDICAL_PAYMENT.accountNumber],
+          ['Banque', IOM_MEDICAL_PAYMENT.bankName],
+          ['Titulaire du compte', IOM_MEDICAL_PAYMENT.accountName],
+          ['Motif', IOM_MEDICAL_PAYMENT.reference],
+        ]
+      : [
+          ['Account number', IOM_MEDICAL_PAYMENT.accountNumber],
+          ['Bank', IOM_MEDICAL_PAYMENT.bankName],
+          ['Account name', IOM_MEDICAL_PAYMENT.accountName],
+          ['Reference', IOM_MEDICAL_PAYMENT.reference],
+        ],
+});
 
 /** Cameroon: the IOM runs the immigration medicals; booking is online. */
 const IOM_MEDICAL_BOOKING = 'https://mymedical.iom.int/apps/omas/#_frmHomeV2';
@@ -170,8 +227,10 @@ export const FEE_GUIDES: Record<Locale, Record<GuideKey, FeeGuide>> = {
         },
         {
           kind: 'note',
-          text: 'Au Cameroun, la visite médicale est assurée par l’OIM (Organisation internationale pour les migrations)\u202f: réservez votre rendez-vous en ligne. Ailleurs, le prix est fixé par la clinique et varie d’un médecin à l’autre.',
+          text: 'Au Cameroun, la visite médicale est assurée par l’OIM (Organisation internationale pour les migrations)\u202f: réservez votre rendez-vous en ligne et payez par virement. Ses prix changent chaque mois, selon le cours du dollar canadien. Ailleurs, le prix est fixé par la clinique et varie d’un médecin à l’autre.',
         },
+        iomGrid('fr'),
+        iomPayment('fr'),
         { kind: 'cta', label: 'Réserver ma visite médicale (OIM)', href: IOM_MEDICAL_BOOKING },
         { kind: 'link', label: 'Trouver un médecin désigné (outil d’IRCC)', href: PANEL_PHYSICIANS_FR },
       ],
@@ -364,8 +423,10 @@ export const FEE_GUIDES: Record<Locale, Record<GuideKey, FeeGuide>> = {
         },
         {
           kind: 'note',
-          text: 'In Cameroon, the medical exam is done by the IOM (International Organization for Migration): book your appointment online. Elsewhere, the clinic sets the price, and it varies from one physician to another.',
+          text: 'In Cameroon, the medical exam is done by the IOM (International Organization for Migration): book your appointment online and pay by bank transfer. Its prices change every month, with the Canadian dollar rate. Elsewhere, the clinic sets the price, and it varies from one physician to another.',
         },
+        iomGrid('en'),
+        iomPayment('en'),
         { kind: 'cta', label: 'Book my medical exam (IOM)', href: IOM_MEDICAL_BOOKING },
         { kind: 'link', label: 'Find a panel physician (IRCC tool)', href: PANEL_PHYSICIANS_EN },
       ],

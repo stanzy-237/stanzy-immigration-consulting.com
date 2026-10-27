@@ -214,6 +214,29 @@ describe('BudgetView', () => {
         );
       });
 
+      it('shows the IOM’s price grid of the month and how to pay it', async () => {
+        renderView();
+        const guide = await openGuide('Visite médicale');
+
+        const grid = within(guide).getByRole('table', { name: /Grille tarifaire de l’OIM.*octobre 2026/ });
+        const rows = within(grid)
+          .getAllByRole('row')
+          .slice(1)
+          .map((row) => [...row.querySelectorAll('th, td')].map((cell) => cell.textContent));
+        // French: a narrow no-break space between thousands, a no-break space before FCFA.
+        expect(rows).toEqual([
+          ['0 à 10 ans', '63\u202f625\u00a0FCFA'],
+          ['11 à 14 ans', '89\u202f650\u00a0FCFA'],
+          ['15 ans et plus', '114\u202f520\u00a0FCFA'],
+        ]);
+
+        const bank = within(guide).getByRole('table', { name: /Paiement/ });
+        expect(bank).toHaveTextContent('30830023091');
+        expect(bank).toHaveTextContent('Ecobank - CAMEROON');
+        expect(bank).toHaveTextContent('OIM');
+        expect(bank).toHaveTextContent('MH.0130');
+      });
+
       it('recommends TCF Express Academy to prepare the TCF Canada', async () => {
         renderView();
         const guide = await openGuide('Test de langue');

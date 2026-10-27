@@ -2,7 +2,7 @@
 
 import { ArrowRight, ExternalLink, Info, MessageCircle, XIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { FEE_GUIDES, type GuideBlock, type GuideKey } from '@/features/budget/data/fee-guides';
@@ -25,15 +25,54 @@ function GuideLink({ href, className, children }: { href: string; className: str
   );
 }
 
+/** A two-column table; its title sits above the rounded frame and names it. */
+function GuideTable({ block }: { block: Extract<GuideBlock, { kind: 'table' }> }): ReactNode {
+  const id = useId();
+  return (
+    <div>
+      <p id={id} className="mb-2 font-heading text-body-sm font-bold text-navy-deep">
+        {block.caption}
+      </p>
+      <div className="overflow-hidden rounded-xl border border-fog-light">
+        <table aria-labelledby={id} className="w-full text-body-sm">
+          {block.head && (
+            <thead className="bg-off-white">
+              <tr>
+                {block.head.map((cell) => (
+                  <th key={cell} scope="col" className="px-3.5 py-2 text-left font-label uppercase tracking-wider text-slate">
+                    {cell}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          )}
+          <tbody>
+            {block.rows.map(([label, value]) => (
+              <tr key={label} className="border-t border-fog-light first:border-t-0">
+                <th scope="row" className="px-3.5 py-2.5 text-left font-medium leading-relaxed text-slate">
+                  {label}
+                </th>
+                <td className="px-3.5 py-2.5 text-right font-heading font-bold text-navy-deep tabular-nums">{value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function Block({ block }: { block: GuideBlock }): ReactNode {
   switch (block.kind) {
     case 'text':
-      return <p className="text-body-sm text-slate">{block.text}</p>;
+      return <p className="text-body-sm leading-relaxed text-slate">{block.text}</p>;
+    case 'table':
+      return <GuideTable block={block} />;
     case 'list':
       return (
         <div>
           {block.title && <h3 className="mb-1.5 font-heading text-body-sm font-bold text-navy-deep">{block.title}</h3>}
-          <ul className="flex list-disc flex-col gap-1 pl-5 text-body-sm text-slate marker:text-rouge">
+          <ul className="flex list-disc flex-col gap-1.5 pl-5 text-body-sm leading-relaxed text-slate marker:text-rouge">
             {block.items.map((item) => (
               <li key={item}>{item}</li>
             ))}
@@ -42,7 +81,7 @@ function Block({ block }: { block: GuideBlock }): ReactNode {
       );
     case 'note':
       return (
-        <p className="flex gap-2 rounded-xl border border-rose bg-blush px-3.5 py-3 text-body-sm font-medium text-navy-deep">
+        <p className="flex gap-2 rounded-xl border border-rose bg-blush px-3.5 py-3 text-body-sm font-medium leading-relaxed text-navy-deep">
           <Info aria-hidden={true} className="mt-0.5 size-4 shrink-0 text-rouge" />
           {block.text}
         </p>
@@ -96,7 +135,7 @@ export function FeeGuideButton({ guide, label }: { guide: GuideKey; label: strin
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
           showCloseButton={false}
-          className="max-h-9/10 gap-0 overflow-y-auto p-0 sm:max-w-lg"
+          className="max-h-9/10 gap-0 overflow-y-auto p-0 sm:max-w-lg lg:max-w-2xl"
         >
           <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-fog-light bg-white px-5 py-4">
             <DialogTitle className="font-heading text-h4 font-bold text-navy-deep">{label}</DialogTitle>
@@ -107,7 +146,7 @@ export function FeeGuideButton({ guide, label }: { guide: GuideKey; label: strin
               <XIcon aria-hidden={true} className="size-4" />
             </DialogClose>
           </div>
-          <div className="flex flex-col gap-4 px-5 py-5">
+          <div className="flex flex-col gap-5 px-5 py-5 lg:px-7 lg:py-6">
             {content.image && (
               // eslint-disable-next-line @next/next/no-img-element -- consultant-provided image, any host
               <img src={content.image.src} alt={content.image.alt} className="w-full rounded-xl object-cover" />
