@@ -160,11 +160,14 @@ export function DrawsHistory({ draws }: { draws: DrawSummary[] }): ReactNode {
                       <DrawTypePill
                         group={draw.group}
                         label={text.type(draw)}
-                        // Category rounds keep their name: "Catégorie" alone says too little.
-                        shortLabel={draw.group === 'CATEGORY' ? text.type(draw) : tGroups(draw.group)}
+                        // In a word or an acronym (« PCP », « Métiers »), as on the home page.
+                        shortLabel={text.shortType(draw)}
                         title={draw.typeLabel}
                       />
-                      <span className="mt-1 block text-xs text-slate sm:hidden">{text.date(draw)}</span>
+                      {/* Phones hide the date and invitations columns; they ride under the type. */}
+                      <span className="mt-1 block text-xs text-slate sm:hidden">
+                        {t('phoneLine', { date: text.date(draw), count: format.number(draw.invitations) })}
+                      </span>
                     </td>
                     <td className={cn(cell, 'hidden text-sm font-semibold text-navy-deep sm:table-cell')}>
                       {format.number(draw.invitations)}
