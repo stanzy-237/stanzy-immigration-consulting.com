@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useFormatter } from "next-intl";
-import { useId, useState, type ReactNode } from "react";
+import { useFormatter } from 'next-intl';
+import { useId, useState, type ReactNode } from 'react';
 
-import { parseAmount } from "@/features/budget/lib/money";
+import { parseAmount } from '@/features/budget/lib/money';
 
 /**
  * A number the User can retype freely: what they type stays while they edit,
@@ -14,8 +14,8 @@ export function AmountInput({
   value,
   onChange,
   hint,
-  className = "",
-  fieldClassName = "",
+  className = '',
+  fieldClassName = '',
   after,
 }: {
   label: string;
@@ -32,17 +32,12 @@ export function AmountInput({
   const format = useFormatter();
   /** The text being typed; null shows `value`. */
   const [draft, setDraft] = useState<string | null>(null);
-  const shown =
-    draft ??
-    format.number(value, { useGrouping: false, maximumFractionDigits: 4 });
+  const shown = draft ?? format.number(value, { useGrouping: false, maximumFractionDigits: 4 });
 
   return (
     <div className={className}>
       {/* One line on desktop; more air on phones, where it wraps. */}
-      <label
-        htmlFor={id}
-        className="mb-2 block font-label leading-relaxed text-slate lg:mb-1.5 lg:whitespace-nowrap"
-      >
+      <label htmlFor={id} className="mb-2 block font-label leading-relaxed text-slate lg:mb-1.5 lg:whitespace-nowrap">
         {label}
       </label>
       <div className={`flex items-center gap-2 ${fieldClassName}`}>

@@ -25,10 +25,9 @@ vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi
 type Mutation = { mutate: ReturnType<typeof vi.fn>; isPending: boolean; isSuccess: boolean; reset: () => void };
 const mutation = (): Mutation => ({ mutate: vi.fn(), isPending: false, isSuccess: false, reset: vi.fn() });
 const server = {
-  profile: undefined as { currency: string | null; estimate: BudgetAnswers | null } | null | undefined,
+  profile: undefined as { currency: string | null } | null | undefined,
   expenses: [] as Expense[],
   setCurrency: mutation(),
-  saveEstimate: mutation(),
   add: mutation(),
   update: mutation(),
   remove: mutation(),
@@ -47,7 +46,6 @@ vi.mock('@/trpc/react', () => ({
               : { data: server.profile, isPending: false },
         },
         setCurrency: { useMutation: () => server.setCurrency },
-        saveEstimate: { useMutation: () => server.saveEstimate },
       },
       expenses: {
         list: {
@@ -78,7 +76,6 @@ beforeEach(() => {
   server.profile = undefined;
   server.expenses = [];
   server.setCurrency = mutation();
-  server.saveEstimate = mutation();
   server.add = mutation();
   server.update = mutation();
   server.remove = mutation();
@@ -86,6 +83,9 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 const renderView = () => render(withIntl(<BudgetView />));
+/** The estimate this browser keeps, which the journal's budget bar reads. */
+const keepEstimate = (answers: BudgetAnswers) =>
+  window.localStorage.setItem('stanzy.budget.estimate.v1', JSON.stringify(answers));
 const region = (name: string) => screen.getByRole('region', { name });
 const fees = () => region('Frais à payer');
 const funds = () => region('Fonds à prouver');
@@ -311,19 +311,46 @@ describe('BudgetView', () => {
       expect(screen.queryByRole('button', { name: 'Enregistrer dans mon compte' })).toBeNull();
     });
 
-    it('reads a signed-in User’s estimate from their Account and saves it back', () => {
+    it('keeps a signed-in User’s estimate in this browser only, with nothing to save to the Account', () => {
       signedIn();
-      server.profile = { currency: 'XAF', estimate: { ...DEFAULT_ANSWERS, spouse: true, children: 1 } };
+      server.profile = { currency: 'XAF' };
+      const { unmount } = renderView();
+      fireEvent.click(screen.getByLabelText('Mon époux ou conjoint de fait vient avec moi'));
+      unmount();
+
       renderView();
-
       expect(screen.getByLabelText('Mon époux ou conjoint de fait vient avec moi')).toBeChecked();
-      fireEvent.click(screen.getByLabelText('Je n’ai pas à prouver de fonds (CEC ou offre d’emploi valide)'));
-      fireEvent.click(screen.getByRole('button', { name: 'Enregistrer dans mon compte' }));
+      expect(screen.queryByRole('button', { name: 'Enregistrer dans mon compte' })).toBeNull();
+    });
 
-      expect(server.saveEstimate.mutate).toHaveBeenCalledWith(
-        { estimate: { ...DEFAULT_ANSWERS, spouse: true, children: 1, fundsExempt: true } },
-        expect.anything(),
-      );
+    describe('« J’ai déjà reçu mon invitation »', () => {
+      const ita = () => screen.getByLabelText('J’ai déjà reçu mon invitation (ITA)');
+
+      it('comes just before « Tests et diplômes »', () => {
+        renderView();
+        const tests = region('Tests et diplômes');
+
+        expect(ita().compareDocumentPosition(tests) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      });
+
+      it('takes away the tests and diploma evaluation, which come before an ITA, and brings them back', () => {
+        renderView();
+        // Single applicant by default: 1 333 520 FCFA with a TEF (210 000) and a WES (132 000).
+        expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('1 333 520 FCFA');
+
+        fireEvent.click(ita());
+
+        expect(screen.queryByRole('region', { name: 'Tests et diplômes' })).toBeNull();
+        expect(within(fees()).queryByRole('listitem', { name: 'Test de langue' })).toBeNull();
+        expect(within(fees()).queryByRole('listitem', { name: 'Évaluation des diplômes (WES)' })).toBeNull();
+        // 1 333 520 − 210 000 − 132 000.
+        expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('991 520 FCFA');
+
+        fireEvent.click(ita());
+        expect(region('Tests et diplômes')).toBeInTheDocument();
+        expect(screen.getByLabelText('Votre test de langue')).toHaveValue('TEF');
+        expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('1 333 520 FCFA');
+      });
     });
 
     it('speaks English on the English site', () => {
@@ -380,18 +407,10 @@ describe('BudgetView', () => {
       expect(server.setCurrency.mutate).toHaveBeenCalledWith({ currency: 'XOF' }, expect.anything());
     });
 
-    it('still asks for a currency when the User only saved an estimate', async () => {
-      signedIn();
-      server.profile = { currency: null, estimate: DEFAULT_ANSWERS };
-      renderView();
-      openJournal();
-
-      expect(await screen.findByRole('dialog', { name: 'Choisissez votre devise' })).toBeInTheDocument();
-    });
-
     it('lists Dépenses newest first with the total, subtotals by reason and the budget bar', () => {
       signedIn();
-      server.profile = { currency: 'XAF', estimate: DEFAULT_ANSWERS };
+      server.profile = { currency: 'XAF' };
+      keepEstimate(DEFAULT_ANSWERS);
       server.expenses = [TEF, WES];
       renderView();
       openJournal();
@@ -417,7 +436,8 @@ describe('BudgetView', () => {
 
     it('adds a Dépense, then shows it in the total, its reason and the bar', () => {
       signedIn();
-      server.profile = { currency: 'XAF', estimate: DEFAULT_ANSWERS };
+      server.profile = { currency: 'XAF' };
+      keepEstimate(DEFAULT_ANSWERS);
       server.expenses = [TEF];
       server.add.mutate.mockImplementation((input: Omit<Expense, 'id'>, options: { onSuccess: () => void }) => {
         server.expenses = [{ ...input, id: 'x3', note: input.note ?? '' }, ...server.expenses];
@@ -447,7 +467,7 @@ describe('BudgetView', () => {
 
     it('keeps cents for a currency that has them', () => {
       signedIn();
-      server.profile = { currency: 'CAD', estimate: null };
+      server.profile = { currency: 'CAD' };
       renderView();
       openJournal();
 
@@ -461,7 +481,7 @@ describe('BudgetView', () => {
 
     it('asks for a name, an amount and a past date before saving', () => {
       signedIn();
-      server.profile = { currency: 'XAF', estimate: null };
+      server.profile = { currency: 'XAF' };
       renderView();
       openJournal();
 
@@ -478,7 +498,7 @@ describe('BudgetView', () => {
 
     it('edits a Dépense in place and deletes one only once the User confirms', async () => {
       signedIn();
-      server.profile = { currency: 'XAF', estimate: null };
+      server.profile = { currency: 'XAF' };
       server.expenses = [WES, TEF];
       renderView();
       openJournal();
@@ -503,7 +523,7 @@ describe('BudgetView', () => {
 
     it('warns that amounts aren’t converted when the User changes currency', async () => {
       signedIn();
-      server.profile = { currency: 'XAF', estimate: null };
+      server.profile = { currency: 'XAF' };
       server.expenses = [TEF];
       renderView();
       openJournal();
@@ -520,7 +540,8 @@ describe('BudgetView', () => {
     it('has no detectable accessibility violations', async () => {
       vi.useRealTimers();
       signedIn();
-      server.profile = { currency: 'XAF', estimate: DEFAULT_ANSWERS };
+      server.profile = { currency: 'XAF' };
+      keepEstimate(DEFAULT_ANSWERS);
       server.expenses = [TEF, WES];
       const { container } = renderView();
       openJournal();
@@ -537,7 +558,7 @@ describe('BudgetView', () => {
 
       it('adds from the floating button in a drawer', async () => {
         signedIn();
-        server.profile = { currency: 'XAF', estimate: null };
+        server.profile = { currency: 'XAF' };
         renderView();
         openJournal();
 

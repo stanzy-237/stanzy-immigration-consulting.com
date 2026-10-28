@@ -84,8 +84,9 @@ export function estimateBudget(answers: BudgetAnswers, rates: Rates): BudgetEsti
     adult: adults,
     child: answers.children,
     person: persons,
-    assessed: Number(answers.ecaPrincipal) + Number(answers.spouse && answers.ecaSpouse),
-    testTaker: Number(answers.test !== 'none') + Number(answers.spouse && answers.spouseTest),
+    // After the ITA, tests and diploma evaluations are already done.
+    assessed: answers.itaReceived ? 0 : Number(answers.ecaPrincipal) + Number(answers.spouse && answers.ecaSpouse),
+    testTaker: answers.itaReceived ? 0 : Number(answers.test !== 'none') + Number(answers.spouse && answers.spouseTest),
   };
   const inTarget = (amount: number, from: Currency) => Math.round(convert(amount, from, target, rates));
 
