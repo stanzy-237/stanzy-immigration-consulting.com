@@ -1258,7 +1258,10 @@
       "save": "Save to my account",
       "saved": "Estimate saved to your account.",
       "saveError": "The estimate could not be saved. Try again.",
-      "keptHere": "Your estimate is kept in this browser."
+      "keptHere": "Your estimate is kept in this browser.",
+      "learnMore": "Learn more",
+      "learnMoreAbout": "Learn more: {line}",
+      "closeGuide": "Close"
     },
     "lines": {
       "processing": "IRCC processing fee (adult)",

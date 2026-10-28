@@ -2,10 +2,14 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Stanzy Design System — see GLOSSARY.md and issue #3.
- * Light mode only. No dark variant is defined; dark: utilities in shadcn
- * vendor files become no-ops because nothing ever adds .dark to the tree.
+ * Light mode only. dark: is bound to a .dark class below, so the dark:
+ * utilities in shadcn vendor files stay off: nothing ever adds .dark to the
+ * tree. (Tailwind v4's default dark: follows the OS setting, which leaked
+ * dark styles into components on devices in dark mode.)
  * Brand palette, typography, and spacing come from the MagicPath
  * "Stanzy Design System" project; shadcn/ui semantic tokens (--primary,
  * --background, etc.) are mapped to those brand tokens.

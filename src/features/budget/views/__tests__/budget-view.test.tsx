@@ -13,8 +13,8 @@ import { BudgetView } from '@/features/budget/views/budget-view';
  * it. Only the browser auth client and the tRPC hooks are stubbed. Expected
  * amounts are worked by hand from IRCC's fee page (30 Apr 2026), its
  * proof-of-funds table (7 Jul 2025) and the spec's defaults (1 CAD = 440 XAF,
- * WES 300 CAD, test 210 000 XAF, medical 100 000, police 10 000, passport
- * 110 000, photos 5 000 XAF).
+ * WES 300 CAD, test 210 000 XAF, medical 114 520 — the IOM's October 2026
+ * price from 15 — police 25 000, passport 110 000, photos 5 000 XAF).
  */
 vi.mock('@/i18n/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/i18n/navigation')>()),
@@ -123,13 +123,151 @@ describe('BudgetView', () => {
       answerCoupleWithChild();
 
       // IRCC 3 450 CAD = 1 518 000; biometrics 170 CAD = 74 800; WES 300 CAD =
-      // 132 000; TEF × 2 = 420 000; medical × 3 = 300 000; police × 2 = 20 000;
+      // 132 000; TEF × 2 = 420 000; medical × 3 = 343 560; police × 2 = 50 000;
       // passport × 3 = 330 000; photos × 3 = 15 000.
       expect(line('Évaluation des diplômes (WES)')).toHaveTextContent('132 000 FCFA');
       expect(line('Test de langue')).toHaveTextContent('420 000 FCFA');
-      expect(line('Visite médicale')).toHaveTextContent('300 000 FCFA');
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 809 800 FCFA');
-      expect(line('Visite médicale')).toHaveTextContent('Source : Estimation Stanzy · vérifié le 27 octobre 2026');
+      expect(line('Visite médicale')).toHaveTextContent('343 560 FCFA');
+      expect(line('Certificat de police')).toHaveTextContent('50 000 FCFA');
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 883 360 FCFA');
+      expect(line('Visite médicale')).toHaveTextContent('Source : OIM (grille mensuelle) · vérifié le 1 octobre 2026');
+    });
+
+    describe('« En savoir plus »', () => {
+      const learnMore = (name: string) => within(line(name)).getByRole('button', { name: `En savoir plus\u202f: ${name}` });
+      const openGuide = async (name: string) => {
+        fireEvent.click(learnMore(name));
+        return screen.findByRole('dialog', { name });
+      };
+
+      it('is offered on every line but the photos', () => {
+        renderView();
+        answerCoupleWithChild();
+
+        for (const name of [
+          'Frais de traitement IRCC (adulte)',
+          'Frais de traitement IRCC (enfant à charge)',
+          'Frais de résidence permanente (RPRF)',
+          'Biométrie',
+          'Évaluation des diplômes (WES)',
+          'Test de langue',
+          'Visite médicale',
+          'Certificat de police',
+          'Passeport',
+        ]) {
+          expect(learnMore(name)).toBeInTheDocument();
+        }
+        expect(within(line('Photos d’identité')).queryByRole('button', { name: /En savoir plus/ })).toBeNull();
+      });
+
+      it('explains biometrics: the fee, paid when the application is submitted, and its validity', async () => {
+        renderView();
+        const guide = await openGuide('Biométrie');
+
+        expect(guide).toHaveTextContent('85 $ CA par personne');
+        expect(guide).toHaveTextContent('170 $ CA au maximum par famille');
+        expect(guide).toHaveTextContent('payés avec les frais de la demande, au moment de la soumission');
+        expect(guide).toHaveTextContent('10 ans');
+      });
+
+      it('explains the medical: after the application, a panel physician, 12 months of validity', async () => {
+        renderView();
+        const guide = await openGuide('Visite médicale');
+
+        expect(guide).toHaveTextContent('après la soumission');
+        expect(guide).toHaveTextContent('médecin désigné');
+        expect(guide).toHaveTextContent('12 mois');
+        // IRCC's own search tool for panel physicians.
+        expect(within(guide).getByRole('link', { name: /Trouver un médecin désigné/ })).toHaveAttribute(
+          'href',
+          'https://secure.cic.gc.ca/PanelPhysicianMedecinDesigne/fr/Accueil',
+        );
+      });
+
+      it('offers Stanzy’s help for the Cameroon police certificate, on WhatsApp', async () => {
+        renderView();
+        const guide = await openGuide('Certificat de police');
+
+        expect(guide).toHaveTextContent('Uniquement pour le Cameroun');
+        for (const piece of ['Acte de naissance', 'CNI', 'Bulletin n° 3', 'Passeport']) {
+          expect(within(guide).getByText(piece, { exact: false })).toBeInTheDocument();
+        }
+        expect(within(guide).getByRole('link', { name: /WhatsApp/ })).toHaveAttribute(
+          'href',
+          expect.stringMatching(/^https:\/\/wa\.me\/message\/H3LTKVCVL6GAL1/),
+        );
+      });
+
+      it('sends Cameroonians to book their medical with the IOM and their biometrics with VFS Global', async () => {
+        renderView();
+        const medical = await openGuide('Visite médicale');
+        expect(medical).toHaveTextContent('Au Cameroun, la visite médicale est assurée par l’OIM');
+        expect(within(medical).getByRole('link', { name: /Réserver ma visite médicale/ })).toHaveAttribute(
+          'href',
+          'https://mymedical.iom.int/apps/omas/#_frmHomeV2',
+        );
+        fireEvent.keyDown(medical, { key: 'Escape' });
+
+        const biometrics = await openGuide('Biométrie');
+        expect(within(biometrics).getByRole('link', { name: /Prendre rendez-vous pour la biométrie/ })).toHaveAttribute(
+          'href',
+          expect.stringMatching(/^https:\/\/www\.vfsglobal\.ca\/IRCC-AppointmentWave1\/Account\/RegisteredLogin\?q=/),
+        );
+      });
+
+      it('shows the IOM’s price grid of the month and how to pay it', async () => {
+        renderView();
+        const guide = await openGuide('Visite médicale');
+
+        const grid = within(guide).getByRole('table', { name: /Grille tarifaire de l’OIM.*octobre 2026/ });
+        const rows = within(grid)
+          .getAllByRole('row')
+          .slice(1)
+          .map((row) => [...row.querySelectorAll('th, td')].map((cell) => cell.textContent));
+        // French: a narrow no-break space between thousands, a no-break space before FCFA.
+        expect(rows).toEqual([
+          ['0 à 10 ans', '63\u202f625\u00a0FCFA'],
+          ['11 à 14 ans', '89\u202f650\u00a0FCFA'],
+          ['15 ans et plus', '114\u202f520\u00a0FCFA'],
+        ]);
+
+        const bank = within(guide).getByRole('table', { name: /Paiement/ });
+        expect(bank).toHaveTextContent('30830023091');
+        expect(bank).toHaveTextContent('Ecobank - CAMEROON');
+        expect(bank).toHaveTextContent('OIM');
+        expect(bank).toHaveTextContent('MH.0130');
+      });
+
+      it('recommends TCF Express Academy to prepare the TCF Canada', async () => {
+        renderView();
+        const guide = await openGuide('Test de langue');
+
+        expect(guide).toHaveTextContent('TCF Canada');
+        expect(within(guide).getByRole('link', { name: /TCF Express Academy/ })).toHaveAttribute(
+          'href',
+          'https://tcf-express-academy.com',
+        );
+      });
+
+      it('offers Stanzy’s WES or IQAS service to graduates of the seven Cameroonian state universities', async () => {
+        renderView();
+        const guide = await openGuide('Évaluation des diplômes (WES)');
+
+        for (const university of ['Dschang', 'Yaoundé I', 'Yaoundé II', 'Buea', 'Bamenda', 'Maroua', 'Ngaoundéré']) {
+          expect(guide).toHaveTextContent(university);
+        }
+        expect(guide).toHaveTextContent('IQAS');
+        // A page of this site, through the (mocked) locale-aware Link.
+        expect(within(guide).getByRole('link', { name: /service EDE/ })).toHaveAttribute('href', '/services/ede');
+      });
+
+      it('names the RPRF amount and that it is refunded if the application fails', async () => {
+        renderView();
+        const guide = await openGuide('Frais de résidence permanente (RPRF)');
+
+        expect(guide).toHaveTextContent('600 $ CA');
+        expect(guide).toHaveTextContent('remboursés');
+      });
     });
 
     it('shows the proof of funds apart, never added to the fees, and says when the User is exempt', () => {
@@ -139,7 +277,7 @@ describe('BudgetView', () => {
       // 3 persons: 23 360 CAD × 440.
       expect(funds()).toHaveTextContent('10 278 400 FCFA');
       expect(funds()).toHaveTextContent('Pour 3 personnes · soit 23 360 $CA');
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 809 800 FCFA');
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 883 360 FCFA');
 
       fireEvent.click(screen.getByLabelText('Je n’ai pas à prouver de fonds (CEC ou offre d’emploi valide)'));
       expect(funds()).toHaveTextContent('Vous n’avez pas à prouver de fonds');
@@ -151,13 +289,13 @@ describe('BudgetView', () => {
       answerCoupleWithChild();
 
       type(screen.getByLabelText('Prix par personne : Visite médicale (XAF)'), '150000');
-      // Medical 3 × 150 000 = 450 000 instead of 300 000.
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 959 800 FCFA');
+      // Medical 3 × 150 000 = 450 000 instead of 343 560: 2 883 360 − 343 560 + 450 000.
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 989 800 FCFA');
 
       type(screen.getByLabelText('Taux de conversion : 1 CAD en XAF'), '450');
       // CAD lines at 450: IRCC 1 552 500 + biometrics 76 500 + WES 135 000;
-      // XAF lines unchanged: 420 000 + 450 000 + 20 000 + 330 000 + 15 000.
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 999 000 FCFA');
+      // XAF lines unchanged: 420 000 + 450 000 + 50 000 + 330 000 + 15 000.
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('3 029 000 FCFA');
     });
 
     it('remembers the visitor’s estimate in this browser', () => {
@@ -169,7 +307,7 @@ describe('BudgetView', () => {
       renderView();
       expect(screen.getByLabelText('Mon époux ou conjoint de fait vient avec moi')).toBeChecked();
       expect(screen.getByLabelText('Prix par personne : Visite médicale (XAF)')).toHaveValue('150000');
-      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 959 800 FCFA');
+      expect(within(fees()).getByTestId('fees-total')).toHaveTextContent('2 989 800 FCFA');
       expect(screen.queryByRole('button', { name: 'Enregistrer dans mon compte' })).toBeNull();
     });
 
@@ -192,9 +330,9 @@ describe('BudgetView', () => {
       render(withIntl(<BudgetView />, 'en'));
 
       expect(screen.getByRole('tab', { name: 'Estimate my budget' })).toHaveAttribute('aria-selected', 'true');
-      // Single applicant, TEF and WES by default: 1 975 CAD × 440 + 435 000 XAF.
+      // Single applicant, TEF and WES by default: 1 975 CAD × 440 + 464 520 XAF.
       expect(within(screen.getByRole('region', { name: 'Fees to pay' })).getByTestId('fees-total')).toHaveTextContent(
-        'FCFA 1,304,000',
+        'FCFA 1,333,520',
       );
     });
 
@@ -269,8 +407,8 @@ describe('BudgetView', () => {
       expect(byMotif.getByRole('listitem', { name: 'Évaluation des diplômes (ECA)' })).toHaveTextContent('132 000 FCFA');
 
       // Single TEF + WES default estimate: 1 975 CAD × 440 = 869 000, plus
-      // 210 000 + 100 000 + 10 000 + 110 000 + 5 000 = 1 304 000 FCFA.
-      expect(region('Total dépensé')).toHaveTextContent('Dépensé 342 000 FCFA sur un budget estimé de 1 304 000 FCFA');
+      // 210 000 + 114 520 + 25 000 + 110 000 + 5 000 = 1 333 520 FCFA; 342 000 is 25.6 %.
+      expect(region('Total dépensé')).toHaveTextContent('Dépensé 342 000 FCFA sur un budget estimé de 1 333 520 FCFA');
       expect(screen.getByRole('progressbar', { name: 'Part du budget estimé dépensée' })).toHaveAttribute(
         'aria-valuenow',
         '26',
@@ -298,12 +436,12 @@ describe('BudgetView', () => {
         { name: 'Frais IRCC', motif: 'irccFees', amount: 699_600, date: '2026-10-20', note: '' },
         expect.anything(),
       );
-      // 210 000 + 699 600.
-      expect(region('Total dépensé')).toHaveTextContent('Dépensé 909 600 FCFA sur un budget estimé de 1 304 000 FCFA');
+      // 210 000 + 699 600 = 909 600, 68.2 % of 1 333 520.
+      expect(region('Total dépensé')).toHaveTextContent('Dépensé 909 600 FCFA sur un budget estimé de 1 333 520 FCFA');
       expect(within(region('Par motif')).getByRole('listitem', { name: 'Frais IRCC' })).toHaveTextContent('699 600 FCFA');
       expect(screen.getByRole('progressbar', { name: 'Part du budget estimé dépensée' })).toHaveAttribute(
         'aria-valuenow',
-        '70',
+        '68',
       );
     });
 

@@ -1275,7 +1275,10 @@
       "save": "Enregistrer dans mon compte",
       "saved": "Estimation enregistrée dans votre compte.",
       "saveError": "L’estimation n’a pas pu être enregistrée. Réessayez.",
-      "keptHere": "Votre estimation est gardée dans ce navigateur."
+      "keptHere": "Votre estimation est gardée dans ce navigateur.",
+      "learnMore": "En savoir plus",
+      "learnMoreAbout": "En savoir plus : {line}",
+      "closeGuide": "Fermer"
     },
     "lines": {
       "processing": "Frais de traitement IRCC (adulte)",

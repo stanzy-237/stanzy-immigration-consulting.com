@@ -5,6 +5,8 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 
 import { AmountInput } from '@/features/budget/components/amount-input';
+import { FeeGuideButton } from '@/features/budget/components/fee-guide-dialog';
+import { GUIDE_FOR } from '@/features/budget/data/fee-guides';
 import { BIOMETRICS_FAMILY_CAP, type EditableLine, type LineSource } from '@/features/budget/data/fees';
 import { useFormatMoney } from '@/features/budget/hooks/use-format-money';
 import { convert, type BudgetEstimate, type BudgetLine, type Rates } from '@/features/budget/lib/estimate-budget';
@@ -16,7 +18,7 @@ export function SourceNote({ source, checkedOn, message }: { source: LineSource;
   const format = useFormatter();
   const date = format.dateTime(noonUtc(checkedOn), LONG_DAY);
   return (
-    <p className="mt-1 text-caption text-slate">
+    <p className="mt-1.5 text-caption leading-relaxed text-slate lg:mt-1">
       {t.rich(message, {
         source: source.name,
         date,
@@ -67,33 +69,37 @@ function FeeRow({
               </span>
             )}
           </p>
-          <p className="mt-1 text-body-sm text-slate">
+          <p className="mt-1.5 text-body-sm leading-relaxed text-slate lg:mt-1">
             {capped ? t('estimator.familyCap') : t('estimator.times', { count: line.count, unit: money(unit, line.currency, true) })}
           </p>
           <SourceNote source={line.source} checkedOn={line.checkedOn} message="source" />
+          {line.key in GUIDE_FOR && (
+            <FeeGuideButton guide={GUIDE_FOR[line.key as keyof typeof GUIDE_FOR]} label={label} />
+          )}
         </div>
         <p className="shrink-0 font-heading text-body font-bold text-navy-deep">{money(line.amount, line.currency, true)}</p>
       </div>
       {line.editable && (
-        <div className="mt-3 flex items-end gap-2">
-          <AmountInput
-            className="max-w-xs flex-1"
-            label={t('estimator.price', { line: label, currency: line.currency })}
-            value={unit}
-            onChange={(amount) => onPrice(line.key as EditableLine, amount)}
-          />
-          {edited && (
-            <button
-              type="button"
-              onClick={() => onReset(line.key as EditableLine)}
-              aria-label={t('estimator.resetLine', { line: label })}
-              title={t('estimator.resetLine', { line: label })}
-              className="grid size-11 shrink-0 place-items-center rounded-xl border border-fog bg-white text-navy-deep hover:border-slate-mute"
-            >
-              <RotateCcw aria-hidden={true} className="size-4" />
-            </button>
-          )}
-        </div>
+        <AmountInput
+          className="mt-4 lg:mt-3"
+          fieldClassName="max-w-xs"
+          label={t('estimator.price', { line: label, currency: line.currency })}
+          value={unit}
+          onChange={(amount) => onPrice(line.key as EditableLine, amount)}
+          after={
+            edited && (
+              <button
+                type="button"
+                onClick={() => onReset(line.key as EditableLine)}
+                aria-label={t('estimator.resetLine', { line: label })}
+                title={t('estimator.resetLine', { line: label })}
+                className="grid size-11 shrink-0 place-items-center rounded-xl border border-fog bg-white text-navy-deep hover:border-slate-mute"
+              >
+                <RotateCcw aria-hidden={true} className="size-4" />
+              </button>
+            )
+          }
+        />
       )}
     </li>
   );
