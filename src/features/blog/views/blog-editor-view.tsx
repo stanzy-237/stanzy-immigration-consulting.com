@@ -16,7 +16,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { ArticleBody } from '@/features/blog/components/article-body';
 import { RichTextEditor } from '@/features/blog/components/rich-text-editor';
-import { SEO_DESCRIPTION_LIMIT, SEO_TITLE_LIMIT, slugify, type BlogLocale } from '@/features/blog/lib/blog-schema';
+import { SEO_DESCRIPTION_LIMIT, SEO_TITLE_LIMIT, slugify, toBlogLocale, type BlogLocale } from '@/features/blog/lib/blog-schema';
+import { categoryName } from '@/features/blog/lib/category-name';
 import { missingForPublish } from '@/features/blog/lib/publish-check';
 import { EMPTY_ARTICLE, renderArticle, type ArticleDoc } from '@/features/blog/lib/render-article';
 import { uploadBlogImage } from '@/features/blog/lib/upload-image';
@@ -102,22 +103,23 @@ function Field({
  * tags, excerpt, cover, search fields) and its status actions.
  */
 export function BlogEditorView({ id }: { id?: string }): ReactNode {
-  const t = useTranslations('BlogAdmin');
-  const tEditor = useTranslations('BlogAdmin.editor');
+  const t = useTranslations('BlogDashboard');
+  const tEditor = useTranslations('BlogDashboard.editor');
+  const tPublic = useTranslations('Blog');
   const format = useFormatter();
   const router = useRouter();
   const utils = api.useUtils();
   const uid = useId();
   const ids = (name: string) => `${uid}-${name}`;
 
-  const article = api.blog.admin.get.useQuery({ id: id ?? '' }, { enabled: Boolean(id) });
+  const article = api.blog.dashboard.get.useQuery({ id: id ?? '' }, { enabled: Boolean(id) });
   const categories = api.blog.categories.useQuery();
-  const knownTags = api.blog.admin.tags.useQuery();
-  const create = api.blog.admin.create.useMutation();
-  const update = api.blog.admin.update.useMutation();
-  const publish = api.blog.admin.publish.useMutation();
-  const unpublish = api.blog.admin.unpublish.useMutation();
-  const remove = api.blog.admin.delete.useMutation();
+  const knownTags = api.blog.dashboard.tags.useQuery();
+  const create = api.blog.dashboard.create.useMutation();
+  const update = api.blog.dashboard.update.useMutation();
+  const publish = api.blog.dashboard.publish.useMutation();
+  const unpublish = api.blog.dashboard.unpublish.useMutation();
+  const remove = api.blog.dashboard.delete.useMutation();
 
   const [form, setForm] = useState<Form>(EMPTY_FORM);
   const [loadedId, setLoadedId] = useState<string | null>(null);
@@ -141,7 +143,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
     setForm({
       title: data.title,
       slug: data.slug,
-      locale: data.locale === 'en' ? 'en' : 'fr',
+      locale: toBlogLocale(data.locale),
       content: data.content as ArticleDoc,
       categoryId: data.categoryId,
       tagsText: data.tags.join(', '),
@@ -155,13 +157,25 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
     setPublishedAt(data.publishedAt);
   }
 
-  // Leaving with unsaved changes asks first.
+  // Leaving with unsaved changes asks first: closing the tab, and following
+  // any link in the page (the sidebar, « Retour », « Voir le site »).
   useEffect(() => {
     if (!dirty) return;
     const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    const confirmLink = (event: MouseEvent) => {
+      const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+      if (link && !window.confirm(tEditor('leaveWarning'))) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
     window.addEventListener('beforeunload', warn);
-    return () => window.removeEventListener('beforeunload', warn);
-  }, [dirty]);
+    document.addEventListener('click', confirmLink, true);
+    return () => {
+      window.removeEventListener('beforeunload', warn);
+      document.removeEventListener('click', confirmLink, true);
+    };
+  }, [dirty, tEditor]);
 
   const change = (patch: Partial<Form>) => {
     setForm((current) => ({ ...current, ...patch }));
@@ -193,7 +207,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
       const result = id ? await update.mutateAsync({ id, ...payload }) : await create.mutateAsync(payload);
       setDirty(false);
       setSaved(true);
-      void utils.blog.admin.invalidate();
+      void utils.blog.dashboard.invalidate();
       if (!id) router.replace(`/tableau-de-bord/blog/${result.id}`);
       return result.id;
     } catch (caught) {
@@ -229,7 +243,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
       await publish.mutateAsync({ id: savedId });
       setStatus('PUBLISHED');
       setPublishedAt((current) => current ?? new Date());
-      void utils.blog.admin.invalidate();
+      void utils.blog.dashboard.invalidate();
     });
 
   const onUnpublish = () =>
@@ -237,7 +251,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
       if (!id) return;
       await unpublish.mutateAsync({ id });
       setStatus('DRAFT');
-      void utils.blog.admin.invalidate();
+      void utils.blog.dashboard.invalidate();
     });
 
   const onDelete = () =>
@@ -245,7 +259,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
       if (!id) return;
       try {
         await remove.mutateAsync({ id });
-        void utils.blog.admin.invalidate();
+        void utils.blog.dashboard.invalidate();
         setDirty(false);
         router.replace('/tableau-de-bord/blog');
       } catch {
@@ -272,8 +286,8 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
   }
   if (id && !data) return <p className="text-slate">{t('loading')}</p>;
 
-  const categoryName = (categoryId: string) =>
-    categories.data?.find((category) => category.id === categoryId)?.[form.locale === 'en' ? 'nameEn' : 'nameFr'];
+  const chosenCategory = categories.data?.find((category) => category.id === form.categoryId);
+  const rendered = renderArticle(form.content);
   const unusedTags = (knownTags.data ?? []).filter((tag) => !tagsOf(form.tagsText).map(slugify).includes(tag));
 
   return (
@@ -357,20 +371,30 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
 
       {previewing ? (
         <article lang={form.locale} className="mx-auto max-w-3xl rounded-2xl bg-white px-5 py-8 shadow-sm sm:px-10">
-          {form.categoryId && (
+          {chosenCategory && (
             <p className="inline-flex rounded-full bg-blush px-3 py-1 text-xs font-semibold uppercase tracking-widest text-rouge">
-              {categoryName(form.categoryId)}
+              {categoryName(chosenCategory, form.locale)}
             </p>
           )}
           <h1 className="mt-4 font-heading text-3xl font-bold leading-tight text-navy-deep sm:text-4xl">{form.title}</h1>
+          <p className="mt-3 text-sm text-slate">{tPublic('readingMinutes', { minutes: rendered.readingMinutes })}</p>
           {form.coverUrl && (
             <div className="relative mt-6 aspect-video w-full overflow-hidden rounded-2xl bg-ice-blue">
               <Image src={form.coverUrl} alt={form.coverAlt} fill sizes="768px" className="object-cover" />
             </div>
           )}
           <div className="mt-6">
-            <ArticleBody html={renderArticle(form.content).html} />
+            <ArticleBody html={rendered.html} />
           </div>
+          {tagsOf(form.tagsText).length > 0 && (
+            <ul className="mt-8 flex flex-wrap gap-2 border-t border-fog-light pt-6">
+              {tagsOf(form.tagsText).map((tag) => (
+                <li key={tag} className="rounded-full border-2 border-fog-light px-3.5 py-1.5 text-sm font-semibold text-navy-deep">
+                  #{slugify(tag)}
+                </li>
+              ))}
+            </ul>
+          )}
         </article>
       ) : (
         <div className="grid gap-6 lg:grid-cols-3">
@@ -436,7 +460,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
                   <option value="">{tEditor('chooseCategory')}</option>
                   {categories.data?.map((category) => (
                     <option key={category.id} value={category.id}>
-                      {category.nameFr}
+                      {categoryName(category, form.locale)}
                     </option>
                   ))}
                 </select>

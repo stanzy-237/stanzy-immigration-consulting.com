@@ -7,6 +7,7 @@ import {
   BLOG_LOCALES,
   categoryInputSchema,
 } from '@/features/blog/lib/blog-schema';
+import { missingForPublish } from '@/features/blog/lib/publish-check';
 import { renderArticle, type ArticleDoc } from '@/features/blog/lib/render-article';
 import { invalidateBlog } from '@/features/blog/server/blog-cache';
 import { findPublished, listCategories, listPublished } from '@/features/blog/server/blog-queries';
@@ -14,28 +15,34 @@ import { consultantProcedure, createTRPCRouter, publicProcedure } from '@/server
 import type { TRPCContext } from '@/server/trpc/context';
 
 const byId = z.object({ id: z.string().min(1) });
-const fail = (code: 'BAD_REQUEST' | 'CONFLICT' | 'NOT_FOUND', message?: string) => new TRPCError({ code, message });
+const trpcError = (code: 'BAD_REQUEST' | 'CONFLICT' | 'NOT_FOUND', message?: string) => new TRPCError({ code, message });
 
 type Db = TRPCContext['prisma'];
 
 async function postOrThrow(db: Db, id: string) {
   const post = await db.blogPost.findUnique({ where: { id } });
-  if (!post) throw fail('NOT_FOUND');
+  if (!post) throw trpcError('NOT_FOUND');
   return post;
 }
 
 /** Another Article (or category) already answers at this slug. */
 async function assertSlugFree(find: () => Promise<{ id: string } | null>, ownId?: string) {
   const other = await find();
-  if (other && other.id !== ownId) throw fail('CONFLICT', 'BLOG_SLUG_TAKEN');
+  if (other && other.id !== ownId) throw trpcError('CONFLICT', 'BLOG_SLUG_TAKEN');
 }
 
 async function assertCategory(db: Db, id: string) {
-  if (!(await db.blogCategory.findUnique({ where: { id } }))) throw fail('BAD_REQUEST', 'BLOG_CATEGORY_MISSING');
+  if (!(await db.blogCategory.findUnique({ where: { id } }))) throw trpcError('BAD_REQUEST', 'BLOG_CATEGORY_MISSING');
+}
+
+async function categoryOrThrow(db: Db, id: string) {
+  const category = await db.blogCategory.findUnique({ where: { id } });
+  if (!category) throw trpcError('NOT_FOUND');
+  return category;
 }
 
 /** The columns a save writes: the input as validated, plus its reading time. */
-const columns = (input: z.output<typeof articleInputSchema>) => ({
+const articleRow = (input: z.output<typeof articleInputSchema>) => ({
   ...input,
   content: input.content as unknown as Prisma.InputJsonValue,
   readingMinutes: renderArticle(input.content).readingMinutes,
@@ -60,13 +67,13 @@ export const blogRouter = createTRPCRouter({
 
   bySlug: publicProcedure.input(z.object({ slug: z.string() })).query(async ({ ctx, input }) => {
     const article = await findPublished(ctx.prisma, input.slug);
-    if (!article) throw fail('NOT_FOUND');
+    if (!article) throw trpcError('NOT_FOUND');
     return article;
   }),
 
   categories: publicProcedure.query(({ ctx }) => listCategories(ctx.prisma)),
 
-  admin: createTRPCRouter({
+  dashboard: createTRPCRouter({
     /** Every Article, last modified first. */
     list: consultantProcedure
       .input(z.object({ status: z.enum(['DRAFT', 'PUBLISHED']).optional() }))
@@ -98,7 +105,7 @@ export const blogRouter = createTRPCRouter({
       await assertSlugFree(() => ctx.prisma.blogPost.findUnique({ where: { slug: input.slug } }));
       await assertCategory(ctx.prisma, input.categoryId);
       const post = await ctx.prisma.blogPost.create({
-        data: { ...columns(input), authorId: ctx.session.account.id },
+        data: { ...articleRow(input), authorId: ctx.session.account.id },
       });
       invalidateBlog();
       return { id: post.id };
@@ -111,14 +118,21 @@ export const blogRouter = createTRPCRouter({
         await postOrThrow(ctx.prisma, id);
         await assertSlugFree(() => ctx.prisma.blogPost.findUnique({ where: { slug: article.slug } }), id);
         await assertCategory(ctx.prisma, article.categoryId);
-        await ctx.prisma.blogPost.update({ where: { id }, data: columns(article) });
+        await ctx.prisma.blogPost.update({ where: { id }, data: articleRow(article) });
         invalidateBlog();
         return { id };
       }),
 
-    /** The publish date is set the first time only. */
+    /**
+     * The publish date is set the first time only. Refused (BLOG_NOT_READY)
+     * while the stored Article lacks what the editor also asks for: a title,
+     * content, a category, alt text on its cover and every image.
+     */
     publish: consultantProcedure.input(byId).mutation(async ({ ctx, input }) => {
       const post = await postOrThrow(ctx.prisma, input.id);
+      if (missingForPublish({ ...post, content: post.content as unknown as ArticleDoc }).length > 0) {
+        throw trpcError('BAD_REQUEST', 'BLOG_NOT_READY');
+      }
       await ctx.prisma.blogPost.update({
         where: { id: input.id },
         data: { status: 'PUBLISHED', publishedAt: post.publishedAt ?? new Date() },
@@ -135,7 +149,7 @@ export const blogRouter = createTRPCRouter({
     /** Drafts only: a published Article is unpublished first. */
     delete: consultantProcedure.input(byId).mutation(async ({ ctx, input }) => {
       const post = await postOrThrow(ctx.prisma, input.id);
-      if (post.status === 'PUBLISHED') throw fail('BAD_REQUEST', 'BLOG_DELETE_PUBLISHED');
+      if (post.status === 'PUBLISHED') throw trpcError('BAD_REQUEST', 'BLOG_DELETE_PUBLISHED');
       await ctx.prisma.blogPost.delete({ where: { id: input.id } });
       invalidateBlog();
     }),
@@ -170,7 +184,7 @@ export const blogRouter = createTRPCRouter({
         .input(categoryInputSchema.extend(byId.shape))
         .mutation(async ({ ctx, input }) => {
           const { id, ...data } = input;
-          if (!(await ctx.prisma.blogCategory.findUnique({ where: { id } }))) throw fail('NOT_FOUND');
+          await categoryOrThrow(ctx.prisma, id);
           await assertSlugFree(() => ctx.prisma.blogCategory.findUnique({ where: { slug: data.slug } }), id);
           await ctx.prisma.blogCategory.update({ where: { id }, data });
           invalidateBlog();
@@ -178,9 +192,9 @@ export const blogRouter = createTRPCRouter({
 
       /** Refused while an Article uses it: every Article keeps a category. */
       delete: consultantProcedure.input(byId).mutation(async ({ ctx, input }) => {
-        if (!(await ctx.prisma.blogCategory.findUnique({ where: { id: input.id } }))) throw fail('NOT_FOUND');
+        await categoryOrThrow(ctx.prisma, input.id);
         if (await ctx.prisma.blogPost.count({ where: { categoryId: input.id } })) {
-          throw fail('CONFLICT', 'BLOG_CATEGORY_IN_USE');
+          throw trpcError('CONFLICT', 'BLOG_CATEGORY_IN_USE');
         }
         await ctx.prisma.blogCategory.delete({ where: { id: input.id } });
         invalidateBlog();

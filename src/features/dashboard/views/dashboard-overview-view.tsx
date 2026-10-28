@@ -11,7 +11,7 @@ import { api } from '@/trpc/react';
 export function DashboardOverviewView(): ReactNode {
   const t = useTranslations('Dashboard');
   const format = useFormatter();
-  const summary = api.blog.admin.summary.useQuery();
+  const summary = api.blog.dashboard.summary.useQuery();
   const blogId = useId();
   const data = summary.data;
 

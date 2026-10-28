@@ -26,7 +26,7 @@ const summary = vi.hoisted(() => ({
     | undefined,
 }));
 vi.mock('@/trpc/react', () => ({
-  api: { blog: { admin: { summary: { useQuery: () => ({ data: summary.data, isLoading: !summary.data }) } } } },
+  api: { blog: { dashboard: { summary: { useQuery: () => ({ data: summary.data, isLoading: !summary.data }) } } } },
 }));
 
 beforeEach(() => {

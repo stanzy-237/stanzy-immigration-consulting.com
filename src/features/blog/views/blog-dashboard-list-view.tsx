@@ -1,9 +1,10 @@
 'use client';
 
 import { Plus, Tags } from 'lucide-react';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
+import { categoryName } from '@/features/blog/lib/category-name';
 import { Link } from '@/i18n/navigation';
 import { api } from '@/trpc/react';
 
@@ -14,11 +15,12 @@ const head = 'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider
 const cell = 'px-4 py-3 align-middle text-sm text-navy-deep';
 
 /** The Blog section's home: every Article, last modified first, filterable by status. */
-export function BlogAdminListView(): ReactNode {
-  const t = useTranslations('BlogAdmin');
+export function BlogDashboardListView(): ReactNode {
+  const t = useTranslations('BlogDashboard');
   const format = useFormatter();
+  const locale = useLocale();
   const [filter, setFilter] = useState<StatusFilter>('ALL');
-  const list = api.blog.admin.list.useQuery(filter === 'ALL' ? {} : { status: filter });
+  const list = api.blog.dashboard.list.useQuery(filter === 'ALL' ? {} : { status: filter });
   const date = (value: Date) => format.dateTime(value, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const statusPill = (status: 'DRAFT' | 'PUBLISHED') => (
     <span
@@ -95,7 +97,7 @@ export function BlogAdminListView(): ReactNode {
                     </td>
                     <td className={cell}>{statusPill(post.status)}</td>
                     <td className={`${cell} uppercase`}>{post.locale}</td>
-                    <td className={cell}>{post.category.nameFr}</td>
+                    <td className={cell}>{categoryName(post.category, locale)}</td>
                     <td className={`${cell} whitespace-nowrap text-slate`}>{date(post.updatedAt)}</td>
                   </tr>
                 ))}
@@ -115,7 +117,7 @@ export function BlogAdminListView(): ReactNode {
                     {statusPill(post.status)}
                   </span>
                   <span className="mt-2 block text-xs text-slate">
-                    {post.category.nameFr} · {post.locale.toUpperCase()} · {date(post.updatedAt)}
+                    {categoryName(post.category, locale)} · {post.locale.toUpperCase()} · {date(post.updatedAt)}
                   </span>
                 </Link>
               </li>

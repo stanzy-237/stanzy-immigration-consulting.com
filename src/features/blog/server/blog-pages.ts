@@ -1,6 +1,9 @@
+import type { Metadata } from 'next';
 import { unstable_cache } from 'next/cache';
 
+import { articleMetadata } from '@/features/blog/lib/article-metadata';
 import type { BlogLocale } from '@/features/blog/lib/blog-schema';
+import { categoryName } from '@/features/blog/lib/category-name';
 import { BLOG_CACHE_TAG } from '@/features/blog/server/blog-cache';
 import {
   findPublished,
@@ -11,6 +14,7 @@ import {
   type BlogListInput,
   type PublishedArticle,
 } from '@/features/blog/server/blog-queries';
+import { siteUrl } from '@/lib/site-url';
 import { prisma } from '@/server/db/client';
 
 /**
@@ -59,3 +63,13 @@ export const getSitemapArticles = cached('sitemap', async () => {
   });
   return rows.map((row) => ({ ...row, updatedAt: row.updatedAt.toISOString() }));
 });
+
+/** A published Article's search and share tags, for its page; none for an unknown slug. */
+export async function publishedArticleMetadata(slug: string, locale: string): Promise<Metadata> {
+  const article = await getPublishedArticle(slug);
+  if (!article) return {};
+  return articleMetadata(
+    { ...article, excerpt: article.ownExcerpt, categoryName: categoryName(article.category, locale) },
+    siteUrl(),
+  );
+}

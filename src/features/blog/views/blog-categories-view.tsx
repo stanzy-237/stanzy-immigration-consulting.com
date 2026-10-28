@@ -16,7 +16,7 @@ const label = 'mb-1 block text-xs font-semibold text-slate';
 
 /** Shows the server's refusal code as a sentence; anything unexpected as a generic failure. */
 function useErrorText() {
-  const t = useTranslations('BlogAdmin.categories.errors');
+  const t = useTranslations('BlogDashboard.categories.errors');
   return (caught: unknown) => {
     const message = caught instanceof Error ? caught.message : '';
     return message === 'BLOG_SLUG_TAKEN' || message === 'BLOG_CATEGORY_IN_USE' ? t(message) : t('generic');
@@ -24,11 +24,11 @@ function useErrorText() {
 }
 
 function CategoryRow({ category }: { category: Category }): ReactNode {
-  const t = useTranslations('BlogAdmin.categories');
+  const t = useTranslations('BlogDashboard.categories');
   const errorText = useErrorText();
   const utils = api.useUtils();
-  const update = api.blog.admin.categories.update.useMutation();
-  const remove = api.blog.admin.categories.delete.useMutation();
+  const update = api.blog.dashboard.categories.update.useMutation();
+  const remove = api.blog.dashboard.categories.delete.useMutation();
   const [draft, setDraft] = useState(category);
   const [error, setError] = useState<string | null>(null);
   const id = useId();
@@ -83,11 +83,11 @@ function CategoryRow({ category }: { category: Category }): ReactNode {
 
 /** The Blog's categories: rename them in French and English, add new ones, remove unused ones. */
 export function BlogCategoriesView(): ReactNode {
-  const t = useTranslations('BlogAdmin.categories');
+  const t = useTranslations('BlogDashboard.categories');
   const errorText = useErrorText();
   const utils = api.useUtils();
   const categories = api.blog.categories.useQuery();
-  const create = api.blog.admin.categories.create.useMutation();
+  const create = api.blog.dashboard.categories.create.useMutation();
   const [draft, setDraft] = useState({ nameFr: '', nameEn: '', slug: '' });
   const [slugTouched, setSlugTouched] = useState(false);
   const [error, setError] = useState<string | null>(null);

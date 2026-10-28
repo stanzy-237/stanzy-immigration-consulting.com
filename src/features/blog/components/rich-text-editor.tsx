@@ -51,7 +51,7 @@ export function RichTextEditor({
   onChange: (doc: ArticleDoc) => void;
   onUploadError: () => void;
 }): ReactNode {
-  const t = useTranslations('BlogAdmin.editor');
+  const t = useTranslations('BlogDashboard.editor');
   const fileInput = useRef<HTMLInputElement>(null);
   const editor = useEditor({
     extensions: EXTENSIONS,
@@ -87,7 +87,9 @@ export function RichTextEditor({
     if (!editor || !file) return;
     try {
       const src = await uploadBlogImage(file);
-      const alt = window.prompt(t('imageAltPrompt'))?.trim() ?? '';
+      // No alt text, no image: every image the Blog shows is described.
+      const alt = window.prompt(t('imageAltPrompt'))?.trim();
+      if (!alt) return;
       editor.chain().focus().setImage({ src, alt }).run();
     } catch {
       onUploadError();

@@ -58,10 +58,10 @@ vi.mock('@/trpc/react', () => {
   const mutation = (fn: (input: unknown) => unknown) => () => ({ mutateAsync: fn, isPending: false });
   return {
   api: {
-    useUtils: () => ({ blog: { admin: { invalidate: vi.fn() } } }),
+    useUtils: () => ({ blog: { dashboard: { invalidate: vi.fn() } } }),
     blog: {
       categories: { useQuery: () => ({ data: CATEGORIES }) },
-      admin: {
+      dashboard: {
         get: { useQuery: () => ({ data: trpc.article, isLoading: false, isError: false }) },
         tags: { useQuery: () => ({ data: ['tcf', 'nclc'] }) },
         create: { useMutation: mutation((input) => trpc.create(input)) },

@@ -1384,7 +1384,7 @@
     },
     "greeting": "Hello {name}"
   },
-  "BlogAdmin": {
+  "BlogDashboard": {
     "title": "Articles",
     "newArticle": "New article",
     "categoriesLink": "Categories",

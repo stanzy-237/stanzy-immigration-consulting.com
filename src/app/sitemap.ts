@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-import { siteUrl } from '@/features/blog/lib/site-url';
+import { siteUrl } from '@/lib/site-url';
 import { getSitemapArticles } from '@/features/blog/server/blog-pages';
 import { routing } from '@/i18n/routing';
 

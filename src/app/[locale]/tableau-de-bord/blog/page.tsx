@@ -1,5 +1,5 @@
-import { BlogAdminListView } from '@/features/blog/views/blog-admin-list-view';
+import { BlogDashboardListView } from '@/features/blog/views/blog-dashboard-list-view';
 
 export default function Page() {
-  return <BlogAdminListView />;
+  return <BlogDashboardListView />;
 }
