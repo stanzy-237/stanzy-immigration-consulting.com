@@ -4,13 +4,14 @@ import { CalendarClock, Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { ReliabilityBadge } from '@/features/draw-prediction/components/reliability-badge';
 import { usePredictionText } from '@/features/draw-prediction/hooks/use-prediction-text';
 import type { GroupPrediction } from '@/features/draw-prediction/lib/predict-next-draws';
 
 /**
  * The most likely next Tirage, laid out like the latest-Tirage card: a white
- * card led by the expected CRS range in rouge with its median, then the date
- * window and the one-paragraph « why ».
+ * card led by the expected CRS range in rouge with its centre, then the likely
+ * date (or week), how reliable that has been and the one-paragraph « why ».
  */
 export function FeaturedPrediction({ prediction }: { prediction: GroupPrediction }): ReactNode {
   const t = useTranslations('DrawPrediction.featured');
@@ -40,11 +41,15 @@ export function FeaturedPrediction({ prediction }: { prediction: GroupPrediction
 
         <div className="mt-6 border-t border-fog-light pt-6 lg:col-span-3 lg:mt-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10">
           <div className="rounded-xl bg-off-white px-4 py-3">
-            <p className="font-label font-semibold uppercase tracking-widest text-slate">{t('window')}</p>
+            <p className="font-label font-semibold uppercase tracking-widest text-slate">{text.whenLabel(prediction)}</p>
             <p className="mt-1 flex items-center gap-2 font-heading text-lg font-bold text-navy-deep">
               <CalendarClock aria-hidden={true} className="size-5 shrink-0 text-rouge" />
-              <span>{text.window(prediction)}</span>
+              <span>{text.when(prediction)}</span>
             </p>
+          </div>
+          <div className="mt-4 flex flex-col items-start gap-2">
+            <ReliabilityBadge reliability={prediction.reliability} label={text.level(prediction)} />
+            <p className="text-body-sm text-slate">{text.reliability(prediction)}</p>
           </div>
           <p className="mt-4 text-body-sm text-slate">{text.why(prediction)}</p>
           <p className="mt-2 text-caption text-slate">{text.basis(prediction)}</p>

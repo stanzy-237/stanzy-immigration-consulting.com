@@ -9,12 +9,11 @@ import type { DrawSummary } from '@/features/draws/lib/draw-summary';
  * and the current instant to each group's next expected Tirage.
  *
  * Every expected date and score below is worked out by hand from the fixture
- * (calendar arithmetic and sorted lists in the comments), never by calling
- * the module's own helpers.
+ * (calendar arithmetic, weekdays and sorted lists in the comments), never by
+ * calling the module's own helpers.
  */
 
-const NOW = new Date('2026-10-27T10:00:00Z');
-// 12 months before NOW: 2025-10-27. Older Tirages give no cadence.
+const NOW = new Date('2026-10-27T10:00:00Z'); // a Tuesday
 
 const LABELS: Record<DrawGroup, string> = {
   GENERAL: 'No Program Specified',
@@ -23,6 +22,9 @@ const LABELS: Record<DrawGroup, string> = {
   FRENCH: 'French-Language proficiency 2026-Version 2',
   CATEGORY: 'Healthcare and social services occupations 2026-Version 1',
 };
+const HEALTH = 'Healthcare and social services occupations 2026-Version 1';
+const TRADES = 'Trades Occupations, 2026-Version 3';
+const STEM = 'STEM occupations 2026-Version 1';
 
 let roundNumber = 300;
 function draw(group: DrawGroup, date: string, crsMin: number, typeLabel = LABELS[group]): DrawSummary {
@@ -41,165 +43,136 @@ function draw(group: DrawGroup, date: string, crsMin: number, typeLabel = LABELS
   };
 }
 
-const HEALTH = 'Healthcare and social services occupations 2026-Version 1';
-const TRADES = 'Trades Occupations, 2026-Version 3';
-const STEM = 'STEM occupations 2026-Version 1';
-
 /**
- * CEC: six Tirages in the last 12 months (plus one older), gaps
- * 08-05 →12→ 08-17 →14→ 08-31 →20→ 09-20 →14→ 10-04 →16→ 10-20.
- * PNP: four Tirages two weeks apart. FRENCH: one Tirage. GENERAL: only one,
- * 17 months ago. CATEGORY: four Tirages four weeks apart, the last on 09-02.
+ * PNP: every other Monday, 07-06 to 10-26. CEC: every other Tuesday, 07-28 to
+ * 10-20. CATEGORY: every fourth Thursday, 06-04 to 10-22, mostly Santé.
+ * FRENCH: irregular, on Wednesdays (05-06, 07-01, 08-19), Fridays (06-12,
+ * 09-25, 10-16) and a Thursday (07-30). GENERAL: one Tirage 17 months ago.
  */
 const FIXTURE: DrawSummary[] = [
-  draw('CEC', '2025-09-10', 560),
-  draw('CEC', '2026-08-05', 540),
-  draw('CEC', '2026-08-17', 518),
-  draw('CEC', '2026-08-31', 530),
-  draw('CEC', '2026-09-20', 509),
-  draw('CEC', '2026-10-04', 522),
-  draw('CEC', '2026-10-20', 515),
-  draw('PNP', '2026-09-08', 760),
-  draw('PNP', '2026-09-22', 781),
-  draw('PNP', '2026-10-06', 772),
-  draw('PNP', '2026-10-20', 790),
-  draw('FRENCH', '2026-10-22', 410),
   draw('GENERAL', '2025-05-14', 480),
-  draw('CATEGORY', '2026-06-10', 470, HEALTH),
-  draw('CATEGORY', '2026-07-08', 433, TRADES),
-  draw('CATEGORY', '2026-08-05', 462, HEALTH),
-  draw('CATEGORY', '2026-09-02', 455, HEALTH),
+  draw('PNP', '2026-07-06', 761),
+  draw('PNP', '2026-07-20', 772),
+  draw('PNP', '2026-08-03', 725),
+  draw('PNP', '2026-08-17', 734),
+  draw('PNP', '2026-08-31', 697),
+  draw('PNP', '2026-09-14', 744),
+  draw('PNP', '2026-09-28', 760),
+  draw('PNP', '2026-10-12', 752),
+  draw('PNP', '2026-10-26', 770),
+  draw('CEC', '2026-07-28', 518),
+  draw('CEC', '2026-08-11', 521),
+  draw('CEC', '2026-08-25', 519),
+  draw('CEC', '2026-09-08', 523),
+  draw('CEC', '2026-09-22', 515),
+  draw('CEC', '2026-10-06', 520),
+  draw('CEC', '2026-10-20', 517),
+  draw('FRENCH', '2026-05-06', 400),
+  draw('FRENCH', '2026-06-12', 420),
+  draw('FRENCH', '2026-07-01', 395),
+  draw('FRENCH', '2026-07-30', 430),
+  draw('FRENCH', '2026-08-19', 410),
+  draw('FRENCH', '2026-09-25', 440),
+  draw('FRENCH', '2026-10-16', 407),
+  draw('CATEGORY', '2026-06-04', 470, HEALTH),
+  draw('CATEGORY', '2026-07-02', 433, TRADES),
+  draw('CATEGORY', '2026-07-30', 462, HEALTH),
+  draw('CATEGORY', '2026-08-27', 491, STEM),
+  draw('CATEGORY', '2026-09-24', 455, HEALTH),
+  draw('CATEGORY', '2026-10-22', 448, HEALTH),
 ].toReversed(); // newest first, as draws.list returns them
 
-const predictionFor = (group: DrawGroup, draws = FIXTURE, now = NOW) =>
-  predictNextDraws(draws, now).byGroup.find((p) => p.group === group);
+const predictionFor = (group: DrawGroup, draws = FIXTURE, now = NOW) => {
+  const found = predictNextDraws(draws, now).byGroup.find((p) => p.group === group);
+  if (!found) throw new Error(`no prediction for ${group}`);
+  return found;
+};
 
-describe('predictNextDraws — cadence', () => {
-  it('puts the window between the lower and upper quartile gaps after the last Tirage, at least median ± 2 days', () => {
-    // CEC gaps sorted: 12, 14, 14, 16, 20 (the 2025-09-10 one is over 12 months old).
-    // Median 14. Lower half 12, 14 → Q1 13; upper half 16, 20 → Q3 18.
-    // Never narrower than 14 ± 2: start min(13, 12) = 12, end max(18, 16) = 18.
-    // Window: 10-20 + 12 = 11-01, 10-20 + 18 = 11-07.
-    const cec = predictionFor('CEC')!;
-    expect(cec).toMatchObject({
-      windowStart: '2026-11-01',
-      windowEnd: '2026-11-07',
-      gapDays: 14,
-      fallback: false,
-      overdue: false,
-      countInYear: 6,
+describe('predictNextDraws — the date', () => {
+  it('gives a regular group its usual weekday, one usual gap after its last Tirage', () => {
+    // PNP: gaps all 14 days; last 10-26 (Monday) + 14 = 11-09, a Monday.
+    expect(predictionFor('PNP').date).toEqual({
+      precise: true,
+      day: '2026-11-09',
+      weekStart: '2026-11-09',
+      weekEnd: '2026-11-15',
     });
-    expect(cec.lastDraw.date).toBe('2026-10-20');
+    // CEC: last 10-20 (Tuesday) + 14 = 11-03, a Tuesday.
+    expect(predictionFor('CEC').date).toMatchObject({ precise: true, day: '2026-11-03' });
   });
 
-  it('uses the median gap ± 2 days when there are too few gaps for quartiles', () => {
-    // PNP gaps 14, 14, 14: median 14. Window 10-20 + 12 = 11-01, 10-20 + 16 = 11-05.
-    expect(predictionFor('PNP')).toMatchObject({ windowStart: '2026-11-01', windowEnd: '2026-11-05', gapDays: 14, countInYear: 4 });
-  });
-
-  it('never gives a single day, even for a perfectly regular group', () => {
-    // GENERAL every 7 days, 4 gaps: Q1 = Q3 = 7, widened to 7 ± 2.
-    // Window: 10-22 + 5 = 10-27 to 10-22 + 9 = 10-31.
-    const draws = ['2026-09-24', '2026-10-01', '2026-10-08', '2026-10-15', '2026-10-22'].map((date) => draw('GENERAL', date, 480));
-    expect(predictionFor('GENERAL', draws)).toMatchObject({ windowStart: '2026-10-27', windowEnd: '2026-10-31' });
-  });
-
-  it('starts a window that is already under way today', () => {
-    // GENERAL 10-14, 10-21: gap 7 → 10-21 + 5 = 10-26 to 10-21 + 9 = 10-30.
-    // 10-26 is behind NOW (10-27): the window starts today and is not overdue.
-    const draws = [draw('GENERAL', '2026-10-21', 480), draw('GENERAL', '2026-10-14', 485)];
-    expect(predictionFor('GENERAL', draws)).toMatchObject({ windowStart: '2026-10-27', windowEnd: '2026-10-30', overdue: false });
-  });
-
-  it('shifts a window that has already passed so it starts today', () => {
-    // CATEGORY gaps 28, 28, 28: window 09-02 + 26 = 09-28 to 09-02 + 30 = 10-02,
-    // before 10-27. Shifted: 10-27 to 10-27 + 4 = 10-31.
-    expect(predictionFor('CATEGORY')).toMatchObject({ windowStart: '2026-10-27', windowEnd: '2026-10-31', overdue: true });
-  });
-
-  it('gives a single-Tirage group a window from the other groups’ cadence', () => {
-    // Every gap of the other groups: CEC 12, 14, 14, 16, 20; PNP 14, 14, 14;
-    // CATEGORY 28, 28, 28. Sorted, the 6th of 11 is 14.
-    // FRENCH window: 10-22 + 12 = 11-03 to 10-22 + 16 = 11-07.
-    expect(predictionFor('FRENCH')).toMatchObject({
-      windowStart: '2026-11-03',
-      windowEnd: '2026-11-07',
-      gapDays: 14,
-      fallback: true,
-      countInYear: 1,
+  it('gives an irregular group the week only, around its usual weekday', () => {
+    // FRENCH gaps: 37, 19, 29, 20, 37, 21 → sorted 19 20 21 29 37 37, median 25.
+    // 10-16 + 25 = 11-10 (Tuesday). Usual weekday: Wednesday 3, Friday 3, a
+    // tie the most recent (10-16, a Friday) breaks → the Friday within 3 days
+    // of 11-10 is 11-13, in the week of Monday 11-09.
+    expect(predictionFor('FRENCH').date).toEqual({
+      precise: false,
+      day: '2026-11-13',
+      weekStart: '2026-11-09',
+      weekEnd: '2026-11-15',
     });
   });
 
-  it('leaves out a group with no Tirage in the last 12 months', () => {
-    expect(predictNextDraws(FIXTURE, NOW).byGroup.map((p) => p.group)).toEqual(['PNP', 'CEC', 'FRENCH', 'CATEGORY']);
+  it('moves a passed date to the next usual weekday and says so', () => {
+    // On Thursday 11-12, PNP's 11-09 has passed: the next Monday is 11-16.
+    const late = predictionFor('PNP', FIXTURE, new Date('2026-11-12T10:00:00Z'));
+    expect(late.overdue).toBe(true);
+    expect(late.date).toMatchObject({ day: '2026-11-16', weekStart: '2026-11-16', weekEnd: '2026-11-22' });
+    expect(predictionFor('PNP').overdue).toBe(false);
   });
 
-  it('predicts nothing before the first Tirage is stored', () => {
-    expect(predictNextDraws([], NOW)).toEqual({ featured: null, byGroup: [] });
-  });
-});
-
-describe('predictNextDraws — scores', () => {
-  it('gives the min, max and median of the group’s last 5 cut-offs', () => {
-    // CEC last 5, newest first: 515, 522, 509, 530, 518 (540 and 560 are older).
-    // Sorted 509, 515, 518, 522, 530: median 518.
-    expect(predictionFor('CEC')!.scores).toEqual({ min: 509, max: 530, median: 518, last: [515, 522, 509, 530, 518] });
+  it('features the group expected first: CEC on 11-03 before PNP on 11-09', () => {
+    expect(predictNextDraws(FIXTURE, NOW).featured?.group).toBe('CEC');
   });
 
-  it('takes the middle of the two middle cut-offs when there are four', () => {
-    // PNP: 790, 772, 781, 760. Sorted 760, 772, 781, 790: median (772 + 781) / 2 = 776.5 → 777.
-    expect(predictionFor('PNP')!.scores).toEqual({ min: 760, max: 790, median: 777, last: [790, 772, 781, 760] });
+  it('predicts only groups with a Tirage in the last 12 months', () => {
+    expect(predictNextDraws(FIXTURE, NOW).byGroup.map((p) => p.group)).not.toContain('GENERAL');
   });
 });
 
-describe('predictNextDraws — featured', () => {
-  it('features the group whose window starts first', () => {
-    // Starts: CATEGORY 10-27 (shifted), PNP 11-01, CEC 11-01, FRENCH 11-03.
-    expect(predictNextDraws(FIXTURE, NOW).featured?.group).toBe('CATEGORY');
+describe('predictNextDraws — the score', () => {
+  it('centres on the median of the last 3 cut-offs, give or take 1.5 times the usual change', () => {
+    // PNP last 3: 770, 752, 760 → median 760. Last 7 in order: 725 734 697
+    // 744 760 752 770; changes 9 37 47 16 8 18 → sorted 8 9 16 18 37 47,
+    // median 17; 1.5 × 17 = 25.5 → 26. Range 734–786.
+    expect(predictionFor('PNP').scores).toMatchObject({ center: 760, low: 734, high: 786 });
   });
 
-  it('breaks a tie on the start date with the group that had more Tirages in 12 months', () => {
-    // PNP 10-06, 10-20 and CEC 09-22, 10-06, 10-20: both gaps 14 → both windows 11-01 to 11-05.
-    // CEC has 3 Tirages, PNP 2.
-    const draws = [
-      draw('PNP', '2026-10-20', 780),
-      draw('CEC', '2026-10-20', 515),
-      draw('PNP', '2026-10-06', 770),
-      draw('CEC', '2026-10-06', 520),
-      draw('CEC', '2026-09-22', 525),
-    ];
-    const { featured, byGroup } = predictNextDraws(draws, NOW);
-    expect(byGroup.map((p) => [p.group, p.windowStart])).toEqual([
-      ['PNP', '2026-11-01'],
-      ['CEC', '2026-11-01'],
-    ]);
-    expect(featured?.group).toBe('CEC');
+  it('never narrows the range below ± 4 points', () => {
+    // CEC last 3: 517, 520, 515 → 517. Last 7 in order: 518 521 519 523 515
+    // 520 517; changes 3 2 4 8 5 3 → sorted 2 3 3 4 5 8, median 3.5; 1.5 ×
+    // 3.5 = 5.25 → 5. Range 512–522.
+    expect(predictionFor('CEC').scores).toMatchObject({ center: 517, low: 512, high: 522 });
+  });
+
+  it('reads Catégorie from its most likely type only, not the whole group', () => {
+    // Last 3 Catégorie: Santé 10-22, Santé 09-24, STIM 08-27 → Santé, 2 of 3.
+    // Santé alone, newest first: 448, 455, 462, 470 → last 3 median 455;
+    // in order 470 462 455 448, changes 8 7 7 → median 7; 1.5 × 7 = 10.5 → 11.
+    // (Trades' 433 and STEM's 491 are left out.)
+    const category = predictionFor('CATEGORY');
+    expect(category.category).toMatchObject({ count: 2, of: 3 });
+    expect(category.category?.draw.typeLabel).toBe(HEALTH);
+    expect(category.scores).toMatchObject({ center: 455, low: 444, high: 466 });
   });
 });
 
-describe('predictNextDraws — Catégorie type', () => {
-  it('names the type most frequent among the last 3 Catégorie Tirages', () => {
-    // Last 3: 09-02 Health, 08-05 Health, 07-08 Trades → Health, 2 of 3.
-    const { category } = predictionFor('CATEGORY')!;
-    expect(category).toMatchObject({ count: 2, of: 3 });
-    expect(category!.draw.typeLabel).toBe(HEALTH);
-    expect(category!.draw.date).toBe('2026-09-02');
+describe('predictNextDraws — reliability', () => {
+  it('measures itself on the past year: a perfectly regular group finds every week and day', () => {
+    // PNP replays: each Tirage from 08-03 on (two earlier ones give a gap),
+    // predicted the day after the one before it: 7 replays, all exact.
+    expect(predictionFor('PNP').reliability).toMatchObject({ level: 'high', sample: 7, weekRate: 1, dayRate: 1 });
   });
 
-  it('falls back to the most recent type when the last 3 all differ', () => {
-    // Last 3: 10-01 STEM, 09-03 Trades, 08-06 Health → STEM, the most recent.
-    const draws = [
-      draw('CATEGORY', '2026-10-01', 490, STEM),
-      draw('CATEGORY', '2026-09-03', 440, TRADES),
-      draw('CATEGORY', '2026-08-06', 470, HEALTH),
-      draw('CATEGORY', '2026-07-09', 471, HEALTH),
-    ];
-    const { category } = predictionFor('CATEGORY', draws)!;
-    expect(category).toMatchObject({ count: 1, of: 3 });
-    expect(category!.draw.typeLabel).toBe(STEM);
+  it('rates an irregular group low', () => {
+    // FRENCH replays: 07-01, 07-30, 08-19, 09-25, 10-16.
+    expect(predictionFor('FRENCH').reliability).toMatchObject({ level: 'low', sample: 5 });
   });
 
-  it('names no type for the other groups', () => {
-    expect(predictionFor('CEC')!.category).toBeNull();
+  it('says nothing about reliability with fewer than 4 replays', () => {
+    const recentOnly = FIXTURE.filter((d) => d.group !== 'PNP' || d.date >= '2026-09-14');
+    // PNP 09-14, 09-28, 10-12, 10-26: only 10-12 and 10-26 have two earlier ones.
+    expect(predictionFor('PNP', recentOnly).reliability).toBeNull();
   });
 });

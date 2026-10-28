@@ -32,24 +32,35 @@ const draw = (round: number, group: DrawGroup, date: string, crsMin: number, typ
 });
 
 /**
- * Worked by hand (12 months back from NOW: 2025-10-27):
- * - PNP 09-29, 10-21: one gap of 22 days → 10-21 + 20 = 11-10 to 10-21 + 24 = 11-14.
- * - CEC 09-22, 10-06, 10-20: gaps 14, 14 → 10-20 + 12 = 11-01 to 10-20 + 16 = 11-05.
- *   Scores 515, 522, 509: range 509–522, median 515.
- * - CATEGORY 07-08, 08-05, 09-02: gaps 28, 28 → 09-28 to 10-02, already passed,
- *   so 10-27 to 10-31: the earliest, featured. Scores 455, 462, 433: 433–462,
- *   median 455. Last 3: Health, Health, Trades → Health, 2 of 3.
+ * Worked by hand (12 months back from NOW, a Tuesday: 2025-10-27):
+ * - PNP every other Monday, 08-17 to 10-26 → 10-26 + 14 = Monday 11-09. The 4
+ *   Tirages from 09-14 on (two earlier ones each) replay exactly: reliable,
+ *   so the day is named. Last 3: 770, 752, 760 → 760; changes over the last 6
+ *   37 47 16 8 18 → median 18, × 1.5 = 27 → 733–787.
+ * - CEC Tuesdays 09-22, 10-06, 10-20 → Tuesday 11-03; one replay only, so no
+ *   reliability, but every Tirage on a Tuesday names the day. Scores 515, 522,
+ *   509 → 515; changes 13, 7 → 10, × 1.5 = 15 → 500–530.
+ * - CATEGORY Wed 07-08, Thu 08-06, Fri 09-04, Wed 09-30: gaps 29 29 26 → 29;
+ *   09-30 + 29 = Thu 10-29 → the Wednesday within 3 days, 10-28: the earliest,
+ *   featured. Wednesday is only 2 of 4, so the week only (10-26 to 11-01).
+ *   Last 3: Health, Health, Trades → Health, 2 of 3; Health alone 448, 455,
+ *   470 → 455; changes 15, 7 → 11, × 1.5 = 16.5 → 17 → 438–472.
  * - GENERAL: last Tirage 2025-05-14, over 12 months ago → left out.
  */
 const DRAWS: DrawSummary[] = [
-  draw(460, 'PNP', '2026-10-21', 790),
-  draw(459, 'CEC', '2026-10-20', 515),
-  draw(458, 'CEC', '2026-10-06', 522),
-  draw(457, 'PNP', '2026-09-29', 772),
-  draw(456, 'CEC', '2026-09-22', 509),
-  draw(455, 'CATEGORY', '2026-09-02', 455, HEALTH),
-  draw(454, 'CATEGORY', '2026-08-05', 462, HEALTH),
-  draw(453, 'CATEGORY', '2026-07-08', 433, 'Trades Occupations, 2026-Version 3'),
+  draw(470, 'PNP', '2026-10-26', 770),
+  draw(469, 'CEC', '2026-10-20', 515),
+  draw(468, 'PNP', '2026-10-12', 752),
+  draw(467, 'CEC', '2026-10-06', 522),
+  draw(466, 'CATEGORY', '2026-09-30', 448, HEALTH),
+  draw(465, 'PNP', '2026-09-28', 760),
+  draw(464, 'CEC', '2026-09-22', 509),
+  draw(463, 'PNP', '2026-09-14', 744),
+  draw(462, 'CATEGORY', '2026-09-04', 455, HEALTH),
+  draw(461, 'PNP', '2026-08-31', 697),
+  draw(460, 'PNP', '2026-08-17', 734),
+  draw(459, 'CATEGORY', '2026-08-06', 433, 'Trades Occupations, 2026-Version 3'),
+  draw(458, 'CATEGORY', '2026-07-08', 470, HEALTH),
   draw(400, 'GENERAL', '2025-05-14', 480),
 ];
 
@@ -94,7 +105,7 @@ const table = () => within(screen.getByRole('region', { name: 'Par type de tirag
 const bodyRows = () => within(table()).getAllByRole('row').slice(1);
 
 describe('DrawPredictionView', () => {
-  it('features the most likely next Tirage with its window, range, median and why', () => {
+  it('features the most likely next Tirage with its week, range, reliability and why', () => {
     render(withIntl(<DrawPredictionView />));
 
     const title = screen.getByRole('heading', { level: 1, name: 'Prochain tirage' });
@@ -103,29 +114,44 @@ describe('DrawPredictionView', () => {
 
     const card = within(featured());
     expect(card.getByRole('heading', { name: 'Catégorie' })).toBeInTheDocument();
-    expect(card.getByText('433–462')).toBeInTheDocument();
-    expect(card.getByText('médiane 455')).toBeInTheDocument();
-    expect(card.getByText('entre le 27 et le 31 oct.')).toBeInTheDocument();
+    expect(card.getByText('438–472')).toBeInTheDocument();
+    expect(card.getByText('autour de 455')).toBeInTheDocument();
+    expect(card.getByText('Semaine probable')).toBeInTheDocument();
+    expect(card.getByText('Fiabilité inconnue')).toBeInTheDocument();
+    expect(card.getByText('semaine du 26 octobre, date incertaine')).toBeInTheDocument();
+    expect(card.getByText('Pas encore assez de tirages Catégorie pour mesurer la fiabilité.')).toBeInTheDocument();
     expect(
       card.getByText(
-        'Le dernier tirage Catégorie date du 2 sept. ; ils ont lieu en général tous les 28 jours. ' +
-          'La date attendue est passée : le prochain peut tomber d’un jour à l’autre. ' +
+        'Le dernier tirage Catégorie date du 30 sept. ; ils ont lieu en général tous les 29 jours, le plus souvent le mercredi. ' +
           '2 des 3 derniers étaient des tirages Santé et social.',
       ),
     ).toBeInTheDocument();
+    expect(card.getByText('4 tirages en 12 mois · 3 derniers scores Santé et social : 448, 455, 470')).toBeInTheDocument();
   });
 
-  it('gives one row per group with a Tirage in the last 12 months, with the data behind it', () => {
+  it('gives one row per group with a Tirage in the last 12 months, naming the day where it can', () => {
     render(withIntl(<DrawPredictionView />));
 
     expect(bodyRows().map((row) => within(row).getAllByRole('cell')[0]!.textContent)).toEqual(['PCP', 'CEC', 'Catégorie']);
     const cec = within(bodyRows()[1]!);
-    expect(cec.getByText('entre le 1 et le 5 nov.')).toBeInTheDocument();
-    expect(cec.getByText('509–522')).toBeInTheDocument();
-    expect(cec.getByText('médiane 515')).toBeInTheDocument();
-    expect(cec.getByText('Le dernier tirage CEC date du 20 oct. ; ils ont lieu en général tous les 14 jours.')).toBeInTheDocument();
+    expect(cec.getByText('probablement le mardi 3 novembre')).toBeInTheDocument();
+    expect(cec.getByText('500–530')).toBeInTheDocument();
+    expect(cec.getByText('autour de 515')).toBeInTheDocument();
+    expect(
+      cec.getByText('Le dernier tirage CEC date du 20 oct. ; ils ont lieu en général tous les 14 jours, le plus souvent le mardi.'),
+    ).toBeInTheDocument();
     expect(cec.getByText('3 tirages en 12 mois · 3 derniers scores : 515, 522, 509')).toBeInTheDocument();
-    expect(within(bodyRows()[0]!).getByText('entre le 10 et le 14 nov.')).toBeInTheDocument();
+
+    const pnp = within(bodyRows()[0]!);
+    expect(pnp.getByText('probablement le lundi 9 novembre')).toBeInTheDocument();
+    expect(pnp.getByText('733–787')).toBeInTheDocument();
+    expect(pnp.getByText('Fiabilité élevée')).toBeInTheDocument();
+    expect(
+      pnp.getByText(
+        'Sur les 12 derniers mois, nos prédictions PCP ont visé la bonne semaine 100 % du temps, ' +
+          'le bon jour 100 % et la bonne fourchette de score 100 %.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('warns that it is an estimate, not a guarantee', () => {
@@ -148,7 +174,7 @@ describe('DrawPredictionView', () => {
     render(withIntl(<DrawPredictionView />, 'en'));
 
     const card = within(screen.getByRole('region', { name: 'Most likely next draw' }));
-    expect(card.getByText('between Oct 27 and Oct 31')).toBeInTheDocument();
+    expect(card.getByText('week of October 26, date uncertain')).toBeInTheDocument();
     expect(card.getByText(/2 of the last 3 were Health & social draws\.$/)).toBeInTheDocument();
   });
 

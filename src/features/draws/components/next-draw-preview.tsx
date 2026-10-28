@@ -5,7 +5,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { useMemo, type ReactNode } from 'react';
 
 // The pure module only: components stay inside their own feature (folder rule 3).
-import { predictNextDraws, windowDays } from '@/features/draw-prediction/lib/predict-next-draws';
+import { atNoon, predictNextDraws } from '@/features/draw-prediction/lib/predict-next-draws';
 import type { DrawSummary } from '@/features/draws/lib/draw-summary';
 import { Link } from '@/i18n/navigation';
 
@@ -16,19 +16,16 @@ import { Link } from '@/i18n/navigation';
 export function NextDrawPreview({ draws }: { draws: DrawSummary[] }): ReactNode {
   const t = useTranslations('Draws.nextDraw');
   const tGroups = useTranslations('Draws.groups');
-  // One wording for a window, shared with the Prochain tirage page.
+  // One wording for when, shared with the Prochain tirage page.
   const tPrediction = useTranslations('DrawPrediction');
   const format = useFormatter();
   const featured = useMemo(() => predictNextDraws(draws, new Date()).featured, [draws]);
   if (!featured) return null;
 
-  const { start, end, span } = windowDays(featured);
-  const dayMonth = (date: Date) => format.dateTime(date, { day: 'numeric', month: 'short', timeZone: 'UTC' });
-  const window = tPrediction('window', {
-    span,
-    start: dayMonth(start),
-    startDay: format.dateTime(start, { day: 'numeric', timeZone: 'UTC' }),
-    end: dayMonth(end),
+  const when = tPrediction('when', {
+    precise: String(featured.date.precise),
+    day: format.dateTime(atNoon(featured.date.day), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }),
+    week: format.dateTime(atNoon(featured.date.weekStart), { day: 'numeric', month: 'long', timeZone: 'UTC' }),
   });
 
   return (
@@ -38,7 +35,7 @@ export function NextDrawPreview({ draws }: { draws: DrawSummary[] }): ReactNode 
           <CalendarClock aria-hidden={true} className="mt-0.5 size-4 shrink-0 text-rouge" />
           <span>
             <strong className="font-semibold">{t('lead')}</strong>{' '}
-            {t('summary', { group: tGroups(featured.group), window, min: featured.scores.min, max: featured.scores.max })}
+            {t('summary', { group: tGroups(featured.group), when, min: featured.scores.low, max: featured.scores.high })}
           </span>
         </p>
         <Link

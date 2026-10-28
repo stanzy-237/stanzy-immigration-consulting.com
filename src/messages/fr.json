@@ -961,7 +961,7 @@
     "nextDraw": {
       "label": "Prochain tirage probable",
       "lead": "Prochain tirage probable :",
-      "summary": "{group}, {window}, {min}–{max}",
+      "summary": "{group}, {when}, {min}–{max}",
       "link": "Voir la prédiction"
     }
   },
@@ -977,27 +977,32 @@
     "disclaimer": "Estimation, pas une garantie : IRCC n’annonce pas ses tirages. Ces chiffres sont des statistiques sur les tirages passés.",
     "featured": {
       "label": "Prochain tirage le plus probable",
-      "window": "Fenêtre probable",
+      "window": "{precise, select, true {Date probable} other {Semaine probable}}",
       "score": "Score CRS attendu",
-      "median": "médiane {median}"
+      "median": "autour de {median}"
     },
     "groups": {
       "title": "Par type de tirage",
       "group": "Type",
-      "window": "Fenêtre probable",
+      "window": "Quand",
       "score": "Score CRS",
       "why": "Pourquoi"
     },
     "explain": {
-      "cadence": "Le dernier tirage {group} date du {date} ; ils ont lieu en général tous les {days, plural, one {# jour} other {# jours}}.",
+      "cadence": "Le dernier tirage {group} date du {date} ; ils ont lieu en général tous les {days, plural, one {# jour} other {# jours}}, le plus souvent le {weekday}.",
       "single": "Un seul tirage {group} en 12 mois, le {date} : la fenêtre suit le rythme habituel des autres tirages ({days, plural, one {# jour} other {# jours}}).",
       "overdue": "La date attendue est passée : le prochain peut tomber d’un jour à l’autre.",
       "categoryAll": "Les {of} derniers étaient des tirages {type}.",
       "categorySome": "{count} des {of} derniers étaient des tirages {type}.",
       "categoryLatest": "Le dernier était un tirage {type}."
     },
-    "data": "{count, plural, one {# tirage} other {# tirages}} en 12 mois · {scores, plural, one {dernier score} other {# derniers scores}} : {list}",
-    "window": "{span, select, day {le {end}} month {entre le {startDay} et le {end}} other {entre le {start} et le {end}}}"
+    "data": "{count, plural, one {# tirage} other {# tirages}} en 12 mois · {scores, plural, one {dernier score} other {# derniers scores}}{type, select, none {} other { {type}}} : {list}",
+    "when": "{precise, select, true {probablement le {day}} other {semaine du {week}, date incertaine}}",
+    "reliability": {
+      "level": "{level, select, high {Fiabilité élevée} medium {Fiabilité moyenne} low {Fiabilité faible} other {Fiabilité inconnue}}",
+      "measured": "Sur les 12 derniers mois, nos prédictions {group} ont visé la bonne semaine {week} du temps, le bon jour {day} et la bonne fourchette de score {score}.",
+      "unknown": "Pas encore assez de tirages {group} pour mesurer la fiabilité."
+    }
   },
   "Nclc": {
     "eyebrow": "Outil gratuit · Niveau linguistique",
