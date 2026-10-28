@@ -5,7 +5,8 @@ import { useTranslations } from 'next-intl';
 import { useId, useState, type ReactNode } from 'react';
 
 import { slugify } from '@/features/blog/lib/blog-schema';
-import { Link } from '@/i18n/navigation';
+// The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
+import Link from 'next/link';
 import { api } from '@/trpc/react';
 
 type Category = { id: string; slug: string; nameFr: string; nameEn: string };
@@ -107,7 +108,7 @@ export function BlogCategoriesView(): ReactNode {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <Link href="/tableau-de-bord/blog" className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-deep hover:text-rouge">
+      <Link href="/blog" className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-deep hover:text-rouge">
         <ArrowLeft aria-hidden={true} className="size-4" />
         {t('back')}
       </Link>

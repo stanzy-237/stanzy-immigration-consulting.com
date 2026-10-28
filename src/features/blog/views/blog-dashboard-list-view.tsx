@@ -5,7 +5,8 @@ import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
 import { categoryName } from '@/features/blog/lib/category-name';
-import { Link } from '@/i18n/navigation';
+// The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
+import Link from 'next/link';
 import { api } from '@/trpc/react';
 
 type StatusFilter = 'ALL' | 'DRAFT' | 'PUBLISHED';
@@ -38,14 +39,14 @@ export function BlogDashboardListView(): ReactNode {
         <h1 className="font-heading text-3xl font-bold text-navy-deep">{t('title')}</h1>
         <div className="flex flex-wrap gap-2">
           <Link
-            href="/tableau-de-bord/blog/categories"
+            href="/blog/categories"
             className="inline-flex h-11 items-center gap-2 rounded-full border-2 border-fog-light bg-white px-4 text-sm font-semibold text-navy-deep hover:border-navy-deep"
           >
             <Tags aria-hidden={true} className="size-4" />
             {t('categoriesLink')}
           </Link>
           <Link
-            href="/tableau-de-bord/blog/nouveau"
+            href="/blog/nouveau"
             className="inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson"
           >
             <Plus aria-hidden={true} className="size-4" />
@@ -91,7 +92,7 @@ export function BlogDashboardListView(): ReactNode {
                 {list.data.map((post) => (
                   <tr key={post.id} className="border-b border-off-white last:border-b-0 hover:bg-off-white">
                     <td className={`${cell} font-semibold`}>
-                      <Link href={`/tableau-de-bord/blog/${post.id}`} className="hover:text-rouge">
+                      <Link href={`/blog/${post.id}`} className="hover:text-rouge">
                         {post.title}
                       </Link>
                     </td>
@@ -109,7 +110,7 @@ export function BlogDashboardListView(): ReactNode {
             {list.data.map((post) => (
               <li key={post.id}>
                 <Link
-                  href={`/tableau-de-bord/blog/${post.id}`}
+                  href={`/blog/${post.id}`}
                   className="block rounded-2xl border border-fog-light bg-white p-4 shadow-sm hover:border-navy-deep"
                 >
                   <span className="flex items-start justify-between gap-3">

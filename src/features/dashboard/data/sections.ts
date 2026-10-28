@@ -8,16 +8,18 @@ import { LayoutDashboard, Newspaper, type LucideIcon } from 'lucide-react';
 export type DashboardSection = {
   /** Its label is `Dashboard.nav.<key>`. */
   key: 'overview' | 'blog';
+  /** Its address on the dashboard's subdomain. */
   href: string;
+  /** The first route segment below the dashboard it owns; null for the Aperçu. */
+  segment: string | null;
   icon: LucideIcon;
-  /** Active on its own page only, not on the sections below it. */
-  exact?: boolean;
 };
 
 export const DASHBOARD_SECTIONS: readonly DashboardSection[] = [
-  { key: 'overview', href: '/tableau-de-bord', icon: LayoutDashboard, exact: true },
-  { key: 'blog', href: '/tableau-de-bord/blog', icon: Newspaper },
+  { key: 'overview', href: '/', segment: null, icon: LayoutDashboard },
+  { key: 'blog', href: '/blog', segment: 'blog', icon: Newspaper },
 ];
 
-export const isSectionActive = (section: DashboardSection, pathname: string): boolean =>
-  section.exact ? pathname === section.href : pathname === section.href || pathname.startsWith(`${section.href}/`);
+/** `segments` are the route segments below the dashboard's layout (`['blog', 'post_7']`). */
+export const isSectionActive = (section: DashboardSection, segments: string[]): boolean =>
+  (segments[0] ?? null) === section.segment;

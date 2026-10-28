@@ -21,7 +21,9 @@ import { categoryName } from '@/features/blog/lib/category-name';
 import { missingForPublish } from '@/features/blog/lib/publish-check';
 import { EMPTY_ARTICLE, isOptimisableImage, renderArticle, safeImageSrc, type ArticleDoc } from '@/features/blog/lib/render-article';
 import { uploadBlogImage } from '@/features/blog/lib/upload-image';
-import { Link, useRouter } from '@/i18n/navigation';
+// The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api } from '@/trpc/react';
 
 type Form = {
@@ -208,7 +210,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
       setDirty(false);
       setSaved(true);
       void utils.blog.dashboard.invalidate();
-      if (!id) router.replace(`/tableau-de-bord/blog/${result.id}`);
+      if (!id) router.replace(`/blog/${result.id}`);
       return result.id;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : '';
@@ -261,7 +263,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
         await remove.mutateAsync({ id });
         void utils.blog.dashboard.invalidate();
         setDirty(false);
-        router.replace('/tableau-de-bord/blog');
+        router.replace('/blog');
       } catch {
         setError(tEditor('errors.BLOG_DELETE_PUBLISHED'));
       } finally {
@@ -292,7 +294,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <Link href="/tableau-de-bord/blog" className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-deep hover:text-rouge">
+      <Link href="/blog" className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-deep hover:text-rouge">
         <ArrowLeft aria-hidden={true} className="size-4" />
         {tEditor('back')}
       </Link>

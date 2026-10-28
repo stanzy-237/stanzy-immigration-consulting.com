@@ -2,6 +2,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { after } from 'next/server';
 
 import { parseConsultantEmails } from '@/features/auth/lib/consultant-emails';
+import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { env } from '@/lib/env';
 import { prisma } from '@/server/db/client';
 import { createAuth } from '@/server/auth/create-auth';
@@ -25,6 +26,9 @@ function withWwwVariant(origin: string): string[] {
   const host = url.hostname.startsWith('www.') ? url.hostname.slice(4) : `www.${url.hostname}`;
   return [url.origin, `${url.protocol}//${host}${url.port ? `:${url.port}` : ''}`];
 }
+
+/** The site's own hosts, plus admin.<site> where the Tableau de bord signs in. */
+const siteOrigins = (origin: string): string[] => [...withWwwVariant(origin), dashboardOrigin(origin)];
 
 /**
  * The app's Better Auth instance, wired to Neon through Prisma and to Resend.
@@ -50,8 +54,14 @@ export const auth = createAuth({
       ? { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET }
       : undefined,
   consultantEmails: parseConsultantEmails(env.CONSULTANT_EMAILS).emails,
+  cookieDomain: env.AUTH_COOKIE_DOMAIN,
   trustedOrigins: [
-    ...(env.BETTER_AUTH_URL ? withWwwVariant(env.BETTER_AUTH_URL) : []),
+    // Locally (no BETTER_AUTH_URL, not on Vercel) that is localhost and admin.localhost.
+    ...(env.BETTER_AUTH_URL
+      ? siteOrigins(env.BETTER_AUTH_URL)
+      : process.env.VERCEL
+        ? []
+        : siteOrigins('http://localhost:3000')),
     ...[vercelOrigin, vercelBranchOrigin].filter((origin): origin is string => Boolean(origin)),
   ],
 });

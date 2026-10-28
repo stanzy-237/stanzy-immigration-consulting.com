@@ -3,21 +3,23 @@
 import { ExternalLink, Menu, XIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useSelectedLayoutSegments } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { DASHBOARD_SECTIONS, isSectionActive } from '@/features/dashboard/data/sections';
-import { Link, usePathname } from '@/i18n/navigation';
 
 function SectionLinks({ onNavigate }: { onNavigate?: () => void }): ReactNode {
   const t = useTranslations('Dashboard.nav');
-  const pathname = usePathname();
+  // Below the dashboard's layout, whatever the address (admin.<site>/blog).
+  const segments = useSelectedLayoutSegments();
 
   return (
     <nav aria-label={t('label')}>
       <ul className="flex flex-col gap-1">
         {DASHBOARD_SECTIONS.map((section) => {
-          const active = isSectionActive(section, pathname);
+          const active = isSectionActive(section, segments);
           const Icon = section.icon;
           return (
             <li key={section.key}>
@@ -43,9 +45,18 @@ function SectionLinks({ onNavigate }: { onNavigate?: () => void }): ReactNode {
 /**
  * The Tableau de bord's frame around every dashboard page: the sections in a
  * sidebar from tablets up, behind a menu button in a drawer on phones, and a
- * header greeting the consultant with a way back to the public site.
+ * header greeting the consultant with a way back to the public site, which
+ * is on the main domain (`siteUrl`).
  */
-export function DashboardShell({ name, children }: { name: string; children: ReactNode }): ReactNode {
+export function DashboardShell({
+  name,
+  siteUrl,
+  children,
+}: {
+  name: string;
+  siteUrl: string;
+  children: ReactNode;
+}): ReactNode {
   const t = useTranslations('Dashboard');
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -72,13 +83,13 @@ export function DashboardShell({ name, children }: { name: string; children: Rea
             </button>
             <p className="font-heading text-base font-bold text-navy-deep">{t('greeting', { name })}</p>
           </div>
-          <Link
-            href="/"
+          <a
+            href={siteUrl}
             className="inline-flex items-center gap-1.5 rounded-full border-2 border-fog-light px-3.5 py-1.5 text-sm font-semibold text-navy-deep hover:border-navy-deep"
           >
             {t('viewSite')}
             <ExternalLink aria-hidden={true} className="size-3.5" />
-          </Link>
+          </a>
         </header>
         <main className="flex-1 px-4 py-6 sm:px-7 sm:py-8">{children}</main>
       </div>

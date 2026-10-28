@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -12,16 +11,8 @@ import { BlogEditorView } from '@/features/blog/views/blog-editor-view';
  * is replaced by stubs that record what the page sends; the rich-text body
  * is the real editor, only read here, never typed into.
  */
-const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }));
-vi.mock('@/i18n/navigation', () => ({
-  usePathname: () => '/tableau-de-bord/blog/nouveau',
-  useRouter: () => router,
-  Link: ({ href, children, ...rest }: { href: string; children: ReactNode }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }));
+vi.mock('next/navigation', () => ({ useRouter: () => router }));
 
 const CATEGORIES = [
   { id: 'cat_ee', slug: 'entree-express', nameFr: 'Entrée Express', nameEn: 'Express Entry' },
@@ -105,7 +96,7 @@ describe('BlogEditorView — a new Article', () => {
       tags: ['TCF', 'nclc'],
       content: { type: 'doc' },
     });
-    expect(router.replace).toHaveBeenCalledWith('/tableau-de-bord/blog/post_9');
+    expect(router.replace).toHaveBeenCalledWith('/blog/post_9');
   });
 
   it('keeps an address the consultant typed when the title changes', () => {

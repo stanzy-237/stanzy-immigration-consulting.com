@@ -26,6 +26,8 @@ export type AuthDeps = {
    * than one for an unknown address. Tests leave it out to see the email.
    */
   runInBackground?: (task: Promise<unknown>) => void;
+  /** Shares the session cookie with the subdomains of this parent domain. */
+  cookieDomain?: string;
   /** Google OAuth client. Without it, "Continuer avec Google" is off. */
   google?: GoogleOAuthClient;
   /**
@@ -72,9 +74,10 @@ export function createAuth(deps: AuthDeps) {
     secret: deps.secret,
     trustedOrigins: deps.trustedOrigins,
     database: deps.database,
-    advanced: deps.runInBackground
-      ? { backgroundTasks: { handler: deps.runInBackground } }
-      : undefined,
+    advanced: {
+      ...(deps.runInBackground && { backgroundTasks: { handler: deps.runInBackground } }),
+      ...(deps.cookieDomain && { crossSubDomainCookies: { enabled: true, domain: deps.cookieDomain } }),
+    },
     user: {
       modelName: 'account',
       additionalFields: {

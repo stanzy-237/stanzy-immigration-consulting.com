@@ -211,9 +211,10 @@ describe('SiteNav', () => {
       signedInAs('Stanzy', 'CONSULTANT');
       const { unmount } = render(withIntl(<SiteNav />));
       fireEvent.click(screen.getByRole('button', { name: 'Mon compte : Stanzy' }));
+      // On its own subdomain of the site the visitor is on.
       expect(await screen.findByRole('menuitem', { name: 'Tableau de bord' })).toHaveAttribute(
         'href',
-        expect.stringContaining('/tableau-de-bord'),
+        `${window.location.protocol}//admin.${window.location.host}/`,
       );
       unmount();
 

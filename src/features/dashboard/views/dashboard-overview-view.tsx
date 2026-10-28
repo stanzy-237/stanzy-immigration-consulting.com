@@ -4,7 +4,8 @@ import { ArrowRight, FileText, Plus } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 
-import { Link } from '@/i18n/navigation';
+// The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
+import Link from 'next/link';
 import { api } from '@/trpc/react';
 
 /** The Tableau de bord's home: each section at a glance, starting with the Blog. */
@@ -27,7 +28,7 @@ export function DashboardOverviewView(): ReactNode {
             {t('overview.blogTitle')}
           </h2>
           <Link
-            href="/tableau-de-bord/blog/nouveau"
+            href="/blog/nouveau"
             className="inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson"
           >
             <Plus aria-hidden={true} className="size-4" />
@@ -64,7 +65,7 @@ export function DashboardOverviewView(): ReactNode {
         )}
 
         <Link
-          href="/tableau-de-bord/blog"
+          href="/blog"
           className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-rouge hover:text-crimson"
         >
           {t('overview.allArticles')}
