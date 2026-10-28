@@ -944,7 +944,7 @@
     "nextDraw": {
       "label": "Likely next draw",
       "lead": "Likely next draw:",
-      "summary": "{group}, {window}, {min}–{max}",
+      "summary": "{group}, {when}, {min}–{max}",
       "link": "See the prediction"
     }
   },
@@ -960,27 +960,32 @@
     "disclaimer": "An estimate, not a guarantee: IRCC doesn’t announce its draws. These figures are statistics on past rounds.",
     "featured": {
       "label": "Most likely next draw",
-      "window": "Likely window",
+      "window": "{precise, select, true {Likely date} other {Likely week}}",
       "score": "Expected CRS score",
-      "median": "median {median}"
+      "median": "around {median}"
     },
     "groups": {
       "title": "By draw type",
       "group": "Type",
-      "window": "Likely window",
+      "window": "When",
       "score": "CRS score",
       "why": "Why"
     },
     "explain": {
-      "cadence": "The last {group} draw was on {date}; they usually come every {days, plural, one {# day} other {# days}}.",
+      "cadence": "The last {group} draw was on {date}; they usually come every {days, plural, one {# day} other {# days}}, most often on a {weekday}.",
       "single": "Only one {group} draw in 12 months, on {date}: the window follows the other draws’ usual pace ({days, plural, one {# day} other {# days}}).",
       "overdue": "The expected date has passed: the next one could come any day.",
       "categoryAll": "The last {of} were {type} draws.",
       "categorySome": "{count} of the last {of} were {type} draws.",
       "categoryLatest": "The last one was a {type} draw."
     },
-    "data": "{count, plural, one {# draw} other {# draws}} in 12 months · {scores, plural, one {last score} other {last # scores}}: {list}",
-    "window": "{span, select, day {on {end}} other {between {start} and {end}}}"
+    "data": "{count, plural, one {# draw} other {# draws}} in 12 months · {scores, plural, one {last} other {last #}}{type, select, none {} other { {type}}} {scores, plural, one {score} other {scores}}: {list}",
+    "when": "{precise, select, true {probably {day}} other {week of {week}, date uncertain}}",
+    "reliability": {
+      "level": "{level, select, high {High reliability} medium {Medium reliability} low {Low reliability} other {Unknown reliability}}",
+      "measured": "Over the last 12 months, our {group} predictions found the right week {week} of the time, the right day {day} and the right score range {score}.",
+      "unknown": "Not enough {group} draws yet to measure reliability."
+    }
   },
   "Nclc": {
     "eyebrow": "Free tool · Language level",

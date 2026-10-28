@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 
+import { ReliabilityBadge } from '@/features/draw-prediction/components/reliability-badge';
 import { usePredictionText } from '@/features/draw-prediction/hooks/use-prediction-text';
 import type { GroupPrediction } from '@/features/draw-prediction/lib/predict-next-draws';
 
@@ -38,13 +39,19 @@ export function GroupPredictions({ predictions }: { predictions: GroupPrediction
             {predictions.map((p) => (
               <tr key={p.group} className="border-b border-off-white last:border-b-0">
                 <td className={`${cell} whitespace-nowrap font-heading font-bold text-navy-deep`}>{text.group(p)}</td>
-                <td className={`${cell} text-sm font-semibold text-navy-deep`}>{text.window(p)}</td>
+                <td className={`${cell} text-sm font-semibold text-navy-deep`}>
+                  <p>{text.when(p)}</p>
+                  <p className="mt-2">
+                    <ReliabilityBadge reliability={p.reliability} label={text.level(p)} />
+                  </p>
+                </td>
                 <td className={`${cell} whitespace-nowrap`}>
                   <span className="block font-heading font-bold text-rouge">{text.range(p)}</span>
                   <span className="text-xs text-slate">{text.median(p)}</span>
                 </td>
                 <td className={`${cell} text-sm text-slate`}>
                   <p>{text.why(p)}</p>
+                  <p className="mt-1">{text.reliability(p)}</p>
                   <p className="mt-1 text-xs">{text.basis(p)}</p>
                 </td>
               </tr>
@@ -63,8 +70,12 @@ export function GroupPredictions({ predictions }: { predictions: GroupPrediction
                 <span className="text-xs text-slate">{text.median(p)}</span>
               </p>
             </div>
-            <p className="mt-1 text-sm font-semibold text-navy-deep">{text.window(p)}</p>
+            <p className="mt-1 text-sm font-semibold text-navy-deep">{text.when(p)}</p>
+            <p className="mt-2">
+              <ReliabilityBadge reliability={p.reliability} label={text.level(p)} />
+            </p>
             <p className="mt-2 text-sm text-slate">{text.why(p)}</p>
+            <p className="mt-1 text-sm text-slate">{text.reliability(p)}</p>
             <p className="mt-1 text-xs text-slate">{text.basis(p)}</p>
           </li>
         ))}
