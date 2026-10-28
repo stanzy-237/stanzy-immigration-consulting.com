@@ -69,6 +69,20 @@ _Avoid_: "customer" in product-facing French; use Client.
 Stanzy, the one person who runs the practice and administers the platform. Being the consultant is an access level an Account holds, separate from its User → Lead → Client status: the consultant is never "a Client". Nobody can make themselves consultant; it is set by configuration.
 _Avoid_: "admin", "staff".
 
+**Tableau de bord** (Dashboard):
+The consultant's own area of the platform: a sidebar of sections (Aperçu, Blog for now; Leads, Clients and Contenus later) that only the consultant can open. Anyone else signed in gets a 404.
+_Avoid_: "admin", "back-office".
+
+**Article**:
+A Blog post the consultant writes in the Tableau de bord, in French or English. It is a Brouillon (draft, visible only in the Tableau de bord) until published; once Publié it appears on the Blog, the home page and the sitemap. Its publish date is set the first time it is published.
+_Avoid_: "post" in product-facing French copy.
+
+**Catégorie d'article** (Article category):
+One of the consultant's own headings for the Blog (Entrée Express, Documents, Langue, …), named in French and English. Every Article has exactly one; a category still in use can't be deleted.
+
+**Tag**:
+A free keyword on an Article (`tcf`, `preuve-de-fonds`), stored lowercase with hyphens. An Article has any number; the Blog can be filtered by one.
+
 **Partner**:
 An outside professional the consultant outsources part of a Client's work to. The consultant adds each Partner and gives them Missions; a Partner sees only their Missions, never a whole Client or the rest of the practice.
 _Avoid_: "subcontractor", "freelancer", "agent".

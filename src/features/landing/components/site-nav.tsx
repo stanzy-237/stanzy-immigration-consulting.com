@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, LogOut, Menu } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, LogOut, Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
@@ -38,6 +38,8 @@ import {
   TOOL_ENTRIES,
   type NavMenuEntry,
 } from '@/features/landing/data/nav';
+// Pure host helper only: the dashboard's components stay in their feature (folder rule 3).
+import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 
 type MenuKey = 'tools' | 'services';
 
@@ -58,6 +60,9 @@ export function SiteNav(): ReactNode {
   // the nav stays statically rendered; see #26.
   const { account, signOut: endSession } = useCurrentAccount();
   const accountName: string | null = account?.name ?? null;
+  // The Tableau de bord lives on admin.<this site>; the session only exists in the browser.
+  const dashboardUrl: string | null =
+    account?.isConsultant && typeof window !== 'undefined' ? `${dashboardOrigin(window.location.origin)}/` : null;
 
   // Stay on the page: refreshing re-renders it signed out, and a protected
   // page's own guard sends the visitor to Connexion with `next`.
@@ -201,6 +206,7 @@ export function SiteNav(): ReactNode {
             <AccountMenu
               name={accountName}
               triggerLabel={t('account', { name: accountName })}
+              dashboard={dashboardUrl ? { href: dashboardUrl, label: t('dashboard') } : null}
               signOutLabel={t('signOut')}
               onSignOut={signOut}
             />
@@ -280,6 +286,16 @@ export function SiteNav(): ReactNode {
                     {accountName}
                   </p>
                 ) : null}
+                {dashboardUrl ? (
+                  <a
+                    href={dashboardUrl}
+                    className="text-navy-deep inline-flex items-center justify-center gap-2 rounded-md border border-fog px-3 py-2 text-sm font-semibold"
+                    onClick={closeMobile}
+                  >
+                    <LayoutDashboard aria-hidden={true} className="size-4" />
+                    {t('dashboard')}
+                  </a>
+                ) : null}
                 {accountName ? (
                   <button
                     type="button"
@@ -321,6 +337,8 @@ export function SiteNav(): ReactNode {
 type AccountMenuProps = {
   name: string;
   triggerLabel: string;
+  /** The consultant only: the way into the Tableau de bord, on its subdomain. */
+  dashboard: { href: string; label: string } | null;
   signOutLabel: string;
   onSignOut: () => Promise<void>;
 };
@@ -328,6 +346,7 @@ type AccountMenuProps = {
 function AccountMenu({
   name,
   triggerLabel,
+  dashboard,
   signOutLabel,
   onSignOut,
 }: AccountMenuProps): ReactNode {
@@ -347,6 +366,12 @@ function AccountMenu({
         <ChevronDown aria-hidden={true} className="h-3.5 w-3.5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
+        {dashboard ? (
+          <DropdownMenuItem render={<a href={dashboard.href} />}>
+            <LayoutDashboard aria-hidden={true} />
+            {dashboard.label}
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuItem onClick={(): void => void onSignOut()}>
           <LogOut aria-hidden={true} />
           {signOutLabel}

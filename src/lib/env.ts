@@ -29,6 +29,10 @@ const schema = z.object({
   // VERCEL_URL is the per-deployment *.vercel.app host, not the real domain.
   // Previews and local dev fall back to VERCEL_URL / localhost.
   BETTER_AUTH_URL: z.string().url().optional(),
+  // Parent domain for the session cookie (`stanzy-immigration-consulting.com`),
+  // so one sign-in covers the site and the Tableau de bord on admin.<site>.
+  // Production only: unset, each host keeps its own sign-in.
+  AUTH_COOKIE_DOMAIN: z.string().min(3).optional(),
   // Resend API key. Without it, emails are logged to the console instead.
   RESEND_API_KEY: z.string().min(1).optional(),
   // Sender for transactional email; must be on a domain verified in Resend.

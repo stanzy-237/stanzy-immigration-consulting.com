@@ -1,4 +1,5 @@
 import { authRouter } from '@/features/auth/server/auth-router';
+import { blogRouter } from '@/features/blog/server/blog-router';
 import { budgetRouter } from '@/features/budget/server/budget-router';
 import { crsRouter } from '@/features/crs/server/crs-router';
 import { drawsRouter } from '@/features/draws/server/draws-router';
@@ -12,6 +13,7 @@ import { createCallerFactory, createTRPCRouter } from './trpc';
  */
 export const appRouter = createTRPCRouter({
   auth: authRouter,
+  blog: blogRouter,
   budget: budgetRouter,
   crs: crsRouter,
   draws: drawsRouter,

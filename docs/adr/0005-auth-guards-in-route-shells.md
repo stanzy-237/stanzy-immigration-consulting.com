@@ -7,3 +7,5 @@ We decided that a route's `layout.tsx` or `page.tsx` may make **one** guard call
 We considered wrapping each View in a server component inside the feature. We rejected that: it doubles the number of views for no behaviour gain, and it hides from the route the one fact a reader needs, that the page is gated. Anything beyond a single guard call still belongs in the feature.
 
 **Update (2026-10):** the guest-only pages — Connexion, Inscription and their dialogs — no longer use a server guard. Checking the session on the server made them dynamic: every open waited for a serverless function (measured 4.4 s cold on production) and Link couldn't prefetch them. They are now static; the view reads `?next=` in the browser and sends someone who arrives already signed in on to it. This costs no security, since those pages hold nothing private; protected pages keep `requireSession`.
+
+**Update (2026-10):** the Tableau de bord's layout uses `requireConsultant`, the same single guard call for the consultant-only area: it runs `requireSession` and answers 404 to anyone signed in who isn't the consultant. The layout then renders the dashboard shell around its pages.

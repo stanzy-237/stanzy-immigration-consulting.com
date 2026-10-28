@@ -21,9 +21,9 @@ vi.mock('@/features/auth/lib/auth-client', () => ({
 
 const useSession = vi.mocked(authClient.useSession);
 
-function signedInAs(name: string) {
+function signedInAs(name: string, role = 'MEMBER') {
   useSession.mockReturnValue({
-    data: { user: { name, email: 'aminata@example.com' }, session: {} },
+    data: { user: { name, email: 'aminata@example.com', role }, session: {} },
     isPending: false,
   } as never);
 }
@@ -205,6 +205,24 @@ describe('SiteNav', () => {
 
       await waitFor(() => expect(router.refresh).toHaveBeenCalled());
       expect(router.push).not.toHaveBeenCalled();
+    });
+
+    it('offers the Tableau de bord to the consultant only', async () => {
+      signedInAs('Stanzy', 'CONSULTANT');
+      const { unmount } = render(withIntl(<SiteNav />));
+      fireEvent.click(screen.getByRole('button', { name: 'Mon compte : Stanzy' }));
+      // On its own subdomain of the site the visitor is on.
+      expect(await screen.findByRole('menuitem', { name: 'Tableau de bord' })).toHaveAttribute(
+        'href',
+        `${window.location.protocol}//admin.${window.location.host}/`,
+      );
+      unmount();
+
+      signedInAs('Aminata Diallo');
+      render(withIntl(<SiteNav />));
+      fireEvent.click(screen.getByRole('button', { name: 'Mon compte : Aminata Diallo' }));
+      await screen.findByRole('menuitem', { name: 'Déconnexion' });
+      expect(screen.queryByRole('menuitem', { name: 'Tableau de bord' })).toBeNull();
     });
 
     it('has no axe violations', async () => {

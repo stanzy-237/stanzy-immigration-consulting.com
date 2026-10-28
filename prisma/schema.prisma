@@ -46,6 +46,7 @@ model Account {
   pushSubscriptions PushSubscription[]
   budgetExpenses    BudgetExpense[]
   budgetProfile     BudgetProfile?
+  blogPosts         BlogPost[]
 
   @@map("account")
 }
@@ -264,4 +265,55 @@ model BudgetProfile {
   updatedAt DateTime @updatedAt
 
   @@map("budget_profile")
+}
+
+/// GLOSSARY: Catégorie d'article. The consultant's own list; an Article has exactly one.
+model BlogCategory {
+  id        String     @id @default(cuid())
+  slug      String     @unique
+  nameFr    String
+  nameEn    String
+  /// Order in the Blog's filters, smallest first.
+  position  Int        @default(0)
+  posts     BlogPost[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("blog_category")
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// GLOSSARY: Article. A Blog post the consultant writes; Brouillon (DRAFT) or Publié.
+model BlogPost {
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  /// The language it is written in: `fr` | `en`.
+  locale         String         @default("fr")
+  title          String
+  excerpt        String?
+  /// The rich-text document as Tiptap JSON, never HTML (src/features/blog/lib/render-article.ts).
+  content        Json
+  coverUrl       String?
+  coverAlt       String?
+  categoryId     String
+  category       BlogCategory   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  /// Normalised tag slugs; their display text is the slug itself.
+  tags           String[]       @default([])
+  seoTitle       String?
+  seoDescription String?
+  status         BlogPostStatus @default(DRAFT)
+  /// Set on the first publish only, kept through later edits and unpublishing.
+  publishedAt    DateTime?
+  readingMinutes Int            @default(1)
+  authorId       String
+  author         Account        @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([status, locale, publishedAt])
+  @@map("blog_post")
 }

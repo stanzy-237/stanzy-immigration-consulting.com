@@ -4,7 +4,12 @@ import { useCallback } from 'react';
 
 import { authClient } from '@/features/auth/lib/auth-client';
 
-export type CurrentAccount = { name: string; email: string };
+export type CurrentAccount = {
+  name: string;
+  email: string;
+  /** The consultant sees the way into the Tableau de bord; the server still checks. */
+  isConsultant: boolean;
+};
 
 /**
  * The signed-in Account as the browser sees it, plus sign-out. Reads the
@@ -19,7 +24,9 @@ export function useCurrentAccount(): {
   signOut: () => Promise<void>;
 } {
   const { data, isPending } = authClient.useSession();
-  const account = data ? { name: data.user.name, email: data.user.email } : null;
+  const account = data
+    ? { name: data.user.name, email: data.user.email, isConsultant: data.user.role === 'CONSULTANT' }
+    : null;
 
   const signOut = useCallback(async (): Promise<void> => {
     await authClient.signOut();
