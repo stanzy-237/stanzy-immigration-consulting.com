@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { DEFAULT_ANSWERS } from '@/features/budget/lib/budget-schema';
 import { sessionFor } from '@/server/auth/__tests__/fixtures';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -206,7 +205,7 @@ describe('budget router', () => {
   });
 
   describe('profile', () => {
-    it('has no profile until the User sets a currency or saves an estimate', async () => {
+    it('has no profile until the User sets a currency', async () => {
       expect(await callerAs(fakeDatabase(), AMINATA).budget.profile.get()).toBeNull();
     });
 
@@ -217,7 +216,7 @@ describe('budget router', () => {
 
       await caller.budget.profile.setCurrency({ currency: 'CAD' });
 
-      expect(await caller.budget.profile.get()).toEqual({ currency: 'CAD', estimate: null });
+      expect(await caller.budget.profile.get()).toEqual({ currency: 'CAD' });
       expect(await caller.budget.expenses.list()).toEqual([expect.objectContaining({ amount: 210_000 })]);
     });
 
@@ -225,31 +224,6 @@ describe('budget router', () => {
       await expect(
         callerAs(fakeDatabase(), AMINATA).budget.profile.setCurrency({ currency: 'GBP' as 'CAD' }),
       ).rejects.toMatchObject({ code: 'BAD_REQUEST' });
-    });
-
-    it('saves the estimate and reads it back, leaving the currency for the User to pick', async () => {
-      const caller = callerAs(fakeDatabase(), AMINATA);
-      const estimate = {
-        ...DEFAULT_ANSWERS,
-        spouse: true,
-        children: 1,
-        currency: 'EUR' as const,
-        rate: 0.65,
-        lines: { medical: { amount: 150, currency: 'EUR' as const } },
-      };
-
-      await caller.budget.profile.saveEstimate({ estimate });
-
-      expect(await caller.budget.profile.get()).toEqual({ currency: null, estimate });
-    });
-
-    it('keeps the Account’s currency when an estimate is saved later', async () => {
-      const caller = callerAs(fakeDatabase(), AMINATA);
-      await caller.budget.profile.setCurrency({ currency: 'XOF' });
-
-      await caller.budget.profile.saveEstimate({ estimate: { ...DEFAULT_ANSWERS, currency: 'CAD' } });
-
-      expect(await caller.budget.profile.get()).toMatchObject({ currency: 'XOF', estimate: { currency: 'CAD' } });
     });
 
     it('keeps each Account’s profile to itself', async () => {

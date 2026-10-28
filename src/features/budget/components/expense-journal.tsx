@@ -22,6 +22,7 @@ import { ExpenseSummary } from '@/features/budget/components/expense-summary';
 import { DEFAULT_CURRENCY, type Currency } from '@/features/budget/data/currencies';
 import { useFormatMoney } from '@/features/budget/hooks/use-format-money';
 import type { BudgetAnswers, Expense, ExpenseInput } from '@/features/budget/lib/budget-schema';
+import { useBudgetEstimate } from '@/features/budget/hooks/use-budget-estimate';
 import { estimateBudget, ratesFor } from '@/features/budget/lib/estimate-budget';
 import { fromMinor } from '@/features/budget/lib/money';
 import { LONG_DAY, noonUtc } from '@/features/budget/lib/day';
@@ -31,7 +32,7 @@ import { api } from '@/trpc/react';
 /** Below `lg` the form lives in a drawer instead of the sidebar. */
 const isPhone = () => window.matchMedia('(max-width: 1023px)').matches;
 
-/** The saved estimate's fees in the journal's currency, through the estimate's own rate. */
+/** The browser's estimate's fees in the journal's currency, through the estimate's own rate. */
 const budgetIn = (estimate: BudgetAnswers | null, currency: Currency): number | null =>
   estimate ? estimateBudget({ ...estimate, currency }, ratesFor(estimate)).feesTotal : null;
 
@@ -278,6 +279,8 @@ export function ExpenseJournal(): ReactNode {
   const t = useTranslations('Budget.journal');
   const { account, pending } = useCurrentAccount();
   const profile = api.budget.profile.get.useQuery(undefined, { enabled: account !== null });
+  // The « dépensé X sur Y » bar reads the estimate this browser keeps.
+  const [estimate] = useBudgetEstimate();
 
   if (pending) return null;
   if (!account) return <SignInInvite />;
@@ -285,7 +288,7 @@ export function ExpenseJournal(): ReactNode {
   return (
     <Journal
       currency={profile.data?.currency ?? null}
-      estimate={profile.data?.estimate ?? null}
+      estimate={estimate}
     />
   );
 }

@@ -28,6 +28,12 @@ export const budgetAnswersSchema = z.object({
   ecaSpouse: z.boolean(),
   /** CEC candidates and holders of a valid job offer need not prove funds. */
   fundsExempt: z.boolean(),
+  /**
+   * The ITA is in: language tests and diploma evaluations, which come
+   * before it, are behind the User and leave the estimate. Estimates kept
+   * before it existed have none: they read as false.
+   */
+  itaReceived: z.boolean().catch(false),
   currency: currencySchema,
   /** Units of `currency` for 1 CAD, when the User replaced the default. */
   rate: z.number().positive().max(1_000_000).nullable(),
@@ -50,6 +56,7 @@ export const DEFAULT_ANSWERS: BudgetAnswers = {
   ecaPrincipal: true,
   ecaSpouse: false,
   fundsExempt: false,
+  itaReceived: false,
   currency: DEFAULT_CURRENCY,
   rate: null,
   lines: {},

@@ -5,10 +5,8 @@ import { DEFAULT_CURRENCY } from '@/features/budget/data/currencies';
 import { MOTIFS } from '@/features/budget/data/motifs';
 import {
   BUDGET_LIMIT,
-  budgetAnswersSchema,
   currencySchema,
   expenseInputSchema,
-  type BudgetAnswers,
   type Expense,
 } from '@/features/budget/lib/budget-schema';
 import { createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
@@ -65,29 +63,19 @@ const toExpense = (row: {
   note: row.note,
 });
 
-/** A stored estimate from an older shape reads as none rather than breaking the page. */
-const toEstimate = (json: unknown): BudgetAnswers | null => {
-  const parsed = budgetAnswersSchema.safeParse(json);
-  return parsed.success ? parsed.data : null;
-};
-
 /**
- * The signed-in Account's budget: its currency, its Estimation de budget and
- * its Dépenses. Another Account's Dépense answers NOT_FOUND, so ids are never
+ * The signed-in Account's budget: its currency and its Dépenses (the
+ * Estimation de budget stays in the browser). Another Account's Dépense answers NOT_FOUND, so ids are never
  * confirmed.
  */
 export const budgetRouter = createTRPCRouter({
   profile: createTRPCRouter({
-    /**
-     * The Account's currency (null until the User picks one) and saved
-     * estimate, or null before either was set.
-     */
+    /** The Account's currency (null until the User picks one), or null before it was set. */
     get: protectedProcedure.query(async ({ ctx }) => {
       const row = await ctx.prisma.budgetProfile.findUnique({ where: { accountId: ctx.session.account.id } });
       if (!row) return null;
       return {
         currency: row.currency === null ? null : currencySchema.catch(DEFAULT_CURRENCY).parse(row.currency),
-        estimate: toEstimate(row.estimate),
       };
     }),
 
@@ -100,18 +88,6 @@ export const budgetRouter = createTRPCRouter({
           where: { accountId },
           create: { accountId, currency: input.currency },
           update: { currency: input.currency },
-        });
-      }),
-
-    /** Leaves the Account's currency alone: the User picks it in « Mes dépenses ». */
-    saveEstimate: protectedProcedure
-      .input(z.object({ estimate: budgetAnswersSchema }))
-      .mutation(async ({ ctx, input }) => {
-        const accountId = ctx.session.account.id;
-        await ctx.prisma.budgetProfile.upsert({
-          where: { accountId },
-          create: { accountId, estimate: input.estimate },
-          update: { estimate: input.estimate },
         });
       }),
   }),

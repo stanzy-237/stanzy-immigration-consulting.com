@@ -256,7 +256,9 @@ model BudgetProfile {
   /// picks one in « Mes dépenses ». Changing it never converts the amounts
   /// already logged.
   currency  String?
-  /// The estimator's answers (budgetAnswersSchema), or null before one is saved.
+  /// No longer written or read: the estimate stays in the browser (#69
+  /// follow-up). Kept so estimates saved earlier aren't dropped; remove it
+  /// with a migration once that's fine.
   estimate  Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
