@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ArticleDoc } from '@/features/blog/lib/render-article';
+import { safeImageSrc, type ArticleDoc } from '@/features/blog/lib/render-article';
 
 /** Articles in the Blog's list, per page. */
 export const BLOG_PAGE_SIZE = 12;
@@ -49,7 +49,13 @@ export const articleInputSchema = z
     title: z.string().trim().min(1).max(200),
     excerpt: optionalText(300),
     content: articleDocSchema,
-    coverUrl: z.string().url().startsWith('https://').nullish().transform((value) => value || null),
+    // An uploaded image, an https address, or an image on this site (`/blog/…`).
+    coverUrl: z
+      .string()
+      .max(500)
+      .nullish()
+      .transform((value) => value?.trim() || null)
+      .refine((value) => value === null || safeImageSrc(value) !== null, 'BLOG_COVER_INVALID'),
     coverAlt: optionalText(200),
     categoryId: z.string().min(1),
     tags: z

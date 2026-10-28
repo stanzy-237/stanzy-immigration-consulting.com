@@ -73,7 +73,7 @@ describe('renderArticle — HTML', () => {
     expect(html).toBe('<p>clic ailleurs</p>');
   });
 
-  it('drops unknown nodes and marks, images without alt text and images not served over https', () => {
+  it('drops unknown nodes and marks, images without alt text and images not served over https or from the site', () => {
     const { html } = renderArticle(
       doc(
         { type: 'iframe', attrs: { src: 'https://evil.example' } },
@@ -84,6 +84,16 @@ describe('renderArticle — HTML', () => {
       ),
     );
     expect(html).toBe('<p><strong>gardé</strong></p><h2>Un H1 devient H2</h2>');
+  });
+
+  it('keeps an image served from the site itself', () => {
+    const { html } = renderArticle(
+      doc(
+        { type: 'image', attrs: { src: '/blog/covers/cnps.jpg', alt: 'Relevé CNPS' } },
+        { type: 'image', attrs: { src: '//evil.example/x.png', alt: 'Ailleurs' } },
+      ),
+    );
+    expect(html).toBe('<figure><img src="/blog/covers/cnps.jpg" alt="Relevé CNPS" loading="lazy"></figure>');
   });
 });
 

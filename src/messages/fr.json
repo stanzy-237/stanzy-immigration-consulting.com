@@ -1440,7 +1440,8 @@
         "orderedList": "Liste numérotée",
         "quote": "Citation",
         "link": "Lien",
-        "image": "Image"
+        "image": "Image",
+        "imageUrl": "Image par adresse"
       },
       "linkPrompt": "Adresse du lien (https://…, /outils/…, mailto:…)",
       "imageAltPrompt": "Texte alternatif de l’image (obligatoire)",
@@ -1501,7 +1502,10 @@
         "BLOG_DELETE_PUBLISHED": "Dépubliez l’article avant de le supprimer.",
         "generic": "L’enregistrement a échoué. Réessayez."
       },
-      "notFound": "Cet article n’existe pas ou a été supprimé."
+      "notFound": "Cet article n’existe pas ou a été supprimé.",
+      "coverUrl": "Adresse de l’image de couverture",
+      "coverUrlHint": "https://… ou une image du site (/blog/…), ou choisissez un fichier.",
+      "imageUrlPrompt": "Adresse de l’image (https://… ou /blog/…)"
     },
     "categories": {
       "title": "Catégories",

@@ -32,7 +32,7 @@ export function articleMetadata(article: MetadataArticle, siteUrl: string): Meta
   const description = article.seoDescription || article.excerpt || article.fallbackExcerpt;
   const url = `${siteUrl}/${article.locale}/blog/${article.slug}`;
   const image = article.coverUrl
-    ? { url: article.coverUrl, alt: article.coverAlt ?? article.title }
+    ? { url: article.coverUrl.startsWith('/') ? `${siteUrl}${article.coverUrl}` : article.coverUrl, alt: article.coverAlt ?? article.title }
     : { url: `${siteUrl}${DEFAULT_IMAGE}`, alt: DEFAULT_IMAGE_ALT };
 
   return {

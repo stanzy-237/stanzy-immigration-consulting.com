@@ -115,6 +115,21 @@ describe('BlogEditorView — a new Article', () => {
     expect(field('Adresse (slug)')).toHaveValue('tcf-guide');
   });
 
+  it('takes the cover from an image address when uploads are unavailable', async () => {
+    render(withIntl(<BlogEditorView />));
+    type('Titre', 'Tirage francophone du 27 octobre');
+    fireEvent.change(field('Catégorie'), { target: { value: 'cat_ee' } });
+    type('Adresse de l’image de couverture', '/blog/covers/tirage-francophone.jpg');
+    type('Texte alternatif de la couverture', 'Stanzy annonce le tirage');
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer le brouillon' }));
+
+    await waitFor(() => expect(trpc.create).toHaveBeenCalledTimes(1));
+    expect(trpc.create.mock.calls[0]![0]).toMatchObject({
+      coverUrl: '/blog/covers/tirage-francophone.jpg',
+      coverAlt: 'Stanzy annonce le tirage',
+    });
+  });
+
   it('shows a taken address next to the address field', async () => {
     trpc.create.mockRejectedValue(new Error('BLOG_SLUG_TAKEN'));
     render(withIntl(<BlogEditorView />));

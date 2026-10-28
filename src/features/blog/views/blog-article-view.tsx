@@ -10,6 +10,7 @@ import { toBlogLocale } from '@/features/blog/lib/blog-schema';
 import { getPublishedArticle } from '@/features/blog/server/blog-pages';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
+import { isOptimisableImage } from '@/features/blog/lib/render-article';
 import { Link } from '@/i18n/navigation';
 
 /** A published Article's page; a draft or an unknown slug is the site's 404. */
@@ -57,7 +58,8 @@ export async function BlogArticleView({ locale: rawLocale, slug }: { locale: str
 
           {article.coverUrl && (
             <div className="relative mt-8 aspect-video w-full overflow-hidden rounded-2xl bg-ice-blue">
-              <Image src={article.coverUrl} alt={article.coverAlt ?? ''} fill priority sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
+              <Image src={article.coverUrl}
+            unoptimized={!isOptimisableImage(article.coverUrl)} alt={article.coverAlt ?? ''} fill priority sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
             </div>
           )}
 

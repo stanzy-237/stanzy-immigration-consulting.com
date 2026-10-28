@@ -19,7 +19,7 @@ import { RichTextEditor } from '@/features/blog/components/rich-text-editor';
 import { SEO_DESCRIPTION_LIMIT, SEO_TITLE_LIMIT, slugify, toBlogLocale, type BlogLocale } from '@/features/blog/lib/blog-schema';
 import { categoryName } from '@/features/blog/lib/category-name';
 import { missingForPublish } from '@/features/blog/lib/publish-check';
-import { EMPTY_ARTICLE, renderArticle, type ArticleDoc } from '@/features/blog/lib/render-article';
+import { EMPTY_ARTICLE, isOptimisableImage, renderArticle, safeImageSrc, type ArticleDoc } from '@/features/blog/lib/render-article';
 import { uploadBlogImage } from '@/features/blog/lib/upload-image';
 import { Link, useRouter } from '@/i18n/navigation';
 import { api } from '@/trpc/react';
@@ -378,9 +378,9 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
           )}
           <h1 className="mt-4 font-heading text-3xl font-bold leading-tight text-navy-deep sm:text-4xl">{form.title}</h1>
           <p className="mt-3 text-sm text-slate">{tPublic('readingMinutes', { minutes: rendered.readingMinutes })}</p>
-          {form.coverUrl && (
+          {form.coverUrl && safeImageSrc(form.coverUrl) && (
             <div className="relative mt-6 aspect-video w-full overflow-hidden rounded-2xl bg-ice-blue">
-              <Image src={form.coverUrl} alt={form.coverAlt} fill sizes="768px" className="object-cover" />
+              <Image src={form.coverUrl} alt={form.coverAlt} fill sizes="768px" unoptimized={!isOptimisableImage(form.coverUrl)} className="object-cover" />
             </div>
           )}
           <div className="mt-6">
@@ -493,9 +493,9 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
 
             <section aria-label={tEditor('cover')} className={`${panel} flex flex-col gap-3`}>
               <p className={label}>{tEditor('cover')}</p>
-              {form.coverUrl && (
+              {form.coverUrl && safeImageSrc(form.coverUrl) && (
                 <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-ice-blue">
-                  <Image src={form.coverUrl} alt={form.coverAlt} fill sizes="320px" className="object-cover" />
+                  <Image src={form.coverUrl} alt={form.coverAlt} fill sizes="320px" unoptimized={!isOptimisableImage(form.coverUrl)} className="object-cover" />
                 </div>
               )}
               <div className="flex flex-wrap gap-2">
@@ -530,6 +530,15 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
                   e.target.value = '';
                 }}
               />
+              <Field id={ids('coverUrl')} name={tEditor('coverUrl')} hintText={tEditor('coverUrlHint')}>
+                <input
+                  id={ids('coverUrl')}
+                  className={input}
+                  value={form.coverUrl ?? ''}
+                  placeholder="https://…"
+                  onChange={(e) => change({ coverUrl: e.target.value.trim() || null })}
+                />
+              </Field>
               {form.coverUrl && (
                 <Field id={ids('coverAlt')} name={tEditor('coverAlt')}>
                   <input id={ids('coverAlt')} className={input} value={form.coverAlt} onChange={(e) => change({ coverAlt: e.target.value })} />

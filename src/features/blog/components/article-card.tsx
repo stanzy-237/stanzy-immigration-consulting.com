@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 
 import { categoryName } from '@/features/blog/lib/category-name';
 import type { ArticleCard as Card } from '@/features/blog/server/blog-queries';
+import { isOptimisableImage } from '@/features/blog/lib/render-article';
 import { Link } from '@/i18n/navigation';
 
 /** An Article in the Blog's list: cover, category, title, excerpt, date and reading time. */
@@ -22,6 +23,7 @@ export function ArticleCard({ article, locale }: { article: Card; locale: string
         {article.coverUrl && (
           <Image
             src={article.coverUrl}
+            unoptimized={!isOptimisableImage(article.coverUrl)}
             alt={article.coverAlt ?? ''}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"

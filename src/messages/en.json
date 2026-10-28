@@ -1423,7 +1423,8 @@
         "orderedList": "Numbered list",
         "quote": "Quote",
         "link": "Link",
-        "image": "Image"
+        "image": "Image",
+        "imageUrl": "Image from an address"
       },
       "linkPrompt": "Link address (https://…, /outils/…, mailto:…)",
       "imageAltPrompt": "Image alt text (required)",
@@ -1484,7 +1485,10 @@
         "BLOG_DELETE_PUBLISHED": "Unpublish the article before deleting it.",
         "generic": "Saving failed. Try again."
       },
-      "notFound": "This article doesn’t exist or was deleted."
+      "notFound": "This article doesn’t exist or was deleted.",
+      "coverUrl": "Cover image address",
+      "coverUrlHint": "https://… or an image on the site (/blog/…), or choose a file.",
+      "imageUrlPrompt": "Image address (https://… or /blog/…)"
     },
     "categories": {
       "title": "Categories",

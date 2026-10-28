@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 // The blog's data types and naming only: no blog component crosses into landing (folder rule 3).
 import { categoryName } from '@/features/blog/lib/category-name';
 import type { ArticleCard } from '@/features/blog/server/blog-queries';
+import { isOptimisableImage } from '@/features/blog/lib/render-article';
 import { Link } from '@/i18n/navigation';
 
 type CardProps = { article: ArticleCard; locale: string };
@@ -36,6 +37,7 @@ function LargeCard({ article, locale, featured }: CardProps & { featured: boolea
         {article.coverUrl && (
           <Image
             src={article.coverUrl}
+            unoptimized={!isOptimisableImage(article.coverUrl)}
             alt={article.coverAlt ?? ''}
             fill
             sizes="(min-width: 1024px) 55vw, 100vw"
@@ -95,7 +97,8 @@ function SmallCard({ article, locale }: CardProps): ReactNode {
       />
       <div className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-ice-blue">
         {article.coverUrl && (
-          <Image src={article.coverUrl} alt={article.coverAlt ?? ''} fill sizes="56px" className="object-cover" />
+          <Image src={article.coverUrl}
+            unoptimized={!isOptimisableImage(article.coverUrl)} alt={article.coverAlt ?? ''} fill sizes="56px" className="object-cover" />
         )}
       </div>
       <div className="min-w-0 flex-1">

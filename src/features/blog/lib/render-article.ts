@@ -40,6 +40,18 @@ export function safeHref(value: unknown): string | null {
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
+/** An image the page may show: served over https, or from this site (`/blog/…`, not `//host`). */
+export function safeImageSrc(value: unknown): string | null {
+  const src = asString(value);
+  if (/^https:\/\//i.test(src)) return src;
+  if (src.startsWith('/') && !src.startsWith('//')) return src;
+  return null;
+}
+
+/** Vercel Blob and site images go through Next's optimiser; any other host is shown as is. */
+export const isOptimisableImage = (src: string) =>
+  src.startsWith('/') || /^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\//i.test(src);
+
 function renderText(node: ArticleNode): string {
   let html = escape(node.text ?? '');
   // Marks wrap inside out: bold and italic first, the link outermost.
@@ -76,9 +88,9 @@ function renderNode(node: ArticleNode): string {
     case 'hardBreak':
       return '<br>';
     case 'image': {
-      const src = asString(node.attrs?.src);
+      const src = safeImageSrc(node.attrs?.src);
       const alt = asString(node.attrs?.alt);
-      if (!/^https:\/\//i.test(src) || !alt) return '';
+      if (!src || !alt) return '';
       return `<figure><img src="${escape(src)}" alt="${escape(alt)}" loading="lazy"></figure>`;
     }
     default:

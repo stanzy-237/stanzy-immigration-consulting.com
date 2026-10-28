@@ -3,11 +3,11 @@
 import Image from '@tiptap/extension-image';
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Quote, type LucideIcon } from 'lucide-react';
+import { Bold, Heading2, Heading3, ImagePlus, Images, Italic, Link2, List, ListOrdered, Quote, type LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRef, type ReactNode } from 'react';
 
-import { safeHref, type ArticleDoc } from '@/features/blog/lib/render-article';
+import { safeHref, safeImageSrc, type ArticleDoc } from '@/features/blog/lib/render-article';
 import { uploadBlogImage } from '@/features/blog/lib/upload-image';
 
 /** Only what the public renderer shows: H2–H3, bold, italic, links, lists, quotes, images. */
@@ -83,6 +83,17 @@ export function RichTextEditor({
     else editor.chain().focus().extendMarkRange('link').setLink({ href }).run();
   };
 
+  /** Without uploads: an image already online (https) or on the site (`/blog/…`). */
+  const addImageByAddress = () => {
+    if (!editor) return;
+    const src = safeImageSrc(window.prompt(t('imageUrlPrompt'), 'https://'));
+    if (!src) return;
+    // No alt text, no image: every image the Blog shows is described.
+    const alt = window.prompt(t('imageAltPrompt'))?.trim();
+    if (!alt) return;
+    editor.chain().focus().setImage({ src, alt }).run();
+  };
+
   const addImage = async (file: File | undefined) => {
     if (!editor || !file) return;
     try {
@@ -123,6 +134,9 @@ export function RichTextEditor({
           className={toolButton}
         >
           <ImagePlus aria-hidden={true} className="size-4" />
+        </button>
+        <button type="button" aria-label={t('toolbar.imageUrl')} disabled={!editor} onClick={addImageByAddress} className={toolButton}>
+          <Images aria-hidden={true} className="size-4" />
         </button>
         <input
           ref={fileInput}

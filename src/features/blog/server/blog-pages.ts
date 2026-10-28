@@ -4,7 +4,7 @@ import { unstable_cache } from 'next/cache';
 import { articleMetadata } from '@/features/blog/lib/article-metadata';
 import type { BlogLocale } from '@/features/blog/lib/blog-schema';
 import { categoryName } from '@/features/blog/lib/category-name';
-import { BLOG_CACHE_TAG } from '@/features/blog/server/blog-cache';
+import { BLOG_CACHE_SECONDS, BLOG_CACHE_TAG } from '@/features/blog/server/blog-cache';
 import {
   findPublished,
   listCategories,
@@ -23,7 +23,7 @@ import { prisma } from '@/server/db/client';
  * The cache stores JSON, so dates come back as strings and are revived here.
  */
 const cached = <A extends unknown[], R>(key: string, read: (...args: A) => Promise<R>) =>
-  unstable_cache(read, ['blog', key], { tags: [BLOG_CACHE_TAG] });
+  unstable_cache(read, ['blog', key], { tags: [BLOG_CACHE_TAG], revalidate: BLOG_CACHE_SECONDS });
 
 const reviveCard = <T extends ArticleCard>(card: T): T => ({ ...card, publishedAt: new Date(card.publishedAt) });
 
