@@ -3,14 +3,6 @@
     "title": "Stanzy — Conseil en immigration canadienne",
     "description": "Outils gratuits Entrée Express, blog et services de conseil en immigration canadienne."
   },
-  "BlogPlaceholder": {
-    "status": "En développement",
-    "title": "Le blog arrive bientôt",
-    "listingDescription": "Nous préparons des articles clairs, pratiques et sans jargon pour vous accompagner à chaque étape de votre Entrée Express. Revenez très bientôt.",
-    "articleDescription": "Cet article est en cours de rédaction. Nous le polissons pour qu'il tienne vraiment ses promesses — un peu de patience, ça vaudra le coup.",
-    "unknownSlug": "L'adresse « {slug} » ne correspond à aucun article pour l'instant.",
-    "back": "Retour à l'accueil"
-  },
   "ToolPlaceholder": {
     "status": "En développement",
     "description": "Cet outil arrive bientôt. Nous le polissons pour qu'il tienne vraiment ses promesses — un peu de patience, ça vaudra le coup.",
@@ -68,7 +60,8 @@
         "verificationDesc": "Nous relisons votre dossier avant soumission"
       },
       "account": "Mon compte : {name}",
-      "signOut": "Déconnexion"
+      "signOut": "Déconnexion",
+      "dashboard": "Tableau de bord"
     },
     "TikTok": {
       "eyebrow": "Stanzy sur TikTok",
@@ -150,30 +143,7 @@
       "read": "Lire",
       "readingMinutes": "{minutes} min de lecture",
       "readingMinutesShort": "{minutes} min",
-      "cardAriaLabel": "Ouvrir l'article : {title}",
-      "Categories": {
-        "catExpressEntry": "Entrée Express",
-        "catDocuments": "Documents",
-        "catStrategy": "Stratégie",
-        "catLanguage": "Langue",
-        "catWes": "WES",
-        "catAdvice": "Conseils"
-      },
-      "Articles": {
-        "article1Title": "Comment maximiser votre score CRS en 90 jours : le guide complet 2024",
-        "article1Excerpt": "Le score CRS détermine vos chances de recevoir une invitation à présenter une demande. Découvrez les stratégies prouvées pour gagner des points rapidement : langue, études, emploi, adaptabilité.",
-        "article1Alt": "Entrée Express 2024",
-        "article2Title": "Les 10 documents indispensables pour votre dossier ITA",
-        "article2Alt": "Documents immigration",
-        "article3Title": "PNP vs Entrée Express : quelle voie choisir en 2024 ?",
-        "article3Alt": "Visa Canada",
-        "article4Title": "IELTS ou TEF : lequel choisir pour l'immigration ?",
-        "article4Alt": "Préparation IELTS",
-        "article5Title": "Évaluation de diplôme WES : procédure et délais",
-        "article5Alt": "Évaluation WES",
-        "article6Title": "5 erreurs qui font rejeter un dossier Entrée Express",
-        "article6Alt": "Erreurs à éviter"
-      }
+      "cardAriaLabel": "Ouvrir l'article : {title}"
     },
     "Draws": {
       "eyebrow": "Tirages Officiels IRCC",
@@ -1379,6 +1349,175 @@
       "text": "« {name} » sera retirée de votre journal. Cette action est définitive.",
       "cancel": "Annuler",
       "confirm": "Supprimer"
+    }
+  },
+  "Blog": {
+    "metaTitle": "Blog : conseils Entrée Express",
+    "metaDescription": "Conseils clairs et sans jargon pour réussir votre Entrée Express : CRS, tests de langue, équivalence de diplômes, documents.",
+    "eyebrow": "Blog & Ressources",
+    "title": "Conseils d’experts, sans jargon",
+    "subtitle": "Des articles pratiques pour avancer à chaque étape de votre Entrée Express.",
+    "filtersLabel": "Filtrer par catégorie",
+    "allCategories": "Toutes",
+    "tagFilter": "Tag : #{tag}",
+    "clearTag": "Retirer le filtre #{tag}",
+    "empty": "Aucun article ne correspond à ce filtre pour l’instant.",
+    "emptyAll": "Les premiers articles arrivent très bientôt.",
+    "showAll": "Voir tous les articles",
+    "readingMinutes": "{minutes} min de lecture",
+    "inFrench": "En français",
+    "pagination": "Pages du blog",
+    "previous": "Page précédente",
+    "next": "Page suivante",
+    "pageOf": "Page {page} sur {pages}",
+    "backToBlog": "Retour au blog",
+    "by": "Par {author}",
+    "tags": "Tags",
+    "cardLabel": "Lire l’article : {title}",
+    "read": "Lire l’article"
+  },
+  "Dashboard": {
+    "metaTitle": "Tableau de bord",
+    "title": "Tableau de bord",
+    "nav": {
+      "label": "Sections du tableau de bord",
+      "overview": "Aperçu",
+      "blog": "Blog",
+      "openMenu": "Ouvrir le menu du tableau de bord",
+      "menuTitle": "Tableau de bord",
+      "close": "Fermer le menu"
+    },
+    "viewSite": "Voir le site",
+    "overview": {
+      "subtitle": "Votre activité en un coup d’œil.",
+      "blogTitle": "Blog",
+      "drafts": "{count, plural, one {# brouillon} other {# brouillons}}",
+      "published": "{count, plural, one {# article publié} other {# articles publiés}}",
+      "lastPublished": "Dernier publié : {title}, le {date}",
+      "noneYet": "Aucun article publié pour l’instant.",
+      "newArticle": "Nouvel article",
+      "allArticles": "Tous les articles",
+      "loading": "Chargement…"
+    },
+    "greeting": "Bonjour {name}"
+  },
+  "BlogAdmin": {
+    "title": "Articles",
+    "newArticle": "Nouvel article",
+    "categoriesLink": "Catégories",
+    "statusFilter": "Filtrer par statut",
+    "all": "Tous",
+    "status": {
+      "DRAFT": "Brouillon",
+      "PUBLISHED": "Publié"
+    },
+    "columns": {
+      "title": "Titre",
+      "status": "Statut",
+      "language": "Langue",
+      "category": "Catégorie",
+      "updated": "Modifié"
+    },
+    "empty": "Aucun article. Commencez par en écrire un.",
+    "loading": "Chargement des articles…",
+    "error": "Impossible de charger les articles.",
+    "editor": {
+      "newTitle": "Nouvel article",
+      "editTitle": "Modifier l’article",
+      "back": "Retour aux articles",
+      "titleLabel": "Titre",
+      "slugLabel": "Adresse (slug)",
+      "slugHint": "stanzy.ca/{locale}/blog/{slug}",
+      "slugPublishedWarning": "Cet article est publié : changer son adresse cassera les liens déjà partagés.",
+      "bodyLabel": "Contenu",
+      "toolbar": {
+        "label": "Mise en forme",
+        "h2": "Titre de section",
+        "h3": "Sous-titre",
+        "bold": "Gras",
+        "italic": "Italique",
+        "bulletList": "Liste à puces",
+        "orderedList": "Liste numérotée",
+        "quote": "Citation",
+        "link": "Lien",
+        "image": "Image"
+      },
+      "linkPrompt": "Adresse du lien (https://…, /outils/…, mailto:…)",
+      "imageAltPrompt": "Texte alternatif de l’image (obligatoire)",
+      "settings": "Réglages",
+      "language": "Langue",
+      "languages": {
+        "fr": "Français",
+        "en": "Anglais"
+      },
+      "category": "Catégorie",
+      "chooseCategory": "Choisir une catégorie",
+      "tags": "Tags",
+      "tagsHint": "Séparez les tags par des virgules.",
+      "tagSuggestions": "Tags déjà utilisés",
+      "excerpt": "Extrait",
+      "excerptHint": "Laissé vide, le début de l’article est utilisé.",
+      "cover": "Image de couverture",
+      "uploadCover": "Choisir une image",
+      "replaceCover": "Remplacer",
+      "removeCover": "Retirer",
+      "uploading": "Envoi de l’image…",
+      "uploadError": "L’image n’a pas pu être envoyée (JPEG, PNG, WebP ou AVIF, 5 Mo maximum).",
+      "coverAlt": "Texte alternatif de la couverture",
+      "seo": "Référencement (Google)",
+      "seoTitle": "Titre SEO",
+      "seoTitleHint": "Laissé vide, le titre est utilisé.",
+      "seoDescription": "Meta description",
+      "seoDescriptionHint": "Laissée vide, l’extrait est utilisé.",
+      "counter": "{count} / {limit}",
+      "saveDraft": "Enregistrer le brouillon",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré",
+      "preview": "Aperçu",
+      "closePreview": "Revenir à l’édition",
+      "publish": "Publier",
+      "unpublish": "Dépublier",
+      "delete": "Supprimer le brouillon",
+      "deleteConfirmTitle": "Supprimer ce brouillon ?",
+      "deleteConfirmBody": "Le brouillon « {title} » sera supprimé définitivement.",
+      "cancel": "Annuler",
+      "confirmDelete": "Supprimer",
+      "publishedOn": "Publié le {date}",
+      "draftStatus": "Brouillon",
+      "unsaved": "Modifications non enregistrées",
+      "leaveWarning": "Vous avez des modifications non enregistrées. Quitter quand même ?",
+      "mustPublish": "Pour publier : {missing}.",
+      "missing": {
+        "title": "un titre",
+        "category": "une catégorie",
+        "coverAlt": "le texte alternatif de la couverture",
+        "imageAlt": "le texte alternatif de chaque image",
+        "body": "du contenu"
+      },
+      "errors": {
+        "BLOG_SLUG_TAKEN": "Cette adresse est déjà utilisée par un autre article.",
+        "BLOG_SLUG_INVALID": "Lettres minuscules, chiffres et tirets uniquement.",
+        "BLOG_DELETE_PUBLISHED": "Dépubliez l’article avant de le supprimer.",
+        "generic": "L’enregistrement a échoué. Réessayez."
+      },
+      "notFound": "Cet article n’existe pas ou a été supprimé."
+    },
+    "categories": {
+      "title": "Catégories",
+      "back": "Retour aux articles",
+      "nameFr": "Nom (français)",
+      "nameEn": "Nom (anglais)",
+      "slug": "Adresse (slug)",
+      "add": "Ajouter",
+      "save": "Enregistrer",
+      "delete": "Supprimer",
+      "newCategory": "Nouvelle catégorie",
+      "errors": {
+        "BLOG_SLUG_TAKEN": "Une autre catégorie utilise déjà cette adresse.",
+        "BLOG_CATEGORY_IN_USE": "Des articles utilisent encore cette catégorie : changez-les de catégorie avant de la supprimer.",
+        "generic": "L’opération a échoué. Réessayez."
+      }
     }
   }
 }

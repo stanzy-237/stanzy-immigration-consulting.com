@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { requireSession } from '@/features/auth/server/guards';
+import { requireConsultant, requireSession } from '@/features/auth/server/guards';
 import { sessionFor } from '@/server/auth/__tests__/fixtures';
 import { getCurrentSession } from '@/server/auth/session';
 
@@ -41,5 +41,29 @@ describe('requireSession', () => {
   it('returns the session of a signed-in Account', async () => {
     session.mockResolvedValue(SIGNED_IN);
     await expect(requireSession({ locale: 'fr', next: '/compte' })).resolves.toBe(SIGNED_IN);
+  });
+});
+
+describe('requireConsultant', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('sends a signed-out visitor to Connexion, returning to the Tableau de bord afterwards', async () => {
+    session.mockResolvedValue(null);
+    expect(await redirectedTo(requireConsultant({ locale: 'fr', next: '/tableau-de-bord' }))).toBe(
+      '/fr/connexion?next=%2Ftableau-de-bord',
+    );
+  });
+
+  it('answers 404 to a signed-in Account that is not the consultant, so the area is not advertised', async () => {
+    session.mockResolvedValue(sessionFor({ status: 'CLIENT' }));
+    await expect(requireConsultant({ locale: 'fr', next: '/tableau-de-bord' })).rejects.toMatchObject({
+      digest: expect.stringContaining('404'),
+    });
+  });
+
+  it('returns the consultant’s session', async () => {
+    const consultant = sessionFor({ role: 'CONSULTANT' });
+    session.mockResolvedValue(consultant);
+    await expect(requireConsultant({ locale: 'fr', next: '/tableau-de-bord' })).resolves.toBe(consultant);
   });
 });

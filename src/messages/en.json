@@ -3,14 +3,6 @@
     "title": "Stanzy — Canadian Immigration Consulting",
     "description": "Free Express Entry tools, a blog, and Canadian immigration consulting services."
   },
-  "BlogPlaceholder": {
-    "status": "In development",
-    "title": "The blog is on its way",
-    "listingDescription": "We're preparing clear, practical, no-jargon articles to walk you through every step of your Express Entry. Check back soon.",
-    "articleDescription": "This article is being written. We're polishing it so it genuinely delivers — hang tight, it'll be worth it.",
-    "unknownSlug": "The URL “{slug}” doesn't match any article yet.",
-    "back": "Back to home"
-  },
   "ToolPlaceholder": {
     "status": "In development",
     "description": "This tool is on its way. We're polishing it so it genuinely delivers — hang tight, it'll be worth it.",
@@ -68,7 +60,8 @@
         "verificationDesc": "We review your file before you submit"
       },
       "account": "My account: {name}",
-      "signOut": "Log out"
+      "signOut": "Log out",
+      "dashboard": "Dashboard"
     },
     "TikTok": {
       "eyebrow": "Stanzy on TikTok",
@@ -150,30 +143,7 @@
       "read": "Read",
       "readingMinutes": "{minutes} min read",
       "readingMinutesShort": "{minutes} min",
-      "cardAriaLabel": "Open article: {title}",
-      "Categories": {
-        "catExpressEntry": "Express Entry",
-        "catDocuments": "Documents",
-        "catStrategy": "Strategy",
-        "catLanguage": "Language",
-        "catWes": "WES",
-        "catAdvice": "Advice"
-      },
-      "Articles": {
-        "article1Title": "How to maximise your CRS score in 90 days: the full 2024 guide",
-        "article1Excerpt": "Your CRS score drives your chances of landing an invitation. See the proven strategies to pick up points fast: language, studies, work, adaptability.",
-        "article1Alt": "Express Entry 2024",
-        "article2Title": "The 10 must-have documents for your ITA file",
-        "article2Alt": "Immigration documents",
-        "article3Title": "PNP vs Express Entry: which path in 2024?",
-        "article3Alt": "Canada visa",
-        "article4Title": "IELTS or TEF: which test for immigration?",
-        "article4Alt": "IELTS preparation",
-        "article5Title": "WES credential evaluation: process and timing",
-        "article5Alt": "WES evaluation",
-        "article6Title": "5 mistakes that get an Express Entry file rejected",
-        "article6Alt": "Mistakes to avoid"
-      }
+      "cardAriaLabel": "Open article: {title}"
     },
     "Draws": {
       "eyebrow": "Official IRCC Draws",
@@ -1362,6 +1332,175 @@
       "text": "“{name}” will be removed from your log. This cannot be undone.",
       "cancel": "Cancel",
       "confirm": "Delete"
+    }
+  },
+  "Blog": {
+    "metaTitle": "Blog: Express Entry advice",
+    "metaDescription": "Clear, jargon-free advice to succeed with Express Entry: CRS, language tests, credential assessment, documents.",
+    "eyebrow": "Blog & Resources",
+    "title": "Expert advice, no jargon",
+    "subtitle": "Practical articles for every step of your Express Entry journey.",
+    "filtersLabel": "Filter by category",
+    "allCategories": "All",
+    "tagFilter": "Tag: #{tag}",
+    "clearTag": "Remove the #{tag} filter",
+    "empty": "No article matches this filter yet.",
+    "emptyAll": "The first articles are coming very soon.",
+    "showAll": "See all articles",
+    "readingMinutes": "{minutes} min read",
+    "inFrench": "In French",
+    "pagination": "Blog pages",
+    "previous": "Previous page",
+    "next": "Next page",
+    "pageOf": "Page {page} of {pages}",
+    "backToBlog": "Back to the blog",
+    "by": "By {author}",
+    "tags": "Tags",
+    "cardLabel": "Read the article: {title}",
+    "read": "Read the article"
+  },
+  "Dashboard": {
+    "metaTitle": "Dashboard",
+    "title": "Dashboard",
+    "nav": {
+      "label": "Dashboard sections",
+      "overview": "Overview",
+      "blog": "Blog",
+      "openMenu": "Open the dashboard menu",
+      "menuTitle": "Dashboard",
+      "close": "Close the menu"
+    },
+    "viewSite": "View the site",
+    "overview": {
+      "subtitle": "Your activity at a glance.",
+      "blogTitle": "Blog",
+      "drafts": "{count, plural, one {# draft} other {# drafts}}",
+      "published": "{count, plural, one {# published article} other {# published articles}}",
+      "lastPublished": "Last published: {title}, on {date}",
+      "noneYet": "No published article yet.",
+      "newArticle": "New article",
+      "allArticles": "All articles",
+      "loading": "Loading…"
+    },
+    "greeting": "Hello {name}"
+  },
+  "BlogAdmin": {
+    "title": "Articles",
+    "newArticle": "New article",
+    "categoriesLink": "Categories",
+    "statusFilter": "Filter by status",
+    "all": "All",
+    "status": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published"
+    },
+    "columns": {
+      "title": "Title",
+      "status": "Status",
+      "language": "Language",
+      "category": "Category",
+      "updated": "Modified"
+    },
+    "empty": "No articles. Start by writing one.",
+    "loading": "Loading articles…",
+    "error": "Can’t load the articles.",
+    "editor": {
+      "newTitle": "New article",
+      "editTitle": "Edit the article",
+      "back": "Back to articles",
+      "titleLabel": "Title",
+      "slugLabel": "Address (slug)",
+      "slugHint": "stanzy.ca/{locale}/blog/{slug}",
+      "slugPublishedWarning": "This article is published: changing its address will break links already shared.",
+      "bodyLabel": "Content",
+      "toolbar": {
+        "label": "Formatting",
+        "h2": "Section heading",
+        "h3": "Subheading",
+        "bold": "Bold",
+        "italic": "Italic",
+        "bulletList": "Bulleted list",
+        "orderedList": "Numbered list",
+        "quote": "Quote",
+        "link": "Link",
+        "image": "Image"
+      },
+      "linkPrompt": "Link address (https://…, /outils/…, mailto:…)",
+      "imageAltPrompt": "Image alt text (required)",
+      "settings": "Settings",
+      "language": "Language",
+      "languages": {
+        "fr": "French",
+        "en": "English"
+      },
+      "category": "Category",
+      "chooseCategory": "Choose a category",
+      "tags": "Tags",
+      "tagsHint": "Separate tags with commas.",
+      "tagSuggestions": "Tags already used",
+      "excerpt": "Excerpt",
+      "excerptHint": "Left empty, the start of the article is used.",
+      "cover": "Cover image",
+      "uploadCover": "Choose an image",
+      "replaceCover": "Replace",
+      "removeCover": "Remove",
+      "uploading": "Uploading the image…",
+      "uploadError": "The image couldn’t be uploaded (JPEG, PNG, WebP or AVIF, 5 MB max).",
+      "coverAlt": "Cover alt text",
+      "seo": "Search (Google)",
+      "seoTitle": "SEO title",
+      "seoTitleHint": "Left empty, the title is used.",
+      "seoDescription": "Meta description",
+      "seoDescriptionHint": "Left empty, the excerpt is used.",
+      "counter": "{count} / {limit}",
+      "saveDraft": "Save draft",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "preview": "Preview",
+      "closePreview": "Back to editing",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "delete": "Delete draft",
+      "deleteConfirmTitle": "Delete this draft?",
+      "deleteConfirmBody": "The draft “{title}” will be deleted for good.",
+      "cancel": "Cancel",
+      "confirmDelete": "Delete",
+      "publishedOn": "Published on {date}",
+      "draftStatus": "Draft",
+      "unsaved": "Unsaved changes",
+      "leaveWarning": "You have unsaved changes. Leave anyway?",
+      "mustPublish": "To publish: {missing}.",
+      "missing": {
+        "title": "a title",
+        "category": "a category",
+        "coverAlt": "the cover’s alt text",
+        "imageAlt": "alt text on every image",
+        "body": "some content"
+      },
+      "errors": {
+        "BLOG_SLUG_TAKEN": "Another article already uses this address.",
+        "BLOG_SLUG_INVALID": "Lowercase letters, digits and hyphens only.",
+        "BLOG_DELETE_PUBLISHED": "Unpublish the article before deleting it.",
+        "generic": "Saving failed. Try again."
+      },
+      "notFound": "This article doesn’t exist or was deleted."
+    },
+    "categories": {
+      "title": "Categories",
+      "back": "Back to articles",
+      "nameFr": "Name (French)",
+      "nameEn": "Name (English)",
+      "slug": "Address (slug)",
+      "add": "Add",
+      "save": "Save",
+      "delete": "Delete",
+      "newCategory": "New category",
+      "errors": {
+        "BLOG_SLUG_TAKEN": "Another category already uses this address.",
+        "BLOG_CATEGORY_IN_USE": "Articles still use this category: move them to another one before deleting it.",
+        "generic": "That didn’t work. Try again."
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, LogOut, Menu } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, LogOut, Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
@@ -201,6 +201,7 @@ export function SiteNav(): ReactNode {
             <AccountMenu
               name={accountName}
               triggerLabel={t('account', { name: accountName })}
+              dashboardLabel={account?.isConsultant ? t('dashboard') : null}
               signOutLabel={t('signOut')}
               onSignOut={signOut}
             />
@@ -280,6 +281,16 @@ export function SiteNav(): ReactNode {
                     {accountName}
                   </p>
                 ) : null}
+                {account?.isConsultant ? (
+                  <Link
+                    href="/tableau-de-bord"
+                    className="text-navy-deep inline-flex items-center justify-center gap-2 rounded-md border border-fog px-3 py-2 text-sm font-semibold"
+                    onClick={closeMobile}
+                  >
+                    <LayoutDashboard aria-hidden={true} className="size-4" />
+                    {t('dashboard')}
+                  </Link>
+                ) : null}
                 {accountName ? (
                   <button
                     type="button"
@@ -321,6 +332,8 @@ export function SiteNav(): ReactNode {
 type AccountMenuProps = {
   name: string;
   triggerLabel: string;
+  /** The consultant only: the way into the Tableau de bord. */
+  dashboardLabel: string | null;
   signOutLabel: string;
   onSignOut: () => Promise<void>;
 };
@@ -328,6 +341,7 @@ type AccountMenuProps = {
 function AccountMenu({
   name,
   triggerLabel,
+  dashboardLabel,
   signOutLabel,
   onSignOut,
 }: AccountMenuProps): ReactNode {
@@ -347,6 +361,12 @@ function AccountMenu({
         <ChevronDown aria-hidden={true} className="h-3.5 w-3.5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
+        {dashboardLabel ? (
+          <DropdownMenuItem render={<Link href="/tableau-de-bord" />}>
+            <LayoutDashboard aria-hidden={true} />
+            {dashboardLabel}
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuItem onClick={(): void => void onSignOut()}>
           <LogOut aria-hidden={true} />
           {signOutLabel}

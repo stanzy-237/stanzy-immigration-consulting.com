@@ -4,6 +4,10 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  images: {
+    // Blog covers, uploaded by the consultant to Vercel Blob.
+    remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }],
+  },
   env: {
     // Derived, never set by hand: tells the browser bundle whether the server
     // has a Google OAuth client, so "Continuer avec Google" only shows when it

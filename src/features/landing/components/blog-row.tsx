@@ -1,128 +1,78 @@
-import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { useTranslations } from "next-intl";
-import Image from "next/image";
-import type { ReactNode } from "react";
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { useFormatter, useTranslations } from 'next-intl';
+import Image from 'next/image';
+import type { ReactNode } from 'react';
 
-import { Link } from "@/i18n/navigation";
+// The blog's data types and naming only: no blog component crosses into landing (folder rule 3).
+import { categoryName } from '@/features/blog/lib/category-name';
+import type { ArticleCard } from '@/features/blog/server/blog-queries';
+import { Link } from '@/i18n/navigation';
 
-import { ARTICLES, type Article } from "@/features/landing/data/articles";
+type CardProps = { article: ArticleCard; locale: string };
 
-type LargeCardProps = {
-  article: Article;
-  featured: boolean;
-  title: string;
-  excerpt: string | null;
-  category: string;
-  reading: string;
-  cta: string;
-  cardAriaLabel: string;
-  imageAlt: string;
-};
+function useCardText(article: ArticleCard, locale: string) {
+  const format = useFormatter();
+  return {
+    category: categoryName(article.category, locale),
+    date: format.dateTime(article.publishedAt, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }),
+  };
+}
 
-function LargeCard({
-  article,
-  featured,
-  title,
-  excerpt,
-  category,
-  reading,
-  cta,
-  cardAriaLabel,
-  imageAlt,
-}: LargeCardProps): ReactNode {
+function LargeCard({ article, locale, featured }: CardProps & { featured: boolean }): ReactNode {
+  const t = useTranslations('Home.BlogRow');
+  const { category, date } = useCardText(article, locale);
+
   return (
     <Link
       href={`/blog/${article.slug}`}
-      aria-label={cardAriaLabel}
-      className={
-        "group relative flex h-full w-full flex-col overflow-hidden rounded-2xl border-2 border-fog-light bg-white no-underline transition-all duration-200 ease-out " +
-        "hover:-translate-y-0.5 hover:border-navy-deep hover:shadow-[0_12px_36px_rgba(13,31,78,0.10)]"
-      }
+      aria-label={t('cardAriaLabel', { title: article.title })}
+      className="group relative flex h-full w-full flex-col overflow-hidden rounded-2xl border-2 border-fog-light bg-white no-underline transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-navy-deep hover:shadow-lg"
     >
-      {/* Gradient top bar on hover */}
       <span
         aria-hidden={true}
-        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.75 rounded-t-2xl bg-[linear-gradient(90deg,#CC1627,#0D1F4E)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.75 rounded-t-2xl bg-linear-90 from-rouge to-navy-deep opacity-0 transition-opacity duration-200 group-hover:opacity-100"
       />
-      {/* Image wrap — shrink-0 so the body gets any extra height the card
-          absorbs from the 2-row span. */}
-      <div
-        className={
-          "relative w-full shrink-0 overflow-hidden " +
-          (featured ? "h-70" : "h-40")
-        }
-      >
-        <Image
-          src={article.image}
-          alt={imageAlt}
-          fill
-          sizes="(min-width: 1024px) 55vw, 100vw"
-          className="object-cover transition-transform duration-380 ease-out group-hover:scale-105"
-          unoptimized
-        />
-        {/* Darkening overlay for category pill contrast */}
+      <div className={`relative w-full shrink-0 overflow-hidden bg-ice-blue ${featured ? 'h-70' : 'h-40'}`}>
+        {article.coverUrl && (
+          <Image
+            src={article.coverUrl}
+            alt={article.coverAlt ?? ''}
+            fill
+            sizes="(min-width: 1024px) 55vw, 100vw"
+            className="object-cover transition-transform duration-380 ease-out group-hover:scale-105"
+          />
+        )}
         <span
           aria-hidden={true}
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(13,31,78,0.35)_0%,transparent_60%)]"
+          className="pointer-events-none absolute inset-0 bg-linear-to-t from-navy-deep/35 to-transparent to-60%"
         />
-        {/* Category pill */}
         <span className="absolute bottom-3 left-3.5 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 font-sans text-xs font-semibold uppercase tracking-widest text-navy-deep backdrop-blur-sm">
-          <span
-            aria-hidden={true}
-            className="h-1.5 w-1.5 shrink-0 rounded-full bg-rouge"
-          />
+          <span aria-hidden={true} className="size-1.5 shrink-0 rounded-full bg-rouge" />
           {category}
         </span>
       </div>
 
-      {/* Body */}
-      <div
-        className={
-          "flex flex-1 flex-col " +
-          (featured ? "px-6 pb-6 pt-5" : "px-5 pb-5 pt-5")
-        }
-      >
-        {/* Meta */}
+      <div className={`flex flex-1 flex-col ${featured ? 'px-6 pt-5 pb-6' : 'px-5 pt-5 pb-5'}`}>
         <div className="mb-3 flex items-center gap-2.5">
-          <span className="text-xs text-slate">{article.date}</span>
-          <span
-            aria-hidden={true}
-            className="h-0.75 w-0.75  shrink-0 rounded-full bg-fog"
-          />
-          <span className="text-xs text-slate">{reading}</span>
+          <span className="text-xs text-slate">{date}</span>
+          <span aria-hidden={true} className="size-0.75 shrink-0 rounded-full bg-fog" />
+          <span className="text-xs text-slate">
+            {featured
+              ? t('readingMinutes', { minutes: article.readingMinutes })
+              : t('readingMinutesShort', { minutes: article.readingMinutes })}
+          </span>
         </div>
-        {/* Title */}
         <h3
-          className={
-            "font-heading font-bold leading-snug text-navy-deep transition-colors duration-150 group-hover:text-rouge " +
-            (featured ? "text-lg" : "text-base")
-          }
+          className={`font-heading font-bold leading-snug text-navy-deep transition-colors duration-150 group-hover:text-rouge ${featured ? 'text-lg' : 'text-base'}`}
         >
-          {title}
+          {article.title}
         </h3>
-        {/* Excerpt — featured only, and hidden on mobile to match the
-            compact rhythm of the other two large cards. */}
-        {featured && excerpt ? (
-          <p className="mt-2.5 hidden flex-1 text-sm leading-relaxed text-slate md:block">
-            {excerpt}
-          </p>
-        ) : null}
-        {/* Footer */}
-        <div className="mt-4 flex items-center justify-between border-t border-ice-blue pt-4">
-          <div className="flex items-center gap-2">
-            <span
-              aria-hidden={true}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0D1F4E,#CC1627)] font-sans text-[10px] font-bold text-white"
-            >
-              {article.authorInitials}
-            </span>
-            <span className="text-xs font-medium text-slate">
-              {article.authorName}
-            </span>
-          </div>
-          <span className="inline-flex items-center gap-1 text-xs font-semibold text-rouge transition-[gap] duration-150 group-hover:gap-2">
-            {cta}
-            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
+        {/* Excerpt: featured only, and hidden on phones to match the other two large cards. */}
+        {featured && <p className="mt-2.5 hidden flex-1 text-sm leading-relaxed text-slate md:block">{article.excerpt}</p>}
+        <div className="mt-4 flex items-center justify-end border-t border-ice-blue pt-4">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-rouge transition-all duration-150 group-hover:gap-2">
+            {featured ? t('readFull') : t('read')}
+            <ArrowRight className="size-3.5" strokeWidth={2.5} />
           </span>
         </div>
       </div>
@@ -130,159 +80,100 @@ function LargeCard({
   );
 }
 
-type SmallCardProps = {
-  article: Article;
-  title: string;
-  category: string;
-  reading: string;
-  imageAlt: string;
-};
+function SmallCard({ article, locale }: CardProps): ReactNode {
+  const t = useTranslations('Home.BlogRow');
+  const { category, date } = useCardText(article, locale);
 
-function SmallCard({
-  article,
-  title,
-  category,
-  reading,
-  imageAlt,
-}: SmallCardProps): ReactNode {
   return (
     <Link
       href={`/blog/${article.slug}`}
-      className="group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border-2 border-fog-light bg-white p-4 no-underline transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-navy-deep hover:shadow-[0_8px_24px_rgba(13,31,78,0.09)]"
+      className="group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border-2 border-fog-light bg-white p-4 no-underline transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-navy-deep hover:shadow-md"
     >
-      {/* Left accent bar on hover */}
       <span
         aria-hidden={true}
-        className="pointer-events-none absolute inset-y-0 left-0 w-0.75 rounded-l-2xl bg-[linear-gradient(to_bottom,#CC1627,#0D1F4E)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-y-0 left-0 w-0.75 rounded-l-2xl bg-linear-to-b from-rouge to-navy-deep opacity-0 transition-opacity duration-200 group-hover:opacity-100"
       />
-      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl">
-        <Image
-          src={article.image}
-          alt={imageAlt}
-          fill
-          sizes="56px"
-          className="object-cover"
-          unoptimized
-        />
+      <div className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-ice-blue">
+        {article.coverUrl && (
+          <Image src={article.coverUrl} alt={article.coverAlt ?? ''} fill sizes="56px" className="object-cover" />
+        )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-sans text-[10px] font-semibold uppercase tracking-widest text-rouge">
-          {category}
-        </p>
+        <p className="font-sans text-xs font-semibold uppercase tracking-widest text-rouge">{category}</p>
         <p className="mt-1 truncate text-sm font-semibold leading-snug text-navy-deep transition-colors duration-150 group-hover:text-rouge">
-          {title}
+          {article.title}
         </p>
         <p className="mt-1 text-xs text-slate">
-          {article.date} · {reading}
+          {date} · {t('readingMinutesShort', { minutes: article.readingMinutes })}
         </p>
       </div>
     </Link>
   );
 }
 
-export function BlogRow(): ReactNode {
-  const t = useTranslations("Home.BlogRow");
-  const tCat = useTranslations("Home.BlogRow.Categories");
-  const tArt = useTranslations("Home.BlogRow.Articles");
-
-  const large = ARTICLES.filter((a: Article): boolean => a.size === "lg");
-  const small = ARTICLES.filter((a: Article): boolean => a.size === "sm");
+/**
+ * « Blog & Ressources » on the home page: the latest published Articles,
+ * three large (the first featured) then up to three compact ones. Hidden
+ * until the first Article is published.
+ */
+export function BlogRow({ articles, locale }: { articles: ArticleCard[]; locale: string }): ReactNode {
+  const t = useTranslations('Home.BlogRow');
+  if (articles.length === 0) return null;
+  const large = articles.slice(0, 3);
+  const small = articles.slice(3, 6);
 
   return (
-    <section
-      aria-labelledby="blog-row-title"
-      className="bg-white px-5 py-14 md:px-7 md:py-24"
-    >
+    <section aria-labelledby="blog-row-title" className="bg-white px-5 py-14 md:px-7 md:py-24">
       <div className="mx-auto max-w-7xl">
-        {/* Header: eyebrow + title on the left, "See all" button on the right. */}
         <div className="mb-12 flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
           <div className="flex-1">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-fog bg-ice-blue px-3.5 py-1.5">
-              <span
-                aria-hidden={true}
-                className="h-1 w-4 shrink-0 self-center rounded-full bg-navy-deep"
-              />
-              <span className="font-sans text-xs font-semibold uppercase tracking-widest text-navy-deep">
-                {t("eyebrow")}
-              </span>
+              <span aria-hidden={true} className="h-1 w-4 shrink-0 self-center rounded-full bg-navy-deep" />
+              <span className="font-sans text-xs font-semibold uppercase tracking-widest text-navy-deep">{t('eyebrow')}</span>
             </div>
             <h2
               id="blog-row-title"
               className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-none tracking-tight text-navy-deep"
             >
-              {t("titleLead")}
+              {t('titleLead')}
               <br />
-              <span className="text-rouge">{t("titleAccent")}</span>
+              <span className="text-rouge">{t('titleAccent')}</span>
             </h2>
           </div>
           <div className="shrink-0 pb-1.5">
             <Link
               href="/blog"
-              className="group inline-flex h-11 items-center gap-2 rounded-full border-2 border-fog bg-transparent pl-5 pr-2.5 font-sans text-sm font-semibold text-navy-deep no-underline transition-all duration-200 hover:border-navy-deep hover:bg-off-white"
+              className="group inline-flex h-11 items-center gap-2 rounded-full border-2 border-fog bg-transparent pr-2.5 pl-5 font-sans text-sm font-semibold text-navy-deep no-underline transition-all duration-200 hover:border-navy-deep hover:bg-off-white"
             >
-              {t("seeAll")}
+              {t('seeAll')}
               <span
                 aria-hidden={true}
-                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy-deep transition-all duration-200 group-hover:rotate-45 group-hover:bg-rouge"
+                className="flex size-6 shrink-0 items-center justify-center rounded-full bg-navy-deep transition-all duration-200 group-hover:rotate-45 group-hover:bg-rouge"
               >
-                <ArrowUpRight
-                  className="h-3.5 w-3.5 text-white"
-                  strokeWidth={2.5}
-                />
+                <ArrowUpRight className="size-3.5 text-white" strokeWidth={2.5} />
               </span>
             </Link>
           </div>
         </div>
 
-        {/* Main grid: 1-col mobile, 2-col ≥md, 1.2fr/1fr with featured spanning 2 rows at lg+. */}
-        <ul className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr] lg:grid-rows-2">
-          {large.map(
-            (article: Article, i: number): ReactNode => (
-              <li key={article.slug} className={i === 0 ? "lg:row-span-2" : ""}>
-                <LargeCard
-                  article={article}
-                  featured={i === 0}
-                  title={tArt(article.titleKey)}
-                  excerpt={article.excerptKey ? tArt(article.excerptKey) : null}
-                  category={tCat(article.categoryKey)}
-                  reading={
-                    i === 0
-                      ? t("readingMinutes", {
-                          minutes: article.readingMinutes,
-                        })
-                      : t("readingMinutesShort", {
-                          minutes: article.readingMinutes,
-                        })
-                  }
-                  cta={i === 0 ? t("readFull") : t("read")}
-                  imageAlt={tArt(article.imageAltKey)}
-                  cardAriaLabel={t("cardAriaLabel", {
-                    title: tArt(article.titleKey),
-                  })}
-                />
-              </li>
-            ),
-          )}
+        {/* 1 column on phones, 2 from tablets; at lg the featured card spans both rows. */}
+        <ul className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-rows-2">
+          {large.map((article, i) => (
+            <li key={article.slug} className={i === 0 ? 'lg:row-span-2' : ''}>
+              <LargeCard article={article} locale={locale} featured={i === 0} />
+            </li>
+          ))}
         </ul>
 
-        {/* Small grid: 3 compact rows below the main grid. */}
-        <ul className="mt-3.5 grid grid-cols-1 gap-3.5 md:grid-cols-3">
-          {small.map(
-            (article: Article): ReactNode => (
+        {small.length > 0 && (
+          <ul className="mt-3.5 grid grid-cols-1 gap-3.5 md:grid-cols-3">
+            {small.map((article) => (
               <li key={article.slug}>
-                <SmallCard
-                  article={article}
-                  title={tArt(article.titleKey)}
-                  category={tCat(article.categoryKey)}
-                  reading={t("readingMinutesShort", {
-                    minutes: article.readingMinutes,
-                  })}
-                  imageAlt={tArt(article.imageAltKey)}
-                />
+                <SmallCard article={article} locale={locale} />
               </li>
-            ),
-          )}
-        </ul>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );
