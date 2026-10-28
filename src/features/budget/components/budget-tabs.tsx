@@ -13,8 +13,9 @@ type Tab = 'estimer' | 'depenses';
 const tabOfHash = (hash: string): Tab => (hash === '#depenses' ? 'depenses' : 'estimer');
 
 // Phones: tighter padding and text, so « Estimer mon budget » fits half the frame.
+// Hover turns an inactive tab's text red; the active one stays white on navy.
 const trigger =
-  'h-11 min-w-0 flex-1 rounded-full px-3 font-heading text-xs font-bold text-slate data-active:bg-navy-deep data-active:text-white sm:flex-none sm:px-5 sm:text-sm';
+  'h-11 min-w-0 flex-1 rounded-full px-3 font-heading text-xs font-bold text-slate transition-colors hover:text-rouge data-active:bg-navy-deep data-active:text-white data-active:hover:text-white sm:flex-none sm:px-5 sm:text-sm';
 
 /** « Estimer mon budget » / « Mes dépenses ». */
 export function BudgetTabs(): ReactNode {
