@@ -809,8 +809,6 @@
     "subtitle": "Follow the latest Express Entry draws and find the score that matters to you.",
     "synced": "Updated {when}",
     "neverSynced": "Draws are on their way: the first update hasn’t run yet.",
-    "loading": "Loading draws…",
-    "error": "We can’t load the draws right now. Try again in a moment.",
     "latest": {
       "label": "Latest draw",
       "round": "Round #{round}",
@@ -904,7 +902,10 @@
       "install": "On iPhone, first add Stanzy to your home screen (Share → Add to Home Screen), then open the app to turn on alerts.",
       "unsupported": "Your browser doesn’t support notifications. Join our WhatsApp channel to hear about new draws.",
       "whatsapp": "Join the WhatsApp channel",
-      "failed": "Couldn’t turn alerts on. Try again in a moment."
+      "failed": "Couldn’t turn alerts on. Try again in a moment.",
+      "toastOn": "Draw alerts turned on",
+      "toastOff": "Draw alerts turned off",
+      "disableFailed": "Turning alerts off failed. Try again in a moment."
     },
     "alert": {
       "title": "New draw #{round}",
@@ -924,8 +925,6 @@
     "title": "Next draw",
     "subtitle": "Prediction of the next Express Entry draw",
     "synced": "Updated {when}",
-    "loading": "Loading draws…",
-    "error": "We can’t load the draws right now. Try again in a moment.",
     "empty": "No prediction yet: the first draws update hasn’t run.",
     "disclaimer": "An estimate, not a guarantee: IRCC doesn’t announce its draws. These figures are statistics on past rounds.",
     "featured": {

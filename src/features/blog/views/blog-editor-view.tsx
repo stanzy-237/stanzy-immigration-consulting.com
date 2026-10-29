@@ -137,7 +137,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
     <QueryBoundary
       fallback={<EditorSkeleton />}
       renderError={(error) =>
-        isNotFound(error) ? <p className="rounded-2xl bg-white p-6 text-slate">{tEditor('notFound')}</p> : null
+        isNotFound(error) ? <p className="rounded-2xl bg-white p-6 text-slate">{tEditor('notFound')}</p> : undefined
       }
     >
       {id ? <StoredArticleEditor id={id} /> : <NewArticleEditor />}

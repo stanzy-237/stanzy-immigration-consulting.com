@@ -1,13 +1,19 @@
 'use client';
 
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Info } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useMemo, type ReactNode } from 'react';
 
+import { QueryBoundary } from '@/components/query-boundary';
+import { Skeleton } from '@/components/ui/skeleton';
 import { FeaturedPrediction } from '@/features/draw-prediction/components/featured-prediction';
 import { GroupPredictions } from '@/features/draw-prediction/components/group-predictions';
 import { predictNextDraws } from '@/features/draw-prediction/lib/predict-next-draws';
-import { api } from '@/trpc/react';
+import { useTRPC } from '@/trpc/client';
+
+/** A block the hero's prediction already reports failures for: hidden when it fails. */
+const hidden = () => null;
 
 /**
  * The Prochain tirage page body: hero with the most likely next Tirage, the
@@ -16,12 +22,6 @@ import { api } from '@/trpc/react';
  */
 export function PredictionBoard(): ReactNode {
   const t = useTranslations('DrawPrediction');
-  const format = useFormatter();
-  const list = api.draws.list.useQuery();
-  // Only for « Mis à jour … »: when IRCC's feed was last read.
-  const latest = api.draws.latest.useQuery({ take: 1 });
-  const syncedAt = latest.data?.lastSyncedAt;
-  const prediction = useMemo(() => (list.data ? predictNextDraws(list.data, new Date()) : null), [list.data]);
 
   return (
     <>
@@ -33,20 +33,64 @@ export function PredictionBoard(): ReactNode {
           </p>
           <h1 className="mb-2 font-heading text-4xl font-bold tracking-tight text-white sm:text-5xl">{t('title')}</h1>
           <p className="mb-2 text-base text-white/60">{t('subtitle')}</p>
-          {syncedAt && <p className="text-xs text-white/50">{t('synced', { when: format.relativeTime(syncedAt, new Date()) })}</p>}
+          <QueryBoundary fallback={<Skeleton aria-hidden={true} className="h-3 w-40 bg-white/10" />} renderError={hidden}>
+            <Synced />
+          </QueryBoundary>
 
           <p role="note" className="mt-6 mb-8 flex items-start gap-3 rounded-2xl border border-honey-line bg-honey-tint p-4 text-sm text-navy-deep">
             <Info aria-hidden={true} className="mt-0.5 size-4 shrink-0 text-honey" />
             <span>{t('disclaimer')}</span>
           </p>
 
-          {list.isError && <p role="alert" className="rounded-2xl bg-white/10 p-6 text-white/80">{t('error')}</p>}
-          {!list.isError && !prediction && <p className="text-white/70">{t('loading')}</p>}
-          {prediction && !prediction.featured && <p className="rounded-2xl bg-white/10 p-6 text-white/80">{t('empty')}</p>}
-          {prediction?.featured && <FeaturedPrediction prediction={prediction.featured} />}
+          <QueryBoundary tone="dark" fallback={<FeaturedSkeleton />}>
+            <Featured />
+          </QueryBoundary>
         </div>
       </header>
-      {prediction && prediction.byGroup.length > 0 && <GroupPredictions predictions={prediction.byGroup} />}
+      <QueryBoundary fallback={null} renderError={hidden}>
+        <ByGroup />
+      </QueryBoundary>
     </>
+  );
+}
+
+/** The predictions from every stored Tirage (the route prefetches `draws.list`). */
+function usePrediction() {
+  const trpc = useTRPC();
+  const { data: draws } = useSuspenseQuery(trpc.draws.list.queryOptions());
+  return useMemo(() => predictNextDraws(draws, new Date()), [draws]);
+}
+
+/** « Mis à jour … »: when IRCC's feed was last read. */
+function Synced(): ReactNode {
+  const t = useTranslations('DrawPrediction');
+  const format = useFormatter();
+  const trpc = useTRPC();
+  const { data } = useSuspenseQuery(trpc.draws.latest.queryOptions({ take: 1 }));
+  if (!data.lastSyncedAt) return null;
+  // Relative to now: the static HTML can be a few minutes behind the browser.
+  return <p suppressHydrationWarning className="text-xs text-white/50">{t('synced', { when: format.relativeTime(data.lastSyncedAt, new Date()) })}</p>;
+}
+
+function Featured(): ReactNode {
+  const t = useTranslations('DrawPrediction');
+  const { featured } = usePrediction();
+  if (!featured) return <p className="rounded-2xl bg-white/10 p-6 text-white/80">{t('empty')}</p>;
+  return <FeaturedPrediction prediction={featured} />;
+}
+
+function ByGroup(): ReactNode {
+  const { byGroup } = usePrediction();
+  return byGroup.length > 0 ? <GroupPredictions predictions={byGroup} /> : null;
+}
+
+/** The featured prediction's card, on navy. */
+function FeaturedSkeleton(): ReactNode {
+  const t = useTranslations('Common');
+  return (
+    <div role="status">
+      <span className="sr-only">{t('loading')}</span>
+      <Skeleton aria-hidden={true} className="h-80 rounded-3xl bg-white/10 lg:h-64" />
+    </div>
   );
 }

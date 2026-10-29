@@ -6,6 +6,7 @@ import { axe } from 'vitest-axe';
 import { authClient } from '@/features/auth/lib/auth-client';
 import { navigationMock, withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { DrawPredictionView } from '@/features/draw-prediction/views/draw-prediction-view';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 import type { DrawGroup } from '@/features/draws/lib/draw-type';
 import type { DrawSummary } from '@/features/draws/server/draws-router';
 
@@ -64,14 +65,18 @@ const DRAWS: DrawSummary[] = [
   draw(400, 'GENERAL', '2025-05-14', 480),
 ];
 
+/** What the route prefetches: every Tirage and the newest one with the last sync. */
 const query = {
-  list: { data: DRAWS as DrawSummary[] | undefined, isError: false },
-  latest: {
-    data: { draws: DRAWS.slice(0, 1), lastSyncedAt: new Date(NOW.getTime() - 2 * 3600_000) } as
-      | { draws: DrawSummary[]; lastSyncedAt: Date | null }
-      | undefined,
-    isError: false,
-  },
+  list: DRAWS as DrawSummary[],
+  latest: { draws: DRAWS.slice(0, 1), lastSyncedAt: new Date(NOW.getTime() - 2 * 3600_000) as Date | null },
+};
+
+/** The page as its route serves it: the Tirages already in the cache. */
+const predictionPage = () => {
+  const { trpc, queryClient, wrap } = createTestTRPC();
+  queryClient.setQueryData(trpc.draws.list.queryKey(), query.list);
+  queryClient.setQueryData(trpc.draws.latest.queryKey({ take: 1 }), query.latest);
+  return wrap(<DrawPredictionView />);
 };
 
 vi.mock('@/i18n/navigation', async (importOriginal) => ({
@@ -79,21 +84,12 @@ vi.mock('@/i18n/navigation', async (importOriginal) => ({
   ...navigationMock,
 }));
 vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi.fn(), signOut: vi.fn() } }));
-vi.mock('@/trpc/react', () => ({
-  api: {
-    draws: {
-      list: { useQuery: () => query.list },
-      latest: { useQuery: () => query.latest },
-    },
-  },
-}));
-
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never);
-  query.list.data = DRAWS;
-  query.latest.data = { draws: DRAWS.slice(0, 1), lastSyncedAt: new Date(NOW.getTime() - 2 * 3600_000) };
+  query.list = DRAWS;
+  query.latest = { draws: DRAWS.slice(0, 1), lastSyncedAt: new Date(NOW.getTime() - 2 * 3600_000) };
 });
 
 afterEach(() => {
@@ -106,7 +102,7 @@ const bodyRows = () => within(table()).getAllByRole('row').slice(1);
 
 describe('DrawPredictionView', () => {
   it('features the most likely next Tirage with its week, range, reliability and why', () => {
-    render(withIntl(<DrawPredictionView />));
+    render(withIntl(predictionPage()));
 
     const title = screen.getByRole('heading', { level: 1, name: 'Prochain tirage' });
     expect(title.nextElementSibling).toHaveTextContent('Prédiction du prochain tirage Entrée Express');
@@ -130,7 +126,7 @@ describe('DrawPredictionView', () => {
   });
 
   it('gives one row per group with a Tirage in the last 12 months, naming the day where it can', () => {
-    render(withIntl(<DrawPredictionView />));
+    render(withIntl(predictionPage()));
 
     expect(bodyRows().map((row) => within(row).getAllByRole('cell')[0]!.textContent)).toEqual(['PCP', 'CEC', 'Catégorie']);
     const cec = within(bodyRows()[1]!);
@@ -155,15 +151,15 @@ describe('DrawPredictionView', () => {
   });
 
   it('warns that it is an estimate, not a guarantee', () => {
-    render(withIntl(<DrawPredictionView />));
+    render(withIntl(predictionPage()));
 
     expect(screen.getByRole('note')).toHaveTextContent(/^Estimation, pas une garantie : IRCC n’annonce pas ses tirages\./);
   });
 
   it('says so before the first update has run', () => {
-    query.list.data = [];
-    query.latest.data = { draws: [], lastSyncedAt: null };
-    render(withIntl(<DrawPredictionView />));
+    query.list = [];
+    query.latest = { draws: [], lastSyncedAt: null };
+    render(withIntl(predictionPage()));
 
     expect(screen.getByText(/Pas encore de prédiction/)).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Prochain tirage le plus probable' })).not.toBeInTheDocument();
@@ -171,7 +167,7 @@ describe('DrawPredictionView', () => {
   });
 
   it('reads in English at /en', () => {
-    render(withIntl(<DrawPredictionView />, 'en'));
+    render(withIntl(predictionPage(), 'en'));
 
     const card = within(screen.getByRole('region', { name: 'Most likely next draw' }));
     expect(card.getByText('week of October 26, date uncertain')).toBeInTheDocument();
@@ -180,7 +176,7 @@ describe('DrawPredictionView', () => {
 
   it('has no axe violations', async () => {
     vi.useRealTimers();
-    const { container } = render(withIntl(<DrawPredictionView />));
+    const { container } = render(withIntl(predictionPage()));
     expect(await axe(container)).toHaveNoViolations();
   });
 });

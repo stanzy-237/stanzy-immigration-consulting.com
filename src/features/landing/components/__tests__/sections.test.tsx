@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { ConsultationCta } from '@/features/landing/components/consultation-cta';
 import { Draws } from '@/features/landing/components/draws';
@@ -8,17 +8,20 @@ import { Faq } from '@/features/landing/components/faq';
 import { ServicesGrid } from '@/features/landing/components/services-grid';
 import { Subscribe } from '@/features/landing/components/subscribe';
 import { WhyStanzy } from '@/features/landing/components/why-stanzy';
+import type { DrawSummary } from '@/features/draws/lib/draw-summary';
+import type { DrawGroup } from '@/features/draws/lib/draw-type';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 import { withIntl } from './test-utils';
 
-const latest = vi.hoisted(() => ({
-  data: undefined as unknown,
-}));
-vi.mock('@/trpc/react', () => ({
-  api: { draws: { latest: { useQuery: () => latest } } },
-}));
+/** The section as the home route serves it: the latest four Tirages prefetched. */
+const drawsSection = (latest: { lastSyncedAt: Date | null; draws: DrawSummary[] } = { lastSyncedAt: null, draws: [] }) => {
+  const { trpc, queryClient, wrap } = createTestTRPC();
+  queryClient.setQueryData(trpc.draws.latest.queryKey({ take: 4 }), latest);
+  return wrap(<Draws />);
+};
 
-const draw = (round: number, typeLabel: string, group: string, crsMin: number, invitations = 1500) => ({
+const draw = (round: number, typeLabel: string, group: DrawGroup, crsMin: number, invitations = 1500): DrawSummary => ({
   round: String(round),
   roundNumber: round,
   date: `2026-10-${round - 434}`,
@@ -44,7 +47,7 @@ const factsOf = (card: HTMLElement) =>
 
 describe('Draws', () => {
   it('shows the latest stored round and the three before it', () => {
-    latest.data = {
+    const latest = {
       lastSyncedAt: new Date(),
       draws: [
         draw(450, 'French-Language proficiency 2026-Version 2', 'FRENCH', 435),
@@ -53,7 +56,7 @@ describe('Draws', () => {
         draw(447, 'Trades Occupations, 2026-Version 3', 'CATEGORY', 476),
       ],
     };
-    render(withIntl(<Draws />));
+    render(withIntl(drawsSection(latest)));
     expect(screen.getByText(/#450/)).toBeInTheDocument();
     expect(screen.getAllByText('Connaissance du français').length).toBeGreaterThan(0);
     for (const round of ['449', '448', '447']) {
@@ -63,8 +66,7 @@ describe('Draws', () => {
   });
 
   it('leads the latest Tirage with its minimum score, then its category, invitations, date and tie-break', () => {
-    latest.data = { lastSyncedAt: new Date(), draws: FOUR };
-    render(withIntl(<Draws />));
+    render(withIntl(drawsSection({ lastSyncedAt: new Date(), draws: FOUR })));
     const card = screen.getByRole('article', { name: 'Dernier tirage' });
 
     expect(within(card).getByText('Tirage #450')).toBeInTheDocument();
@@ -80,8 +82,7 @@ describe('Draws', () => {
   });
 
   it('shows each earlier Tirage by its score, its type in short for phones and in full for wider screens', () => {
-    latest.data = { lastSyncedAt: new Date(), draws: FOUR };
-    render(withIntl(<Draws />));
+    render(withIntl(drawsSection({ lastSyncedAt: new Date(), draws: FOUR })));
     const pnp = screen.getByRole('heading', { name: 'Tirage #448' }).closest('a')!;
 
     expect(within(pnp).getAllByText('772').length).toBeGreaterThan(0);
@@ -91,21 +92,19 @@ describe('Draws', () => {
   });
 
   it('labels the minimum score in English at /en', () => {
-    latest.data = { lastSyncedAt: new Date(), draws: [draw(450, 'French-Language proficiency 2026-Version 2', 'FRENCH', 435)] };
-    render(withIntl(<Draws />, 'en'));
+    render(withIntl(drawsSection({ lastSyncedAt: new Date(), draws: [draw(450, 'French-Language proficiency 2026-Version 2', 'FRENCH', 435)] }), 'en'));
     expect(screen.queryByText(/Score min/)).not.toBeInTheDocument();
     expect(screen.getAllByText(/Min(imum)? (CRS )?score/).length).toBeGreaterThan(0);
     expect(screen.getAllByText('French-Language proficiency 2026-Version 2').length).toBeGreaterThan(0);
   });
 
   it('shows only the header and link until the first rounds are stored', () => {
-    latest.data = { lastSyncedAt: null, draws: [] };
-    render(withIntl(<Draws />));
+    render(withIntl(drawsSection({ lastSyncedAt: null, draws: [] })));
     expect(screen.queryByText(/#\d+/)).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Voir les derniers tirages/i })).toBeInTheDocument();
   });
   it('exposes a "latest draws" CTA linking to the dernier-tirage tool', () => {
-    render(withIntl(<Draws />));
+    render(withIntl(drawsSection()));
     const link = screen.getByRole('link', {
       name: /Voir les derniers tirages/i,
     });

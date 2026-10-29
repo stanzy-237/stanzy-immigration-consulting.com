@@ -61,8 +61,13 @@ export function QueryBoundary({
   fallback: ReactNode;
   /** `dark` on navy sections. */
   tone?: 'light' | 'dark';
-  /** A failure this place explains itself (an Article that doesn't exist); null keeps « Réessayer ». */
-  renderError?: (error: Error) => ReactNode | null;
+  /**
+   * What to show instead of « Réessayer » for a failure this place explains
+   * itself (an Article that doesn't exist), or `null` to show nothing (a
+   * secondary block whose page already shows the error). `undefined` keeps
+   * « Réessayer ».
+   */
+  renderError?: (error: Error) => ReactNode | undefined;
   children: ReactNode;
 }) {
   return (
@@ -70,7 +75,10 @@ export function QueryBoundary({
       {({ reset }) => (
         <ErrorBoundary
           onReset={reset}
-          fallback={(error, retry) => renderError?.(error) ?? <QueryError retry={retry} tone={tone} />}
+          fallback={(error, retry) => {
+            const custom = renderError?.(error);
+            return custom === undefined ? <QueryError retry={retry} tone={tone} /> : custom;
+          }}
         >
           <Suspense fallback={fallback}>{children}</Suspense>
         </ErrorBoundary>

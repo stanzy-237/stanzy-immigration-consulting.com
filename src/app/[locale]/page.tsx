@@ -2,6 +2,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { HomeView } from '@/features/landing/views/home-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { HydrateClient, prefetch, publicTrpc } from '@/trpc/server';
+
+// Static with the latest Tirages and Articles in its HTML, refreshed every 5 minutes.
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,
@@ -20,5 +24,11 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <HomeView locale={locale} />;
+  // The « Derniers tirages » section's four Tirages.
+  prefetch(publicTrpc.draws.latest.queryOptions({ take: 4 }));
+  return (
+    <HydrateClient>
+      <HomeView locale={locale} />
+    </HydrateClient>
+  );
 }

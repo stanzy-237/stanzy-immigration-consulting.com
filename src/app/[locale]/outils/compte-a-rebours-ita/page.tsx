@@ -2,6 +2,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { ItaCountdownView } from '@/features/ita-countdown/views/ita-countdown-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { HydrateClient, prefetch, publicTrpc } from '@/trpc/server';
+
+// Static; the « Derniers tirages » shortcut's Tirages are in its HTML, refreshed every 5 minutes.
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,
@@ -23,5 +27,10 @@ export default async function Page({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ItaCountdownView />;
+  prefetch(publicTrpc.draws.latest.queryOptions({ take: 5 }));
+  return (
+    <HydrateClient>
+      <ItaCountdownView />
+    </HydrateClient>
+  );
 }
