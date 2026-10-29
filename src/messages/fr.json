@@ -577,7 +577,13 @@
       "deleteTitle": "Supprimer « {name} » ?",
       "deleteDescription": "Cette simulation sera définitivement supprimée.",
       "cancelDelete": "Annuler",
-      "confirmDelete": "Supprimer"
+      "confirmDelete": "Supprimer",
+      "toast": {
+        "renamed": "Simulation renommée",
+        "deleted": "Simulation supprimée",
+        "failed": "L’opération a échoué. Réessayez.",
+        "openFailed": "La simulation n’a pas pu être ouverte. Réessayez."
+      }
     },
     "hints": {
       "title": "Comment augmenter votre score",
@@ -799,7 +805,8 @@
       "trigger": "Reprendre une simulation CRS",
       "inProgress": "Réponses en cours du Calculateur CRS (cet appareil)",
       "saved": "Mes simulations enregistrées",
-      "points": "{points} pts"
+      "points": "{points} pts",
+      "openFailed": "La simulation n’a pas pu être ouverte. Réessayez."
     }
   },
   "Draws": {
@@ -1060,7 +1067,6 @@
     "lead": "ITA, AOR, biométrie, médical — enregistrez chaque jalon au fil de votre parcours.",
     "viewTimeline": "Voir la timeline",
     "feedTitle": "Étapes enregistrées",
-    "loading": "Chargement de votre parcours…",
     "empty": {
       "title": "Aucune étape enregistrée",
       "text": "Ajoutez votre première étape pour commencer à suivre votre parcours.",
@@ -1146,6 +1152,12 @@
       "running": "{duration} depuis l’AOR",
       "done": "Dossier traité en {duration} (AOR → COPR)",
       "total": "soit {total, plural, one {# jour} other {# jours}}"
+    },
+    "toast": {
+      "added": "Étape ajoutée",
+      "updated": "Étape modifiée",
+      "deleted": "Étape supprimée",
+      "deleteFailed": "L’étape n’a pas pu être supprimée. Réessayez."
     }
   },
   "ItaCountdown": {
@@ -1307,7 +1319,14 @@
         "text": "Ajoutez votre première dépense : test de langue, WES, frais IRCC…"
       },
       "edit": "Modifier {name}",
-      "fab": "Ajouter une dépense"
+      "fab": "Ajouter une dépense",
+      "toast": {
+        "added": "Dépense ajoutée",
+        "updated": "Dépense modifiée",
+        "deleted": "Dépense supprimée",
+        "deleteFailed": "La dépense n’a pas pu être supprimée. Réessayez.",
+        "currencySaved": "Devise enregistrée"
+      }
     },
     "currencyDialog": {
       "firstTitle": "Choisissez votre devise",

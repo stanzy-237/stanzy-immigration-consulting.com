@@ -11,15 +11,11 @@ export function ScoreSummary({
   onSave,
   onReset,
   saving,
-  saved,
-  offline,
 }: {
   breakdown: CrsBreakdown | null;
   onSave: () => void;
   onReset: () => void;
   saving: boolean;
-  saved: boolean;
-  offline: boolean;
 }): ReactNode {
   const t = useTranslations('Crs.summary');
   const total = breakdown?.total ?? null;
@@ -66,8 +62,6 @@ export function ScoreSummary({
           <Save aria-hidden={true} className="size-4" />
           {t('save')}
         </button>
-        {saved ? <p className="mt-2 text-center text-body-sm text-white/80">{t('saved')}</p> : null}
-        {offline ? <p className="mt-2 text-center text-body-sm text-white/80">{t('saveOffline')}</p> : null}
         <button
           type="button"
           onClick={onReset}

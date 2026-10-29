@@ -65,7 +65,7 @@ Several queries at once: `useSuspenseQueries({ queries: [trpc.a.queryOptions(), 
 
 - `publicTrpc`: `publicProcedure`s on a public page. It doesn't read the request, so the page stays static. Add `export const revalidate = <seconds>`.
 - `trpc`: `protectedProcedure` / `consultantProcedure`, only on pages that already render per visit (a `requireSession` / `requireConsultant` layout or page). It reads the request's cookies.
-- **Neither:** a visitor's private data on a static page (« Mes dépenses » on `/outils/budget`, the saved CRS simulations). Prefetching would make the page dynamic for everyone. Read it in the browser with `useQuery(trpc.x.queryOptions(input, { enabled: signedIn }))` and render the skeleton while `isPending`.
+- **Neither:** a visitor's private data on a static page (« Mes dépenses » on `/outils/budget`, the saved CRS simulations). Prefetching would make the page dynamic for everyone. Render the reading component only once signed in, under a `QueryBoundary` with its skeleton; its `useSuspenseQuery` then fetches in the browser. Something optional behind a tap or a menu (the recent-Tirages shortcut, « Reprendre une simulation CRS ») may use `useQuery` instead, with skeleton rows while `isPending`, so the page never waits for it.
 
 ## 2. Skeletons, never « Chargement… »
 
@@ -113,4 +113,6 @@ await user.click(screen.getByRole('button', { name: 'Ajouter' }));
 expect(await screen.findByText('Étape ajoutée')).toBeInTheDocument(); // the toast
 ```
 
-Seeding the cache plays the server prefetch, so the View renders its data on the first render. To test the skeleton, leave the cache empty and give a handler that never resolves (`() => new Promise(() => {})`).
+Seeding the cache plays the server prefetch (or a browser fetch that already came back), so the View renders its data on the first render. To test the skeleton, leave the cache empty and give a handler that never resolves (`() => new Promise(() => {})`). Mutations now really succeed through their handlers, so assert with `await waitFor(...)` / `findBy...`, and expect what success does next (a form that closes, a list that refetches).
+
+Examples: `src/features/blog/views/__tests__/blog-editor-view.test.tsx`, `src/features/parcours/views/__tests__/parcours-view.test.tsx`, `src/features/draws/views/__tests__/draws-view.test.tsx`.

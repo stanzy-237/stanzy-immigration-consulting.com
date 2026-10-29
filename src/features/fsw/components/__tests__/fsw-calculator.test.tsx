@@ -8,10 +8,11 @@ import { navigationMock, withIntl } from '@/features/auth/views/__tests__/test-u
 import { CRS_DRAFT_KEY } from '@/features/crs/hooks/use-crs-draft';
 import { DEFAULT_FORM as CRS_DEFAULT, toProfile as toCrsProfile } from '@/features/crs/lib/crs-form';
 import { FswCalculator } from '@/features/fsw/components/fsw-calculator';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /**
  * Seam: the Calculateur 67 points as a visitor uses it. Nothing is stubbed
- * but navigation. Expected totals are worked by hand from IRCC's grid (see
+ * but navigation, the session and the server's answers. Expected totals are worked by hand from IRCC's grid (see
  * the engine tests): language 6/5/4 per ability at CLB 9+/8/7, bachelor's
  * 21, 2–3 years 11, age 30 12.
  */
@@ -19,13 +20,6 @@ vi.mock('@/i18n/navigation', () => navigationMock);
 vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi.fn() } }));
 const fetchSaved = vi.fn();
 let saved: { id: string; name: string; total: number; rules: string; updatedAt: Date }[] = [];
-vi.mock('@/trpc/react', () => ({
-  api: {
-    useUtils: () => ({ crs: { get: { fetch: fetchSaved } } }),
-    crs: { list: { useQuery: (_input: unknown, opts?: { enabled?: boolean }) => ({ data: opts?.enabled === false ? undefined : saved }) } },
-  },
-}));
-
 const useSession = vi.mocked(authClient.useSession);
 const signedIn = () =>
   useSession.mockReturnValue({
@@ -51,7 +45,10 @@ const stepPoints = (heading: string) =>
   within(screen.getByRole('region', { name: heading })).getByTestId('section-points');
 
 function renderCalculator(locale: 'fr' | 'en' = 'fr') {
-  return render(withIntl(<FswCalculator today={TODAY} />, locale));
+  // The saved simulations the menu reads once signed in, already fetched.
+  const { trpc, queryClient, wrap } = createTestTRPC({ 'crs.list': () => saved, 'crs.get': (input) => fetchSaved(input) });
+  queryClient.setQueryData(trpc.crs.list.queryKey(), saved as never);
+  return render(withIntl(wrap(<FswCalculator today={TODAY} />), locale));
 }
 
 const FRENCH = ['Expression orale', 'Compréhension orale', 'Compréhension écrite', 'Expression écrite'];

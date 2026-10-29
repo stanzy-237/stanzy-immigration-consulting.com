@@ -1,5 +1,6 @@
 'use client';
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, FilePenLine, History } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -13,10 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toast } from '@/components/ui/toast';
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { useCrsDraftValue } from '@/features/crs/hooks/use-crs-draft';
 import { fromProfile, type CrsForm } from '@/features/crs/lib/crs-form';
-import { api } from '@/trpc/react';
+import { useTRPC } from '@/trpc/client';
 
 /**
  * « Reprendre une simulation CRS »: a dropdown of the CRS answers in progress
@@ -29,14 +31,20 @@ export function ReuseCrsMenu({ onPick }: { onPick: (answers: CrsForm) => void })
   const format = useFormatter();
   const { account } = useCurrentAccount();
   const draft = useCrsDraftValue();
-  const utils = api.useUtils();
-  const { data: simulations = [] } = api.crs.list.useQuery(undefined, { enabled: account !== null });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  // Not suspense: the menu only appears once there is something to reuse.
+  const { data: simulations = [] } = useQuery(trpc.crs.list.queryOptions(undefined, { enabled: account !== null }));
 
   if (!draft && simulations.length === 0) return null;
 
   const pickSaved = async (id: string): Promise<void> => {
-    const simulation = await utils.crs.get.fetch({ id });
-    onPick(fromProfile(simulation.profile));
+    try {
+      const simulation = await queryClient.fetchQuery(trpc.crs.get.queryOptions({ id }));
+      onPick(fromProfile(simulation.profile));
+    } catch {
+      toast.add({ title: t('openFailed'), type: 'error' });
+    }
   };
 
   return (

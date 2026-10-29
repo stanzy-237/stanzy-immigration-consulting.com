@@ -9,7 +9,6 @@ import superjson from 'superjson';
 import type { AppRouter } from '@/server/trpc/root';
 
 import { makeQueryClient } from './query-client';
-import { api } from './react';
 
 /**
  * `useTRPC()` gives the option builders for TanStack Query:
@@ -38,26 +37,26 @@ function getBaseUrl() {
 /** Client-side tRPC + TanStack Query provider. Wrap the app once. */
 export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
-  const [links] = useState(() => [
-    loggerLink({
-      enabled: (op) =>
-        process.env.NODE_ENV === 'development' ||
-        (op.direction === 'down' && op.result instanceof Error),
+  const [trpcClient] = useState(() =>
+    createTRPCClient<AppRouter>({
+      links: [
+        loggerLink({
+          enabled: (op) =>
+            process.env.NODE_ENV === 'development' ||
+            (op.direction === 'down' && op.result instanceof Error),
+        }),
+        httpBatchLink({
+          url: `${getBaseUrl()}/api/trpc`,
+          transformer: superjson,
+        }),
+      ],
     }),
-    httpBatchLink({
-      url: `${getBaseUrl()}/api/trpc`,
-      transformer: superjson,
-    }),
-  ]);
-  const [trpcClient] = useState(() => createTRPCClient<AppRouter>({ links }));
-  const [legacyClient] = useState(() => api.createClient({ links }));
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-        <api.Provider client={legacyClient} queryClient={queryClient}>
-          {children}
-        </api.Provider>
+        {children}
       </TRPCProvider>
     </QueryClientProvider>
   );

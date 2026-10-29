@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -7,10 +7,11 @@ import { authClient } from '@/features/auth/lib/auth-client';
 import { navigationMock, withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { DEFAULT_ANSWERS, type BudgetAnswers, type Expense } from '@/features/budget/lib/budget-schema';
 import { BudgetView } from '@/features/budget/views/budget-view';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /**
  * Seam: the Budget & dépenses page as a visitor and a signed-in User drive
- * it. Only the browser auth client and the tRPC hooks are stubbed. Expected
+ * it. Only the browser auth client and the server's answers are stubbed. Expected
  * amounts are worked by hand from IRCC's fee page (30 Apr 2026), its
  * proof-of-funds table (7 Jul 2025) and the spec's defaults (1 CAD = 440 XAF,
  * WES 300 CAD, test 210 000 XAF, medical 114 520 — the IOM's October 2026
@@ -22,43 +23,15 @@ vi.mock('@/i18n/navigation', async (importOriginal) => ({
 }));
 vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi.fn(), signOut: vi.fn() } }));
 
-type Mutation = { mutate: ReturnType<typeof vi.fn>; isPending: boolean; isSuccess: boolean; reset: () => void };
-const mutation = (): Mutation => ({ mutate: vi.fn(), isPending: false, isSuccess: false, reset: vi.fn() });
+/** The server's side: the User's profile and Dépenses, and what each call does. */
 const server = {
   profile: undefined as { currency: string | null } | null | undefined,
   expenses: [] as Expense[],
-  setCurrency: mutation(),
-  add: mutation(),
-  update: mutation(),
-  remove: mutation(),
+  setCurrency: vi.fn(),
+  add: vi.fn(),
+  update: vi.fn(),
+  remove: vi.fn(),
 };
-vi.mock('@/trpc/react', () => ({
-  api: {
-    useUtils: () => ({
-      budget: { profile: { get: { invalidate: vi.fn() } }, expenses: { list: { invalidate: vi.fn() } } },
-    }),
-    budget: {
-      profile: {
-        get: {
-          useQuery: (_: unknown, opts?: { enabled?: boolean }) =>
-            opts?.enabled === false || server.profile === undefined
-              ? { data: undefined, isPending: true }
-              : { data: server.profile, isPending: false },
-        },
-        setCurrency: { useMutation: () => server.setCurrency },
-      },
-      expenses: {
-        list: {
-          useQuery: (_: unknown, opts?: { enabled?: boolean }) =>
-            opts?.enabled === false ? { data: undefined, isPending: true } : { data: server.expenses, isPending: false },
-        },
-        add: { useMutation: () => server.add },
-        update: { useMutation: () => server.update },
-        delete: { useMutation: () => server.remove },
-      },
-    },
-  },
-}));
 
 const useSession = vi.mocked(authClient.useSession);
 const signedOut = () => useSession.mockReturnValue({ data: null, isPending: false } as never);
@@ -75,14 +48,33 @@ beforeEach(() => {
   signedOut();
   server.profile = undefined;
   server.expenses = [];
-  server.setCurrency = mutation();
-  server.add = mutation();
-  server.update = mutation();
-  server.remove = mutation();
+  server.setCurrency = vi.fn(async (input: object) => input);
+  server.add = vi.fn(async (input: object) => ({ id: 'new', ...input }));
+  server.update = vi.fn(async (input: object) => input);
+  server.remove = vi.fn(async () => ({ ok: true }));
 });
 afterEach(() => vi.useRealTimers());
 
-const renderView = () => render(withIntl(<BudgetView />));
+/**
+ * The page, with the signed-in User's profile and Dépenses already fetched
+ * when `server.profile` is set (the journal reads them in the browser).
+ */
+const budgetPage = () => {
+  const { trpc, queryClient, wrap } = createTestTRPC({
+    'budget.profile.get': () => server.profile ?? null,
+    'budget.profile.setCurrency': (input) => server.setCurrency(input),
+    'budget.expenses.list': () => server.expenses,
+    'budget.expenses.add': (input) => server.add(input),
+    'budget.expenses.update': (input) => server.update(input),
+    'budget.expenses.delete': (input) => server.remove(input),
+  });
+  if (server.profile !== undefined) {
+    queryClient.setQueryData(trpc.budget.profile.get.queryKey(), server.profile as never);
+    queryClient.setQueryData(trpc.budget.expenses.list.queryKey(), server.expenses);
+  }
+  return wrap(<BudgetView />);
+};
+const renderView = () => render(withIntl(budgetPage()));
 /** The estimate this browser keeps, which the journal's budget bar reads. */
 const keepEstimate = (answers: BudgetAnswers) =>
   window.localStorage.setItem('stanzy.budget.estimate.v1', JSON.stringify(answers));
@@ -354,7 +346,7 @@ describe('BudgetView', () => {
     });
 
     it('speaks English on the English site', () => {
-      render(withIntl(<BudgetView />, 'en'));
+      render(withIntl(budgetPage(), 'en'));
 
       expect(screen.getByRole('tab', { name: 'Estimate my budget' })).toHaveAttribute('aria-selected', 'true');
       // Single applicant, TEF and WES by default: 1 975 CAD × 440 + 464 520 XAF.
@@ -404,7 +396,7 @@ describe('BudgetView', () => {
       type(within(dialog).getByLabelText('Devise'), 'XOF');
       fireEvent.click(within(dialog).getByRole('button', { name: 'Valider' }));
 
-      expect(server.setCurrency.mutate).toHaveBeenCalledWith({ currency: 'XOF' }, expect.anything());
+      await waitFor(() => expect(server.setCurrency).toHaveBeenCalledWith({ currency: 'XOF' }));
     });
 
     it('lists Dépenses newest first with the total, subtotals by reason and the budget bar', () => {
@@ -434,14 +426,15 @@ describe('BudgetView', () => {
       );
     });
 
-    it('adds a Dépense, then shows it in the total, its reason and the bar', () => {
+    it('adds a Dépense, then shows it in the total, its reason and the bar', async () => {
       signedIn();
       server.profile = { currency: 'XAF' };
       keepEstimate(DEFAULT_ANSWERS);
       server.expenses = [TEF];
-      server.add.mutate.mockImplementation((input: Omit<Expense, 'id'>, options: { onSuccess: () => void }) => {
-        server.expenses = [{ ...input, id: 'x3', note: input.note ?? '' }, ...server.expenses];
-        options.onSuccess();
+      server.add.mockImplementation(async (input: Omit<Expense, 'id'>) => {
+        const expense = { ...input, id: 'x3', note: input.note ?? '' };
+        server.expenses = [expense, ...server.expenses];
+        return expense;
       });
       renderView();
       openJournal();
@@ -452,12 +445,16 @@ describe('BudgetView', () => {
       type(form().getByLabelText('Date'), '2026-10-20');
       fireEvent.click(form().getByRole('button', { name: 'Ajouter la dépense' }));
 
-      expect(server.add.mutate).toHaveBeenCalledWith(
-        { name: 'Frais IRCC', motif: 'irccFees', amount: 699_600, date: '2026-10-20', note: '' },
-        expect.anything(),
+      await waitFor(() =>
+        expect(server.add).toHaveBeenCalledWith(
+          { name: 'Frais IRCC', motif: 'irccFees', amount: 699_600, date: '2026-10-20', note: '' },
+        ),
       );
+      expect(await screen.findByText('Dépense ajoutée')).toBeInTheDocument(); // the toast
       // 210 000 + 699 600 = 909 600, 68.2 % of 1 333 520.
-      expect(region('Total dépensé')).toHaveTextContent('Dépensé 909 600 FCFA sur un budget estimé de 1 333 520 FCFA');
+      await waitFor(() =>
+        expect(region('Total dépensé')).toHaveTextContent('Dépensé 909 600 FCFA sur un budget estimé de 1 333 520 FCFA'),
+      );
       expect(within(region('Par motif')).getByRole('listitem', { name: 'Frais IRCC' })).toHaveTextContent('699 600 FCFA');
       expect(screen.getByRole('progressbar', { name: 'Part du budget estimé dépensée' })).toHaveAttribute(
         'aria-valuenow',
@@ -465,7 +462,7 @@ describe('BudgetView', () => {
       );
     });
 
-    it('keeps cents for a currency that has them', () => {
+    it('keeps cents for a currency that has them', async () => {
       signedIn();
       server.profile = { currency: 'CAD' };
       renderView();
@@ -476,7 +473,7 @@ describe('BudgetView', () => {
       type(form().getByLabelText('Date'), '2026-10-20');
       fireEvent.click(form().getByRole('button', { name: 'Ajouter la dépense' }));
 
-      expect(server.add.mutate).toHaveBeenCalledWith(expect.objectContaining({ amount: 159_050 }), expect.anything());
+      await waitFor(() => expect(server.add).toHaveBeenCalledWith(expect.objectContaining({ amount: 159_050 })));
     });
 
     it('asks for a name, an amount and a past date before saving', () => {
@@ -493,7 +490,7 @@ describe('BudgetView', () => {
       type(form().getByLabelText('Date'), '2026-10-28');
       fireEvent.click(form().getByRole('button', { name: 'Ajouter la dépense' }));
       expect(form().getByText('La date ne peut pas être dans le futur.')).toBeInTheDocument();
-      expect(server.add.mutate).not.toHaveBeenCalled();
+      expect(server.add).not.toHaveBeenCalled();
     });
 
     it('edits a Dépense in place and deletes one only once the User confirms', async () => {
@@ -508,17 +505,22 @@ describe('BudgetView', () => {
       expect(edit.getByLabelText('Montant (XAF)')).toHaveValue('210000');
       type(edit.getByLabelText('Montant (XAF)'), '215000');
       fireEvent.click(edit.getByRole('button', { name: 'Enregistrer les modifications' }));
-      expect(server.update.mutate).toHaveBeenCalledWith(
-        { id: 'x1', name: 'TEF Canada', motif: 'languageTest', amount: 215_000, date: '2026-09-12', note: '' },
-        expect.anything(),
+      await waitFor(() =>
+        expect(server.update).toHaveBeenCalledWith(
+          { id: 'x1', name: 'TEF Canada', motif: 'languageTest', amount: 215_000, date: '2026-09-12', note: '' },
+        ),
       );
 
-      fireEvent.click(edit.getByRole('button', { name: 'Supprimer cette dépense' }));
+      expect(await screen.findByText('Dépense modifiée')).toBeInTheDocument(); // the toast
+
+      // Saved: the form is back to adding. Open the Dépense again to delete it.
+      fireEvent.click(screen.getByRole('button', { name: 'Modifier TEF Canada' }));
+      fireEvent.click(form('Modifier la dépense').getByRole('button', { name: 'Supprimer cette dépense' }));
       const confirm = await screen.findByRole('alertdialog', { name: 'Supprimer cette dépense ?' });
       expect(confirm).toHaveTextContent('« TEF Canada » sera retirée de votre journal.');
-      expect(server.remove.mutate).not.toHaveBeenCalled();
+      expect(server.remove).not.toHaveBeenCalled();
       fireEvent.click(within(confirm).getByRole('button', { name: 'Supprimer' }));
-      expect(server.remove.mutate).toHaveBeenCalledWith({ id: 'x1' }, expect.anything());
+      await waitFor(() => expect(server.remove).toHaveBeenCalledWith({ id: 'x1' }));
     });
 
     it('warns that amounts aren’t converted when the User changes currency', async () => {
@@ -534,7 +536,7 @@ describe('BudgetView', () => {
       type(within(dialog).getByLabelText('Devise'), 'EUR');
       fireEvent.click(within(dialog).getByRole('button', { name: 'Valider' }));
 
-      expect(server.setCurrency.mutate).toHaveBeenCalledWith({ currency: 'EUR' }, expect.anything());
+      await waitFor(() => expect(server.setCurrency).toHaveBeenCalledWith({ currency: 'EUR' }));
     });
 
     it('has no detectable accessibility violations', async () => {
@@ -572,9 +574,10 @@ describe('BudgetView', () => {
           fireEvent.click(within(drawer).getByRole('button', { name: 'Ajouter la dépense' }));
         });
 
-        expect(server.add.mutate).toHaveBeenCalledWith(
-          expect.objectContaining({ name: 'Passeport', motif: 'passport', amount: 110_000 }),
-          expect.anything(),
+        await waitFor(() =>
+          expect(server.add).toHaveBeenCalledWith(
+            expect.objectContaining({ name: 'Passeport', motif: 'passport', amount: 110_000 }),
+          ),
         );
       });
     });

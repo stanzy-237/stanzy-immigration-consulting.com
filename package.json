@@ -41,7 +41,6 @@
     "@tiptap/react": "3.30.0",
     "@tiptap/starter-kit": "3.30.0",
     "@trpc/client": "^11.19.0",
-    "@trpc/react-query": "^11.19.0",
     "@trpc/server": "^11.19.0",
     "@trpc/tanstack-react-query": "11.19.0",
     "@vercel/blob": "^2.8.2",

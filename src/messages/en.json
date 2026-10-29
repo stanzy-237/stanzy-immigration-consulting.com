@@ -577,7 +577,13 @@
       "deleteTitle": "Delete “{name}”?",
       "deleteDescription": "This simulation will be permanently deleted.",
       "cancelDelete": "Cancel",
-      "confirmDelete": "Delete"
+      "confirmDelete": "Delete",
+      "toast": {
+        "renamed": "Simulation renamed",
+        "deleted": "Simulation deleted",
+        "failed": "That didn’t work. Try again.",
+        "openFailed": "The simulation couldn’t be opened. Try again."
+      }
     },
     "hints": {
       "title": "How to raise your score",
@@ -799,7 +805,8 @@
       "trigger": "Reuse a CRS simulation",
       "inProgress": "CRS calculator answers in progress (this device)",
       "saved": "My saved simulations",
-      "points": "{points} pts"
+      "points": "{points} pts",
+      "openFailed": "The simulation couldn’t be opened. Try again."
     }
   },
   "Draws": {
@@ -1043,7 +1050,6 @@
     "lead": "ITA, AOR, biometrics, medical — log each milestone as your journey unfolds.",
     "viewTimeline": "View timeline",
     "feedTitle": "Saved steps",
-    "loading": "Loading your journey…",
     "empty": {
       "title": "No steps saved yet",
       "text": "Add your first step to start tracking your journey.",
@@ -1129,6 +1135,12 @@
       "running": "{duration} since AOR",
       "done": "File processed in {duration} (AOR → COPR)",
       "total": "that is {total, plural, one {# day} other {# days}}"
+    },
+    "toast": {
+      "added": "Step added",
+      "updated": "Step updated",
+      "deleted": "Step deleted",
+      "deleteFailed": "The step couldn’t be deleted. Try again."
     }
   },
   "ItaCountdown": {
@@ -1290,7 +1302,14 @@
         "text": "Add your first expense: language test, WES, IRCC fees…"
       },
       "edit": "Edit {name}",
-      "fab": "Add an expense"
+      "fab": "Add an expense",
+      "toast": {
+        "added": "Expense added",
+        "updated": "Expense updated",
+        "deleted": "Expense deleted",
+        "deleteFailed": "The expense couldn’t be deleted. Try again.",
+        "currencySaved": "Currency saved"
+      }
     },
     "currencyDialog": {
       "firstTitle": "Choose your currency",
