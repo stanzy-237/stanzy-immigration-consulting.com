@@ -93,7 +93,15 @@ const add = useMutation(
 ```
 
 - **Invalidate** what the mutation changed with `trpc.<path>.queryKey()` (a whole router: `trpc.blog.dashboard.pathKey()`).
-- **Toast** the outcome: `success` when something was saved, deleted or sent; `error` when it failed; `info` / `warning` for other notices. Titles are translated (`messages/{fr,en}.json`) and short: « Étape ajoutée », « L’étape n’a pas pu être ajoutée. Réessayez. ». Fall back to `Common.Toast.genericError`.
+- **Toast** the outcome with its kind, which sets its colour and icon (white card, accent bar and tinted icon tile, like the home page's cards):
+
+  | `type` | When | Look |
+  |---|---|---|
+  | `success` | saved, added, sent, turned on | green (`leaf`), check |
+  | `deleted` | something was removed | crimson, bin |
+  | `error` | it failed | rouge, stop sign |
+  | `warning` | it can't be done right now (offline) | amber (`honey`), triangle |
+  | `info` | a neutral change (alerts turned off) | steel blue, i | Titles are translated (`messages/{fr,en}.json`) and short: « Étape ajoutée », « L’étape n’a pas pu être ajoutée. Réessayez. ». Fall back to `Common.Toast.genericError`.
 - **Inline errors stay inline** when they belong to a field (a slug already taken, a missing title): the message sits under the field, and no toast is added. Toasts are for the outcome of an action, not for form validation.
 - Don't toast reads: a query that fails shows the `QueryBoundary` « Réessayer » panel.
 

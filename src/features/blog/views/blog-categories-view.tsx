@@ -34,7 +34,7 @@ function useCategoryAction() {
     try {
       await action();
       await queryClient.invalidateQueries({ queryKey: trpc.blog.categories.queryKey() });
-      toast.add({ title: t(`toast.${done}`), type: 'success' });
+      toast.add({ title: t(`toast.${done}`), type: done === 'deleted' ? 'deleted' : 'success' });
       return { ok: true, fieldError: null };
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : '';

@@ -69,14 +69,14 @@ export function SavedSimulations({ onOpen }: { onOpen: (profile: CrsProfile) => 
   const queryClient = useQueryClient();
   const { data: simulations } = useSuspenseQuery(trpc.crs.list.queryOptions());
   /** Refreshes the list and says it worked, or says it didn't. */
-  const outcome = (done: string) => ({
+  const outcome = (done: string, type: 'success' | 'deleted' = 'success') => ({
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: trpc.crs.list.queryKey() });
-      toast.add({ title: done, type: 'success' });
+      toast.add({ title: done, type });
     },
     onError: () => toast.add({ title: t('toast.failed'), type: 'error' }),
   });
-  const remove = useMutation(trpc.crs.delete.mutationOptions(outcome(t('toast.deleted'))));
+  const remove = useMutation(trpc.crs.delete.mutationOptions(outcome(t('toast.deleted'), 'deleted')));
   const rename = useMutation(trpc.crs.rename.mutationOptions(outcome(t('toast.renamed'))));
   const [renaming, setRenaming] = useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null);

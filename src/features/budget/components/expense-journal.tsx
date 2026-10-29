@@ -193,7 +193,7 @@ function Journal({ estimate }: { estimate: BudgetAnswers | null }): ReactNode {
             : t('form.errors.save'),
       type: 'error',
     });
-  const confirmed = (title: string) => () => toast.add({ title, type: 'success' });
+  const confirmed = (title: string, type: 'success' | 'deleted' = 'success') => () => toast.add({ title, type });
   const save = (input: ExpenseInput) => {
     setFailure(undefined);
     // Known before asking: the limit stays in the form, which keeps the draft.
@@ -210,7 +210,7 @@ function Journal({ estimate }: { estimate: BudgetAnswers | null }): ReactNode {
     remove.mutate(
       { id: deleting.id },
       {
-        onSuccess: confirmed(t('journal.toast.deleted')),
+        onSuccess: confirmed(t('journal.toast.deleted'), 'deleted'),
         onError: () => toast.add({ title: t('journal.toast.deleteFailed'), type: 'error' }),
       },
     );

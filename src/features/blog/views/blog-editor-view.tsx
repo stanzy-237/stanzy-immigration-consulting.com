@@ -353,7 +353,7 @@ function ArticleEditor({
         await remove.mutateAsync({ id });
         refresh();
         setDirty(false);
-        toast.add({ title: tEditor('toast.deleted'), type: 'success' });
+        toast.add({ title: tEditor('toast.deleted'), type: 'deleted' });
         router.replace('/blog');
       } catch (caught) {
         const message = caught instanceof Error ? caught.message : '';

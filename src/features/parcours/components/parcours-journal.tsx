@@ -135,7 +135,7 @@ export function ParcoursJournal(): ReactNode {
             : t('form.errors.save'),
       type: 'error',
     });
-  const confirmed = (title: string) => () => toast.add({ title, type: 'success' });
+  const confirmed = (title: string, type: 'success' | 'deleted' = 'success') => () => toast.add({ title, type });
   const save = (input: EtapeInput) => {
     setFailure(undefined);
     // Known before asking: the limit stays in the form, which keeps the draft.
@@ -151,7 +151,7 @@ export function ParcoursJournal(): ReactNode {
     if (!deleting) return;
     remove.mutate(
       { id: deleting.id },
-      { onSuccess: confirmed(t('toast.deleted')), onError: () => toast.add({ title: t('toast.deleteFailed'), type: 'error' }) },
+      { onSuccess: confirmed(t('toast.deleted'), 'deleted'), onError: () => toast.add({ title: t('toast.deleteFailed'), type: 'error' }) },
     );
     setDeleting(null);
     done();

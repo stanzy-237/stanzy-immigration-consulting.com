@@ -156,7 +156,7 @@ export function useDrawAlerts() {
       }
       setOptedOut(true);
       setStatus('off');
-      toast.add({ title: t('toastOff'), type: 'success' });
+      toast.add({ title: t('toastOff'), type: 'info' });
     } catch {
       toast.add({ title: t('disableFailed'), type: 'error' });
     } finally {
