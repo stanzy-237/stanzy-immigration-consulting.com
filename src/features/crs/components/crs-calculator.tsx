@@ -1,12 +1,15 @@
 'use client';
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useMemo, useState, type ReactNode } from 'react';
 
+import { QueryBoundary } from '@/components/query-boundary';
+import { toast } from '@/components/ui/toast';
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { withNext } from '@/features/auth/lib/safe-next-path';
 import { SaveSimulationDialog } from '@/features/crs/components/save-simulation-dialog';
-import { SavedSimulations } from '@/features/crs/components/saved-simulations';
+import { SavedSimulations, SavedSimulationsSkeleton } from '@/features/crs/components/saved-simulations';
 import { ScoreAdvice } from '@/features/crs/components/score-advice';
 import { ScoreSummary } from '@/features/crs/components/score-summary';
 import { HIGH_WAGE_LEVELS } from '@/features/crs/data/crs-criteria';
@@ -30,7 +33,7 @@ import { isPartnered } from '@/features/shared/lib/marital-status';
 import { rulesInForceOn, type RulesVersion } from '@/features/shared/lib/rules-version';
 import { useRouter } from '@/i18n/navigation';
 import { track } from '@/lib/analytics';
-import { api } from '@/trpc/react';
+import { useTRPC } from '@/trpc/client';
 
 const CANADIAN_YEARS = [0, 1, 2, 3, 4, 5] as const;
 /** 0 = none, 1 = 1 to 2 years, 3 = 3 years or more (the transferability rows). */
@@ -47,6 +50,7 @@ const HIGH_WAGE_KEY = { none: 'none', '1.3x': 'x1_3', '1.5x': 'x1_5', '2x': 'x2'
  */
 export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNode {
   const t = useTranslations('Crs');
+  const tSummary = useTranslations('Crs.summary');
   const tLanguage = useTranslations('Calculators.language');
   const format = useFormatter();
   const router = useRouter();
@@ -54,10 +58,10 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
   const [form, setForm] = useCrsDraft();
   const inForce = rulesInForceOn(today);
   const [rules, setRules] = useState<RulesVersion>(inForce);
-  const [offline, setOffline] = useState(false);
   const [naming, setNaming] = useState(false);
-  const utils = api.useUtils();
-  const save = api.crs.save.useMutation();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const save = useMutation(trpc.crs.save.mutationOptions());
 
   const result = useMemo(() => computeCrs(toProfile(form), { rules }), [form, rules]);
   const breakdown = result.ok ? result.breakdown : null;
@@ -82,10 +86,9 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
       return;
     }
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-      setOffline(true);
+      toast.add({ title: tSummary('saveOffline'), type: 'warning' });
       return;
     }
-    setOffline(false);
     save.reset();
     setNaming(true);
   };
@@ -96,8 +99,9 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
       {
         onSuccess: (saved) => {
           track('crs.saved', { total: saved.total });
-          void utils.crs.list.invalidate();
+          void queryClient.invalidateQueries({ queryKey: trpc.crs.list.queryKey() });
           setNaming(false);
+          toast.add({ title: tSummary('saved'), type: 'success' });
         },
       },
     );
@@ -263,11 +267,14 @@ export function CrsCalculator({ today = new Date() }: { today?: Date }): ReactNo
           onSave={onSave}
           onReset={() => update(DEFAULT_FORM)}
           saving={save.isPending}
-          saved={save.isSuccess}
-          offline={offline}
         />
         <ScoreAdvice profile={toProfile(form)} rules={rules} />
-        {account ? <SavedSimulations onOpen={openSaved} /> : null}
+        {/* The User's own data on a static page: fetched in the browser, under a skeleton. */}
+        {account ? (
+          <QueryBoundary fallback={<SavedSimulationsSkeleton />}>
+            <SavedSimulations onOpen={openSaved} />
+          </QueryBoundary>
+        ) : null}
         {naming ? (
           <SaveSimulationDialog
             open

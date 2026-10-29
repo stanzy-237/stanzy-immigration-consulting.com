@@ -10,6 +10,7 @@ import { fromProfile } from '@/features/crs/lib/crs-form';
 import type { DrawGroup } from '@/features/draws/lib/draw-type';
 import type { DrawSummary } from '@/features/draws/server/draws-router';
 import { DrawsView } from '@/features/draws/views/draws-view';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /** Seam: the Derniers tirages page as a visitor uses it, fed fixture Tirages. */
 const IRCC = 'https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations.html';
@@ -40,14 +41,10 @@ const OLDER: DrawSummary[] = Array.from({ length: 22 }, (_, i) => {
 });
 const ALL = [...LATEST, ...OLDER];
 
+/** What the route prefetches: every Tirage and the newest one with the last sync. */
 const query = {
-  list: { data: ALL as DrawSummary[] | undefined, isError: false },
-  latest: {
-    data: { draws: LATEST, lastSyncedAt: new Date(NOW.getTime() - 2 * 3600_000) } as
-      | { draws: DrawSummary[]; lastSyncedAt: Date | null }
-      | undefined,
-    isError: false,
-  },
+  list: ALL,
+  latest: { draws: LATEST.slice(0, 1), lastSyncedAt: new Date(NOW.getTime() - 2 * 3600_000) as Date | null },
 };
 const subscribe = vi.fn();
 const unsubscribe = vi.fn();
@@ -57,23 +54,28 @@ vi.mock('@/i18n/navigation', async (importOriginal) => ({
   ...navigationMock,
 }));
 vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi.fn(), signOut: vi.fn() } }));
-vi.mock('@/trpc/react', () => ({
-  api: {
-    draws: {
-      list: { useQuery: () => query.list },
-      latest: { useQuery: () => query.latest },
-      subscribe: { useMutation: () => ({ mutateAsync: subscribe }) },
-      unsubscribe: { useMutation: () => ({ mutateAsync: unsubscribe }) },
-    },
-  },
-}));
+/** The page as its route serves it: the Tirages already in the cache, unless `arrived` is false. */
+const drawsPage = ({ arrived = true } = {}) => {
+  const { trpc, queryClient, wrap } = createTestTRPC({
+    'draws.subscribe': (input) => subscribe(input),
+    'draws.unsubscribe': (input) => unsubscribe(input),
+    'draws.list': () => new Promise(() => {}),
+    'draws.latest': () => new Promise(() => {}),
+  });
+  if (arrived) {
+    queryClient.setQueryData(trpc.draws.list.queryKey(), query.list);
+    queryClient.setQueryData(trpc.draws.latest.queryKey({ take: 1 }), query.latest);
+  }
+  return wrap(<DrawsView />);
+};
+
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never);
-  query.list.data = ALL;
-  query.latest.data = { draws: LATEST, lastSyncedAt: new Date(NOW.getTime() - 2 * 3600_000) };
+  query.list = ALL;
+  query.latest = { draws: LATEST.slice(0, 1), lastSyncedAt: new Date(NOW.getTime() - 2 * 3600_000) };
   window.localStorage.clear();
   subscribe.mockReset().mockResolvedValue(undefined);
   unsubscribe.mockReset().mockResolvedValue(undefined);
@@ -98,7 +100,7 @@ const compare = (score: string) => {
 
 describe('DrawsView — latest Tirage', () => {
   it('shows the newest round with its facts, in French', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
 
     expect(screen.getByRole('heading', { level: 1, name: 'Les tirages, sans détour.' })).toBeInTheDocument();
     const card = within(latestCard());
@@ -120,16 +122,26 @@ describe('DrawsView — latest Tirage', () => {
   });
 
   it('says so before the first update has run', () => {
-    query.latest.data = { draws: [], lastSyncedAt: null };
-    query.list.data = [];
-    render(withIntl(<DrawsView />));
+    query.latest = { draws: [], lastSyncedAt: null };
+    query.list = [];
+    render(withIntl(drawsPage()));
 
     expect(screen.getByText(/la première mise à jour n’a pas encore eu lieu/)).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Dernier tirage' })).not.toBeInTheDocument();
   });
 
+  it('shows the page at once and skeletons where the Tirages will be, never a loading sentence', () => {
+    render(withIntl(drawsPage({ arrived: false })));
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Les tirages, sans détour.' })).toBeInTheDocument();
+    // Each skeleton says « Chargement… » to screen readers only.
+    for (const status of screen.getAllByRole('status')) expect(status).toHaveTextContent('Chargement…');
+    expect(screen.queryByText('Chargement des tirages…')).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Dernier tirage' })).not.toBeInTheDocument();
+  });
+
   it('shows English labels as IRCC publishes them at /en', () => {
-    render(withIntl(<DrawsView />, 'en'));
+    render(withIntl(drawsPage(), 'en'));
 
     expect(within(screen.getByRole('region', { name: 'Latest draw' })).getByText('French-Language proficiency 2026-Version 2')).toBeInTheDocument();
   });
@@ -137,7 +149,7 @@ describe('DrawsView — latest Tirage', () => {
 
 describe('DrawsView — Prochain tirage probable', () => {
   it('previews the most likely next Tirage and links to the prediction', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
     const preview = screen.getByRole('region', { name: 'Prochain tirage probable' });
 
     // Worked by hand from the fixture, on Saturday 2026-10-24: every group's
@@ -153,20 +165,20 @@ describe('DrawsView — Prochain tirage probable', () => {
 
 describe('DrawsView — Votre score CRS', () => {
   it('says how far above the cut-off a score is', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
     compare('500');
     expect(screen.getByText('Vous dépassez de 65 points')).toBeInTheDocument();
   });
 
   it('says how many points are missing, and offers to improve the score', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
     compare('434');
     expect(screen.getByText('Il vous manque 1 point')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Améliorer mon score' })).toHaveAttribute('href', '/outils/crs');
   });
 
   it('shows no comparison for something that is not a CRS score', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
     for (const value of ['abc', '1201', '-4']) {
       compare(value);
       expect(screen.getByText('Entrez un score CRS entre 0 et 1200.')).toBeInTheDocument();
@@ -184,7 +196,7 @@ describe('DrawsView — Votre score CRS', () => {
     });
     window.localStorage.setItem(CRS_DRAFT_KEY, JSON.stringify(draft));
 
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
 
     await waitFor(() => expect(scoreBox()).toHaveValue('429'));
   });
@@ -192,7 +204,7 @@ describe('DrawsView — Votre score CRS', () => {
 
 describe('DrawsView — Historique des tirages', () => {
   it('lists every round, newest first, ten per page, the latest marked Nouveau', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
 
     expect(within(history()).getByText('26 tirages trouvés')).toBeInTheDocument();
     expect(firstCells()).toEqual(['#450Nouveau', '#449', '#448', '#447', '#446', '#445', '#444', '#443', '#442', '#441']);
@@ -200,7 +212,7 @@ describe('DrawsView — Historique des tirages', () => {
   });
 
   it('on phones, gives each round its type in short, with its date and invitations under it', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
     const [, cec, pnp, trades] = bodyRows();
 
     expect(within(pnp!).getByText('PCP')).toBeInTheDocument();
@@ -210,7 +222,7 @@ describe('DrawsView — Historique des tirages', () => {
   });
 
   it('searches by type, number, date or score', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
     const search = within(history()).getByRole('searchbox', { name: 'Rechercher un tirage' });
 
     fireEvent.change(search, { target: { value: 'trades' } });
@@ -225,7 +237,7 @@ describe('DrawsView — Historique des tirages', () => {
   });
 
   it('filters by Type de tirage', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
 
     fireEvent.click(within(history()).getByRole('button', { name: 'CEC' }));
 
@@ -236,7 +248,7 @@ describe('DrawsView — Historique des tirages', () => {
   });
 
   it('sorts by any column, highest first then lowest', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
     const byScore = within(history()).getByRole('button', { name: /Score CRS/ });
 
     fireEvent.click(byScore);
@@ -249,7 +261,7 @@ describe('DrawsView — Historique des tirages', () => {
   });
 
   it('changes page size and pages', () => {
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
 
     fireEvent.change(within(history()).getByRole('combobox', { name: 'Nombre de lignes par page' }), { target: { value: '25' } });
     expect(bodyRows()).toHaveLength(25);
@@ -261,7 +273,7 @@ describe('DrawsView — Historique des tirages', () => {
 
   it('has no axe violations', async () => {
     vi.useRealTimers();
-    render(withIntl(<DrawsView />));
+    render(withIntl(drawsPage()));
     expect(await axe(history())).toHaveNoViolations();
   });
 });
@@ -290,7 +302,7 @@ describe('DrawsView — Alertes tirages', () => {
   /** Renders and lets the page's async browser checks settle. */
   const renderSettled = async (locale?: 'fr' | 'en') => {
     await act(async () => {
-      render(withIntl(<DrawsView />, locale));
+      render(withIntl(drawsPage(), locale));
     });
   };
 
@@ -319,6 +331,20 @@ describe('DrawsView — Alertes tirages', () => {
     expect(pushManager.subscribe).toHaveBeenCalledWith(expect.objectContaining({ userVisibleOnly: true }));
     expect(subscribe).toHaveBeenCalledWith({ subscription: json, locale: 'fr' });
     expect(await within(alerts()).findByText('Alertes tirages activées sur cet appareil')).toBeInTheDocument();
+    expect(screen.getByText('Alertes tirages activées')).toBeInTheDocument(); // the toast
+  });
+
+  it('says in a toast when turning alerts on fails', async () => {
+    pushCapable();
+    subscribe.mockRejectedValue(new Error('INTERNAL_SERVER_ERROR'));
+    await renderSettled();
+
+    await act(async () => {
+      fireEvent.click(await within(alerts()).findByRole('button', { name: 'Activer les alertes tirages' }));
+    });
+
+    expect(await screen.findByText('L’activation a échoué. Réessayez dans un instant.')).toBeInTheDocument();
+    expect(within(alerts()).getByRole('button', { name: 'Activer les alertes tirages' })).toBeInTheDocument();
   });
 
   it('lets a subscribed device turn alerts off', async () => {
@@ -346,7 +372,7 @@ describe('DrawsView — Alertes tirages', () => {
     pushCapable({ permission: 'granted', existing: {} });
     let unmount = () => {};
     await act(async () => {
-      ({ unmount } = render(withIntl(<DrawsView />)));
+      ({ unmount } = render(withIntl(drawsPage())));
     });
     await act(async () => {
       fireEvent.click(await within(alerts()).findByRole('button', { name: 'Désactiver les alertes' }));

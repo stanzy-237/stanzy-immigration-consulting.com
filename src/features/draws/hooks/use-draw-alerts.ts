@@ -1,10 +1,12 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useMutation } from '@tanstack/react-query';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { toast } from '@/components/ui/toast';
 import { toLocale } from '@/i18n/routing';
-import { api } from '@/trpc/react';
+import { useTRPC } from '@/trpc/client';
 
 /**
  * Where this device stands with Alertes tirages:
@@ -76,13 +78,13 @@ export function useDrawAlerts() {
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const [status, setStatus] = useState<DrawAlertsStatus>(publicKey ? 'checking' : 'hidden');
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const subscribe = api.draws.subscribe.useMutation();
-  const unsubscribe = api.draws.unsubscribe.useMutation();
+  const t = useTranslations('Draws.alerts');
+  const trpc = useTRPC();
+  const { mutateAsync: subscribe } = useMutation(trpc.draws.subscribe.mutationOptions());
+  const { mutateAsync: unsubscribe } = useMutation(trpc.draws.unsubscribe.mutationOptions());
 
   const sync = useCallback(
-    (subscription: PushSubscription) =>
-      subscribe.mutateAsync({ subscription: subscription.toJSON() as SubscriptionJson, locale }),
+    (subscription: PushSubscription) => subscribe({ subscription: subscription.toJSON() as SubscriptionJson, locale }),
     [subscribe, locale],
   );
   // The detection effect runs once; it reads the latest `sync` through a ref.
@@ -127,7 +129,6 @@ export function useDrawAlerts() {
   const enable = useCallback(async () => {
     if (!publicKey) return;
     setBusy(true);
-    setFailed(false);
     try {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
@@ -137,30 +138,32 @@ export function useDrawAlerts() {
       await sync(await subscribeDevice(publicKey));
       setOptedOut(false);
       setStatus('on');
+      toast.add({ title: t('toastOn'), type: 'success' });
     } catch {
-      setFailed(true);
+      toast.add({ title: t('failed'), type: 'error' });
     } finally {
       setBusy(false);
     }
-  }, [publicKey, sync]);
+  }, [publicKey, sync, t]);
 
   const disable = useCallback(async () => {
     setBusy(true);
-    setFailed(false);
     try {
       const existing = await (await registration(false))?.pushManager.getSubscription();
       if (existing) {
-        await unsubscribe.mutateAsync({ endpoint: existing.endpoint });
+        await unsubscribe({ endpoint: existing.endpoint });
         await existing.unsubscribe();
       }
       setOptedOut(true);
       setStatus('off');
+      toast.add({ title: t('toastOff'), type: 'info' });
     } catch {
-      setFailed(true);
+      toast.add({ title: t('disableFailed'), type: 'error' });
     } finally {
       setBusy(false);
     }
-  }, [unsubscribe]);
+  }, [unsubscribe, t]);
 
-  return { status, busy, failed, enable, disable };
+  /** `enable` and `disable` say how they went in a toast. */
+  return { status, busy, enable, disable };
 }

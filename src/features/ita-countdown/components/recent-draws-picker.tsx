@@ -1,15 +1,17 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, Clock } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import { useDrawText } from '@/features/draws/hooks/use-draw-text';
 import { utcDate } from '@/features/ita-countdown/lib/ita-deadline';
 import { cn } from '@/lib/utils';
-import { api } from '@/trpc/react';
+import { useTRPC } from '@/trpc/client';
 
-/** How many recent Tirages the shortcut offers. */
+/** How many recent Tirages the shortcut offers (the route prefetches as many). */
 const DRAWS_SHOWN = 5;
 
 /**
@@ -27,8 +29,11 @@ export function RecentDrawsPicker({
   const format = useFormatter();
   const drawText = useDrawText();
   const [open, setOpen] = useState(false);
-  const { data } = api.draws.latest.useQuery({ take: DRAWS_SHOWN });
+  const trpc = useTRPC();
+  // Not suspense: the list is behind a tap, so the form never waits for it.
+  const { data, isPending } = useQuery(trpc.draws.latest.queryOptions({ take: DRAWS_SHOWN }));
   const draws = data?.draws ?? [];
+  const tCommon = useTranslations('Common');
 
   return (
     <>
@@ -48,8 +53,12 @@ export function RecentDrawsPicker({
           id="ita-recent-draws"
           role="listbox"
           aria-label={t('label')}
+          aria-busy={isPending}
           className="order-last mt-2 flex basis-full flex-col gap-1.5"
         >
+          {isPending && <span className="sr-only">{tCommon('loading')}</span>}
+          {isPending &&
+            [0, 1, 2].map((row) => <Skeleton key={row} aria-hidden={true} className="h-20 rounded-xl" />)}
           {draws.map((draw) => (
             <button
               key={draw.round}

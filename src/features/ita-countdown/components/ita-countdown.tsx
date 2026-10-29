@@ -1,5 +1,6 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { CalendarDays, TriangleAlert } from 'lucide-react';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
@@ -12,7 +13,7 @@ import { ITA_WINDOW_DAYS, itaDeadline, timeLeft, utcDate, utcToday, type TimeLef
 import { URGENCY_CLASSES, urgencyOf } from '@/features/ita-countdown/lib/urgency';
 import { useStoredForm } from '@/features/shared/hooks/use-stored-form';
 import { Link } from '@/i18n/navigation';
-import { api } from '@/trpc/react';
+import { useTRPC } from '@/trpc/client';
 
 /** The ITA date, kept in this browser between visits. */
 export const ITA_DATE_KEY = 'stanzy.ita-countdown.v1';
@@ -52,7 +53,9 @@ function FlipBoard({
  */
 function useParcoursIta(): { day: string | null; loading: boolean } {
   const { account, pending } = useCurrentAccount();
-  const { data: etapes, isPending } = api.parcours.list.useQuery(undefined, { enabled: account !== null });
+  const trpc = useTRPC();
+  // Private data on a static page: read in the browser, never prefetched.
+  const { data: etapes, isPending } = useQuery(trpc.parcours.list.queryOptions(undefined, { enabled: account !== null }));
   const itas = (etapes ?? []).filter((etape) => etape.code === 'ITA').map((etape) => etape.date);
   return {
     day: itas.length > 0 ? itas.reduce((latest, day) => (day > latest ? day : latest)) : null,
@@ -63,6 +66,7 @@ function useParcoursIta(): { day: string | null; loading: boolean } {
 /** The countdown itself: the ITA date in, the time left and the deadline out. */
 export function ItaCountdown(): ReactNode {
   const t = useTranslations('ItaCountdown');
+  const tCommon = useTranslations('Common');
   const format = useFormatter();
   const now = useNow({ updateInterval: 1000 });
   const [stored, store] = useStoredForm(ITA_DATE_KEY, storedSchema, { itaDay: '' });
@@ -99,9 +103,13 @@ export function ItaCountdown(): ReactNode {
           <FlipBoard left={running} daysRing={urgency ? URGENCY_CLASSES[urgency].ring : undefined} />
         </section>
       ) : (
-        // Nothing to count yet (or any more): the board at rest, for the eye only.
-        <div aria-hidden={true} className="opacity-40">
-          <FlipBoard left={left ?? { days: ITA_WINDOW_DAYS, hours: 0, minutes: 0, seconds: 0 }} />
+        // Nothing to count yet (or any more): the board at rest, for the eye
+        // only. It pulses, as a skeleton, while the Parcours is looked up.
+        <div role={waiting ? 'status' : undefined}>
+          {waiting && <span className="sr-only">{tCommon('loading')}</span>}
+          <div aria-hidden={true} className={waiting ? 'animate-pulse opacity-40' : 'opacity-40'}>
+            <FlipBoard left={left ?? { days: ITA_WINDOW_DAYS, hours: 0, minutes: 0, seconds: 0 }} />
+          </div>
         </div>
       )}
 

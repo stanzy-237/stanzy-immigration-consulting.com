@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { requireSession } from '@/features/auth/server/guards';
 import { ParcoursView } from '@/features/parcours/views/parcours-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 
 export async function generateMetadata({
   params,
@@ -26,5 +27,10 @@ export default async function Page({
   const { locale } = await params;
   setRequestLocale(locale);
   await requireSession({ locale, next: '/outils/timeline' });
-  return <ParcoursView />;
+  prefetch(trpc.parcours.list.queryOptions());
+  return (
+    <HydrateClient>
+      <ParcoursView />
+    </HydrateClient>
+  );
 }

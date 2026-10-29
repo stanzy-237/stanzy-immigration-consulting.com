@@ -1,11 +1,14 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState, type ReactNode } from 'react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { BudgetEstimator } from '@/features/budget/components/budget-estimator';
 import { ExpenseJournal } from '@/features/budget/components/expense-journal';
+import { useTRPC } from '@/trpc/client';
 
 /** Each tab has a URL hash, so a link can open « Mes dépenses » directly. */
 type Tab = 'estimer' | 'depenses';
@@ -21,6 +24,18 @@ const trigger =
 export function BudgetTabs(): ReactNode {
   const t = useTranslations('Budget.tabs');
   const [tab, setTab] = useState<Tab>('estimer');
+  const { account } = useCurrentAccount();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  // Signed in: fetch « Mes dépenses » while the estimator is open, so the tab
+  // opens on the journal itself, not its skeleton.
+  const accountId = account?.email;
+  useEffect(() => {
+    if (!accountId) return;
+    void queryClient.prefetchQuery(trpc.budget.profile.get.queryOptions());
+    void queryClient.prefetchQuery(trpc.budget.expenses.list.queryOptions());
+  }, [accountId, queryClient, trpc]);
 
   // The hash only exists in the browser; read it once mounted.
   useEffect(() => {

@@ -14,7 +14,7 @@ const button =
 /** "Activer les alertes tirages": opt this device in to a push notification for every new Tirage. */
 export function DrawAlerts(): ReactNode {
   const t = useTranslations('Draws.alerts');
-  const { status, busy, failed, enable, disable } = useDrawAlerts();
+  const { status, busy, enable, disable } = useDrawAlerts();
   if (status === 'hidden') return null;
 
   return (
@@ -38,11 +38,6 @@ export function DrawAlerts(): ReactNode {
           {status === 'denied' && <p>{t('denied')}</p>}
           {status === 'needs-install' && <p>{t('install')}</p>}
           {status === 'unsupported' && <p>{t('unsupported')}</p>}
-          {failed && (
-            <p role="alert" className="mt-1 text-rouge">
-              {t('failed')}
-            </p>
-          )}
         </div>
         {status === 'off' && (
           <button type="button" disabled={busy} onClick={enable} className={`${button} bg-rouge text-white hover:bg-crimson`}>

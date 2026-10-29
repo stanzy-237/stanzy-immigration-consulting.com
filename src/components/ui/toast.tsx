@@ -5,7 +5,7 @@ import { Toast as ToastPrimitive } from "@base-ui/react/toast"
 import { cn } from "cn"
 
 import { Button } from "@/components/ui/button"
-import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon, Trash2Icon } from "lucide-react"
 
 const toast = ToastPrimitive.createToastManager()
 
@@ -132,49 +132,35 @@ function ToastClose({
   )
 }
 
+/**
+ * Stanzy's toast kinds, each styled like the home page's cards: a white
+ * card with a coloured accent bar and a tinted icon tile. `deleted` is a
+ * success of its own, so removing something reads differently from saving.
+ */
+type ToastKind = "success" | "deleted" | "error" | "warning" | "info" | "loading"
+
+const TOAST_KINDS: Record<ToastKind, { icon: React.ReactNode; bar: string; tile: string }> = {
+  success: { icon: <CircleCheckIcon className="size-4.5" />, bar: "bg-leaf", tile: "bg-leaf-tint text-leaf" },
+  deleted: { icon: <Trash2Icon className="size-4.5" />, bar: "bg-crimson", tile: "bg-blush text-crimson" },
+  error: { icon: <OctagonXIcon className="size-4.5" />, bar: "bg-rouge", tile: "bg-blush text-rouge" },
+  warning: { icon: <TriangleAlertIcon className="size-4.5" />, bar: "bg-honey", tile: "bg-honey-tint text-honey" },
+  info: { icon: <InfoIcon className="size-4.5" />, bar: "bg-steel-blue", tile: "bg-ice-blue text-steel-blue" },
+  loading: { icon: <Loader2Icon className="size-4.5 animate-spin" />, bar: "bg-navy-deep", tile: "bg-ice-blue text-navy-deep" },
+}
+
+const kindOf = (type: string | undefined): ToastKind | null =>
+  type && type in TOAST_KINDS ? (type as ToastKind) : null
+
 function ToastIcon({ type }: { type: string | undefined }) {
-  let icon: React.ReactNode = null
-
-  if (type === "success") {
-    icon = (
-      <CircleCheckIcon aria-hidden="true" />
-    )
-  }
-
-  if (type === "info") {
-    icon = (
-      <InfoIcon aria-hidden="true" />
-    )
-  }
-
-  if (type === "warning") {
-    icon = (
-      <TriangleAlertIcon aria-hidden="true" />
-    )
-  }
-
-  if (type === "error") {
-    icon = (
-      <OctagonXIcon className="text-destructive" aria-hidden="true" />
-    )
-  }
-
-  if (type === "loading") {
-    icon = (
-      <Loader2Icon className="animate-spin" aria-hidden="true" />
-    )
-  }
-
-  if (!icon) {
-    return null
-  }
-
+  const kind = kindOf(type)
+  if (!kind) return null
   return (
     <span
       data-slot="toast-icon"
-      className="shrink-0 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4"
+      aria-hidden="true"
+      className={cn("flex size-9 shrink-0 items-center justify-center rounded-xl", TOAST_KINDS[kind].tile)}
     >
-      {icon}
+      {TOAST_KINDS[kind].icon}
     </span>
   )
 }
@@ -182,19 +168,31 @@ function ToastIcon({ type }: { type: string | undefined }) {
 function ToastList() {
   const { toasts } = ToastPrimitive.useToastManager()
 
-  return toasts.map((toastItem) => (
-    <Toast key={toastItem.id} toast={toastItem}>
-      <ToastContent>
-        <ToastIcon type={toastItem.type} />
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <ToastTitle />
-          <ToastDescription />
-        </div>
-        <ToastAction />
-        <ToastClose />
-      </ToastContent>
-    </Toast>
-  ))
+  return toasts.map((toastItem) => {
+    const kind = kindOf(toastItem.type)
+    return (
+      <Toast
+        key={toastItem.id}
+        toast={toastItem}
+        data-kind={kind ?? undefined}
+        className="overflow-hidden border-fog-light bg-white text-navy-deep"
+      >
+        {/* The accent bar, in the toast's colour. */}
+        {kind && (
+          <span aria-hidden="true" className={cn("absolute inset-y-0 left-0 w-1.5", TOAST_KINDS[kind].bar)} />
+        )}
+        <ToastContent className="pl-5">
+          <ToastIcon type={toastItem.type} />
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <ToastTitle className="font-heading text-sm font-bold text-navy-deep" />
+            <ToastDescription className="text-slate" />
+          </div>
+          <ToastAction />
+          <ToastClose />
+        </ToastContent>
+      </Toast>
+    )
+  })
 }
 
 function Toaster({

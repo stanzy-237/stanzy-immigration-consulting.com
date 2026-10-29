@@ -22,7 +22,7 @@ src/
 ├─ hooks/               # cross-feature hooks only; feature hooks go in the feature
 ├─ lib/                 # cross-cutting utilities (cn, formatting, analytics)
 ├─ server/              # server-only helpers shared by features (db, auth)
-├─ trpc/                # tRPC router wiring (routers themselves live in features)
+├─ trpc/                # tRPC wiring: client.tsx, server.tsx (prefetch), query-client.ts
 ├─ i18n/                # next-intl routing config
 ├─ messages/            # next-intl translation JSON per locale
 └─ proxy.ts
@@ -50,7 +50,7 @@ src/features/<feature>/
 
 ### Rules
 
-1. **Routes are thin.** A `src/app/.../page.tsx` file contains metadata, locale setup, and a single `<FeatureView />` import. No business logic, no section composition, no data fetching above `<FeatureView />`.
+1. **Routes are thin.** A `src/app/.../page.tsx` file contains metadata, locale setup, and a single `<FeatureView />` import. No business logic, no section composition, no data fetching above `<FeatureView />`. Two exceptions, each one line: a guard call (ADR 0005) and `prefetch(...)` of the queries the View reads, inside `<HydrateClient>` (ADR 0006, `docs/agents/data-fetching.md`).
 2. **One feature folder per product capability.** When in doubt, map it to a GitHub issue / spec: one spec usually = one feature folder.
 3. **No cross-feature imports between `components/`.** Feature A does not import `src/features/B/components/*`. If two features need the same component, promote it to `src/components/ui/` (if generic) or to a new `src/features/shared/` feature (if domain-specific).
 4. **`src/components/ui/` is for generic primitives only** — the shadcn/ui output and brand-token wrappers. Nothing that mentions a domain term (CRS, tirage, dossier, …) belongs there.

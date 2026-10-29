@@ -1,5 +1,7 @@
 'use client';
 
+import { useMutation, useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
+import { TRPCClientError } from '@trpc/client';
 import { ArrowLeft, Eye, ImagePlus, PencilLine, Trash2 } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -14,6 +16,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { QueryBoundary } from '@/components/query-boundary';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/components/ui/toast';
 import { ArticleBody } from '@/features/blog/components/article-body';
 import { RichTextEditor } from '@/features/blog/components/rich-text-editor';
 import { SEO_DESCRIPTION_LIMIT, SEO_TITLE_LIMIT, slugify, toBlogLocale, type BlogLocale } from '@/features/blog/lib/blog-schema';
@@ -24,7 +29,8 @@ import { uploadBlogImage } from '@/features/blog/lib/upload-image';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api } from '@/trpc/react';
+import type { RouterOutputs } from '@/trpc/types';
+import { useTRPC } from '@/trpc/client';
 
 type Form = {
   title: string;
@@ -99,65 +105,137 @@ function Field({
   );
 }
 
+type StoredArticle = RouterOutputs['blog']['dashboard']['get'];
+type Category = RouterOutputs['blog']['categories'][number];
+
+/** The form as the stored Article fills it. */
+const formOf = (data: StoredArticle): Form => ({
+  title: data.title,
+  slug: data.slug,
+  locale: toBlogLocale(data.locale),
+  content: data.content as ArticleDoc,
+  categoryId: data.categoryId,
+  tagsText: data.tags.join(', '),
+  excerpt: data.excerpt ?? '',
+  coverUrl: data.coverUrl,
+  coverAlt: data.coverAlt ?? '',
+  seoTitle: data.seoTitle ?? '',
+  seoDescription: data.seoDescription ?? '',
+});
+
+const isNotFound = (error: Error) => error instanceof TRPCClientError && error.data?.code === 'NOT_FOUND';
+
 /**
  * The Blog section's editor, for a new Article (no `id`) or an existing one:
  * title and address, the rich-text body, its settings (language, category,
- * tags, excerpt, cover, search fields) and its status actions.
+ * tags, excerpt, cover, search fields) and its status actions. The route
+ * prefetches what it reads.
  */
 export function BlogEditorView({ id }: { id?: string }): ReactNode {
+  const tEditor = useTranslations('BlogDashboard.editor');
+  return (
+    <QueryBoundary
+      fallback={<EditorSkeleton />}
+      renderError={(error) =>
+        isNotFound(error) ? <p className="rounded-2xl bg-white p-6 text-slate">{tEditor('notFound')}</p> : undefined
+      }
+    >
+      {id ? <StoredArticleEditor id={id} /> : <NewArticleEditor />}
+    </QueryBoundary>
+  );
+}
+
+function NewArticleEditor(): ReactNode {
+  const trpc = useTRPC();
+  const [categories, tags] = useSuspenseQueries({
+    queries: [trpc.blog.categories.queryOptions(), trpc.blog.dashboard.tags.queryOptions()],
+  });
+  return <ArticleEditor categories={categories.data} knownTags={tags.data} />;
+}
+
+function StoredArticleEditor({ id }: { id: string }): ReactNode {
+  const trpc = useTRPC();
+  const [article, categories, tags] = useSuspenseQueries({
+    queries: [
+      trpc.blog.dashboard.get.queryOptions({ id }),
+      trpc.blog.categories.queryOptions(),
+      trpc.blog.dashboard.tags.queryOptions(),
+    ],
+  });
+  // Keyed by Article: the form starts from what's stored, and later refetches don't overwrite typing.
+  return <ArticleEditor key={id} id={id} stored={article.data} categories={categories.data} knownTags={tags.data} />;
+}
+
+/** The editor's frame before its data arrives: title bar, body, settings. */
+function EditorSkeleton(): ReactNode {
+  const t = useTranslations('Common');
+  return (
+    <div role="status" className="mx-auto max-w-6xl">
+      <span className="sr-only">{t('loading')}</span>
+      <div aria-hidden={true}>
+        <Skeleton className="mb-4 h-4 w-36" />
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <Skeleton className="h-9 w-64" />
+          <div className="flex gap-2">
+            <Skeleton className="h-11 w-28 rounded-full" />
+            <Skeleton className="h-11 w-44 rounded-full" />
+            <Skeleton className="h-11 w-28 rounded-full" />
+          </div>
+        </div>
+        <div className="grid gap-5 lg:grid-cols-3">
+          <div className="flex flex-col gap-5 lg:col-span-2">
+            <Skeleton className="h-11 rounded-xl" />
+            <Skeleton className="h-11 rounded-xl" />
+            <Skeleton className="h-96 rounded-2xl" />
+          </div>
+          <Skeleton className="h-96 rounded-2xl" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ArticleEditor({
+  id,
+  stored,
+  categories,
+  knownTags,
+}: {
+  id?: string;
+  stored?: StoredArticle;
+  categories: Category[];
+  knownTags: string[];
+}): ReactNode {
   const t = useTranslations('BlogDashboard');
   const tEditor = useTranslations('BlogDashboard.editor');
   const tPublic = useTranslations('Blog');
   const format = useFormatter();
   const router = useRouter();
-  const utils = api.useUtils();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const uid = useId();
   const ids = (name: string) => `${uid}-${name}`;
 
-  const article = api.blog.dashboard.get.useQuery({ id: id ?? '' }, { enabled: Boolean(id) });
-  const categories = api.blog.categories.useQuery();
-  const knownTags = api.blog.dashboard.tags.useQuery();
-  const create = api.blog.dashboard.create.useMutation();
-  const update = api.blog.dashboard.update.useMutation();
-  const publish = api.blog.dashboard.publish.useMutation();
-  const unpublish = api.blog.dashboard.unpublish.useMutation();
-  const remove = api.blog.dashboard.delete.useMutation();
+  const create = useMutation(trpc.blog.dashboard.create.mutationOptions());
+  const update = useMutation(trpc.blog.dashboard.update.mutationOptions());
+  const publish = useMutation(trpc.blog.dashboard.publish.mutationOptions());
+  const unpublish = useMutation(trpc.blog.dashboard.unpublish.mutationOptions());
+  const remove = useMutation(trpc.blog.dashboard.delete.mutationOptions());
+  /** The list, the Aperçu's counts and the tags all change with an Article. */
+  const refresh = () => void queryClient.invalidateQueries({ queryKey: trpc.blog.dashboard.pathKey() });
+  const failed = (title: string) => toast.add({ title, type: 'error' });
 
-  const [form, setForm] = useState<Form>(EMPTY_FORM);
-  const [loadedId, setLoadedId] = useState<string | null>(null);
-  const [status, setStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
-  const [publishedAt, setPublishedAt] = useState<Date | null>(null);
+  const [form, setForm] = useState<Form>(() => (stored ? formOf(stored) : EMPTY_FORM));
+  const [status, setStatus] = useState<'DRAFT' | 'PUBLISHED'>(stored?.status ?? 'DRAFT');
+  const [publishedAt, setPublishedAt] = useState<Date | null>(stored?.publishedAt ?? null);
   const [slugTouched, setSlugTouched] = useState(Boolean(id));
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [slugError, setSlugError] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const coverInput = useRef<HTMLInputElement>(null);
-
-  // Load the stored Article once; later refetches don't overwrite typing.
-  const data = article.data;
-  if (id && data && loadedId !== data.id) {
-    setLoadedId(data.id);
-    setForm({
-      title: data.title,
-      slug: data.slug,
-      locale: toBlogLocale(data.locale),
-      content: data.content as ArticleDoc,
-      categoryId: data.categoryId,
-      tagsText: data.tags.join(', '),
-      excerpt: data.excerpt ?? '',
-      coverUrl: data.coverUrl,
-      coverAlt: data.coverAlt ?? '',
-      seoTitle: data.seoTitle ?? '',
-      seoDescription: data.seoDescription ?? '',
-    });
-    setStatus(data.status);
-    setPublishedAt(data.publishedAt);
-  }
 
   // Leaving with unsaved changes asks first: closing the tab, and following
   // any link in the page (the sidebar, « Retour », « Voir le site »).
@@ -182,16 +260,16 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
   const change = (patch: Partial<Form>) => {
     setForm((current) => ({ ...current, ...patch }));
     setDirty(true);
-    setSaved(false);
-    setError(null);
   };
 
   const setTitle = (title: string) => change(slugTouched ? { title } : { title, slug: slugify(title) });
 
-  /** Saves the form; resolves to the Article's id, or null when the save was refused. */
-  const save = async (): Promise<string | null> => {
+  /**
+   * Saves the form; resolves to the Article's id, or null when the save was
+   * refused. `announce` toasts the save (not when publishing, which says so).
+   */
+  const save = async ({ announce }: { announce: boolean }): Promise<string | null> => {
     setSlugError(null);
-    setError(null);
     const payload = {
       title: form.title,
       slug: form.slug,
@@ -208,15 +286,15 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
     try {
       const result = id ? await update.mutateAsync({ id, ...payload }) : await create.mutateAsync(payload);
       setDirty(false);
-      setSaved(true);
-      void utils.blog.dashboard.invalidate();
+      refresh();
+      if (announce) toast.add({ title: tEditor('toast.saved'), type: 'success' });
       if (!id) router.replace(`/blog/${result.id}`);
       return result.id;
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : '';
       if (message === 'BLOG_SLUG_TAKEN') setSlugError(tEditor('errors.BLOG_SLUG_TAKEN'));
       else if (message.includes('BLOG_SLUG_INVALID')) setSlugError(tEditor('errors.BLOG_SLUG_INVALID'));
-      else setError(tEditor('errors.generic'));
+      else failed(tEditor('errors.generic'));
       return null;
     }
   };
@@ -240,20 +318,32 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
         return;
       }
       setPublishBlocked(false);
-      const savedId = await save();
+      const savedId = await save({ announce: false });
       if (!savedId) return;
-      await publish.mutateAsync({ id: savedId });
+      try {
+        await publish.mutateAsync({ id: savedId });
+      } catch {
+        failed(tEditor('errors.generic'));
+        return;
+      }
       setStatus('PUBLISHED');
       setPublishedAt((current) => current ?? new Date());
-      void utils.blog.dashboard.invalidate();
+      refresh();
+      toast.add({ title: tEditor('toast.published'), type: 'success' });
     });
 
   const onUnpublish = () =>
     run(async () => {
       if (!id) return;
-      await unpublish.mutateAsync({ id });
+      try {
+        await unpublish.mutateAsync({ id });
+      } catch {
+        failed(tEditor('errors.generic'));
+        return;
+      }
       setStatus('DRAFT');
-      void utils.blog.dashboard.invalidate();
+      refresh();
+      toast.add({ title: tEditor('toast.unpublished'), type: 'success' });
     });
 
   const onDelete = () =>
@@ -261,11 +351,13 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
       if (!id) return;
       try {
         await remove.mutateAsync({ id });
-        void utils.blog.dashboard.invalidate();
+        refresh();
         setDirty(false);
+        toast.add({ title: tEditor('toast.deleted'), type: 'deleted' });
         router.replace('/blog');
-      } catch {
-        setError(tEditor('errors.BLOG_DELETE_PUBLISHED'));
+      } catch (caught) {
+        const message = caught instanceof Error ? caught.message : '';
+        failed(message === 'BLOG_DELETE_PUBLISHED' ? tEditor('errors.BLOG_DELETE_PUBLISHED') : tEditor('errors.generic'));
       } finally {
         setDeleting(false);
       }
@@ -277,20 +369,15 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
     try {
       change({ coverUrl: await uploadBlogImage(file) });
     } catch {
-      setError(tEditor('uploadError'));
+      failed(tEditor('uploadError'));
     } finally {
       setUploading(false);
     }
   };
 
-  if (id && article.isError) {
-    return <p className="rounded-2xl bg-white p-6 text-slate">{tEditor('notFound')}</p>;
-  }
-  if (id && !data) return <p className="text-slate">{t('loading')}</p>;
-
-  const chosenCategory = categories.data?.find((category) => category.id === form.categoryId);
+  const chosenCategory = categories.find((category) => category.id === form.categoryId);
   const rendered = renderArticle(form.content);
-  const unusedTags = (knownTags.data ?? []).filter((tag) => !tagsOf(form.tagsText).map(slugify).includes(tag));
+  const unusedTags = knownTags.filter((tag) => !tagsOf(form.tagsText).map(slugify).includes(tag));
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -321,7 +408,6 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {dirty && <span className="text-xs font-semibold text-honey">{tEditor('unsaved')}</span>}
-          {saved && !dirty && <span className="text-xs font-semibold text-leaf">{tEditor('saved')}</span>}
           <button
             type="button"
             onClick={() => setPreviewing((on) => !on)}
@@ -333,7 +419,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
           <button
             type="button"
             disabled={busy}
-            onClick={() => void run(async () => void (await save()))}
+            onClick={() => void run(async () => void (await save({ announce: true })))}
             className="inline-flex h-11 items-center rounded-full border-2 border-navy-deep px-4 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white disabled:opacity-60"
           >
             {status === 'PUBLISHED' ? tEditor('save') : tEditor('saveDraft')}
@@ -363,11 +449,6 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
       {publishBlocked && missing.length > 0 && (
         <p role="alert" className="mb-4 rounded-xl border border-rose bg-blush px-4 py-3 text-sm font-semibold text-rouge">
           {tEditor('mustPublish', { missing: missing.map((key) => tEditor(`missing.${key}`)).join(', ') })}
-        </p>
-      )}
-      {error && (
-        <p role="alert" className="mb-4 rounded-xl border border-rose bg-blush px-4 py-3 text-sm font-semibold text-rouge">
-          {error}
         </p>
       )}
 
@@ -431,10 +512,9 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
             <div>
               <p className={label}>{tEditor('bodyLabel')}</p>
               <RichTextEditor
-                key={loadedId ?? 'new'}
                 initial={form.content}
                 onChange={(content) => change({ content })}
-                onUploadError={() => setError(tEditor('uploadError'))}
+                onUploadError={() => failed(tEditor('uploadError'))}
               />
             </div>
           </div>
@@ -460,7 +540,7 @@ export function BlogEditorView({ id }: { id?: string }): ReactNode {
                   onChange={(e) => change({ categoryId: e.target.value })}
                 >
                   <option value="">{tEditor('chooseCategory')}</option>
-                  {categories.data?.map((category) => (
+                  {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {categoryName(category, form.locale)}
                     </option>

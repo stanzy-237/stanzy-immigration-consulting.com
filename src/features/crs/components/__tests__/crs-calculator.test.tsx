@@ -7,10 +7,11 @@ import { authClient } from '@/features/auth/lib/auth-client';
 import { navigationMock, router, withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { CrsCalculator } from '@/features/crs/components/crs-calculator';
 import { DEFAULT_FORM, toProfile } from '@/features/crs/lib/crs-form';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /**
  * Seam: the calculator as a visitor uses it — answering questions and reading
- * the score. Only the browser auth client and the tRPC hooks are stubbed.
+ * the score. Only the browser auth client and the server's answers are stubbed.
  * Expected totals are worked by hand from IRCC's tables (see the engine tests).
  */
 vi.mock('@/i18n/navigation', () => navigationMock);
@@ -22,18 +23,6 @@ const remove = vi.fn();
 const rename = vi.fn();
 const fetchSaved = vi.fn();
 let saved: { id: string; name: string; total: number; rules: string; updatedAt: Date }[] = [];
-vi.mock('@/trpc/react', () => ({
-  api: {
-    useUtils: () => ({ crs: { list: { invalidate: vi.fn() }, get: { fetch: fetchSaved } } }),
-    crs: {
-      save: { useMutation: () => ({ mutate: save, reset: vi.fn(), isPending: false, isSuccess: false, isError: false }) },
-      list: { useQuery: () => ({ data: saved }) },
-      delete: { useMutation: () => ({ mutate: remove }) },
-      rename: { useMutation: () => ({ mutate: rename }) },
-    },
-  },
-}));
-
 const useSession = vi.mocked(authClient.useSession);
 const signedOut = () => useSession.mockReturnValue({ data: null, isPending: false } as never);
 const signedIn = () =>
@@ -49,12 +38,22 @@ const total = () => within(screen.getByRole('complementary', { name: 'Votre scor
 const sectionPoints = (heading: string) =>
   within(screen.getByRole('region', { name: heading })).getByTestId('section-points');
 
+/** The calculator, the signed-in Account's saved simulations already fetched. */
 function renderCalculator(locale: 'fr' | 'en' = 'fr') {
-  return render(withIntl(<CrsCalculator today={TODAY} />, locale));
+  const { trpc, queryClient, wrap } = createTestTRPC({
+    'crs.save': (input) => save(input),
+    'crs.list': () => saved,
+    'crs.get': (input) => fetchSaved(input),
+    'crs.delete': (input) => remove(input),
+    'crs.rename': (input) => rename(input),
+  });
+  queryClient.setQueryData(trpc.crs.list.queryKey(), saved as never);
+  return render(withIntl(wrap(<CrsCalculator today={TODAY} />), locale));
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
+  save.mockResolvedValue({ id: 'sim_9', name: 'Après TEF', total: 225 });
   saved = [];
   window.localStorage.clear();
   signedOut();
@@ -218,13 +217,15 @@ describe('CrsCalculator', () => {
     fireEvent.change(name, { target: { value: 'Après TEF' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }));
 
-    expect(save).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: 'Après TEF',
-        profile: expect.objectContaining({ age: 30, education: 'bachelors' }),
-      }),
-      expect.anything(),
+    await waitFor(() =>
+      expect(save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Après TEF',
+          profile: expect.objectContaining({ age: 30, education: 'bachelors' }),
+        }),
+      ),
     );
+    expect(await screen.findByText('Simulation enregistrée')).toBeInTheDocument(); // the toast
   });
 
   it('saves nothing when the visitor cancels, and refuses an empty name', async () => {
@@ -274,7 +275,7 @@ describe('CrsCalculator', () => {
       expect(fetchSaved).toHaveBeenCalledWith({ id: 'sim_1' });
     });
 
-    it('renames in place', () => {
+    it('renames in place', async () => {
       renderCalculator();
 
       fireEvent.click(within(card()).getByRole('button', { name: 'Renommer « Après TEF »' }));
@@ -283,7 +284,8 @@ describe('CrsCalculator', () => {
       });
       fireEvent.click(within(card()).getByRole('button', { name: 'Valider le nouveau nom' }));
 
-      expect(rename).toHaveBeenCalledWith({ id: 'sim_1', name: 'Après TEF 2' });
+      await waitFor(() => expect(rename).toHaveBeenCalledWith({ id: 'sim_1', name: 'Après TEF 2' }));
+      expect(await screen.findByText('Simulation renommée')).toBeInTheDocument(); // the toast
     });
 
     it('asks before deleting, and deletes only once confirmed', async () => {
@@ -294,7 +296,7 @@ describe('CrsCalculator', () => {
       expect(remove).not.toHaveBeenCalled();
 
       fireEvent.click(within(confirm).getByRole('button', { name: 'Supprimer' }));
-      expect(remove).toHaveBeenCalledWith({ id: 'sim_1' });
+      await waitFor(() => expect(remove).toHaveBeenCalledWith({ id: 'sim_1' }));
     });
   });
 

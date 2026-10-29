@@ -1,5 +1,6 @@
 'use client';
 
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Check, FolderOpen, Pencil, Trash2, X, type LucideIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
@@ -13,10 +14,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/components/ui/toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { CrsProfile } from '@/features/crs/lib/compute-crs';
 import { cn } from '@/lib/utils';
-import { api } from '@/trpc/react';
+import { useTRPC } from '@/trpc/client';
 
 /** A round icon-only button: `label` names it for screen readers, `tip` shows on hover. */
 function IconButton({
@@ -62,17 +65,29 @@ function IconButton({
 export function SavedSimulations({ onOpen }: { onOpen: (profile: CrsProfile) => void }): ReactNode {
   const t = useTranslations('Crs.simulations');
   const format = useFormatter();
-  const utils = api.useUtils();
-  const { data: simulations = [] } = api.crs.list.useQuery();
-  const refresh = { onSuccess: () => void utils.crs.list.invalidate() };
-  const remove = api.crs.delete.useMutation(refresh);
-  const rename = api.crs.rename.useMutation(refresh);
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const { data: simulations } = useSuspenseQuery(trpc.crs.list.queryOptions());
+  /** Refreshes the list and says it worked, or says it didn't. */
+  const outcome = (done: string, type: 'success' | 'deleted' = 'success') => ({
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: trpc.crs.list.queryKey() });
+      toast.add({ title: done, type });
+    },
+    onError: () => toast.add({ title: t('toast.failed'), type: 'error' }),
+  });
+  const remove = useMutation(trpc.crs.delete.mutationOptions(outcome(t('toast.deleted'), 'deleted')));
+  const rename = useMutation(trpc.crs.rename.mutationOptions(outcome(t('toast.renamed'))));
   const [renaming, setRenaming] = useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null);
 
   const open = async (id: string): Promise<void> => {
-    const simulation = await utils.crs.get.fetch({ id });
-    onOpen(simulation.profile);
+    try {
+      const simulation = await queryClient.fetchQuery(trpc.crs.get.queryOptions({ id }));
+      onOpen(simulation.profile);
+    } catch {
+      toast.add({ title: t('toast.openFailed'), type: 'error' });
+    }
   };
 
   return (
@@ -182,6 +197,25 @@ export function SavedSimulations({ onOpen }: { onOpen: (profile: CrsProfile) => 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </section>
+  );
+}
+
+/** « Mes simulations » before the list arrives. */
+export function SavedSimulationsSkeleton(): ReactNode {
+  const t = useTranslations('Crs.simulations');
+  const tCommon = useTranslations('Common');
+  return (
+    <section aria-labelledby="crs-simulations-title" className="rounded-2xl border border-fog bg-white p-5 shadow-sm">
+      <h2 id="crs-simulations-title" className="font-heading text-h4 font-bold text-navy-deep">
+        {t('title')}
+      </h2>
+      <div role="status" className="mt-4 space-y-2">
+        <span className="sr-only">{tCommon('loading')}</span>
+        {[0, 1].map((row) => (
+          <Skeleton key={row} aria-hidden={true} className="h-16 rounded-xl" />
+        ))}
+      </div>
     </section>
   );
 }

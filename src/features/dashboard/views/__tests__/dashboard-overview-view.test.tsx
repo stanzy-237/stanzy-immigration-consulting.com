@@ -6,6 +6,7 @@ import { axe } from 'vitest-axe';
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { DashboardShell } from '@/features/dashboard/components/dashboard-shell';
 import { DashboardOverviewView } from '@/features/dashboard/views/dashboard-overview-view';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /** Seam: the Tableau de bord as the consultant sees it, its shell around the Aperçu. */
 /** The route segments below the dashboard's layout: [] is the Aperçu. */
@@ -15,33 +16,32 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }),
 }));
 
-const summary = vi.hoisted(() => ({
-  data: undefined as
-    | { drafts: number; published: number; lastPublished: { id: string; title: string; publishedAt: Date } | null }
-    | undefined,
-}));
-vi.mock('@/trpc/react', () => ({
-  api: { blog: { dashboard: { summary: { useQuery: () => ({ data: summary.data, isLoading: !summary.data }) } } } },
-}));
+type Summary = { drafts: number; published: number; lastPublished: { id: string; title: string; publishedAt: Date } | null };
+let summary: Summary | undefined;
 
 beforeEach(() => {
   nav.segments = [];
-  summary.data = {
+  summary = {
     drafts: 2,
     published: 1,
     lastPublished: { id: 'post_2', title: 'Réussir le TCF Canada', publishedAt: new Date('2026-10-21T09:00:00Z') },
   };
 });
 
-const page = () =>
-  render(
+/** The Aperçu as the route serves it: the summary prefetched, unless `summary` is unset (still on its way). */
+const page = () => {
+  const { trpc, queryClient, wrap } = createTestTRPC({ 'blog.dashboard.summary': () => new Promise(() => {}) });
+  if (summary) queryClient.setQueryData(trpc.blog.dashboard.summary.queryKey(), summary);
+  return render(
     withIntl(
-      <DashboardShell name="Stanzy" siteUrl="https://stanzy-immigration-consulting.com/fr">
-        <DashboardOverviewView />
-      </DashboardShell>,
+      wrap(
+        <DashboardShell name="Stanzy" siteUrl="https://stanzy-immigration-consulting.com/fr">
+          <DashboardOverviewView />
+        </DashboardShell>,
+      ),
     ),
   );
-
+};
 describe('Tableau de bord — shell', () => {
   it('lists its sections and marks the one open', () => {
     page();
@@ -79,9 +79,18 @@ describe('Tableau de bord — Aperçu', () => {
   });
 
   it('says so before the first Article is published', () => {
-    summary.data = { drafts: 0, published: 0, lastPublished: null };
+    summary = { drafts: 0, published: 0, lastPublished: null };
     page();
     expect(screen.getByText('Aucun article publié pour l’instant.')).toBeInTheDocument();
+  });
+
+  it('holds the Blog’s place with a skeleton while its counts arrive, not a loading sentence', () => {
+    summary = undefined;
+    page();
+    const blog = within(screen.getByRole('region', { name: 'Blog' }));
+    expect(blog.getByRole('status')).toBeInTheDocument();
+    expect(blog.queryByText(/brouillon/)).not.toBeInTheDocument();
+    expect(blog.getByRole('link', { name: /Nouvel article/ })).toBeInTheDocument();
   });
 
   it('has no axe violations', async () => {

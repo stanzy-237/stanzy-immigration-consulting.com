@@ -1,5 +1,6 @@
 'use client';
 
+import { useMutation, useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
 import { LockKeyhole, Receipt } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useMemo, useState, type ReactNode } from 'react';
@@ -13,6 +14,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { QueryBoundary } from '@/components/query-boundary';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/components/ui/toast';
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { withNext } from '@/features/auth/lib/safe-next-path';
 import { CurrencyDialog } from '@/features/budget/components/currency-dialog';
@@ -21,13 +25,14 @@ import { ExpenseForm } from '@/features/budget/components/expense-form';
 import { ExpenseSummary } from '@/features/budget/components/expense-summary';
 import { DEFAULT_CURRENCY, type Currency } from '@/features/budget/data/currencies';
 import { useFormatMoney } from '@/features/budget/hooks/use-format-money';
-import type { BudgetAnswers, Expense, ExpenseInput } from '@/features/budget/lib/budget-schema';
+import { BUDGET_LIMIT, type BudgetAnswers, type Expense, type ExpenseInput } from '@/features/budget/lib/budget-schema';
 import { useBudgetEstimate } from '@/features/budget/hooks/use-budget-estimate';
 import { estimateBudget, ratesFor } from '@/features/budget/lib/estimate-budget';
 import { fromMinor } from '@/features/budget/lib/money';
 import { LONG_DAY, noonUtc } from '@/features/budget/lib/day';
 import { Link } from '@/i18n/navigation';
-import { api } from '@/trpc/react';
+import { isOptimistic, optimisticId, optimisticList } from '@/lib/optimistic-list';
+import { useTRPC } from '@/trpc/client';
 
 /** Below `lg` the form lives in a drawer instead of the sidebar. */
 const isPhone = () => window.matchMedia('(max-width: 1023px)').matches;
@@ -83,20 +88,68 @@ function ExpenseCard({ expense, currency, onEdit }: { expense: Expense; currency
   );
 }
 
-/** The signed-in User's journal: summary, Dépenses newest first, and the add/edit form. */
-function Journal({ currency, estimate }: { currency: Currency | null; estimate: BudgetAnswers | null }): ReactNode {
+/** The journal before its Dépenses arrive: the currency bar, summary, list and form as blocks. */
+function JournalSkeleton(): ReactNode {
+  const t = useTranslations('Budget.journal');
+  return (
+    <div role="status">
+      <span className="sr-only">{t('loading')}</span>
+      <div aria-hidden={true}>
+        <Skeleton className="mb-6 h-12 rounded-2xl" />
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
+          <div className="flex flex-col gap-3 lg:col-span-2">
+            <Skeleton className="mb-3 h-32 rounded-2xl" />
+            {[0, 1, 2].map((row) => (
+              <Skeleton key={row} className="h-20 rounded-2xl" />
+            ))}
+          </div>
+          <Skeleton className="hidden h-96 rounded-2xl lg:block" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The signed-in User's journal: summary, Dépenses newest first, and the
+ * add/edit form. A User's own data on a static page: fetched in the browser,
+ * under the skeleton, never prefetched.
+ */
+function Journal({ estimate }: { estimate: BudgetAnswers | null }): ReactNode {
   const t = useTranslations('Budget');
-  const { data = [] } = api.budget.expenses.list.useQuery();
-  // Newest first; same-day Dépenses keep the server's order.
-  const expenses = useMemo(() => [...data].sort((a, b) => b.date.localeCompare(a.date)), [data]);
-  const utils = api.useUtils();
-  const refresh = { onSuccess: () => void utils.budget.expenses.list.invalidate() };
-  const add = api.budget.expenses.add.useMutation(refresh);
-  const update = api.budget.expenses.update.useMutation(refresh);
-  const remove = api.budget.expenses.delete.useMutation(refresh);
-  const setCurrency = api.budget.profile.setCurrency.useMutation({
-    onSuccess: () => void utils.budget.profile.get.invalidate(),
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const [profile, list] = useSuspenseQueries({
+    queries: [trpc.budget.profile.get.queryOptions(), trpc.budget.expenses.list.queryOptions()],
   });
+  const currency: Currency | null = profile.data?.currency ?? null;
+  // Newest first; same-day Dépenses keep the server's order.
+  const expenses = useMemo(() => [...list.data].sort((a, b) => b.date.localeCompare(a.date)), [list.data]);
+  // Optimistic: the list, total and bar change on the tap; a refusal puts them back (and says so).
+  const listKey = trpc.budget.expenses.list.queryKey();
+  const asExpense = (input: ExpenseInput, id: string): Expense => ({ id, ...input, note: input.note ?? '' });
+  const add = useMutation(
+    trpc.budget.expenses.add.mutationOptions(
+      optimisticList<Expense, ExpenseInput>(queryClient, listKey, (list, input) => [asExpense(input, optimisticId()), ...list]),
+    ),
+  );
+  const update = useMutation(
+    trpc.budget.expenses.update.mutationOptions(
+      optimisticList<Expense, ExpenseInput & { id: string }>(queryClient, listKey, (list, { id, ...input }) =>
+        list.map((expense) => (expense.id === id ? asExpense(input, id) : expense)),
+      ),
+    ),
+  );
+  const remove = useMutation(
+    trpc.budget.expenses.delete.mutationOptions(
+      optimisticList<Expense, { id: string }>(queryClient, listKey, (list, { id }) => list.filter((expense) => expense.id !== id)),
+    ),
+  );
+  const setCurrency = useMutation(
+    trpc.budget.profile.setCurrency.mutationOptions({
+      onSuccess: () => void queryClient.invalidateQueries({ queryKey: trpc.budget.profile.get.queryKey() }),
+    }),
+  );
 
   const [picking, setPicking] = useState(currency === null);
   const [currencyError, setCurrencyError] = useState<string>();
@@ -120,34 +173,62 @@ function Journal({ currency, estimate }: { currency: Currency | null; estimate: 
     if (isPhone()) setDrawerOpen(true);
   };
   const edit = (expense: Expense) => {
+    // Not saved yet: it has no id the server knows. The refetch brings it in a moment.
+    if (isOptimistic(expense)) return;
     setEditing(expense);
     setFailure(undefined);
     if (isPhone()) setDrawerOpen(true);
   };
+  /**
+   * The form closes at once (the list already shows the change); the server's
+   * answer arrives as a toast. A refusal is a toast too: the form is gone.
+   */
   const failed = (error: { message: string }) =>
-    setFailure(
-      error.message === 'BUDGET_LIMIT'
-        ? t('form.errors.limit')
-        : error.message === 'BUDGET_FUTURE_DATE'
-          ? t('form.errors.future')
-          : t('form.errors.save'),
-    );
+    toast.add({
+      title:
+        error.message === 'BUDGET_LIMIT'
+          ? t('form.errors.limit')
+          : error.message === 'BUDGET_FUTURE_DATE'
+            ? t('form.errors.future')
+            : t('form.errors.save'),
+      type: 'error',
+    });
+  const confirmed = (title: string, type: 'success' | 'deleted' = 'success') => () => toast.add({ title, type });
   const save = (input: ExpenseInput) => {
     setFailure(undefined);
-    const outcome = { onSuccess: done, onError: failed };
-    if (editing) update.mutate({ id: editing.id, ...input }, outcome);
-    else add.mutate(input, outcome);
+    // Known before asking: the limit stays in the form, which keeps the draft.
+    if (!editing && expenses.length >= BUDGET_LIMIT) {
+      setFailure(t('form.errors.limit'));
+      return;
+    }
+    if (editing) update.mutate({ id: editing.id, ...input }, { onSuccess: confirmed(t('journal.toast.updated')), onError: failed });
+    else add.mutate(input, { onSuccess: confirmed(t('journal.toast.added')), onError: failed });
+    done();
   };
   const confirmDelete = () => {
     if (!deleting) return;
-    remove.mutate({ id: deleting.id }, { onSuccess: done, onError: failed });
+    remove.mutate(
+      { id: deleting.id },
+      {
+        onSuccess: confirmed(t('journal.toast.deleted'), 'deleted'),
+        onError: () => toast.add({ title: t('journal.toast.deleteFailed'), type: 'error' }),
+      },
+    );
     setDeleting(null);
+    done();
   };
+  // A failure stays in the dialog, which is still open over the page.
   const chooseCurrency = (next: Currency) => {
     setCurrencyError(undefined);
     setCurrency.mutate(
       { currency: next },
-      { onSuccess: () => setPicking(false), onError: () => setCurrencyError(t('currencyDialog.error')) },
+      {
+        onSuccess: () => {
+          setPicking(false);
+          toast.add({ title: t('journal.toast.currencySaved'), type: 'success' });
+        },
+        onError: () => setCurrencyError(t('currencyDialog.error')),
+      },
     );
   };
 
@@ -156,7 +237,8 @@ function Journal({ currency, estimate }: { currency: Currency | null; estimate: 
       key={`${editing?.id ?? `new-${formKey}`}-${shown}`}
       expense={editing}
       currency={shown}
-      pending={add.isPending || update.isPending}
+      // Optimistic: the form is reset at once, so it never waits on a save.
+      pending={false}
       error={failure}
       onSubmit={save}
       onDelete={editing ? () => setDeleting(editing) : undefined}
@@ -276,19 +358,15 @@ function Journal({ currency, estimate }: { currency: Currency | null; estimate: 
  * without a currency yet is asked to choose one first.
  */
 export function ExpenseJournal(): ReactNode {
-  const t = useTranslations('Budget.journal');
   const { account, pending } = useCurrentAccount();
-  const profile = api.budget.profile.get.useQuery(undefined, { enabled: account !== null });
   // The « dépensé X sur Y » bar reads the estimate this browser keeps.
   const [estimate] = useBudgetEstimate();
 
-  if (pending) return null;
+  if (pending) return <JournalSkeleton />;
   if (!account) return <SignInInvite />;
-  if (profile.isPending) return <p className="text-center text-body text-slate">{t('loading')}</p>;
   return (
-    <Journal
-      currency={profile.data?.currency ?? null}
-      estimate={estimate}
-    />
+    <QueryBoundary fallback={<JournalSkeleton />}>
+      <Journal estimate={estimate} />
+    </QueryBoundary>
   );
 }

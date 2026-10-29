@@ -74,3 +74,9 @@ export const categoryInputSchema = z.object({
   nameFr: z.string().trim().min(1).max(80),
   nameEn: z.string().trim().min(1).max(80),
 });
+
+/** The Blog section's status filter: every Article, or one status. */
+export type DashboardStatusFilter = 'ALL' | 'DRAFT' | 'PUBLISHED';
+
+/** The dashboard list query's input for a filter (the route prefetches `ALL`'s). */
+export const dashboardListInput = (filter: DashboardStatusFilter) => (filter === 'ALL' ? {} : { status: filter });

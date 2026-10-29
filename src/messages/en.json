@@ -577,7 +577,13 @@
       "deleteTitle": "Delete “{name}”?",
       "deleteDescription": "This simulation will be permanently deleted.",
       "cancelDelete": "Cancel",
-      "confirmDelete": "Delete"
+      "confirmDelete": "Delete",
+      "toast": {
+        "renamed": "Simulation renamed",
+        "deleted": "Simulation deleted",
+        "failed": "That didn’t work. Try again.",
+        "openFailed": "The simulation couldn’t be opened. Try again."
+      }
     },
     "hints": {
       "title": "How to raise your score",
@@ -799,7 +805,8 @@
       "trigger": "Reuse a CRS simulation",
       "inProgress": "CRS calculator answers in progress (this device)",
       "saved": "My saved simulations",
-      "points": "{points} pts"
+      "points": "{points} pts",
+      "openFailed": "The simulation couldn’t be opened. Try again."
     }
   },
   "Draws": {
@@ -809,8 +816,6 @@
     "subtitle": "Follow the latest Express Entry draws and find the score that matters to you.",
     "synced": "Updated {when}",
     "neverSynced": "Draws are on their way: the first update hasn’t run yet.",
-    "loading": "Loading draws…",
-    "error": "We can’t load the draws right now. Try again in a moment.",
     "latest": {
       "label": "Latest draw",
       "round": "Round #{round}",
@@ -904,7 +909,10 @@
       "install": "On iPhone, first add Stanzy to your home screen (Share → Add to Home Screen), then open the app to turn on alerts.",
       "unsupported": "Your browser doesn’t support notifications. Join our WhatsApp channel to hear about new draws.",
       "whatsapp": "Join the WhatsApp channel",
-      "failed": "Couldn’t turn alerts on. Try again in a moment."
+      "failed": "Couldn’t turn alerts on. Try again in a moment.",
+      "toastOn": "Draw alerts turned on",
+      "toastOff": "Draw alerts turned off",
+      "disableFailed": "Turning alerts off failed. Try again in a moment."
     },
     "alert": {
       "title": "New draw #{round}",
@@ -924,8 +932,6 @@
     "title": "Next draw",
     "subtitle": "Prediction of the next Express Entry draw",
     "synced": "Updated {when}",
-    "loading": "Loading draws…",
-    "error": "We can’t load the draws right now. Try again in a moment.",
     "empty": "No prediction yet: the first draws update hasn’t run.",
     "disclaimer": "An estimate, not a guarantee: IRCC doesn’t announce its draws. These figures are statistics on past rounds.",
     "featured": {
@@ -1044,7 +1050,6 @@
     "lead": "ITA, AOR, biometrics, medical — log each milestone as your journey unfolds.",
     "viewTimeline": "View timeline",
     "feedTitle": "Saved steps",
-    "loading": "Loading your journey…",
     "empty": {
       "title": "No steps saved yet",
       "text": "Add your first step to start tracking your journey.",
@@ -1130,6 +1135,12 @@
       "running": "{duration} since AOR",
       "done": "File processed in {duration} (AOR → COPR)",
       "total": "that is {total, plural, one {# day} other {# days}}"
+    },
+    "toast": {
+      "added": "Step added",
+      "updated": "Step updated",
+      "deleted": "Step deleted",
+      "deleteFailed": "The step couldn’t be deleted. Try again."
     }
   },
   "ItaCountdown": {
@@ -1291,7 +1302,14 @@
         "text": "Add your first expense: language test, WES, IRCC fees…"
       },
       "edit": "Edit {name}",
-      "fab": "Add an expense"
+      "fab": "Add an expense",
+      "toast": {
+        "added": "Expense added",
+        "updated": "Expense updated",
+        "deleted": "Expense deleted",
+        "deleteFailed": "The expense couldn’t be deleted. Try again.",
+        "currencySaved": "Currency saved"
+      }
     },
     "currencyDialog": {
       "firstTitle": "Choose your currency",
@@ -1403,7 +1421,6 @@
     },
     "empty": "No articles. Start by writing one.",
     "loading": "Loading articles…",
-    "error": "Can’t load the articles.",
     "editor": {
       "newTitle": "New article",
       "editTitle": "Edit the article",
@@ -1456,8 +1473,6 @@
       "counter": "{count} / {limit}",
       "saveDraft": "Save draft",
       "save": "Save",
-      "saving": "Saving…",
-      "saved": "Saved",
       "preview": "Preview",
       "closePreview": "Back to editing",
       "publish": "Publish",
@@ -1488,7 +1503,13 @@
       "notFound": "This article doesn’t exist or was deleted.",
       "coverUrl": "Cover image address",
       "coverUrlHint": "https://… or an image on the site (/blog/…), or choose a file.",
-      "imageUrlPrompt": "Image address (https://… or /blog/…)"
+      "imageUrlPrompt": "Image address (https://… or /blog/…)",
+      "toast": {
+        "saved": "Article saved",
+        "published": "Article published",
+        "unpublished": "Article unpublished",
+        "deleted": "Draft deleted"
+      }
     },
     "categories": {
       "title": "Categories",
@@ -1504,7 +1525,23 @@
         "BLOG_SLUG_TAKEN": "Another category already uses this address.",
         "BLOG_CATEGORY_IN_USE": "Articles still use this category: move them to another one before deleting it.",
         "generic": "That didn’t work. Try again."
+      },
+      "toast": {
+        "added": "Category added",
+        "saved": "Category saved",
+        "deleted": "Category deleted"
       }
+    }
+  },
+  "Common": {
+    "loading": "Loading…",
+    "QueryError": {
+      "title": "This couldn’t be loaded.",
+      "description": "Check your connection, then try again.",
+      "retry": "Try again"
+    },
+    "Toast": {
+      "genericError": "Something went wrong. Try again."
     }
   }
 }

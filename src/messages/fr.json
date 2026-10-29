@@ -577,7 +577,13 @@
       "deleteTitle": "Supprimer « {name} » ?",
       "deleteDescription": "Cette simulation sera définitivement supprimée.",
       "cancelDelete": "Annuler",
-      "confirmDelete": "Supprimer"
+      "confirmDelete": "Supprimer",
+      "toast": {
+        "renamed": "Simulation renommée",
+        "deleted": "Simulation supprimée",
+        "failed": "L’opération a échoué. Réessayez.",
+        "openFailed": "La simulation n’a pas pu être ouverte. Réessayez."
+      }
     },
     "hints": {
       "title": "Comment augmenter votre score",
@@ -799,7 +805,8 @@
       "trigger": "Reprendre une simulation CRS",
       "inProgress": "Réponses en cours du Calculateur CRS (cet appareil)",
       "saved": "Mes simulations enregistrées",
-      "points": "{points} pts"
+      "points": "{points} pts",
+      "openFailed": "La simulation n’a pas pu être ouverte. Réessayez."
     }
   },
   "Draws": {
@@ -809,8 +816,6 @@
     "subtitle": "Suivez les derniers tirages Entrée express et trouvez le score qui vous concerne.",
     "synced": "Mis à jour {when}",
     "neverSynced": "Les tirages arrivent bientôt : la première mise à jour n’a pas encore eu lieu.",
-    "loading": "Chargement des tirages…",
-    "error": "Impossible de charger les tirages pour le moment. Réessayez dans un instant.",
     "latest": {
       "label": "Dernier tirage",
       "round": "Tirage #{round}",
@@ -921,7 +926,10 @@
       "install": "Sur iPhone, ajoutez d’abord Stanzy à votre écran d’accueil (Partager → Sur l’écran d’accueil), puis ouvrez l’app pour activer les alertes.",
       "unsupported": "Votre navigateur ne gère pas les notifications. Rejoignez notre chaîne WhatsApp pour être prévenu des nouveaux tirages.",
       "whatsapp": "Rejoindre la chaîne WhatsApp",
-      "failed": "L’activation a échoué. Réessayez dans un instant."
+      "failed": "L’activation a échoué. Réessayez dans un instant.",
+      "toastOn": "Alertes tirages activées",
+      "toastOff": "Alertes tirages désactivées",
+      "disableFailed": "La désactivation a échoué. Réessayez dans un instant."
     },
     "alert": {
       "title": "Nouveau tirage #{round}",
@@ -941,8 +949,6 @@
     "title": "Prochain tirage",
     "subtitle": "Prédiction du prochain tirage Entrée Express",
     "synced": "Mis à jour {when}",
-    "loading": "Chargement des tirages…",
-    "error": "Impossible de charger les tirages pour le moment. Réessayez dans quelques instants.",
     "empty": "Pas encore de prédiction : la première mise à jour des tirages n’a pas encore eu lieu.",
     "disclaimer": "Estimation, pas une garantie : IRCC n’annonce pas ses tirages. Ces chiffres sont des statistiques sur les tirages passés.",
     "featured": {
@@ -1061,7 +1067,6 @@
     "lead": "ITA, AOR, biométrie, médical — enregistrez chaque jalon au fil de votre parcours.",
     "viewTimeline": "Voir la timeline",
     "feedTitle": "Étapes enregistrées",
-    "loading": "Chargement de votre parcours…",
     "empty": {
       "title": "Aucune étape enregistrée",
       "text": "Ajoutez votre première étape pour commencer à suivre votre parcours.",
@@ -1147,6 +1152,12 @@
       "running": "{duration} depuis l’AOR",
       "done": "Dossier traité en {duration} (AOR → COPR)",
       "total": "soit {total, plural, one {# jour} other {# jours}}"
+    },
+    "toast": {
+      "added": "Étape ajoutée",
+      "updated": "Étape modifiée",
+      "deleted": "Étape supprimée",
+      "deleteFailed": "L’étape n’a pas pu être supprimée. Réessayez."
     }
   },
   "ItaCountdown": {
@@ -1308,7 +1319,14 @@
         "text": "Ajoutez votre première dépense : test de langue, WES, frais IRCC…"
       },
       "edit": "Modifier {name}",
-      "fab": "Ajouter une dépense"
+      "fab": "Ajouter une dépense",
+      "toast": {
+        "added": "Dépense ajoutée",
+        "updated": "Dépense modifiée",
+        "deleted": "Dépense supprimée",
+        "deleteFailed": "La dépense n’a pas pu être supprimée. Réessayez.",
+        "currencySaved": "Devise enregistrée"
+      }
     },
     "currencyDialog": {
       "firstTitle": "Choisissez votre devise",
@@ -1420,7 +1438,6 @@
     },
     "empty": "Aucun article. Commencez par en écrire un.",
     "loading": "Chargement des articles…",
-    "error": "Impossible de charger les articles.",
     "editor": {
       "newTitle": "Nouvel article",
       "editTitle": "Modifier l’article",
@@ -1473,8 +1490,6 @@
       "counter": "{count} / {limit}",
       "saveDraft": "Enregistrer le brouillon",
       "save": "Enregistrer",
-      "saving": "Enregistrement…",
-      "saved": "Enregistré",
       "preview": "Aperçu",
       "closePreview": "Revenir à l’édition",
       "publish": "Publier",
@@ -1505,7 +1520,13 @@
       "notFound": "Cet article n’existe pas ou a été supprimé.",
       "coverUrl": "Adresse de l’image de couverture",
       "coverUrlHint": "https://… ou une image du site (/blog/…), ou choisissez un fichier.",
-      "imageUrlPrompt": "Adresse de l’image (https://… ou /blog/…)"
+      "imageUrlPrompt": "Adresse de l’image (https://… ou /blog/…)",
+      "toast": {
+        "saved": "Article enregistré",
+        "published": "Article publié",
+        "unpublished": "Article dépublié",
+        "deleted": "Brouillon supprimé"
+      }
     },
     "categories": {
       "title": "Catégories",
@@ -1521,7 +1542,23 @@
         "BLOG_SLUG_TAKEN": "Une autre catégorie utilise déjà cette adresse.",
         "BLOG_CATEGORY_IN_USE": "Des articles utilisent encore cette catégorie : changez-les de catégorie avant de la supprimer.",
         "generic": "L’opération a échoué. Réessayez."
+      },
+      "toast": {
+        "added": "Catégorie ajoutée",
+        "saved": "Catégorie enregistrée",
+        "deleted": "Catégorie supprimée"
       }
+    }
+  },
+  "Common": {
+    "loading": "Chargement…",
+    "QueryError": {
+      "title": "Impossible de charger ces informations.",
+      "description": "Vérifiez votre connexion, puis réessayez.",
+      "retry": "Réessayer"
+    },
+    "Toast": {
+      "genericError": "L’opération a échoué. Réessayez."
     }
   }
 }

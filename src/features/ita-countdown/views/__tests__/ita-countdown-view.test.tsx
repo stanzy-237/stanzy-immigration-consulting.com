@@ -1,10 +1,12 @@
 // @vitest-environment jsdom
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { authClient } from '@/features/auth/lib/auth-client';
 import { navigationMock, withIntl } from '@/features/auth/views/__tests__/test-utils';
+import type { DrawSummary } from '@/features/draws/lib/draw-summary';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 import { ItaCountdownView } from '@/features/ita-countdown/views/ita-countdown-view';
 
 /** Seam: the Compte à rebours ITA page as a visitor uses it, with the clock frozen. */
@@ -14,7 +16,7 @@ vi.mock('@/i18n/navigation', async (importOriginal) => ({
 }));
 vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi.fn(), signOut: vi.fn() } }));
 
-const draw = (roundNumber: number, date: string, crsMin: number, invitations: number, typeLabel = 'Canadian Experience Class') => ({
+const draw = (roundNumber: number, date: string, crsMin: number, invitations: number, typeLabel = 'Canadian Experience Class'): DrawSummary => ({
   round: String(roundNumber),
   roundNumber,
   date,
@@ -24,6 +26,7 @@ const draw = (roundNumber: number, date: string, crsMin: number, invitations: nu
   crsMin,
   irccUrl: null,
   crsChange: null,
+  tieBreakAt: null,
 });
 /** The newest Tirages, as `draws.latest` returns them: the server keeps the first `take`. */
 const DRAWS = [
@@ -36,19 +39,17 @@ const DRAWS = [
 ];
 /** The signed-in User's Parcours; only read when someone is signed in. */
 const parcours = { etapes: [] as { id: string; code: string; date: string; label: string }[], loading: false };
-vi.mock('@/trpc/react', () => ({
-  api: {
-    draws: { latest: { useQuery: ({ take }: { take: number }) => ({ data: { draws: DRAWS.slice(0, take), lastSyncedAt: null } }) } },
-    parcours: {
-      list: {
-        useQuery: (_input: undefined, options?: { enabled?: boolean }) => ({
-          data: options?.enabled && !parcours.loading ? parcours.etapes : undefined,
-          isPending: Boolean(options?.enabled) && parcours.loading,
-        }),
-      },
-    },
-  },
-}));
+/**
+ * The page as its route serves it: recent Tirages prefetched. The Parcours is
+ * fetched in the browser, answered from `parcours`, or never while `loading`.
+ */
+const itaPage = () => {
+  const { trpc, queryClient, wrap } = createTestTRPC({
+    'parcours.list': () => (parcours.loading ? new Promise(() => {}) : parcours.etapes),
+  });
+  queryClient.setQueryData(trpc.draws.latest.queryKey({ take: 5 }), { draws: DRAWS.slice(0, 5), lastSyncedAt: null });
+  return wrap(<ItaCountdownView />);
+};
 const signIn = () =>
   vi.mocked(authClient.useSession).mockReturnValue({
     data: { user: { name: 'Aminata Diallo', email: 'aminata@example.com' } },
@@ -77,7 +78,7 @@ const deadline = () => screen.getByRole('region', { name: 'Date limite de dépô
 
 describe('ItaCountdownView', () => {
   it('counts down the 60 days after the ITA day, to 00:00 UTC after the last one', () => {
-    render(withIntl(<ItaCountdownView />));
+    render(withIntl(itaPage()));
     expect(screen.getByRole('heading', { level: 1, name: 'Compte à rebours ITA' })).toBeInTheDocument();
 
     // ITA on 25 Oct: the 60 days are 26 Oct – 24 Dec; the window closes 25 Dec 00:00 UTC.
@@ -91,7 +92,7 @@ describe('ItaCountdownView', () => {
   });
 
   it('ticks every second', () => {
-    render(withIntl(<ItaCountdownView />));
+    render(withIntl(itaPage()));
     enterIta('2026-10-25');
 
     act(() => void vi.advanceTimersByTime(61_000));
@@ -105,7 +106,7 @@ describe('ItaCountdownView', () => {
     ['2026-09-05', 10, 'Moins de deux semaines'],
     ['2026-09-01', 6, 'Moins d’une semaine'],
   ])('after an ITA on %s, shows %i days left and says: %s', (day, days, advice) => {
-    render(withIntl(<ItaCountdownView />));
+    render(withIntl(itaPage()));
     enterIta(day);
 
     expect(screen.getByRole('status')).toHaveTextContent(advice);
@@ -117,7 +118,7 @@ describe('ItaCountdownView', () => {
   });
 
   it('says when the window has closed, and what that means', () => {
-    render(withIntl(<ItaCountdownView />));
+    render(withIntl(itaPage()));
 
     // ITA on 1 Aug: last day 30 Sep, closed since 1 Oct 00:00 UTC.
     enterIta('2026-08-01');
@@ -129,7 +130,7 @@ describe('ItaCountdownView', () => {
   });
 
   it('refuses an ITA date in the future', () => {
-    render(withIntl(<ItaCountdownView />));
+    render(withIntl(itaPage()));
 
     enterIta('2026-10-26');
 
@@ -140,7 +141,7 @@ describe('ItaCountdownView', () => {
   });
 
   it('fills the ITA date from a recent Tirage', () => {
-    render(withIntl(<ItaCountdownView />));
+    render(withIntl(itaPage()));
 
     fireEvent.click(screen.getByRole('button', { name: 'Derniers tirages' }));
     const draws = screen.getByRole('listbox', { name: 'Choisir la date d’un tirage récent' });
@@ -158,11 +159,11 @@ describe('ItaCountdownView', () => {
   });
 
   it('remembers the ITA date in this browser for the next visit', () => {
-    const first = render(withIntl(<ItaCountdownView />));
+    const first = render(withIntl(itaPage()));
     enterIta('2026-10-22');
     first.unmount();
 
-    render(withIntl(<ItaCountdownView />));
+    render(withIntl(itaPage()));
 
     expect(itaDate()).toHaveValue('2026-10-22');
     expect(deadline()).toHaveTextContent('Dernier jour : 21 décembre 2026');
@@ -170,7 +171,7 @@ describe('ItaCountdownView', () => {
 
   it('has no detectable accessibility violations, empty or counting', async () => {
     vi.useRealTimers();
-    const { container } = render(withIntl(<ItaCountdownView />));
+    const { container } = render(withIntl(itaPage()));
     expect(await axe(container)).toHaveNoViolations();
 
     enterIta('2026-10-01');
@@ -183,7 +184,7 @@ describe('ItaCountdownView', () => {
     // 26 Oct has happened, and its ITA must count.
     vi.stubEnv('TZ', 'America/Toronto');
     vi.setSystemTime(new Date('2026-10-26T01:00:00Z'));
-    render(withIntl(<ItaCountdownView />));
+    render(withIntl(itaPage()));
 
     enterIta('2026-10-26');
 
@@ -202,11 +203,11 @@ describe('ItaCountdownView', () => {
       ];
     });
 
-    it('starts from the most recent ITA Étape, over a date kept in this browser', () => {
+    it('starts from the most recent ITA Étape, over a date kept in this browser', async () => {
       window.localStorage.setItem('stanzy.ita-countdown.v1', JSON.stringify({ itaDay: '2026-10-22' }));
-      render(withIntl(<ItaCountdownView />));
+      render(withIntl(itaPage()));
 
-      expect(itaDate()).toHaveValue('2026-10-08');
+      await waitFor(() => expect(itaDate()).toHaveValue('2026-10-08'));
       expect(deadline()).toHaveTextContent('Dernier jour : 7 décembre 2026');
       expect(screen.getByText(/Date reprise de votre parcours/)).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Voir mon parcours' })).toHaveAttribute('href', '/outils/timeline');
@@ -215,14 +216,15 @@ describe('ItaCountdownView', () => {
     it('waits for the Parcours instead of flashing the date kept in this browser', () => {
       parcours.loading = true;
       window.localStorage.setItem('stanzy.ita-countdown.v1', JSON.stringify({ itaDay: '2026-10-22' }));
-      render(withIntl(<ItaCountdownView />));
+      render(withIntl(itaPage()));
 
       expect(itaDate()).toHaveValue('');
       expect(screen.queryByRole('region', { name: 'Date limite de dépôt' })).not.toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent('Chargement…'); // the board pulses as a skeleton
     });
 
     it('lets the User count from another date on this page', () => {
-      render(withIntl(<ItaCountdownView />));
+      render(withIntl(itaPage()));
 
       enterIta('2026-10-22');
 
@@ -233,7 +235,7 @@ describe('ItaCountdownView', () => {
 
   it('never reads a Parcours when nobody is signed in', () => {
     parcours.etapes = [{ id: 'e1', code: 'ITA', date: '2026-10-08', label: 'ITA reçue' }];
-    render(withIntl(<ItaCountdownView />));
+    render(withIntl(itaPage()));
 
     expect(itaDate()).toHaveValue('');
   });

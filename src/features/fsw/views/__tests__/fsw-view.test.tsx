@@ -5,6 +5,7 @@ import { axe } from 'vitest-axe';
 
 import { authClient } from '@/features/auth/lib/auth-client';
 import { navigationMock, withIntl } from '@/features/auth/views/__tests__/test-utils';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 import { FswView } from '@/features/fsw/views/fsw-view';
 
 /**
@@ -16,10 +17,6 @@ vi.mock('@/i18n/navigation', async (importOriginal) => ({
   ...navigationMock,
 }));
 vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi.fn(), signOut: vi.fn() } }));
-vi.mock('@/trpc/react', () => ({
-  api: { useUtils: () => ({}), crs: { list: { useQuery: () => ({ data: undefined }) } } },
-}));
-
 beforeEach(() => {
   vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never);
 });
@@ -28,7 +25,7 @@ const guide = () => screen.getByRole('region', { name: 'Atteindre 67 points n’
 
 describe('FswView — À savoir', () => {
   it('lists what the application also needs and offers Stanzy’s support', () => {
-    render(withIntl(<FswView />));
+    render(withIntl(createTestTRPC().wrap(<FswView />)));
 
     expect(within(guide()).getByText(/preuves de votre expérience professionnelle qualifiée/)).toBeInTheDocument();
     expect(within(guide()).getByText(/preuve de fonds suffisants/)).toBeInTheDocument();
@@ -37,7 +34,7 @@ describe('FswView — À savoir', () => {
   });
 
   it('promotes the WhatsApp channel', () => {
-    render(withIntl(<FswView />));
+    render(withIntl(createTestTRPC().wrap(<FswView />)));
 
     const join = within(guide()).getByRole('link', { name: /Rejoindre la chaîne WhatsApp/ });
     expect(join).toHaveAttribute('href', expect.stringContaining('whatsapp.com/channel/'));
@@ -50,7 +47,7 @@ describe('FswView — À savoir', () => {
   });
 
   it('has no axe violations', async () => {
-    const { container } = render(withIntl(<FswView />));
+    const { container } = render(withIntl(createTestTRPC().wrap(<FswView />)));
     expect(await axe(guide())).toHaveNoViolations();
     expect(container).toBeTruthy();
   });

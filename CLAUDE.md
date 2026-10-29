@@ -20,6 +20,10 @@ Single-context: one `GLOSSARY.md` + `docs/adr/` at the repo root. See `docs/agen
 
 Code is organised **by feature** under `src/features/<feature>/{views,components,data,hooks,server,lib}`, after `code-with-antonio/resonance`. Routes under `src/app/` are thin shells that import a `<FeatureView />`. Every agent MUST read `docs/agents/folder-structure.md` before creating a new file, moving a file, or writing a spec. Deviations require an ADR.
 
+### Data fetching (mandatory)
+
+tRPC data is prefetched in the route and read with `useSuspenseQuery` under a skeleton; mutations end in a toast. Every agent MUST read `docs/agents/data-fetching.md` before writing code that calls tRPC (ADR 0006, summary in `AGENTS.md`).
+
 ### Tailwind — no arbitrary values (mandatory)
 
 The editor's `tailwindcss(suggestCanonicalClasses)` warning is a hard rule, not a nag. **Do not ship `className` strings containing `[...]` arbitrary values** — not for colors, spacing, radius, font-size, line-height, letter-spacing, shadow, or anything else — when a canonical class or project token exists.
