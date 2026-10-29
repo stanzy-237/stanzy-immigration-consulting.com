@@ -1506,5 +1506,15 @@
         "generic": "That didn’t work. Try again."
       }
     }
+  },
+  "Common": {
+    "QueryError": {
+      "title": "This couldn’t be loaded.",
+      "description": "Check your connection, then try again.",
+      "retry": "Try again"
+    },
+    "Toast": {
+      "genericError": "Something went wrong. Try again."
+    }
   }
 }

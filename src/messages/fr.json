@@ -1523,5 +1523,15 @@
         "generic": "L’opération a échoué. Réessayez."
       }
     }
+  },
+  "Common": {
+    "QueryError": {
+      "title": "Impossible de charger ces informations.",
+      "description": "Vérifiez votre connexion, puis réessayez.",
+      "retry": "Réessayer"
+    },
+    "Toast": {
+      "genericError": "L’opération a échoué. Réessayez."
+    }
   }
 }

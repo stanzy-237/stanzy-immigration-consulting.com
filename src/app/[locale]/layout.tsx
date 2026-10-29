@@ -5,9 +5,10 @@ import { notFound } from 'next/navigation';
 import { Plus_Jakarta_Sans, Syne, Work_Sans } from 'next/font/google';
 
 import { ServiceWorkerRegister } from '@/components/service-worker-register';
+import { Toaster } from '@/components/ui/toast';
 import { DrawAlertsAuto } from '@/features/draws/components/draw-alerts-auto';
 import { routing, type LocaleParams } from '@/i18n/routing';
-import { TRPCReactProvider } from '@/trpc/react';
+import { TRPCReactProvider } from '@/trpc/client';
 
 import '../globals.css';
 
@@ -83,9 +84,11 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider>
           <TRPCReactProvider>
-            {children}
-            {modal}
-            <DrawAlertsAuto />
+            <Toaster>
+              {children}
+              {modal}
+              <DrawAlertsAuto />
+            </Toaster>
           </TRPCReactProvider>
         </NextIntlClientProvider>
         <ServiceWorkerRegister />
