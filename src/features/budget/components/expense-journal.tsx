@@ -25,12 +25,13 @@ import { ExpenseForm } from '@/features/budget/components/expense-form';
 import { ExpenseSummary } from '@/features/budget/components/expense-summary';
 import { DEFAULT_CURRENCY, type Currency } from '@/features/budget/data/currencies';
 import { useFormatMoney } from '@/features/budget/hooks/use-format-money';
-import type { BudgetAnswers, Expense, ExpenseInput } from '@/features/budget/lib/budget-schema';
+import { BUDGET_LIMIT, type BudgetAnswers, type Expense, type ExpenseInput } from '@/features/budget/lib/budget-schema';
 import { useBudgetEstimate } from '@/features/budget/hooks/use-budget-estimate';
 import { estimateBudget, ratesFor } from '@/features/budget/lib/estimate-budget';
 import { fromMinor } from '@/features/budget/lib/money';
 import { LONG_DAY, noonUtc } from '@/features/budget/lib/day';
 import { Link } from '@/i18n/navigation';
+import { isOptimistic, optimisticId, optimisticList } from '@/lib/optimistic-list';
 import { useTRPC } from '@/trpc/client';
 
 /** Below `lg` the form lives in a drawer instead of the sidebar. */
@@ -124,10 +125,26 @@ function Journal({ estimate }: { estimate: BudgetAnswers | null }): ReactNode {
   const currency: Currency | null = profile.data?.currency ?? null;
   // Newest first; same-day Dépenses keep the server's order.
   const expenses = useMemo(() => [...list.data].sort((a, b) => b.date.localeCompare(a.date)), [list.data]);
-  const refresh = { onSuccess: () => void queryClient.invalidateQueries({ queryKey: trpc.budget.expenses.list.queryKey() }) };
-  const add = useMutation(trpc.budget.expenses.add.mutationOptions(refresh));
-  const update = useMutation(trpc.budget.expenses.update.mutationOptions(refresh));
-  const remove = useMutation(trpc.budget.expenses.delete.mutationOptions(refresh));
+  // Optimistic: the list, total and bar change on the tap; a refusal puts them back (and says so).
+  const listKey = trpc.budget.expenses.list.queryKey();
+  const asExpense = (input: ExpenseInput, id: string): Expense => ({ id, ...input, note: input.note ?? '' });
+  const add = useMutation(
+    trpc.budget.expenses.add.mutationOptions(
+      optimisticList<Expense, ExpenseInput>(queryClient, listKey, (list, input) => [asExpense(input, optimisticId()), ...list]),
+    ),
+  );
+  const update = useMutation(
+    trpc.budget.expenses.update.mutationOptions(
+      optimisticList<Expense, ExpenseInput & { id: string }>(queryClient, listKey, (list, { id, ...input }) =>
+        list.map((expense) => (expense.id === id ? asExpense(input, id) : expense)),
+      ),
+    ),
+  );
+  const remove = useMutation(
+    trpc.budget.expenses.delete.mutationOptions(
+      optimisticList<Expense, { id: string }>(queryClient, listKey, (list, { id }) => list.filter((expense) => expense.id !== id)),
+    ),
+  );
   const setCurrency = useMutation(
     trpc.budget.profile.setCurrency.mutationOptions({
       onSuccess: () => void queryClient.invalidateQueries({ queryKey: trpc.budget.profile.get.queryKey() }),
@@ -156,35 +173,49 @@ function Journal({ estimate }: { estimate: BudgetAnswers | null }): ReactNode {
     if (isPhone()) setDrawerOpen(true);
   };
   const edit = (expense: Expense) => {
+    // Not saved yet: it has no id the server knows. The refetch brings it in a moment.
+    if (isOptimistic(expense)) return;
     setEditing(expense);
     setFailure(undefined);
     if (isPhone()) setDrawerOpen(true);
   };
-  /** The limit and a future date are the form's to explain; anything else is a toast. */
-  const failed = (error: { message: string }) => {
-    if (error.message === 'BUDGET_LIMIT') setFailure(t('form.errors.limit'));
-    else if (error.message === 'BUDGET_FUTURE_DATE') setFailure(t('form.errors.future'));
-    else toast.add({ title: t('form.errors.save'), type: 'error' });
-  };
-  const saved = (title: string) => () => {
-    done();
-    toast.add({ title, type: 'success' });
-  };
+  /**
+   * The form closes at once (the list already shows the change); the server's
+   * answer arrives as a toast. A refusal is a toast too: the form is gone.
+   */
+  const failed = (error: { message: string }) =>
+    toast.add({
+      title:
+        error.message === 'BUDGET_LIMIT'
+          ? t('form.errors.limit')
+          : error.message === 'BUDGET_FUTURE_DATE'
+            ? t('form.errors.future')
+            : t('form.errors.save'),
+      type: 'error',
+    });
+  const confirmed = (title: string) => () => toast.add({ title, type: 'success' });
   const save = (input: ExpenseInput) => {
     setFailure(undefined);
-    if (editing) update.mutate({ id: editing.id, ...input }, { onSuccess: saved(t('journal.toast.updated')), onError: failed });
-    else add.mutate(input, { onSuccess: saved(t('journal.toast.added')), onError: failed });
+    // Known before asking: the limit stays in the form, which keeps the draft.
+    if (!editing && expenses.length >= BUDGET_LIMIT) {
+      setFailure(t('form.errors.limit'));
+      return;
+    }
+    if (editing) update.mutate({ id: editing.id, ...input }, { onSuccess: confirmed(t('journal.toast.updated')), onError: failed });
+    else add.mutate(input, { onSuccess: confirmed(t('journal.toast.added')), onError: failed });
+    done();
   };
   const confirmDelete = () => {
     if (!deleting) return;
     remove.mutate(
       { id: deleting.id },
       {
-        onSuccess: saved(t('journal.toast.deleted')),
+        onSuccess: confirmed(t('journal.toast.deleted')),
         onError: () => toast.add({ title: t('journal.toast.deleteFailed'), type: 'error' }),
       },
     );
     setDeleting(null);
+    done();
   };
   // A failure stays in the dialog, which is still open over the page.
   const chooseCurrency = (next: Currency) => {
@@ -206,7 +237,8 @@ function Journal({ estimate }: { estimate: BudgetAnswers | null }): ReactNode {
       key={`${editing?.id ?? `new-${formKey}`}-${shown}`}
       expense={editing}
       currency={shown}
-      pending={add.isPending || update.isPending}
+      // Optimistic: the form is reset at once, so it never waits on a save.
+      pending={false}
       error={failure}
       onSubmit={save}
       onDelete={editing ? () => setDeleting(editing) : undefined}

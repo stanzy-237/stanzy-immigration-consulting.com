@@ -20,8 +20,10 @@ import { EtapeFeed } from '@/features/parcours/components/etape-feed';
 import { EtapeForm } from '@/features/parcours/components/etape-form';
 import { EtapeDrawer } from '@/features/parcours/components/etape-drawer';
 import { ParcoursShareView } from '@/features/parcours/components/parcours-share-view';
+import { MAX_ETAPES } from '@/features/parcours/data/etapes';
 import { sortByDate } from '@/features/parcours/lib/calendar-day';
 import type { Etape, EtapeInput } from '@/features/parcours/lib/etape-schema';
+import { isOptimistic, optimisticId, optimisticList } from '@/lib/optimistic-list';
 import { useTRPC } from '@/trpc/client';
 
 /** Below `lg` the form lives in a drawer instead of the sidebar. */
@@ -71,10 +73,26 @@ export function ParcoursJournal(): ReactNode {
   const queryClient = useQueryClient();
   const { data } = useSuspenseQuery(trpc.parcours.list.queryOptions());
   const etapes = sortByDate(data);
-  const refresh = { onSuccess: () => void queryClient.invalidateQueries({ queryKey: trpc.parcours.list.queryKey() }) };
-  const add = useMutation(trpc.parcours.add.mutationOptions(refresh));
-  const update = useMutation(trpc.parcours.update.mutationOptions(refresh));
-  const remove = useMutation(trpc.parcours.delete.mutationOptions(refresh));
+  // Optimistic: the feed changes on the tap; a refusal puts it back (and says so in a toast).
+  const listKey = trpc.parcours.list.queryKey();
+  const asEtape = (input: EtapeInput, id: string): Etape => ({ id, ...input, code: input.code ?? '', note: input.note ?? '' });
+  const add = useMutation(
+    trpc.parcours.add.mutationOptions(
+      optimisticList<Etape, EtapeInput>(queryClient, listKey, (list, input) => [...list, asEtape(input, optimisticId())]),
+    ),
+  );
+  const update = useMutation(
+    trpc.parcours.update.mutationOptions(
+      optimisticList<Etape, EtapeInput & { id: string }>(queryClient, listKey, (list, { id, ...input }) =>
+        list.map((etape) => (etape.id === id ? asEtape(input, id) : etape)),
+      ),
+    ),
+  );
+  const remove = useMutation(
+    trpc.parcours.delete.mutationOptions(
+      optimisticList<Etape, { id: string }>(queryClient, listKey, (list, { id }) => list.filter((etape) => etape.id !== id)),
+    ),
+  );
 
   /** The Étape open in the form, or null when the form adds a new one. */
   const [editing, setEditing] = useState<Etape | null>(null);
@@ -96,40 +114,55 @@ export function ParcoursJournal(): ReactNode {
     if (isPhone()) setDrawerOpen(true);
   };
   const edit = (etape: Etape) => {
+    // Not saved yet: it has no id the server knows. The refetch brings it in a moment.
+    if (isOptimistic(etape)) return;
     setEditing(etape);
     setFailure(undefined);
     if (isPhone()) setDrawerOpen(true);
   };
 
-  /** The limit and a future date are the form's to explain; anything else is a toast. */
-  const failed = (error: { message: string }) => {
-    if (error.message === 'PARCOURS_LIMIT') setFailure(t('form.errors.limit'));
-    else if (error.message === 'PARCOURS_FUTURE_DATE') setFailure(t('form.errors.future'));
-    else toast.add({ title: t('form.errors.save'), type: 'error' });
-  };
-  const saved = (title: string) => () => {
-    done();
-    toast.add({ title, type: 'success' });
-  };
+  /**
+   * The form closes at once (the feed already shows the change); the server's
+   * answer arrives as a toast. A refusal is a toast too: the form is gone.
+   */
+  const failed = (error: { message: string }) =>
+    toast.add({
+      title:
+        error.message === 'PARCOURS_LIMIT'
+          ? t('form.errors.limit')
+          : error.message === 'PARCOURS_FUTURE_DATE'
+            ? t('form.errors.future')
+            : t('form.errors.save'),
+      type: 'error',
+    });
+  const confirmed = (title: string) => () => toast.add({ title, type: 'success' });
   const save = (input: EtapeInput) => {
     setFailure(undefined);
-    if (editing) update.mutate({ id: editing.id, ...input }, { onSuccess: saved(t('toast.updated')), onError: failed });
-    else add.mutate(input, { onSuccess: saved(t('toast.added')), onError: failed });
+    // Known before asking: the limit stays in the form, which keeps the draft.
+    if (!editing && etapes.length >= MAX_ETAPES) {
+      setFailure(t('form.errors.limit'));
+      return;
+    }
+    if (editing) update.mutate({ id: editing.id, ...input }, { onSuccess: confirmed(t('toast.updated')), onError: failed });
+    else add.mutate(input, { onSuccess: confirmed(t('toast.added')), onError: failed });
+    done();
   };
   const confirmDelete = () => {
     if (!deleting) return;
     remove.mutate(
       { id: deleting.id },
-      { onSuccess: saved(t('toast.deleted')), onError: () => toast.add({ title: t('toast.deleteFailed'), type: 'error' }) },
+      { onSuccess: confirmed(t('toast.deleted')), onError: () => toast.add({ title: t('toast.deleteFailed'), type: 'error' }) },
     );
     setDeleting(null);
+    done();
   };
 
   const form = (
     <EtapeForm
       key={editing?.id ?? `new-${formKey}`}
       etape={editing}
-      pending={add.isPending || update.isPending}
+      // Optimistic: the form is reset at once, so it never waits on a save.
+      pending={false}
       error={failure}
       onSubmit={save}
       onDelete={editing ? () => setDeleting(editing) : undefined}

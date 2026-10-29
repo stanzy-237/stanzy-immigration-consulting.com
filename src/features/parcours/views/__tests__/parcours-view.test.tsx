@@ -186,19 +186,46 @@ describe('ParcoursView', () => {
     expect(await screen.findByText('Étape supprimée')).toBeInTheDocument(); // the toast
   });
 
-  it('keeps the draft and says so when saving fails', async () => {
-    server.add.mockRejectedValue(new Error('PARCOURS_LIMIT'));
+  it('keeps the draft and says so at the 100-Étape limit, without asking the server', async () => {
+    server.etapes = Array.from({ length: 100 }, (_, i) => ({ ...ITA, id: `e${i}`, label: `Étape ${i}` }));
     render(withIntl(parcoursPage()));
 
     type(form().getByLabelText('Nom de l’étape'), 'Biométrie');
     type(form().getByLabelText('Date'), '2026-10-01');
     fireEvent.click(form().getByRole('button', { name: 'Ajouter l’étape' }));
 
-    expect(await form().findByRole('alert')).toHaveTextContent('Vous avez atteint la limite de 100 étapes.');
+    expect(form().getByRole('alert')).toHaveTextContent('Vous avez atteint la limite de 100 étapes.');
     expect(form().getByLabelText('Nom de l’étape')).toHaveValue('Biométrie');
+    expect(server.add).not.toHaveBeenCalled();
   });
 
-  it('says in a toast when saving fails for another reason, and keeps the draft', async () => {
+  it('shows a new Étape at once, before the server answers', async () => {
+    server.add.mockReturnValue(new Promise(() => {}));
+    render(withIntl(parcoursPage()));
+
+    type(form().getByLabelText('Nom de l’étape'), 'Biométrie');
+    type(form().getByLabelText('Date'), '2026-10-01');
+    fireEvent.click(form().getByRole('button', { name: 'Ajouter l’étape' }));
+
+    expect(await screen.findByRole('button', { name: 'Modifier Biométrie' })).toBeInTheDocument();
+    expect(form().getByLabelText('Nom de l’étape')).toHaveValue(''); // ready for the next one
+  });
+
+  it('removes an Étape at once, and puts it back with a toast when the server refuses', async () => {
+    server.etapes = [ITA, AOR];
+    server.remove.mockRejectedValue(new Error('INTERNAL_SERVER_ERROR'));
+    render(withIntl(parcoursPage()));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier ITA reçue' }));
+    fireEvent.click(form('Modifier l’étape').getByRole('button', { name: 'Supprimer cette étape' }));
+    const confirm = await screen.findByRole('alertdialog', { name: 'Supprimer cette étape ?' });
+    fireEvent.click(within(confirm).getByRole('button', { name: 'Supprimer' }));
+
+    expect(await screen.findByText('L’étape n’a pas pu être supprimée. Réessayez.')).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Modifier ITA reçue' })).toBeInTheDocument();
+  });
+
+  it('takes a new Étape back out with a toast when the server refuses it', async () => {
     server.add.mockRejectedValue(new Error('INTERNAL_SERVER_ERROR'));
     render(withIntl(parcoursPage()));
 
@@ -207,7 +234,7 @@ describe('ParcoursView', () => {
     fireEvent.click(form().getByRole('button', { name: 'Ajouter l’étape' }));
 
     expect(await screen.findByText('L’étape n’a pas pu être enregistrée. Réessayez.')).toBeInTheDocument();
-    expect(form().getByLabelText('Nom de l’étape')).toHaveValue('Biométrie');
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Modifier Biométrie' })).not.toBeInTheDocument());
   });
 
   it('opens a screenshot-ready timeline with notes hidden until the User shows them', async () => {

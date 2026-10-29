@@ -97,6 +97,36 @@ const add = useMutation(
 - **Inline errors stay inline** when they belong to a field (a slug already taken, a missing title): the message sits under the field, and no toast is added. Toasts are for the outcome of an action, not for form validation.
 - Don't toast reads: a query that fails shows the `QueryBoundary` « Réessayer » panel.
 
+## 3b. Optimistic updates, for lists the User edits
+
+Adding, editing and deleting in a User's own list (Étapes of the Parcours, Dépenses) change the screen on the tap, before the server answers. Use `optimisticList` from `src/lib/optimistic-list.ts`:
+
+```tsx
+const listKey = trpc.parcours.list.queryKey();
+const add = useMutation(
+  trpc.parcours.add.mutationOptions(
+    optimisticList<Etape, EtapeInput>(queryClient, listKey, (list, input) => [...list, asEtape(input, optimisticId())]),
+  ),
+);
+
+add.mutate(input, {
+  onSuccess: () => toast.add({ title: t('toast.added'), type: 'success' }),
+  onError: () => toast.add({ title: t('form.errors.save'), type: 'error' }),
+});
+closeTheForm(); // at once: the list already shows the new item
+```
+
+- `optimisticList` cancels refetches, applies the change to the cache, puts the list back on a refusal and refetches once the server has answered.
+- Close or reset the form right after `mutate`, and don't disable it on `isPending`: the next entry can start immediately.
+- The success toast comes when the server confirms; a refusal rolls back and toasts the reason (the form is gone by then).
+- Check what the client already knows before sending (the 100-Étape limit, a future date) and keep those in the form, with the draft.
+- An item with an `optimisticId()` has no server id yet: don't let it be edited or deleted until the refetch replaces it (`isOptimistic`).
+- Not for Articles or anything public: the editor waits for the server, which may refuse a slug.
+
+## 3c. Fetch the next view in the background
+
+When a tab or filter is one tap away, `queryClient.prefetchQuery(trpc.x.queryOptions(input))` its data once the page has loaded, so switching shows content and not a skeleton (« Mes dépenses » behind « Estimer mon budget », the Blog list's status filters). Only for what this visitor can read (signed in for private data); a prefetch is skipped while cached data is still fresh.
+
 ## 4. Tests
 
 Use `createTestTRPC` from `src/trpc/__tests__/test-utils.tsx` instead of mocking `@/trpc/client`:

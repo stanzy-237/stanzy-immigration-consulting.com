@@ -1,9 +1,9 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Plus, Tags } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
-import { useState, useTransition, type ReactNode } from 'react';
+import { useEffect, useState, useTransition, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,6 +25,16 @@ export function BlogDashboardListView(): ReactNode {
   const [filter, setFilter] = useState<StatusFilter>('ALL');
   // The current list stays on screen while another filter's loads.
   const [, startTransition] = useTransition();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  // The route prefetched « Tous »; fetch the other filters in the background
+  // so switching to them is instant.
+  useEffect(() => {
+    for (const other of FILTERS) {
+      void queryClient.prefetchQuery(trpc.blog.dashboard.list.queryOptions(dashboardListInput(other)));
+    }
+  }, [queryClient, trpc]);
 
   return (
     <div className="mx-auto max-w-6xl">

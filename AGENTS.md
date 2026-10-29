@@ -16,4 +16,6 @@ Features read and write data through tRPC + TanStack Query, after `code-with-ant
 - **Read with `useSuspenseQuery`** from `useTRPC()` (`@/trpc/client`), under a `<QueryBoundary fallback={<…Skeleton />}>`.
 - **Skeletons, never « Chargement… ».** While content loads, show `Skeleton` blocks shaped like it.
 - **Toasts for outcomes.** Mutations invalidate what they changed and call `toast.add({ title, type: 'success' | 'error' | 'info' | 'warning' })` with a translated title. Field errors stay under their field.
+- **Optimistic lists.** Adding, editing, deleting in a User's own list (Étapes, Dépenses) updates the cache at once with `optimisticList` (`src/lib/optimistic-list.ts`), closes the form, rolls back and toasts on a refusal.
+- **Prefetch the next tab** (`queryClient.prefetchQuery`) when it is one tap away.
 - **Tests** use `createTestTRPC` (`src/trpc/__tests__/test-utils.tsx`): seed the cache as the prefetch would, answer calls with handlers, find toasts by their text.

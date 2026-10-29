@@ -75,6 +75,8 @@ const budgetPage = () => {
   return wrap(<BudgetView />);
 };
 const renderView = () => render(withIntl(budgetPage()));
+/** What the toast says when a Dépense can't be saved. */
+const budgetSaveError = 'La dépense n’a pas pu être enregistrée. Réessayez.';
 /** The estimate this browser keeps, which the journal's budget bar reads. */
 const keepEstimate = (answers: BudgetAnswers) =>
   window.localStorage.setItem('stanzy.budget.estimate.v1', JSON.stringify(answers));
@@ -460,6 +462,43 @@ describe('BudgetView', () => {
         'aria-valuenow',
         '68',
       );
+    });
+
+    it('counts a new Dépense at once, before the server answers', async () => {
+      signedIn();
+      server.profile = { currency: 'XAF' };
+      server.expenses = [TEF];
+      server.add.mockReturnValue(new Promise(() => {}));
+      renderView();
+      openJournal();
+
+      type(form().getByLabelText('Nom de la dépense'), 'Frais IRCC');
+      type(form().getByLabelText('Motif'), 'irccFees');
+      type(form().getByLabelText('Montant (XAF)'), '699 600');
+      type(form().getByLabelText('Date'), '2026-10-20');
+      fireEvent.click(form().getByRole('button', { name: 'Ajouter la dépense' }));
+
+      await waitFor(() => expect(region('Total dépensé')).toHaveTextContent('909 600 FCFA'));
+      expect(screen.getByRole('button', { name: 'Modifier Frais IRCC' })).toBeInTheDocument();
+    });
+
+    it('takes a Dépense back out of the total, with a toast, when the server refuses it', async () => {
+      signedIn();
+      server.profile = { currency: 'XAF' };
+      server.expenses = [TEF];
+      server.add.mockRejectedValue(new Error('INTERNAL_SERVER_ERROR'));
+      renderView();
+      openJournal();
+
+      type(form().getByLabelText('Nom de la dépense'), 'Frais IRCC');
+      type(form().getByLabelText('Motif'), 'irccFees');
+      type(form().getByLabelText('Montant (XAF)'), '699 600');
+      type(form().getByLabelText('Date'), '2026-10-20');
+      fireEvent.click(form().getByRole('button', { name: 'Ajouter la dépense' }));
+
+      expect(await screen.findByText(budgetSaveError)).toBeInTheDocument();
+      await waitFor(() => expect(screen.queryByRole('button', { name: 'Modifier Frais IRCC' })).not.toBeInTheDocument());
+      expect(region('Total dépensé')).toHaveTextContent('210 000 FCFA');
     });
 
     it('keeps cents for a currency that has them', async () => {
