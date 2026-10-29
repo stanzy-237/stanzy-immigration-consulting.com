@@ -1403,7 +1403,6 @@
     },
     "empty": "No articles. Start by writing one.",
     "loading": "Loading articles…",
-    "error": "Can’t load the articles.",
     "editor": {
       "newTitle": "New article",
       "editTitle": "Edit the article",
@@ -1456,8 +1455,6 @@
       "counter": "{count} / {limit}",
       "saveDraft": "Save draft",
       "save": "Save",
-      "saving": "Saving…",
-      "saved": "Saved",
       "preview": "Preview",
       "closePreview": "Back to editing",
       "publish": "Publish",
@@ -1488,7 +1485,13 @@
       "notFound": "This article doesn’t exist or was deleted.",
       "coverUrl": "Cover image address",
       "coverUrlHint": "https://… or an image on the site (/blog/…), or choose a file.",
-      "imageUrlPrompt": "Image address (https://… or /blog/…)"
+      "imageUrlPrompt": "Image address (https://… or /blog/…)",
+      "toast": {
+        "saved": "Article saved",
+        "published": "Article published",
+        "unpublished": "Article unpublished",
+        "deleted": "Draft deleted"
+      }
     },
     "categories": {
       "title": "Categories",
@@ -1504,10 +1507,16 @@
         "BLOG_SLUG_TAKEN": "Another category already uses this address.",
         "BLOG_CATEGORY_IN_USE": "Articles still use this category: move them to another one before deleting it.",
         "generic": "That didn’t work. Try again."
+      },
+      "toast": {
+        "added": "Category added",
+        "saved": "Category saved",
+        "deleted": "Category deleted"
       }
     }
   },
   "Common": {
+    "loading": "Loading…",
     "QueryError": {
       "title": "This couldn’t be loaded.",
       "description": "Check your connection, then try again.",

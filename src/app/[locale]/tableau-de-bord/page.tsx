@@ -1,5 +1,11 @@
 import { DashboardOverviewView } from '@/features/dashboard/views/dashboard-overview-view';
+import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 
 export default function Page() {
-  return <DashboardOverviewView />;
+  prefetch(trpc.blog.dashboard.summary.queryOptions());
+  return (
+    <HydrateClient>
+      <DashboardOverviewView />
+    </HydrateClient>
+  );
 }

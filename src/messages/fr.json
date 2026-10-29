@@ -1420,7 +1420,6 @@
     },
     "empty": "Aucun article. Commencez par en écrire un.",
     "loading": "Chargement des articles…",
-    "error": "Impossible de charger les articles.",
     "editor": {
       "newTitle": "Nouvel article",
       "editTitle": "Modifier l’article",
@@ -1473,8 +1472,6 @@
       "counter": "{count} / {limit}",
       "saveDraft": "Enregistrer le brouillon",
       "save": "Enregistrer",
-      "saving": "Enregistrement…",
-      "saved": "Enregistré",
       "preview": "Aperçu",
       "closePreview": "Revenir à l’édition",
       "publish": "Publier",
@@ -1505,7 +1502,13 @@
       "notFound": "Cet article n’existe pas ou a été supprimé.",
       "coverUrl": "Adresse de l’image de couverture",
       "coverUrlHint": "https://… ou une image du site (/blog/…), ou choisissez un fichier.",
-      "imageUrlPrompt": "Adresse de l’image (https://… ou /blog/…)"
+      "imageUrlPrompt": "Adresse de l’image (https://… ou /blog/…)",
+      "toast": {
+        "saved": "Article enregistré",
+        "published": "Article publié",
+        "unpublished": "Article dépublié",
+        "deleted": "Brouillon supprimé"
+      }
     },
     "categories": {
       "title": "Catégories",
@@ -1521,10 +1524,16 @@
         "BLOG_SLUG_TAKEN": "Une autre catégorie utilise déjà cette adresse.",
         "BLOG_CATEGORY_IN_USE": "Des articles utilisent encore cette catégorie : changez-les de catégorie avant de la supprimer.",
         "generic": "L’opération a échoué. Réessayez."
+      },
+      "toast": {
+        "added": "Catégorie ajoutée",
+        "saved": "Catégorie enregistrée",
+        "deleted": "Catégorie supprimée"
       }
     }
   },
   "Common": {
+    "loading": "Chargement…",
     "QueryError": {
       "title": "Impossible de charger ces informations.",
       "description": "Vérifiez votre connexion, puis réessayez.",

@@ -1,20 +1,68 @@
 'use client';
 
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowRight, FileText, Plus } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
-import { api } from '@/trpc/react';
+import { QueryBoundary } from '@/components/query-boundary';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useTRPC } from '@/trpc/client';
+
+/** The Blog's counts and its last published Article. */
+function BlogSummary(): ReactNode {
+  const t = useTranslations('Dashboard');
+  const format = useFormatter();
+  const trpc = useTRPC();
+  const { data } = useSuspenseQuery(trpc.blog.dashboard.summary.queryOptions());
+
+  return (
+    <>
+      <ul className="mt-5 grid grid-cols-2 gap-3">
+        <li className="rounded-xl bg-off-white px-4 py-3 font-heading text-lg font-bold text-navy-deep">
+          {t('overview.drafts', { count: data.drafts })}
+        </li>
+        <li className="rounded-xl bg-off-white px-4 py-3 font-heading text-lg font-bold text-navy-deep">
+          {t('overview.published', { count: data.published })}
+        </li>
+      </ul>
+      <p className="mt-4 text-sm text-slate">
+        {data.lastPublished
+          ? t('overview.lastPublished', {
+              title: data.lastPublished.title,
+              date: format.dateTime(data.lastPublished.publishedAt, {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                timeZone: 'UTC',
+              }),
+            })
+          : t('overview.noneYet')}
+      </p>
+    </>
+  );
+}
+
+function BlogSummarySkeleton(): ReactNode {
+  const t = useTranslations('Dashboard');
+  return (
+    <div role="status">
+      <span className="sr-only">{t('overview.loading')}</span>
+      <div aria-hidden={true} className="mt-5 grid grid-cols-2 gap-3">
+        <Skeleton className="h-14 rounded-xl" />
+        <Skeleton className="h-14 rounded-xl" />
+      </div>
+      <Skeleton aria-hidden={true} className="mt-4 h-4 w-2/3" />
+    </div>
+  );
+}
 
 /** The Tableau de bord's home: each section at a glance, starting with the Blog. */
 export function DashboardOverviewView(): ReactNode {
   const t = useTranslations('Dashboard');
-  const format = useFormatter();
-  const summary = api.blog.dashboard.summary.useQuery();
   const blogId = useId();
-  const data = summary.data;
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -36,33 +84,9 @@ export function DashboardOverviewView(): ReactNode {
           </Link>
         </div>
 
-        {!data ? (
-          <p className="mt-5 text-sm text-slate">{t('overview.loading')}</p>
-        ) : (
-          <>
-            <ul className="mt-5 grid grid-cols-2 gap-3">
-              <li className="rounded-xl bg-off-white px-4 py-3 font-heading text-lg font-bold text-navy-deep">
-                {t('overview.drafts', { count: data.drafts })}
-              </li>
-              <li className="rounded-xl bg-off-white px-4 py-3 font-heading text-lg font-bold text-navy-deep">
-                {t('overview.published', { count: data.published })}
-              </li>
-            </ul>
-            <p className="mt-4 text-sm text-slate">
-              {data.lastPublished
-                ? t('overview.lastPublished', {
-                    title: data.lastPublished.title,
-                    date: format.dateTime(data.lastPublished.publishedAt, {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                      timeZone: 'UTC',
-                    }),
-                  })
-                : t('overview.noneYet')}
-            </p>
-          </>
-        )}
+        <QueryBoundary fallback={<BlogSummarySkeleton />}>
+          <BlogSummary />
+        </QueryBoundary>
 
         <Link
           href="/blog"

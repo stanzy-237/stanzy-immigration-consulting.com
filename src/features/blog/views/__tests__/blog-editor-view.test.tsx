@@ -5,11 +5,12 @@ import { axe } from 'vitest-axe';
 
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { BlogEditorView } from '@/features/blog/views/blog-editor-view';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /**
- * Seam: the Blog section's editor as the consultant uses it. The tRPC client
- * is replaced by stubs that record what the page sends; the rich-text body
- * is the real editor, only read here, never typed into.
+ * Seam: the Blog section's editor as the consultant uses it. Its data is in
+ * the cache as the route prefetches it; stubs answer and record what the page
+ * sends. The rich-text body is the real editor, only read here, never typed into.
  */
 const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: () => router }));
@@ -45,27 +46,6 @@ const trpc = vi.hoisted(() => ({
   unpublish: vi.fn(),
   remove: vi.fn(),
 }));
-vi.mock('@/trpc/react', () => {
-  const mutation = (fn: (input: unknown) => unknown) => () => ({ mutateAsync: fn, isPending: false });
-  return {
-  api: {
-    useUtils: () => ({ blog: { dashboard: { invalidate: vi.fn() } } }),
-    blog: {
-      categories: { useQuery: () => ({ data: CATEGORIES }) },
-      dashboard: {
-        get: { useQuery: () => ({ data: trpc.article, isLoading: false, isError: false }) },
-        tags: { useQuery: () => ({ data: ['tcf', 'nclc'] }) },
-        create: { useMutation: mutation((input) => trpc.create(input)) },
-        update: { useMutation: mutation((input) => trpc.update(input)) },
-        publish: { useMutation: mutation((input) => trpc.publish(input)) },
-        unpublish: { useMutation: mutation((input) => trpc.unpublish(input)) },
-        delete: { useMutation: mutation((input) => trpc.remove(input)) },
-      },
-    },
-  },
-  };
-});
-
 beforeEach(() => {
   vi.clearAllMocks();
   trpc.article = undefined;
@@ -74,12 +54,32 @@ beforeEach(() => {
   trpc.publish.mockResolvedValue(undefined);
 });
 
+/** The editor as its route serves it: categories and tags prefetched, and the Article when it has an `id`. */
+const editor = (id?: string) => {
+  const { trpc: api, queryClient, wrap } = createTestTRPC({
+    'blog.dashboard.create': (input) => trpc.create(input),
+    'blog.dashboard.update': (input) => trpc.update(input),
+    'blog.dashboard.publish': (input) => trpc.publish(input),
+    'blog.dashboard.unpublish': (input) => trpc.unpublish(input),
+    'blog.dashboard.delete': (input) => trpc.remove(input),
+    // What saving invalidates comes back the same.
+    'blog.dashboard.get': () => trpc.article,
+    'blog.dashboard.tags': () => ['tcf', 'nclc'],
+    'blog.dashboard.list': () => [],
+    'blog.dashboard.summary': () => ({ drafts: 0, published: 0, lastPublished: null }),
+  });
+  queryClient.setQueryData(api.blog.categories.queryKey(), CATEGORIES);
+  queryClient.setQueryData(api.blog.dashboard.tags.queryKey(), ['tcf', 'nclc']);
+  if (id) queryClient.setQueryData(api.blog.dashboard.get.queryKey({ id }), trpc.article as never);
+  return render(withIntl(wrap(<BlogEditorView id={id} />)));
+};
+
 const field = (name: string) => screen.getByLabelText(name);
 const type = (name: string, value: string) => fireEvent.change(field(name), { target: { value } });
 
 describe('BlogEditorView — a new Article', () => {
   it('suggests the address from the title and saves the draft', async () => {
-    render(withIntl(<BlogEditorView />));
+    editor();
 
     type('Titre', 'Réussir le TCF Canada !');
     expect(field('Adresse (slug)')).toHaveValue('reussir-le-tcf-canada');
@@ -100,14 +100,14 @@ describe('BlogEditorView — a new Article', () => {
   });
 
   it('keeps an address the consultant typed when the title changes', () => {
-    render(withIntl(<BlogEditorView />));
+    editor();
     type('Adresse (slug)', 'tcf-guide');
     type('Titre', 'Réussir le TCF Canada');
     expect(field('Adresse (slug)')).toHaveValue('tcf-guide');
   });
 
   it('takes the cover from an image address when uploads are unavailable', async () => {
-    render(withIntl(<BlogEditorView />));
+    editor();
     type('Titre', 'Tirage francophone du 27 octobre');
     fireEvent.change(field('Catégorie'), { target: { value: 'cat_ee' } });
     type('Adresse de l’image de couverture', '/blog/covers/tirage-francophone.jpg');
@@ -123,7 +123,7 @@ describe('BlogEditorView — a new Article', () => {
 
   it('shows a taken address next to the address field', async () => {
     trpc.create.mockRejectedValue(new Error('BLOG_SLUG_TAKEN'));
-    render(withIntl(<BlogEditorView />));
+    editor();
     type('Titre', 'Réussir le TCF Canada');
     fireEvent.change(field('Catégorie'), { target: { value: 'cat_lang' } });
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer le brouillon' }));
@@ -133,7 +133,7 @@ describe('BlogEditorView — a new Article', () => {
   });
 
   it('refuses to publish without content and a category, and says what is missing', () => {
-    render(withIntl(<BlogEditorView />));
+    editor();
     type('Titre', 'Réussir le TCF Canada');
     fireEvent.click(screen.getByRole('button', { name: 'Publier' }));
 
@@ -146,7 +146,7 @@ describe('BlogEditorView — a new Article', () => {
 describe('BlogEditorView — an existing Article', () => {
   it('saves then publishes, and offers to unpublish', async () => {
     trpc.article = DRAFT;
-    render(withIntl(<BlogEditorView id="post_7" />));
+    editor('post_7');
 
     expect(field('Titre')).toHaveValue('Réussir le TCF Canada');
     expect(screen.getByText('Brouillon')).toBeInTheDocument();
@@ -158,12 +158,33 @@ describe('BlogEditorView — an existing Article', () => {
     expect(screen.getByText('Publié')).toBeInTheDocument();
   });
 
+  it('confirms each step with a toast: saved, then published', async () => {
+    trpc.article = DRAFT;
+    editor('post_7');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer le brouillon' }));
+    expect(await screen.findByText('Article enregistré')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Publier' }));
+    expect(await screen.findByText('Article publié')).toBeInTheDocument();
+  });
+
+  it('says in a toast when saving fails for a reason the form can’t show', async () => {
+    trpc.article = DRAFT;
+    trpc.update.mockRejectedValue(new Error('INTERNAL_SERVER_ERROR'));
+    editor('post_7');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer le brouillon' }));
+    expect(await screen.findByText('L’enregistrement a échoué. Réessayez.')).toBeInTheDocument();
+    expect(screen.queryByText('Article enregistré')).not.toBeInTheDocument();
+  });
+
   it('refuses to publish while an image has no alt text', () => {
     trpc.article = {
       ...DRAFT,
       content: { type: 'doc', content: [paragraph('Texte.'), { type: 'image', attrs: { src: 'https://a.public.blob.vercel-storage.com/x.png', alt: '' } }] },
     };
-    render(withIntl(<BlogEditorView id="post_7" />));
+    editor('post_7');
     fireEvent.click(screen.getByRole('button', { name: 'Publier' }));
 
     expect(screen.getByRole('alert')).toHaveTextContent('Pour publier : le texte alternatif de chaque image.');
@@ -172,14 +193,14 @@ describe('BlogEditorView — an existing Article', () => {
 
   it('warns before changing the address of a published Article', () => {
     trpc.article = { ...DRAFT, status: 'PUBLISHED', publishedAt: new Date('2026-10-21T09:00:00Z') };
-    render(withIntl(<BlogEditorView id="post_7" />));
+    editor('post_7');
     expect(screen.getByText('Cet article est publié : changer son adresse cassera les liens déjà partagés.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Supprimer le brouillon' })).not.toBeInTheDocument();
   });
 
   it('previews the Article as visitors will read it', () => {
     trpc.article = DRAFT;
-    render(withIntl(<BlogEditorView id="post_7" />));
+    editor('post_7');
     fireEvent.click(screen.getByRole('button', { name: 'Aperçu' }));
     const preview = screen.getByRole('article');
     expect(within(preview).getByRole('heading', { level: 1, name: 'Réussir le TCF Canada' })).toBeInTheDocument();
@@ -188,7 +209,7 @@ describe('BlogEditorView — an existing Article', () => {
 
   it('has no axe violations', async () => {
     trpc.article = DRAFT;
-    const { container } = render(withIntl(<BlogEditorView id="post_7" />));
+    const { container } = editor('post_7');
     expect(await axe(container)).toHaveNoViolations();
   });
 });

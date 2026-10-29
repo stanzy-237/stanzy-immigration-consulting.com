@@ -8,15 +8,15 @@ import { Button } from '@/components/ui/button';
 
 type ErrorBoundaryProps = {
   onReset: () => void;
-  fallback: (retry: () => void) => ReactNode;
+  fallback: (error: Error, retry: () => void) => ReactNode;
   children: ReactNode;
 };
 
-class ErrorBoundary extends Component<ErrorBoundaryProps, { failed: boolean }> {
-  state = { failed: false };
+class ErrorBoundary extends Component<ErrorBoundaryProps, { error: Error | null }> {
+  state: { error: Error | null } = { error: null };
 
-  static getDerivedStateFromError() {
-    return { failed: true };
+  static getDerivedStateFromError(error: Error) {
+    return { error };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
@@ -25,11 +25,11 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, { failed: boolean }> {
 
   retry = () => {
     this.props.onReset();
-    this.setState({ failed: false });
+    this.setState({ error: null });
   };
 
   render() {
-    return this.state.failed ? this.props.fallback(this.retry) : this.props.children;
+    return this.state.error ? this.props.fallback(this.state.error, this.retry) : this.props.children;
   }
 }
 
@@ -55,17 +55,23 @@ function QueryError({ retry, tone }: { retry: () => void; tone: 'light' | 'dark'
 export function QueryBoundary({
   fallback,
   tone = 'light',
+  renderError,
   children,
 }: {
   fallback: ReactNode;
   /** `dark` on navy sections. */
   tone?: 'light' | 'dark';
+  /** A failure this place explains itself (an Article that doesn't exist); null keeps « Réessayer ». */
+  renderError?: (error: Error) => ReactNode | null;
   children: ReactNode;
 }) {
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
-        <ErrorBoundary onReset={reset} fallback={(retry) => <QueryError retry={retry} tone={tone} />}>
+        <ErrorBoundary
+          onReset={reset}
+          fallback={(error, retry) => renderError?.(error) ?? <QueryError retry={retry} tone={tone} />}
+        >
           <Suspense fallback={fallback}>{children}</Suspense>
         </ErrorBoundary>
       )}
