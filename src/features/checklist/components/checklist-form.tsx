@@ -23,6 +23,7 @@ import {
   type Job,
   type PrefillSource,
 } from '@/features/checklist/lib/checklist-form';
+import { ChecklistPreview } from '@/features/checklist/components/checklist-preview';
 import { useCrsDraftValue } from '@/features/crs/hooks/use-crs-draft';
 import { fromProfile } from '@/features/crs/lib/crs-form';
 import { CalculatorSection, CheckField, SelectField, TextField } from '@/features/shared/components/calculator-fields';
@@ -250,7 +251,8 @@ function ChecklistFields({
   };
 
   return (
-    <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+    <form onSubmit={submit} noValidate className="grid grid-cols-1 items-start gap-7 lg:grid-cols-3">
+      <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
       <PrefillNote source={source} />
 
       <CalculatorSection id="checklist-family" title={t('family')} accent="steel">
@@ -414,6 +416,8 @@ function ChecklistFields({
           <ArrowRight aria-hidden={true} className="size-4" />
         </button>
       </div>
+      </div>
+      <ChecklistPreview form={form} />
     </form>
   );
 }
@@ -422,11 +426,14 @@ function ChecklistFields({
 export function ChecklistFormSkeleton(): ReactNode {
   const t = useTranslations('Checklist.form');
   return (
-    <div role="status" className="flex flex-col gap-4">
+    <div role="status" className="grid grid-cols-1 items-start gap-7 lg:grid-cols-3">
       <span className="sr-only">{t('loading')}</span>
-      {['h-56', 'h-40', 'h-28', 'h-56'].map((height, i) => (
-        <Skeleton key={i} aria-hidden={true} className={`${height} rounded-2xl`} />
-      ))}
+      <div className="flex flex-col gap-4 lg:col-span-2">
+        {['h-56', 'h-40', 'h-72', 'h-28'].map((height, i) => (
+          <Skeleton key={i} aria-hidden={true} className={`${height} rounded-2xl`} />
+        ))}
+      </div>
+      <Skeleton aria-hidden={true} className="h-96 rounded-2xl" />
     </div>
   );
 }

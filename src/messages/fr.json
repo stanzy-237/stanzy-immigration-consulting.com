@@ -1576,10 +1576,10 @@
     "metaTitle": "Checklist Entrée Express : les documents à préparer",
     "metaDescription": "Préparez votre dossier Entrée Express avant l’ITA : la liste des documents demandés par IRCC pour vous, votre conjoint(e) et vos enfants (obligatoires et recommandés), une explication pour chacun et les frais officiels d’IRCC.",
     "listMetaTitle": "Mes documents à préparer",
-    "eyebrow": "Checklist Entrée Express",
-    "title": "Préparez vos documents avant l’ITA",
+    "eyebrow": "Entrée Express · Outil gratuit",
+    "title": "Checklist",
     "lead": "Après l’invitation, vous n’avez que 60 jours pour déposer votre demande. Répondez à quelques questions : vous obtenez la liste des documents qu’IRCC vous demandera, organisée comme dans votre compte IRCC, et les frais officiels à payer.",
-    "listTitle": "Vos documents à préparer",
+    "listTitle": "Mes documents",
     "listLead": "Touchez un document pour savoir ce qu’il doit contenir et comment l’obtenir. Cochez « Prêt » au fur et à mesure.",
     "form": {
       "family": "Votre famille",
@@ -1696,6 +1696,12 @@
         "childProcessing": "Frais relatifs à une demande de résidence permanente pour un enfant",
         "grandTotal": "Prix total (CAD)",
         "budgetLink": "Estimer tout mon budget (tests, EDE, examen médical…)"
+      },
+      "side": {
+        "people": "Par personne",
+        "jump": "Aller à : {person}",
+        "fees": "Frais officiels IRCC",
+        "seeFees": "Voir le détail des frais"
       }
     },
     "intro": {
@@ -1727,6 +1733,23 @@
         }
       },
       "free": "Gratuit, sans inscription. Environ 3 minutes."
+    },
+    "titleAccent": "Entrée Express",
+    "listAccent": "à préparer",
+    "preview": {
+      "title": "Votre dossier",
+      "mandatory": "documents obligatoires",
+      "more": "+ {recommended} recommandés · {slots} champs IRCC",
+      "people": "Personnes du dossier",
+      "fees": "Frais officiels IRCC",
+      "feesNote": "Traitement, FDRP et biométrie",
+      "cta": "Voir ma checklist",
+      "live": "Mis à jour à chaque réponse"
+    },
+    "guide": {
+      "title": "Des documents prêts, un dépôt serein.",
+      "text": "Après l’invitation, vous aurez 60 jours pour téléverser ces documents dans votre compte IRCC. Préparés à l’avance, ils vous laissent le temps de vérifier chaque détail, ou de faire relire votre dossier par Stanzy.",
+      "secondary": "Lancer le compte à rebours ITA"
     }
   }
 }

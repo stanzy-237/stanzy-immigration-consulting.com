@@ -7,18 +7,21 @@ import { ChecklistIntro } from '@/features/checklist/components/checklist-intro'
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 
-/** `/outils/checklist`: what the list gives, then the questions that decide which documents to prepare. */
+/**
+ * `/outils/checklist`, laid out like the calculators: the questions, with
+ * « Votre dossier » updating beside them, then what the list gives in detail.
+ */
 export function ChecklistFormView(): ReactNode {
   const t = useTranslations('Checklist');
   return (
     <>
       <SiteNav />
       <main className="bg-off-white">
-        <ChecklistHeader eyebrow={t('eyebrow')} title={t('title')} lead={t('lead')} />
-        <div className="mx-auto max-w-3xl px-5 pb-20 sm:px-8">
-          <ChecklistIntro />
+        <ChecklistHeader eyebrow={t('eyebrow')} title={t('title')} accent={t('titleAccent')} lead={t('lead')} />
+        <div className="mx-auto max-w-6xl px-5 pb-16 sm:px-8">
           <ChecklistFormPanel />
         </div>
+        <ChecklistIntro />
       </main>
       <SiteFooter />
     </>

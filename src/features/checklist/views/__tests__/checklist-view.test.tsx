@@ -130,6 +130,21 @@ describe('Checklist form', () => {
     expect(JSON.parse(window.localStorage.getItem(ANSWERS_KEY)!)).toEqual(FAMILY);
   });
 
+  it('sums up the file beside the form as the answers change', async () => {
+    page(<ChecklistFormView />);
+    const file = await screen.findByRole('complementary', { name: 'Votre dossier' });
+    const before = Number(within(file).getByText(/^\d+$/).textContent);
+    expect(file).toHaveTextContent('Requérant principal');
+    expect(file).toHaveTextContent(/1\s*675,00\s*\$/); // 990 + 600 + 85
+
+    type('Enfants à charge', '1');
+
+    expect(file).toHaveTextContent('Enfant 1');
+    // A child's passport, photo, medical exam and birth certificate.
+    expect(Number(within(file).getByText(/^\d+$/).textContent)).toBe(before + 4);
+    expect(file).toHaveTextContent(/2\s*030,00\s*\$/); // + 270, biometrics at the family rate
+  });
+
   it('won’t continue with a job or a country left unnamed', async () => {
     page(<ChecklistFormView />);
     await screen.findByLabelText('Poste 1');
@@ -288,6 +303,16 @@ describe('Checklist list', () => {
     expect(within(dialog).getByRole('heading', { name: 'Ce que la lettre doit contenir' })).toBeInTheDocument();
     expect(dialog).toHaveTextContent('Relevé d’emploi – Responsable QHSE · Requérant principal');
     expect(within(dialog).getByRole('link', { name: 'Faire vérifier mes lettres par Stanzy' })).toHaveAttribute('href', '/services/verification');
+  });
+
+  it('links each person from the progress card to their block', async () => {
+    keepAnswers(FAMILY);
+    page(<ChecklistView />);
+
+    const progress = await screen.findByRole('region', { name: 'Votre avancement' });
+    expect(within(progress).getByRole('link', { name: 'Aller à : Enfant 2' })).toHaveAttribute('href', '#person-child2');
+    expect(document.getElementById('person-child2')).toHaveAccessibleName('Enfant 2 : documents justificatifs');
+    expect(within(progress).getByRole('link', { name: /Frais officiels IRCC/ })).toHaveTextContent(/3\s*890,00\s*\$/);
   });
 
   it('shows IRCC’s fees for the family', async () => {

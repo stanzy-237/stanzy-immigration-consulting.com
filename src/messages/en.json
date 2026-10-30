@@ -1559,10 +1559,10 @@
     "metaTitle": "Express Entry checklist: the documents to prepare",
     "metaDescription": "Get your Express Entry file ready before the ITA: the documents IRCC asks for from you, your spouse and your children (mandatory and recommended), an explanation of each and IRCC’s official fees.",
     "listMetaTitle": "My documents to prepare",
-    "eyebrow": "Express Entry checklist",
-    "title": "Get your documents ready before the ITA",
+    "eyebrow": "Express Entry · Free tool",
+    "title": "Checklist",
     "lead": "After the invitation, you only have 60 days to submit your application. Answer a few questions: you get the list of documents IRCC will ask for, organized as in your IRCC account, and the official fees to pay.",
-    "listTitle": "Your documents to prepare",
+    "listTitle": "My documents",
     "listLead": "Tap a document to learn what it must include and how to get it. Tick « Ready » as you go.",
     "form": {
       "family": "Your family",
@@ -1679,6 +1679,12 @@
         "childProcessing": "Permanent residence processing fee for a child",
         "grandTotal": "Total price (CAD)",
         "budgetLink": "Estimate my whole budget (tests, ECA, medical exam…)"
+      },
+      "side": {
+        "people": "By person",
+        "jump": "Go to: {person}",
+        "fees": "Official IRCC fees",
+        "seeFees": "See the fee details"
       }
     },
     "intro": {
@@ -1710,6 +1716,23 @@
         }
       },
       "free": "Free, no sign-up. About 3 minutes."
+    },
+    "titleAccent": "Express Entry",
+    "listAccent": "to prepare",
+    "preview": {
+      "title": "Your file",
+      "mandatory": "mandatory documents",
+      "more": "+ {recommended} recommended · {slots} IRCC slots",
+      "people": "People in the file",
+      "fees": "Official IRCC fees",
+      "feesNote": "Processing, RPRF and biometrics",
+      "cta": "See my checklist",
+      "live": "Updated with every answer"
+    },
+    "guide": {
+      "title": "Documents ready, a calm submission.",
+      "text": "After the invitation, you’ll have 60 days to upload these documents to your IRCC account. Prepared ahead, they leave you time to check every detail, or to have Stanzy review your file.",
+      "secondary": "Start the ITA countdown"
     }
   }
 }

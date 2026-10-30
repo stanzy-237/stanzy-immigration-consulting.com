@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Check, ClipboardList, ExternalLink, Info, LockKeyhole, PencilLine } from 'lucide-react';
-import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/toast';
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { withNext } from '@/features/auth/lib/safe-next-path';
 import { DOCUMENT_GUIDES } from '@/features/checklist/data/document-guides';
+import { useCad, usePeopleNames } from '@/features/checklist/hooks/use-checklist-labels';
 import { useStoredChecklistAnswers, useStoredReady } from '@/features/checklist/hooks/use-stored-checklist';
 import {
   buildChecklist,
@@ -57,12 +58,7 @@ function VisitorChecklist(): ReactNode {
   const [ready, setReady] = useStoredReady();
   if (!answers) return <EmptyChecklist />;
   const toggle: Toggle = (key, on) => setReady(on ? [...ready.filter((k) => k !== key), key] : ready.filter((k) => k !== key));
-  return (
-    <>
-      <ChecklistList answers={answers} ready={ready} onToggle={toggle} />
-      <SignInInvite />
-    </>
-  );
+  return <ChecklistList answers={answers} ready={ready} onToggle={toggle} side={<SignInInvite />} />;
 }
 
 /** A User: the Account's answers (or this device's) and ticks, ticked at once and saved behind. */
@@ -97,64 +93,116 @@ function SignedInChecklist(): ReactNode {
   return <ChecklistList answers={answers} ready={data?.ready ?? []} onToggle={(item, ready) => setReady.mutate({ key: item, ready })} />;
 }
 
-function ChecklistList({ answers, ready, onToggle }: { answers: ChecklistForm; ready: string[]; onToggle: Toggle }): ReactNode {
+/**
+ * The list, laid out like the calculators: each person's documents and the
+ * fees on the left; on the right, sticky, the progress with a link to each
+ * person (first on phones).
+ */
+function ChecklistList({
+  answers,
+  ready,
+  onToggle,
+  side,
+}: {
+  answers: ChecklistForm;
+  ready: string[];
+  onToggle: Toggle;
+  side?: ReactNode;
+}): ReactNode {
   const t = useTranslations('Checklist.list');
   const people = useMemo(() => buildChecklist(answers), [answers]);
   const readySet = useMemo(() => new Set(ready), [ready]);
-  const progress = progressOf(people, readySet);
-  const percent = progress.total ? Math.round((progress.ready / progress.total) * 100) : 0;
 
   return (
-    <div className="flex flex-col gap-5">
-      <section aria-labelledby="checklist-progress" className="rounded-2xl border-2 border-fog-light bg-white p-5 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 id="checklist-progress" className="font-heading text-h4 font-bold text-navy-deep">
-              {t('progressTitle')}
-            </h2>
-            <p className="mt-1 text-body-sm text-slate">{t('progress', { ready: progress.ready, total: progress.total })}</p>
-            <p className="text-body-sm text-slate">
-              {t('progressMandatory', { ready: progress.mandatoryReady, total: progress.mandatoryTotal })}
-            </p>
-          </div>
-          <Link
-            href={FORM_PATH}
-            className="inline-flex h-10 items-center gap-2 rounded-full border-2 border-fog-light px-4 font-heading text-body-sm font-bold text-navy-deep transition-colors hover:border-navy-deep"
-          >
-            <PencilLine aria-hidden={true} className="size-4" />
-            {t('edit')}
-          </Link>
-        </div>
-        <div
-          role="progressbar"
-          aria-label={t('progressLabel')}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={percent}
-          className="mt-4 h-2.5 overflow-hidden rounded-full bg-fog-light"
-        >
-          <div className="h-full rounded-full bg-leaf transition-all duration-300" style={{ width: `${percent}%` }} />
-        </div>
-        <p className="mt-4 flex flex-wrap items-center gap-2 text-caption text-slate">
+    <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-3">
+      <aside className="space-y-4 lg:sticky-below-nav lg:order-last">
+        <ProgressCard people={people} ready={readySet} answers={answers} />
+        {side}
+      </aside>
+      <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
+        <p className="flex flex-wrap items-center gap-2 text-caption text-slate">
           <NeedBadge need="mandatory" />
           <NeedBadge need="recommended" />
           <span>{t('legend')}</span>
         </p>
-      </section>
-
-      {people.map((person) => (
-        <PersonCard key={person.id} person={person} ready={readySet} onToggle={onToggle} />
-      ))}
-
-      <FeesCard answers={answers} />
+        {people.map((person) => (
+          <PersonCard key={person.id} person={person} ready={readySet} onToggle={onToggle} />
+        ))}
+        <FeesCard answers={answers} />
+        <ChecklistDisclaimer />
+      </div>
     </div>
   );
 }
 
-/** « Requérant principal », « Conjoint(e) », « Enfant 2 ». */
-function usePersonName(person: ChecklistPerson): string {
-  const t = useTranslations('Checklist.list.people');
-  return person.kind === 'child' ? t('child', { number: person.number ?? 1 }) : t(person.kind);
+/** « Votre avancement »: the share ready, each person's count (a link to their block), the fees, and the way back to the form. */
+function ProgressCard({ people, ready, answers }: { people: ChecklistPerson[]; ready: ReadonlySet<string>; answers: ChecklistForm }): ReactNode {
+  const t = useTranslations('Checklist.list');
+  const cad = useCad();
+  const names = usePeopleNames(people);
+  const progress = progressOf(people, ready);
+  const percent = progress.total ? Math.round((progress.ready / progress.total) * 100) : 0;
+  return (
+    <section aria-labelledby="checklist-progress" className="rounded-2xl bg-navy-deep p-6 text-white shadow-lg">
+      <h2 id="checklist-progress" className="font-label text-white/60">
+        {t('progressTitle')}
+      </h2>
+      <p className="mt-3 font-heading text-6xl font-bold leading-none tabular-nums">
+        {percent}
+        <span className="text-3xl text-white/60"> %</span>
+      </p>
+      <div
+        role="progressbar"
+        aria-label={t('progressLabel')}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent}
+        className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/15"
+      >
+        <div className="h-full rounded-full bg-leaf-line transition-all duration-300" style={{ width: `${percent}%` }} />
+      </div>
+      <p className="mt-3 text-body-sm text-white/80">{t('progress', { ready: progress.ready, total: progress.total })}</p>
+      <p className="text-body-sm text-white/60">{t('progressMandatory', { ready: progress.mandatoryReady, total: progress.mandatoryTotal })}</p>
+
+      <p className="mt-6 font-label text-white/60">{t('side.people')}</p>
+      <ul className="mt-2 flex flex-col gap-1">
+        {people.map((person, i) => {
+          const own = progressOf(person.slots, ready);
+          const done = own.total > 0 && own.ready === own.total;
+          return (
+            <li key={person.id}>
+              <a
+                href={`#person-${person.id}`}
+                aria-label={t('side.jump', { person: names[i]! })}
+                className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-white/10"
+              >
+                <span className="flex-1 truncate text-body-sm font-semibold">{names[i]}</span>
+                <span className={cn('font-label tabular-nums', done ? 'text-leaf-line' : 'text-white/60')}>
+                  {own.ready}/{own.total}
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+
+      <a
+        href="#checklist-fees-card"
+        className="mt-5 flex items-baseline justify-between gap-3 border-t border-white/10 pt-4 transition-colors hover:text-rose"
+      >
+        <span className="font-label text-white/60">{t('side.fees')}</span>
+        <span className="font-heading text-xl font-bold tabular-nums">{cad(checklistFees(answers).total)}</span>
+      </a>
+
+      <Link
+        href={FORM_PATH}
+        className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border-2 border-white/20 font-heading text-body-sm font-bold text-white transition-colors hover:border-white"
+      >
+        <PencilLine aria-hidden={true} className="size-4" />
+        {t('edit')}
+      </Link>
+    </section>
+  );
 }
 
 /** « Passeports/titres de voyage », « Relevé d'emploi – Responsable QHSE ». */
@@ -166,11 +214,11 @@ function useSlotName(slot: ChecklistSlot): string {
 /** One person's block, as in IRCC's checklist: « {person} : documents justificatifs ». */
 function PersonCard({ person, ready, onToggle }: { person: ChecklistPerson; ready: ReadonlySet<string>; onToggle: Toggle }): ReactNode {
   const t = useTranslations('Checklist.list');
-  const name = usePersonName(person);
+  const [name] = usePeopleNames([person]) as [string];
   const headingId = `checklist-${person.id}`;
   const progress = progressOf(person.slots, ready);
   return (
-    <section aria-labelledby={headingId} className="overflow-hidden rounded-2xl border border-fog bg-white shadow-sm">
+    <section id={`person-${person.id}`} aria-labelledby={headingId} className="scroll-mt-28 overflow-hidden rounded-2xl border border-fog bg-white shadow-sm">
       <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-fog-light bg-navy-deep px-5 py-4 sm:px-6">
         <h2 id={headingId} className="font-heading text-h4 font-bold text-white">
           {t('personTitle', { person: name })}
@@ -309,12 +357,10 @@ function PieceRow({
 /** « Frais »: IRCC's fees for this family, as at the end of its checklist. */
 function FeesCard({ answers }: { answers: ChecklistForm }): ReactNode {
   const t = useTranslations('Checklist.list.fees');
-  const format = useFormatter();
+  const money = useCad();
   const { rows, total } = checklistFees(answers);
-  // The columns say CAD: « 990,00 $ », as in IRCC's checklist.
-  const money = (amount: number) => format.number(amount, { style: 'currency', currency: 'CAD', currencyDisplay: 'narrowSymbol' });
   return (
-    <section aria-labelledby="checklist-fees" className="rounded-2xl border border-fog bg-white p-5 shadow-sm sm:p-6">
+    <section id="checklist-fees-card" aria-labelledby="checklist-fees" className="scroll-mt-28 rounded-2xl border border-fog bg-white p-5 shadow-sm sm:p-6">
       <h2 id="checklist-fees" className="font-heading text-h4 font-bold text-navy-deep">
         {t('title')}
       </h2>
@@ -369,8 +415,8 @@ function FeesCard({ answers }: { answers: ChecklistForm }): ReactNode {
 function EmptyChecklist(): ReactNode {
   const t = useTranslations('Checklist.list');
   return (
-    <section className="mx-auto max-w-xl rounded-2xl border-2 border-fog-light bg-white p-8 text-center">
-      <span aria-hidden={true} className="mx-auto grid size-12 place-items-center rounded-2xl bg-blush text-rouge">
+    <section className="max-w-2xl rounded-2xl border-2 border-fog-light bg-white p-8">
+      <span aria-hidden={true} className="grid size-12 place-items-center rounded-2xl bg-blush text-rouge">
         <ClipboardList className="size-6" />
       </span>
       <h2 className="mt-4 font-heading text-h4 font-bold text-navy-deep">{t('emptyTitle')}</h2>
@@ -388,17 +434,17 @@ function EmptyChecklist(): ReactNode {
 function SignInInvite(): ReactNode {
   const t = useTranslations('Checklist.list');
   return (
-    <section className="mt-5 flex flex-col items-start gap-4 rounded-2xl border-2 border-fog-light bg-white p-5 sm:flex-row sm:items-center sm:p-6">
-      <span aria-hidden={true} className="grid size-11 shrink-0 place-items-center rounded-xl bg-blush text-rouge">
+    <section aria-labelledby="checklist-sign-in" className="rounded-2xl border-2 border-fog-light bg-white p-5">
+      <span aria-hidden={true} className="grid size-10 place-items-center rounded-xl bg-blush text-rouge">
         <LockKeyhole className="size-5" />
       </span>
-      <div className="flex-1">
-        <h2 className="font-heading text-body font-bold text-navy-deep">{t('signInTitle')}</h2>
-        <p className="mt-1 text-body-sm text-slate">{t('signInText')}</p>
-      </div>
+      <h3 id="checklist-sign-in" className="mt-3 font-heading text-body font-bold text-navy-deep">
+        {t('signInTitle')}
+      </h3>
+      <p className="mt-1 text-body-sm text-slate">{t('signInText')}</p>
       <Link
         href={withNext('/connexion', LIST_PATH)}
-        className="inline-flex h-11 shrink-0 items-center rounded-full bg-navy-deep px-5 font-heading text-body-sm font-bold text-white hover:bg-navy-80"
+        className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-full bg-rouge font-heading text-body-sm font-bold text-white hover:bg-crimson"
       >
         {t('signIn')}
       </Link>
@@ -407,11 +453,11 @@ function SignInInvite(): ReactNode {
 }
 
 /** Where the list ends: IRCC's own checklist after the ITA is the reference. */
-export function ChecklistDisclaimer(): ReactNode {
+function ChecklistDisclaimer(): ReactNode {
   const t = useTranslations('Checklist.list');
   const irccUrl = IRCC_DOCUMENTS[toLocale(useLocale())];
   return (
-    <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-body-sm text-slate">
+    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-sm text-slate">
       <Check aria-hidden={true} className="size-4 text-leaf" />
       {t('disclaimer')}
       <a href={irccUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-navy-deep underline underline-offset-2">
@@ -426,11 +472,13 @@ export function ChecklistDisclaimer(): ReactNode {
 export function ChecklistSkeleton(): ReactNode {
   const t = useTranslations('Checklist.list');
   return (
-    <div role="status" className="flex flex-col gap-5">
+    <div role="status" className="grid grid-cols-1 items-start gap-7 lg:grid-cols-3">
       <span className="sr-only">{t('loading')}</span>
-      <Skeleton aria-hidden={true} className="h-40 rounded-2xl" />
-      <Skeleton aria-hidden={true} className="h-72 rounded-2xl" />
-      <Skeleton aria-hidden={true} className="h-56 rounded-2xl" />
+      <Skeleton aria-hidden={true} className="h-96 rounded-2xl lg:order-last" />
+      <div className="flex flex-col gap-5 lg:col-span-2">
+        <Skeleton aria-hidden={true} className="h-96 rounded-2xl" />
+        <Skeleton aria-hidden={true} className="h-56 rounded-2xl" />
+      </div>
     </div>
   );
 }
