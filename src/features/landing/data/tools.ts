@@ -124,7 +124,7 @@ export const TOOLS: ReadonlyArray<Tool> = [
     descKey: 'checklistDesc',
     href: '/outils/checklist',
     variant: 'default',
-    badgeKeys: ['badgeDocuments', 'badgeBeforeIta', 'badgeIrccFees'],
+    badgeKeys: ['badgeDocuments', 'badgeIrccFees'],
     freeKey: 'free',
   },
   {
