@@ -325,6 +325,18 @@ describe('Checklist list', () => {
     expect(within(fees).getByRole('row', { name: /Prix total/ })).toHaveTextContent(/3\s*890,00\s*\$/);
   });
 
+  it('stacks the fees one per line on phones, the total last', async () => {
+    keepAnswers(FAMILY);
+    page(<ChecklistView />);
+
+    const fees = await screen.findByRole('region', { name: 'Frais' });
+    const terms = within(fees).getAllByRole('term').map((term) => term.textContent);
+    expect(terms[0]).toBe('Frais relatifs à la demande de résidence permanente');
+    expect(terms.at(-1)).toBe('Prix total (CAD)');
+    const child = within(fees).getAllByRole('term').find((term) => /pour un enfant/.test(term.textContent ?? ''))!.parentElement!;
+    expect(child).toHaveTextContent(/2 × 270,00\s*\$.*540,00\s*\$/);
+  });
+
   it('ticks a visitor’s documents « Prêt » in this browser, with the progress', async () => {
     keepAnswers(SINGLE);
     page(<ChecklistView />);

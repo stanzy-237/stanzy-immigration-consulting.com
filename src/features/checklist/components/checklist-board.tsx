@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Check, ClipboardList, ExternalLink, Info, LockKeyhole, PencilLine } from 'lucide-react';
+import { ArrowRight, Check, ClipboardList, ExternalLink, Info, LockKeyhole, PencilLine } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState, type ReactNode } from 'react';
 
@@ -365,7 +365,26 @@ function FeesCard({ answers }: { answers: ChecklistForm }): ReactNode {
         {t('title')}
       </h2>
       <p className="mt-1 text-body-sm text-slate">{t('lead')}</p>
-      <div className="mt-4 overflow-x-auto rounded-xl border border-fog-light">
+      {/* Phones: one stacked line per fee (name, then « 1 × 990,00 $ » and its total), the total in a band. */}
+      <dl className="mt-4 overflow-hidden rounded-xl border border-fog-light sm:hidden">
+        {rows.map((row) => (
+          <div key={row.id} className="border-b border-fog-light px-4 py-3">
+            <dt className="text-body-sm font-medium leading-snug text-navy-deep">{t(row.id)}</dt>
+            <dd className="mt-1.5 flex items-baseline justify-between gap-3">
+              <span className="text-caption tabular-nums text-slate">
+                {row.quantity} × {money(row.unit)}
+              </span>
+              <span className="text-body-sm font-semibold tabular-nums text-navy-deep">{money(row.quantity * row.unit)}</span>
+            </dd>
+          </div>
+        ))}
+        <div className="flex items-baseline justify-between gap-3 bg-blush px-4 py-3.5">
+          <dt className="font-heading text-body-sm font-bold text-navy-deep">{t('grandTotal')}</dt>
+          <dd className="font-heading text-xl font-bold tabular-nums text-rouge">{money(total)}</dd>
+        </div>
+      </dl>
+      {/* From tablets up: IRCC's four columns. */}
+      <div className="mt-4 hidden overflow-hidden rounded-xl border border-fog-light sm:block">
         <table className="w-full text-body-sm">
           <thead className="bg-off-white">
             <tr>
@@ -405,8 +424,12 @@ function FeesCard({ answers }: { answers: ChecklistForm }): ReactNode {
           </tfoot>
         </table>
       </div>
-      <Link href="/outils/budget" className="mt-4 inline-flex items-center gap-1.5 text-body-sm font-semibold text-navy-deep underline underline-offset-2 hover:text-rouge">
+      <Link
+        href="/outils/budget"
+        className="mt-4 inline-flex min-h-11 items-center gap-1.5 text-body-sm font-semibold text-navy-deep underline underline-offset-2 hover:text-rouge"
+      >
         {t('budgetLink')}
+        <ArrowRight aria-hidden={true} className="size-4 shrink-0" />
       </Link>
     </section>
   );
@@ -457,13 +480,15 @@ function ChecklistDisclaimer(): ReactNode {
   const t = useTranslations('Checklist.list');
   const irccUrl = IRCC_DOCUMENTS[toLocale(useLocale())];
   return (
-    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-sm text-slate">
-      <Check aria-hidden={true} className="size-4 text-leaf" />
-      {t('disclaimer')}
-      <a href={irccUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-navy-deep underline underline-offset-2">
-        {t('irccLink')}
-        <ExternalLink aria-hidden={true} className="size-3.5" />
-      </a>
+    <p className="flex gap-2 text-body-sm leading-relaxed text-slate">
+      <Check aria-hidden={true} className="mt-1 size-4 shrink-0 text-leaf" />
+      <span>
+        {t('disclaimer')}{' '}
+        <a href={irccUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-navy-deep underline underline-offset-2">
+          {t('irccLink')}
+          <ExternalLink aria-hidden={true} className="size-3.5" />
+        </a>
+      </span>
     </p>
   );
 }
