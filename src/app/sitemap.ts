@@ -17,6 +17,7 @@ const PAGES = [
   '/outils/compte-a-rebours-ita',
   '/outils/timeline',
   '/outils/budget',
+  '/outils/checklist',
   '/services/consultation',
   '/services/accompagnement',
   '/services/ede',

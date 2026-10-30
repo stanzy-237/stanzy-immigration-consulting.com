@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   CalendarClock,
   Calculator,
+  ClipboardCheck,
   ShieldCheck,
   FileSearch,
   FileCheck,
@@ -75,6 +76,12 @@ export const TOOL_ENTRIES: ReadonlyArray<NavMenuEntry> = [
     labelKey: 'budgetName',
     descKey: 'budgetDesc',
     href: '/outils/budget',
+  },
+  {
+    icon: ClipboardCheck,
+    labelKey: 'checklistName',
+    descKey: 'checklistDesc',
+    href: '/outils/checklist',
   },
   // Not built yet: last, tagged « Bientôt ».
   {

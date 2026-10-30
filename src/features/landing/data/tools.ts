@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
   CalendarClock,
+  ClipboardCheck,
   ClipboardList,
   Clock,
   Cloud,
@@ -31,9 +32,9 @@ export type Tool = {
   comingSoon?: true;
 };
 
-// Nine cards in four full rows of the MagicPath mosaic
+// Ten cards in four full rows, after the MagicPath mosaic
 // ("Stanzy Immigration — Navigation", revision 460790112943476736):
-// row 1: [featured] [·] [·]   rows 2–4: [wide] [·]
+// row 1: [featured] [·] [·]   rows 2–3: [wide] [·]   row 4: [·] [·] [·]
 // Tools not built yet (`comingSoon`) come last.
 export const TOOLS: ReadonlyArray<Tool> = [
   {
@@ -112,8 +113,18 @@ export const TOOLS: ReadonlyArray<Tool> = [
     nameKey: 'budgetName',
     descKey: 'budgetDesc',
     href: '/outils/budget',
-    variant: 'wide',
+    variant: 'default',
     badgeKeys: ['badgeBudget', 'badgeExpenses'],
+    freeKey: 'free',
+  },
+  {
+    slug: 'checklist',
+    icon: ClipboardCheck,
+    nameKey: 'checklistName',
+    descKey: 'checklistDesc',
+    href: '/outils/checklist',
+    variant: 'default',
+    badgeKeys: ['badgeDocuments', 'badgeBeforeIta'],
     freeKey: 'free',
   },
   {

@@ -33,6 +33,15 @@ export function readStored<T>(key: string, schema: StoredSchema<T>): T | null {
   return parseStored(readRaw(key), schema);
 }
 
+/** Keeps `value` under `key` in this browser; storage full or blocked only loses it for later visits. */
+export function writeStored(key: string, value: unknown): void {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Storage full or blocked: the answers still work for this visit.
+  }
+}
+
 function subscribe(onChange: () => void): () => void {
   window.addEventListener('storage', onChange);
   return () => window.removeEventListener('storage', onChange);
@@ -58,11 +67,7 @@ export function useStoredForm<T>(key: string, schema: StoredSchema<T>, defaults:
   const update = useCallback(
     (next: T) => {
       setEdited(next);
-      try {
-        window.localStorage.setItem(key, JSON.stringify(next));
-      } catch {
-        // Storage full or blocked: the answers still work for this visit.
-      }
+      writeStored(key, next);
     },
     [key],
   );

@@ -49,7 +49,9 @@
         "predictionName": "Prochain tirage",
         "predictionDesc": "Prédiction du prochain tirage Entrée Express",
         "budgetName": "Budget & dépenses",
-        "budgetDesc": "Estimez vos frais et suivez vos dépenses"
+        "budgetDesc": "Estimez vos frais et suivez vos dépenses",
+        "checklistName": "Checklist Entrée Express",
+        "checklistDesc": "Les documents à préparer avant l’ITA"
       },
       "Services": {
         "consultationName": "Consultation privée",
@@ -105,7 +107,9 @@
         "predictionName": "Prédiction du prochain tirage",
         "predictionDesc": "Quand viendra le prochain tirage, de quel type et à quel score ? Une estimation transparente, groupe par groupe, tirée des tirages passés.",
         "budgetName": "Budget & dépenses",
-        "budgetDesc": "Estimez le coût de votre Entrée Express — frais IRCC, tests, WES, fonds à prouver — puis notez chaque dépense dans votre devise."
+        "budgetDesc": "Estimez le coût de votre Entrée Express — frais IRCC, tests, WES, fonds à prouver — puis notez chaque dépense dans votre devise.",
+        "checklistName": "Checklist Entrée Express",
+        "checklistDesc": "Les documents qu’IRCC vous demandera après l’ITA, selon votre situation, avec une explication détaillée pour chacun. Préparez-les avant l’invitation."
       },
       "Badges": {
         "free": "Gratuit",
@@ -132,10 +136,12 @@
         "badgeCrsRange": "Fourchette CRS",
         "comingSoon": "Bientôt",
         "badgeBudget": "Frais IRCC",
-        "badgeExpenses": "Journal de dépenses"
+        "badgeExpenses": "Journal de dépenses",
+        "badgeDocuments": "Documents",
+        "badgeBeforeIta": "Avant l’ITA"
       },
       "metaTitle": "Outils Entrée Express gratuits",
-      "metaDescription": "Calculateur CRS, 67 points, NCLC / CLB, tirages, compte à rebours ITA, parcours et budget : tous les outils gratuits de Stanzy pour votre Entrée Express."
+      "metaDescription": "Calculateur CRS, 67 points, NCLC / CLB, tirages, compte à rebours ITA, parcours, budget et checklist des documents : tous les outils gratuits de Stanzy pour votre Entrée Express."
     },
     "BlogRow": {
       "eyebrow": "Blog & Ressources",
@@ -318,7 +324,8 @@
         "ita": "Compte à rebours ITA",
         "draw": "Dernier tirage",
         "cnp": "Recherche code CNP",
-        "nclc": "Calculateur NCLC / CLB"
+        "nclc": "Calculateur NCLC / CLB",
+        "checklist": "Checklist Entrée Express"
       },
       "Services": {
         "consultation": "Consultation privée",
@@ -1562,6 +1569,89 @@
     },
     "Toast": {
       "genericError": "L’opération a échoué. Réessayez."
+    }
+  },
+  "Checklist": {
+    "metaTitle": "Checklist Entrée Express : les documents à préparer",
+    "metaDescription": "Les documents qu’IRCC vous demandera après l’invitation à présenter une demande (ITA), selon votre situation : obligatoires et recommandés, avec une explication pour chacun.",
+    "listMetaTitle": "Mes documents à préparer",
+    "eyebrow": "Checklist Entrée Express",
+    "title": "Préparez vos documents avant l’ITA",
+    "lead": "Après l’invitation, vous n’avez que 60 jours. Répondez à quelques questions : nous listons les documents qu’IRCC vous demandera, pour les préparer dès maintenant.",
+    "listTitle": "Vos documents à préparer",
+    "listLead": "Touchez un document pour savoir ce qu’il doit contenir et comment l’obtenir. Cochez « Prêt » au fur et à mesure.",
+    "form": {
+      "family": "Votre famille",
+      "spouseAccompanying": "Mon époux(se) ou conjoint(e) vient avec moi au Canada",
+      "spouseClaimsPoints": "Je déclare des points pour ses études ou son test de langue",
+      "previousUnion": "J’ai déjà été marié(e) ou en union de fait avant",
+      "children": "Enfants à charge",
+      "childrenHint": "Les vôtres et ceux de votre conjoint(e), même s’ils ne viennent pas au Canada.",
+      "education": "Vos études",
+      "foreignEducation": "J’ai un diplôme obtenu hors du Canada",
+      "canadianEducation": "J’ai un diplôme obtenu au Canada",
+      "language": "Vos langues",
+      "secondLanguage": "J’ai des résultats de test en français et en anglais",
+      "work": "Votre expérience",
+      "foreignWork": "J’ai travaillé comme salarié(e) hors du Canada",
+      "canadianWork": "J’ai au moins un an d’expérience qualifiée au Canada",
+      "selfEmployed": "J’ai travaillé à mon compte (travailleur autonome)",
+      "authorizedToWork": "J’ai un permis de travail canadien valide",
+      "countries": "Pays où vous avez vécu",
+      "policeCountries": "Nombre de pays",
+      "policeCountriesHint": "Pays (hors Canada) où vous avez vécu 6 mois de suite ou plus depuis vos 18 ans, au cours des 10 dernières années. Votre pays actuel compte.",
+      "special": "Situations particulières",
+      "jobOffer": "J’ai une offre d’emploi d’un employeur canadien",
+      "provincialNomination": "J’ai une nomination provinciale",
+      "certificateOfQualification": "J’ai un certificat de qualification canadien dans un métier",
+      "siblingInCanada": "J’ai un frère ou une sœur citoyen(ne) ou résident(e) permanent(e) au Canada",
+      "representative": "Un consultant ou un avocat me représente auprès d’IRCC",
+      "continue": "Continuer",
+      "prefilledSaved": "Pré-rempli avec votre simulation CRS « {name} ». Vérifiez et complétez.",
+      "prefilledDraft": "Pré-rempli avec vos réponses du Calculateur CRS. Vérifiez et complétez.",
+      "loading": "Chargement de vos réponses",
+      "saveFailed": "Vos réponses n’ont pas pu être enregistrées dans votre compte. Elles restent sur cet appareil."
+    },
+    "list": {
+      "progressTitle": "Votre avancement",
+      "progress": "{ready} sur {total} documents prêts",
+      "progressMandatory": "{ready} sur {total} documents obligatoires",
+      "progressLabel": "Documents prêts",
+      "mandatory": "Obligatoire",
+      "recommended": "Recommandé",
+      "legend": "Obligatoire : IRCC le demande. Recommandé : il renforce votre dossier.",
+      "edit": "Modifier mes réponses",
+      "ready": "Prêt",
+      "readyLabel": "{name} ({who}) : prêt",
+      "who": {
+        "you": "Vous",
+        "spouse": "Conjoint(e)",
+        "children": "Enfants"
+      },
+      "count": "× {count}",
+      "sections": {
+        "identity": "Identité et état civil",
+        "forms": "Informations à préparer",
+        "language": "Tests de langue",
+        "education": "Études",
+        "work": "Expérience professionnelle",
+        "funds": "Preuve de fonds",
+        "police": "Certificats de police",
+        "medical": "Examen médical",
+        "special": "Situations particulières"
+      },
+      "sectionProgress": "{ready} sur {total}",
+      "closeGuide": "Fermer",
+      "emptyTitle": "Votre checklist n’est pas encore prête",
+      "emptyText": "Répondez d’abord à quelques questions sur votre situation.",
+      "emptyCta": "Remplir le formulaire",
+      "signInTitle": "Retrouvez votre checklist partout",
+      "signInText": "Connectez-vous : vos réponses et vos documents prêts sont gardés dans votre compte, sur tous vos appareils.",
+      "signIn": "Se connecter",
+      "disclaimer": "Cette liste vous aide à vous préparer. Après l’invitation, la liste personnalisée de votre compte IRCC fait foi.",
+      "irccLink": "Documents Entrée Express (IRCC)",
+      "loading": "Chargement de votre checklist",
+      "toastFailed": "Le document n’a pas pu être coché. Réessayez."
     }
   }
 }
