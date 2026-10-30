@@ -51,7 +51,7 @@
         "budgetName": "Budget & dépenses",
         "budgetDesc": "Estimez vos frais et suivez vos dépenses",
         "checklistName": "Checklist Entrée Express",
-        "checklistDesc": "Les documents à préparer avant l’ITA"
+        "checklistDesc": "Documents à préparer et frais officiels IRCC"
       },
       "Services": {
         "consultationName": "Consultation privée",
@@ -109,7 +109,7 @@
         "budgetName": "Budget & dépenses",
         "budgetDesc": "Estimez le coût de votre Entrée Express — frais IRCC, tests, WES, fonds à prouver — puis notez chaque dépense dans votre devise.",
         "checklistName": "Checklist Entrée Express",
-        "checklistDesc": "Les documents qu’IRCC vous demandera après l’ITA, selon votre situation, avec une explication détaillée pour chacun. Préparez-les avant l’invitation."
+        "checklistDesc": "Votre liste de documents personnalisée, présentée comme celle d’IRCC après l’ITA : pour vous, votre conjoint(e) et chaque enfant, avec les documents obligatoires ★ et recommandés, une explication détaillée pour chacun et les frais officiels à payer à IRCC."
       },
       "Badges": {
         "free": "Gratuit",
@@ -138,7 +138,8 @@
         "badgeBudget": "Frais IRCC",
         "badgeExpenses": "Journal de dépenses",
         "badgeDocuments": "Documents",
-        "badgeBeforeIta": "Avant l’ITA"
+        "badgeBeforeIta": "Avant l’ITA",
+        "badgeIrccFees": "Frais IRCC"
       },
       "metaTitle": "Outils Entrée Express gratuits",
       "metaDescription": "Calculateur CRS, 67 points, NCLC / CLB, tirages, compte à rebours ITA, parcours, budget et checklist des documents : tous les outils gratuits de Stanzy pour votre Entrée Express."
@@ -1573,11 +1574,11 @@
   },
   "Checklist": {
     "metaTitle": "Checklist Entrée Express : les documents à préparer",
-    "metaDescription": "Les documents qu’IRCC vous demandera après l’invitation à présenter une demande (ITA), selon votre situation : obligatoires et recommandés, avec une explication pour chacun.",
+    "metaDescription": "Préparez votre dossier Entrée Express avant l’ITA : la liste des documents demandés par IRCC pour vous, votre conjoint(e) et vos enfants (obligatoires et recommandés), une explication pour chacun et les frais officiels d’IRCC.",
     "listMetaTitle": "Mes documents à préparer",
     "eyebrow": "Checklist Entrée Express",
     "title": "Préparez vos documents avant l’ITA",
-    "lead": "Après l’invitation, vous n’avez que 60 jours. Répondez à quelques questions : nous listons les documents qu’IRCC vous demandera, pour les préparer dès maintenant.",
+    "lead": "Après l’invitation, vous n’avez que 60 jours pour déposer votre demande. Répondez à quelques questions : vous obtenez la liste des documents qu’IRCC vous demandera, organisée comme dans votre compte IRCC, et les frais officiels à payer.",
     "listTitle": "Vos documents à préparer",
     "listLead": "Touchez un document pour savoir ce qu’il doit contenir et comment l’obtenir. Cochez « Prêt » au fur et à mesure.",
     "form": {
@@ -1696,6 +1697,36 @@
         "grandTotal": "Prix total (CAD)",
         "budgetLink": "Estimer tout mon budget (tests, EDE, examen médical…)"
       }
+    },
+    "intro": {
+      "title": "Ce que vous obtenez",
+      "items": {
+        "people": {
+          "title": "Une liste comme celle d’IRCC",
+          "text": "Un bloc par personne (requérant principal, conjoint(e), chaque enfant), avec les champs de téléversement d’IRCC : « Relevé d’emploi » par poste, « Certificat de police » par pays…"
+        },
+        "need": {
+          "title": "Obligatoires ★ et recommandés",
+          "text": "Les documents qu’IRCC exige, et ceux qui rendent votre dossier plus solide : fiches de paie, attestation CNPS, relevés bancaires…"
+        },
+        "guides": {
+          "title": "Une explication pour chaque document",
+          "text": "Ce qu’il doit contenir, comment l’obtenir, les délais, les pièges à éviter et les conseils de Stanzy, avec les liens vers IRCC."
+        },
+        "fees": {
+          "title": "Les frais officiels d’IRCC",
+          "text": "Frais de traitement, droit de résidence permanente (FDRP) et biométrie, calculés pour votre famille selon le barème d’IRCC en vigueur."
+        },
+        "progress": {
+          "title": "Votre avancement",
+          "text": "Cochez chaque document « Prêt » et suivez votre progression. Connecté, vous retrouvez votre liste sur tous vos appareils."
+        },
+        "prefill": {
+          "title": "Relié à vos autres outils",
+          "text": "Le formulaire reprend les réponses de votre simulation CRS ; le budget complet (tests, EDE, examen médical) est dans « Budget & dépenses »."
+        }
+      },
+      "free": "Gratuit, sans inscription. Environ 3 minutes."
     }
   }
 }

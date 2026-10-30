@@ -102,6 +102,15 @@ const documentsOf = (slot: HTMLElement) =>
     .map((row) => within(row).getAllByRole('button')[0]!.textContent);
 
 describe('Checklist form', () => {
+  it('says what the list gives, IRCC’s official fees included', async () => {
+    page(<ChecklistFormView />);
+
+    const intro = screen.getByRole('region', { name: 'Ce que vous obtenez' });
+    expect(within(intro).getByRole('heading', { name: 'Les frais officiels d’IRCC' })).toBeInTheDocument();
+    expect(within(intro).getByRole('heading', { name: 'Une liste comme celle d’IRCC' })).toBeInTheDocument();
+    expect(await screen.findByLabelText('Poste 1')).toBeInTheDocument();
+  });
+
   it('asks for each job and country by name, and hands the answers to the list', async () => {
     page(<ChecklistFormView />);
 

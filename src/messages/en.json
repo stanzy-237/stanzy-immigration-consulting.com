@@ -51,7 +51,7 @@
         "budgetName": "Budget & expenses",
         "budgetDesc": "Estimate your fees and track your expenses",
         "checklistName": "Express Entry checklist",
-        "checklistDesc": "The documents to prepare before the ITA"
+        "checklistDesc": "Documents to prepare and official IRCC fees"
       },
       "Services": {
         "consultationName": "Private consultation",
@@ -109,7 +109,7 @@
         "budgetName": "Budget & expenses",
         "budgetDesc": "Estimate what your Express Entry costs — IRCC fees, tests, WES, proof of funds — then log every expense in your currency.",
         "checklistName": "Express Entry checklist",
-        "checklistDesc": "The documents IRCC will ask for after the ITA, for your situation, with a detailed explanation of each. Get them ready before the invitation."
+        "checklistDesc": "Your personalized document list, laid out like IRCC’s after the ITA: for you, your spouse and each child, with mandatory ★ and recommended documents, a detailed explanation of each and the official fees to pay IRCC."
       },
       "Badges": {
         "free": "Free",
@@ -138,7 +138,8 @@
         "badgeBudget": "IRCC fees",
         "badgeExpenses": "Expense log",
         "badgeDocuments": "Documents",
-        "badgeBeforeIta": "Before the ITA"
+        "badgeBeforeIta": "Before the ITA",
+        "badgeIrccFees": "IRCC fees"
       },
       "metaTitle": "Free Express Entry tools",
       "metaDescription": "CRS calculator, 67 points, NCLC / CLB, draws, ITA countdown, journey, budget and document checklist: all of Stanzy's free tools for your Express Entry."
@@ -1556,11 +1557,11 @@
   },
   "Checklist": {
     "metaTitle": "Express Entry checklist: the documents to prepare",
-    "metaDescription": "The documents IRCC will ask for after the invitation to apply (ITA), for your situation: mandatory and recommended, with an explanation of each.",
+    "metaDescription": "Get your Express Entry file ready before the ITA: the documents IRCC asks for from you, your spouse and your children (mandatory and recommended), an explanation of each and IRCC’s official fees.",
     "listMetaTitle": "My documents to prepare",
     "eyebrow": "Express Entry checklist",
     "title": "Get your documents ready before the ITA",
-    "lead": "After the invitation, you only have 60 days. Answer a few questions: we list the documents IRCC will ask for, so you can prepare them now.",
+    "lead": "After the invitation, you only have 60 days to submit your application. Answer a few questions: you get the list of documents IRCC will ask for, organized as in your IRCC account, and the official fees to pay.",
     "listTitle": "Your documents to prepare",
     "listLead": "Tap a document to learn what it must include and how to get it. Tick « Ready » as you go.",
     "form": {
@@ -1679,6 +1680,36 @@
         "grandTotal": "Total price (CAD)",
         "budgetLink": "Estimate my whole budget (tests, ECA, medical exam…)"
       }
+    },
+    "intro": {
+      "title": "What you get",
+      "items": {
+        "people": {
+          "title": "A list like IRCC’s",
+          "text": "One block per person (principal applicant, spouse, each child), with IRCC’s upload slots: an “Employment record” per job, a “Police certificate” per country…"
+        },
+        "need": {
+          "title": "Mandatory ★ and recommended",
+          "text": "The documents IRCC requires, and those that make your file stronger: payslips, social security records, bank statements…"
+        },
+        "guides": {
+          "title": "An explanation for every document",
+          "text": "What it must include, how to get it, delays, pitfalls to avoid and Stanzy’s advice, with links to IRCC."
+        },
+        "fees": {
+          "title": "IRCC’s official fees",
+          "text": "Processing fees, right of permanent residence fee (RPRF) and biometrics, worked out for your family from IRCC’s current fee list."
+        },
+        "progress": {
+          "title": "Your progress",
+          "text": "Tick each document « Ready » and follow your progress. Logged in, you find your list on all your devices."
+        },
+        "prefill": {
+          "title": "Linked to your other tools",
+          "text": "The form picks up your CRS simulation’s answers; the full budget (tests, ECA, medical exam) is in “Budget & expenses”."
+        }
+      },
+      "free": "Free, no sign-up. About 3 minutes."
     }
   }
 }
