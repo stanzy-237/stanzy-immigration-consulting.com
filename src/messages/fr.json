@@ -61,7 +61,8 @@
       },
       "account": "Mon compte : {name}",
       "signOut": "Déconnexion",
-      "dashboard": "Tableau de bord"
+      "dashboard": "Tableau de bord",
+      "allTools": "Voir tous les outils"
     },
     "TikTok": {
       "eyebrow": "Stanzy sur TikTok",
@@ -132,7 +133,9 @@
         "comingSoon": "Bientôt",
         "badgeBudget": "Frais IRCC",
         "badgeExpenses": "Journal de dépenses"
-      }
+      },
+      "metaTitle": "Outils Entrée Express gratuits",
+      "metaDescription": "Calculateur CRS, 67 points, NCLC / CLB, tirages, compte à rebours ITA, parcours et budget : tous les outils gratuits de Stanzy pour votre Entrée Express."
     },
     "BlogRow": {
       "eyebrow": "Blog & Ressources",
