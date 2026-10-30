@@ -177,16 +177,29 @@ export const DOCUMENT_GUIDES_EN: DocumentGuides = {
       { kind: 'link', label: 'Educational credential assessment (IRCC)', href: `${IRCC}/services/immigrate-canada/express-entry/documents/education-assessment.html` },
     ],
   },
-  foreignDiplomas: {
-    name: 'Diplomas and transcripts',
-    summary: 'The diplomas the ECA assessed, with their transcripts.',
+  diplomas: {
+    name: 'Diplomas and degree certificates',
+    summary: 'The diploma, or the certificate of completion, for each declared program.',
     blocks: [
-      { kind: 'text', text: 'The ECA is enough for points, but the officer may want to see the diplomas themselves. Having them ready avoids a delay if you’re asked.' },
+      { kind: 'text', text: 'In the “Education” field, IRCC expects proof of each diploma declared in the profile, on top of the ECA. If the final diploma hasn’t been issued yet, the certificate of completion signed by the institution replaces it.' },
       { kind: 'list', title: 'To prepare', items: [
-        'A copy of each assessed diploma.',
-        'Transcripts for every year.',
+        'A colour copy of each diploma the ECA assessed (both sides if there are notes on the back).',
+        'Otherwise, the certificate of completion, with the institution’s stamp and signature.',
+        'A certified translation if it is in neither English nor French.',
+      ] },
+      { kind: 'text', text: 'Stanzy’s advice: the name, date and title of the diploma must match on the diploma, the ECA report and your profile.' },
+    ],
+  },
+  transcripts: {
+    name: 'Transcripts',
+    summary: 'Transcripts for every year of each program.',
+    blocks: [
+      { kind: 'text', text: 'Transcripts show how long the program was and which years you attended. They back up the ECA and are often asked for when the officer doubts a diploma.' },
+      { kind: 'list', title: 'To prepare', items: [
+        'Transcripts for each year (or semester) of the declared programs.',
         'A certified translation if they are in neither English nor French.',
       ] },
+      { kind: 'text', text: 'Stanzy’s advice: ask your institution for them when it sends them to WES or IQAS: you’ll have your own official copies.' },
     ],
   },
   canadianDiploma: {

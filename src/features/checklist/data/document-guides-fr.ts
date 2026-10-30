@@ -181,16 +181,29 @@ export const DOCUMENT_GUIDES_FR: DocumentGuides = {
       { kind: 'link', label: 'Évaluation des diplômes (IRCC)', href: `${IRCC}/services/immigrer-canada/entree-express/documents/evaluer-diplomes-etudes.html` },
     ],
   },
-  foreignDiplomas: {
-    name: 'Diplômes et relevés de notes',
-    summary: 'Les diplômes évalués par l’EDE, avec leurs relevés.',
+  diplomas: {
+    name: 'Diplômes et attestations de diplôme',
+    summary: 'Le diplôme, ou l’attestation de réussite, de chaque formation déclarée.',
     blocks: [
-      { kind: 'text', text: 'L’EDE suffit pour les points, mais l’agent peut vouloir voir les diplômes eux-mêmes. Les avoir prêts évite un délai si on vous les demande.' },
+      { kind: 'text', text: 'Dans le champ « Études », IRCC attend la preuve de chaque diplôme déclaré dans le profil, en plus de l’EDE. Si le diplôme définitif n’a pas encore été délivré, l’attestation de réussite (ou de diplôme) signée par l’établissement le remplace.' },
       { kind: 'list', title: 'À préparer', items: [
-        'Une copie de chaque diplôme évalué.',
-        'Les relevés de notes de toutes les années.',
-        'Une traduction certifiée si les documents ne sont ni en français ni en anglais.',
+        'Une copie couleur de chaque diplôme évalué par l’EDE (recto et verso s’il y a des mentions).',
+        'À défaut, l’attestation de réussite ou de diplôme, avec le cachet et la signature de l’établissement.',
+        'Une traduction certifiée si le document n’est ni en français ni en anglais.',
       ] },
+      { kind: 'text', text: 'Conseil Stanzy : le nom, la date et l’intitulé du diplôme doivent être les mêmes sur le diplôme, le rapport EDE et votre profil.' },
+    ],
+  },
+  transcripts: {
+    name: 'Relevés de notes',
+    summary: 'Les relevés de toutes les années de chaque formation.',
+    blocks: [
+      { kind: 'text', text: 'Les relevés de notes montrent la durée de la formation et les années suivies. Ils confirment l’EDE et sont souvent demandés si l’agent a un doute sur un diplôme.' },
+      { kind: 'list', title: 'À préparer', items: [
+        'Les relevés de chaque année (ou semestre) des formations déclarées.',
+        'Une traduction certifiée s’ils ne sont ni en français ni en anglais.',
+      ] },
+      { kind: 'text', text: 'Conseil Stanzy : demandez-les à votre établissement en même temps que l’envoi à WES ou à IQAS : vous aurez vos propres copies officielles.' },
     ],
   },
   canadianDiploma: {

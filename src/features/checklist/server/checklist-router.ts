@@ -1,13 +1,11 @@
 import { z } from 'zod';
 
-import { DOCUMENTS } from '@/features/checklist/lib/build-checklist';
+import { READY_KEY_PATTERN } from '@/features/checklist/lib/build-checklist';
 import { checklistFormSchema } from '@/features/checklist/lib/checklist-form';
 import { createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 
-/** A document's tick: `who:document`, e.g. `spouse:passport`. */
-const readyKey = z
-  .string()
-  .regex(new RegExp(`^(you|spouse|children):(${DOCUMENTS.join('|')})$`));
+/** A document's tick: `person:slot:document`, e.g. `principal:job-1:payslips`. */
+const readyKey = z.string().regex(READY_KEY_PATTERN);
 
 /**
  * The signed-in Account's Checklist Entrée Express: its answers and the

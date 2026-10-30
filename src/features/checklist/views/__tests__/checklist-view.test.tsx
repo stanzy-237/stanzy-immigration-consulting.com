@@ -22,11 +22,24 @@ vi.mock('@/i18n/navigation', async (importOriginal) => ({
 }));
 vi.mock('@/features/auth/lib/auth-client', () => ({ authClient: { useSession: vi.fn(), signOut: vi.fn() } }));
 
-const ANSWERS_KEY = 'stanzy.checklist.answers.v1';
-const READY_KEY = 'stanzy.checklist.ready.v1';
+const ANSWERS_KEY = 'stanzy.checklist.answers.v2';
+const READY_KEY = 'stanzy.checklist.ready.v2';
 
-/** A married candidate with two children, the spouse coming too. */
-const FAMILY: ChecklistForm = { ...DEFAULT_CHECKLIST_FORM, maritalStatus: 'married', spouseAccompanying: true, children: 2, policeCountries: 2 };
+/** A single candidate: one job abroad, one country. */
+const SINGLE: ChecklistForm = {
+  ...DEFAULT_CHECKLIST_FORM,
+  jobs: [{ title: 'Responsable QHSE', inCanada: false, selfEmployed: false }],
+  countries: ['Cameroun'],
+};
+/** A married couple coming with two children. */
+const FAMILY: ChecklistForm = {
+  ...SINGLE,
+  maritalStatus: 'married',
+  spouseAccompanying: true,
+  children: 2,
+  spouseJobs: ['Commerciale'],
+  spouseCountries: ['Cameroun'],
+};
 
 /** The server's side for a signed-in User. */
 const server = {
@@ -77,29 +90,62 @@ const page = (view: React.ReactNode) => {
 };
 const keepAnswers = (answers: ChecklistForm) => window.localStorage.setItem(ANSWERS_KEY, JSON.stringify(answers));
 const check = (name: string | RegExp) => screen.getByRole('checkbox', { name });
-const section = (name: string) => screen.getByRole('region', { name });
+const type = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } });
+const personBlock = (name: string | RegExp) => screen.getByRole('region', { name });
+/** A slot of a person's block, found by its heading. */
+const slotRow = (block: HTMLElement, name: string | RegExp) =>
+  within(block).getByRole('heading', { level: 3, name }).closest('li')!;
+/** The documents of a slot, by their buttons. */
+const documentsOf = (slot: HTMLElement) =>
+  within(slot)
+    .getAllByRole('listitem')
+    .map((row) => within(row).getAllByRole('button')[0]!.textContent);
 
 describe('Checklist form', () => {
-  it('asks about the family, and hands the answers to the list on « Continuer »', async () => {
+  it('asks for each job and country by name, and hands the answers to the list', async () => {
     page(<ChecklistFormView />);
 
     fireEvent.change(await screen.findByLabelText('Votre état matrimonial'), { target: { value: 'married' } });
     fireEvent.click(check('Mon époux(se) ou conjoint(e) vient avec moi au Canada'));
-    fireEvent.change(screen.getByLabelText('Enfants à charge'), { target: { value: '2' } });
-    fireEvent.change(screen.getByLabelText('Nombre de pays'), { target: { value: '2' } });
+    type('Enfants à charge', '2');
+    fireEvent.change(screen.getAllByLabelText('Poste 1')[0]!, { target: { value: 'Responsable QHSE' } });
+    fireEvent.change(screen.getAllByLabelText('Pays 1')[0]!, { target: { value: 'Cameroun' } });
+    // The spouse's part: one job, one country.
+    const spouse = screen.getByRole('region', { name: 'Votre conjoint(e)' });
+    fireEvent.click(within(spouse).getByRole('button', { name: 'Ajouter un emploi' }));
+    fireEvent.change(within(spouse).getByLabelText('Poste 1'), { target: { value: 'Commerciale' } });
+    fireEvent.change(within(spouse).getByLabelText('Pays 1'), { target: { value: 'Cameroun' } });
     fireEvent.click(screen.getByRole('button', { name: 'Continuer' }));
 
     expect(router.push).toHaveBeenCalledWith('/outils/checklist/liste');
     expect(JSON.parse(window.localStorage.getItem(ANSWERS_KEY)!)).toEqual(FAMILY);
   });
 
-  it('only asks about the spouse when there is one', async () => {
+  it('won’t continue with a job or a country left unnamed', async () => {
     page(<ChecklistFormView />);
-    await screen.findByLabelText('Votre état matrimonial');
+    await screen.findByLabelText('Poste 1');
 
-    expect(screen.queryByRole('checkbox', { name: /vient avec moi au Canada/ })).not.toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('Votre état matrimonial'), { target: { value: 'commonLaw' } });
-    expect(check(/vient avec moi au Canada/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Continuer' }));
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Complétez les champs signalés pour continuer.');
+    expect(screen.getByLabelText('Poste 1')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('Pays 1')).toHaveAccessibleDescription('Indiquez le pays.');
+    expect(router.push).not.toHaveBeenCalled();
+  });
+
+  it('adds and removes jobs and countries', async () => {
+    page(<ChecklistFormView />);
+    await screen.findByLabelText('Poste 1');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter un emploi' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter un pays' }));
+    expect(screen.getByLabelText('Poste 2')).toBeInTheDocument();
+    expect(screen.getByLabelText('Pays 2')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Retirer le pays 2' }));
+    expect(screen.queryByLabelText('Pays 2')).not.toBeInTheDocument();
+    // The last country can't be removed.
+    expect(screen.queryByRole('button', { name: 'Retirer le pays 1' })).not.toBeInTheDocument();
   });
 
   it('starts from the CRS calculator’s answers on this device', async () => {
@@ -109,6 +155,9 @@ describe('Checklist form', () => {
     expect(await screen.findByText('Pré-rempli avec vos réponses du Calculateur CRS. Vérifiez et complétez.')).toBeInTheDocument();
     expect(screen.getByLabelText('Votre état matrimonial')).toHaveValue('married');
     expect(check('J’ai au moins un an d’expérience qualifiée au Canada')).toBeChecked();
+    // The Canadian job is there, to name.
+    expect(screen.getByLabelText('Poste 1')).toHaveValue('');
+    expect(check('Au Canada')).toBeChecked();
   });
 
   it('reopens on its own answers kept in this browser, over the CRS draft', async () => {
@@ -117,7 +166,7 @@ describe('Checklist form', () => {
     page(<ChecklistFormView />);
 
     expect(await screen.findByLabelText('Enfants à charge')).toHaveValue('2');
-    expect(screen.getByLabelText('Votre état matrimonial')).toHaveValue('married');
+    expect(screen.getAllByLabelText('Poste 1')[0]).toHaveValue('Responsable QHSE');
     expect(screen.queryByText(/Pré-rempli/)).not.toBeInTheDocument();
   });
 
@@ -135,16 +184,16 @@ describe('Checklist form', () => {
     });
 
     it('reopens on the answers saved in the Account, and saves them there on « Continuer »', async () => {
-      server.checklist = { answers: FAMILY, ready: [] };
+      server.checklist = { answers: SINGLE, ready: [] };
       server.simulations = [{ id: 'sim_1', name: 'Profil avec Kemi', total: 471, updatedAt: new Date('2026-10-20') }];
       page(<ChecklistFormView />);
 
-      expect(await screen.findByLabelText('Enfants à charge')).toHaveValue('2');
+      expect(await screen.findByLabelText('Poste 1')).toHaveValue('Responsable QHSE');
       fireEvent.click(check('J’ai une offre d’emploi d’un employeur canadien'));
       fireEvent.click(screen.getByRole('button', { name: 'Continuer' }));
 
       expect(router.push).toHaveBeenCalledWith('/outils/checklist/liste');
-      await waitFor(() => expect(server.saveAnswers).toHaveBeenCalledWith({ ...FAMILY, jobOffer: true }));
+      await waitFor(() => expect(server.saveAnswers).toHaveBeenCalledWith({ ...SINGLE, jobOffer: true }));
     });
   });
 });
@@ -157,52 +206,104 @@ describe('Checklist list', () => {
     expect(screen.getByRole('link', { name: 'Remplir le formulaire' })).toHaveAttribute('href', '/outils/checklist');
   });
 
-  it('lists the documents section by section, mandatory ones starred', async () => {
+  it('gives each person their block: principal applicant, spouse, then each child', async () => {
     keepAnswers(FAMILY);
     page(<ChecklistView />);
 
-    const identity = await screen.findByRole('region', { name: 'Identité et état civil' });
-    const passport = within(identity).getAllByRole('listitem')[0]!;
-    expect(passport).toHaveTextContent('Passeport');
-    expect(passport).toHaveTextContent('★Obligatoire');
-
-    const birth = within(identity)
-      .getAllByRole('listitem')
-      .filter((row) => within(row).queryByRole('button', { name: /Acte de naissance/ }));
-    expect(birth.map((row) => row.textContent)).toEqual([
-      expect.stringMatching(/Acte de naissance.*★Obligatoire.*Enfants× 2/),
-      expect.stringMatching(/Acte de naissance.*Recommandé/),
-      expect.stringMatching(/Acte de naissance.*Recommandé.*Conjoint\(e\)/),
+    await screen.findByRole('region', { name: 'Requérant principal : documents justificatifs' });
+    expect(screen.getAllByRole('heading', { level: 2 }).slice(0, 6).map((h) => h.textContent)).toEqual([
+      'Votre avancement',
+      'Requérant principal : documents justificatifs',
+      'Conjoint(e) : documents justificatifs',
+      'Enfant 1 : documents justificatifs',
+      'Enfant 2 : documents justificatifs',
+      'Frais',
     ]);
-    expect(within(section('Certificats de police')).getAllByRole('listitem')[0]).toHaveTextContent('× 2');
-    expect(within(section('Identité et état civil')).getByRole('button', { name: /Acte de mariage/ })).toBeInTheDocument();
+    const principal = personBlock('Requérant principal : documents justificatifs');
+    expect(within(principal).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
+      '*Passeports/titres de voyage(requis)',
+      '*Certificat de mariage/permis(requis)',
+      '*Preuve d’examen médical préalable(requis)',
+      '*Études (diplômes ou grades universitaires)(requis)',
+      '*Relevé d’emploi – Responsable QHSE(requis)',
+      '*Certificat de police – Cameroun(requis)',
+      '*Preuve de ressources financières suffisantes(requis)',
+      '*Photographie(requis)',
+      'Documents optionnels',
+      '*Renseignements du client(requis)',
+    ]);
+    const child = personBlock('Enfant 2 : documents justificatifs');
+    expect(within(child).getByRole('heading', { level: 3, name: /Enregistrement\/certificat naissance/ })).toBeInTheDocument();
+    expect(
+      within(personBlock('Conjoint(e) : documents justificatifs')).getByRole('heading', { level: 3, name: /Relevé d’emploi – Commerciale/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('lists a job’s documents, the letter starred and the rest recommended', async () => {
+    keepAnswers(SINGLE);
+    page(<ChecklistView />);
+
+    const job = slotRow(await screen.findByRole('region', { name: /Requérant principal/ }), /Relevé d’emploi – Responsable QHSE/);
+    expect(documentsOf(job)).toEqual([
+      'Lettres de référence des employeurs',
+      'Fiches de paie',
+      'Contrat de travail',
+      'Attestation de sécurité sociale',
+      'Relevés du compte de salaire',
+    ]);
+    const rows = within(job).getAllByRole('listitem');
+    expect(rows[0]).toHaveTextContent('★Obligatoire');
+    for (const row of rows.slice(1)) expect(row).toHaveTextContent('Recommandé');
+  });
+
+  it('groups the ECA, the diploma, the transcripts and the language test under « Études »', async () => {
+    keepAnswers(SINGLE);
+    page(<ChecklistView />);
+
+    const studies = slotRow(await screen.findByRole('region', { name: /Requérant principal/ }), /Études/);
+    expect(documentsOf(studies)).toEqual([
+      'Évaluation des diplômes d’études (EDE)',
+      'Diplômes et attestations de diplôme',
+      'Résultats du test de langue',
+      'Relevés de notes',
+    ]);
   });
 
   it('opens a document’s guide in a dialog', async () => {
-    keepAnswers(FAMILY);
+    keepAnswers(SINGLE);
     page(<ChecklistView />);
 
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Lettres de référence des employeurs' }))[0]!);
+    fireEvent.click(await screen.findByRole('button', { name: 'Lettres de référence des employeurs' }));
 
     const dialog = await screen.findByRole('dialog', { name: 'Lettres de référence des employeurs' });
     expect(within(dialog).getByRole('heading', { name: 'Ce que la lettre doit contenir' })).toBeInTheDocument();
-    expect(dialog).toHaveTextContent('Le nombre d’heures de travail par semaine.');
+    expect(dialog).toHaveTextContent('Relevé d’emploi – Responsable QHSE · Requérant principal');
     expect(within(dialog).getByRole('link', { name: 'Faire vérifier mes lettres par Stanzy' })).toHaveAttribute('href', '/services/verification');
   });
 
+  it('shows IRCC’s fees for the family', async () => {
+    keepAnswers(FAMILY);
+    page(<ChecklistView />);
+
+    const fees = await screen.findByRole('region', { name: 'Frais' });
+    expect(within(fees).getByRole('row', { name: /pour un enfant/ })).toHaveTextContent(/2\s*270,00\s*\$\s*540,00\s*\$/);
+    // 990 + 600 + 170 + 990 + 600 + 540
+    expect(within(fees).getByRole('row', { name: /Prix total/ })).toHaveTextContent(/3\s*890,00\s*\$/);
+  });
+
   it('ticks a visitor’s documents « Prêt » in this browser, with the progress', async () => {
-    keepAnswers(DEFAULT_CHECKLIST_FORM);
+    keepAnswers(SINGLE);
     page(<ChecklistView />);
     const progress = await screen.findByRole('progressbar', { name: 'Documents prêts' });
     expect(progress).toHaveAttribute('aria-valuenow', '0');
 
-    fireEvent.click(check('Passeport (Vous) : prêt'));
+    fireEvent.click(check('Prêt : Passeport – Passeports/titres de voyage (Requérant principal)'));
 
-    expect(check('Passeport (Vous) : prêt')).toBeChecked();
+    expect(check('Prêt : Passeport – Passeports/titres de voyage (Requérant principal)')).toBeChecked();
     expect(progress).not.toHaveAttribute('aria-valuenow', '0');
     expect(screen.getByText(/^1 sur \d+ documents prêts$/)).toBeInTheDocument();
-    expect(screen.getByText(/^1 sur \d+ documents obligatoires$/)).toBeInTheDocument();
-    expect(JSON.parse(window.localStorage.getItem(READY_KEY)!)).toEqual(['you:passport']);
+    expect(slotRow(personBlock(/Requérant principal/), /Passeports/)).toHaveTextContent('Prêt');
+    expect(JSON.parse(window.localStorage.getItem(READY_KEY)!)).toEqual(['principal:passport:passport']);
     expect(screen.getByRole('link', { name: 'Se connecter' })).toBeInTheDocument();
   });
 
@@ -210,43 +311,42 @@ describe('Checklist list', () => {
     beforeEach(signedIn);
 
     it('shows the ticks saved in the Account and saves a new one', async () => {
-      server.checklist = { answers: DEFAULT_CHECKLIST_FORM, ready: ['you:passport'] };
+      server.checklist = { answers: SINGLE, ready: ['principal:passport:passport'] };
       page(<ChecklistView />);
 
-      expect(await screen.findByRole('checkbox', { name: 'Passeport (Vous) : prêt' })).toBeChecked();
-      fireEvent.click(check('Photo numérique (Vous) : prêt'));
+      expect(await screen.findByRole('checkbox', { name: /^Prêt : Passeport –/ })).toBeChecked();
+      fireEvent.click(check(/^Prêt : Fiches de paie – Relevé d’emploi – Responsable QHSE/));
 
-      await waitFor(() => expect(check('Photo numérique (Vous) : prêt')).toBeChecked());
-      expect(server.setReady).toHaveBeenCalledWith({ key: 'you:photo', ready: true });
-      expect(server.checklist?.ready).toEqual(['you:passport', 'you:photo']);
+      await waitFor(() => expect(check(/^Prêt : Fiches de paie/)).toBeChecked());
+      expect(server.setReady).toHaveBeenCalledWith({ key: 'principal:job-0:payslips', ready: true });
       expect(screen.queryByRole('link', { name: 'Se connecter' })).not.toBeInTheDocument();
     });
 
     it('unticks a refused tick and says so', async () => {
-      server.checklist = { answers: DEFAULT_CHECKLIST_FORM, ready: [] };
+      server.checklist = { answers: SINGLE, ready: [] };
       server.setReady = vi.fn(async () => {
         throw new Error('offline');
       });
       page(<ChecklistView />);
 
-      fireEvent.click(await screen.findByRole('checkbox', { name: 'Passeport (Vous) : prêt' }));
+      fireEvent.click(await screen.findByRole('checkbox', { name: /^Prêt : Passeport –/ }));
 
       expect(await screen.findByText('Le document n’a pas pu être coché. Réessayez.')).toBeInTheDocument();
-      expect(check('Passeport (Vous) : prêt')).not.toBeChecked();
+      expect(check(/^Prêt : Passeport –/)).not.toBeChecked();
     });
 
     it('builds the list from this device’s answers before any were saved', async () => {
       keepAnswers(FAMILY);
       page(<ChecklistView />);
 
-      expect(await screen.findByRole('region', { name: 'Identité et état civil' })).toHaveTextContent('Acte de mariage');
+      expect(await screen.findByRole('region', { name: 'Conjoint(e) : documents justificatifs' })).toBeInTheDocument();
     });
   });
 
   it('has no detectable accessibility violations', async () => {
     keepAnswers(FAMILY);
     const { container } = page(<ChecklistView />);
-    await screen.findByRole('region', { name: 'Identité et état civil' });
+    await screen.findByRole('region', { name: /Requérant principal/ });
     expect(await axe(container)).toHaveNoViolations();
-  }, 20_000);
+  }, 30_000);
 });

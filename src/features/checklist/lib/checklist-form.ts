@@ -5,7 +5,11 @@ import { toLanguageResult } from '@/features/shared/lib/language-form';
 import { isPartnered, MARITAL_STATUSES, type MaritalStatus } from '@/features/shared/lib/marital-status';
 
 export const MAX_CHILDREN = 10;
-export const MAX_POLICE_COUNTRIES = 10;
+/** Jobs and countries one person can list. */
+export const MAX_ENTRIES = 10;
+
+/** A job declared in the profile: IRCC asks for one « Relevé d'emploi » per job, named by its title. */
+export type Job = { title: string; inCanada: boolean; selfEmployed: boolean };
 
 /**
  * What the Checklist asks about the candidate: only what changes the list of
@@ -25,22 +29,29 @@ export type ChecklistForm = {
   canadianEducation: boolean;
   /** Results in both official languages. */
   secondLanguage: boolean;
-  foreignWork: boolean;
+  /** The candidate's jobs, at least one. */
+  jobs: Job[];
   /** At least a year of skilled work in Canada (Canadian Experience Class). */
   canadianWork: boolean;
-  selfEmployed: boolean;
-  jobOffer: boolean;
   /** Authorized to work in Canada today (a work permit). */
   authorizedToWork: boolean;
+  /** Countries (not Canada) lived in 6 months in a row or more, in the last 10 years since age 18: one police certificate each. */
+  countries: string[];
+  /** The accompanying spouse's job titles. */
+  spouseJobs: string[];
+  /** The accompanying spouse's countries, as for the candidate. */
+  spouseCountries: string[];
+  jobOffer: boolean;
   provincialNomination: boolean;
   certificateOfQualification: boolean;
   siblingInCanada: boolean;
   /** A consultant or lawyer represents the candidate with IRCC. */
   representative: boolean;
-  /** Countries (not Canada) lived in 6 months in a row or more, in the last 10 years since age 18. */
-  policeCountries: number;
 };
 
+export const emptyJob = (inCanada = false): Job => ({ title: '', inCanada, selfEmployed: false });
+
+/** The form's first answers: one job and one country still to name. */
 export const DEFAULT_CHECKLIST_FORM: ChecklistForm = {
   maritalStatus: 'single',
   spouseAccompanying: false,
@@ -50,18 +61,22 @@ export const DEFAULT_CHECKLIST_FORM: ChecklistForm = {
   foreignEducation: true,
   canadianEducation: false,
   secondLanguage: false,
-  foreignWork: true,
+  jobs: [emptyJob()],
   canadianWork: false,
-  selfEmployed: false,
-  jobOffer: false,
   authorizedToWork: false,
+  countries: [''],
+  spouseJobs: [],
+  spouseCountries: [],
+  jobOffer: false,
   provincialNomination: false,
   certificateOfQualification: false,
   siblingInCanada: false,
   representative: false,
-  policeCountries: 1,
 };
 
+const name = z.string().trim().min(1).max(80);
+
+/** Complete answers, as saved: every job and country named. */
 export const checklistFormSchema = z.object({
   maritalStatus: z.enum(MARITAL_STATUSES),
   spouseAccompanying: z.boolean(),
@@ -71,16 +86,17 @@ export const checklistFormSchema = z.object({
   foreignEducation: z.boolean(),
   canadianEducation: z.boolean(),
   secondLanguage: z.boolean(),
-  foreignWork: z.boolean(),
+  jobs: z.array(z.object({ title: name, inCanada: z.boolean(), selfEmployed: z.boolean() })).min(1).max(MAX_ENTRIES),
   canadianWork: z.boolean(),
-  selfEmployed: z.boolean(),
-  jobOffer: z.boolean(),
   authorizedToWork: z.boolean(),
+  countries: z.array(name).min(1).max(MAX_ENTRIES),
+  spouseJobs: z.array(name).max(MAX_ENTRIES),
+  spouseCountries: z.array(name).max(MAX_ENTRIES),
+  jobOffer: z.boolean(),
   provincialNomination: z.boolean(),
   certificateOfQualification: z.boolean(),
   siblingInCanada: z.boolean(),
   representative: z.boolean(),
-  policeCountries: z.number().int().min(1).max(MAX_POLICE_COUNTRIES),
 }) satisfies z.ZodType<ChecklistForm>;
 
 /** The spouse or partner comes too, so they need their own documents. */
@@ -89,13 +105,17 @@ export const spouseComes = (form: ChecklistForm): boolean =>
 
 /**
  * The Checklist answers that CRS answers already give. What the CRS doesn't
- * ask (children, self-employment, countries lived in…) is left out, for the
- * form's own answers or defaults to fill.
+ * ask (children, job titles, countries…) is left out, or left to name: a
+ * job row for each kind of experience the CRS counts.
  */
 export function fromCrsForm(crs: CrsForm): Partial<ChecklistForm> {
   const spouseAccompanying =
     isPartnered(crs.maritalStatus) && crs.spouseAccompanying && !crs.spouseIsCanadianCitizenOrPR;
   const hasPostSecondary = crs.education !== 'lessThanSecondary';
+  const jobs = [
+    ...(crs.foreignWorkYears > 0 ? [emptyJob(false)] : []),
+    ...(crs.canadianWorkYears > 0 ? [emptyJob(true)] : []),
+  ];
   return {
     maritalStatus: crs.maritalStatus,
     spouseAccompanying,
@@ -106,7 +126,7 @@ export function fromCrsForm(crs: CrsForm): Partial<ChecklistForm> {
     canadianEducation: crs.canadianStudy !== 'none',
     foreignEducation: hasPostSecondary && crs.canadianStudy === 'none',
     secondLanguage: toLanguageResult(crs.secondLanguage) !== null,
-    foreignWork: crs.foreignWorkYears > 0,
+    ...(jobs.length > 0 ? { jobs } : {}),
     canadianWork: crs.canadianWorkYears >= 1,
     jobOffer: crs.highWageJobOffer !== 'none',
     provincialNomination: crs.provincialNomination,

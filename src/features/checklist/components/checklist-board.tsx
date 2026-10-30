@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Check, ClipboardList, ExternalLink, Info, LockKeyhole, PencilLine } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
@@ -15,10 +15,12 @@ import { useStoredChecklistAnswers, useStoredReady } from '@/features/checklist/
 import {
   buildChecklist,
   progressOf,
-  type ChecklistItem,
-  type ChecklistSection,
+  type ChecklistPerson,
+  type ChecklistPiece,
+  type ChecklistSlot,
   type Need,
 } from '@/features/checklist/lib/build-checklist';
+import { checklistFees } from '@/features/checklist/lib/checklist-fees';
 import type { ChecklistForm } from '@/features/checklist/lib/checklist-form';
 import { GuideBlocks, GuideDialog } from '@/features/shared/components/guide-blocks';
 import { Link } from '@/i18n/navigation';
@@ -97,9 +99,9 @@ function SignedInChecklist(): ReactNode {
 
 function ChecklistList({ answers, ready, onToggle }: { answers: ChecklistForm; ready: string[]; onToggle: Toggle }): ReactNode {
   const t = useTranslations('Checklist.list');
-  const sections = useMemo(() => buildChecklist(answers), [answers]);
+  const people = useMemo(() => buildChecklist(answers), [answers]);
   const readySet = useMemo(() => new Set(ready), [ready]);
-  const progress = progressOf(sections, readySet);
+  const progress = progressOf(people, readySet);
   const percent = progress.total ? Math.round((progress.ready / progress.total) * 100) : 0;
 
   return (
@@ -140,31 +142,85 @@ function ChecklistList({ answers, ready, onToggle }: { answers: ChecklistForm; r
         </p>
       </section>
 
-      {sections.map((section) => (
-        <SectionCard key={section.id} section={section} ready={readySet} onToggle={onToggle} />
+      {people.map((person) => (
+        <PersonCard key={person.id} person={person} ready={readySet} onToggle={onToggle} />
       ))}
+
+      <FeesCard answers={answers} />
     </div>
   );
 }
 
-function SectionCard({ section, ready, onToggle }: { section: ChecklistSection; ready: ReadonlySet<string>; onToggle: Toggle }): ReactNode {
+/** « Requérant principal », « Conjoint(e) », « Enfant 2 ». */
+function usePersonName(person: ChecklistPerson): string {
+  const t = useTranslations('Checklist.list.people');
+  return person.kind === 'child' ? t('child', { number: person.number ?? 1 }) : t(person.kind);
+}
+
+/** « Passeports/titres de voyage », « Relevé d'emploi – Responsable QHSE ». */
+function useSlotName(slot: ChecklistSlot): string {
+  const t = useTranslations('Checklist.list.slots');
+  return t(slot.slot, { label: slot.label ?? '' });
+}
+
+/** One person's block, as in IRCC's checklist: « {person} : documents justificatifs ». */
+function PersonCard({ person, ready, onToggle }: { person: ChecklistPerson; ready: ReadonlySet<string>; onToggle: Toggle }): ReactNode {
   const t = useTranslations('Checklist.list');
-  const headingId = `checklist-${section.id}`;
-  const done = section.items.filter((item) => ready.has(item.key)).length;
+  const name = usePersonName(person);
+  const headingId = `checklist-${person.id}`;
+  const progress = progressOf(person.slots, ready);
   return (
-    <section aria-labelledby={headingId} className="rounded-2xl border border-fog bg-white p-5 shadow-sm sm:p-6">
-      <div className="mb-4 flex items-baseline justify-between gap-3">
-        <h2 id={headingId} className="font-heading text-h4 font-bold text-navy-deep">
-          {t(`sections.${section.id}`)}
+    <section aria-labelledby={headingId} className="overflow-hidden rounded-2xl border border-fog bg-white shadow-sm">
+      <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-fog-light bg-navy-deep px-5 py-4 sm:px-6">
+        <h2 id={headingId} className="font-heading text-h4 font-bold text-white">
+          {t('personTitle', { person: name })}
         </h2>
-        <span className="shrink-0 font-label text-slate">{t('sectionProgress', { ready: done, total: section.items.length })}</span>
+        <span className="font-label text-white/70">{t('personProgress', { ready: progress.ready, total: progress.total })}</span>
       </div>
-      <ul className="flex flex-col gap-2.5">
-        {section.items.map((item) => (
-          <DocumentRow key={item.key} item={item} ready={ready.has(item.key)} onToggle={onToggle} />
+      <ul className="divide-y divide-fog-light">
+        {person.slots.map((slot) => (
+          <SlotRow key={slot.key} slot={slot} person={name} ready={ready} onToggle={onToggle} />
         ))}
       </ul>
     </section>
+  );
+}
+
+/** An IRCC slot: its status, its name (« * … (requis) »), and the documents that go in it. */
+function SlotRow({ slot, person, ready, onToggle }: { slot: ChecklistSlot; person: string; ready: ReadonlySet<string>; onToggle: Toggle }): ReactNode {
+  const t = useTranslations('Checklist.list');
+  const name = useSlotName(slot);
+  const done = slot.pieces.filter((piece) => ready.has(piece.key)).length;
+  const complete = done === slot.pieces.length;
+  return (
+    <li className="px-5 py-4 sm:px-6">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold',
+            complete ? 'bg-leaf-tint text-leaf' : 'bg-off-white text-slate',
+          )}
+        >
+          {complete ? <Check aria-hidden={true} className="size-3.5" /> : null}
+          {complete ? t('slotReady') : t('slotPending')}
+        </span>
+        <h3 className="font-heading text-body font-bold text-navy-deep">
+          {slot.required ? (
+            <span aria-hidden={true} className="mr-1 text-rouge">
+              *
+            </span>
+          ) : null}
+          {name}
+          {slot.required ? <span className="ml-1 font-body text-body-sm font-medium text-slate">{t('requiredTag')}</span> : null}
+        </h3>
+        <span className="ml-auto font-label text-slate">{t('slotCount', { ready: done, total: slot.pieces.length })}</span>
+      </div>
+      <ul className="mt-3 flex flex-col gap-2">
+        {slot.pieces.map((piece) => (
+          <PieceRow key={piece.key} piece={piece} slot={name} person={person} ready={ready.has(piece.key)} onToggle={onToggle} />
+        ))}
+      </ul>
+    </li>
   );
 }
 
@@ -182,26 +238,27 @@ function NeedBadge({ need }: { need: Need }): ReactNode {
   );
 }
 
-/** Whose document, and how many: « Conjoint(e) », « Enfants × 2 », « × 3 ». */
-function WhoChip({ item }: { item: ChecklistItem }): ReactNode {
+/** A document in a slot: its name opens its guide; « Prêt » ticks it. */
+function PieceRow({
+  piece,
+  slot,
+  person,
+  ready,
+  onToggle,
+}: {
+  piece: ChecklistPiece;
+  slot: string;
+  person: string;
+  ready: boolean;
+  onToggle: Toggle;
+}): ReactNode {
   const t = useTranslations('Checklist.list');
-  if (item.who === 'you' && !item.count) return null;
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-off-white px-2 py-0.5 text-xs font-semibold text-navy-deep">
-      {item.who === 'you' ? null : t(`who.${item.who}`)}
-      {item.count ? <span>{t('count', { count: item.count })}</span> : null}
-    </span>
-  );
-}
-
-function DocumentRow({ item, ready, onToggle }: { item: ChecklistItem; ready: boolean; onToggle: Toggle }): ReactNode {
-  const t = useTranslations('Checklist.list');
-  const guide = DOCUMENT_GUIDES[toLocale(useLocale())][item.document];
+  const guide = DOCUMENT_GUIDES[toLocale(useLocale())][piece.document];
   const [open, setOpen] = useState(false);
   return (
     <li
       className={cn(
-        'flex items-start gap-3 rounded-xl border p-3.5 transition-colors sm:p-4',
+        'flex items-start gap-3 rounded-xl border p-3 transition-colors sm:p-3.5',
         ready ? 'border-leaf-line bg-leaf-tint' : 'border-fog-light',
       )}
     >
@@ -210,13 +267,12 @@ function DocumentRow({ item, ready, onToggle }: { item: ChecklistItem; ready: bo
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-1.5 text-left font-heading text-body font-bold text-navy-deep underline-offset-4 hover:text-rouge hover:underline"
+            className="inline-flex items-center gap-1.5 text-left font-heading text-body-sm font-bold text-navy-deep underline-offset-4 hover:text-rouge hover:underline sm:text-body"
           >
             {guide.name}
             <Info aria-hidden={true} className="size-4 shrink-0 text-rouge" />
           </button>
-          <NeedBadge need={item.need} />
-          <WhoChip item={item} />
+          <NeedBadge need={piece.need} />
         </div>
         <p className="mt-1 text-body-sm leading-relaxed text-slate">{guide.summary}</p>
       </div>
@@ -224,8 +280,8 @@ function DocumentRow({ item, ready, onToggle }: { item: ChecklistItem; ready: bo
         <input
           type="checkbox"
           checked={ready}
-          onChange={(event) => onToggle(item.key, event.target.checked)}
-          aria-label={t('readyLabel', { name: guide.name, who: t(`who.${item.who}`) })}
+          onChange={(event) => onToggle(piece.key, event.target.checked)}
+          aria-label={t('readyFor', { name: guide.name, slot, person })}
           className="size-5 accent-leaf"
         />
         <span aria-hidden={true} className="hidden sm:inline">
@@ -238,15 +294,75 @@ function DocumentRow({ item, ready, onToggle }: { item: ChecklistItem; ready: bo
         title={guide.name}
         closeLabel={t('closeGuide')}
         header={
-          <span className="flex flex-wrap items-center gap-2">
-            <NeedBadge need={item.need} />
-            <WhoChip item={item} />
+          <span className="flex flex-wrap items-center gap-2 text-body-sm text-slate">
+            <NeedBadge need={piece.need} />
+            {slot} · {person}
           </span>
         }
       >
         <GuideBlocks blocks={guide.blocks} />
       </GuideDialog>
     </li>
+  );
+}
+
+/** « Frais »: IRCC's fees for this family, as at the end of its checklist. */
+function FeesCard({ answers }: { answers: ChecklistForm }): ReactNode {
+  const t = useTranslations('Checklist.list.fees');
+  const format = useFormatter();
+  const { rows, total } = checklistFees(answers);
+  // The columns say CAD: « 990,00 $ », as in IRCC's checklist.
+  const money = (amount: number) => format.number(amount, { style: 'currency', currency: 'CAD', currencyDisplay: 'narrowSymbol' });
+  return (
+    <section aria-labelledby="checklist-fees" className="rounded-2xl border border-fog bg-white p-5 shadow-sm sm:p-6">
+      <h2 id="checklist-fees" className="font-heading text-h4 font-bold text-navy-deep">
+        {t('title')}
+      </h2>
+      <p className="mt-1 text-body-sm text-slate">{t('lead')}</p>
+      <div className="mt-4 overflow-x-auto rounded-xl border border-fog-light">
+        <table className="w-full text-body-sm">
+          <thead className="bg-off-white">
+            <tr>
+              <th scope="col" className="px-3.5 py-2 text-left font-label text-slate">
+                {t('request')}
+              </th>
+              <th scope="col" className="px-3.5 py-2 text-right font-label text-slate">
+                {t('quantity')}
+              </th>
+              <th scope="col" className="px-3.5 py-2 text-right font-label text-slate">
+                {t('unit')}
+              </th>
+              <th scope="col" className="px-3.5 py-2 text-right font-label text-slate">
+                {t('total')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.id} className="border-t border-fog-light">
+                <th scope="row" className="px-3.5 py-2.5 text-left font-medium text-navy-deep">
+                  {t(row.id)}
+                </th>
+                <td className="px-3.5 py-2.5 text-right tabular-nums text-slate">{row.quantity}</td>
+                <td className="px-3.5 py-2.5 text-right tabular-nums text-slate">{money(row.unit)}</td>
+                <td className="px-3.5 py-2.5 text-right font-semibold tabular-nums text-navy-deep">{money(row.quantity * row.unit)}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="border-t-2 border-fog">
+              <th scope="row" colSpan={3} className="px-3.5 py-3 text-left font-heading font-bold text-navy-deep">
+                {t('grandTotal')}
+              </th>
+              <td className="px-3.5 py-3 text-right font-heading font-bold tabular-nums text-rouge">{money(total)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <Link href="/outils/budget" className="mt-4 inline-flex items-center gap-1.5 text-body-sm font-semibold text-navy-deep underline underline-offset-2 hover:text-rouge">
+        {t('budgetLink')}
+      </Link>
+    </section>
   );
 }
 

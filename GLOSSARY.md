@@ -114,7 +114,7 @@ One amount a User logged as spent on their procedure: a name, a motif from a fix
 _Avoid_: "transaction", "paiement" (IRCC payments are one kind of Dépense).
 
 **Checklist Entrée Express** (Express Entry checklist):
-The documents a candidate should prepare before the ITA, built from a few answers about their situation (family, studies, work, languages, countries lived in, special situations) and prefilled from their latest saved Simulation or the CRS answers on the device. Each document is ★ Obligatoire or Recommandé, opens a guide, and can be ticked « Prêt ». Answers and ticks stay in the browser, and in the Account for a User. A preparation aid: IRCC's personalized checklist after the ITA is the reference. Stores no files (that is the Coffre-fort).
+The documents a candidate should prepare before the ITA, built from a few answers about their situation (family, studies, each job, each country lived in, special situations) and prefilled from their latest saved Simulation or the CRS answers on the device. Laid out like IRCC's personal checklist: one block per person (Requérant principal, Conjoint(e), Enfant 1, 2…), each with IRCC's slots (« Relevé d'emploi – <poste> », « Certificat de police – <pays> »…) and the documents that go in them, ★ Obligatoire or Recommandé, each opening a guide and ticked « Prêt »; IRCC's fees close the list. Answers and ticks stay in the browser, and in the Account for a User. A preparation aid: IRCC's personalized checklist after the ITA is the reference. Stores no files (that is the Coffre-fort).
 _Avoid_: "document list" alone (ambiguous with the Coffre-fort or Documents de service).
 
 **Canal WhatsApp** (WhatsApp channel):

@@ -6,8 +6,8 @@ import { checklistFormSchema, type ChecklistForm } from '@/features/checklist/li
 import { useStoredForm, useStoredValue, writeStored } from '@/features/shared/hooks/use-stored-form';
 
 /** Versioned, so a later change to the form discards old answers instead of breaking. */
-export const CHECKLIST_ANSWERS_KEY = 'stanzy.checklist.answers.v1';
-export const CHECKLIST_READY_KEY = 'stanzy.checklist.ready.v1';
+export const CHECKLIST_ANSWERS_KEY = 'stanzy.checklist.answers.v2';
+export const CHECKLIST_READY_KEY = 'stanzy.checklist.ready.v2';
 
 const readySchema = z.array(z.string());
 
