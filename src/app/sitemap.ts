@@ -8,6 +8,7 @@ import { routing } from '@/i18n/routing';
 const PAGES = [
   '',
   '/blog',
+  '/outils',
   '/outils/crs',
   '/outils/67-points',
   '/outils/nclc-clb',

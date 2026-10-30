@@ -21,6 +21,10 @@ vi.mock('@/features/auth/lib/auth-client', () => ({
 
 const useSession = vi.mocked(authClient.useSession);
 
+/** The tool entries of a menu, without its last « Voir tous les outils » link. */
+const toolLinks = (menu: HTMLElement) =>
+  within(menu).getAllByRole('link').filter((link) => link.textContent !== 'Voir tous les outils');
+
 function signedInAs(name: string, role = 'MEMBER') {
   useSession.mockReturnValue({
     data: { user: { name, email: 'aminata@example.com', role }, session: {} },
@@ -86,7 +90,7 @@ describe('SiteNav', () => {
     const panel = document.getElementById(trigger.getAttribute('aria-controls')!);
     expect(panel).not.toBeNull();
     expect(panel!.getAttribute('aria-hidden')).toBe('false');
-    expect(within(panel!).getAllByRole('link')).toHaveLength(10);
+    expect(toolLinks(panel!)).toHaveLength(10);
     expect(within(panel!).getByRole('link', { name: /Prochain tirage/ })).toHaveAttribute('href', expect.stringContaining('/outils/prochain-tirage'));
     expect(within(panel!).getByRole('link', { name: /NCLC \/ CLB/ })).toHaveAttribute('href', expect.stringContaining('/outils/nclc-clb'));
     expect(within(panel!).getByText('Calculateur CRS')).toBeInTheDocument();
@@ -98,7 +102,7 @@ describe('SiteNav', () => {
     const trigger = screen.getByRole('button', { name: 'Ouvrir le menu Outils' });
     fireEvent.mouseEnter(trigger.closest('li')!);
     const panel = document.getElementById(trigger.getAttribute('aria-controls')!)!;
-    const links = within(panel).getAllByRole('link');
+    const links = toolLinks(panel);
 
     const soon = links.filter((link) => within(link).queryByText('Bientôt'));
     expect(soon.map((link) => link.getAttribute('href'))).toEqual(['/fr/outils/cnp', '/fr/outils/coffre-fort']);
@@ -110,11 +114,25 @@ describe('SiteNav', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Ouvrir le menu' }));
     const menu = await screen.findByRole('dialog');
     const tools = within(menu).getByText('Outils', { selector: 'summary' }).closest('details')!;
-    const links = within(tools).getAllByRole('link');
+    const links = toolLinks(tools);
 
     expect(links.slice(-2).map((link) => link.getAttribute('href'))).toEqual(['/fr/outils/cnp', '/fr/outils/coffre-fort']);
     for (const link of links.slice(-2)) expect(within(link).getByText('Bientôt')).toBeInTheDocument();
     for (const link of links.slice(0, -2)) expect(within(link).queryByText('Bientôt')).toBeNull();
+  });
+
+  it('ends the Outils menus with a link to the page of every tool', async () => {
+    render(withIntl(<SiteNav />));
+    const trigger = screen.getByRole('button', { name: 'Ouvrir le menu Outils' });
+    fireEvent.mouseEnter(trigger.closest('li')!);
+    const panel = document.getElementById(trigger.getAttribute('aria-controls')!)!;
+    expect(within(panel).getAllByRole('link').at(-1)).toHaveAccessibleName('Voir tous les outils');
+    expect(within(panel).getByRole('link', { name: 'Voir tous les outils' })).toHaveAttribute('href', '/fr/outils');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ouvrir le menu' }));
+    const menu = await screen.findByRole('dialog');
+    const tools = within(menu).getByText('Outils', { selector: 'summary' }).closest('details')!;
+    expect(within(tools).getAllByRole('link').at(-1)).toHaveAttribute('href', '/fr/outils');
   });
 
   it('marks the Dernier tirage entry with a live IRCC leaf icon', () => {

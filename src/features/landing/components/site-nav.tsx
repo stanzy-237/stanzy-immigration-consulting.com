@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, LayoutDashboard, LogOut, Menu } from 'lucide-react';
+import { ArrowRight, ChevronDown, LayoutDashboard, LogOut, Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
@@ -167,6 +167,7 @@ export function SiteNav(): ReactNode {
                 getDesc={(e: NavMenuEntry): string => tTools(e.descKey)}
                 mapleLabel={t('liveMarker')}
                 comingSoonLabel={t('comingSoon')}
+                seeAll={{ label: t('allTools'), href: '/outils' }}
                 onNavigate={closeDropdown}
               />
             }
@@ -263,6 +264,7 @@ export function SiteNav(): ReactNode {
                 entries={TOOL_ENTRIES}
                 getName={(e: NavMenuEntry): string => tTools(e.labelKey)}
                 comingSoonLabel={t('comingSoon')}
+                seeAll={{ label: t('allTools'), href: '/outils' }}
                 onNavigate={closeMobile}
               />
               <MobileSection
@@ -489,8 +491,12 @@ type DropdownPanelProps = {
   getDesc: (entry: NavMenuEntry) => string;
   mapleLabel?: string;
   comingSoonLabel?: string;
+  /** A last link to the page listing the whole group (« Voir tous les outils »). */
+  seeAll?: SeeAllLink;
   onNavigate: () => void;
 };
+
+type SeeAllLink = { label: string; href: string };
 
 /** « Bientôt »: the tool's page is a placeholder for now. */
 function ComingSoonTag({ label }: { label: string }): ReactNode {
@@ -509,6 +515,7 @@ function DropdownPanel({
   getDesc,
   mapleLabel,
   comingSoonLabel,
+  seeAll,
   onNavigate,
 }: DropdownPanelProps): ReactNode {
   return (
@@ -554,6 +561,17 @@ function DropdownPanel({
           </Link>
         );
       })}
+      {seeAll ? (
+        <Link
+          href={seeAll.href}
+          tabIndex={open ? 0 : -1}
+          onClick={onNavigate}
+          className="text-rouge hover:bg-fog/40 group mt-1 flex items-center justify-center gap-1.5 rounded-lg border-t border-fog px-3 py-2.5 text-sm font-semibold transition-colors md:col-span-2"
+        >
+          {seeAll.label}
+          <ArrowRight aria-hidden={true} className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      ) : null}
     </div>
   );
 }
@@ -585,6 +603,7 @@ type MobileGroupProps = {
   entries: ReadonlyArray<NavMenuEntry>;
   getName: (entry: NavMenuEntry) => string;
   comingSoonLabel?: string;
+  seeAll?: SeeAllLink;
   onNavigate: () => void;
 };
 
@@ -593,6 +612,7 @@ function MobileGroup({
   entries,
   getName,
   comingSoonLabel,
+  seeAll,
   onNavigate,
 }: MobileGroupProps): ReactNode {
   return (
@@ -617,6 +637,18 @@ function MobileGroup({
             </li>
           ),
         )}
+        {seeAll ? (
+          <li>
+            <Link
+              href={seeAll.href}
+              onClick={onNavigate}
+              className="text-rouge flex items-center gap-1.5 px-6 py-2 text-sm font-semibold"
+            >
+              {seeAll.label}
+              <ArrowRight aria-hidden={true} className="h-4 w-4" />
+            </Link>
+          </li>
+        ) : null}
       </ul>
     </details>
   );

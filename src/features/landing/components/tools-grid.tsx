@@ -154,7 +154,16 @@ function ToolCard({
   );
 }
 
-export function ToolsGrid(): ReactNode {
+/**
+ * The tools mosaic: a section of the home page (`h2`), or the whole `/outils`
+ * page (`h1`).
+ */
+export function ToolsGrid({
+  headingLevel = "h2",
+}: {
+  headingLevel?: "h1" | "h2";
+}): ReactNode {
+  const Heading = headingLevel;
   const t = useTranslations("Home.ToolsGrid");
   const tItems = useTranslations("Home.ToolsGrid.Items");
   const tBadges = useTranslations("Home.ToolsGrid.Badges");
@@ -177,14 +186,14 @@ export function ToolsGrid(): ReactNode {
         </div>
 
         {/* Title */}
-        <h2
+        <Heading
           id="tools-grid-title"
           className="mb-2.5 font-heading text-[clamp(34px,4vw,52px)] font-bold leading-none tracking-tight text-navy-deep"
         >
           {t("titleLead")}
           <br />
           <span className="text-rouge">{t("titleAccent")}</span>
-        </h2>
+        </Heading>
 
         {/* Subtitle */}
         <p className="mb-12 max-w-lg lg:mb-8 text-lg leading-relaxed text-slate">

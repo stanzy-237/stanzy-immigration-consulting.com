@@ -17,6 +17,12 @@ describe('ToolsGrid', () => {
     );
   });
 
+  it('is the page heading on /outils', () => {
+    render(withIntl(<ToolsGrid headingLevel="h1" />));
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toMatch(/Vos outils d'immigration\./);
+    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
+  });
+
   it('renders all nine tools linking to their routes', () => {
     render(withIntl(<ToolsGrid />));
     const expected: ReadonlyArray<[RegExp, string]> = [
