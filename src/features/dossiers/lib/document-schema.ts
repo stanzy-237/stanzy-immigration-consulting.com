@@ -18,7 +18,11 @@ export const DOCUMENT_FILE_MAX_BYTES = 25 * 1024 * 1024;
 export const dossierBlobPrefix = (dossierId: string): string => `dossiers/${dossierId}/`;
 
 /** Whether `url` is a Vercel Blob file under the Dossier's folder (the only place the upload route signs). */
-export function isDossierBlob(url: string, dossierId: string): boolean {
+export const isDossierBlob = (url: string, dossierId: string): boolean =>
+  isBlobUnder(url, dossierBlobPrefix(dossierId));
+
+/** Whether `url` is a Vercel Blob file whose path starts with `prefix`. */
+export function isBlobUnder(url: string, prefix: string): boolean {
   let parsed: URL;
   try {
     parsed = new URL(url);
@@ -28,7 +32,7 @@ export function isDossierBlob(url: string, dossierId: string): boolean {
   return (
     parsed.protocol === 'https:' &&
     parsed.hostname.endsWith('.blob.vercel-storage.com') &&
-    parsed.pathname.slice(1).startsWith(dossierBlobPrefix(dossierId))
+    parsed.pathname.slice(1).startsWith(prefix)
   );
 }
 
@@ -43,9 +47,11 @@ export const addSectionInput = z.object({ dossierId: id, title });
 export const renameSectionInput = z.object({ id, title });
 export const addDocumentInput = z.object({ sectionId: id, title });
 
-/** A file already encrypted and sent to Vercel Blob, with its key for the server to wrap. */
-export const addVersionInput = z.object({
-  documentId: id,
+/**
+ * A file already encrypted and sent to Vercel Blob, with its key for the
+ * server to wrap (ADR 0007). Also what a Preuve de paiement records.
+ */
+export const encryptedFileInput = z.object({
   blobUrl: z.string().url(),
   // A 256-bit key and a 96-bit IV, base64.
   key: z.string().regex(/^[A-Za-z0-9+/]{43}=$/),
@@ -54,6 +60,8 @@ export const addVersionInput = z.object({
   contentType: z.enum(DOCUMENT_FILE_TYPES),
   size: z.number().int().min(1).max(DOCUMENT_FILE_MAX_BYTES),
 });
+
+export const addVersionInput = encryptedFileInput.extend({ documentId: id });
 
 /** `versionId` null takes the Finale off. */
 export const setFinalInput = z.object({ documentId: id, versionId: id.nullable() });

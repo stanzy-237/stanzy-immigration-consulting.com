@@ -9,6 +9,8 @@ export type EmailMessage = {
   subject: string;
   html: string;
   text: string;
+  /** Files sent along, such as a Facture's PDF. */
+  attachments?: { filename: string; content: Buffer }[];
 };
 
 /**
@@ -25,15 +27,16 @@ export type Mailer = {
  * previews without email set up) it logs the message instead, so links can be
  * followed from the terminal.
  */
-export function createMailer(opts: {
-  apiKey: string | undefined;
-  from: string;
-}): Mailer {
+export function createMailer(opts: { apiKey: string | undefined; from: string }): Mailer {
   if (!opts.apiKey) {
     return {
       async send(message) {
         console.info(
-          `[mailer] (no RESEND_API_KEY) to=${message.to} subject="${message.subject}"\n${message.text}`,
+          `[mailer] (no RESEND_API_KEY) to=${message.to} subject="${message.subject}"` +
+            (message.attachments?.length
+              ? ` attachments=${message.attachments.map((a) => a.filename).join(',')}`
+              : '') +
+            `\n${message.text}`,
         );
       },
     };

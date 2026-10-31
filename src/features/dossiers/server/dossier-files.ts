@@ -24,16 +24,36 @@ export async function storedSize(url: string): Promise<number | null> {
 
 export const sealKey = (key: string): Promise<string> => wrapKey(key, masterKey());
 
-/** Fetches a Version's encrypted file and decrypts it. */
-export async function openVersionFile(version: {
-  blobUrl: string;
-  wrappedKey: string;
-  iv: string;
-}): Promise<ArrayBuffer> {
-  const result = await get(version.blobUrl, { access: 'public', useCache: false });
+type StoredFile = { blobUrl: string; wrappedKey: string; iv: string; fileName: string; contentType: string };
+
+/** Fetches an encrypted file (a Version, a Preuve de paiement) and decrypts it. */
+export async function openEncryptedFile(file: StoredFile): Promise<ArrayBuffer> {
+  const result = await get(file.blobUrl, { access: 'public', useCache: false });
   if (!result || result.statusCode !== 200) throw new Error('DOSSIER_FILE_MISSING');
   const ciphertext = await new Response(result.stream).arrayBuffer();
-  return decryptFile(ciphertext, await unwrapKey(version.wrappedKey, masterKey()), version.iv);
+  return decryptFile(ciphertext, await unwrapKey(file.wrappedKey, masterKey()), file.iv);
+}
+
+/**
+ * The decrypted file as a response: never cached, shown in the browser
+ * (every accepted type, PDF or image, is safe inline) unless `?download`.
+ */
+export async function serveEncryptedFile(request: Request, file: StoredFile): Promise<Response> {
+  try {
+    const body = await openEncryptedFile(file);
+    const download = new URL(request.url).searchParams.has('download');
+    return new Response(body, {
+      headers: {
+        'Content-Type': file.contentType,
+        'Content-Disposition': `${download ? 'attachment' : 'inline'}; filename*=UTF-8''${encodeURIComponent(file.fileName)}`,
+        'Cache-Control': 'private, no-store',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    });
+  } catch (error) {
+    console.error('[dossiers] could not open an encrypted file', error);
+    return new Response(null, { status: 502 });
+  }
 }
 
 /** Removes files from Vercel Blob; a failure is logged, the rows are already gone. */

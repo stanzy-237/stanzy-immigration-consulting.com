@@ -25,24 +25,36 @@ export function documentFileType(file: { name: string; type: string }): Document
 }
 
 /**
- * Encrypts a file in the browser and sends it to Vercel Blob (ADR 0007).
- * Resolves to what `dossiers.documents.addVersion` records. Rejects
- * DOCUMENT_FILE_TYPE or DOCUMENT_FILE_TOO_LARGE before sending anything.
+ * Encrypts a file in the browser and sends it to Vercel Blob at `path`,
+ * through the upload route that signs it (ADR 0007). Resolves to what the
+ * server records. Rejects DOCUMENT_FILE_TYPE or DOCUMENT_FILE_TOO_LARGE
+ * before sending anything.
  */
-export async function uploadVersionFile(dossierId: string, documentId: string, file: File) {
+export async function uploadEncryptedFile(
+  file: File,
+  target: { path: string; handleUploadUrl: string; clientPayload: Record<string, string> },
+) {
   const contentType = documentFileType(file);
   if (!contentType) throw new Error('DOCUMENT_FILE_TYPE');
   if (file.size === 0 || file.size > DOCUMENT_FILE_MAX_BYTES) throw new Error('DOCUMENT_FILE_TOO_LARGE');
 
   const { ciphertext, key, iv } = await encryptFile(await file.arrayBuffer());
-  const blob = await upload(`${dossierBlobPrefix(dossierId)}${documentId}.bin`, new Blob([ciphertext]), {
+  const blob = await upload(target.path, new Blob([ciphertext]), {
     access: 'public',
     contentType: 'application/octet-stream',
-    handleUploadUrl: '/api/dossiers/upload',
-    clientPayload: JSON.stringify({ documentId }),
+    handleUploadUrl: target.handleUploadUrl,
+    clientPayload: JSON.stringify(target.clientPayload),
   });
   return { blobUrl: blob.url, key, iv, fileName: file.name, contentType, size: file.size };
 }
+
+/** A Document's next Version. */
+export const uploadVersionFile = (dossierId: string, documentId: string, file: File) =>
+  uploadEncryptedFile(file, {
+    path: `${dossierBlobPrefix(dossierId)}${documentId}.bin`,
+    handleUploadUrl: '/api/dossiers/upload',
+    clientPayload: { documentId },
+  });
 
 /** Where a Version opens, decrypted by the server. */
 export const versionFileUrl = (versionId: string): string => `/api/dossiers/files/${versionId}`;

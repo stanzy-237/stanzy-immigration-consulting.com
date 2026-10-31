@@ -53,6 +53,7 @@ model Account {
   dossierDocuments  DossierDocument[]
   documentVersions  DocumentVersion[]
   documentComments  DocumentComment[]
+  paymentProofs     PaymentProof[]
 
   @@map("account")
 }
@@ -372,6 +373,7 @@ model Dossier {
   closedReason String?
   events       DossierEvent[]
   sections     DossierSection[]
+  invoices     Invoice[]
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
@@ -473,4 +475,85 @@ model DocumentComment {
 
   @@index([documentId, createdAt])
   @@map("document_comment")
+}
+
+enum InvoiceCurrency {
+  XAF
+  CAD
+  EUR
+}
+
+/// En retard is not stored: it is a SENT or PROOF_RECEIVED invoice past its due date.
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PROOF_RECEIVED
+  PAID
+  CANCELLED
+}
+
+/// A Facture, for one Dossier. Amounts are in the currency's minor unit (XAF has none, CAD and EUR cents).
+model Invoice {
+  id           String          @id @default(cuid())
+  /// STZ-<year>-<0001>, given when it is sent, so drafts never burn a number.
+  number       String?         @unique
+  dossierId    String
+  dossier      Dossier         @relation(fields: [dossierId], references: [id], onDelete: Restrict)
+  currency     InvoiceCurrency @default(XAF)
+  status       InvoiceStatus   @default(DRAFT)
+  dueDate      DateTime?
+  /// Printed under the lines: payment instructions, a note to the Client.
+  notes        String?
+  lines        InvoiceLine[]
+  proofs       PaymentProof[]
+  sentAt       DateTime?
+  paidAt       DateTime?
+  cancelledAt  DateTime?
+  cancelReason String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([dossierId, createdAt])
+  @@index([status, updatedAt])
+  @@map("invoice")
+}
+
+model InvoiceLine {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  position    Int
+  description String
+  quantity    Int
+  unitAmount  Int
+
+  @@index([invoiceId, position])
+  @@map("invoice_line")
+}
+
+/// The last invoice number given in a year.
+model InvoiceCounter {
+  year Int @id
+  last Int
+
+  @@map("invoice_counter")
+}
+
+/// A Preuve de paiement the Client uploaded on an invoice, encrypted like a Document (ADR 0007).
+model PaymentProof {
+  id           String   @id @default(cuid())
+  invoiceId    String
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  fileName     String
+  contentType  String
+  size         Int
+  blobUrl      String
+  wrappedKey   String
+  iv           String
+  uploadedById String
+  uploadedBy   Account  @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+  createdAt    DateTime @default(now())
+
+  @@index([invoiceId, createdAt])
+  @@map("payment_proof")
 }

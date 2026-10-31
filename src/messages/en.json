@@ -1399,7 +1399,8 @@
       "openMenu": "Open the dashboard menu",
       "menuTitle": "Dashboard",
       "close": "Close the menu",
-      "dossiers": "Files"
+      "dossiers": "Files",
+      "factures": "Invoices"
     },
     "viewSite": "View the site",
     "overview": {
@@ -1987,6 +1988,164 @@
         "DOCUMENT_FILE_INVALID": "The file didn’t arrive properly. Try again.",
         "UNKNOWN": "The change couldn’t be saved. Try again."
       }
+    }
+  },
+  "Invoices": {
+    "status": {
+      "DRAFT": "Draft",
+      "SENT": "Sent",
+      "OVERDUE": "Overdue",
+      "PROOF_RECEIVED": "Proof received",
+      "PAID": "Paid",
+      "CANCELLED": "Cancelled"
+    },
+    "currencies": {
+      "XAF": "CFA franc (XAF)",
+      "CAD": "Canadian dollar (CAD)",
+      "EUR": "Euro (EUR)"
+    },
+    "pdf": {
+      "title": "Invoice",
+      "number": "No.",
+      "issuedOn": "Issued",
+      "dueDate": "Due",
+      "billedTo": "Billed to",
+      "dossier": "File",
+      "description": "Description",
+      "quantity": "Qty",
+      "unitPrice": "Unit price",
+      "amount": "Amount",
+      "total": "Total",
+      "notes": "Notes",
+      "page": "Page {page}/{pages}"
+    },
+    "emails": {
+      "sent": {
+        "subject": "Invoice {number} – Stanzy Immigration Consulting",
+        "body": "Here is your invoice {number} for your {service} file, for {total}. It is attached.",
+        "bodyDue": "Here is your invoice {number} for your {service} file, for {total}, due by {due}. It is attached.",
+        "proof": "Once you have paid, upload your proof of payment in your space."
+      },
+      "paid": {
+        "subject": "Payment received – invoice {number}",
+        "body": "We have received your payment of {total} for invoice {number}. Thank you!"
+      },
+      "proof": {
+        "subject": "{client} sent a proof of payment ({number})",
+        "body": "{client} uploaded a proof of payment for invoice {number} ({total}). Check it, then mark the invoice paid.",
+        "cta": "Open the invoice"
+      }
+    },
+    "list": {
+      "title": "Invoices",
+      "intro": "Invoices for every file: drafts, sent, paid.",
+      "new": "New invoice",
+      "filtersLabel": "Filter invoices",
+      "filters": {
+        "ALL": "All",
+        "DRAFT": "Drafts",
+        "AWAITING": "Awaiting",
+        "OVERDUE": "Overdue",
+        "PAID": "Paid",
+        "CANCELLED": "Cancelled"
+      },
+      "empty": "No invoices here.",
+      "draft": "Draft",
+      "dueOn": "Due {date}",
+      "loading": "Loading the invoices",
+      "status": "Status"
+    },
+    "editor": {
+      "titleNew": "New invoice",
+      "titleDraft": "Draft invoice",
+      "back": "All invoices",
+      "dossier": "File",
+      "dossierSearch": "Client’s name or email",
+      "dossierHint": "Type at least 2 letters: only open files are listed.",
+      "dossierRequired": "Choose a file.",
+      "noMatch": "No open file matches.",
+      "change": "Change",
+      "currency": "Currency",
+      "dueDate": "Due date",
+      "dueHint": "Optional. After that day the invoice is “Overdue”.",
+      "lines": "Lines",
+      "description": "Description",
+      "quantity": "Quantity",
+      "unitPrice": "Unit price",
+      "lineNumber": "Line {number}",
+      "addLine": "Add a line",
+      "removeLine": "Remove line {number}",
+      "lineError": "Each line needs a description, a quantity and a valid price.",
+      "notes": "Notes",
+      "notesHint": "Printed under the lines: payment terms, a note to the Client.",
+      "total": "Total",
+      "save": "Save draft",
+      "send": "Send to the Client",
+      "sendTitle": "Send this invoice?",
+      "sendBody": "It gets its number and goes to the Client by email, as a PDF on your letterhead. It can’t be edited afterwards.",
+      "confirmSend": "Send",
+      "delete": "Delete draft",
+      "deleteTitle": "Delete this draft?",
+      "deleteBody": "It was never sent: the Client loses nothing.",
+      "confirmDelete": "Delete",
+      "cancel": "Cancel",
+      "loading": "Loading the invoice",
+      "loadingDossiers": "Searching files",
+      "lineAmount": "Amount: {amount}"
+    },
+    "detail": {
+      "sentOn": "Sent on {date}",
+      "paidOn": "Paid on {date}",
+      "cancelledOn": "Cancelled on {date}",
+      "cancelReason": "Reason: {reason}",
+      "downloadPdf": "Download the PDF",
+      "markPaid": "Mark paid",
+      "cancelInvoice": "Cancel the invoice",
+      "cancelTitle": "Cancel this invoice?",
+      "cancelBody": "It stays in the history, marked “Cancelled”. The Client isn’t emailed.",
+      "reason": "Reason",
+      "reasonError": "Enter a reason (at least 3 characters).",
+      "confirmCancel": "Cancel the invoice",
+      "keep": "Keep",
+      "proofs": "Proofs of payment",
+      "noProofs": "No proof of payment yet.",
+      "openProof": "Open",
+      "dossierLink": "See the file",
+      "lines": "Lines"
+    },
+    "dossier": {
+      "title": "Invoices",
+      "new": "New invoice",
+      "empty": "No invoices for this file.",
+      "emptyClient": "No invoices yet.",
+      "pdf": "See the PDF",
+      "pdfLabel": "See the PDF of invoice {number}",
+      "dueOn": "Due by {date}",
+      "uploadProof": "Upload a proof of payment",
+      "uploadProofLabel": "Upload a proof of payment for invoice {number}",
+      "uploading": "Encrypting and sending…",
+      "proofHint": "Photo or PDF of the receipt (Orange Money, MTN MoMo, bank transfer…), 25 MB at most.",
+      "proofCount": "{count, plural, one {# proof of payment sent} other {# proofs of payment sent}}",
+      "loading": "Loading the invoices"
+    },
+    "toast": {
+      "saved": "Draft saved",
+      "sent": "Invoice {number} sent",
+      "deleted": "Draft deleted",
+      "paid": "Invoice marked paid",
+      "cancelled": "Invoice cancelled",
+      "proofAdded": "Proof of payment sent",
+      "changed": "This invoice changed in the meantime: the page is up to date."
+    },
+    "errors": {
+      "INVOICE_EMPTY": "Add at least one line with an amount.",
+      "INVOICE_NOT_DRAFT": "This invoice was already sent.",
+      "INVOICE_NOT_PAYABLE": "This invoice is no longer awaiting payment.",
+      "DOSSIER_FILES_UNCONFIGURED": "Uploads aren’t switched on yet. Try again later.",
+      "DOCUMENT_FILE_TYPE": "This file type isn’t accepted: PDF, JPG, PNG, WebP or HEIC.",
+      "DOCUMENT_FILE_TOO_LARGE": "This file is over 25 MB.",
+      "DOCUMENT_FILE_INVALID": "The file didn’t arrive properly. Try again.",
+      "UNKNOWN": "The change couldn’t be saved. Try again."
     }
   }
 }
