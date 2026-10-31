@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import { SERVICE_TYPES } from '@/features/dossiers/data/workflows';
 import {
+  displayState,
   isLastStage,
   isStageOf,
   nextStage,
   previousStage,
   stageStatuses,
+  stagePosition,
   stagesOf,
 } from '@/features/dossiers/lib/workflow';
 
@@ -55,5 +57,17 @@ describe('the Workflow de service', () => {
   it('lets the current stage move back before the start', () => {
     const statuses = stageStatuses('EDE', 'compte', 'envoi').map((s) => s.status);
     expect(statuses).toEqual(['skipped', 'current', 'upcoming', 'upcoming', 'upcoming', 'upcoming']);
+  });
+});
+
+describe('how a Dossier reads', () => {
+  it('is Terminé once open at its last stage, Clôturé once closed', () => {
+    expect(displayState('EDE', 'envoi', 'OPEN')).toBe('OPEN');
+    expect(displayState('EDE', 'rapport', 'OPEN')).toBe('DONE');
+    expect(displayState('EDE', 'rapport', 'CLOSED')).toBe('CLOSED');
+  });
+
+  it('counts stages from 1', () => {
+    expect(stagePosition('ACCOMPAGNEMENT', 'bassin')).toEqual({ position: 5, total: 10 });
   });
 });

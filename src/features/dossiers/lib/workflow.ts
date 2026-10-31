@@ -24,6 +24,20 @@ export function previousStage(service: ServiceType, stage: string): string | nul
 export const isLastStage = (service: ServiceType, stage: string): boolean =>
   nextStage(service, stage) === null;
 
+/** `stage`'s place in its workflow, from 1. */
+export function stagePosition(service: ServiceType, stage: string): { position: number; total: number } {
+  const stages = stagesOf(service);
+  return { position: stages.indexOf(stage) + 1, total: stages.length };
+}
+
+/** How a Dossier reads: Clôturé, Terminé once open at its last stage, else En cours. */
+export type DisplayState = 'OPEN' | 'DONE' | 'CLOSED';
+
+export function displayState(service: ServiceType, stage: string, state: 'OPEN' | 'CLOSED'): DisplayState {
+  if (state === 'CLOSED') return 'CLOSED';
+  return isLastStage(service, stage) ? 'DONE' : 'OPEN';
+}
+
 /**
  * How each stage reads on the Dossier's stepper: `skipped` before the stage it
  * opened at (« Déjà fait »), `done` from there up to the current one, then
