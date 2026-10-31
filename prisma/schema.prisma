@@ -48,6 +48,8 @@ model Account {
   budgetProfile     BudgetProfile?
   blogPosts         BlogPost[]
   checklist         Checklist?
+  dossiers          Dossier[]
+  dossierEvents     DossierEvent[]
 
   @@map("account")
 }
@@ -334,4 +336,67 @@ model BlogPost {
 
   @@index([status, locale, publishedAt])
   @@map("blog_post")
+}
+
+// ─── Dossiers (#79) ──────────────────────────────────────────────────────────
+
+/// The paid service a Dossier delivers; its stages are in src/features/dossiers/data/workflows.ts.
+enum ServiceType {
+  ACCOMPAGNEMENT
+  VERIFICATION
+  EDE
+  SERVICE_DOCUMENTAIRE
+}
+
+/// OPEN until the consultant closes it (Clôturé, with a reason).
+enum DossierState {
+  OPEN
+  CLOSED
+}
+
+/// GLOSSARY: Dossier. A Client's case file for one service, moved through its Workflow de service.
+model Dossier {
+  id           String         @id @default(cuid())
+  accountId    String
+  account      Account        @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  service      ServiceType
+  /// The current stage's key, one of the service's stages.
+  stage        String
+  /// The stage it opened at; the ones before it are « Déjà fait ».
+  startStage   String
+  state        DossierState   @default(OPEN)
+  closedAt     DateTime?
+  closedReason String?
+  events       DossierEvent[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([accountId, createdAt])
+  @@index([state, updatedAt])
+  @@map("dossier")
+}
+
+enum DossierEventKind {
+  OPENED
+  ADVANCED
+  MOVED_BACK
+  CLOSED
+}
+
+/// One change in a Dossier's history: who moved it, from which stage to which.
+model DossierEvent {
+  id        String           @id @default(cuid())
+  dossierId String
+  dossier   Dossier          @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  kind      DossierEventKind
+  fromStage String?
+  toStage   String
+  /// The closing reason, for CLOSED.
+  note      String?
+  actorId   String
+  actor     Account          @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  createdAt DateTime         @default(now())
+
+  @@index([dossierId, createdAt])
+  @@map("dossier_event")
 }
