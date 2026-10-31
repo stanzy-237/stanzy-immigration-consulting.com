@@ -49,7 +49,9 @@
         "predictionName": "Next draw",
         "predictionDesc": "Prediction of the next Express Entry draw",
         "budgetName": "Budget & expenses",
-        "budgetDesc": "Estimate your fees and track your expenses"
+        "budgetDesc": "Estimate your fees and track your expenses",
+        "checklistName": "Express Entry checklist",
+        "checklistDesc": "Documents to prepare and official IRCC fees"
       },
       "Services": {
         "consultationName": "Private consultation",
@@ -105,7 +107,9 @@
         "predictionName": "Next draw prediction",
         "predictionDesc": "When will the next draw come, of what type, at what score? A transparent estimate, group by group, drawn from past rounds.",
         "budgetName": "Budget & expenses",
-        "budgetDesc": "Estimate what your Express Entry costs — IRCC fees, tests, WES, proof of funds — then log every expense in your currency."
+        "budgetDesc": "Estimate what your Express Entry costs — IRCC fees, tests, WES, proof of funds — then log every expense in your currency.",
+        "checklistName": "Express Entry checklist",
+        "checklistDesc": "The documents to prepare before the ITA, laid out like IRCC’s, each one explained, with IRCC’s official fees."
       },
       "Badges": {
         "free": "Free",
@@ -132,10 +136,13 @@
         "badgeCrsRange": "CRS range",
         "comingSoon": "Coming soon",
         "badgeBudget": "IRCC fees",
-        "badgeExpenses": "Expense log"
+        "badgeExpenses": "Expense log",
+        "badgeDocuments": "Documents",
+        "badgeBeforeIta": "Before the ITA",
+        "badgeIrccFees": "IRCC fees"
       },
       "metaTitle": "Free Express Entry tools",
-      "metaDescription": "CRS calculator, 67 points, NCLC / CLB, draws, ITA countdown, journey and budget: all of Stanzy's free tools for your Express Entry."
+      "metaDescription": "CRS calculator, 67 points, NCLC / CLB, draws, ITA countdown, journey, budget and document checklist: all of Stanzy's free tools for your Express Entry."
     },
     "BlogRow": {
       "eyebrow": "Blog & Resources",
@@ -318,7 +325,8 @@
         "ita": "ITA countdown",
         "draw": "Latest draw",
         "cnp": "NOC/CNP lookup",
-        "nclc": "CLB / NCLC calculator"
+        "nclc": "CLB / NCLC calculator",
+        "checklist": "Express Entry checklist"
       },
       "Services": {
         "consultation": "Private consultation",
@@ -1545,6 +1553,186 @@
     },
     "Toast": {
       "genericError": "Something went wrong. Try again."
+    }
+  },
+  "Checklist": {
+    "metaTitle": "Express Entry checklist: the documents to prepare",
+    "metaDescription": "Get your Express Entry file ready before the ITA: the documents IRCC asks for from you, your spouse and your children (mandatory and recommended), an explanation of each and IRCC’s official fees.",
+    "listMetaTitle": "My documents to prepare",
+    "eyebrow": "Express Entry · Free tool",
+    "title": "Checklist",
+    "lead": "After the invitation, you only have 60 days to submit your application. Answer a few questions: you get the list of documents IRCC will ask for, organized as in your IRCC account, and the official fees to pay.",
+    "listTitle": "My documents",
+    "listLead": "Tap a document to learn what it must include and how to get it. Tick « Ready » as you go.",
+    "form": {
+      "family": "Your family",
+      "spouseAccompanying": "My spouse or partner is coming to Canada with me",
+      "spouseClaimsPoints": "I claim points for their studies or language test",
+      "previousUnion": "I was married or in a common-law union before",
+      "children": "Dependent children",
+      "childrenHint": "Yours and your spouse’s, even if they aren’t coming to Canada.",
+      "education": "Your studies",
+      "foreignEducation": "I have a diploma from outside Canada",
+      "canadianEducation": "I have a diploma from Canada",
+      "language": "Your languages",
+      "secondLanguage": "I have test results in both English and French",
+      "work": "Your experience",
+      "canadianWork": "I have at least a year of skilled work in Canada",
+      "authorizedToWork": "I have a valid Canadian work permit",
+      "countries": "Countries you lived in",
+      "special": "Special situations",
+      "jobOffer": "I have a job offer from a Canadian employer",
+      "provincialNomination": "I have a provincial nomination",
+      "certificateOfQualification": "I have a Canadian certificate of qualification in a trade",
+      "siblingInCanada": "I have a brother or sister who is a citizen or permanent resident in Canada",
+      "representative": "A consultant or lawyer represents me with IRCC",
+      "continue": "Continue",
+      "prefilledSaved": "Filled in from your CRS simulation « {name} ». Check and complete.",
+      "prefilledDraft": "Filled in from your CRS calculator answers. Check and complete.",
+      "loading": "Loading your answers",
+      "saveFailed": "Your answers couldn’t be saved to your account. They stay on this device.",
+      "jobs": "Your jobs",
+      "jobsHint": "Each job declared in your profile: IRCC asks for an “Employment record” for each one.",
+      "jobTitle": "Job {number}",
+      "jobInCanada": "In Canada",
+      "jobSelfEmployed": "Self-employed",
+      "addJob": "Add a job",
+      "removeJob": "Remove job {number}",
+      "countriesHint": "Countries (not Canada) where you lived 6 months in a row or more since age 18, in the last 10 years, your current country included: one police certificate per country.",
+      "country": "Country {number}",
+      "addCountry": "Add a country",
+      "removeCountry": "Remove country {number}",
+      "spouse": "Your spouse or partner",
+      "spouseJobs": "Their jobs",
+      "spouseJobsHint": "The jobs declared for your spouse or partner, if any.",
+      "spouseCountries": "Countries they lived in",
+      "titleRequired": "Enter the job title.",
+      "countryRequired": "Enter the country.",
+      "fixErrors": "Fill in the highlighted fields to continue."
+    },
+    "list": {
+      "progressTitle": "Your progress",
+      "progress": "{ready} of {total} documents ready",
+      "progressMandatory": "{ready} of {total} mandatory documents",
+      "progressLabel": "Documents ready",
+      "mandatory": "Mandatory",
+      "recommended": "Recommended",
+      "legend": "Mandatory: IRCC asks for it. Recommended: it makes your file stronger.",
+      "edit": "Change my answers",
+      "ready": "Ready",
+      "closeGuide": "Close",
+      "emptyTitle": "Your checklist isn’t ready yet",
+      "emptyText": "First answer a few questions about your situation.",
+      "emptyCta": "Fill in the form",
+      "signInTitle": "Find your checklist everywhere",
+      "signInText": "Log in: your answers and ready documents are kept in your account, on all your devices.",
+      "signIn": "Log in",
+      "disclaimer": "This list helps you prepare. After the invitation, the personalized list in your IRCC account is the reference.",
+      "irccLink": "Express Entry documents (IRCC)",
+      "loading": "Loading your checklist",
+      "toastFailed": "The document couldn’t be ticked. Try again.",
+      "people": {
+        "principal": "Principal applicant",
+        "spouse": "Spouse or partner",
+        "child": "Child {number}"
+      },
+      "personTitle": "{person}: supporting documents",
+      "personProgress": "{ready} of {total} ready",
+      "slots": {
+        "passport": "Passport/travel document",
+        "marriage": "Marriage certificate/licence",
+        "commonLaw": "Proof of common-law relationship",
+        "previousUnion": "Proof a previous union ended",
+        "medical": "Proof of upfront medical exam",
+        "education": "Education (diplomas or degrees)",
+        "job": "Employment record – {label}",
+        "police": "Police certificate – {label}",
+        "funds": "Proof of sufficient funds",
+        "photo": "Photo",
+        "birth": "Birth registration/certificate",
+        "jobOffer": "Job offer",
+        "nomination": "Provincial nomination certificate",
+        "qualification": "Certificate of qualification",
+        "sibling": "Proof of relationship",
+        "representative": "Use of a representative",
+        "optional": "Optional documents",
+        "clientInfo": "Client information"
+      },
+      "requiredTag": "(required)",
+      "slotPending": "To prepare",
+      "slotReady": "Ready",
+      "slotCount": "{ready}/{total}",
+      "readyFor": "Ready: {name} – {slot} ({person})",
+      "fees": {
+        "title": "Fees",
+        "lead": "Estimate from IRCC’s current fees. The actual fees are worked out on the day you submit.",
+        "request": "Application",
+        "quantity": "Quantity",
+        "unit": "Unit price (CAD)",
+        "total": "Total (CAD)",
+        "processing": "Permanent residence application processing fee",
+        "rprf": "Right of permanent residence fee (RPRF)",
+        "biometricsFamily": "Biometrics – family rate",
+        "biometrics": "Biometrics",
+        "spouseProcessing": "Permanent residence processing fee for a spouse",
+        "spouseRprf": "Right of permanent residence fee (RPRF) for a spouse",
+        "childProcessing": "Permanent residence processing fee for a child",
+        "grandTotal": "Total price (CAD)",
+        "budgetLink": "Estimate my whole budget (tests, ECA, medical exam…)"
+      },
+      "side": {
+        "people": "By person",
+        "jump": "Go to: {person}",
+        "fees": "Official IRCC fees",
+        "seeFees": "See the fee details"
+      }
+    },
+    "intro": {
+      "title": "What you get",
+      "items": {
+        "people": {
+          "title": "A list like IRCC’s",
+          "text": "One block per person (principal applicant, spouse, each child), with IRCC’s upload slots: an “Employment record” per job, a “Police certificate” per country…"
+        },
+        "need": {
+          "title": "Mandatory ★ and recommended",
+          "text": "The documents IRCC requires, and those that make your file stronger: payslips, social security records, bank statements…"
+        },
+        "guides": {
+          "title": "An explanation for every document",
+          "text": "What it must include, how to get it, delays, pitfalls to avoid and Stanzy’s advice, with links to IRCC."
+        },
+        "fees": {
+          "title": "IRCC’s official fees",
+          "text": "Processing fees, right of permanent residence fee (RPRF) and biometrics, worked out for your family from IRCC’s current fee list."
+        },
+        "progress": {
+          "title": "Your progress",
+          "text": "Tick each document « Ready » and follow your progress. Logged in, you find your list on all your devices."
+        },
+        "prefill": {
+          "title": "Linked to your other tools",
+          "text": "The form picks up your CRS simulation’s answers; the full budget (tests, ECA, medical exam) is in “Budget & expenses”."
+        }
+      },
+      "free": "Free, no sign-up. About 3 minutes."
+    },
+    "titleAccent": "Express Entry",
+    "listAccent": "to prepare",
+    "preview": {
+      "title": "Your file",
+      "mandatory": "mandatory documents",
+      "more": "+ {recommended} recommended · {slots} IRCC slots",
+      "people": "People in the file",
+      "fees": "Official IRCC fees",
+      "feesNote": "Processing, RPRF and biometrics",
+      "cta": "See my checklist",
+      "live": "Updated with every answer"
+    },
+    "guide": {
+      "title": "Documents ready, a calm submission.",
+      "text": "After the invitation, you’ll have 60 days to upload these documents to your IRCC account. Prepared ahead, they leave you time to check every detail, or to have Stanzy review your file.",
+      "secondary": "Start the ITA countdown"
     }
   }
 }

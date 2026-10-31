@@ -15,6 +15,7 @@ export const FOOTER_TOOL_LINKS: ReadonlyArray<FooterLink> = [
   { key: 'nclc', labelKey: 'nclc', href: '/outils/nclc-clb' },
   { key: 'ita', labelKey: 'ita', href: '/outils/compte-a-rebours-ita' },
   { key: 'draw', labelKey: 'draw', href: '/outils/dernier-tirage' },
+  { key: 'checklist', labelKey: 'checklist', href: '/outils/checklist' },
   { key: 'cnp', labelKey: 'cnp', href: '/outils/cnp' },
 ] as const;
 

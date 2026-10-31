@@ -47,6 +47,7 @@ model Account {
   budgetExpenses    BudgetExpense[]
   budgetProfile     BudgetProfile?
   blogPosts         BlogPost[]
+  checklist         Checklist?
 
   @@map("account")
 }
@@ -265,6 +266,23 @@ model BudgetProfile {
   updatedAt DateTime @updatedAt
 
   @@map("budget_profile")
+}
+
+// ─── Checklist Entrée Express (#76) ──────────────────────────────────────────
+
+/// An Account's Checklist Entrée Express: its answers and the documents it ticked « Prêt ».
+model Checklist {
+  id        String   @id @default(cuid())
+  accountId String   @unique
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  /// The form's answers (src/features/checklist/lib/checklist-form.ts); null until saved.
+  answers   Json?
+  /// `who:document` keys of the documents ticked « Prêt ».
+  ready     String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("checklist")
 }
 
 /// GLOSSARY: Catégorie d'article. The consultant's own list; an Article has exactly one.

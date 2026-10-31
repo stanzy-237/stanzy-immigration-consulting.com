@@ -117,6 +117,42 @@ export function NumberField({
   );
 }
 
+export function TextField({
+  label,
+  value,
+  onChange,
+  hint,
+  error,
+  autoComplete,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  hint?: ReactNode;
+  error?: ReactNode;
+  autoComplete?: string;
+}): ReactNode {
+  const id = useId();
+  return (
+    <div>
+      <label htmlFor={id} className={LABEL}>
+        {label}
+      </label>
+      <input
+        id={id}
+        type="text"
+        className={CONTROL}
+        value={value}
+        autoComplete={autoComplete}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy(id, hint, error)}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      <Described id={id} hint={hint} error={error} />
+    </div>
+  );
+}
+
 export function CheckField({
   label,
   checked,

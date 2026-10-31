@@ -1,6 +1,7 @@
 import { BIOMETRICS_FAMILY_CAP, OFFICIAL_FEES } from '@/features/budget/data/fees';
 import { IOM_MEDICAL_GRID, IOM_MEDICAL_PAYMENT } from '@/features/budget/data/iom-medical';
 import { TCF_ACADEMY_URL } from '@/features/shared/data/links';
+import type { GuideBlock } from '@/features/shared/lib/guide-blocks';
 import type { Locale } from '@/i18n/routing';
 
 /**
@@ -12,17 +13,7 @@ import type { Locale } from '@/i18n/routing';
  *
  * Images: only images Stanzy owns or has permission to use.
  */
-export type GuideBlock =
-  | { kind: 'text'; text: string }
-  | { kind: 'list'; title?: string; items: string[] }
-  /** Highlighted, e.g. a warning or Stanzy's own offer. */
-  | { kind: 'note'; text: string }
-  /** `href` starting with « / » is a page of this site, in the visitor's language. */
-  | { kind: 'link'; label: string; href: string }
-  /** A button, e.g. « Me contacter sur WhatsApp » (tone `whatsapp`) or a Stanzy service. */
-  | { kind: 'cta'; label: string; href: string; tone?: 'whatsapp' }
-  /** Two columns; the first cell of each row heads it (e.g. an age bracket). */
-  | { kind: 'table'; caption: string; head?: [string, string]; rows: [string, string][] };
+export type { GuideBlock };
 
 export type FeeGuide = {
   blocks: GuideBlock[];

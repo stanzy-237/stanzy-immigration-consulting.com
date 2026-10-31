@@ -78,7 +78,7 @@ describe('SiteNav', () => {
     expect(logo.getAttribute('src') ?? '').toContain('logo2');
   });
 
-  it('opens the Outils dropdown on pointer hover and lists the ten tools', () => {
+  it('opens the Outils dropdown on pointer hover and lists the eleven tools', () => {
     render(withIntl(<SiteNav />));
     const trigger = screen.getByRole('button', { name: 'Ouvrir le menu Outils' });
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
@@ -90,7 +90,8 @@ describe('SiteNav', () => {
     const panel = document.getElementById(trigger.getAttribute('aria-controls')!);
     expect(panel).not.toBeNull();
     expect(panel!.getAttribute('aria-hidden')).toBe('false');
-    expect(toolLinks(panel!)).toHaveLength(10);
+    expect(toolLinks(panel!)).toHaveLength(11);
+    expect(within(panel!).getByRole('link', { name: /Checklist Entrée Express/ })).toHaveAttribute('href', expect.stringContaining('/outils/checklist'));
     expect(within(panel!).getByRole('link', { name: /Prochain tirage/ })).toHaveAttribute('href', expect.stringContaining('/outils/prochain-tirage'));
     expect(within(panel!).getByRole('link', { name: /NCLC \/ CLB/ })).toHaveAttribute('href', expect.stringContaining('/outils/nclc-clb'));
     expect(within(panel!).getByText('Calculateur CRS')).toBeInTheDocument();

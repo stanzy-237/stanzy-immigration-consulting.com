@@ -113,6 +113,10 @@ _Avoid_: "devis", "budget" alone (ambiguous with what was actually spent).
 One amount a User logged as spent on their procedure: a name, a motif from a fixed list (Test de langue, Frais IRCC, Biométrie, …), an amount in the Account's single currency, a date and an optional note. Private to the Account; changing the currency never converts Dépenses already logged.
 _Avoid_: "transaction", "paiement" (IRCC payments are one kind of Dépense).
 
+**Checklist Entrée Express** (Express Entry checklist):
+The documents a candidate should prepare before the ITA, built from a few answers about their situation (family, studies, each job, each country lived in, special situations) and prefilled from their latest saved Simulation or the CRS answers on the device. Laid out like IRCC's personal checklist: one block per person (Requérant principal, Conjoint(e), Enfant 1, 2…), each with IRCC's slots (« Relevé d'emploi – <poste> », « Certificat de police – <pays> »…) and the documents that go in them, ★ Obligatoire or Recommandé, each opening a guide and ticked « Prêt »; IRCC's fees close the list. Answers and ticks stay in the browser, and in the Account for a User. A preparation aid: IRCC's personalized checklist after the ITA is the reference. Stores no files (that is the Coffre-fort).
+_Avoid_: "document list" alone (ambiguous with the Coffre-fort or Documents de service).
+
 **Canal WhatsApp** (WhatsApp channel):
 WhatsApp is a first-class contact/community channel surfaced on the site (e.g. "Rejoindre WhatsApp"), reflecting the francophone-Africa audience. Integration depth TBD.
 
