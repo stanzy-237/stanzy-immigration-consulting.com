@@ -152,7 +152,7 @@ The ordered set of stages the consultant moves a Dossier through by hand for a g
 
 **Facture** (Invoice):
 A bill the consultant writes in the Tableau de bord for a Dossier, in a currency of its own (XAF by default), sent by email as a PDF: Brouillon → Envoyée → Preuve reçue → Payée (or En retard, Annulée). A Dossier can have several.
-_Avoid_: "devis" (the quoted amount goes straight on the Facture).
+Accompagnement, Vérification and Services documentaires have no Devis: the quoted amount goes straight on the Facture.
 
 **Demande d'intérêt** (Expression of interest):
 The IRCC-style form a signed-in User fills to ask for Accompagnement: their profile, a « Je l'ai / Je ne l'ai pas / Pas sûr / Stanzy s'en charge » answer and a note per document area. Submitting it makes them a Lead; the consultant approves or rejects it.
@@ -177,7 +177,7 @@ _Avoid_: saying Stanzy submits "on their behalf".
 The list a Client follows to submit on the IRCC portal: each Section IRCC under the portal's own upload box name, with its Fichier de soumission to download and a « Téléversé » tick.
 
 **Évaluation des diplômes étrangers** (ECA — Educational Credential Assessment):
-Assessment of foreign credentials through recognized bodies such as WES or IQAS, to make them count for Entrée Express.
+Assessment of foreign credentials through recognized bodies such as WES or IQAS, to make them count for Entrée Express. Offered for diplomas issued in Cameroon; Stanzy handles every step up to the report, starting from a Demande de devis.
 
 **Services documentaires** (Document services):
 Documents Stanzy obtains for a Client in Cameroon at catalogue prices (preuve de fonds, certificat de police, attestation CNPS, compte salaire, ACF, pack expérience pro), usually through a Partner's Mission. Requested with « Stanzy s'en charge ». Never on a public page; shown to Clients in « Mon espace » and to anyone holding a Lien partagé. The only priced offering.
@@ -190,6 +190,12 @@ A password-protected, expiring link the consultant sends so that someone can rea
 
 **Dossier service documentaire**:
 A small Dossier holding only the Documents someone ordered from the Services documentaires, without Accompagnement.
+
+**Demande de devis** (Quote request):
+The EDE's public form, filled without an Account: the evaluation body (WES by default, or IQAS), any existing WES/IQAS account, and up to two diplômes (a second only as a BTS / DSEP / HND / HPD next to a Licence), each showing the documents to provide. Nothing is uploaded in it.
+
+**Devis** (Quote):
+The EDE price calculated from a Demande de devis with the consultant's private fees (body, account setup, certification per document, service), emailed at once and valid 30 days. « Accepter le devis » makes the person a Client, opens the EDE Dossier and turns the Devis into its Facture.
 
 **Formation TCF Canada**:
 French-exam preparation. **Not built in this project** — it lives on a separate platform and is linked out to.
