@@ -12,14 +12,14 @@ describe('nextStatus', () => {
   });
 
   it('moves a Lead to Client when they buy Accompagnement', () => {
-    expect(nextStatus('LEAD', 'PURCHASE_ACCOMPAGNEMENT')).toBe('CLIENT');
+    expect(nextStatus('LEAD', 'OPEN_DOSSIER')).toBe('CLIENT');
   });
 
   it.each([
-    ['USER', 'PURCHASE_ACCOMPAGNEMENT'], // jump straight to Client
+    ['USER', 'OPEN_DOSSIER'], // jump straight to Client
     ['LEAD', 'START_ONBOARDING'], // already a Lead
     ['CLIENT', 'START_ONBOARDING'], // backwards
-    ['CLIENT', 'PURCHASE_ACCOMPAGNEMENT'], // already a Client
+    ['CLIENT', 'OPEN_DOSSIER'], // already a Client
   ] as const)('refuses %s + %s', (status, event) => {
     expect(() => nextStatus(status, event)).toThrow(InvalidStatusTransitionError);
   });
