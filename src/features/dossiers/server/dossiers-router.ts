@@ -11,12 +11,9 @@ import {
 } from '@/features/dossiers/lib/dossier-schema';
 import { isStageOf, nextStage, previousStage } from '@/features/dossiers/lib/workflow';
 import { notifyClient } from '@/features/dossiers/server/dossier-notify';
+import { documentsRouter } from '@/features/dossiers/server/documents-router';
 import type { TRPCContext } from '@/server/trpc/context';
-import {
-  consultantProcedure,
-  createTRPCRouter,
-  protectedProcedure,
-} from '@/server/trpc/trpc';
+import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 
 const byId = z.object({ id: z.string().min(1) });
 const refuse = (message: string): TRPCError => new TRPCError({ code: 'BAD_REQUEST', message });
@@ -84,6 +81,18 @@ export const dossiersRouter = createTRPCRouter({
       select: summary,
     }),
   ),
+
+  /** One of the signed-in Account's Dossiers; NOT_FOUND for anyone else's. */
+  myDossier: protectedProcedure.input(byId).query(async ({ ctx, input }) => {
+    const dossier = await ctx.prisma.dossier.findFirst({
+      where: { id: input.id, accountId: ctx.session.account.id },
+      select: summary,
+    });
+    if (!dossier) throw notFound();
+    return dossier;
+  }),
+
+  documents: documentsRouter,
 
   dashboard: createTRPCRouter({
     /** Every Dossier in `state`, last changed first. */

@@ -50,6 +50,8 @@ beforeEach(() => {
   });
 });
 
+const NO_SECTIONS = { open: true, locked: false, sections: [] };
+
 function dossierPage(dossier = at('compte')) {
   api.dossier = dossier;
   const { trpc, queryClient, wrap } = createTestTRPC({
@@ -58,8 +60,10 @@ function dossierPage(dossier = at('compte')) {
     'dossiers.dashboard.advance': (input) => api.advance(input),
     'dossiers.dashboard.moveBack': () => ({ stage: 'verification' }),
     'dossiers.dashboard.close': (input) => api.close(input),
+    'dossiers.documents.sections': () => NO_SECTIONS,
   });
   queryClient.setQueryData(trpc.dossiers.dashboard.get.queryKey({ id: 'dos_1' }), dossier as never);
+  queryClient.setQueryData(trpc.dossiers.documents.sections.queryKey({ dossierId: 'dos_1' }), NO_SECTIONS as never);
   return render(withIntl(wrap(<DossierDashboardView id="dos_1" />)));
 }
 
@@ -80,7 +84,10 @@ describe('DossierDashboardView', () => {
     await waitFor(() => expect(api.advance).toHaveBeenCalledWith({ id: 'dos_1', from: 'compte' }));
     expect(await screen.findByText('Dossier passé à l’étape suivante')).toBeInTheDocument();
     await waitFor(() =>
-      expect(screen.getByText('Démarches auprès de l’établissement').closest('li')).toHaveAttribute('aria-current', 'step'),
+      expect(screen.getByText('Démarches auprès de l’établissement').closest('li')).toHaveAttribute(
+        'aria-current',
+        'step',
+      ),
     );
   });
 
@@ -114,7 +121,9 @@ describe('DossierDashboardView', () => {
   });
 
   it('shows a closed Dossier’s reason and no moves', () => {
-    dossierPage(at('compte', { state: 'CLOSED', closedAt: new Date('2026-10-31T10:00:00Z'), closedReason: 'Refus IRCC' }));
+    dossierPage(
+      at('compte', { state: 'CLOSED', closedAt: new Date('2026-10-31T10:00:00Z'), closedReason: 'Refus IRCC' }),
+    );
     expect(screen.queryByRole('button', { name: 'Étape suivante' })).not.toBeInTheDocument();
     expect(screen.getByText(/Motif : Refus IRCC/)).toBeInTheDocument();
   });

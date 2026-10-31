@@ -14,8 +14,8 @@ import { Link } from '@/i18n/navigation';
 import { useTRPC } from '@/trpc/client';
 
 /**
- * « Mon espace »: the signed-in Account's Dossiers, each with its stages.
- * Documents and invoices join each Dossier in later slices of #79.
+ * « Mon espace »: the signed-in Account's Dossiers, each with its stages and
+ * a link to its documents. Invoices join in a later slice of #79.
  */
 export function MySpaceView(): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
@@ -83,6 +83,14 @@ function MyDossiers(): ReactNode {
                 {dossier.closedReason ? ` · ${t('mySpace.closedReason', { reason: dossier.closedReason })}` : null}
               </p>
             ) : null}
+            <Link
+              href={`/mon-espace/dossiers/${dossier.id}`}
+              className="mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-navy-deep px-5 text-sm font-semibold text-white hover:bg-navy-80"
+            >
+              {t('mySpace.openDossier')}
+              <ArrowRight aria-hidden={true} className="size-4" />
+              <span className="sr-only">{t(`services.${dossier.service}`)}</span>
+            </Link>
           </article>
         </li>
       ))}

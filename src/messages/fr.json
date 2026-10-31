@@ -1825,6 +1825,14 @@
       "closed": {
         "subject": "Votre dossier {service} est clôturé",
         "body": "Votre dossier {service} a été clôturé. Motif : {reason}"
+      },
+      "newVersion": {
+        "subject": "Nouveau fichier dans votre dossier {service}",
+        "body": "Stanzy a ajouté une nouvelle version de « {document} » à votre dossier {service}."
+      },
+      "comment": {
+        "subject": "Nouveau commentaire dans votre dossier {service}",
+        "body": "Stanzy a commenté « {document} » dans votre dossier {service} : « {excerpt} »"
       }
     },
     "dashboard": {
@@ -1910,7 +1918,92 @@
       "currentStage": "Étape actuelle",
       "closedOn": "Clôturé le {date}",
       "closedReason": "Motif : {reason}",
-      "loading": "Chargement de vos dossiers"
+      "loading": "Chargement de vos dossiers",
+      "metaTitleDossier": "Mon dossier",
+      "back": "Mon espace",
+      "openDossier": "Voir le dossier et ses documents",
+      "loadingDossier": "Chargement du dossier"
+    },
+    "consultantEmails": {
+      "cta": "Ouvrir le dossier",
+      "clientUpload": {
+        "subject": "{client} a ajouté « {document} »",
+        "body": "{client} a téléversé une nouvelle version de « {document} » dans son dossier {service}."
+      },
+      "clientComment": {
+        "subject": "{client} a commenté « {document} »",
+        "body": "{client} a commenté « {document} » dans son dossier {service} : « {excerpt} »"
+      }
+    },
+    "documents": {
+      "title": "Documents",
+      "introConsultant": "Les Sections IRCC du dossier, comme les cases de téléversement du portail. Le Client voit tout et peut ajouter ses fichiers.",
+      "introClient": "Vos documents, rangés comme sur le portail d’IRCC. Ajoutez ce que vous avez déjà ; Stanzy prépare les versions finales.",
+      "locked": "Le dossier a passé l’étape de dépôt : les versions finales sont figées.",
+      "emptyConsultant": "Aucune section pour l’instant. Ajoutez-en une ci-dessous (« Diplômes – Requérant principal », « Preuve de fonds »…).",
+      "emptyClient": "Stanzy n’a pas encore préparé les sections de votre dossier.",
+      "noDocuments": "Aucun document dans cette section.",
+      "newSection": "Nouvelle section",
+      "sectionTitle": "Nom de la section",
+      "sectionHint": "Le nom de la case sur le portail d’IRCC, par exemple « Diplômes – Requérant principal ».",
+      "addSection": "Ajouter la section",
+      "renameSection": "Renommer la section {title}",
+      "deleteSection": "Supprimer la section {title}",
+      "documentTitle": "Ajouter un document",
+      "documentHint": "Vous avez déjà ce document ? Nommez-le, puis téléversez le fichier.",
+      "addDocument": "Ajouter",
+      "titleError": "Indiquez un nom (2 caractères au moins).",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "addedBy": "Ajouté par {name}",
+      "versionCount": "{count, plural, one {# version} other {# versions}}",
+      "noVersion": "aucun fichier",
+      "finalBadge": "Finale : V{number}",
+      "versions": "Versions",
+      "noVersionHint": "Aucun fichier pour l’instant.",
+      "size": "{size} Mo",
+      "uploadedBy": "par {name}, le {date}",
+      "final": "Finale",
+      "markFinal": "Marquer finale",
+      "finalLabel": "(version {number})",
+      "openVersion": "Ouvrir",
+      "openVersionLabel": "Ouvrir la version {number}",
+      "upload": "Téléverser une version",
+      "uploading": "Envoi chiffré en cours…",
+      "uploadLabel": "Téléverser une version de {title}",
+      "uploadHint": "PDF, JPG, PNG, WebP ou HEIC, 25 Mo au plus. Le fichier est chiffré avant de quitter votre appareil.",
+      "comments": "Commentaires",
+      "noComments": "Aucun commentaire.",
+      "commentLabel": "Commenter {title}",
+      "commentPlaceholder": "Écrire un commentaire…",
+      "commentError": "Écrivez un message.",
+      "send": "Envoyer",
+      "deleteDocument": "Supprimer le document {title}",
+      "deleteTitle": "Supprimer « {title} » ?",
+      "deleteBody": "{count, plural, =0 {Ses commentaires sont supprimés avec lui.} one {Sa version et ses commentaires sont supprimés avec lui.} other {Ses # versions et ses commentaires sont supprimés avec lui.}} C’est définitif.",
+      "confirmDelete": "Supprimer",
+      "loading": "Chargement des documents",
+      "toast": {
+        "sectionAdded": "Section ajoutée",
+        "sectionRenamed": "Section renommée",
+        "sectionDeleted": "Section supprimée",
+        "documentAdded": "Document ajouté",
+        "documentDeleted": "Document supprimé",
+        "versionAdded": "Version V{number} ajoutée",
+        "finalSet": "Version finale choisie",
+        "finalCleared": "Version finale retirée",
+        "commented": "Commentaire envoyé"
+      },
+      "errors": {
+        "DOSSIER_CLOSED": "Ce dossier est clôturé : il ne peut plus changer.",
+        "DOSSIER_SECTION_NOT_EMPTY": "Cette section contient des documents : supprimez-les d’abord.",
+        "DOSSIER_FINALES_LOCKED": "Le dossier a passé l’étape de dépôt : les versions finales sont figées.",
+        "DOSSIER_FILES_UNCONFIGURED": "Le téléversement n’est pas encore activé. Réessayez plus tard.",
+        "DOCUMENT_FILE_TYPE": "Ce type de fichier n’est pas accepté : PDF, JPG, PNG, WebP ou HEIC.",
+        "DOCUMENT_FILE_TOO_LARGE": "Ce fichier dépasse 25 Mo.",
+        "DOCUMENT_FILE_INVALID": "Le fichier n’a pas été reçu correctement. Réessayez.",
+        "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez."
+      }
     }
   }
 }

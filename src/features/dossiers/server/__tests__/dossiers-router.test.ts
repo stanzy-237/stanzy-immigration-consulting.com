@@ -6,7 +6,7 @@ import type { TRPCContext } from '@/server/trpc/context';
 import { createCaller } from '@/server/trpc/root';
 
 const notifyClient = vi.hoisted(() => vi.fn());
-vi.mock('@/features/dossiers/server/dossier-notify', () => ({ notifyClient }));
+vi.mock('@/features/dossiers/server/dossier-notify', () => ({ notifyClient, notifyConsultants: vi.fn() }));
 
 /**
  * Seam: the `dossiers` tRPC router through a server-side caller, over an
@@ -66,8 +66,12 @@ function fakeDatabase(accounts: AccountRow[]) {
       for (const a of hit) Object.assign(a, data);
       return { count: hit.length };
     },
-    async findMany({ where }: { where: { role: string; OR: { name?: { contains: string }; email?: { contains: string } }[] } }) {
-      const q = (where.OR[0]!.name!.contains).toLowerCase();
+    async findMany({
+      where,
+    }: {
+      where: { role: string; OR: { name?: { contains: string }; email?: { contains: string } }[] };
+    }) {
+      const q = where.OR[0]!.name!.contains.toLowerCase();
       return accounts.filter(
         (a) => a.role === where.role && (a.name.toLowerCase().includes(q) || a.email.toLowerCase().includes(q)),
       );
@@ -83,12 +87,33 @@ function fakeDatabase(accounts: AccountRow[]) {
   });
 
   const dossier = {
-    async create({ data }: { data: Omit<DossierRow, 'id' | 'state' | 'closedAt' | 'closedReason' | 'createdAt' | 'updatedAt'> & { events: { create: Omit<EventRow, 'id' | 'dossierId' | 'createdAt' | 'fromStage' | 'note'> } } }) {
+    async create({
+      data,
+    }: {
+      data: Omit<DossierRow, 'id' | 'state' | 'closedAt' | 'closedReason' | 'createdAt' | 'updatedAt'> & {
+        events: { create: Omit<EventRow, 'id' | 'dossierId' | 'createdAt' | 'fromStage' | 'note'> };
+      };
+    }) {
       const { events: nested, ...columns } = data;
       const now = tick();
-      const row: DossierRow = { ...columns, id: `dos_${dossiers.length + 1}`, state: 'OPEN', closedAt: null, closedReason: null, createdAt: now, updatedAt: now };
+      const row: DossierRow = {
+        ...columns,
+        id: `dos_${dossiers.length + 1}`,
+        state: 'OPEN',
+        closedAt: null,
+        closedReason: null,
+        createdAt: now,
+        updatedAt: now,
+      };
       dossiers.push(row);
-      events.push({ ...nested.create, id: `ev_${events.length + 1}`, dossierId: row.id, fromStage: null, note: null, createdAt: now });
+      events.push({
+        ...nested.create,
+        id: `ev_${events.length + 1}`,
+        dossierId: row.id,
+        fromStage: null,
+        note: null,
+        createdAt: now,
+      });
       return { id: row.id };
     },
     async findUnique({ where }: { where: { id: string } }) {
@@ -116,9 +141,30 @@ function fakeDatabase(accounts: AccountRow[]) {
   return { prisma: prisma as unknown as TRPCContext['prisma'], accounts, dossiers, events };
 }
 
-const CONSULTANT: AccountRow = { id: 'acc_stanzy', name: 'Stanzy', email: 'stanzy@example.com', locale: 'fr', role: 'CONSULTANT', status: 'USER' };
-const PARTNER: AccountRow = { id: 'acc_partner', name: 'Paul Partner', email: 'paul@example.com', locale: 'fr', role: 'PARTNER', status: 'USER' };
-const aminata = (status: AccountRow['status'] = 'USER'): AccountRow => ({ id: 'acc_1', name: 'Aminata Diallo', email: 'aminata@example.com', locale: 'fr', role: 'MEMBER', status });
+const CONSULTANT: AccountRow = {
+  id: 'acc_stanzy',
+  name: 'Stanzy',
+  email: 'stanzy@example.com',
+  locale: 'fr',
+  role: 'CONSULTANT',
+  status: 'USER',
+};
+const PARTNER: AccountRow = {
+  id: 'acc_partner',
+  name: 'Paul Partner',
+  email: 'paul@example.com',
+  locale: 'fr',
+  role: 'PARTNER',
+  status: 'USER',
+};
+const aminata = (status: AccountRow['status'] = 'USER'): AccountRow => ({
+  id: 'acc_1',
+  name: 'Aminata Diallo',
+  email: 'aminata@example.com',
+  locale: 'fr',
+  role: 'MEMBER',
+  status,
+});
 
 const asConsultant = sessionFor({ id: CONSULTANT.id, name: CONSULTANT.name, role: 'CONSULTANT' });
 const asAminata = sessionFor();
@@ -150,7 +196,11 @@ describe('opening a Dossier', () => {
 
   it('keeps a Client a Client when they open a second Dossier', async () => {
     const db = fakeDatabase([CONSULTANT, aminata('CLIENT')]);
-    await callerAs(db, asConsultant).dossiers.dashboard.open({ accountId: 'acc_1', service: 'EDE', startStage: 'verification' });
+    await callerAs(db, asConsultant).dossiers.dashboard.open({
+      accountId: 'acc_1',
+      service: 'EDE',
+      startStage: 'verification',
+    });
     expect(db.accounts.find((a) => a.id === 'acc_1')!.status).toBe('CLIENT');
   });
 
@@ -165,14 +215,22 @@ describe('opening a Dossier', () => {
   it('refuses a Partner', async () => {
     const db = fakeDatabase([CONSULTANT, PARTNER]);
     await expect(
-      callerAs(db, asConsultant).dossiers.dashboard.open({ accountId: PARTNER.id, service: 'EDE', startStage: 'verification' }),
+      callerAs(db, asConsultant).dossiers.dashboard.open({
+        accountId: PARTNER.id,
+        service: 'EDE',
+        startStage: 'verification',
+      }),
     ).rejects.toMatchObject({ message: 'DOSSIER_ACCOUNT_NOT_ELIGIBLE' });
   });
 
   it('is for the consultant only', async () => {
     const db = fakeDatabase([CONSULTANT, aminata()]);
     await expect(
-      callerAs(db, asAminata).dossiers.dashboard.open({ accountId: 'acc_1', service: 'EDE', startStage: 'verification' }),
+      callerAs(db, asAminata).dossiers.dashboard.open({
+        accountId: 'acc_1',
+        service: 'EDE',
+        startStage: 'verification',
+      }),
     ).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 });
@@ -222,7 +280,10 @@ describe('moving a Dossier', () => {
     const { db, caller, id } = await opened();
     await caller.dossiers.dashboard.close({ id, reason: 'Le Client a abandonné.' });
     expect(db.dossiers[0]).toMatchObject({ state: 'CLOSED', closedReason: 'Le Client a abandonné.' });
-    expect(notifyClient).toHaveBeenCalledWith(expect.anything(), 'EDE', { kind: 'closed', reason: 'Le Client a abandonné.' });
+    expect(notifyClient).toHaveBeenCalledWith(expect.anything(), 'EDE', {
+      kind: 'closed',
+      reason: 'Le Client a abandonné.',
+    });
     await expect(caller.dossiers.dashboard.advance({ id, from: 'verification' })).rejects.toMatchObject({
       message: 'DOSSIER_CLOSED',
     });

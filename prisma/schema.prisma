@@ -50,6 +50,9 @@ model Account {
   checklist         Checklist?
   dossiers          Dossier[]
   dossierEvents     DossierEvent[]
+  dossierDocuments  DossierDocument[]
+  documentVersions  DocumentVersion[]
+  documentComments  DocumentComment[]
 
   @@map("account")
 }
@@ -356,20 +359,21 @@ enum DossierState {
 
 /// GLOSSARY: Dossier. A Client's case file for one service, moved through its Workflow de service.
 model Dossier {
-  id           String         @id @default(cuid())
+  id           String           @id @default(cuid())
   accountId    String
-  account      Account        @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  account      Account          @relation(fields: [accountId], references: [id], onDelete: Restrict)
   service      ServiceType
   /// The current stage's key, one of the service's stages.
   stage        String
   /// The stage it opened at; the ones before it are « Déjà fait ».
   startStage   String
-  state        DossierState   @default(OPEN)
+  state        DossierState     @default(OPEN)
   closedAt     DateTime?
   closedReason String?
   events       DossierEvent[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  sections     DossierSection[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
   @@index([accountId, createdAt])
   @@index([state, updatedAt])
@@ -399,4 +403,74 @@ model DossierEvent {
 
   @@index([dossierId, createdAt])
   @@map("dossier_event")
+}
+
+/// A Section IRCC: one of the portal's upload boxes (« Diplômes – Requérant principal »), grouping Documents.
+model DossierSection {
+  id        String            @id @default(cuid())
+  dossierId String
+  dossier   Dossier           @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  title     String
+  position  Int
+  documents DossierDocument[]
+  createdAt DateTime          @default(now())
+
+  @@index([dossierId, position])
+  @@map("dossier_section")
+}
+
+/// One Document in a Section (diplôme, relevé de notes…), with its Versions and one comment thread.
+model DossierDocument {
+  id             String            @id @default(cuid())
+  sectionId      String
+  section        DossierSection    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  title          String
+  addedById      String
+  addedBy        Account           @relation(fields: [addedById], references: [id], onDelete: Restrict)
+  /// The Version the consultant marked Finale.
+  finalVersionId String?           @unique
+  finalVersion   DocumentVersion?  @relation("FinalVersion", fields: [finalVersionId], references: [id], onDelete: SetNull)
+  versions       DocumentVersion[] @relation("Versions")
+  comments       DocumentComment[]
+  createdAt      DateTime          @default(now())
+
+  @@index([sectionId, createdAt])
+  @@map("dossier_document")
+}
+
+/// One uploaded file of a Document (V1, V2…). Stored encrypted in Vercel Blob (ADR 0007).
+model DocumentVersion {
+  id           String           @id @default(cuid())
+  documentId   String
+  document     DossierDocument  @relation("Versions", fields: [documentId], references: [id], onDelete: Cascade)
+  finalOf      DossierDocument? @relation("FinalVersion")
+  number       Int
+  fileName     String
+  contentType  String
+  /// The file's size before encryption, in bytes.
+  size         Int
+  blobUrl      String
+  /// The file's own key, encrypted with DOSSIER_FILES_KEY.
+  wrappedKey   String
+  iv           String
+  uploadedById String
+  uploadedBy   Account          @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+  createdAt    DateTime         @default(now())
+
+  @@unique([documentId, number])
+  @@map("document_version")
+}
+
+/// A message in a Document's comment thread.
+model DocumentComment {
+  id         String          @id @default(cuid())
+  documentId String
+  document   DossierDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     Account         @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  body       String
+  createdAt  DateTime        @default(now())
+
+  @@index([documentId, createdAt])
+  @@map("document_comment")
 }

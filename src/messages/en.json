@@ -1808,6 +1808,14 @@
       "closed": {
         "subject": "Your {service} file is closed",
         "body": "Your {service} file has been closed. Reason: {reason}"
+      },
+      "newVersion": {
+        "subject": "New file in your {service} file",
+        "body": "Stanzy added a new version of “{document}” to your {service} file."
+      },
+      "comment": {
+        "subject": "New comment in your {service} file",
+        "body": "Stanzy commented on “{document}” in your {service} file: “{excerpt}”"
       }
     },
     "dashboard": {
@@ -1893,7 +1901,92 @@
       "currentStage": "Current stage",
       "closedOn": "Closed on {date}",
       "closedReason": "Reason: {reason}",
-      "loading": "Loading your files"
+      "loading": "Loading your files",
+      "metaTitleDossier": "My file",
+      "back": "My space",
+      "openDossier": "See the file and its documents",
+      "loadingDossier": "Loading the file"
+    },
+    "consultantEmails": {
+      "cta": "Open the file",
+      "clientUpload": {
+        "subject": "{client} added “{document}”",
+        "body": "{client} uploaded a new version of “{document}” to their {service} file."
+      },
+      "clientComment": {
+        "subject": "{client} commented on “{document}”",
+        "body": "{client} commented on “{document}” in their {service} file: “{excerpt}”"
+      }
+    },
+    "documents": {
+      "title": "Documents",
+      "introConsultant": "The file’s IRCC Sections, like the portal’s upload boxes. The Client sees everything and can add their files.",
+      "introClient": "Your documents, grouped as on the IRCC portal. Add what you already have; Stanzy prepares the final versions.",
+      "locked": "The file is past the submission stage: the final versions are locked.",
+      "emptyConsultant": "No sections yet. Add one below (“Education – Principal applicant”, “Proof of funds”…).",
+      "emptyClient": "Stanzy hasn’t set up your file’s sections yet.",
+      "noDocuments": "No documents in this section.",
+      "newSection": "New section",
+      "sectionTitle": "Section name",
+      "sectionHint": "The upload box’s name on the IRCC portal, e.g. “Education – Principal applicant”.",
+      "addSection": "Add section",
+      "renameSection": "Rename section {title}",
+      "deleteSection": "Delete section {title}",
+      "documentTitle": "Add a document",
+      "documentHint": "Already have this document? Name it, then upload the file.",
+      "addDocument": "Add",
+      "titleError": "Enter a name (at least 2 characters).",
+      "save": "Save",
+      "cancel": "Cancel",
+      "addedBy": "Added by {name}",
+      "versionCount": "{count, plural, one {# version} other {# versions}}",
+      "noVersion": "no file",
+      "finalBadge": "Final: V{number}",
+      "versions": "Versions",
+      "noVersionHint": "No file yet.",
+      "size": "{size} MB",
+      "uploadedBy": "by {name}, on {date}",
+      "final": "Final",
+      "markFinal": "Mark final",
+      "finalLabel": "(version {number})",
+      "openVersion": "Open",
+      "openVersionLabel": "Open version {number}",
+      "upload": "Upload a version",
+      "uploading": "Encrypting and sending…",
+      "uploadLabel": "Upload a version of {title}",
+      "uploadHint": "PDF, JPG, PNG, WebP or HEIC, 25 MB at most. The file is encrypted before it leaves your device.",
+      "comments": "Comments",
+      "noComments": "No comments.",
+      "commentLabel": "Comment on {title}",
+      "commentPlaceholder": "Write a comment…",
+      "commentError": "Write a message.",
+      "send": "Send",
+      "deleteDocument": "Delete document {title}",
+      "deleteTitle": "Delete “{title}”?",
+      "deleteBody": "{count, plural, =0 {Its comments go with it.} one {Its version and comments go with it.} other {Its # versions and comments go with it.}} This can’t be undone.",
+      "confirmDelete": "Delete",
+      "loading": "Loading the documents",
+      "toast": {
+        "sectionAdded": "Section added",
+        "sectionRenamed": "Section renamed",
+        "sectionDeleted": "Section deleted",
+        "documentAdded": "Document added",
+        "documentDeleted": "Document deleted",
+        "versionAdded": "Version V{number} added",
+        "finalSet": "Final version chosen",
+        "finalCleared": "Final version removed",
+        "commented": "Comment sent"
+      },
+      "errors": {
+        "DOSSIER_CLOSED": "This file is closed: it can no longer change.",
+        "DOSSIER_SECTION_NOT_EMPTY": "This section has documents: delete them first.",
+        "DOSSIER_FINALES_LOCKED": "The file is past the submission stage: the final versions are locked.",
+        "DOSSIER_FILES_UNCONFIGURED": "Uploads aren’t switched on yet. Try again later.",
+        "DOCUMENT_FILE_TYPE": "This file type isn’t accepted: PDF, JPG, PNG, WebP or HEIC.",
+        "DOCUMENT_FILE_TOO_LARGE": "This file is over 25 MB.",
+        "DOCUMENT_FILE_INVALID": "The file didn’t arrive properly. Try again.",
+        "UNKNOWN": "The change couldn’t be saved. Try again."
+      }
     }
   }
 }
