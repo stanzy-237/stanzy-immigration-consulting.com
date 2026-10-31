@@ -62,7 +62,7 @@ A User whom the consultant is onboarding — typically after they booked a consu
 A paid, booked appointment between a User and the consultant, and the primary funnel into becoming a Client. Booked through an embedded external scheduler (Cal.com) in v1.
 
 **Client**:
-A Lead who has purchased Accompagnement. A Client has one or more Dossiers.
+A Lead with at least one open Dossier: their Demande d'intérêt for Accompagnement was approved, or the consultant sent the invoice for a Services documentaires order. A Client follows their Dossiers in « Mon espace ».
 _Avoid_: "customer" in product-facing French; use Client.
 
 **Consultant**:
@@ -96,7 +96,24 @@ _Avoid_: "version", "brouillon".
 _Avoid_: "task", "assignment", "job".
 
 **Dossier**:
-The case file for a Client's engagement — what the consultant tracks and works through.
+The case file for a Client's engagement — what the consultant tracks and works through. Made of Sections IRCC holding Documents, and moved through its service's Workflow de service. An Accompagnement Dossier opens at the stage matching the Client's Niveau.
+
+**Section IRCC** (IRCC upload slot):
+One upload box of the IRCC portal within a Dossier (« Diplômes – Requérant principal », « Preuve de fonds »…). It holds several Documents and produces exactly one Fichier de soumission.
+
+**Document** (in a Dossier):
+One piece inside a Section IRCC (a diplôme, a relevé de notes, a rapport WES…), generated from the Checklist logic or added by the Client or the consultant. Has Versions and one comment thread. **Manquant** when the Client doesn't have it yet.
+_Avoid_: "file" (a Document has several Versions).
+
+**Version**:
+One upload of a Document (V1, V2…), by the Client or the consultant, or delivered by a Partner's Mission. The consultant alone marks one Version **Finale**, and can change it until the Dossier passes « Vérification et dépôt ».
+_Avoid_: "Mouture" (that is a Partner's draft inside a Mission).
+
+**Fichier de soumission** (Submission file):
+The single PDF of a Section IRCC that is uploaded to the IRCC portal, built with the Outils PDF from its Documents' Versions. Never above 4 Mo.
+
+**Outils PDF** (PDF tools):
+The consultant's iLovePDF-style tool in the Tableau de bord: merge, reorder, rotate and delete pages, turn photos into PDF, compress to 4 Mo. Runs in the browser, on a Section IRCC or on local files.
 
 **Parcours** (Journey / Timeline):
 A User's own, self-logged journal of immigration milestones — each a dated **Étape** with a label, a short code, an optional note and a colour. The User adds, edits and deletes entries freely; it is not a fixed pipeline with mandatory stages. Has a clean, branded, **screenshot-ready** view ("Voir la timeline" / "Partager", headed "Mon Parcours Entrée Express") that users capture and share (e.g. on WhatsApp) — not a public server-hosted link. This is what the "timeline" tool is — NOT IRCC's published processing times.
@@ -131,22 +148,44 @@ Documents a User uploads for a specific paid service (e.g. diplomas for an ECA) 
 A file a User uploads on a service's fulfillment page to evidence an offline payment, which the consultant reviews before marking the invoice paid. Stand-in until online payment exists.
 
 **Workflow de service** (Service workflow):
-The ordered set of stages the consultant advances for a given service type while delivering it, visible to the Client as progress. Each service type has its own stage set (concrete stages TBD from the design).
+The ordered set of stages the consultant moves a Dossier through by hand for a given service type, visible to the Client as progress. Stages can move back, and a Dossier can be closed early as Clôturé with a reason. Each service type has its own stage set; Accompagnement has 10, from Évaluation du profil to COPR.
+
+**Facture** (Invoice):
+A bill the consultant writes in the Tableau de bord for a Dossier, in a currency of its own (XAF by default), sent by email as a PDF: Brouillon → Envoyée → Preuve reçue → Payée (or En retard, Annulée). A Dossier can have several.
+_Avoid_: "devis" (the quoted amount goes straight on the Facture).
+
+**Demande d'intérêt** (Expression of interest):
+The IRCC-style form a signed-in User fills to ask for Accompagnement: their profile, a « Je l'ai / Je ne l'ai pas / Pas sûr / Stanzy s'en charge » answer and a note per document area. Submitting it makes them a Lead; the consultant approves or rejects it.
+
+**Niveau** (Level):
+How far an Accompagnement candidate already is, worked out from their Demande d'intérêt and changeable by the consultant: **A Débutant**, **B Prérequis faits** (language test and EDE done, no Entrée Express profile), **C Profil créé** (in the pool, invited or not). It sets the Dossier's starting stage.
 
 ### Services (paid offerings)
 
-Services have **no fixed public price** — each is quoted per case, with the amount set on the invoice.
+Services have **no fixed public price** — each is quoted per case, with the amount set on the invoice. The Services documentaires have catalogue prices, but they are never public.
 
 
 
 **Accompagnement Entrée Express**:
-End-to-end guidance of a client through their Express Entry application.
+End-to-end guidance of a client through their Express Entry application, from their Niveau up to COPR. Starts with a Demande d'intérêt and includes Vérification et soumission des documents; an EDE is a separate service.
 
 **Vérification et soumission des documents**:
 Reviewing a client's documents and submitting them on their behalf.
 
 **Évaluation des diplômes étrangers** (ECA — Educational Credential Assessment):
 Assessment of foreign credentials through recognized bodies such as WES or IQAS, to make them count for Entrée Express.
+
+**Services documentaires** (Document services):
+Documents Stanzy obtains for a Client in Cameroon at catalogue prices (preuve de fonds, certificat de police, attestation CNPS, compte salaire, ACF, pack expérience pro), usually through a Partner's Mission. Requested with « Stanzy s'en charge ». Never on a public page; shown to Clients in « Mon espace » and to anyone holding a Lien partagé. The only priced offering.
+
+**ACF** (Attestation de conformité fiscale):
+A Cameroonian tax compliance certificate, one of the Services documentaires.
+
+**Lien partagé** (Shared link):
+A password-protected, expiring link the consultant sends so that someone can read chosen Services documentaires and order them without being a Client, anonymously until they order. Revocable; an order placed through it stays valid after it expires.
+
+**Dossier service documentaire**:
+A small Dossier holding only the Documents someone ordered from the Services documentaires, without Accompagnement.
 
 **Formation TCF Canada**:
 French-exam preparation. **Not built in this project** — it lives on a separate platform and is linked out to.
