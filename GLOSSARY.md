@@ -170,7 +170,11 @@ Services have **no fixed public price** — each is quoted per case, with the am
 End-to-end guidance of a client through their Express Entry application, from their Niveau up to COPR. Starts with a Demande d'intérêt and includes Vérification et soumission des documents; an EDE is a separate service.
 
 **Vérification et soumission des documents**:
-Reviewing a client's documents and submitting them on their behalf.
+Checking and preparing every file of a client's RP application after their ITA, which the client then submits from their own IRCC account with Stanzy's Guide de soumission. Stanzy is not the declared representative and never holds the client's IRCC login. Ends at the AOR.
+_Avoid_: saying Stanzy submits "on their behalf".
+
+**Guide de soumission** (Submission guide):
+The list a Client follows to submit on the IRCC portal: each Section IRCC under the portal's own upload box name, with its Fichier de soumission to download and a « Téléversé » tick.
 
 **Évaluation des diplômes étrangers** (ECA — Educational Credential Assessment):
 Assessment of foreign credentials through recognized bodies such as WES or IQAS, to make them count for Entrée Express.
