@@ -2,13 +2,13 @@ import type { Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
-import { dossierRefInput, encryptedFileInput, isBlobUnder } from '@/features/dossiers/lib/document-schema';
+import { dossierRefInput, encryptedFileInput } from '@/features/dossiers/lib/document-schema';
 import { dossierFor, isConsultant } from '@/features/dossiers/server/dossier-access';
-import { ENCRYPTED_FILE_MAX_BYTES, sealKey, storedSize } from '@/features/dossiers/server/dossier-files';
+import { acceptEncryptedUpload } from '@/features/dossiers/server/dossier-files';
 import {
   cancelInvoiceInput,
   dossierSearchInput,
-  invoiceBlobPrefix,
+  invoiceFilePrefix,
   invoiceListInput,
   saveInvoiceInput,
   type InvoiceFilter,
@@ -79,7 +79,7 @@ export const invoicesRouter = createTRPCRouter({
   }),
 
   /**
-   * Records a Preuve de paiement the browser encrypted and sent to Blob
+   * Records a Preuve de paiement the browser encrypted and sent to R2
    * (ADR 0007); the Facture becomes « Preuve reçue » and the consultant is
    * told. INVOICE_NOT_PAYABLE unless it is Envoyée or already has a proof.
    */
@@ -88,17 +88,7 @@ export const invoicesRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const invoice = await invoiceFor(ctx.prisma, ctx.session, input.invoiceId);
       if (!isAwaitingPayment(invoice.status)) throw refuse('INVOICE_NOT_PAYABLE');
-      if (!isBlobUnder(input.blobUrl, invoiceBlobPrefix(invoice.id))) throw refuse('DOCUMENT_FILE_INVALID');
-      const size = await storedSize(input.blobUrl);
-      if (size === null || size > ENCRYPTED_FILE_MAX_BYTES || size !== input.size + 16) {
-        throw refuse('DOCUMENT_FILE_INVALID');
-      }
-      let wrappedKey: string;
-      try {
-        wrappedKey = await sealKey(input.key);
-      } catch {
-        throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'DOSSIER_FILES_UNCONFIGURED' });
-      }
+      const wrappedKey = await acceptEncryptedUpload(input, invoiceFilePrefix(invoice.id));
 
       const proof = await ctx.prisma.$transaction(async (tx) => {
         const created = await tx.paymentProof.create({
@@ -107,7 +97,7 @@ export const invoicesRouter = createTRPCRouter({
             fileName: input.fileName,
             contentType: input.contentType,
             size: input.size,
-            blobUrl: input.blobUrl,
+            objectKey: input.objectKey,
             wrappedKey,
             iv: input.iv,
             uploadedById: ctx.session.account.id,

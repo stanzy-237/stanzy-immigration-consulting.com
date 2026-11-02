@@ -3,14 +3,19 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
+// Where the public R2 bucket is served (#87); read at build time.
+const R2_PUBLIC_HOST = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
+  ? new URL(process.env.NEXT_PUBLIC_R2_PUBLIC_URL).hostname
+  : null;
+
 const nextConfig: NextConfig = {
   // The letterhead Factures are printed on, read from disk by whichever route builds one (#79).
   outputFileTracingIncludes: {
     '/api/**/*': ['./src/features/invoices/assets/letterhead.pdf'],
   },
   images: {
-    // Blog covers, uploaded by the consultant to Vercel Blob.
-    remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }],
+    // Blog covers, uploaded by the consultant to the public R2 bucket (#87).
+    remotePatterns: R2_PUBLIC_HOST ? [{ protocol: 'https', hostname: R2_PUBLIC_HOST }] : [],
   },
   env: {
     // Derived, never set by hand: tells the browser bundle whether the server

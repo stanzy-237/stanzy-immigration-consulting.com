@@ -227,7 +227,7 @@ function UploadVersion({
     if (!file) return;
     setSending(true);
     try {
-      const uploaded = await uploadVersionFile(dossierId, documentId, file);
+      const uploaded = await uploadVersionFile(documentId, file);
       const { number } = await addVersion.mutateAsync({ documentId, ...uploaded });
       void refresh();
       toast.add({ title: t('toast.versionAdded', { number }), type: 'success' });

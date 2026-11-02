@@ -440,7 +440,7 @@ model DossierDocument {
   @@map("dossier_document")
 }
 
-/// One uploaded file of a Document (V1, V2…). Stored encrypted in Vercel Blob (ADR 0007).
+/// One uploaded file of a Document (V1, V2…). Stored encrypted in R2 (ADR 0007, #87).
 model DocumentVersion {
   id           String           @id @default(cuid())
   documentId   String
@@ -451,7 +451,8 @@ model DocumentVersion {
   contentType  String
   /// The file's size before encryption, in bytes.
   size         Int
-  blobUrl      String
+  /// Where the ciphertext sits in the private R2 bucket (#87).
+  objectKey    String
   /// The file's own key, encrypted with DOSSIER_FILES_KEY.
   wrappedKey   String
   iv           String
@@ -547,7 +548,8 @@ model PaymentProof {
   fileName     String
   contentType  String
   size         Int
-  blobUrl      String
+  /// Where the ciphertext sits in the private R2 bucket (#87).
+  objectKey    String
   wrappedKey   String
   iv           String
   uploadedById String

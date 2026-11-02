@@ -8,19 +8,24 @@ import { createCaller } from '@/server/trpc/root';
 const notify = vi.hoisted(() => ({ notifyClient: vi.fn(), notifyConsultants: vi.fn() }));
 vi.mock('@/features/dossiers/server/dossier-notify', () => notify);
 
-const files = vi.hoisted(() => ({
-  ENCRYPTED_FILE_MAX_BYTES: 25 * 1024 * 1024 + 16,
-  storedSize: vi.fn(),
-  sealKey: vi.fn(async (key: string) => `wrapped:${key}`),
-  deleteFiles: vi.fn(),
+const storage = vi.hoisted(() => ({
+  objectSize: vi.fn(),
+  deleteObjects: vi.fn(),
+  presignUpload: vi.fn(),
+  readObject: vi.fn(),
 }));
-vi.mock('@/features/dossiers/server/dossier-files', () => files);
+vi.mock('@/server/storage/r2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/server/storage/r2')>()),
+  ...storage,
+}));
+// A real master key: the routers wrap each file's key with it.
+vi.stubEnv('DOSSIER_FILES_KEY', 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=');
 vi.mock('next/server', () => ({ after: (fn: () => unknown) => fn() }));
 
 /**
  * Seam: `dossiers.documents` through a server-side caller, over an in-memory
  * stand-in for the dossier, section, document, version and comment tables.
- * Vercel Blob and the emails are stubbed; the access rules and the Finale lock
+ * R2 and the emails are stubbed; the access rules and the Finale lock
  * run for real.
  */
 type Row = Record<string, unknown> & { id: string };
@@ -130,8 +135,9 @@ const asConsultant = sessionFor({ id: 'acc_stanzy', name: 'Stanzy', role: 'CONSU
 const asAminata = sessionFor();
 const asBob = sessionFor({ id: 'acc_2', name: 'Bob Other', email: 'bob@example.com' });
 
-const BLOB = 'https://store.public.blob.vercel-storage.com/dossiers/dos_1/doc-x1.bin';
-const KEY = `${'A'.repeat(43)}=`;
+const OBJECT = 'dossiers/dos_1/5f1c.bin';
+// A real 256-bit key, base64.
+const KEY = 'ZmVkY2JhOTg3NjU0MzIxMGZlZGNiYTk4NzY1NDMyMTA=';
 const IV = 'B'.repeat(16);
 
 let db: ReturnType<typeof fakeDatabase>;
@@ -140,7 +146,7 @@ const as = (session: CurrentSession) =>
 
 const version = (documentId: string, extra: Record<string, unknown> = {}) => ({
   documentId,
-  blobUrl: BLOB,
+  objectKey: OBJECT,
   key: KEY,
   iv: IV,
   fileName: 'releve-n2.pdf',
@@ -152,7 +158,7 @@ const version = (documentId: string, extra: Record<string, unknown> = {}) => ({
 beforeEach(() => {
   db = fakeDatabase();
   vi.clearAllMocks();
-  files.storedSize.mockResolvedValue(1016);
+  storage.objectSize.mockResolvedValue(1016);
 });
 
 describe('the Client’s documents', () => {
@@ -161,7 +167,9 @@ describe('the Client’s documents', () => {
     expect(await as(asAminata).addVersion(version(id))).toMatchObject({ number: 1 });
     expect(await as(asAminata).addVersion(version(id))).toMatchObject({ number: 2 });
 
-    expect(db.tables.documentVersion![0]).toMatchObject({ wrappedKey: `wrapped:${KEY}`, uploadedById: 'acc_1' });
+    const saved = db.tables.documentVersion![0]!;
+    expect(saved).toMatchObject({ objectKey: OBJECT, uploadedById: 'acc_1' });
+    expect(saved.wrappedKey).not.toContain(KEY);
     expect(notify.notifyConsultants).toHaveBeenCalledWith(expect.objectContaining({ id: 'dos_1' }), 'Aminata Diallo', {
       kind: 'clientUpload',
       document: 'Relevé N2',
@@ -191,13 +199,15 @@ describe('the Client’s documents', () => {
 
   it('refuses a file outside the Dossier’s folder or not the size announced', async () => {
     const { id } = await as(asAminata).addDocument({ sectionId: 'sec_1', title: 'Relevé N2' });
-    const elsewhere = BLOB.replace('dos_1', 'dos_closed');
-    await expect(as(asAminata).addVersion(version(id, { blobUrl: elsewhere }))).rejects.toMatchObject({
-      message: 'DOCUMENT_FILE_INVALID',
-    });
-    files.storedSize.mockResolvedValue(5000);
+    for (const elsewhere of ['dossiers/dos_closed/5f1c.bin', 'dossiers/dos_1/../dos_closed/5f1c.bin']) {
+      await expect(as(asAminata).addVersion(version(id, { objectKey: elsewhere }))).rejects.toMatchObject({
+        message: 'DOCUMENT_FILE_INVALID',
+      });
+    }
+    storage.objectSize.mockResolvedValue(5000);
     await expect(as(asAminata).addVersion(version(id))).rejects.toMatchObject({ message: 'DOCUMENT_FILE_INVALID' });
-    files.storedSize.mockResolvedValue(null);
+    expect(storage.deleteObjects).toHaveBeenCalledWith('private', [OBJECT]);
+    storage.objectSize.mockResolvedValue(null);
     await expect(as(asAminata).addVersion(version(id))).rejects.toMatchObject({ message: 'DOCUMENT_FILE_INVALID' });
     expect(db.tables.documentVersion).toHaveLength(0);
   });
@@ -267,6 +277,6 @@ describe('the consultant’s documents', () => {
     await as(asAminata).addVersion(version(id));
     await as(asConsultant).deleteDocument({ id });
     expect(db.tables.dossierDocument!.some((d) => d.id === id)).toBe(false);
-    expect(files.deleteFiles).toHaveBeenCalledWith([BLOB]);
+    expect(storage.deleteObjects).toHaveBeenCalledWith('private', [OBJECT]);
   });
 });

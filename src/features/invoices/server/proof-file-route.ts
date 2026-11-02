@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ proo
 
   const proof = await prisma.paymentProof.findUnique({
     where: { id: proofId },
-    select: { invoiceId: true, fileName: true, contentType: true, blobUrl: true, wrappedKey: true, iv: true },
+    select: { invoiceId: true, fileName: true, contentType: true, objectKey: true, wrappedKey: true, iv: true },
   });
   if (!proof) return new NextResponse(null, { status: 404 });
   try {

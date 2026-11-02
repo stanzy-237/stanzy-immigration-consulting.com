@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ vers
 
   const version = await prisma.documentVersion.findUnique({
     where: { id: versionId },
-    select: { documentId: true, fileName: true, contentType: true, blobUrl: true, wrappedKey: true, iv: true },
+    select: { documentId: true, fileName: true, contentType: true, objectKey: true, wrappedKey: true, iv: true },
   });
   if (!version) return new NextResponse(null, { status: 404 });
   try {

@@ -76,6 +76,18 @@ const schema = z.object({
     .string()
     .refine((raw) => Buffer.from(raw, 'base64').length === 32, 'Expected 32 bytes, base64 (openssl rand -base64 32)')
     .optional(),
+  // Cloudflare R2 (#87): every file the app stores. One API token with
+  // object read/write on both buckets (scripts/setup-r2.sh walks through it).
+  // Optional: without them uploads are refused. Set all five or none.
+  R2_ACCOUNT_ID: z.string().min(1).optional(),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  // Private bucket: Documents de service and Preuves de paiement (ciphertext only).
+  R2_PRIVATE_BUCKET: z.string().min(1).optional(),
+  // Public bucket: blog images and the TikTok carousel.
+  R2_PUBLIC_BUCKET: z.string().min(1).optional(),
+  // Where the public bucket is served: its custom domain, or its r2.dev address.
+  NEXT_PUBLIC_R2_PUBLIC_URL: z.string().url().optional(),
 }).superRefine((value, ctx) => {
   if (process.env.VERCEL_ENV === 'production' && !value.BETTER_AUTH_URL) {
     ctx.addIssue({
@@ -98,6 +110,16 @@ const schema = z.object({
         code: z.ZodIssueCode.custom,
         path: [key],
         message: 'Required when any VAPID variable is set (set all three or none)',
+      });
+    }
+  }
+  const r2 = ['R2_ACCOUNT_ID', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_PRIVATE_BUCKET', 'R2_PUBLIC_BUCKET'] as const;
+  if (r2.some((key) => value[key])) {
+    for (const key of r2.filter((k) => !value[k])) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [key],
+        message: 'Required when any R2 variable is set (set all five or none)',
       });
     }
   }
