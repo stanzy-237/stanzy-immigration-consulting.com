@@ -3,7 +3,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { ChevronDown, ExternalLink, FileText, Star, Trash2, Upload } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useId, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
+import { useId, useState, type ChangeEvent, type ReactNode } from 'react';
 
 import {
   AlertDialog,
@@ -15,28 +15,34 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from '@/components/ui/toast';
+import { DocumentConversation } from '@/features/dossiers/components/document-conversation';
 import { smallButton, type DocumentData, type Viewer } from '@/features/dossiers/components/document-styles';
 import { useDocumentsMutation } from '@/features/dossiers/hooks/use-documents-mutation';
-import { COMMENT_MAX, commentInput, DOCUMENT_FILE_TYPES } from '@/features/dossiers/lib/document-schema';
+import { DOCUMENT_FILE_TYPES } from '@/features/dossiers/lib/document-schema';
+import { withFinal, withoutDocument, type SectionsData } from '@/features/dossiers/lib/documents-cache';
 import { uploadVersionFile, versionFileUrl } from '@/features/dossiers/lib/upload-version';
+import { isOptimistic } from '@/lib/optimistic-list';
 import { useTRPC } from '@/trpc/client';
 
 const ACCEPT = [...DOCUMENT_FILE_TYPES, '.heic', '.heif'].join(',');
 
 /**
  * One Document: its Versions (with the Finale), an upload for the next one
- * and its comment thread. Folded until opened, showing the latest Version.
+ * and its conversation. Folded until opened, showing the latest Version.
  */
 export function DocumentCard({
   dossierId,
   document,
   viewer,
+  me,
   open,
   locked,
 }: {
   dossierId: string;
   document: DocumentData;
   viewer: Viewer;
+  /** The signed-in Account, as the conversation shows its own messages. */
+  me: SectionsData['viewer'];
   open: boolean;
   locked: boolean;
 }): ReactNode {
@@ -46,6 +52,8 @@ export function DocumentCard({
   const [expanded, setExpanded] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const consultant = viewer === 'consultant';
+  // Just added: it has no server id until the refetch, so nothing can be done with it yet.
+  const pending = isOptimistic(document);
   const final = document.versions.find((version) => version.id === document.finalVersionId);
   const latest = document.versions.at(-1);
 
@@ -79,7 +87,7 @@ export function DocumentCard({
             className={expanded ? 'size-4 shrink-0 rotate-180 text-slate' : 'size-4 shrink-0 text-slate'}
           />
         </button>
-        {consultant && open ? (
+        {consultant && open && !pending ? (
           <button
             type="button"
             onClick={() => setDeleting(true)}
@@ -144,10 +152,12 @@ export function DocumentCard({
                 ))}
               </ol>
             )}
-            {open ? <UploadVersion dossierId={dossierId} documentId={document.id} title={document.title} /> : null}
+            {open && !pending ? (
+              <UploadVersion dossierId={dossierId} documentId={document.id} title={document.title} />
+            ) : null}
           </div>
 
-          <Comments dossierId={dossierId} document={document} open={open} />
+          <DocumentConversation dossierId={dossierId} document={document} viewer={me} open={open && !pending} />
         </div>
       ) : null}
 
@@ -175,21 +185,17 @@ function FinaleToggle({
 }): ReactNode {
   const t = useTranslations('Dossiers.documents');
   const trpc = useTRPC();
-  const { refresh, failed } = useDocumentsMutation(dossierId);
+  const { optimistic } = useDocumentsMutation(dossierId);
   const setFinal = useMutation(
-    trpc.dossiers.documents.setFinal.mutationOptions({
-      onSuccess: (_, input) => {
-        void refresh();
-        toast.add({ title: input.versionId ? t('toast.finalSet') : t('toast.finalCleared'), type: 'success' });
-      },
-      onError: failed,
-    }),
+    trpc.dossiers.documents.setFinal.mutationOptions(
+      optimistic(withFinal, (input) => (input.versionId ? t('toast.finalSet') : t('toast.finalCleared'))),
+    ),
   );
   return (
     <button
       type="button"
       aria-pressed={isFinal}
-      disabled={disabled || setFinal.isPending}
+      disabled={disabled}
       onClick={() => setFinal.mutate({ documentId, versionId: isFinal ? null : versionId })}
       className={
         isFinal
@@ -261,104 +267,6 @@ function UploadVersion({
   );
 }
 
-function Comments({
-  dossierId,
-  document,
-  open,
-}: {
-  dossierId: string;
-  document: DocumentData;
-  open: boolean;
-}): ReactNode {
-  const t = useTranslations('Dossiers.documents');
-  const format = useFormatter();
-  const id = useId();
-  const trpc = useTRPC();
-  const { refresh, failed } = useDocumentsMutation(dossierId);
-  const [body, setBody] = useState('');
-  const [invalid, setInvalid] = useState(false);
-  const comment = useMutation(
-    trpc.dossiers.documents.comment.mutationOptions({
-      onSuccess: () => {
-        void refresh();
-        setBody('');
-        toast.add({ title: t('toast.commented'), type: 'success' });
-      },
-      onError: failed,
-    }),
-  );
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const parsed = commentInput.safeParse({ documentId: document.id, body });
-    setInvalid(!parsed.success);
-    if (parsed.success) comment.mutate(parsed.data);
-  };
-
-  return (
-    <div>
-      <h4 className="text-sm font-semibold text-navy-deep">{t('comments')}</h4>
-      {document.comments.length === 0 ? (
-        <p className="mt-2 text-sm text-slate">{t('noComments')}</p>
-      ) : (
-        <ol className="mt-2 grid gap-2">
-          {document.comments.map((entry) => (
-            <li
-              key={entry.id}
-              className={
-                entry.author.role === 'CONSULTANT'
-                  ? 'rounded-lg bg-ice-blue px-3 py-2 text-sm'
-                  : 'rounded-lg bg-off-white px-3 py-2 text-sm'
-              }
-            >
-              <p className="whitespace-pre-line text-navy-deep">{entry.body}</p>
-              <p className="mt-1 text-xs text-slate">
-                {entry.author.name} ·{' '}
-                {format.dateTime(entry.createdAt, {
-                  day: 'numeric',
-                  month: 'short',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </p>
-            </li>
-          ))}
-        </ol>
-      )}
-      {open ? (
-        <form onSubmit={submit} noValidate className="mt-3 grid gap-1.5">
-          <label htmlFor={id} className="sr-only">
-            {t('commentLabel', { title: document.title })}
-          </label>
-          <textarea
-            id={id}
-            rows={2}
-            value={body}
-            maxLength={COMMENT_MAX}
-            placeholder={t('commentPlaceholder')}
-            aria-invalid={invalid}
-            aria-describedby={invalid ? `${id}-error` : undefined}
-            onChange={(event) => setBody(event.target.value)}
-            className="rounded-xl border-2 border-fog-light px-3 py-2 text-sm text-navy-deep focus:border-navy-deep focus:outline-none aria-invalid:border-rouge"
-          />
-          {invalid ? (
-            <p id={`${id}-error`} className="text-sm text-rouge">
-              {t('commentError')}
-            </p>
-          ) : null}
-          <button
-            type="submit"
-            disabled={comment.isPending}
-            className={`${smallButton} justify-self-end bg-navy-deep text-white hover:bg-navy-80`}
-          >
-            {t('send')}
-          </button>
-        </form>
-      ) : null}
-    </div>
-  );
-}
-
 function DeleteDocumentDialog({
   dossierId,
   document,
@@ -372,16 +280,11 @@ function DeleteDocumentDialog({
 }): ReactNode {
   const t = useTranslations('Dossiers.documents');
   const trpc = useTRPC();
-  const { refresh, failed } = useDocumentsMutation(dossierId);
+  const { optimistic } = useDocumentsMutation(dossierId);
   const remove = useMutation(
-    trpc.dossiers.documents.deleteDocument.mutationOptions({
-      onSuccess: () => {
-        void refresh();
-        onOpenChange(false);
-        toast.add({ title: t('toast.documentDeleted'), type: 'deleted' });
-      },
-      onError: failed,
-    }),
+    trpc.dossiers.documents.deleteDocument.mutationOptions(
+      optimistic(withoutDocument, () => t('toast.documentDeleted')),
+    ),
   );
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -398,8 +301,10 @@ function DeleteDocumentDialog({
           <AlertDialogCancel className="rounded-full">{t('cancel')}</AlertDialogCancel>
           <button
             type="button"
-            disabled={remove.isPending}
-            onClick={() => remove.mutate({ id: document.id })}
+            onClick={() => {
+              remove.mutate({ id: document.id });
+              onOpenChange(false);
+            }}
             className="rounded-full bg-rouge px-5 py-2 text-sm font-semibold text-white hover:bg-crimson disabled:opacity-50"
           >
             {t('confirmDelete')}

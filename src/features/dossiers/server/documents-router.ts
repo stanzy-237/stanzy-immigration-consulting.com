@@ -8,6 +8,8 @@ import {
   addSectionInput,
   addVersionInput,
   commentInput,
+  deleteCommentInput,
+  editCommentInput,
   dossierFilePrefix,
   dossierRefInput,
   renameSectionInput,
@@ -18,6 +20,7 @@ import { finalesLocked } from '@/features/dossiers/lib/workflow';
 import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { documentFor, dossierFor, isConsultant, sectionFor, writable } from '@/features/dossiers/server/dossier-access';
 import { notifyClient, notifyConsultants } from '@/features/dossiers/server/dossier-notify';
+import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 
@@ -68,13 +71,34 @@ export const documentsRouter = createTRPCRouter({
             },
             comments: {
               orderBy: { createdAt: 'asc' },
-              select: { id: true, body: true, createdAt: true, author: person },
+              select: {
+                id: true,
+                parentId: true,
+                body: true,
+                createdAt: true,
+                editedAt: true,
+                deletedAt: true,
+                author: { select: { id: true, name: true, role: true } },
+              },
             },
           },
         },
       },
     });
-    return { open: dossier.state === 'OPEN', locked: finalesLocked(dossier.service, dossier.stage), sections };
+    return {
+      /** Who is looking: their own comments can be edited, and what they add shows under their name at once. */
+      viewer: { id: ctx.session.account.id, name: ctx.session.account.name, role: ctx.session.account.role },
+      open: dossier.state === 'OPEN',
+      locked: finalesLocked(dossier.service, dossier.stage),
+      // A deleted comment keeps its place in the conversation, not its words.
+      sections: sections.map((section) => ({
+        ...section,
+        documents: section.documents.map((document) => ({
+          ...document,
+          comments: document.comments.map((comment) => (comment.deletedAt ? { ...comment, body: '' } : comment)),
+        })),
+      })),
+    };
   }),
 
   /** A Section at the end of the Dossier's list. */
@@ -177,13 +201,26 @@ export const documentsRouter = createTRPCRouter({
     });
   }),
 
-  /** A message in the Document's thread; the other side is emailed. */
+  /**
+   * A message in the Document's conversation, or a reply (`parentId`); a
+   * reply to a reply joins its comment, so threads stay one level deep. The
+   * other side is emailed.
+   */
   comment: protectedProcedure.input(commentInput).mutation(async ({ ctx, input }) => {
     const document = await documentFor(ctx.prisma, ctx.session, input.documentId);
     const { dossier } = document;
     writable(dossier);
+    let parentId: string | null = null;
+    if (input.parentId) {
+      const parent = await ctx.prisma.documentComment.findFirst({
+        where: { id: input.parentId, documentId: document.id },
+        select: { id: true, parentId: true },
+      });
+      if (!parent) throw notFound();
+      parentId = parent.parentId ?? parent.id;
+    }
     const comment = await ctx.prisma.documentComment.create({
-      data: { documentId: document.id, authorId: ctx.session.account.id, body: input.body },
+      data: { documentId: document.id, parentId, authorId: ctx.session.account.id, body: input.body },
       select: { id: true },
     });
     const excerpt = excerptOf(input.body);
@@ -199,7 +236,55 @@ export const documentsRouter = createTRPCRouter({
     }
     return comment;
   }),
+
+  /** Its author rewrites a comment; it shows « modifié ». COMMENT_NOT_YOURS for anyone else's. */
+  editComment: protectedProcedure.input(editCommentInput).mutation(async ({ ctx, input }) => {
+    const comment = await commentFor(ctx.prisma, ctx.session, input.id);
+    if (comment.authorId !== ctx.session.account.id) throw refuse('COMMENT_NOT_YOURS');
+    await ctx.prisma.documentComment.update({
+      where: { id: comment.id },
+      data: { body: input.body, editedAt: new Date() },
+    });
+  }),
+
+  /**
+   * Its author, or the consultant, deletes a comment. One with replies stays
+   * as « Commentaire supprimé » so the replies still read; once its last
+   * reply goes, it goes too.
+   */
+  deleteComment: protectedProcedure.input(deleteCommentInput).mutation(async ({ ctx, input }) => {
+    const comment = await commentFor(ctx.prisma, ctx.session, input.id);
+    if (comment.authorId !== ctx.session.account.id && !isConsultant(ctx.session)) throw refuse('COMMENT_NOT_YOURS');
+    await ctx.prisma.$transaction(async (tx) => {
+      if ((await tx.documentComment.count({ where: { parentId: comment.id } })) > 0) {
+        await tx.documentComment.update({ where: { id: comment.id }, data: { deletedAt: new Date(), body: '' } });
+        return;
+      }
+      await tx.documentComment.delete({ where: { id: comment.id } });
+      if (comment.parentId) {
+        const parent = await tx.documentComment.findUnique({
+          where: { id: comment.parentId },
+          select: { deletedAt: true, _count: { select: { replies: true } } },
+        });
+        if (parent?.deletedAt && parent._count.replies === 0) {
+          await tx.documentComment.delete({ where: { id: comment.parentId } });
+        }
+      }
+    });
+  }),
 });
+
+/** A comment still in the conversation, in a Dossier `session` reaches and that is still open. */
+async function commentFor(prisma: Db, session: CurrentSession, id: string) {
+  const comment = await prisma.documentComment.findUnique({
+    where: { id },
+    select: { id: true, documentId: true, parentId: true, authorId: true, deletedAt: true },
+  });
+  if (!comment || comment.deletedAt) throw notFound();
+  const { dossier } = await documentFor(prisma, session, comment.documentId);
+  writable(dossier);
+  return comment;
+}
 
 /**
  * Saves the Document's next Version number. Two uploads at once can pick the

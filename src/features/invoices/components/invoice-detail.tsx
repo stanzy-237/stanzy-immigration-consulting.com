@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ban, CheckCircle2, Download, ExternalLink } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
@@ -23,6 +23,7 @@ import { CANCEL_REASON_MAX, cancelInvoiceInput } from '@/features/invoices/lib/i
 import { isAwaitingPayment } from '@/features/invoices/lib/invoice-status';
 import { formatMoney, lineTotal } from '@/features/invoices/lib/money';
 import { invoicePdfUrl, proofFileUrl } from '@/features/invoices/lib/invoice-urls';
+import { optimisticUpdate } from '@/lib/optimistic-list';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
 
@@ -34,18 +35,29 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }): ReactNode {
   const locale = useLocale();
   const format = useFormatter();
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const { refresh, failed } = useInvoiceMutation();
   const [cancelling, setCancelling] = useState(false);
   const money = (minor: number) => formatMoney(minor, invoice.currency, locale);
   const date = (value: Date) => format.dateTime(value, { day: 'numeric', month: 'long', year: 'numeric' });
 
+  // « Payée » shows on the click; a refusal puts the invoice back.
+  const paid = optimisticUpdate<Invoice, { id: string }>(
+    queryClient,
+    trpc.invoices.dashboard.get.queryKey({ id: invoice.id }),
+    (current) => ({ ...current, status: 'PAID', paidAt: new Date() }),
+  );
   const markPaid = useMutation(
     trpc.invoices.dashboard.markPaid.mutationOptions({
+      onMutate: paid.onMutate,
       onSuccess: () => {
         void refresh();
         toast.add({ title: t('Invoices.toast.paid'), type: 'success' });
       },
-      onError: failed,
+      onError: (error, input, context) => {
+        paid.onError(error, input, context);
+        failed(error);
+      },
     }),
   );
   const awaiting = isAwaitingPayment(invoice.status);

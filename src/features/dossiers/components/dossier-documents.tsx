@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from '@/components/ui/toast';
 import { DocumentCard } from '@/features/dossiers/components/document-card';
 import {
   fieldClass,
@@ -15,6 +14,14 @@ import {
   type Viewer,
 } from '@/features/dossiers/components/document-styles';
 import { useDocumentsMutation } from '@/features/dossiers/hooks/use-documents-mutation';
+import {
+  renamedSection,
+  withDocument,
+  withoutSection,
+  withSection,
+  type SectionsData,
+} from '@/features/dossiers/lib/documents-cache';
+import { isOptimistic } from '@/lib/optimistic-list';
 import { addSectionInput, TITLE_MAX } from '@/features/dossiers/lib/document-schema';
 import { useTRPC } from '@/trpc/client';
 
@@ -55,6 +62,7 @@ export function DossierDocuments({ dossierId, viewer }: { dossierId: string; vie
                 dossierId={dossierId}
                 section={section}
                 viewer={viewer}
+                me={data.viewer}
                 open={data.open}
                 locked={data.locked}
               />
@@ -78,29 +86,27 @@ function SectionCard({
   dossierId,
   section,
   viewer,
+  me,
   open,
   locked,
 }: {
   dossierId: string;
   section: SectionData;
   viewer: Viewer;
+  me: SectionsData['viewer'];
   open: boolean;
   locked: boolean;
 }): ReactNode {
   const t = useTranslations('Dossiers.documents');
   const trpc = useTRPC();
-  const { refresh, failed } = useDocumentsMutation(dossierId);
+  const { optimistic } = useDocumentsMutation(dossierId);
   const [renaming, setRenaming] = useState(false);
   const consultant = viewer === 'consultant';
+  // Just added: it has no server id until the refetch, so it can't change yet.
+  const pending = isOptimistic(section);
 
   const remove = useMutation(
-    trpc.dossiers.documents.deleteSection.mutationOptions({
-      onSuccess: () => {
-        void refresh();
-        toast.add({ title: t('toast.sectionDeleted'), type: 'deleted' });
-      },
-      onError: failed,
-    }),
+    trpc.dossiers.documents.deleteSection.mutationOptions(optimistic(withoutSection, () => t('toast.sectionDeleted'))),
   );
 
   return (
@@ -120,7 +126,7 @@ function SectionCard({
         ) : (
           <>
             <h3 className="font-heading text-lg font-bold text-navy-deep">{section.title}</h3>
-            {consultant && open ? (
+            {consultant && open && !pending ? (
               <div className="flex items-center gap-1">
                 <button
                   type="button"
@@ -133,7 +139,6 @@ function SectionCard({
                 {section.documents.length === 0 ? (
                   <button
                     type="button"
-                    disabled={remove.isPending}
                     onClick={() => remove.mutate({ id: section.id })}
                     className={`${smallButton} text-slate hover:text-rouge`}
                   >
@@ -153,13 +158,20 @@ function SectionCard({
         <ul className="mt-3 grid gap-3">
           {section.documents.map((document) => (
             <li key={document.id}>
-              <DocumentCard dossierId={dossierId} document={document} viewer={viewer} open={open} locked={locked} />
+              <DocumentCard
+                dossierId={dossierId}
+                document={document}
+                viewer={viewer}
+                me={me}
+                open={open}
+                locked={locked}
+              />
             </li>
           ))}
         </ul>
       )}
 
-      {open ? (
+      {open && !pending ? (
         <div className="mt-4 border-t border-off-white pt-4">
           <TitleForm
             label={t('documentTitle')}
@@ -220,36 +232,21 @@ function TitleForm({
   const t = useTranslations('Dossiers.documents');
   const id = useId();
   const trpc = useTRPC();
-  const { refresh, failed } = useDocumentsMutation(dossierId);
+  const { optimistic } = useDocumentsMutation(dossierId);
   const [title, setTitle] = useState(initial);
   const [invalid, setInvalid] = useState(false);
-  const succeeded = (message: string) => () => {
-    void refresh();
-    setTitle('');
-    onDone?.();
-    toast.add({ title: message, type: 'success' });
-  };
 
   const addSection = useMutation(
-    trpc.dossiers.documents.addSection.mutationOptions({
-      onSuccess: succeeded(t('toast.sectionAdded')),
-      onError: failed,
-    }),
+    trpc.dossiers.documents.addSection.mutationOptions(optimistic(withSection, () => t('toast.sectionAdded'))),
   );
   const addDocument = useMutation(
-    trpc.dossiers.documents.addDocument.mutationOptions({
-      onSuccess: succeeded(t('toast.documentAdded')),
-      onError: failed,
-    }),
+    trpc.dossiers.documents.addDocument.mutationOptions(optimistic(withDocument, () => t('toast.documentAdded'))),
   );
   const rename = useMutation(
-    trpc.dossiers.documents.renameSection.mutationOptions({
-      onSuccess: succeeded(t('toast.sectionRenamed')),
-      onError: failed,
-    }),
+    trpc.dossiers.documents.renameSection.mutationOptions(optimistic(renamedSection, () => t('toast.sectionRenamed'))),
   );
-  const pending = addSection.isPending || addDocument.isPending || rename.isPending;
 
+  // The change is on screen at once: the form clears (or closes) without waiting for the server.
   const submit = (event: FormEvent) => {
     event.preventDefault();
     const valid = addSectionInput.shape.title.safeParse(title).success;
@@ -258,6 +255,8 @@ function TitleForm({
     if (mutation === 'addSection') addSection.mutate({ dossierId: targetId, title });
     else if (mutation === 'addDocument') addDocument.mutate({ sectionId: targetId, title });
     else rename.mutate({ id: targetId, title });
+    setTitle('');
+    onDone?.();
   };
 
   const described = invalid ? `${id}-error` : hint ? `${id}-hint` : undefined;
@@ -276,7 +275,7 @@ function TitleForm({
           onChange={(event) => setTitle(event.target.value)}
           className={fieldClass}
         />
-        <button type="submit" disabled={pending} className={`${smallButton} bg-navy-deep text-white hover:bg-navy-80`}>
+        <button type="submit" className={`${smallButton} bg-navy-deep text-white hover:bg-navy-80`}>
           {submitLabel}
         </button>
         {onCancel ? (

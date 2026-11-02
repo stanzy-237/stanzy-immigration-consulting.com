@@ -75,7 +75,7 @@ function fakeDatabase() {
       .map((v) => ({ ...v, uploadedBy: person(v.uploadedById) })),
     comments: tables
       .documentComment!.filter((c) => c.documentId === doc.id)
-      .map((c) => ({ ...c, author: person(c.authorId) })),
+      .map((c) => ({ ...c, author: { id: c.authorId, ...person(c.authorId) } })),
   });
 
   const table = (name: string, shape: (row: Row) => unknown = (row) => row) => ({
@@ -111,7 +111,7 @@ function fakeDatabase() {
     },
   });
 
-  const prisma = {
+  const prisma: Record<string, unknown> = {
     dossier: table('dossier', (row) => withDossier(row)),
     dossierSection: {
       ...table('dossierSection', (row) => withSection(row)),
@@ -126,8 +126,27 @@ function fakeDatabase() {
     },
     dossierDocument: table('dossierDocument', fullDocument),
     documentVersion: table('documentVersion'),
-    documentComment: table('documentComment'),
+    documentComment: {
+      ...table('documentComment'),
+      async findUnique({ where }: { where: { id: string } }) {
+        const row = byId('documentComment', where.id);
+        const replies = tables.documentComment!.filter((c) => c.parentId === where.id).length;
+        return row ? { ...row, _count: { replies } } : null;
+      },
+      async create({ data }: { data: Record<string, unknown> }) {
+        const row: Row = {
+          editedAt: null,
+          deletedAt: null,
+          ...data,
+          id: `com_${++seq}`,
+          createdAt: new Date((clock += 1000)),
+        };
+        tables.documentComment!.push(row);
+        return row;
+      },
+    },
   };
+  prisma.$transaction = (fn: (tx: unknown) => Promise<unknown>) => fn(prisma);
   return { prisma: prisma as unknown as TRPCContext['prisma'], tables };
 }
 
@@ -278,5 +297,70 @@ describe('the consultant’s documents', () => {
     await as(asConsultant).deleteDocument({ id });
     expect(db.tables.dossierDocument!.some((d) => d.id === id)).toBe(false);
     expect(storage.deleteObjects).toHaveBeenCalledWith('private', [OBJECT]);
+  });
+});
+
+describe('the conversation on a Document', () => {
+  async function conversation() {
+    const { id } = await as(asConsultant).addDocument({ sectionId: 'sec_1', title: 'Relevé N2' });
+    const { id: question } = await as(asConsultant).comment({ documentId: id, body: 'Le scan est flou.' });
+    return { documentId: id, question };
+  }
+  const commentsOf = async (documentId: string) =>
+    (await as(asAminata).sections({ dossierId: 'dos_1' })).sections[0]!.documents.find((d) => d.id === documentId)!
+      .comments;
+
+  it('threads replies one level deep, and emails the other side', async () => {
+    const { documentId, question } = await conversation();
+    const { id: answer } = await as(asAminata).comment({ documentId, parentId: question, body: 'Je le refais.' });
+    await as(asConsultant).comment({ documentId, parentId: answer, body: 'Merci !' });
+
+    expect((await commentsOf(documentId)).map((c) => [c.body, c.parentId])).toEqual([
+      ['Le scan est flou.', null],
+      ['Je le refais.', question],
+      ['Merci !', question],
+    ]);
+    expect(notify.notifyConsultants).toHaveBeenCalledWith(expect.anything(), 'Aminata Diallo', {
+      kind: 'clientComment',
+      document: 'Relevé N2',
+      excerpt: 'Je le refais.',
+    });
+  });
+
+  it('lets only the author edit, and shows the edit', async () => {
+    const { documentId, question } = await conversation();
+    await expect(as(asAminata).editComment({ id: question, body: 'Changé' })).rejects.toMatchObject({
+      message: 'COMMENT_NOT_YOURS',
+    });
+    await as(asConsultant).editComment({ id: question, body: 'Le scan du relevé est flou.' });
+    expect((await commentsOf(documentId))[0]).toMatchObject({
+      body: 'Le scan du relevé est flou.',
+      editedAt: expect.any(Date),
+    });
+  });
+
+  it('keeps a deleted message with replies as an empty placeholder, then clears it with its last reply', async () => {
+    const { documentId, question } = await conversation();
+    const { id: answer } = await as(asAminata).comment({ documentId, parentId: question, body: 'Je le refais.' });
+
+    await expect(as(asAminata).deleteComment({ id: question })).rejects.toMatchObject({ message: 'COMMENT_NOT_YOURS' });
+    await as(asConsultant).deleteComment({ id: question });
+    expect((await commentsOf(documentId))[0]).toMatchObject({ id: question, body: '', deletedAt: expect.any(Date) });
+    await expect(as(asConsultant).editComment({ id: question, body: 'Revenu' })).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
+
+    await as(asAminata).deleteComment({ id: answer });
+    expect(await commentsOf(documentId)).toEqual([]);
+  });
+
+  it('won’t reply across Documents', async () => {
+    const { question } = await conversation();
+    const other = await as(asConsultant).addDocument({ sectionId: 'sec_1', title: 'Licence' });
+    await expect(
+      as(asAminata).comment({ documentId: other.id, parentId: question, body: 'Ici ?' }),
+    ).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
   });
 });

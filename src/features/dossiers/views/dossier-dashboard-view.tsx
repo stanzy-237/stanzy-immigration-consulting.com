@@ -21,6 +21,7 @@ import { DossierDocuments, DossierDocumentsSkeleton } from '@/features/dossiers/
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
 import { CLOSE_REASON_MAX, closeDossierInput } from '@/features/dossiers/lib/dossier-schema';
 import { nextStage, previousStage } from '@/features/dossiers/lib/workflow';
+import { optimisticUpdate } from '@/lib/optimistic-list';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
 import { useTRPC } from '@/trpc/client';
@@ -83,11 +84,33 @@ function DossierDetail({ id }: { id: string }): ReactNode {
     toast.add({ title: t('toast.failed'), type: 'error' });
   };
 
+  // The stepper moves on the click; a refusal puts it back, then explains.
+  const moveTo = (step: typeof nextStage) => {
+    const update = optimisticUpdate<typeof dossier, { from: string }>(
+      queryClient,
+      trpc.dossiers.dashboard.get.queryKey({ id }),
+      (current, input) => ({ ...current, stage: step(current.service, input.from) ?? current.stage }),
+    );
+    return {
+      onMutate: update.onMutate,
+      onError: (
+        error: { message: string },
+        input: { from: string },
+        context: { previous?: typeof dossier } | undefined,
+      ) => {
+        update.onError(error, input, context);
+        onRefused(error);
+      },
+    };
+  };
   const advance = useMutation(
-    trpc.dossiers.dashboard.advance.mutationOptions({ onSuccess: onMoved(t('toast.advanced')), onError: onRefused }),
+    trpc.dossiers.dashboard.advance.mutationOptions({ ...moveTo(nextStage), onSuccess: onMoved(t('toast.advanced')) }),
   );
   const moveBack = useMutation(
-    trpc.dossiers.dashboard.moveBack.mutationOptions({ onSuccess: onMoved(t('toast.movedBack')), onError: onRefused }),
+    trpc.dossiers.dashboard.moveBack.mutationOptions({
+      ...moveTo(previousStage),
+      onSuccess: onMoved(t('toast.movedBack')),
+    }),
   );
   const moving = advance.isPending || moveBack.isPending;
   const open = dossier.state === 'OPEN';

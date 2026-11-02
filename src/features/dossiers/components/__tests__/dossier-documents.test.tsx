@@ -20,7 +20,20 @@ const upload = vi.hoisted(() => ({
 vi.mock('@/features/dossiers/lib/upload-version', () => upload);
 
 const person = (name: string, role: 'MEMBER' | 'CONSULTANT' = 'MEMBER') => ({ name, role });
-const sections = (extra: { locked?: boolean; open?: boolean } = {}) => ({
+const CLIENT = { id: 'acc_1', name: 'Aminata Diallo', role: 'MEMBER' as const };
+const STANZY = { id: 'acc_stanzy', name: 'Stanzy', role: 'CONSULTANT' as const };
+const message = (id: string, parentId: string | null, author: typeof CLIENT | typeof STANZY, body: string) => ({
+  id,
+  parentId,
+  body,
+  createdAt: new Date('2026-10-21T11:00:00Z'),
+  editedAt: null,
+  deletedAt: null,
+  author,
+});
+
+const sections = (extra: { locked?: boolean; open?: boolean; viewer?: typeof CLIENT | typeof STANZY } = {}) => ({
+  viewer: CLIENT,
   open: true,
   locked: false,
   ...extra,
@@ -56,12 +69,8 @@ const sections = (extra: { locked?: boolean; open?: boolean } = {}) => ({
             },
           ],
           comments: [
-            {
-              id: 'com_1',
-              body: 'Le scan est flou.',
-              createdAt: new Date('2026-10-21T11:00:00Z'),
-              author: person('Stanzy', 'CONSULTANT'),
-            },
+            message('com_1', null, STANZY, 'Le scan est flou.'),
+            message('com_2', 'com_1', CLIENT, 'Je le refais ce soir.'),
           ],
         },
       ],
@@ -75,10 +84,15 @@ const api = vi.hoisted(() => ({
   addVersion: vi.fn(),
   setFinal: vi.fn(),
   comment: vi.fn(),
+  editComment: vi.fn(),
+  deleteComment: vi.fn(),
 }));
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => vi.resetAllMocks());
 
-function documents(viewer: Viewer, data = sections()) {
+/** A server that hasn't answered yet: what the screen shows meanwhile. */
+const silent = () => new Promise(() => {});
+
+function documents(viewer: Viewer, data = sections({ viewer: viewer === 'consultant' ? STANZY : CLIENT })) {
   const { trpc, queryClient, wrap } = createTestTRPC({
     'dossiers.documents.sections': () => data,
     'dossiers.documents.addDocument': (input) => api.addDocument(input) ?? { id: 'doc_9' },
@@ -86,12 +100,16 @@ function documents(viewer: Viewer, data = sections()) {
     'dossiers.documents.addVersion': (input) => api.addVersion(input) ?? { id: 'ver_9', number: 3 },
     'dossiers.documents.setFinal': (input) => api.setFinal(input),
     'dossiers.documents.comment': (input) => api.comment(input) ?? { id: 'com_9' },
+    'dossiers.documents.editComment': (input) => api.editComment(input),
+    'dossiers.documents.deleteComment': (input) => api.deleteComment(input),
   });
   queryClient.setQueryData(trpc.dossiers.documents.sections.queryKey({ dossierId: 'dos_1' }), data as never);
   return render(withIntl(wrap(<DossierDocuments dossierId="dos_1" viewer={viewer} />)));
 }
 
 const openDocument = () => fireEvent.click(screen.getByRole('button', { name: /^Relevé N2/ }));
+/** The message showing `text`, to act on it. */
+const messageWith = (text: string) => screen.getByText(text).closest('article') as HTMLElement;
 
 describe('DossierDocuments for the Client', () => {
   it('shows each Version and comment, without the consultant’s controls', async () => {
@@ -153,20 +171,79 @@ describe('DossierDocuments for the Client', () => {
     expect(api.addVersion).not.toHaveBeenCalled();
   });
 
-  it('asks for a message before commenting', async () => {
+  it('asks for a message, then shows it before the server answers', async () => {
+    api.comment.mockImplementation(silent);
     documents('client');
     openDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Envoyer' }));
     expect(await screen.findByText('Écrivez un message.')).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('Commenter Relevé N2'), { target: { value: 'Voici le nouveau scan.' } });
+
+    const field = screen.getByLabelText('Écrire à propos de Relevé N2');
+    fireEvent.change(field, { target: { value: 'Voici le nouveau scan.' } });
     fireEvent.click(screen.getByRole('button', { name: 'Envoyer' }));
-    await waitFor(() =>
-      expect(api.comment).toHaveBeenCalledWith({ documentId: 'doc_1', body: 'Voici le nouveau scan.' }),
+    expect(await screen.findByText('Voici le nouveau scan.')).toBeInTheDocument();
+    expect(screen.getByText('· envoi…')).toBeInTheDocument();
+    expect(field).toHaveValue('');
+    expect(api.comment).toHaveBeenCalledWith({ documentId: 'doc_1', body: 'Voici le nouveau scan.' });
+  });
+
+  it('replies in the thread', async () => {
+    documents('client');
+    openDocument();
+    fireEvent.click(within(messageWith('Le scan est flou.')).getByRole('button', { name: 'Répondre' }));
+    fireEvent.change(screen.getByLabelText('Répondre à Stanzy'), { target: { value: 'C’est fait.' } });
+    fireEvent.click(
+      within(screen.getByLabelText('Répondre à Stanzy').closest('form')!).getByRole('button', { name: 'Répondre' }),
     );
+    await waitFor(() =>
+      expect(api.comment).toHaveBeenCalledWith({ documentId: 'doc_1', parentId: 'com_1', body: 'C’est fait.' }),
+    );
+    expect(await screen.findByText('Réponse envoyée')).toBeInTheDocument();
+  });
+
+  it('edits and deletes only their own messages, on screen at once', async () => {
+    api.editComment.mockImplementation(silent);
+    api.deleteComment.mockImplementation(silent);
+    documents('client');
+    openDocument();
+    const question = messageWith('Le scan est flou.');
+    expect(within(question).queryByRole('button', { name: 'Modifier' })).not.toBeInTheDocument();
+    expect(within(question).queryByRole('button', { name: 'Supprimer' })).not.toBeInTheDocument();
+
+    fireEvent.click(within(messageWith('Je le refais ce soir.')).getByRole('button', { name: 'Modifier' }));
+    fireEvent.change(screen.getByLabelText('Modifier votre message'), { target: { value: 'Je le refais demain.' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
+    expect(await screen.findByText('Je le refais demain.')).toBeInTheDocument();
+    await waitFor(() => expect(api.editComment).toHaveBeenCalledWith({ id: 'com_2', body: 'Je le refais demain.' }));
+
+    fireEvent.click(within(messageWith('Je le refais demain.')).getByRole('button', { name: 'Supprimer' }));
+    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Supprimer' }));
+    await waitFor(() => expect(screen.queryByText('Je le refais demain.')).not.toBeInTheDocument());
+    expect(api.deleteComment).toHaveBeenCalledWith({ id: 'com_2' });
+  });
+
+  it('puts a message back when the server refuses it', async () => {
+    api.comment.mockImplementation(() => {
+      throw new Error('DOSSIER_CLOSED');
+    });
+    documents('client');
+    openDocument();
+    fireEvent.change(screen.getByLabelText('Écrire à propos de Relevé N2'), { target: { value: 'Trop tard ?' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Envoyer' }));
+    expect(await screen.findByText('Ce dossier est clôturé : il ne peut plus changer.')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Trop tard ?')).not.toBeInTheDocument());
   });
 });
 
 describe('DossierDocuments for the consultant', () => {
+  it('deletes any message, as the consultant', async () => {
+    documents('consultant');
+    openDocument();
+    const answer = messageWith('Je le refais ce soir.');
+    expect(within(answer).queryByRole('button', { name: 'Modifier' })).not.toBeInTheDocument();
+    expect(within(answer).getByRole('button', { name: 'Supprimer' })).toBeInTheDocument();
+  });
+
   it('moves the Finale to another Version', async () => {
     documents('consultant');
     openDocument();
@@ -186,10 +263,12 @@ describe('DossierDocuments for the consultant', () => {
     expect(screen.getByRole('button', { name: /Marquer finale/ })).toBeDisabled();
   });
 
-  it('adds a Section', async () => {
+  it('adds a Section, on screen at once', async () => {
+    api.addSection.mockImplementation(silent);
     documents('consultant');
     fireEvent.change(screen.getByLabelText('Nom de la section'), { target: { value: 'Preuve de fonds' } });
     fireEvent.click(screen.getByRole('button', { name: 'Ajouter la section' }));
+    expect(await screen.findByRole('heading', { name: 'Preuve de fonds' })).toBeInTheDocument();
     await waitFor(() => expect(api.addSection).toHaveBeenCalledWith({ dossierId: 'dos_1', title: 'Preuve de fonds' }));
   });
 

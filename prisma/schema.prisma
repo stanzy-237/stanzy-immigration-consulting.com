@@ -464,17 +464,25 @@ model DocumentVersion {
   @@map("document_version")
 }
 
-/// A message in a Document's comment thread.
+/// A message in a Document's conversation: a comment, or a reply to one (one level deep).
 model DocumentComment {
-  id         String          @id @default(cuid())
+  id         String            @id @default(cuid())
   documentId String
-  document   DossierDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  document   DossierDocument   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  /// The comment this one replies to; replies to a reply attach to its comment.
+  parentId   String?
+  parent     DocumentComment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies    DocumentComment[] @relation("Replies")
   authorId   String
-  author     Account         @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  author     Account           @relation(fields: [authorId], references: [id], onDelete: Restrict)
   body       String
-  createdAt  DateTime        @default(now())
+  editedAt   DateTime?
+  /// Deleted while it had replies: kept as « Commentaire supprimé » so the replies still make sense.
+  deletedAt  DateTime?
+  createdAt  DateTime          @default(now())
 
   @@index([documentId, createdAt])
+  @@index([parentId])
   @@map("document_comment")
 }
 
