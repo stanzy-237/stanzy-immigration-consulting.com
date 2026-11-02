@@ -1416,7 +1416,8 @@
       "openMenu": "Ouvrir le menu du tableau de bord",
       "menuTitle": "Tableau de bord",
       "close": "Fermer le menu",
-      "dossiers": "Dossiers"
+      "dossiers": "Dossiers",
+      "factures": "Factures"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -2004,6 +2005,164 @@
         "DOCUMENT_FILE_INVALID": "Le fichier n’a pas été reçu correctement. Réessayez.",
         "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez."
       }
+    }
+  },
+  "Invoices": {
+    "status": {
+      "DRAFT": "Brouillon",
+      "SENT": "Envoyée",
+      "OVERDUE": "En retard",
+      "PROOF_RECEIVED": "Preuve reçue",
+      "PAID": "Payée",
+      "CANCELLED": "Annulée"
+    },
+    "currencies": {
+      "XAF": "Franc CFA (XAF)",
+      "CAD": "Dollar canadien (CAD)",
+      "EUR": "Euro (EUR)"
+    },
+    "pdf": {
+      "title": "Facture",
+      "number": "N°",
+      "issuedOn": "Date d’émission",
+      "dueDate": "Échéance",
+      "billedTo": "Facturé à",
+      "dossier": "Dossier",
+      "description": "Description",
+      "quantity": "Qté",
+      "unitPrice": "Prix unitaire",
+      "amount": "Montant",
+      "total": "Total",
+      "notes": "Notes",
+      "page": "Page {page}/{pages}"
+    },
+    "emails": {
+      "sent": {
+        "subject": "Facture {number} – Stanzy Immigration Consulting",
+        "body": "Voici votre facture {number} pour votre dossier {service}, d’un montant de {total}. Vous la trouverez en pièce jointe.",
+        "bodyDue": "Voici votre facture {number} pour votre dossier {service}, d’un montant de {total}, à régler avant le {due}. Vous la trouverez en pièce jointe.",
+        "proof": "Une fois le paiement fait, téléversez votre preuve de paiement dans votre espace."
+      },
+      "paid": {
+        "subject": "Paiement reçu – facture {number}",
+        "body": "Nous avons bien reçu votre paiement de {total} pour la facture {number}. Merci !"
+      },
+      "proof": {
+        "subject": "{client} a envoyé une preuve de paiement ({number})",
+        "body": "{client} a téléversé une preuve de paiement pour la facture {number} ({total}). Vérifiez-la, puis marquez la facture payée.",
+        "cta": "Ouvrir la facture"
+      }
+    },
+    "list": {
+      "title": "Factures",
+      "intro": "Les factures de tous les dossiers : brouillons, envoyées, payées.",
+      "new": "Nouvelle facture",
+      "filtersLabel": "Filtrer les factures",
+      "filters": {
+        "ALL": "Toutes",
+        "DRAFT": "Brouillons",
+        "AWAITING": "En attente",
+        "OVERDUE": "En retard",
+        "PAID": "Payées",
+        "CANCELLED": "Annulées"
+      },
+      "empty": "Aucune facture ici.",
+      "draft": "Brouillon",
+      "dueOn": "Échéance le {date}",
+      "loading": "Chargement des factures",
+      "status": "Statut"
+    },
+    "editor": {
+      "titleNew": "Nouvelle facture",
+      "titleDraft": "Brouillon de facture",
+      "back": "Toutes les factures",
+      "dossier": "Dossier",
+      "dossierSearch": "Nom ou email du Client",
+      "dossierHint": "Tapez au moins 2 lettres : seuls les dossiers en cours apparaissent.",
+      "dossierRequired": "Choisissez un dossier.",
+      "noMatch": "Aucun dossier en cours ne correspond.",
+      "change": "Changer",
+      "currency": "Devise",
+      "dueDate": "Échéance",
+      "dueHint": "Facultatif. Passé ce jour, la facture est « En retard ».",
+      "lines": "Lignes",
+      "description": "Description",
+      "quantity": "Quantité",
+      "unitPrice": "Prix unitaire",
+      "lineNumber": "Ligne {number}",
+      "addLine": "Ajouter une ligne",
+      "removeLine": "Retirer la ligne {number}",
+      "lineError": "Chaque ligne a une description, une quantité et un prix valides.",
+      "notes": "Notes",
+      "notesHint": "Imprimé sous les lignes : modalités de paiement, message au Client.",
+      "total": "Total",
+      "save": "Enregistrer le brouillon",
+      "send": "Envoyer au Client",
+      "sendTitle": "Envoyer cette facture ?",
+      "sendBody": "Elle reçoit son numéro et part par email au Client, en PDF sur votre papier à en-tête. Elle ne pourra plus être modifiée.",
+      "confirmSend": "Envoyer",
+      "delete": "Supprimer le brouillon",
+      "deleteTitle": "Supprimer ce brouillon ?",
+      "deleteBody": "Il n’a jamais été envoyé : rien n’est perdu côté Client.",
+      "confirmDelete": "Supprimer",
+      "cancel": "Annuler",
+      "loading": "Chargement de la facture",
+      "loadingDossiers": "Recherche des dossiers",
+      "lineAmount": "Montant : {amount}"
+    },
+    "detail": {
+      "sentOn": "Envoyée le {date}",
+      "paidOn": "Payée le {date}",
+      "cancelledOn": "Annulée le {date}",
+      "cancelReason": "Motif : {reason}",
+      "downloadPdf": "Télécharger le PDF",
+      "markPaid": "Marquer payée",
+      "cancelInvoice": "Annuler la facture",
+      "cancelTitle": "Annuler cette facture ?",
+      "cancelBody": "Elle reste dans l’historique, marquée « Annulée ». Le Client n’est pas prévenu par email.",
+      "reason": "Motif",
+      "reasonError": "Indiquez un motif (3 caractères au moins).",
+      "confirmCancel": "Annuler la facture",
+      "keep": "Garder",
+      "proofs": "Preuves de paiement",
+      "noProofs": "Aucune preuve de paiement pour l’instant.",
+      "openProof": "Ouvrir",
+      "dossierLink": "Voir le dossier",
+      "lines": "Lignes"
+    },
+    "dossier": {
+      "title": "Factures",
+      "new": "Nouvelle facture",
+      "empty": "Aucune facture pour ce dossier.",
+      "emptyClient": "Aucune facture pour l’instant.",
+      "pdf": "Voir le PDF",
+      "pdfLabel": "Voir le PDF de la facture {number}",
+      "dueOn": "À régler avant le {date}",
+      "uploadProof": "Téléverser une preuve de paiement",
+      "uploadProofLabel": "Téléverser une preuve de paiement pour la facture {number}",
+      "uploading": "Envoi chiffré en cours…",
+      "proofHint": "Photo ou PDF du reçu (Orange Money, MTN MoMo, virement…), 25 Mo au plus.",
+      "proofCount": "{count, plural, one {# preuve de paiement envoyée} other {# preuves de paiement envoyées}}",
+      "loading": "Chargement des factures"
+    },
+    "toast": {
+      "saved": "Brouillon enregistré",
+      "sent": "Facture {number} envoyée",
+      "deleted": "Brouillon supprimé",
+      "paid": "Facture marquée payée",
+      "cancelled": "Facture annulée",
+      "proofAdded": "Preuve de paiement envoyée",
+      "changed": "Cette facture a changé entre-temps : la page est à jour."
+    },
+    "errors": {
+      "INVOICE_EMPTY": "Ajoutez au moins une ligne avec un montant.",
+      "INVOICE_NOT_DRAFT": "Cette facture a déjà été envoyée.",
+      "INVOICE_NOT_PAYABLE": "Cette facture n’attend plus de paiement.",
+      "DOSSIER_FILES_UNCONFIGURED": "Le téléversement n’est pas encore activé. Réessayez plus tard.",
+      "DOCUMENT_FILE_TYPE": "Ce type de fichier n’est pas accepté : PDF, JPG, PNG, WebP ou HEIC.",
+      "DOCUMENT_FILE_TOO_LARGE": "Ce fichier dépasse 25 Mo.",
+      "DOCUMENT_FILE_INVALID": "Le fichier n’a pas été reçu correctement. Réessayez.",
+      "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez."
     }
   }
 }

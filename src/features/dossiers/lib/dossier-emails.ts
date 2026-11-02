@@ -27,7 +27,14 @@ export type ClientActivity =
 /** A comment as quoted in an email: its first 200 characters. */
 export const excerptOf = (body: string): string => (body.length > 200 ? `${body.slice(0, 199)}…` : body);
 
-function render(opts: { to: string; subject: string; lines: string[]; cta: string; url: string }): EmailMessage {
+/** One of the app's notification emails: paragraphs, then a red button. */
+export function renderEmail(opts: {
+  to: string;
+  subject: string;
+  lines: string[];
+  cta: string;
+  url: string;
+}): EmailMessage {
   return {
     to: opts.to,
     subject: opts.subject,
@@ -70,7 +77,7 @@ export function dossierEmail(opts: {
               stage: t(`stages.${opts.service}.${change.stage}` as never),
             });
 
-  return render({
+  return renderEmail({
     to: opts.to,
     subject: t(`emails.${change.kind}.subject`, { service }),
     lines: [t('emails.greeting', { name: opts.name }), body],
@@ -107,7 +114,7 @@ export function consultantEmail(opts: {
           excerpt: activity.excerpt,
         });
 
-  return render({
+  return renderEmail({
     to: opts.to,
     subject: t(`consultantEmails.${activity.kind}.subject`, { client, document: activity.document }),
     lines: [body],

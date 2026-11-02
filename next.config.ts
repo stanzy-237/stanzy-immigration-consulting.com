@@ -4,6 +4,10 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  // The letterhead Factures are printed on, read from disk by whichever route builds one (#79).
+  outputFileTracingIncludes: {
+    '/api/**/*': ['./src/features/invoices/assets/letterhead.pdf'],
+  },
   images: {
     // Blog covers, uploaded by the consultant to Vercel Blob.
     remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }],

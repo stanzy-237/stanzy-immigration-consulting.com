@@ -15,7 +15,7 @@ import { useTRPC } from '@/trpc/client';
 
 /**
  * « Mon espace »: the signed-in Account's Dossiers, each with its stages and
- * a link to its documents. Invoices join in a later slice of #79.
+ * a link to its documents and invoices.
  */
 export function MySpaceView(): ReactNode {
   const t = useTranslations('Dossiers.mySpace');

@@ -25,8 +25,12 @@ import { nextStage, previousStage } from '@/features/dossiers/lib/workflow';
 import Link from 'next/link';
 import { useTRPC } from '@/trpc/client';
 
-/** One Dossier in the Tableau de bord: its stages, the moves the consultant can make, its history. */
-export function DossierDashboardView({ id }: { id: string }): ReactNode {
+/**
+ * One Dossier in the Tableau de bord: its stages, the moves the consultant
+ * can make, its history and documents. `invoices` is the Factures panel the
+ * route passes in.
+ */
+export function DossierDashboardView({ id, invoices }: { id: string; invoices?: ReactNode }): ReactNode {
   const t = useTranslations('Dossiers.detail');
   return (
     <div className="mx-auto max-w-5xl">
@@ -40,6 +44,7 @@ export function DossierDashboardView({ id }: { id: string }): ReactNode {
       <QueryBoundary fallback={<DossierSkeleton />}>
         <DossierDetail id={id} />
       </QueryBoundary>
+      {invoices ? <div className="mt-10">{invoices}</div> : null}
       <div className="mt-10">
         <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
           <DossierDocuments dossierId={id} viewer="consultant" />

@@ -14,8 +14,11 @@ import { SiteNav } from '@/features/landing/components/site-nav';
 import { Link } from '@/i18n/navigation';
 import { useTRPC } from '@/trpc/client';
 
-/** One of the Client's Dossiers in « Mon espace »: its stages, then its Sections and Documents. */
-export function MyDossierView({ id }: { id: string }): ReactNode {
+/**
+ * One of the Client's Dossiers in « Mon espace »: its stages, its Factures
+ * (`invoices`, passed in by the route), then its Sections and Documents.
+ */
+export function MyDossierView({ id, invoices }: { id: string; invoices?: ReactNode }): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
   return (
     <>
@@ -34,6 +37,7 @@ export function MyDossierView({ id }: { id: string }): ReactNode {
               <MyDossierHeader id={id} />
             </QueryBoundary>
           </div>
+          {invoices}
           <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
             <DossierDocuments dossierId={id} viewer="client" />
           </QueryBoundary>
