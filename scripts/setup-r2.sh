@@ -335,13 +335,16 @@ say "Without RESEND_API_KEY in $ENV_FILE, emails on your machine are only printe
 say "dev-server terminal. With it, they really go out, from your machine too."
 if confirm "Send real emails when testing locally?"; then
   open_url "https://resend.com/domains"
-  step "Check $SITE_DOMAIN shows Verified (if not, add it and copy its DNS records)."
+  step "Check notifications.$SITE_DOMAIN and auth.$SITE_DOMAIN both show Verified"
+  step "(if not, add each and copy its DNS records)."
   open_url "https://resend.com/api-keys"
-  step "« Create API Key » → Permission: Sending access → Domain: $SITE_DOMAIN → Add. Copy it."
+  step "« Create API Key » → Permission: Sending access → Domain: All domains → Add. Copy it."
   ask_secret RESEND_API_KEY "Paste the Resend API key:"
   write_env RESEND_API_KEY "$RESEND_API_KEY"
-  ask EMAIL_FROM "Sender [Stanzy Immigration <noreply@$SITE_DOMAIN>]:" || true
-  write_env EMAIL_FROM "${EMAIL_FROM:-Stanzy Immigration <noreply@$SITE_DOMAIN>}"
+  ask EMAIL_FROM "Sender for Dossiers and Factures [Stanzy Immigration <dossiers@notifications.$SITE_DOMAIN>]:" || true
+  write_env EMAIL_FROM "${EMAIL_FROM:-Stanzy Immigration <dossiers@notifications.$SITE_DOMAIN>}"
+  ask AUTH_EMAIL_FROM "Sender for account emails [Stanzy Immigration <compte@auth.$SITE_DOMAIN>]:" || true
+  write_env AUTH_EMAIL_FROM "${AUTH_EMAIL_FROM:-Stanzy Immigration <compte@auth.$SITE_DOMAIN>}"
   warn "Test accounts now receive real emails: sign them up with addresses you own."
 else
   note "Kept as is: emails stay in the terminal on this machine."
