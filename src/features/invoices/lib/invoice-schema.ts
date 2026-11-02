@@ -35,4 +35,5 @@ export const dossierSearchInput = z.object({ query: z.string().trim().min(2).max
 
 export const cancelInvoiceInput = z.object({ id, reason: z.string().trim().min(3).max(CANCEL_REASON_MAX) });
 
-export const invoiceBlobPrefix = (invoiceId: string): string => `invoices/${invoiceId}/`;
+/** Where a Facture's encrypted Preuves de paiement live in the private R2 bucket (#87). */
+export const invoiceFilePrefix = (invoiceId: string): string => `invoices/${invoiceId}/`;

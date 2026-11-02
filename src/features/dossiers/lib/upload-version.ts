@@ -1,9 +1,6 @@
-import { upload } from '@vercel/blob/client';
-
 import {
   DOCUMENT_FILE_MAX_BYTES,
   DOCUMENT_FILE_TYPES,
-  dossierBlobPrefix,
   type DocumentFileType,
 } from '@/features/dossiers/lib/document-schema';
 import { encryptFile } from '@/features/dossiers/lib/file-crypto';
@@ -25,36 +22,43 @@ export function documentFileType(file: { name: string; type: string }): Document
 }
 
 /**
- * Encrypts a file in the browser and sends it to Vercel Blob at `path`,
- * through the upload route that signs it (ADR 0007). Resolves to what the
- * server records. Rejects DOCUMENT_FILE_TYPE or DOCUMENT_FILE_TOO_LARGE
- * before sending anything.
+ * Encrypts a file in the browser and sends it to the private R2 bucket
+ * (ADR 0007, #87): `uploadRoute` names where it goes, then the ciphertext is
+ * PUT there directly. Resolves to what the server records. Rejects
+ * DOCUMENT_FILE_TYPE or DOCUMENT_FILE_TOO_LARGE before sending anything,
+ * DOSSIER_FILES_UNCONFIGURED or DOCUMENT_FILE_INVALID after.
  */
 export async function uploadEncryptedFile(
   file: File,
-  target: { path: string; handleUploadUrl: string; clientPayload: Record<string, string> },
+  target: { uploadRoute: string; payload: Record<string, string> },
 ) {
   const contentType = documentFileType(file);
   if (!contentType) throw new Error('DOCUMENT_FILE_TYPE');
   if (file.size === 0 || file.size > DOCUMENT_FILE_MAX_BYTES) throw new Error('DOCUMENT_FILE_TOO_LARGE');
 
-  const { ciphertext, key, iv } = await encryptFile(await file.arrayBuffer());
-  const blob = await upload(target.path, new Blob([ciphertext]), {
-    access: 'public',
-    contentType: 'application/octet-stream',
-    handleUploadUrl: target.handleUploadUrl,
-    clientPayload: JSON.stringify(target.clientPayload),
+  const response = await fetch(target.uploadRoute, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(target.payload),
   });
-  return { blobUrl: blob.url, key, iv, fileName: file.name, contentType, size: file.size };
+  if (!response.ok) {
+    throw new Error(response.status === 503 ? 'DOSSIER_FILES_UNCONFIGURED' : 'DOCUMENT_FILE_INVALID');
+  }
+  const { objectKey, uploadUrl } = (await response.json()) as { objectKey: string; uploadUrl: string };
+
+  const { ciphertext, key, iv } = await encryptFile(await file.arrayBuffer());
+  const stored = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/octet-stream' },
+    body: ciphertext,
+  });
+  if (!stored.ok) throw new Error('DOCUMENT_FILE_INVALID');
+  return { objectKey, key, iv, fileName: file.name, contentType, size: file.size };
 }
 
 /** A Document's next Version. */
-export const uploadVersionFile = (dossierId: string, documentId: string, file: File) =>
-  uploadEncryptedFile(file, {
-    path: `${dossierBlobPrefix(dossierId)}${documentId}.bin`,
-    handleUploadUrl: '/api/dossiers/upload',
-    clientPayload: { documentId },
-  });
+export const uploadVersionFile = (documentId: string, file: File) =>
+  uploadEncryptedFile(file, { uploadRoute: '/api/dossiers/upload', payload: { documentId } });
 
 /** Where a Version opens, decrypted by the server. */
 export const versionFileUrl = (versionId: string): string => `/api/dossiers/files/${versionId}`;

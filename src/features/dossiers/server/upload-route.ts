@@ -1,45 +1,37 @@
-import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
 
-import { dossierBlobPrefix } from '@/features/dossiers/lib/document-schema';
+import { dossierFilePrefix } from '@/features/dossiers/lib/document-schema';
 import { documentFor, writable } from '@/features/dossiers/server/dossier-access';
-import { ENCRYPTED_FILE_MAX_BYTES, masterKey } from '@/features/dossiers/server/dossier-files';
+import { prepareEncryptedUpload } from '@/features/dossiers/server/dossier-files';
 import { getCurrentSession } from '@/server/auth/session';
 import { prisma } from '@/server/db/client';
 
 /**
- * Hands the browser a one-time token to send an already encrypted Version
- * straight to Vercel Blob (ADR 0007). The client payload names the Document;
- * only its Client or the consultant, while the Dossier is open, and only
- * under that Dossier's folder. The Version is recorded afterwards by
- * `dossiers.documents.addVersion`, which checks the file again.
+ * Where the browser sends a Version it encrypted: a fresh key in the
+ * private R2 bucket under the Dossier's folder, and a short-lived address to
+ * PUT it to (ADR 0007, #87). Body: `{ documentId }`. Only its Client or the
+ * consultant, while the Dossier is open. `dossiers.documents.addVersion`
+ * records the file and checks it again.
  */
 export async function POST(request: Request): Promise<NextResponse> {
-  const body = (await request.json()) as HandleUploadBody;
+  const session = await getCurrentSession(request.headers);
+  if (!session) return NextResponse.json({ error: 'FORBIDDEN' }, { status: 401 });
   try {
-    const result = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async (pathname, clientPayload) => {
-        masterKey();
-        const session = await getCurrentSession(request.headers);
-        if (!session) throw new Error('FORBIDDEN');
-        const { documentId } = JSON.parse(clientPayload ?? '{}') as { documentId?: unknown };
-        if (typeof documentId !== 'string') throw new Error('DOCUMENT_FILE_INVALID');
-        const { dossier } = await documentFor(prisma, session, documentId);
-        writable(dossier);
-        if (!pathname.startsWith(dossierBlobPrefix(dossier.id))) throw new Error('DOCUMENT_FILE_INVALID');
-        return {
-          allowedContentTypes: ['application/octet-stream'],
-          maximumSizeInBytes: ENCRYPTED_FILE_MAX_BYTES,
-          addRandomSuffix: true,
-        };
-      },
-    });
-    return NextResponse.json(result);
+    const { documentId } = (await request.json()) as { documentId?: unknown };
+    if (typeof documentId !== 'string') throw new Error('DOCUMENT_FILE_INVALID');
+    const { dossier } = await documentFor(prisma, session, documentId);
+    writable(dossier);
+    return NextResponse.json(await prepareEncryptedUpload(dossierFilePrefix(dossier.id)));
   } catch (error) {
-    const message = error instanceof Error ? error.message : '';
-    if (message === 'DOSSIER_FILES_UNCONFIGURED') return NextResponse.json({ error: message }, { status: 503 });
-    return NextResponse.json({ error: 'DOCUMENT_FILE_REJECTED' }, { status: 403 });
+    return uploadRefused(error);
   }
+}
+
+/** The JSON a refused upload request answers with: 503 when files can't be stored on this deploy. */
+export function uploadRefused(error: unknown): NextResponse {
+  const message = error instanceof Error ? error.message : '';
+  if (message === 'DOSSIER_FILES_UNCONFIGURED' || message === 'STORAGE_UNCONFIGURED') {
+    return NextResponse.json({ error: 'DOSSIER_FILES_UNCONFIGURED' }, { status: 503 });
+  }
+  return NextResponse.json({ error: 'DOCUMENT_FILE_REJECTED' }, { status: 403 });
 }

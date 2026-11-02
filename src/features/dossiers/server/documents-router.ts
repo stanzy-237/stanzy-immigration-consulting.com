@@ -8,14 +8,14 @@ import {
   addSectionInput,
   addVersionInput,
   commentInput,
+  dossierFilePrefix,
   dossierRefInput,
-  isDossierBlob,
   renameSectionInput,
   setFinalInput,
 } from '@/features/dossiers/lib/document-schema';
 import { excerptOf } from '@/features/dossiers/lib/dossier-emails';
 import { finalesLocked } from '@/features/dossiers/lib/workflow';
-import { deleteFiles, ENCRYPTED_FILE_MAX_BYTES, sealKey, storedSize } from '@/features/dossiers/server/dossier-files';
+import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { documentFor, dossierFor, isConsultant, sectionFor, writable } from '@/features/dossiers/server/dossier-access';
 import { notifyClient, notifyConsultants } from '@/features/dossiers/server/dossier-notify';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -124,14 +124,14 @@ export const documentsRouter = createTRPCRouter({
     writable(document.dossier);
     const versions = await ctx.prisma.documentVersion.findMany({
       where: { documentId: document.id },
-      select: { blobUrl: true },
+      select: { objectKey: true },
     });
     await ctx.prisma.dossierDocument.delete({ where: { id: document.id } });
-    after(() => deleteFiles(versions.map((version) => version.blobUrl)));
+    after(() => deleteFiles(versions.map((version) => version.objectKey)));
   }),
 
   /**
-   * Records a file the browser encrypted and sent to Blob as the Document's
+   * Records a file the browser encrypted and sent to R2 as the Document's
    * next Version. Refuses DOCUMENT_FILE_INVALID for a file outside the
    * Dossier's folder, missing, or not the size announced.
    */
@@ -139,23 +139,13 @@ export const documentsRouter = createTRPCRouter({
     const document = await documentFor(ctx.prisma, ctx.session, input.documentId);
     const { dossier } = document;
     writable(dossier);
-    if (!isDossierBlob(input.blobUrl, dossier.id)) throw refuse('DOCUMENT_FILE_INVALID');
-    const size = await storedSize(input.blobUrl);
-    if (size === null || size > ENCRYPTED_FILE_MAX_BYTES || size !== input.size + 16) {
-      throw refuse('DOCUMENT_FILE_INVALID');
-    }
-    let wrappedKey: string;
-    try {
-      wrappedKey = await sealKey(input.key);
-    } catch {
-      throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'DOSSIER_FILES_UNCONFIGURED' });
-    }
+    const wrappedKey = await acceptEncryptedUpload(input, dossierFilePrefix(dossier.id));
 
     const version = await nextVersion(ctx.prisma, document.id, {
       fileName: input.fileName,
       contentType: input.contentType,
       size: input.size,
-      blobUrl: input.blobUrl,
+      objectKey: input.objectKey,
       wrappedKey,
       iv: input.iv,
       uploadedById: ctx.session.account.id,

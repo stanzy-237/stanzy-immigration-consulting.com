@@ -121,7 +121,7 @@ describe('DossierDocuments for the Client', () => {
 
   it('uploads a Version: encrypted and sent first, then recorded', async () => {
     upload.uploadVersionFile.mockResolvedValue({
-      blobUrl: 'https://x',
+      objectKey: 'dossiers/dos_1/x.bin',
       key: 'k',
       iv: 'i',
       fileName: 'scan.jpg',
@@ -133,10 +133,10 @@ describe('DossierDocuments for the Client', () => {
     const file = new File(['x'], 'scan.jpg', { type: 'image/jpeg' });
     fireEvent.change(screen.getByLabelText('Téléverser une version de Relevé N2'), { target: { files: [file] } });
 
-    await waitFor(() => expect(upload.uploadVersionFile).toHaveBeenCalledWith('dos_1', 'doc_1', file));
+    await waitFor(() => expect(upload.uploadVersionFile).toHaveBeenCalledWith('doc_1', file));
     await waitFor(() =>
       expect(api.addVersion).toHaveBeenCalledWith(
-        expect.objectContaining({ documentId: 'doc_1', blobUrl: 'https://x' }),
+        expect.objectContaining({ documentId: 'doc_1', objectKey: 'dossiers/dos_1/x.bin' }),
       ),
     );
     expect(await screen.findByText('Version V3 ajoutée')).toBeInTheDocument();

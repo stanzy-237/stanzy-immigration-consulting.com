@@ -20,18 +20,17 @@ export type TikTokManifest = {
   videos: ReadonlyArray<ManifestEntry>;
 };
 
-// Blob store serves JSON from a stable URL based on the pathname we uploaded
-// under (`tiktok/manifest.json`). The exact origin depends on the store id;
-// set NEXT_PUBLIC_BLOB_BASE_URL in Vercel env for the project (visible under
-// Storage → the store → Settings). Falls back to the public tikwm pipeline
+// The public R2 bucket (#87) serves the JSON the weekly job wrote at
+// `tiktok/manifest.json`, from NEXT_PUBLIC_R2_PUBLIC_URL (the bucket's
+// custom domain or r2.dev address). Falls back to the public tikwm pipeline
 // when the manifest can't be read.
-const BLOB_BASE_URL = process.env.NEXT_PUBLIC_BLOB_BASE_URL ?? '';
+const PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL ?? '';
 const MANIFEST_PATH = 'tiktok/manifest.json';
 const REVALIDATE_SECONDS = 3600;
 
 export async function fetchTikTokManifest(): Promise<TikTokManifest | null> {
-  if (!BLOB_BASE_URL) return null;
-  const url = `${BLOB_BASE_URL.replace(/\/$/, '')}/${MANIFEST_PATH}`;
+  if (!PUBLIC_BASE_URL) return null;
+  const url = `${PUBLIC_BASE_URL.replace(/\/$/, '')}/${MANIFEST_PATH}`;
   try {
     const res = await fetch(url, {
       next: { revalidate: REVALIDATE_SECONDS, tags: ['tiktok'] },

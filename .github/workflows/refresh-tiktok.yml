@@ -12,14 +12,18 @@ concurrency:
 
 jobs:
   refresh:
-    name: Pull 6 latest @stanzycanada videos → Vercel Blob
+    name: Pull 6 latest @stanzycanada videos → Cloudflare R2
     runs-on: ubuntu-latest
     permissions:
       contents: read
     env:
       TIKTOK_CHANNEL: 'https://www.tiktok.com/@stanzycanada'
       DUMP_DIR: tmp/tiktok
-      BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_PUBLIC_BUCKET: ${{ secrets.R2_PUBLIC_BUCKET }}
+      R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
@@ -31,10 +35,10 @@ jobs:
           cache: npm
 
       - name: Install upload-script dependency
-        # The upload script only needs @vercel/blob; skip the full `npm ci`
-        # (which pulls dev deps + is sensitive to lockfile drift) and
+        # The upload script only needs aws4fetch (R2's S3 API); skip the full
+        # `npm ci` (which pulls dev deps + is sensitive to lockfile drift) and
         # install the one package into a scratch node_modules.
-        run: npm install --no-save --prefix . @vercel/blob
+        run: npm install --no-save --prefix . aws4fetch@1.0.20
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -66,5 +70,5 @@ jobs:
       - name: List dump
         run: ls -lh "$DUMP_DIR"
 
-      - name: Upload to Vercel Blob + write manifest
+      - name: Upload to Cloudflare R2 + write manifest
         run: node scripts/refresh-tiktok.mjs

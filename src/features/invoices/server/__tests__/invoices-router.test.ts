@@ -14,17 +14,22 @@ const notify = vi.hoisted(() => ({
 vi.mock('@/features/invoices/server/invoice-notify', () => notify);
 vi.mock('@/features/dossiers/server/dossier-notify', () => ({ notifyClient: vi.fn(), notifyConsultants: vi.fn() }));
 
-const files = vi.hoisted(() => ({
-  ENCRYPTED_FILE_MAX_BYTES: 25 * 1024 * 1024 + 16,
-  storedSize: vi.fn(),
-  sealKey: vi.fn(async (key: string) => `wrapped:${key}`),
-  deleteFiles: vi.fn(),
+const storage = vi.hoisted(() => ({
+  objectSize: vi.fn(),
+  deleteObjects: vi.fn(),
+  presignUpload: vi.fn(),
+  readObject: vi.fn(),
 }));
-vi.mock('@/features/dossiers/server/dossier-files', () => files);
+vi.mock('@/server/storage/r2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/server/storage/r2')>()),
+  ...storage,
+}));
+// A real master key: the routers wrap each file's key with it.
+vi.stubEnv('DOSSIER_FILES_KEY', 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=');
 
 /**
  * Seam: `invoices` through a server-side caller, over an in-memory stand-in
- * for the dossier, invoice, line, counter and proof tables. Emails and Blob
+ * for the dossier, invoice, line, counter and proof tables. Emails and R2
  * are stubbed; numbering, access and the status rules run for real.
  */
 type Row = Record<string, unknown> & { id: string };
@@ -167,8 +172,8 @@ const draft = {
 
 const proof = (invoiceId: string, extra: Record<string, unknown> = {}) => ({
   invoiceId,
-  blobUrl: `https://store.public.blob.vercel-storage.com/invoices/${invoiceId}/proof-x1.bin`,
-  key: `${'A'.repeat(43)}=`,
+  objectKey: `invoices/${invoiceId}/9a2b.bin`,
+  key: 'ZmVkY2JhOTg3NjU0MzIxMGZlZGNiYTk4NzY1NDMyMTA=',
   iv: 'B'.repeat(16),
   fileName: 'recu-momo.jpg',
   contentType: 'image/jpeg' as const,
@@ -182,7 +187,7 @@ beforeEach(() => {
   vi.setSystemTime(new Date('2026-10-31T10:00:00Z'));
   db = fakeDatabase();
   vi.clearAllMocks();
-  files.storedSize.mockResolvedValue(2016);
+  storage.objectSize.mockResolvedValue(2016);
 });
 
 afterEach(() => {
@@ -266,7 +271,7 @@ describe('the Client’s Factures', () => {
     const id = await sent();
     await as(asAminata).addProof(proof(id));
     expect(db.invoices[0]).toMatchObject({ status: 'PROOF_RECEIVED' });
-    expect(db.proofs[0]).toMatchObject({ wrappedKey: `wrapped:${'A'.repeat(43)}=`, uploadedById: 'acc_1' });
+    expect(db.proofs[0]).toMatchObject({ objectKey: `invoices/${id}/9a2b.bin`, uploadedById: 'acc_1' });
     expect(notify.notifyProofReceived).toHaveBeenCalledOnce();
   });
 
@@ -275,10 +280,10 @@ describe('the Client’s Factures', () => {
     await expect(as(asAminata).addProof(proof(draftId))).rejects.toMatchObject({ code: 'NOT_FOUND' });
 
     const id = await sent();
-    await expect(as(asAminata).addProof(proof(id, { blobUrl: proof(draftId).blobUrl }))).rejects.toMatchObject({
+    await expect(as(asAminata).addProof(proof(id, { objectKey: proof(draftId).objectKey }))).rejects.toMatchObject({
       message: 'DOCUMENT_FILE_INVALID',
     });
-    files.storedSize.mockResolvedValue(99);
+    storage.objectSize.mockResolvedValue(99);
     await expect(as(asAminata).addProof(proof(id))).rejects.toMatchObject({ message: 'DOCUMENT_FILE_INVALID' });
     expect(db.proofs).toHaveLength(0);
   });

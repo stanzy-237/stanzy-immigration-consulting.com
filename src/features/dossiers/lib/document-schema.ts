@@ -14,27 +14,8 @@ export type DocumentFileType = (typeof DOCUMENT_FILE_TYPES)[number];
 /** Per file, before encryption. Larger than IRCC's 4 Mo: raw scans are trimmed down in the Outils PDF. */
 export const DOCUMENT_FILE_MAX_BYTES = 25 * 1024 * 1024;
 
-/** Where a Dossier's encrypted files live in Vercel Blob; the upload route only signs paths under it. */
-export const dossierBlobPrefix = (dossierId: string): string => `dossiers/${dossierId}/`;
-
-/** Whether `url` is a Vercel Blob file under the Dossier's folder (the only place the upload route signs). */
-export const isDossierBlob = (url: string, dossierId: string): boolean =>
-  isBlobUnder(url, dossierBlobPrefix(dossierId));
-
-/** Whether `url` is a Vercel Blob file whose path starts with `prefix`. */
-export function isBlobUnder(url: string, prefix: string): boolean {
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return false;
-  }
-  return (
-    parsed.protocol === 'https:' &&
-    parsed.hostname.endsWith('.blob.vercel-storage.com') &&
-    parsed.pathname.slice(1).startsWith(prefix)
-  );
-}
+/** Where a Dossier's encrypted files live in the private R2 bucket; uploads are only signed under it (#87). */
+export const dossierFilePrefix = (dossierId: string): string => `dossiers/${dossierId}/`;
 
 export const TITLE_MAX = 120;
 export const COMMENT_MAX = 2000;
@@ -48,11 +29,12 @@ export const renameSectionInput = z.object({ id, title });
 export const addDocumentInput = z.object({ sectionId: id, title });
 
 /**
- * A file already encrypted and sent to Vercel Blob, with its key for the
- * server to wrap (ADR 0007). Also what a Preuve de paiement records.
+ * A file already encrypted and sent to R2, with its key for the server to
+ * wrap (ADR 0007). Also what a Preuve de paiement records.
  */
 export const encryptedFileInput = z.object({
-  blobUrl: z.string().url(),
+  /** Its key in the private bucket, as the upload route gave it. */
+  objectKey: z.string().min(1).max(300),
   // A 256-bit key and a 96-bit IV, base64.
   key: z.string().regex(/^[A-Za-z0-9+/]{43}=$/),
   iv: z.string().regex(/^[A-Za-z0-9+/]{16}$/),

@@ -143,7 +143,7 @@ function dossierInvoices(viewer: 'consultant' | 'client', invoices = [invoice()]
 describe('DossierInvoices', () => {
   it('lets the Client open the PDF and send a Preuve de paiement', async () => {
     urls.uploadProofFile.mockResolvedValue({
-      blobUrl: 'https://x',
+      objectKey: 'dossiers/dos_1/x.bin',
       key: 'k',
       iv: 'i',
       fileName: 'recu.jpg',
