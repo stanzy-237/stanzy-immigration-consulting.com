@@ -64,7 +64,8 @@
       "account": "Mon compte : {name}",
       "signOut": "Déconnexion",
       "dashboard": "Tableau de bord",
-      "allTools": "Voir tous les outils"
+      "allTools": "Voir tous les outils",
+      "mySpace": "Mon espace"
     },
     "TikTok": {
       "eyebrow": "Stanzy sur TikTok",
@@ -1414,7 +1415,8 @@
       "blog": "Blog",
       "openMenu": "Ouvrir le menu du tableau de bord",
       "menuTitle": "Tableau de bord",
-      "close": "Fermer le menu"
+      "close": "Fermer le menu",
+      "dossiers": "Dossiers"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -1750,6 +1752,165 @@
       "title": "Des documents prêts, un dépôt serein.",
       "text": "Après l’invitation, vous aurez 60 jours pour téléverser ces documents dans votre compte IRCC. Préparés à l’avance, ils vous laissent le temps de vérifier chaque détail, ou de faire relire votre dossier par Stanzy.",
       "secondary": "Lancer le compte à rebours ITA"
+    }
+  },
+  "Dossiers": {
+    "services": {
+      "ACCOMPAGNEMENT": "Accompagnement Entrée Express",
+      "VERIFICATION": "Vérification et soumission",
+      "EDE": "Évaluation des diplômes (EDE)",
+      "SERVICE_DOCUMENTAIRE": "Service documentaire"
+    },
+    "stages": {
+      "ACCOMPAGNEMENT": {
+        "evaluation": "Évaluation du profil",
+        "test-langue": "Test de langue (TCF)",
+        "ede": "EDE (WES / IQAS)",
+        "profil-ee": "Création du profil Entrée Express",
+        "bassin": "Dans le bassin",
+        "ita": "ITA, préparation de la demande RP",
+        "depot": "Vérification et dépôt par le Client",
+        "aor": "AOR, biométrie et examen médical",
+        "ppr": "Décision : PPR",
+        "copr": "COPR, dossier terminé"
+      },
+      "VERIFICATION": {
+        "evaluation": "Évaluation",
+        "collecte": "Collecte des documents",
+        "revue": "Revue des documents",
+        "fichiers": "Préparation des fichiers de soumission",
+        "formulaires": "Revue des formulaires IRCC",
+        "validation": "Validation par le Client",
+        "soumission": "Soumission par le Client",
+        "aor": "Accusé de réception (AOR), terminé"
+      },
+      "EDE": {
+        "verification": "Vérification des documents",
+        "compte": "Compte WES / IQAS et paiement",
+        "etablissement": "Démarches auprès de l’établissement",
+        "envoi": "Envoi à l’organisme",
+        "evaluation": "Évaluation en cours",
+        "rapport": "Rapport EDE reçu, terminé"
+      },
+      "SERVICE_DOCUMENTAIRE": {
+        "commande": "Commande reçue",
+        "en-cours": "En préparation",
+        "livre": "Livré, terminé"
+      }
+    },
+    "state": {
+      "OPEN": "En cours",
+      "CLOSED": "Clôturé",
+      "DONE": "Terminé"
+    },
+    "stageStatus": {
+      "skipped": "Déjà fait",
+      "done": "Fait",
+      "current": "En cours",
+      "upcoming": "À venir"
+    },
+    "progress": "Étape {current} sur {total}",
+    "stepperLabel": "Étapes du dossier",
+    "emails": {
+      "greeting": "Bonjour {name},",
+      "cta": "Voir mon espace",
+      "opened": {
+        "subject": "Votre dossier {service} est ouvert",
+        "body": "Votre dossier {service} est ouvert. Il commence à l’étape « {stage} ». Vous pouvez suivre son avancement dans votre espace."
+      },
+      "stageChanged": {
+        "subject": "Votre dossier {service} a changé d’étape",
+        "body": "Votre dossier {service} est maintenant à l’étape « {stage} »."
+      },
+      "closed": {
+        "subject": "Votre dossier {service} est clôturé",
+        "body": "Votre dossier {service} a été clôturé. Motif : {reason}"
+      }
+    },
+    "dashboard": {
+      "title": "Dossiers",
+      "newDossier": "Ouvrir un dossier",
+      "filterLabel": "Filtrer par état",
+      "filters": {
+        "OPEN": "En cours",
+        "CLOSED": "Clôturés",
+        "ALL": "Tous"
+      },
+      "columns": {
+        "client": "Client",
+        "service": "Service",
+        "stage": "Étape",
+        "state": "État",
+        "updated": "Modifié"
+      },
+      "empty": "Aucun dossier ici pour l’instant.",
+      "loading": "Chargement des dossiers"
+    },
+    "detail": {
+      "back": "Tous les dossiers",
+      "openedOn": "Ouvert le {date}",
+      "advance": "Étape suivante",
+      "moveBack": "Étape précédente",
+      "lastStage": "Dernière étape atteinte : le travail est terminé.",
+      "close": "Clôturer le dossier",
+      "closeTitle": "Clôturer ce dossier ?",
+      "closeBody": "Le Client est prévenu par email avec le motif. Un dossier clôturé ne peut pas être rouvert.",
+      "closeReason": "Motif",
+      "closeReasonError": "Indiquez un motif (3 caractères au moins).",
+      "cancel": "Annuler",
+      "confirmClose": "Clôturer",
+      "closedOn": "Clôturé le {date}",
+      "closedReason": "Motif : {reason}",
+      "history": "Historique",
+      "by": "par {name}",
+      "events": {
+        "OPENED": "Ouvert à « {to} »",
+        "ADVANCED": "Passé à « {to} »",
+        "MOVED_BACK": "Revenu à « {to} »",
+        "CLOSED": "Clôturé"
+      },
+      "loading": "Chargement du dossier"
+    },
+    "new": {
+      "title": "Ouvrir un dossier",
+      "intro": "Le compte choisi devient Client et reçoit un email avec le lien vers son espace.",
+      "account": "Compte",
+      "searchPlaceholder": "Nom ou adresse email",
+      "searchHint": "Tapez au moins 2 caractères.",
+      "noMatch": "Aucun compte ne correspond.",
+      "change": "Changer",
+      "accountStatus": {
+        "USER": "Utilisateur",
+        "LEAD": "Prospect",
+        "CLIENT": "Client"
+      },
+      "service": "Service",
+      "startStage": "Étape de départ",
+      "startHint": "Les étapes avant celle-ci s’affichent « Déjà fait ».",
+      "submit": "Ouvrir le dossier",
+      "accountRequired": "Choisissez un compte.",
+      "loading": "Recherche des comptes"
+    },
+    "toast": {
+      "opened": "Dossier ouvert",
+      "advanced": "Dossier passé à l’étape suivante",
+      "movedBack": "Dossier revenu à l’étape précédente",
+      "closed": "Dossier clôturé",
+      "stageChanged": "Ce dossier a changé entre-temps : la page est à jour.",
+      "failed": "La modification n’a pas pu être enregistrée. Réessayez."
+    },
+    "mySpace": {
+      "metaTitle": "Mon espace",
+      "title": "Mon espace",
+      "subtitle": "Suivez l’avancement de vos dossiers avec Stanzy.",
+      "empty": "Vous n’avez pas encore de dossier.",
+      "emptyHint": "Quand Stanzy ouvre un dossier pour vous, son avancement s’affiche ici.",
+      "servicesLink": "Découvrir nos services",
+      "openedOn": "Ouvert le {date}",
+      "currentStage": "Étape actuelle",
+      "closedOn": "Clôturé le {date}",
+      "closedReason": "Motif : {reason}",
+      "loading": "Chargement de vos dossiers"
     }
   }
 }

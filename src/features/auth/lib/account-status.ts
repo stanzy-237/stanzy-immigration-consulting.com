@@ -14,11 +14,11 @@ export const ACCOUNT_ROLES = ['MEMBER', 'PARTNER', 'CONSULTANT'] as const;
 export type AccountRole = (typeof ACCOUNT_ROLES)[number];
 
 /** What moves an Account forward. Each event is valid from exactly one status. */
-export type StatusEvent = 'START_ONBOARDING' | 'PURCHASE_ACCOMPAGNEMENT';
+export type StatusEvent = 'START_ONBOARDING' | 'OPEN_DOSSIER';
 
 const TRANSITIONS: Record<StatusEvent, { from: AccountStatus; to: AccountStatus }> = {
   START_ONBOARDING: { from: 'USER', to: 'LEAD' },
-  PURCHASE_ACCOMPAGNEMENT: { from: 'LEAD', to: 'CLIENT' },
+  OPEN_DOSSIER: { from: 'LEAD', to: 'CLIENT' },
 };
 
 export class InvalidStatusTransitionError extends Error {

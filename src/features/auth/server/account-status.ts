@@ -23,7 +23,7 @@ export type AccountStatusStore = {
  * Applies `event` to the Account's status and saves it; returns the new
  * status. Throws `InvalidStatusTransitionError` for a transition the rule
  * refuses, including when another request changed the status first (the
- * save only matches the status that was read). Called by #14 and #16.
+ * save only matches the status that was read). Called when a Dossier opens (#79).
  *
  * The Account's own session keeps its old status for up to 5 minutes (the
  * session cookie cache), so a new Client may briefly still fail

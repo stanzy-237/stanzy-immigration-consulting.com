@@ -3,6 +3,7 @@ import { blogRouter } from '@/features/blog/server/blog-router';
 import { budgetRouter } from '@/features/budget/server/budget-router';
 import { checklistRouter } from '@/features/checklist/server/checklist-router';
 import { crsRouter } from '@/features/crs/server/crs-router';
+import { dossiersRouter } from '@/features/dossiers/server/dossiers-router';
 import { drawsRouter } from '@/features/draws/server/draws-router';
 import { parcoursRouter } from '@/features/parcours/server/parcours-router';
 
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   budget: budgetRouter,
   checklist: checklistRouter,
   crs: crsRouter,
+  dossiers: dossiersRouter,
   draws: drawsRouter,
   health: healthRouter,
   parcours: parcoursRouter,

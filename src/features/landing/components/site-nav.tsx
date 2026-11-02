@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, ChevronDown, LayoutDashboard, LogOut, Menu } from 'lucide-react';
+import { ArrowRight, ChevronDown, FolderOpen, LayoutDashboard, LogOut, Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
@@ -208,6 +208,7 @@ export function SiteNav(): ReactNode {
               name={accountName}
               triggerLabel={t('account', { name: accountName })}
               dashboard={dashboardUrl ? { href: dashboardUrl, label: t('dashboard') } : null}
+              mySpaceLabel={account?.isConsultant ? null : t('mySpace')}
               signOutLabel={t('signOut')}
               onSignOut={signOut}
             />
@@ -298,6 +299,16 @@ export function SiteNav(): ReactNode {
                     {t('dashboard')}
                   </a>
                 ) : null}
+                {accountName && !account?.isConsultant ? (
+                  <Link
+                    href="/mon-espace"
+                    className="text-navy-deep inline-flex items-center justify-center gap-2 rounded-md border border-fog px-3 py-2 text-sm font-semibold"
+                    onClick={closeMobile}
+                  >
+                    <FolderOpen aria-hidden={true} className="size-4" />
+                    {t('mySpace')}
+                  </Link>
+                ) : null}
                 {accountName ? (
                   <button
                     type="button"
@@ -341,6 +352,8 @@ type AccountMenuProps = {
   triggerLabel: string;
   /** The consultant only: the way into the Tableau de bord, on its subdomain. */
   dashboard: { href: string; label: string } | null;
+  /** « Mon espace », for everyone but the consultant. */
+  mySpaceLabel: string | null;
   signOutLabel: string;
   onSignOut: () => Promise<void>;
 };
@@ -349,6 +362,7 @@ function AccountMenu({
   name,
   triggerLabel,
   dashboard,
+  mySpaceLabel,
   signOutLabel,
   onSignOut,
 }: AccountMenuProps): ReactNode {
@@ -372,6 +386,12 @@ function AccountMenu({
           <DropdownMenuItem render={<a href={dashboard.href} />}>
             <LayoutDashboard aria-hidden={true} />
             {dashboard.label}
+          </DropdownMenuItem>
+        ) : null}
+        {mySpaceLabel ? (
+          <DropdownMenuItem render={<Link href="/mon-espace" />}>
+            <FolderOpen aria-hidden={true} />
+            {mySpaceLabel}
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuItem onClick={(): void => void onSignOut()}>

@@ -36,7 +36,7 @@ describe('transitionAccountStatus', () => {
     expect(await transitionAccountStatus(store, 'acc_1', 'START_ONBOARDING')).toBe('LEAD');
     expect(statusOf('acc_1')).toBe('LEAD');
 
-    expect(await transitionAccountStatus(store, 'acc_1', 'PURCHASE_ACCOMPAGNEMENT')).toBe('CLIENT');
+    expect(await transitionAccountStatus(store, 'acc_1', 'OPEN_DOSSIER')).toBe('CLIENT');
     expect(statusOf('acc_1')).toBe('CLIENT');
   });
 
@@ -44,7 +44,7 @@ describe('transitionAccountStatus', () => {
     const { store, statusOf } = storeWith({ acc_1: 'USER' });
 
     await expect(
-      transitionAccountStatus(store, 'acc_1', 'PURCHASE_ACCOMPAGNEMENT'),
+      transitionAccountStatus(store, 'acc_1', 'OPEN_DOSSIER'),
     ).rejects.toBeInstanceOf(InvalidStatusTransitionError);
     expect(statusOf('acc_1')).toBe('USER');
   });

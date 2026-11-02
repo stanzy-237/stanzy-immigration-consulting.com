@@ -64,7 +64,8 @@
       "account": "My account: {name}",
       "signOut": "Log out",
       "dashboard": "Dashboard",
-      "allTools": "See all tools"
+      "allTools": "See all tools",
+      "mySpace": "My space"
     },
     "TikTok": {
       "eyebrow": "Stanzy on TikTok",
@@ -1397,7 +1398,8 @@
       "blog": "Blog",
       "openMenu": "Open the dashboard menu",
       "menuTitle": "Dashboard",
-      "close": "Close the menu"
+      "close": "Close the menu",
+      "dossiers": "Files"
     },
     "viewSite": "View the site",
     "overview": {
@@ -1733,6 +1735,165 @@
       "title": "Documents ready, a calm submission.",
       "text": "After the invitation, you’ll have 60 days to upload these documents to your IRCC account. Prepared ahead, they leave you time to check every detail, or to have Stanzy review your file.",
       "secondary": "Start the ITA countdown"
+    }
+  },
+  "Dossiers": {
+    "services": {
+      "ACCOMPAGNEMENT": "Express Entry guidance",
+      "VERIFICATION": "Review and submission",
+      "EDE": "Credential assessment (ECA)",
+      "SERVICE_DOCUMENTAIRE": "Document service"
+    },
+    "stages": {
+      "ACCOMPAGNEMENT": {
+        "evaluation": "Profile assessment",
+        "test-langue": "Language test (TCF)",
+        "ede": "ECA (WES / IQAS)",
+        "profil-ee": "Express Entry profile",
+        "bassin": "In the pool",
+        "ita": "ITA, preparing the PR application",
+        "depot": "Review and submission by the Client",
+        "aor": "AOR, biometrics and medical exam",
+        "ppr": "Decision: PPR",
+        "copr": "COPR, file complete"
+      },
+      "VERIFICATION": {
+        "evaluation": "Assessment",
+        "collecte": "Gathering the documents",
+        "revue": "Document review",
+        "fichiers": "Preparing the submission files",
+        "formulaires": "IRCC forms review",
+        "validation": "Approval by the Client",
+        "soumission": "Submission by the Client",
+        "aor": "Acknowledgement of receipt (AOR), complete"
+      },
+      "EDE": {
+        "verification": "Checking the documents",
+        "compte": "WES / IQAS account and payment",
+        "etablissement": "Steps with the institution",
+        "envoi": "Sending to the body",
+        "evaluation": "Assessment in progress",
+        "rapport": "ECA report received, complete"
+      },
+      "SERVICE_DOCUMENTAIRE": {
+        "commande": "Order received",
+        "en-cours": "In preparation",
+        "livre": "Delivered, complete"
+      }
+    },
+    "state": {
+      "OPEN": "In progress",
+      "CLOSED": "Closed",
+      "DONE": "Complete"
+    },
+    "stageStatus": {
+      "skipped": "Already done",
+      "done": "Done",
+      "current": "In progress",
+      "upcoming": "Upcoming"
+    },
+    "progress": "Stage {current} of {total}",
+    "stepperLabel": "File stages",
+    "emails": {
+      "greeting": "Hello {name},",
+      "cta": "View my space",
+      "opened": {
+        "subject": "Your {service} file is open",
+        "body": "Your {service} file is open. It starts at the “{stage}” stage. You can follow its progress in your space."
+      },
+      "stageChanged": {
+        "subject": "Your {service} file changed stage",
+        "body": "Your {service} file is now at the “{stage}” stage."
+      },
+      "closed": {
+        "subject": "Your {service} file is closed",
+        "body": "Your {service} file has been closed. Reason: {reason}"
+      }
+    },
+    "dashboard": {
+      "title": "Files",
+      "newDossier": "Open a file",
+      "filterLabel": "Filter by state",
+      "filters": {
+        "OPEN": "In progress",
+        "CLOSED": "Closed",
+        "ALL": "All"
+      },
+      "columns": {
+        "client": "Client",
+        "service": "Service",
+        "stage": "Stage",
+        "state": "State",
+        "updated": "Updated"
+      },
+      "empty": "No files here yet.",
+      "loading": "Loading files"
+    },
+    "detail": {
+      "back": "All files",
+      "openedOn": "Opened on {date}",
+      "advance": "Next stage",
+      "moveBack": "Previous stage",
+      "lastStage": "Last stage reached: the work is complete.",
+      "close": "Close the file",
+      "closeTitle": "Close this file?",
+      "closeBody": "The Client is emailed the reason. A closed file can’t be reopened.",
+      "closeReason": "Reason",
+      "closeReasonError": "Give a reason (at least 3 characters).",
+      "cancel": "Cancel",
+      "confirmClose": "Close",
+      "closedOn": "Closed on {date}",
+      "closedReason": "Reason: {reason}",
+      "history": "History",
+      "by": "by {name}",
+      "events": {
+        "OPENED": "Opened at “{to}”",
+        "ADVANCED": "Moved to “{to}”",
+        "MOVED_BACK": "Moved back to “{to}”",
+        "CLOSED": "Closed"
+      },
+      "loading": "Loading the file"
+    },
+    "new": {
+      "title": "Open a file",
+      "intro": "The chosen Account becomes a Client and gets an email with the link to their space.",
+      "account": "Account",
+      "searchPlaceholder": "Name or email address",
+      "searchHint": "Type at least 2 characters.",
+      "noMatch": "No Account matches.",
+      "change": "Change",
+      "accountStatus": {
+        "USER": "User",
+        "LEAD": "Lead",
+        "CLIENT": "Client"
+      },
+      "service": "Service",
+      "startStage": "Starting stage",
+      "startHint": "Stages before this one show as “Already done”.",
+      "submit": "Open the file",
+      "accountRequired": "Choose an Account.",
+      "loading": "Searching Accounts"
+    },
+    "toast": {
+      "opened": "File opened",
+      "advanced": "File moved to the next stage",
+      "movedBack": "File moved back a stage",
+      "closed": "File closed",
+      "stageChanged": "This file changed in the meantime: the page is up to date.",
+      "failed": "The change couldn’t be saved. Try again."
+    },
+    "mySpace": {
+      "metaTitle": "My space",
+      "title": "My space",
+      "subtitle": "Follow the progress of your files with Stanzy.",
+      "empty": "You don’t have a file yet.",
+      "emptyHint": "When Stanzy opens a file for you, its progress shows here.",
+      "servicesLink": "See our services",
+      "openedOn": "Opened on {date}",
+      "currentStage": "Current stage",
+      "closedOn": "Closed on {date}",
+      "closedReason": "Reason: {reason}",
+      "loading": "Loading your files"
     }
   }
 }
