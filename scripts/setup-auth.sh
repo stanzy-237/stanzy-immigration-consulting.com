@@ -237,11 +237,13 @@ step "Copy the key (starts with re_). Resend shows it only once."
 ask_secret RESEND_API_KEY "Paste the Resend API key (Enter to skip for console-only email):" || true
 if [[ -n "${RESEND_API_KEY:-}" ]]; then
   write_env RESEND_API_KEY "$RESEND_API_KEY"
-  say "The sender must be on the verified domain."
-  ask EMAIL_FROM "Sender (e.g. Stanzy Immigration <noreply@your-domain.com>):"
+  say "Each sender must be on a verified domain, written Name <address@domain>."
+  ask AUTH_EMAIL_FROM "Sender for account emails (e.g. Stanzy Immigration <compte@auth.your-domain.com>):"
+  write_env AUTH_EMAIL_FROM "$AUTH_EMAIL_FROM"
+  ask EMAIL_FROM "Sender for everything else (e.g. Stanzy Immigration <dossiers@notifications.your-domain.com>):"
   write_env EMAIL_FROM "$EMAIL_FROM"
 else
-  SKIPPED+=("RESEND_API_KEY / EMAIL_FROM (emails will only be logged to the console)")
+  SKIPPED+=("RESEND_API_KEY / EMAIL_FROM / AUTH_EMAIL_FROM (emails will only be logged to the console)")
 fi
 pause
 
@@ -253,7 +255,7 @@ step "Open the stanzy-immigration-consulting project → Settings → Environmen
 step "Add BETTER_AUTH_SECRET: generate a NEW one for production (openssl rand -base64 32), scope Production + Preview."
 step "Add BETTER_AUTH_URL = your production URL (e.g. https://stanzy-immigration-consulting.com), scope Production only."
 note "Previews derive their URL from VERCEL_URL automatically, so don't set BETTER_AUTH_URL for Preview."
-step "Add RESEND_API_KEY and EMAIL_FROM (copy them from $ENV_FILE), scope Production + Preview."
+step "Add RESEND_API_KEY, EMAIL_FROM and AUTH_EMAIL_FROM (copy them from $ENV_FILE), scope Production + Preview."
 step "Redeploy so the new variables take effect."
 pause "Press Enter when the four variables are saved in Vercel"
 

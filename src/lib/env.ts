@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
 import { parseConsultantEmails } from '@/features/auth/lib/consultant-emails';
+import { isEmailSender } from '@/server/email/sender';
+
+const SENDER_FORMAT = 'Expected an email address or Name <address@domain>, e.g. Stanzy Immigration <dossiers@notifications.your-domain.com>';
 
 /**
  * Validated application configuration. For config this app depends on (e.g.
@@ -35,9 +38,13 @@ const schema = z.object({
   AUTH_COOKIE_DOMAIN: z.string().min(3).optional(),
   // Resend API key. Without it, emails are logged to the console instead.
   RESEND_API_KEY: z.string().min(1).optional(),
-  // Sender for transactional email; must be on a domain verified in Resend.
-  // Required whenever RESEND_API_KEY is set.
-  EMAIL_FROM: z.string().min(3).optional(),
+  // Sender for the app's emails (Dossiers, Factures, messages):
+  // `Name <address@domain>`, on a domain verified in Resend. Required whenever
+  // RESEND_API_KEY is set.
+  EMAIL_FROM: z.string().refine(isEmailSender, SENDER_FORMAT).optional(),
+  // Sender for account emails (verification, password reset), on its own
+  // subdomain. Optional: without it they come from EMAIL_FROM.
+  AUTH_EMAIL_FROM: z.string().refine(isEmailSender, SENDER_FORMAT).optional(),
   // Google OAuth client for "Continuer avec Google" (scripts/setup-google-sign-in.sh).
   // Optional: without it the Google button is hidden and email/password still
   // works, so a deploy never breaks for lack of it. Set both or neither.

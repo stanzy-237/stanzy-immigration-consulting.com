@@ -6,7 +6,7 @@ import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { env } from '@/lib/env';
 import { prisma } from '@/server/db/client';
 import { createAuth } from '@/server/auth/create-auth';
-import { appMailer } from '@/server/email/app-mailer';
+import { accountMailer } from '@/server/email/app-mailer';
 
 const vercelOrigin = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined;
 // Previews are opened from the branch alias (`…-git-<branch>-….vercel.app`),
@@ -37,7 +37,7 @@ const siteOrigins = (origin: string): string[] => [...withWwwVariant(origin), da
  */
 export const auth = createAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
-  mailer: appMailer,
+  mailer: accountMailer,
   // On previews, the branch alias: it is where people open the preview, and
   // it stays the same across pushes, so Google's redirect URI for it (which
   // Better Auth derives from baseURL) only has to be registered once.
