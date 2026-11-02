@@ -1,9 +1,8 @@
-import { WORKFLOWS, type ServiceType } from '@/features/dossiers/data/workflows';
+import { FINALES_LOCK_AFTER, WORKFLOWS, type ServiceType } from '@/features/dossiers/data/workflows';
 
 export const stagesOf = (service: ServiceType): readonly string[] => WORKFLOWS[service];
 
-export const isStageOf = (service: ServiceType, stage: string): boolean =>
-  stagesOf(service).includes(stage);
+export const isStageOf = (service: ServiceType, stage: string): boolean => stagesOf(service).includes(stage);
 
 /** The stage after `stage`, or null on the last one. */
 export function nextStage(service: ServiceType, stage: string): string | null {
@@ -21,13 +20,20 @@ export function previousStage(service: ServiceType, stage: string): string | nul
   return index === 0 ? null : stages[index - 1]!;
 }
 
-export const isLastStage = (service: ServiceType, stage: string): boolean =>
-  nextStage(service, stage) === null;
+export const isLastStage = (service: ServiceType, stage: string): boolean => nextStage(service, stage) === null;
 
 /** `stage`'s place in its workflow, from 1. */
 export function stagePosition(service: ServiceType, stage: string): { position: number; total: number } {
   const stages = stagesOf(service);
   return { position: stages.indexOf(stage) + 1, total: stages.length };
+}
+
+/** Whether the Dossier has moved past its service's lock stage, so its Finales can't change. */
+export function finalesLocked(service: ServiceType, stage: string): boolean {
+  const lockAfter = FINALES_LOCK_AFTER[service];
+  if (!lockAfter) return false;
+  const stages = stagesOf(service);
+  return stages.indexOf(stage) > stages.indexOf(lockAfter);
 }
 
 /** How a Dossier reads: Clôturé, Terminé once open at its last stage, else En cours. */
@@ -56,7 +62,6 @@ export function stageStatuses(
   const start = Math.min(stages.indexOf(startStage), current);
   return stages.map((key, index) => ({
     key,
-    status:
-      index === current ? 'current' : index > current ? 'upcoming' : index < start ? 'skipped' : 'done',
+    status: index === current ? 'current' : index > current ? 'upcoming' : index < start ? 'skipped' : 'done',
   }));
 }

@@ -4,6 +4,7 @@ import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   prefetch(trpc.dossiers.dashboard.get.queryOptions({ id }));
+  prefetch(trpc.dossiers.documents.sections.queryOptions({ dossierId: id }));
   return (
     <HydrateClient>
       <DossierDashboardView id={id} />

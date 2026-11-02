@@ -12,29 +12,9 @@ export type ServiceType = (typeof SERVICE_TYPES)[number];
  */
 export const WORKFLOWS = {
   // #81
-  ACCOMPAGNEMENT: [
-    'evaluation',
-    'test-langue',
-    'ede',
-    'profil-ee',
-    'bassin',
-    'ita',
-    'depot',
-    'aor',
-    'ppr',
-    'copr',
-  ],
+  ACCOMPAGNEMENT: ['evaluation', 'test-langue', 'ede', 'profil-ee', 'bassin', 'ita', 'depot', 'aor', 'ppr', 'copr'],
   // #82
-  VERIFICATION: [
-    'evaluation',
-    'collecte',
-    'revue',
-    'fichiers',
-    'formulaires',
-    'validation',
-    'soumission',
-    'aor',
-  ],
+  VERIFICATION: ['evaluation', 'collecte', 'revue', 'fichiers', 'formulaires', 'validation', 'soumission', 'aor'],
   // #83
   EDE: ['verification', 'compte', 'etablissement', 'envoi', 'evaluation', 'rapport'],
   // #80
@@ -42,3 +22,15 @@ export const WORKFLOWS = {
 } as const satisfies Record<ServiceType, readonly string[]>;
 
 export type StageKey<S extends ServiceType = ServiceType> = (typeof WORKFLOWS)[S][number];
+
+/**
+ * The stage after which the Finales lock (#79: « Vérification et dépôt » for
+ * the Accompagnement): once the Dossier has moved past it, the files went to
+ * IRCC or the evaluator and the consultant's choice is history. Null: never locks.
+ */
+export const FINALES_LOCK_AFTER = {
+  ACCOMPAGNEMENT: 'depot',
+  VERIFICATION: 'soumission',
+  EDE: 'envoi',
+  SERVICE_DOCUMENTAIRE: null,
+} as const satisfies { [S in ServiceType]: StageKey<S> | null };

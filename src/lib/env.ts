@@ -69,6 +69,13 @@ const schema = z.object({
   VAPID_PRIVATE_KEY: z.string().min(1).optional(),
   // Contact the push services can reach: `mailto:you@your-domain.com`.
   VAPID_SUBJECT: z.string().regex(/^(mailto:|https:\/\/)/, 'Expected mailto:… or https://…').optional(),
+  // Encrypts the Documents de service's file keys (ADR 0007): 32 random bytes,
+  // base64 (`openssl rand -base64 32`). Never change it once files exist:
+  // they could no longer be read. Optional: without it uploads are refused.
+  DOSSIER_FILES_KEY: z
+    .string()
+    .refine((raw) => Buffer.from(raw, 'base64').length === 32, 'Expected 32 bytes, base64 (openssl rand -base64 32)')
+    .optional(),
 }).superRefine((value, ctx) => {
   if (process.env.VERCEL_ENV === 'production' && !value.BETTER_AUTH_URL) {
     ctx.addIssue({
