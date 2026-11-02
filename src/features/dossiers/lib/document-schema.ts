@@ -48,4 +48,9 @@ export const addVersionInput = encryptedFileInput.extend({ documentId: id });
 /** `versionId` null takes the Finale off. */
 export const setFinalInput = z.object({ documentId: id, versionId: id.nullable() });
 
-export const commentInput = z.object({ documentId: id, body: z.string().trim().min(1).max(COMMENT_MAX) });
+const commentBody = z.string().trim().min(1).max(COMMENT_MAX);
+
+/** A comment on a Document, or (`parentId`) a reply to one. */
+export const commentInput = z.object({ documentId: id, parentId: id.optional(), body: commentBody });
+export const editCommentInput = z.object({ id, body: commentBody });
+export const deleteCommentInput = z.object({ id });

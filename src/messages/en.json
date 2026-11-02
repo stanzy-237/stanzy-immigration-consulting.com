@@ -1956,12 +1956,6 @@
       "uploading": "Encrypting and sending…",
       "uploadLabel": "Upload a version of {title}",
       "uploadHint": "PDF, JPG, PNG, WebP or HEIC, 25 MB at most. The file is encrypted before it leaves your device.",
-      "comments": "Comments",
-      "noComments": "No comments.",
-      "commentLabel": "Comment on {title}",
-      "commentPlaceholder": "Write a comment…",
-      "commentError": "Write a message.",
-      "send": "Send",
       "deleteDocument": "Delete document {title}",
       "deleteTitle": "Delete “{title}”?",
       "deleteBody": "{count, plural, =0 {Its comments go with it.} one {Its version and comments go with it.} other {Its # versions and comments go with it.}} This can’t be undone.",
@@ -1975,8 +1969,7 @@
         "documentDeleted": "Document deleted",
         "versionAdded": "Version V{number} added",
         "finalSet": "Final version chosen",
-        "finalCleared": "Final version removed",
-        "commented": "Comment sent"
+        "finalCleared": "Final version removed"
       },
       "errors": {
         "DOSSIER_CLOSED": "This file is closed: it can no longer change.",
@@ -1986,7 +1979,37 @@
         "DOCUMENT_FILE_TYPE": "This file type isn’t accepted: PDF, JPG, PNG, WebP or HEIC.",
         "DOCUMENT_FILE_TOO_LARGE": "This file is over 25 MB.",
         "DOCUMENT_FILE_INVALID": "The file didn’t arrive properly. Try again.",
-        "UNKNOWN": "The change couldn’t be saved. Try again."
+        "UNKNOWN": "The change couldn’t be saved. Try again.",
+        "COMMENT_NOT_YOURS": "You can only change your own messages."
+      },
+      "conversation": {
+        "title": "Conversation",
+        "empty": "No messages yet: ask your question or leave a note.",
+        "label": "Write about {title}",
+        "placeholder": "Write a message…",
+        "send": "Send",
+        "reply": "Reply",
+        "replyLabel": "Reply to {name}",
+        "replyPlaceholder": "Your reply…",
+        "edit": "Edit",
+        "editLabel": "Edit your message",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "deleteTitle": "Delete this message?",
+        "deleteBody": "It disappears from the conversation, for you and for the other person.",
+        "deleteBodyWithReplies": "Its replies stay: it will show as “Message deleted”.",
+        "deleted": "Message deleted",
+        "edited": "edited",
+        "sending": "sending…",
+        "you": "You",
+        "error": "Write a message.",
+        "toast": {
+          "sent": "Message sent",
+          "replied": "Reply sent",
+          "edited": "Message edited",
+          "deleted": "Message deleted"
+        }
       }
     }
   },

@@ -130,6 +130,7 @@ closeTheForm(); // at once: the list already shows the new item
 - Check what the client already knows before sending (the 100-Étape limit, a future date) and keep those in the form, with the draft.
 - An item with an `optimisticId()` has no server id yet: don't let it be edited or deleted until the refetch replaces it (`isOptimistic`).
 - Not for Articles or anything public: the editor waits for the server, which may refuse a slug.
+- For cached data that isn't a plain list (a Dossier's Sections with their Documents and conversations, one Dossier, one Facture), use `optimisticUpdate(queryClient, key, apply)` from the same file: `apply` returns the whole new value. Keep `apply` a pure function beside the feature's data (`src/features/dossiers/lib/documents-cache.ts`) so it can be tested alone, and mirror the server's rules in it.
 
 ## 3c. Fetch the next view in the background
 
