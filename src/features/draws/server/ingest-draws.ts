@@ -145,6 +145,8 @@ export async function ingestDraws(deps: {
   fetchFeed: () => Promise<unknown>;
   sendPush: PushSender | null;
   now: Date;
+  /** Called once per Tirage alerted; a failure is logged, the alert stands. */
+  onAlerted?: (draw: NormalizedDraw) => Promise<void>;
 }): Promise<IngestReport> {
   const { db, sendPush, now } = deps;
   const { draws, skipped } = normalizeIrccRounds(await deps.fetchFeed());
@@ -180,7 +182,7 @@ export async function ingestDraws(deps: {
     throw new Error(`${pending.length} Alerte tirage waiting: push is not configured (VAPID keys)`);
   }
 
-  const alerted = sendPush ? await sendAlerts(db, pending, draws, sendPush, now) : 0;
+  const alerted = sendPush ? await sendAlerts(db, pending, draws, sendPush, now, deps.onAlerted) : 0;
   return { fetched: draws.length + skipped.length, inserted, updated: changed.length, skipped, alerted };
 }
 
@@ -190,6 +192,7 @@ async function sendAlerts(
   draws: NormalizedDraw[],
   sendPush: PushSender,
   now: Date,
+  onAlerted?: (draw: NormalizedDraw) => Promise<void>,
 ): Promise<number> {
   const byRound = new Map(draws.map((draw) => [draw.round, draw]));
   let alerted = 0;
@@ -201,7 +204,10 @@ async function sendAlerts(
     const { count } = await db.draw.updateMany({ where: { round, notifiedAt: null }, data: { notifiedAt: now } });
     if (count === 0) continue;
 
-    const subscriptions = await db.pushSubscription.findMany({ orderBy: [{ createdAt: 'asc' }] });
+    const subscriptions = await db.pushSubscription.findMany({
+      where: { drawAlerts: true },
+      orderBy: [{ createdAt: 'asc' }],
+    });
     const results: ('sent' | 'gone' | 'failed')[] = [];
     for (let i = 0; i < subscriptions.length; i += SEND_BATCH) {
       const batch = subscriptions.slice(i, i + SEND_BATCH);
@@ -225,6 +231,7 @@ async function sendAlerts(
       throw new Error(`Alerte tirage #${round} reached no device; it will be retried on the next run`);
     }
     alerted++;
+    await onAlerted?.(draw).catch((error: unknown) => console.error(`Tirage #${round}: could not notify`, error));
   }
   return alerted;
 }

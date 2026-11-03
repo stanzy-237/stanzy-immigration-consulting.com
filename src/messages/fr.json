@@ -2232,7 +2232,40 @@
       "INVOICE_DUE_SOON": "Votre facture {number} ({total}) arrive à échéance dans 3 jours.",
       "INVOICE_OVERDUE": "L’échéance de votre facture {number} ({total}) est passée.",
       "INVOICE_LATE": "La facture {number} de {client} est en retard.",
-      "ACCOUNTS_SIGNED_UP": "{count, plural, one {# nouveau compte} other {# nouveaux comptes}} hier."
+      "ACCOUNTS_SIGNED_UP": "{count, plural, one {# nouveau compte} other {# nouveaux comptes}} hier.",
+      "DRAW_PUBLISHED": "Nouveau tirage Entrée Express n° {round} : {invitations} invitations, {crs} points minimum."
+    },
+    "push": {
+      "DOSSIER_OPENED": "Votre dossier est ouvert.",
+      "DOSSIER_STAGE_CHANGED": "Votre dossier a avancé.",
+      "DOSSIER_CLOSED": "Votre dossier a changé.",
+      "DOCUMENT_ADDED": "Nouveau document dans un dossier.",
+      "VERSION_UPLOADED": "Nouveau fichier dans un dossier.",
+      "MESSAGE_POSTED": "Nouveau message.",
+      "INVOICE_SENT": "Nouvelle facture.",
+      "INVOICE_PAID": "Paiement confirmé.",
+      "PROOF_RECEIVED": "Preuve de paiement reçue.",
+      "INVOICE_DUE_SOON": "Rappel de facture.",
+      "INVOICE_OVERDUE": "Rappel de facture.",
+      "INVOICE_LATE": "Une facture est en retard.",
+      "ACCOUNTS_SIGNED_UP": "Nouveaux comptes."
+    },
+    "pushSwitch": {
+      "label": "Recevoir sur ce téléphone",
+      "hint": "Une alerte courte, sans montant ni nom de document ; le détail s’ouvre dans l’application.",
+      "why": {
+        "unsupported": "Ce navigateur ne peut pas recevoir de notifications.",
+        "needs-install": "Sur iPhone, ajoutez d’abord le site à l’écran d’accueil (Partager → Sur l’écran d’accueil), puis ouvrez-le depuis l’icône.",
+        "denied": "Les notifications sont bloquées pour ce site : autorisez-les dans les réglages du navigateur."
+      },
+      "toastOn": "Notifications activées sur ce téléphone",
+      "toastOff": "Notifications désactivées sur ce téléphone",
+      "failed": "Le réglage n’a pas pu être enregistré. Réessayez."
+    },
+    "pushBanner": {
+      "title": "Soyez prévenu dès que votre dossier avance.",
+      "enable": "Activer",
+      "later": "Plus tard"
     }
   },
   "Accounts": {

@@ -2215,7 +2215,40 @@
       "INVOICE_DUE_SOON": "Your invoice {number} ({total}) is due in 3 days.",
       "INVOICE_OVERDUE": "Your invoice {number} ({total}) is past its due date.",
       "INVOICE_LATE": "Invoice {number} for {client} is overdue.",
-      "ACCOUNTS_SIGNED_UP": "{count, plural, one {# new account} other {# new accounts}} yesterday."
+      "ACCOUNTS_SIGNED_UP": "{count, plural, one {# new account} other {# new accounts}} yesterday.",
+      "DRAW_PUBLISHED": "New Express Entry draw #{round}: {invitations} invitations, {crs} points minimum."
+    },
+    "push": {
+      "DOSSIER_OPENED": "Your file is open.",
+      "DOSSIER_STAGE_CHANGED": "Your file moved forward.",
+      "DOSSIER_CLOSED": "Your file changed.",
+      "DOCUMENT_ADDED": "New document in a file.",
+      "VERSION_UPLOADED": "New file in a file.",
+      "MESSAGE_POSTED": "New message.",
+      "INVOICE_SENT": "New invoice.",
+      "INVOICE_PAID": "Payment confirmed.",
+      "PROOF_RECEIVED": "Proof of payment received.",
+      "INVOICE_DUE_SOON": "Invoice reminder.",
+      "INVOICE_OVERDUE": "Invoice reminder.",
+      "INVOICE_LATE": "An invoice is overdue.",
+      "ACCOUNTS_SIGNED_UP": "New accounts."
+    },
+    "pushSwitch": {
+      "label": "Get them on this phone",
+      "hint": "A short alert, with no amount or document name; the details open in the app.",
+      "why": {
+        "unsupported": "This browser can’t receive notifications.",
+        "needs-install": "On iPhone, first add the site to your home screen (Share → Add to Home Screen), then open it from the icon.",
+        "denied": "Notifications are blocked for this site: allow them in your browser settings."
+      },
+      "toastOn": "Notifications on for this phone",
+      "toastOff": "Notifications off for this phone",
+      "failed": "The setting couldn’t be saved. Try again."
+    },
+    "pushBanner": {
+      "title": "Get told as soon as your file moves forward.",
+      "enable": "Turn on",
+      "later": "Later"
     }
   },
   "Accounts": {

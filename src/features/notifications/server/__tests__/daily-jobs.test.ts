@@ -54,7 +54,9 @@ function fakeDatabase(invoices: Row[], accounts: Row[] = []) {
         return null;
       },
       async create({ data }: { data: Record<string, unknown> }) {
-        notifications.push({ readAt: null, ...data, id: `n_${++seq}` });
+        const row = { readAt: null, ...data, id: `n_${++seq}` };
+        notifications.push(row);
+        return row;
       },
       async deleteMany({ where }: { where: { readAt: { lt: Date } } }) {
         const old = notifications.filter((n) => n.readAt && (n.readAt as Date) < where.readAt.lt);

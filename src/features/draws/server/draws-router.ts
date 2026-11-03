@@ -4,6 +4,7 @@ import type { DrawGroup } from '@/features/draws/lib/draw-type';
 import { irccInstant, roundOrder, type DrawSummary } from '@/features/draws/lib/draw-summary';
 import { SYNC_ID } from '@/features/draws/server/ingest-draws';
 import { routing } from '@/i18n/routing';
+import { pushEndpoint, pushSubscriptionInput } from '@/server/push/subscription-schema';
 import { createTRPCRouter, publicProcedure } from '@/server/trpc/trpc';
 
 export type { DrawSummary };
@@ -43,25 +44,8 @@ function withCrsChange(rows: Row[]): DrawSummary[] {
     .toReversed();
 }
 
-/**
- * Browsers' push services. The server POSTs alerts to the endpoint, so only
- * these hosts are accepted: an arbitrary URL would make it call anywhere.
- */
-const PUSH_HOSTS = /(^|\.)(fcm\.googleapis\.com|push\.services\.mozilla\.com|push\.apple\.com|notify\.windows\.com)$/;
-
-const endpoint = z
-  .string()
-  .max(2048)
-  .url()
-  .refine((value) => {
-    const url = new URL(value);
-    return url.protocol === 'https:' && PUSH_HOSTS.test(url.hostname);
-  }, 'Not a push service endpoint');
-
-const pushSubscription = z.object({
-  endpoint,
-  keys: z.object({ p256dh: z.string().min(1).max(256), auth: z.string().min(1).max(256) }),
-});
+const endpoint = pushEndpoint;
+const pushSubscription = pushSubscriptionInput;
 
 /** Derniers tirages: IRCC rounds stored by `ingestDraws`, and Alertes tirages opt-in. */
 export const drawsRouter = createTRPCRouter({
@@ -91,6 +75,7 @@ export const drawsRouter = createTRPCRouter({
         p256dh: keys.p256dh,
         auth: keys.auth,
         locale: input.locale,
+        drawAlerts: true,
         ...(ctx.session ? { accountId: ctx.session.account.id } : {}),
       };
       await ctx.prisma.pushSubscription.upsert({
@@ -100,9 +85,17 @@ export const drawsRouter = createTRPCRouter({
       });
     }),
 
+  /**
+   * Opts this device out of Alertes tirages. It stays registered while it
+   * still receives its Account's Notifications (#92); otherwise it's forgotten.
+   */
   unsubscribe: publicProcedure
     .input(z.object({ endpoint }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.pushSubscription.deleteMany({ where: { endpoint: input.endpoint } });
+      await ctx.prisma.pushSubscription.deleteMany({ where: { endpoint: input.endpoint, notifications: false } });
+      await ctx.prisma.pushSubscription.updateMany({
+        where: { endpoint: input.endpoint },
+        data: { drawAlerts: false },
+      });
     }),
 });

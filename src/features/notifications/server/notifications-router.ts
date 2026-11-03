@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { notificationListInput, notificationRefInput } from '@/features/notifications/lib/notification-schema';
+import { routing } from '@/i18n/routing';
+import { pushEndpoint, pushSubscriptionInput } from '@/server/push/subscription-schema';
 import { createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 
 const fields = {
@@ -77,5 +79,48 @@ export const notificationsRouter = createTRPCRouter({
       where: { recipientId: ctx.session.account.id, readAt: null },
       data: { readAt: new Date() },
     });
+  }),
+
+  /** « Recevoir sur ce téléphone » (#92): this device, for the signed-in Account. */
+  push: createTRPCRouter({
+    /** Whether this device receives the Account's Notifications. */
+    status: protectedProcedure.input(z.object({ endpoint: pushEndpoint })).query(async ({ ctx, input }) => {
+      const device = await ctx.prisma.pushSubscription.findFirst({
+        where: { endpoint: input.endpoint, accountId: ctx.session.account.id, notifications: true },
+        select: { endpoint: true },
+      });
+      return { on: Boolean(device) };
+    }),
+
+    /** Turns it on for this device; its Alertes tirages stay as they were. */
+    subscribe: protectedProcedure
+      .input(z.object({ subscription: pushSubscriptionInput, locale: z.enum(routing.locales) }))
+      .mutation(async ({ ctx, input }) => {
+        const { endpoint, keys } = input.subscription;
+        const fields = {
+          p256dh: keys.p256dh,
+          auth: keys.auth,
+          locale: input.locale,
+          accountId: ctx.session.account.id,
+          notifications: true,
+        };
+        await ctx.prisma.pushSubscription.upsert({
+          where: { endpoint },
+          create: { endpoint, ...fields, drawAlerts: false },
+          update: fields,
+        });
+      }),
+
+    /**
+     * Turns it off for this device. Without Alertes tirages either, the device
+     * is forgotten (`forgotten`), and the browser can drop its subscription.
+     */
+    unsubscribe: protectedProcedure.input(z.object({ endpoint: pushEndpoint })).mutation(async ({ ctx, input }) => {
+      const mine = { endpoint: input.endpoint, accountId: ctx.session.account.id };
+      const { count } = await ctx.prisma.pushSubscription.deleteMany({ where: { ...mine, drawAlerts: false } });
+      if (count > 0) return { forgotten: true };
+      await ctx.prisma.pushSubscription.updateMany({ where: mine, data: { notifications: false } });
+      return { forgotten: false };
+    }),
   }),
 });

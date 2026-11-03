@@ -199,14 +199,18 @@ model DrawSync {
 
 /// One device opted in to Alertes tirages (Web Push).
 model PushSubscription {
-  endpoint  String   @id
-  p256dh    String
-  auth      String
+  endpoint      String   @id
+  p256dh        String
+  auth          String
   /// Language the alert is written in. `fr` | `en`.
-  locale    String   @default("fr")
-  accountId String?
-  account   Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
+  locale        String   @default("fr")
+  accountId     String?
+  account       Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  /// This device wants the Alertes tirages (every new Tirage).
+  drawAlerts    Boolean  @default(true)
+  /// This device wants its Account's Notifications pushed (#92), as general text.
+  notifications Boolean  @default(false)
+  createdAt     DateTime @default(now())
 
   @@index([accountId])
   @@map("push_subscription")
@@ -596,6 +600,8 @@ enum NotificationKind {
   INVOICE_LATE
   /// To the consultant, once a day: the accounts created the day before.
   ACCOUNTS_SIGNED_UP
+  /// A new Tirage, for Accounts with Alertes tirages on.
+  DRAW_PUBLISHED
 }
 
 /// One line in an Account's notification center. Repeats by the same actor on the same target, while unread and within 30 minutes, raise `count` instead of adding lines.
