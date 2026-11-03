@@ -1,17 +1,23 @@
 'use client';
 
-import {
-  ChevronLeft,
-  ChevronRight,
-  FilePlus2,
-  Minimize2,
-  RotateCcw,
-  RotateCw,
-  Trash2,
-  type LucideIcon,
-} from 'lucide-react';
+import { FilePlus2, Minimize2, RotateCcw, RotateCw, Trash2, type LucideIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useEffect, useId, useRef, useState, type ChangeEvent, type DragEvent, type ReactNode } from 'react';
+import {
+  closestCenter,
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type Announcements,
+  type DragEndEvent,
+  type UniqueIdentifier,
+} from '@dnd-kit/core';
+import { rectSortingStrategy, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { useEffect, useId, useRef, useState, type ChangeEvent, type HTMLAttributes, type ReactNode } from 'react';
 
 import { toast } from '@/components/ui/toast';
 import { usePdfWorkbench } from '@/features/pdf-tools/hooks/use-pdf-workbench';
@@ -57,7 +63,6 @@ export function PdfWorkbench({
   const tool = usePdfWorkbench(engine.rasterize);
   const [adding, setAdding] = useState(false);
   const [finishing, setFinishing] = useState(false);
-  const [dragged, setDragged] = useState<string | null>(null);
   const started = useRef(false);
 
   useEffect(() => {
@@ -103,12 +108,6 @@ export function PdfWorkbench({
     }
   };
 
-  const drop = (event: DragEvent, index: number) => {
-    event.preventDefault();
-    if (dragged) tool.move(dragged, index);
-    setDragged(null);
-  };
-
   const fits = tool.size !== null && tool.size <= IRCC_MAX_BYTES;
   const FinishIcon = finish.icon;
 
@@ -148,29 +147,14 @@ export function PdfWorkbench({
       {tool.pages.length === 0 ? (
         <p className="rounded-2xl bg-white px-6 py-12 text-center text-sm text-slate">{t('empty')}</p>
       ) : (
-        <ol aria-label={t('pages')} className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {tool.pages.map((page, index) => (
-            <li
-              key={page.id}
-              draggable
-              onDragStart={() => setDragged(page.id)}
-              onDragOver={(event) => dragged && event.preventDefault()}
-              onDrop={(event) => drop(event, index)}
-              className={`rounded-2xl border bg-white p-2 shadow-sm ${dragged === page.id ? 'border-navy-deep opacity-50' : 'border-fog-light'}`}
-            >
-              <PageCard
-                page={page}
-                number={index + 1}
-                count={tool.pages.length}
-                source={tool.sourceOf.get(page.sourceId)!}
-                thumbnail={engine.thumbnail}
-                onMove={(to) => tool.move(page.id, to)}
-                onRotate={(turn) => tool.rotate(page.id, turn)}
-                onRemove={() => tool.remove(page.id)}
-              />
-            </li>
-          ))}
-        </ol>
+        <SortablePages
+          pages={tool.pages}
+          sourceOf={tool.sourceOf}
+          thumbnail={engine.thumbnail}
+          onReorder={tool.reorder}
+          onRotate={tool.rotate}
+          onRemove={tool.remove}
+        />
       )}
 
       <div className="sticky bottom-0 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-fog-light bg-white/95 p-4 shadow-sm backdrop-blur">
@@ -224,21 +208,20 @@ export function PdfWorkbench({
 function PageCard({
   page,
   number,
-  count,
   source,
   thumbnail,
-  onMove,
+  handle,
   onRotate,
   onRemove,
 }: {
   page: Page;
   number: number;
-  count: number;
   source: Source;
   thumbnail: WorkbenchEngine['thumbnail'];
-  onMove: (to: number) => void;
-  onRotate: (turn: 1 | -1) => void;
-  onRemove: () => void;
+  /** What makes the thumbnail the drag handle (dnd-kit); none in the drag overlay. */
+  handle?: HTMLAttributes<HTMLDivElement>;
+  onRotate?: (turn: 1 | -1) => void;
+  onRemove?: () => void;
 }): ReactNode {
   const t = useTranslations('PdfTools');
   const [src, setSrc] = useState<string | null>(null);
@@ -259,7 +242,11 @@ function PageCard({
 
   return (
     <figure>
-      <div className="flex aspect-3/4 items-center justify-center overflow-hidden rounded-xl bg-off-white">
+      <div
+        {...handle}
+        aria-label={handle ? t('dragLabel', { number }) : undefined}
+        className="flex aspect-3/4 cursor-grab touch-manipulation items-center justify-center overflow-hidden rounded-xl bg-off-white focus-visible:ring-2 focus-visible:ring-rouge focus-visible:outline-none active:cursor-grabbing"
+      >
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element -- a local data/blob URL, not an optimisable asset
           <img src={src} alt={label} className={`max-h-full max-w-full object-contain ${turn}`} />
@@ -270,45 +257,146 @@ function PageCard({
       <figcaption className="mt-1.5 truncate text-xs text-slate">
         <span className="font-semibold text-navy-deep">{number}</span> · {source.name}
       </figcaption>
-      <div className="mt-1 flex items-center justify-between">
-        <button
-          type="button"
-          disabled={number === 1}
-          onClick={() => onMove(number - 2)}
-          className={iconButton}
-          aria-label={t('moveEarlier', { number })}
-        >
-          <ChevronLeft aria-hidden={true} className="size-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => onRotate(-1)}
-          className={iconButton}
-          aria-label={t('rotateLeft', { number })}
-        >
-          <RotateCcw aria-hidden={true} className="size-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => onRotate(1)}
-          className={iconButton}
-          aria-label={t('rotateRight', { number })}
-        >
-          <RotateCw aria-hidden={true} className="size-4" />
-        </button>
-        <button type="button" onClick={onRemove} className={iconButton} aria-label={t('remove', { number })}>
-          <Trash2 aria-hidden={true} className="size-4" />
-        </button>
-        <button
-          type="button"
-          disabled={number === count}
-          onClick={() => onMove(number)}
-          className={iconButton}
-          aria-label={t('moveLater', { number })}
-        >
-          <ChevronRight aria-hidden={true} className="size-4" />
-        </button>
-      </div>
+      {onRotate && onRemove ? (
+        <div className="mt-1 flex items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => onRotate(-1)}
+            className={iconButton}
+            aria-label={t('rotateLeft', { number })}
+          >
+            <RotateCcw aria-hidden={true} className="size-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onRotate(1)}
+            className={iconButton}
+            aria-label={t('rotateRight', { number })}
+          >
+            <RotateCw aria-hidden={true} className="size-4" />
+          </button>
+          <button type="button" onClick={onRemove} className={iconButton} aria-label={t('remove', { number })}>
+            <Trash2 aria-hidden={true} className="size-4" />
+          </button>
+        </div>
+      ) : null}
     </figure>
+  );
+}
+
+/**
+ * The pages, reordered by drag and drop (dnd-kit): the mouse after a few
+ * pixels, a finger after a short press (so the page still scrolls), the
+ * keyboard from the thumbnail (Espace to lift, the arrows, Espace to drop).
+ * The page being dragged follows the pointer; the others make room.
+ */
+function SortablePages({
+  pages,
+  sourceOf,
+  thumbnail,
+  onReorder,
+  onRotate,
+  onRemove,
+}: {
+  pages: Page[];
+  sourceOf: Map<string, Source>;
+  thumbnail: WorkbenchEngine['thumbnail'];
+  onReorder: (id: string, overId: string) => void;
+  onRotate: (id: string, turn: 1 | -1) => void;
+  onRemove: (id: string) => void;
+}): ReactNode {
+  const t = useTranslations('PdfTools');
+  const [active, setActive] = useState<string | null>(null);
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const numberOf = (id: UniqueIdentifier) => pages.findIndex((page) => page.id === id) + 1;
+  const announcements: Announcements = {
+    onDragStart: ({ active: dragged }) => t('announce.start', { number: numberOf(dragged.id) }),
+    onDragOver: ({ over }) => (over ? t('announce.over', { number: numberOf(over.id) }) : undefined),
+    onDragEnd: ({ over }) => (over ? t('announce.end', { number: numberOf(over.id) }) : t('announce.cancel')),
+    onDragCancel: () => t('announce.cancel'),
+  };
+
+  const end = ({ active: dragged, over }: DragEndEvent) => {
+    setActive(null);
+    if (over && dragged.id !== over.id) onReorder(String(dragged.id), String(over.id));
+  };
+  const dragged = active ? pages.find((page) => page.id === active) : undefined;
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      accessibility={{ announcements, screenReaderInstructions: { draggable: t('announce.instructions') } }}
+      onDragStart={({ active: started }) => setActive(String(started.id))}
+      onDragEnd={end}
+      onDragCancel={() => setActive(null)}
+    >
+      <SortableContext items={pages.map((page) => page.id)} strategy={rectSortingStrategy}>
+        <ol aria-label={t('pages')} className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {pages.map((page, index) => (
+            <SortablePage
+              key={page.id}
+              page={page}
+              number={index + 1}
+              source={sourceOf.get(page.sourceId)!}
+              thumbnail={thumbnail}
+              onRotate={(turn) => onRotate(page.id, turn)}
+              onRemove={() => onRemove(page.id)}
+            />
+          ))}
+        </ol>
+      </SortableContext>
+      <DragOverlay>
+        {dragged ? (
+          <div className="rounded-2xl border border-navy-deep bg-white p-2 shadow-xl">
+            <PageCard
+              page={dragged}
+              number={numberOf(dragged.id)}
+              source={sourceOf.get(dragged.sourceId)!}
+              thumbnail={thumbnail}
+            />
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  );
+}
+
+function SortablePage({
+  page,
+  number,
+  source,
+  thumbnail,
+  onRotate,
+  onRemove,
+}: {
+  page: Page;
+  number: number;
+  source: Source;
+  thumbnail: WorkbenchEngine['thumbnail'];
+  onRotate: (turn: 1 | -1) => void;
+  onRemove: () => void;
+}): ReactNode {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: page.id });
+  return (
+    <li
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`rounded-2xl border bg-white p-2 shadow-sm ${isDragging ? 'border-dashed border-navy-deep opacity-40' : 'border-fog-light'}`}
+    >
+      <PageCard
+        page={page}
+        number={number}
+        source={source}
+        thumbnail={thumbnail}
+        handle={{ ...attributes, ...listeners }}
+        onRotate={onRotate}
+        onRemove={onRemove}
+      />
+    </li>
   );
 }

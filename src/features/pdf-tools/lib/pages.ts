@@ -48,6 +48,12 @@ export function moved(pages: Page[], id: string, to: number): Page[] {
   return [...rest.slice(0, target), pages[from]!, ...rest.slice(target)];
 }
 
+/** The page dropped where `overId` stands (drag and drop); the others make room. */
+export function movedOnto(pages: Page[], id: string, overId: string): Page[] {
+  const to = pages.findIndex((page) => page.id === overId);
+  return to === -1 || id === overId ? pages : moved(pages, id, to);
+}
+
 /** A quarter turn clockwise (`1`) or counter-clockwise (`-1`). */
 export const rotated = (pages: Page[], id: string, turn: 1 | -1): Page[] =>
   pages.map((page) =>

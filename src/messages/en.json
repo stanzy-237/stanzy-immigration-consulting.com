@@ -2305,8 +2305,6 @@
     "fileName": "stanzy-document.pdf",
     "rendering": "Preview…",
     "pageLabel": "Page {number}: {name}",
-    "moveEarlier": "Move page {number} earlier",
-    "moveLater": "Move page {number} later",
     "rotateLeft": "Rotate page {number} left",
     "rotateRight": "Rotate page {number} right",
     "remove": "Remove page {number}",
@@ -2318,6 +2316,14 @@
       "unreadable": "{name} couldn’t be read (protected or damaged PDF?).",
       "tooLarge": "Even at the strongest, the document is {size}: remove pages or split it.",
       "failed": "Compression failed. Try again."
+    },
+    "dragLabel": "Page {number}: drag to move",
+    "announce": {
+      "instructions": "To move a page: Space to pick it up, the arrows to move it, Space to drop it, Escape to cancel.",
+      "start": "Picked up page {number}.",
+      "over": "Over position {number}.",
+      "end": "Page dropped at position {number}.",
+      "cancel": "Move cancelled."
     }
   }
 }

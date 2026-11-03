@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { PDFDocument } from 'pdf-lib';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -61,14 +61,49 @@ describe('PdfWorkbench', () => {
     expect(await axe(container)).toHaveNoViolations();
   }, 30_000);
 
-  it('moves, turns and removes pages, and refuses what it can’t read', async () => {
-    workbench();
-    addFiles('releve.pdf', 'photo.jpg', 'lettre.docx');
-    expect(await screen.findByText('lettre.docx : type de fichier non pris en charge.')).toBeInTheDocument();
-    await waitFor(() => expect(pageNames()).toHaveLength(3));
+  it('reorders by dragging with the keyboard, turns and removes pages, and refuses what it can’t read', async () => {
+    // jsdom lays nothing out: give each page a place in a row, as dnd-kit measures them.
+    const rect = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) {
+      const list = this.closest('ol');
+      const index = this.tagName === 'LI' && list ? [...list.children].indexOf(this) : 0;
+      return {
+        x: index * 200,
+        y: 0,
+        left: index * 200,
+        top: 0,
+        right: index * 200 + 180,
+        bottom: 240,
+        width: 180,
+        height: 240,
+        toJSON: () => ({}),
+      } as DOMRect;
+    });
+    try {
+      workbench();
+      addFiles('releve.pdf', 'photo.jpg', 'lettre.docx');
+      expect(await screen.findByText('lettre.docx : type de fichier non pris en charge.')).toBeInTheDocument();
+      await waitFor(() => expect(pageNames()).toHaveLength(3));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Avancer la page 3' }));
-    expect(pageNames()).toEqual(['Page 1 : releve.pdf', 'Page 2 : photo.jpg', 'Page 3 : releve.pdf']);
+      const handle = screen.getByRole('button', { name: 'Page 1 : glisser pour déplacer' });
+      expect(handle).toHaveAttribute('aria-roledescription', 'sortable');
+      handle.focus();
+      fireEvent.keyDown(handle, { code: 'Space' });
+      // dnd-kit listens for the arrows from the next tick, as a person would press them.
+      const tick = () => act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      await tick();
+      // Two places on, past the photo: the move shows in the order.
+      fireEvent.keyDown(document, { code: 'ArrowRight' });
+      await tick();
+      fireEvent.keyDown(document, { code: 'ArrowRight' });
+      await tick();
+      fireEvent.keyDown(document, { code: 'Space' });
+      await waitFor(() =>
+        expect(pageNames()).toEqual(['Page 1 : releve.pdf', 'Page 2 : photo.jpg', 'Page 3 : releve.pdf']),
+      );
+    } finally {
+      rect.mockRestore();
+    }
+
     fireEvent.click(screen.getByRole('button', { name: 'Retirer la page 1' }));
     expect(pageNames()).toEqual(['Page 1 : photo.jpg', 'Page 2 : releve.pdf']);
     fireEvent.click(screen.getByRole('button', { name: 'Tourner la page 1 vers la droite' }));

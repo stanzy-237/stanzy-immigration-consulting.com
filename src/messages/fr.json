@@ -2322,8 +2322,6 @@
     "fileName": "document-stanzy.pdf",
     "rendering": "Aperçu…",
     "pageLabel": "Page {number} : {name}",
-    "moveEarlier": "Avancer la page {number}",
-    "moveLater": "Reculer la page {number}",
     "rotateLeft": "Tourner la page {number} vers la gauche",
     "rotateRight": "Tourner la page {number} vers la droite",
     "remove": "Retirer la page {number}",
@@ -2335,6 +2333,14 @@
       "unreadable": "{name} n’a pas pu être lu (PDF protégé ou abîmé ?).",
       "tooLarge": "Même au plus fort, le document fait {size} : retirez des pages ou découpez-le.",
       "failed": "La compression a échoué. Réessayez."
+    },
+    "dragLabel": "Page {number} : glisser pour déplacer",
+    "announce": {
+      "instructions": "Pour déplacer une page : Espace pour la prendre, les flèches pour la déplacer, Espace pour la poser, Échap pour annuler.",
+      "start": "Page {number} prise.",
+      "over": "Au-dessus de la place {number}.",
+      "end": "Page posée à la place {number}.",
+      "cancel": "Déplacement annulé."
     }
   }
 }

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { jpegOf, pdfSource, photoSource } from '@/features/pdf-tools/lib/__tests__/fixtures';
 import { buildPdf, COMPRESSION_STEPS, compressPdf, compressToLimit } from '@/features/pdf-tools/lib/build-pdf';
-import { moved, rotated, withoutPage, withSource } from '@/features/pdf-tools/lib/pages';
+import { moved, movedOnto, rotated, withoutPage, withSource } from '@/features/pdf-tools/lib/pages';
 
 describe('the pages', () => {
   it('lists every page of each file added, then moves, turns and removes them', async () => {
@@ -19,6 +19,14 @@ describe('the pages', () => {
     expect(rotated(rotated(pages, photo, -1), photo, -1).find((p) => p.id === photo)!.rotation).toBe(180);
     expect(rotated(pages, photo, 1).find((p) => p.id === photo)!.rotation).toBe(90);
     expect(withoutPage(pages, photo)).toHaveLength(2);
+  });
+
+  it('drops a dragged page where the one it was dropped on stood', async () => {
+    const pages = withSource([], await pdfSource('a', 4));
+    const [first, , third, fourth] = pages.map((p) => p.id);
+    expect(movedOnto(pages, first!, third!).map((p) => p.index)).toEqual([1, 2, 0, 3]);
+    expect(movedOnto(pages, fourth!, first!).map((p) => p.index)).toEqual([3, 0, 1, 2]);
+    expect(movedOnto(pages, first!, first!)).toBe(pages);
   });
 });
 

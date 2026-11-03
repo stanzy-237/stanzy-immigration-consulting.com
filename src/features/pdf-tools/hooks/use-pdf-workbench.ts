@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { buildPdf, compressPdf, compressToLimit, type RasterizePdf } from '@/features/pdf-tools/lib/build-pdf';
 import {
   IRCC_MAX_BYTES,
-  moved,
+  movedOnto,
   rotated,
   withoutPage,
   withSource,
@@ -102,7 +102,7 @@ export function usePdfWorkbench(rasterize: RasterizePdf) {
     steps,
     compressing,
     addSources,
-    move: (id: string, to: number) => change((current) => moved(current, id, to)),
+    reorder: (id: string, overId: string) => change((current) => movedOnto(current, id, overId)),
     rotate: (id: string, turn: 1 | -1) => change((current) => rotated(current, id, turn)),
     remove: (id: string) => change((current) => withoutPage(current, id)),
     compress,
