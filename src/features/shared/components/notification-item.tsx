@@ -12,7 +12,7 @@ import {
   Waypoints,
   type LucideIcon,
 } from 'lucide-react';
-import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useFormatter, useLocale, useNow, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
@@ -51,6 +51,8 @@ export function NotificationItem({
 }): ReactNode {
   const t = useTranslations('Notifications');
   const format = useFormatter();
+  // « il y a 5 min » moves on while the list stays open.
+  const now = useNow({ updateInterval: 60_000 });
   const locale = useLocale();
   const text = useNotificationText();
   const { title, detail } = text(item);
@@ -79,7 +81,7 @@ export function NotificationItem({
         </span>
         {detail ? <span className="mt-0.5 line-clamp-2 block text-xs text-slate">{detail}</span> : null}
         <span className="mt-0.5 block text-xs text-slate-mute">
-          <time dateTime={new Date(item.updatedAt).toISOString()}>{format.relativeTime(item.updatedAt)}</time>
+          <time dateTime={new Date(item.updatedAt).toISOString()}>{format.relativeTime(item.updatedAt, now)}</time>
           {unread ? <span className="sr-only"> · {t('unread')}</span> : null}
         </span>
       </span>
