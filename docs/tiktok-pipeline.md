@@ -18,8 +18,10 @@ never fights TikTok's CDN at request time.
    `tiktok/manifest.json` via `fetchTikTokManifest()` (Next `fetch` cache,
    revalidate 3600s) and hands the videos to the client carousel.
 4. **Fallback**: if the manifest can't be loaded (first deploy, R2 down),
-   the RSC falls back to the live `tikwm.com` proxy per-video so the row
-   still renders.
+   the RSC asks the public `tikwm.com` API for each video's cover and title
+   and shows the covers, each opening the video on TikTok. It never streams
+   the MP4s through our own server: that used up Vercel's free Fast Origin
+   Transfer (10 GB) in November 2026.
 
 ## One-time setup
 

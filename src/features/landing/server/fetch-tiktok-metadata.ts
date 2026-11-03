@@ -86,18 +86,16 @@ export async function fetchTikTokMetadata(
       }
 
       const title = data.title ?? '';
-      // Direct TikTok CDN URLs often block cross-origin playback; route the
-      // bytes through our own /api/tiktok/video proxy so the browser hits
-      // the same origin as the page.
-      const upstream = data.play ?? data.wmplay ?? null;
-      const playUrl = upstream
-        ? `/api/tiktok/video?src=${encodeURIComponent(upstream)}`
-        : null;
+      // No inline video on this fallback: TikTok's CDN blocks playback from
+      // another site, and streaming it through our own server made every
+      // home-page visit download the videos through Vercel (it used up the
+      // free plan's Fast Origin Transfer). The card shows the cover and
+      // opens the video on TikTok; inline videos come from the R2 manifest.
       return {
         ...fallback,
         videoId: data.id ?? fallback.videoId,
         cover: data.cover ?? data.origin_cover ?? fallback.cover,
-        playUrl,
+        playUrl: null,
         title: stripTags(title),
         description: stripTags(title),
         tags: extractTags(title),
