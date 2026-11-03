@@ -1405,7 +1405,8 @@
         "clients": "Clients",
         "billing": "Billing",
         "content": "Content"
-      }
+      },
+      "close": "Close the menu"
     },
     "viewSite": "View the site",
     "overview": {

@@ -1422,7 +1422,8 @@
         "clients": "Clients",
         "billing": "Facturation",
         "content": "Contenus"
-      }
+      },
+      "close": "Fermer le menu"
     },
     "viewSite": "Voir le site",
     "overview": {

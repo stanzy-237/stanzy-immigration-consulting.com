@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -46,5 +46,25 @@ describe('DashboardShell', () => {
   it('opens folded when the consultant left it so', () => {
     shell(false);
     expect(document.querySelector('[data-slot="sidebar"]')).toHaveAttribute('data-state', 'collapsed');
+  });
+});
+
+describe('DashboardShell on a phone', () => {
+  it('keeps the bottom drawer: the menu button opens it, choosing a section closes it', async () => {
+    const width = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 375 });
+    try {
+      shell();
+      expect(document.querySelector('[data-slot="sidebar"]')).toBeNull();
+      fireEvent.click(await screen.findByRole('button', { name: 'Afficher ou replier le menu' }));
+      const drawer = await screen.findByRole('dialog', { name: 'Tableau de bord' });
+      const factures = within(drawer).getByRole('link', { name: 'Factures' });
+      expect(factures).toHaveAttribute('aria-current', 'page');
+      expect(within(drawer).getByText('Facturation')).toBeInTheDocument();
+      fireEvent.click(within(drawer).getByRole('link', { name: 'Comptes' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    } finally {
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
+    }
   });
 });
