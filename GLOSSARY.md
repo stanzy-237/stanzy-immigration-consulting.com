@@ -102,7 +102,7 @@ The case file for a Client's engagement — what the consultant tracks and works
 One upload box of the IRCC portal within a Dossier (« Diplômes – Requérant principal », « Preuve de fonds »…). It holds several Documents and produces exactly one Fichier de soumission.
 
 **Document** (in a Dossier):
-One piece inside a Section IRCC (a diplôme, a relevé de notes, a rapport WES…), generated from the Checklist logic or added by the Client or the consultant. Has Versions and one comment thread. **Manquant** when the Client doesn't have it yet.
+One piece inside a Section IRCC (a diplôme, a relevé de notes, a rapport WES…), generated from the Checklist logic or added by the Client or the consultant. Has Versions and one conversation (« Échanges »): messages between the Client and the consultant, each with its replies, one level deep. **Manquant** when the Client doesn't have it yet.
 _Avoid_: "file" (a Document has several Versions).
 
 **Version**:
@@ -114,6 +114,10 @@ The single PDF of a Section IRCC that is uploaded to the IRCC portal, built with
 
 **Outils PDF** (PDF tools):
 The consultant's iLovePDF-style tool in the Tableau de bord: merge, reorder, rotate and delete pages, turn photos into PDF, compress to 4 Mo. Runs in the browser, on a Section IRCC or on local files.
+
+**Notification**:
+One line in an Account's notification center (the bell in « Mon espace » or the Tableau de bord) telling them something happened that concerns them: a message, a Version, a stage, a Facture, a reminder, a new Tirage. It opens the exact item and is **non lue** until then. Several of the same kind, by the same person, on the same Document within 30 minutes are one Notification. Never for the Account's own action. Some also go out by email, and to the phone as a general push when the Account turned that on.
+_Avoid_: "alert" (an Alerte tirage is one kind of Notification), "message" (a message is what someone writes in a Document's conversation).
 
 **Parcours** (Journey / Timeline):
 A User's own, self-logged journal of immigration milestones — each a dated **Étape** with a label, a short code, an optional note and a colour. The User adds, edits and deletes entries freely; it is not a fixed pipeline with mandatory stages. Has a clean, branded, **screenshot-ready** view ("Voir la timeline" / "Partager", headed "Mon Parcours Entrée Express") that users capture and share (e.g. on WhatsApp) — not a public server-hosted link. This is what the "timeline" tool is — NOT IRCC's published processing times.
