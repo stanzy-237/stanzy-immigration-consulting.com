@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
@@ -64,7 +64,8 @@ describe('NotificationsView', () => {
   it('shows only the unread ones on demand', async () => {
     page();
     fireEvent.click(await screen.findByRole('button', { name: 'Non lues (1)' }));
-    expect(await screen.findByRole('link', { name: /Licence/ })).toBeInTheDocument();
-    expect(screen.queryByText(/STZ-2026-0004/)).not.toBeInTheDocument();
+    // The current list stays on screen while the unread one loads: wait for the switch.
+    await waitFor(() => expect(screen.queryByText(/STZ-2026-0004/)).not.toBeInTheDocument());
+    expect(screen.getByRole('link', { name: /Licence/ })).toBeInTheDocument();
   });
 });
