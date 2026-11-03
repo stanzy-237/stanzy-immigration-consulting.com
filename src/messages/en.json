@@ -1404,9 +1404,11 @@
         "general": "General",
         "clients": "Clients",
         "billing": "Billing",
-        "content": "Content"
+        "content": "Content",
+        "tools": "Tools"
       },
-      "close": "Close the menu"
+      "close": "Close the menu",
+      "outils-pdf": "PDF tools"
     },
     "viewSite": "View the site",
     "overview": {
@@ -2281,5 +2283,41 @@
     "dossiers": "Files",
     "noDossier": "No files for this account.",
     "loading": "Loading the accounts"
+  },
+  "PdfTools": {
+    "title": "PDF tools",
+    "intro": "Merge, reorder and compress PDFs and photos down to IRCC’s limit (4 MB per file). It all happens in your browser: nothing is uploaded.",
+    "add": "Add files",
+    "adding": "Reading…",
+    "addHint": "PDF, JPG, PNG, WebP or HEIC; or drop them here.",
+    "empty": "Add PDFs or photos to start.",
+    "pages": "Document pages",
+    "pageCount": "{count, plural, =0 {No pages} one {# page} other {# pages}}",
+    "size": "{size} MB",
+    "measuring": "measuring…",
+    "fits": "Under IRCC’s limit (4 MB).",
+    "tooBig": "Over IRCC’s limit (4 MB): compress it.",
+    "compress": "Compress to 4 MB",
+    "compressing": "Compressing…",
+    "trying": "Trying {quality}%: {size}",
+    "compressedNote": "Compressed at {quality}%: the pages’ text is no longer selectable. Any change undoes the compression.",
+    "download": "Download",
+    "fileName": "stanzy-document.pdf",
+    "rendering": "Preview…",
+    "pageLabel": "Page {number}: {name}",
+    "moveEarlier": "Move page {number} earlier",
+    "moveLater": "Move page {number} later",
+    "rotateLeft": "Rotate page {number} left",
+    "rotateRight": "Rotate page {number} right",
+    "remove": "Remove page {number}",
+    "toast": {
+      "compressed": "Compressed: {size}"
+    },
+    "errors": {
+      "unsupported": "{name}: file type not supported.",
+      "unreadable": "{name} couldn’t be read (protected or damaged PDF?).",
+      "tooLarge": "Even at the strongest, the document is {size}: remove pages or split it.",
+      "failed": "Compression failed. Try again."
+    }
   }
 }

@@ -1421,9 +1421,11 @@
         "general": "Général",
         "clients": "Clients",
         "billing": "Facturation",
-        "content": "Contenus"
+        "content": "Contenus",
+        "tools": "Outils"
       },
-      "close": "Fermer le menu"
+      "close": "Fermer le menu",
+      "outils-pdf": "Outils PDF"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -2298,5 +2300,41 @@
     "dossiers": "Dossiers",
     "noDossier": "Aucun dossier pour ce compte.",
     "loading": "Chargement des comptes"
+  },
+  "PdfTools": {
+    "title": "Outils PDF",
+    "intro": "Assemblez, réorganisez et compressez des PDF et des photos jusqu’à la limite d’IRCC (4 Mo par fichier). Tout se passe dans votre navigateur : rien n’est envoyé.",
+    "add": "Ajouter des fichiers",
+    "adding": "Lecture…",
+    "addHint": "PDF, JPG, PNG, WebP ou HEIC ; ou déposez-les ici.",
+    "empty": "Ajoutez des PDF ou des photos pour commencer.",
+    "pages": "Pages du document",
+    "pageCount": "{count, plural, =0 {Aucune page} one {# page} other {# pages}}",
+    "size": "{size} Mo",
+    "measuring": "mesure…",
+    "fits": "Sous la limite d’IRCC (4 Mo).",
+    "tooBig": "Au-dessus de la limite d’IRCC (4 Mo) : compressez.",
+    "compress": "Compresser jusqu’à 4 Mo",
+    "compressing": "Compression…",
+    "trying": "Essai à {quality} % : {size}",
+    "compressedNote": "Compressé à {quality} % : le texte des pages n’est plus sélectionnable. Toute modification annule la compression.",
+    "download": "Télécharger",
+    "fileName": "document-stanzy.pdf",
+    "rendering": "Aperçu…",
+    "pageLabel": "Page {number} : {name}",
+    "moveEarlier": "Avancer la page {number}",
+    "moveLater": "Reculer la page {number}",
+    "rotateLeft": "Tourner la page {number} vers la gauche",
+    "rotateRight": "Tourner la page {number} vers la droite",
+    "remove": "Retirer la page {number}",
+    "toast": {
+      "compressed": "Compressé : {size}"
+    },
+    "errors": {
+      "unsupported": "{name} : type de fichier non pris en charge.",
+      "unreadable": "{name} n’a pas pu être lu (PDF protégé ou abîmé ?).",
+      "tooLarge": "Même au plus fort, le document fait {size} : retirez des pages ou découpez-le.",
+      "failed": "La compression a échoué. Réessayez."
+    }
   }
 }
