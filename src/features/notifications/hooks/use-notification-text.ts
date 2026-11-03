@@ -1,0 +1,37 @@
+import { useLocale, useTranslations } from 'next-intl';
+
+import { formatMoney } from '@/features/invoices/lib/money';
+import { actorName, type NotificationItem } from '@/features/notifications/lib/notification-links';
+
+/**
+ * A Notification in the reader's language: `title` says what happened,
+ * `detail` adds what helps (the message's words, the closing reason).
+ */
+export function useNotificationText() {
+  const t = useTranslations('Notifications');
+  const dossiers = useTranslations('Dossiers');
+  const locale = useLocale();
+
+  return (item: NotificationItem): { title: string; detail: string | null } => {
+    const service = item.dossier ? dossiers(`services.${item.dossier.service}`) : '';
+    const values = {
+      actor: actorName(item, t('someone')),
+      count: item.count,
+      document: item.document?.title ?? '',
+      service,
+      stage:
+        item.dossier && item.params.stage
+          ? dossiers(`stages.${item.dossier.service}.${item.params.stage}` as never)
+          : '',
+      number: item.invoice?.number ?? '',
+      total: item.invoice ? formatMoney(item.invoice.total, item.invoice.currency, locale) : '',
+    };
+    const detail =
+      item.kind === 'MESSAGE_POSTED' && item.comment?.body
+        ? item.comment.body
+        : item.kind === 'DOSSIER_CLOSED' && item.params.reason
+          ? t('reason', { reason: item.params.reason })
+          : null;
+    return { title: t(`kinds.${item.kind}`, values), detail };
+  };
+}

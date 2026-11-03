@@ -20,6 +20,7 @@ import { finalesLocked } from '@/features/dossiers/lib/workflow';
 import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { documentFor, dossierFor, isConsultant, sectionFor, writable } from '@/features/dossiers/server/dossier-access';
 import { notifyClient, notifyConsultants } from '@/features/dossiers/server/dossier-notify';
+import { forgetComment, notifyLater } from '@/features/notifications/server/notify';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
@@ -136,10 +137,19 @@ export const documentsRouter = createTRPCRouter({
   addDocument: protectedProcedure.input(addDocumentInput).mutation(async ({ ctx, input }) => {
     const section = await sectionFor(ctx.prisma, ctx.session, input.sectionId);
     writable(section.dossier);
-    return ctx.prisma.dossierDocument.create({
+    const document = await ctx.prisma.dossierDocument.create({
       data: { sectionId: section.id, title: input.title, addedById: ctx.session.account.id },
       select: { id: true },
     });
+    if (!isConsultant(ctx.session)) {
+      notifyLater(ctx.prisma, {
+        kind: 'DOCUMENT_ADDED',
+        actorId: ctx.session.account.id,
+        recipients: 'CONSULTANTS',
+        target: { dossierId: section.dossier.id, documentId: document.id },
+      });
+    }
+    return document;
   }),
 
   /** The consultant only; its Versions and comments go with it, and its files leave Blob. */
@@ -180,6 +190,12 @@ export const documentsRouter = createTRPCRouter({
     } else {
       notifyConsultants(dossier, dossier.account.name, { kind: 'clientUpload', document: document.title });
     }
+    notifyLater(ctx.prisma, {
+      kind: 'VERSION_UPLOADED',
+      actorId: ctx.session.account.id,
+      recipients: isConsultant(ctx.session) ? [dossier.accountId] : 'CONSULTANTS',
+      target: { dossierId: dossier.id, documentId: document.id },
+    });
     return version;
   }),
 
@@ -234,6 +250,12 @@ export const documentsRouter = createTRPCRouter({
     } else {
       notifyConsultants(dossier, dossier.account.name, { kind: 'clientComment', document: document.title, excerpt });
     }
+    notifyLater(ctx.prisma, {
+      kind: 'MESSAGE_POSTED',
+      actorId: ctx.session.account.id,
+      recipients: isConsultant(ctx.session) ? [dossier.accountId] : 'CONSULTANTS',
+      target: { dossierId: dossier.id, documentId: document.id, commentId: comment.id },
+    });
     return comment;
   }),
 
@@ -258,6 +280,7 @@ export const documentsRouter = createTRPCRouter({
     await ctx.prisma.$transaction(async (tx) => {
       if ((await tx.documentComment.count({ where: { parentId: comment.id } })) > 0) {
         await tx.documentComment.update({ where: { id: comment.id }, data: { deletedAt: new Date(), body: '' } });
+        await forgetComment(tx as Db, comment.id);
         return;
       }
       await tx.documentComment.delete({ where: { id: comment.id } });

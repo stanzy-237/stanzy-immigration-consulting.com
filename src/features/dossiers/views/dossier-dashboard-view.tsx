@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useId, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
@@ -33,6 +34,9 @@ import { useTRPC } from '@/trpc/client';
  */
 export function DossierDashboardView({ id, invoices }: { id: string; invoices?: ReactNode }): ReactNode {
   const t = useTranslations('Dossiers.detail');
+  // A Notification's link (#92): the Document to unfold, the message to highlight.
+  const params = useSearchParams();
+  const focus = { documentId: params.get('document'), messageId: params.get('message') };
   return (
     <div className="mx-auto max-w-5xl">
       <Link
@@ -48,7 +52,7 @@ export function DossierDashboardView({ id, invoices }: { id: string; invoices?: 
       {invoices ? <div className="mt-10">{invoices}</div> : null}
       <div className="mt-10">
         <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
-          <DossierDocuments dossierId={id} viewer="consultant" />
+          <DossierDocuments dossierId={id} viewer="consultant" focus={focus} />
         </QueryBoundary>
       </div>
     </div>
@@ -134,7 +138,9 @@ function DossierDetail({ id }: { id: string }): ReactNode {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm lg:col-span-2">
-          <StageStepper service={dossier.service} stage={dossier.stage} startStage={dossier.startStage} />
+          <div id="etapes" className="scroll-mt-20">
+            <StageStepper service={dossier.service} stage={dossier.stage} startStage={dossier.startStage} />
+          </div>
 
           {open ? (
             <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-off-white pt-5">

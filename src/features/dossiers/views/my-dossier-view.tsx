@@ -3,6 +3,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
@@ -20,6 +21,9 @@ import { useTRPC } from '@/trpc/client';
  */
 export function MyDossierView({ id, invoices }: { id: string; invoices?: ReactNode }): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
+  // A Notification's link (#92): the Document to unfold, the message to highlight.
+  const params = useSearchParams();
+  const focus = { documentId: params.get('document'), messageId: params.get('message') };
   return (
     <>
       <SiteNav />
@@ -39,7 +43,7 @@ export function MyDossierView({ id, invoices }: { id: string; invoices?: ReactNo
           </div>
           {invoices}
           <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
-            <DossierDocuments dossierId={id} viewer="client" />
+            <DossierDocuments dossierId={id} viewer="client" focus={focus} />
           </QueryBoundary>
         </div>
       </main>
@@ -66,7 +70,9 @@ function MyDossierHeader({ id }: { id: string }): ReactNode {
         </div>
         <DossierStatePill dossier={dossier} />
       </header>
-      <StageStepper service={dossier.service} stage={dossier.stage} startStage={dossier.startStage} />
+      <div id="etapes" className="scroll-mt-20">
+        <StageStepper service={dossier.service} stage={dossier.stage} startStage={dossier.startStage} />
+      </div>
       {dossier.state === 'CLOSED' ? (
         <p className="mt-4 border-t border-off-white pt-4 text-sm text-slate">
           {t('mySpace.closedOn', { date: date(dossier.closedAt ?? dossier.updatedAt) })}

@@ -13,6 +13,8 @@ const notify = vi.hoisted(() => ({
 }));
 vi.mock('@/features/invoices/server/invoice-notify', () => notify);
 vi.mock('@/features/dossiers/server/dossier-notify', () => ({ notifyClient: vi.fn(), notifyConsultants: vi.fn() }));
+const notifications = vi.hoisted(() => ({ notifyLater: vi.fn(), forgetComment: vi.fn(), notify: vi.fn() }));
+vi.mock('@/features/notifications/server/notify', () => notifications);
 
 const storage = vi.hoisted(() => ({
   objectSize: vi.fn(),
@@ -210,6 +212,10 @@ describe('writing and sending a Facture', () => {
     expect(await as(asConsultant).dashboard.send({ id: first.id })).toEqual({ number: 'STZ-2026-0002' });
     expect(notify.notifyInvoiceSent).toHaveBeenCalledWith(
       expect.objectContaining({ number: 'STZ-2026-0001', status: 'SENT' }),
+    );
+    expect(notifications.notifyLater).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ kind: 'INVOICE_SENT', recipients: ['acc_1'] }),
     );
   });
 

@@ -7,6 +7,8 @@ import { createCaller } from '@/server/trpc/root';
 
 const notify = vi.hoisted(() => ({ notifyClient: vi.fn(), notifyConsultants: vi.fn() }));
 vi.mock('@/features/dossiers/server/dossier-notify', () => notify);
+const notifications = vi.hoisted(() => ({ notifyLater: vi.fn(), forgetComment: vi.fn(), notify: vi.fn() }));
+vi.mock('@/features/notifications/server/notify', () => notifications);
 
 const storage = vi.hoisted(() => ({
   objectSize: vi.fn(),
@@ -325,6 +327,12 @@ describe('the conversation on a Document', () => {
       document: 'Relevé N2',
       excerpt: 'Je le refais.',
     });
+    expect(notifications.notifyLater).toHaveBeenCalledWith(expect.anything(), {
+      kind: 'MESSAGE_POSTED',
+      actorId: 'acc_1',
+      recipients: 'CONSULTANTS',
+      target: { dossierId: 'dos_1', documentId, commentId: answer },
+    });
   });
 
   it('lets only the author edit, and shows the edit', async () => {
@@ -345,6 +353,7 @@ describe('the conversation on a Document', () => {
 
     await expect(as(asAminata).deleteComment({ id: question })).rejects.toMatchObject({ message: 'COMMENT_NOT_YOURS' });
     await as(asConsultant).deleteComment({ id: question });
+    expect(notifications.forgetComment).toHaveBeenCalledWith(expect.anything(), question);
     expect((await commentsOf(documentId))[0]).toMatchObject({ id: question, body: '', deletedAt: expect.any(Date) });
     await expect(as(asConsultant).editComment({ id: question, body: 'Revenu' })).rejects.toMatchObject({
       code: 'NOT_FOUND',

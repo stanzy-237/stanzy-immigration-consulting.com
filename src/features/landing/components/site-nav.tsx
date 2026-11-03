@@ -27,6 +27,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
+import { NotificationBell } from '@/features/shared/components/notification-bell';
 import { withNext } from '@/features/auth/lib/safe-next-path';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -203,6 +204,7 @@ export function SiteNav(): ReactNode {
 
         <div className="hidden items-center gap-3 md:flex">
           <LocaleToggle ariaLabel={t('localeToggle')} />
+          {account && !account.isConsultant ? <NotificationBell audience="client" /> : null}
           {accountName ? (
             <AccountMenu
               name={accountName}
@@ -230,6 +232,11 @@ export function SiteNav(): ReactNode {
           )}
         </div>
 
+        {account && !account.isConsultant ? (
+          <div className="md:hidden">
+            <NotificationBell audience="client" />
+          </div>
+        ) : null}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger
             render={

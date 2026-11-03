@@ -11,6 +11,7 @@ import {
 } from '@/features/dossiers/lib/dossier-schema';
 import { isStageOf, nextStage, previousStage } from '@/features/dossiers/lib/workflow';
 import { notifyClient } from '@/features/dossiers/server/dossier-notify';
+import { notifyLater } from '@/features/notifications/server/notify';
 import { documentsRouter } from '@/features/dossiers/server/documents-router';
 import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
@@ -64,6 +65,17 @@ async function move(
     await tx.dossierEvent.create({
       data: { dossierId: dossier.id, kind, fromStage: dossier.stage, toStage: to, actorId },
     });
+  });
+}
+
+/** The Client's Notification of a stage change (#92). */
+function notifyStage(prisma: Db, actorId: string, dossier: { id: string; accountId: string }, stage: string): void {
+  notifyLater(prisma, {
+    kind: 'DOSSIER_STAGE_CHANGED',
+    actorId,
+    recipients: [dossier.accountId],
+    target: { dossierId: dossier.id },
+    params: { stage },
   });
 }
 
@@ -177,6 +189,12 @@ export const dossiersRouter = createTRPCRouter({
       });
 
       notifyClient(account, input.service, { kind: 'opened', stage: input.startStage });
+      notifyLater(ctx.prisma, {
+        kind: 'DOSSIER_OPENED',
+        actorId: ctx.session.account.id,
+        recipients: [account.id],
+        target: { dossierId: dossier.id },
+      });
       return dossier;
     }),
 
@@ -188,6 +206,7 @@ export const dossiersRouter = createTRPCRouter({
       if (!to) throw refuse('DOSSIER_LAST_STAGE');
       await move(ctx.prisma, ctx.session.account.id, dossier, to, 'ADVANCED');
       notifyClient(dossier.account, service, { kind: 'stageChanged', stage: to });
+      notifyStage(ctx.prisma, ctx.session.account.id, dossier, to);
       return { stage: to };
     }),
 
@@ -199,6 +218,7 @@ export const dossiersRouter = createTRPCRouter({
       if (!to) throw refuse('DOSSIER_FIRST_STAGE');
       await move(ctx.prisma, ctx.session.account.id, dossier, to, 'MOVED_BACK');
       notifyClient(dossier.account, service, { kind: 'stageChanged', stage: to });
+      notifyStage(ctx.prisma, ctx.session.account.id, dossier, to);
       return { stage: to };
     }),
 
@@ -227,6 +247,13 @@ export const dossiersRouter = createTRPCRouter({
         });
       });
       notifyClient(dossier.account, dossier.service, { kind: 'closed', reason: input.reason });
+      notifyLater(ctx.prisma, {
+        kind: 'DOSSIER_CLOSED',
+        actorId: ctx.session.account.id,
+        recipients: [dossier.accountId],
+        target: { dossierId: dossier.id },
+        params: { reason: input.reason },
+      });
     }),
   }),
 });

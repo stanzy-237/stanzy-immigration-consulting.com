@@ -40,7 +40,7 @@ export function DossierInvoices({
   const consultant = viewer === 'consultant';
 
   return (
-    <section aria-labelledby={`${dossierId}-invoices`} className="grid gap-4">
+    <section id="factures" aria-labelledby={`${dossierId}-invoices`} className="grid scroll-mt-20 gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h2 id={`${dossierId}-invoices`} className="font-heading text-2xl font-bold text-navy-deep">
           {t('title')}

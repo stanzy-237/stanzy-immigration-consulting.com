@@ -54,6 +54,8 @@ model Account {
   documentVersions  DocumentVersion[]
   documentComments  DocumentComment[]
   paymentProofs     PaymentProof[]
+  notifications     Notification[]     @relation("NotificationRecipient")
+  notificationsMade Notification[]     @relation("NotificationActor")
 
   @@map("account")
 }
@@ -360,22 +362,23 @@ enum DossierState {
 
 /// GLOSSARY: Dossier. A Client's case file for one service, moved through its Workflow de service.
 model Dossier {
-  id           String           @id @default(cuid())
-  accountId    String
-  account      Account          @relation(fields: [accountId], references: [id], onDelete: Restrict)
-  service      ServiceType
+  id            String           @id @default(cuid())
+  accountId     String
+  account       Account          @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  service       ServiceType
   /// The current stage's key, one of the service's stages.
-  stage        String
+  stage         String
   /// The stage it opened at; the ones before it are « Déjà fait ».
-  startStage   String
-  state        DossierState     @default(OPEN)
-  closedAt     DateTime?
-  closedReason String?
-  events       DossierEvent[]
-  sections     DossierSection[]
-  invoices     Invoice[]
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  startStage    String
+  state         DossierState     @default(OPEN)
+  closedAt      DateTime?
+  closedReason  String?
+  events        DossierEvent[]
+  sections      DossierSection[]
+  invoices      Invoice[]
+  notifications Notification[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
   @@index([accountId, createdAt])
   @@index([state, updatedAt])
@@ -434,6 +437,7 @@ model DossierDocument {
   finalVersion   DocumentVersion?  @relation("FinalVersion", fields: [finalVersionId], references: [id], onDelete: SetNull)
   versions       DocumentVersion[] @relation("Versions")
   comments       DocumentComment[]
+  notifications  Notification[]
   createdAt      DateTime          @default(now())
 
   @@index([sectionId, createdAt])
@@ -466,20 +470,21 @@ model DocumentVersion {
 
 /// A message in a Document's conversation: a comment, or a reply to one (one level deep).
 model DocumentComment {
-  id         String            @id @default(cuid())
-  documentId String
-  document   DossierDocument   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id            String            @id @default(cuid())
+  documentId    String
+  document      DossierDocument   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   /// The comment this one replies to; replies to a reply attach to its comment.
-  parentId   String?
-  parent     DocumentComment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies    DocumentComment[] @relation("Replies")
-  authorId   String
-  author     Account           @relation(fields: [authorId], references: [id], onDelete: Restrict)
-  body       String
-  editedAt   DateTime?
+  parentId      String?
+  parent        DocumentComment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       DocumentComment[] @relation("Replies")
+  notifications Notification[]
+  authorId      String
+  author        Account           @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  body          String
+  editedAt      DateTime?
   /// Deleted while it had replies: kept as « Commentaire supprimé » so the replies still make sense.
-  deletedAt  DateTime?
-  createdAt  DateTime          @default(now())
+  deletedAt     DateTime?
+  createdAt     DateTime          @default(now())
 
   @@index([documentId, createdAt])
   @@index([parentId])
@@ -503,24 +508,25 @@ enum InvoiceStatus {
 
 /// A Facture, for one Dossier. Amounts are in the currency's minor unit (XAF has none, CAD and EUR cents).
 model Invoice {
-  id           String          @id @default(cuid())
+  id            String          @id @default(cuid())
   /// STZ-<year>-<0001>, given when it is sent, so drafts never burn a number.
-  number       String?         @unique
-  dossierId    String
-  dossier      Dossier         @relation(fields: [dossierId], references: [id], onDelete: Restrict)
-  currency     InvoiceCurrency @default(XAF)
-  status       InvoiceStatus   @default(DRAFT)
-  dueDate      DateTime?
+  number        String?         @unique
+  dossierId     String
+  dossier       Dossier         @relation(fields: [dossierId], references: [id], onDelete: Restrict)
+  currency      InvoiceCurrency @default(XAF)
+  status        InvoiceStatus   @default(DRAFT)
+  dueDate       DateTime?
   /// Printed under the lines: payment instructions, a note to the Client.
-  notes        String?
-  lines        InvoiceLine[]
-  proofs       PaymentProof[]
-  sentAt       DateTime?
-  paidAt       DateTime?
-  cancelledAt  DateTime?
-  cancelReason String?
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  notes         String?
+  lines         InvoiceLine[]
+  proofs        PaymentProof[]
+  notifications Notification[]
+  sentAt        DateTime?
+  paidAt        DateTime?
+  cancelledAt   DateTime?
+  cancelReason  String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
   @@index([dossierId, createdAt])
   @@index([status, updatedAt])
@@ -566,4 +572,47 @@ model PaymentProof {
 
   @@index([invoiceId, createdAt])
   @@map("payment_proof")
+}
+
+/// What a Notification tells (#92). Its text is rendered in the reader's language, never stored.
+enum NotificationKind {
+  DOSSIER_OPENED
+  DOSSIER_STAGE_CHANGED
+  DOSSIER_CLOSED
+  DOCUMENT_ADDED
+  VERSION_UPLOADED
+  MESSAGE_POSTED
+  INVOICE_SENT
+  INVOICE_PAID
+  PROOF_RECEIVED
+}
+
+/// One line in an Account's notification center. Repeats by the same actor on the same target, while unread and within 30 minutes, raise `count` instead of adding lines.
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  recipient   Account          @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  kind        NotificationKind
+  actorId     String?
+  actor       Account?         @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  dossierId   String?
+  dossier     Dossier?         @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  /// Deleting the Document (or the message) removes the Notification.
+  documentId  String?
+  document    DossierDocument? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  commentId   String?
+  comment     DocumentComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  invoiceId   String?
+  invoice     Invoice?         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  /// What the text needs beyond the relations: a stage key, a closing reason.
+  params      Json             @default("{}")
+  count       Int              @default(1)
+  readAt      DateTime?
+  createdAt   DateTime         @default(now())
+  /// The last time it was raised: the list is sorted by it.
+  updatedAt   DateTime         @default(now())
+
+  @@index([recipientId, updatedAt])
+  @@index([recipientId, readAt])
+  @@map("notification")
 }

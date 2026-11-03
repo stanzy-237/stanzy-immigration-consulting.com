@@ -17,6 +17,7 @@ import { invoiceNumber, isAwaitingPayment } from '@/features/invoices/lib/invoic
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { invoiceFields, invoiceFor } from '@/features/invoices/server/invoice-access';
 import { notifyInvoicePaid, notifyInvoiceSent, notifyProofReceived } from '@/features/invoices/server/invoice-notify';
+import { notifyLater } from '@/features/notifications/server/notify';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 
 const byId = z.object({ id: z.string().min(1) });
@@ -110,7 +111,15 @@ export const invoicesRouter = createTRPCRouter({
         });
         return created;
       });
-      if (!isConsultant(ctx.session)) notifyProofReceived({ ...printable(invoice), status: 'PROOF_RECEIVED' });
+      if (!isConsultant(ctx.session)) {
+        notifyProofReceived({ ...printable(invoice), status: 'PROOF_RECEIVED' });
+        notifyLater(ctx.prisma, {
+          kind: 'PROOF_RECEIVED',
+          actorId: ctx.session.account.id,
+          recipients: 'CONSULTANTS',
+          target: { dossierId: invoice.dossier.id, invoiceId: invoice.id },
+        });
+      }
       return proof;
     }),
 
@@ -219,6 +228,12 @@ export const invoicesRouter = createTRPCRouter({
       });
 
       notifyInvoiceSent({ ...draft, number, sentAt, status: 'SENT' });
+      notifyLater(ctx.prisma, {
+        kind: 'INVOICE_SENT',
+        actorId: ctx.session.account.id,
+        recipients: [draft.dossier.accountId],
+        target: { dossierId: draft.dossier.id, invoiceId: draft.id },
+      });
       return { number };
     }),
 
@@ -231,6 +246,12 @@ export const invoicesRouter = createTRPCRouter({
       });
       if (count === 0) throw refuse('INVOICE_NOT_PAYABLE');
       notifyInvoicePaid({ ...printable(invoice), status: 'PAID' });
+      notifyLater(ctx.prisma, {
+        kind: 'INVOICE_PAID',
+        actorId: ctx.session.account.id,
+        recipients: [invoice.dossier.accountId],
+        target: { dossierId: invoice.dossier.id, invoiceId: invoice.id },
+      });
     }),
 
     /** Annulée with a reason, from Envoyée or Preuve reçue; a Brouillon is deleted instead. */

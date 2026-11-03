@@ -2170,5 +2170,39 @@
       "DOCUMENT_FILE_INVALID": "The file didn’t arrive properly. Try again.",
       "UNKNOWN": "The change couldn’t be saved. Try again."
     }
+  },
+  "Notifications": {
+    "metaTitle": "Notifications",
+    "title": "Notifications",
+    "bell": "Notifications",
+    "bellUnread": "Notifications: {count, plural, one {# unread} other {# unread}}",
+    "markAllRead": "Mark all as read",
+    "seeAll": "See all notifications",
+    "empty": "Nothing new yet.",
+    "emptyUnread": "All caught up.",
+    "loading": "Loading notifications",
+    "loadMore": "Load more",
+    "loadingMore": "Loading…",
+    "filtersLabel": "Filter notifications",
+    "filters": {
+      "ALL": "All",
+      "UNREAD": "Unread ({count})"
+    },
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "unread": "unread",
+    "someone": "Someone",
+    "reason": "Reason: {reason}",
+    "kinds": {
+      "DOSSIER_OPENED": "Your {service} file is open.",
+      "DOSSIER_STAGE_CHANGED": "Your {service} file moved to “{stage}”.",
+      "DOSSIER_CLOSED": "Your {service} file was closed.",
+      "DOCUMENT_ADDED": "{actor} added {count, plural, one {the document “{document}”} other {# documents}}.",
+      "VERSION_UPLOADED": "{actor} uploaded {count, plural, one {a new version} other {# new versions}} of “{document}”.",
+      "MESSAGE_POSTED": "{actor} wrote {count, plural, one {on} other {# messages on}} “{document}”.",
+      "INVOICE_SENT": "New invoice {number}: {total}.",
+      "INVOICE_PAID": "Payment received for invoice {number}. Thank you!",
+      "PROOF_RECEIVED": "{actor} sent a proof of payment for invoice {number}."
+    }
   }
 }

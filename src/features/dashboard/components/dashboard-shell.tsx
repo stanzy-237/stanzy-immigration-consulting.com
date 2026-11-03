@@ -9,6 +9,7 @@ import { useState, type ReactNode } from 'react';
 
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { DASHBOARD_SECTIONS, isSectionActive } from '@/features/dashboard/data/sections';
+import { NotificationBell } from '@/features/shared/components/notification-bell';
 
 function SectionLinks({ onNavigate }: { onNavigate?: () => void }): ReactNode {
   const t = useTranslations('Dashboard.nav');
@@ -83,13 +84,16 @@ export function DashboardShell({
             </button>
             <p className="font-heading text-base font-bold text-navy-deep">{t('greeting', { name })}</p>
           </div>
-          <a
-            href={siteUrl}
-            className="inline-flex items-center gap-1.5 rounded-full border-2 border-fog-light px-3.5 py-1.5 text-sm font-semibold text-navy-deep hover:border-navy-deep"
-          >
-            {t('viewSite')}
-            <ExternalLink aria-hidden={true} className="size-3.5" />
-          </a>
+          <div className="flex items-center gap-2">
+            <NotificationBell audience="consultant" />
+            <a
+              href={siteUrl}
+              className="inline-flex items-center gap-1.5 rounded-full border-2 border-fog-light px-3.5 py-1.5 text-sm font-semibold text-navy-deep hover:border-navy-deep"
+            >
+              {t('viewSite')}
+              <ExternalLink aria-hidden={true} className="size-3.5" />
+            </a>
+          </div>
         </header>
         <main className="flex-1 px-4 py-6 sm:px-7 sm:py-8">{children}</main>
       </div>

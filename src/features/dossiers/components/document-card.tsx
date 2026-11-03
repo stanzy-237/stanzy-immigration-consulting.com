@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from '@/components/ui/toast';
 import { DocumentConversation } from '@/features/dossiers/components/document-conversation';
+import { useDocumentFocus } from '@/features/dossiers/components/document-focus';
 import { smallButton, type DocumentData, type Viewer } from '@/features/dossiers/components/document-styles';
 import { useDocumentsMutation } from '@/features/dossiers/hooks/use-documents-mutation';
 import { DOCUMENT_FILE_TYPES } from '@/features/dossiers/lib/document-schema';
@@ -49,7 +50,9 @@ export function DocumentCard({
   const t = useTranslations('Dossiers.documents');
   const format = useFormatter();
   const ids = useId();
-  const [expanded, setExpanded] = useState(false);
+  const focus = useDocumentFocus();
+  // Opened by a link to this Document (#92).
+  const [expanded, setExpanded] = useState(focus.documentId === document.id);
   const [deleting, setDeleting] = useState(false);
   const consultant = viewer === 'consultant';
   // Just added: it has no server id until the refetch, so nothing can be done with it yet.
