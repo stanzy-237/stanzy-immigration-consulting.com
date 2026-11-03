@@ -61,6 +61,19 @@ A User whom the consultant is onboarding — typically after they booked a consu
 **Consultation**:
 A paid, booked appointment between a User and the consultant, and the primary funnel into becoming a Client. Booked through an embedded external scheduler (Cal.com) in v1.
 
+**Réunion** (Meeting):
+A video meeting the consultant schedules from a Dossier, held in the app, between the Client and the consultant only. Recorded unless the consultant turns it off, after everyone accepted it.
+_Avoid_: "Consultation" (a paid appointment a prospect books on Cal.com).
+
+**Enregistrement** (Recording):
+The video of a Réunion, kept with the Dossier for the consultant only, until 2 years after the Dossier is closed.
+
+**Transcription**:
+The searchable text of a recorded Réunion, kept with its Enregistrement, for the consultant only.
+
+**Messages du dossier** (Dossier messages):
+The general conversation of a Dossier between its Client and the consultant, apart from each Document's conversation: messages with replies (one level), files attached.
+
 **Client**:
 A Lead with at least one open Dossier: their Demande d'intérêt for Accompagnement was approved, or the consultant sent the invoice for a Services documentaires order. A Client follows their Dossiers in « Mon espace ».
 _Avoid_: "customer" in product-facing French; use Client.
@@ -102,7 +115,7 @@ The case file for a Client's engagement — what the consultant tracks and works
 One upload box of the IRCC portal within a Dossier (« Diplômes – Requérant principal », « Preuve de fonds »…). It holds several Documents and produces exactly one Fichier de soumission.
 
 **Document** (in a Dossier):
-One piece inside a Section IRCC (a diplôme, a relevé de notes, a rapport WES…), generated from the Checklist logic or added by the Client or the consultant. Has Versions and one comment thread. **Manquant** when the Client doesn't have it yet.
+One piece inside a Section IRCC (a diplôme, a relevé de notes, a rapport WES…), generated from the Checklist logic or added by the Client or the consultant. Has Versions and one conversation (« Échanges »): messages between the Client and the consultant, each with its replies, one level deep. **Manquant** when the Client doesn't have it yet.
 _Avoid_: "file" (a Document has several Versions).
 
 **Version**:
@@ -114,6 +127,10 @@ The single PDF of a Section IRCC that is uploaded to the IRCC portal, built with
 
 **Outils PDF** (PDF tools):
 The consultant's iLovePDF-style tool in the Tableau de bord: merge, reorder, rotate and delete pages, turn photos into PDF, compress to 4 Mo. Runs in the browser, on a Section IRCC or on local files.
+
+**Notification**:
+One line in an Account's notification center (the bell in « Mon espace » or the Tableau de bord) telling them something happened that concerns them: a message, a Version, a stage, a Facture, a reminder, a new Tirage. It opens the exact item and is **non lue** until then. Several of the same kind, by the same person, on the same Document within 30 minutes are one Notification. Never for the Account's own action. Some also go out by email, and to the phone as a general push when the Account turned that on.
+_Avoid_: "alert" (an Alerte tirage is one kind of Notification), "message" (a message is what someone writes in a Document's conversation).
 
 **Parcours** (Journey / Timeline):
 A User's own, self-logged journal of immigration milestones — each a dated **Étape** with a label, a short code, an optional note and a colour. The User adds, edits and deletes entries freely; it is not a fixed pipeline with mandatory stages. Has a clean, branded, **screenshot-ready** view ("Voir la timeline" / "Partager", headed "Mon Parcours Entrée Express") that users capture and share (e.g. on WhatsApp) — not a public server-hosted link. This is what the "timeline" tool is — NOT IRCC's published processing times.
@@ -153,6 +170,20 @@ The ordered set of stages the consultant moves a Dossier through by hand for a g
 **Facture** (Invoice):
 A bill the consultant writes in the Tableau de bord for a Dossier, in a currency of its own (XAF by default), sent by email as a PDF: Brouillon → Envoyée → Preuve reçue → Payée (or En retard, Annulée). A Dossier can have several.
 Accompagnement, Vérification and Services documentaires have no Devis: the quoted amount goes straight on the Facture.
+
+**Contrat** (Service contract):
+The service agreement for a Dossier, made from its service's template (French or English), numbered CTR-<year>-<0001> when sent, carrying the consultant's signature and the company stamp, and signed online by the Client (the Account holding the Dossier) in « Mon espace ». Locked once signed.
+
+**Avenant** (Amendment):
+A change to a signed Contrat, signed the same way and numbered after it (CTR-2026-0001-A1). A signed Contrat itself never changes.
+
+**Recette** (Income):
+Money the practice received, in the consultant's Finances: a Facture marked Payée (added by itself) or an entry made by hand.
+_Avoid_: "Dépense" (that is a Client's budget entry).
+
+**Charge** (Business expense):
+Money the practice spent, in the consultant's Finances: amount, currency, category, optional receipt, optionally linked to a Dossier, possibly repeating every month.
+_Avoid_: "Dépense" (that is a Client's budget entry in their Estimation de budget).
 
 **Demande d'intérêt** (Expression of interest):
 The IRCC-style form a signed-in User fills to ask for Accompagnement: their profile, a « Je l'ai / Je ne l'ai pas / Pas sûr / Stanzy s'en charge » answer and a note per document area. Submitting it makes them a Lead; the consultant approves or rejects it.
