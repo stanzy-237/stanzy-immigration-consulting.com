@@ -47,7 +47,9 @@ function fakeDatabase() {
         Object.assign(row, rest, { count: (row.count as number) + count.increment });
       },
       async create({ data }: { data: Record<string, unknown> }) {
-        rows.push({ readAt: null, count: 1, documentId: undefined, dossierId: undefined, ...data, id: `n_${++seq}` });
+        const row = { readAt: null, count: 1, documentId: undefined, dossierId: undefined, ...data, id: `n_${++seq}` };
+        rows.push(row);
+        return row;
       },
     },
   };

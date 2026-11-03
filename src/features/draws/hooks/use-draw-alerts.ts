@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { toast } from '@/components/ui/toast';
 import { toLocale } from '@/i18n/routing';
+import { canPush, isIos, isStandalone, registration, subscribeDevice } from '@/lib/web-push-client';
 import { useTRPC } from '@/trpc/client';
 
 /**
@@ -18,20 +19,6 @@ import { useTRPC } from '@/trpc/client';
  * - `off` / `on`: ready to subscribe / subscribed.
  */
 export type DrawAlertsStatus = 'hidden' | 'checking' | 'unsupported' | 'needs-install' | 'denied' | 'off' | 'on';
-
-/** The VAPID public key, base64url, as the bytes `pushManager.subscribe` wants. */
-function keyBytes(base64url: string): Uint8Array<ArrayBuffer> {
-  const base64 = base64url.replaceAll('-', '+').replaceAll('_', '/').padEnd(Math.ceil(base64url.length / 4) * 4, '=');
-  return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-}
-
-/** iPadOS Safari reports a Mac browser; a Mac with a touch screen is an iPad. */
-const isIos = () =>
-  /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
-const isStandalone = () =>
-  (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches) ||
-  (navigator as Navigator & { standalone?: boolean }).standalone === true;
-const canPush = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 
 type SubscriptionJson = { endpoint: string; keys: { p256dh: string; auth: string } };
 
@@ -56,21 +43,6 @@ function setOptedOut(off: boolean): void {
   } catch {
     // Storage unavailable (private mode): the choice lasts for this visit only.
   }
-}
-
-/** This page's service worker registration, registering `/sw.js` when asked to. */
-async function registration(register: boolean): Promise<ServiceWorkerRegistration | undefined> {
-  const existing = await navigator.serviceWorker.getRegistration();
-  if (existing || !register) return existing;
-  await navigator.serviceWorker.register('/sw.js');
-  return navigator.serviceWorker.ready;
-}
-
-/** A new push subscription for this device. Needs notification permission. */
-async function subscribeDevice(publicKey: string): Promise<PushSubscription> {
-  const reg = await registration(true);
-  if (!reg) throw new Error('No service worker');
-  return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) });
 }
 
 export function useDrawAlerts() {

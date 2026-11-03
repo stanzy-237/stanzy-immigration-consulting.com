@@ -8,6 +8,7 @@ import {
   FilePlus,
   FolderOpen,
   Lock,
+  Megaphone,
   MessageSquare,
   ReceiptText,
   Upload,
@@ -40,6 +41,7 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   INVOICE_OVERDUE: AlarmClock,
   INVOICE_LATE: AlarmClock,
   ACCOUNTS_SIGNED_UP: UserPlus,
+  DRAW_PUBLISHED: Megaphone,
 };
 
 /**

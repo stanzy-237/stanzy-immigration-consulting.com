@@ -1,6 +1,7 @@
 import type { NotificationKind, Prisma } from '@prisma/client';
 import { after } from 'next/server';
 
+import { pushNotification } from '@/features/notifications/server/push-notifications';
 import type { TRPCContext } from '@/server/trpc/context';
 
 type Db = TRPCContext['prisma'];
@@ -63,12 +64,30 @@ export async function notify(db: Db, event: NotificationEvent, now = new Date())
           where: { id: existing.id },
           data: { ...event.target, params, count: { increment: 1 }, updatedAt: now },
         });
+        await pushTo(existing.id, recipientId);
         continue;
       }
     }
-    await db.notification.create({
+    const created = await db.notification.create({
       data: { recipientId, kind: event.kind, actorId: event.actorId, ...event.target, params, updatedAt: now },
+      select: { id: true },
     });
+    await pushTo(created.id, recipientId);
+  }
+
+  async function pushTo(id: string, recipientId: string): Promise<void> {
+    try {
+      await pushNotification(db, {
+        id,
+        kind: event.kind,
+        recipientId,
+        // Every consultant-bound event goes to 'CONSULTANTS'; ids name Clients.
+        audience: event.recipients === 'CONSULTANTS' ? 'consultant' : 'client',
+        target: event.target,
+      });
+    } catch (error) {
+      console.error('[notifications] could not push', event.kind, error);
+    }
   }
 }
 

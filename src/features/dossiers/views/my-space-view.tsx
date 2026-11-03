@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
+import { PushBanner } from '@/features/shared/components/push-banner';
 import { Link } from '@/i18n/navigation';
 import { useTRPC } from '@/trpc/client';
 
@@ -63,38 +64,43 @@ function MyDossiers(): ReactNode {
   }
 
   return (
-    <ul className="grid gap-5">
-      {dossiers.map((dossier) => (
-        <li key={dossier.id}>
-          <article className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
-            <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h2 className="font-heading text-xl font-bold text-navy-deep">{t(`services.${dossier.service}`)}</h2>
-                <p className="mt-0.5 text-sm text-slate">{t('mySpace.openedOn', { date: date(dossier.createdAt) })}</p>
-              </div>
-              <DossierStatePill dossier={dossier} />
-            </header>
-            <StageStepper service={dossier.service} stage={dossier.stage} startStage={dossier.startStage} />
-            {dossier.state === 'CLOSED' ? (
-              <p className="mt-4 border-t border-off-white pt-4 text-sm text-slate">
-                {t('mySpace.closedOn', {
-                  date: date(dossier.closedAt ?? dossier.updatedAt),
-                })}
-                {dossier.closedReason ? ` · ${t('mySpace.closedReason', { reason: dossier.closedReason })}` : null}
-              </p>
-            ) : null}
-            <Link
-              href={`/mon-espace/dossiers/${dossier.id}`}
-              className="mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-navy-deep px-5 text-sm font-semibold text-white hover:bg-navy-80"
-            >
-              {t('mySpace.openDossier')}
-              <ArrowRight aria-hidden={true} className="size-4" />
-              <span className="sr-only">{t(`services.${dossier.service}`)}</span>
-            </Link>
-          </article>
-        </li>
-      ))}
-    </ul>
+    <>
+      <PushBanner />
+      <ul className="grid gap-5">
+        {dossiers.map((dossier) => (
+          <li key={dossier.id}>
+            <article className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
+              <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-heading text-xl font-bold text-navy-deep">{t(`services.${dossier.service}`)}</h2>
+                  <p className="mt-0.5 text-sm text-slate">
+                    {t('mySpace.openedOn', { date: date(dossier.createdAt) })}
+                  </p>
+                </div>
+                <DossierStatePill dossier={dossier} />
+              </header>
+              <StageStepper service={dossier.service} stage={dossier.stage} startStage={dossier.startStage} />
+              {dossier.state === 'CLOSED' ? (
+                <p className="mt-4 border-t border-off-white pt-4 text-sm text-slate">
+                  {t('mySpace.closedOn', {
+                    date: date(dossier.closedAt ?? dossier.updatedAt),
+                  })}
+                  {dossier.closedReason ? ` · ${t('mySpace.closedReason', { reason: dossier.closedReason })}` : null}
+                </p>
+              ) : null}
+              <Link
+                href={`/mon-espace/dossiers/${dossier.id}`}
+                className="mt-4 inline-flex h-11 items-center gap-2 rounded-full bg-navy-deep px-5 text-sm font-semibold text-white hover:bg-navy-80"
+              >
+                {t('mySpace.openDossier')}
+                <ArrowRight aria-hidden={true} className="size-4" />
+                <span className="sr-only">{t(`services.${dossier.service}`)}</span>
+              </Link>
+            </article>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

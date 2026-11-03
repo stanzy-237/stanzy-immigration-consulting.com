@@ -7,6 +7,7 @@ import { useState, useTransition, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PushSwitch } from '@/features/notifications/components/push-switch';
 import { NotificationItem } from '@/features/shared/components/notification-item';
 import { useMarkRead, useUnreadCount } from '@/features/notifications/hooks/use-notifications';
 import type { Audience, NotificationItem as Item } from '@/features/notifications/lib/notification-links';
@@ -43,6 +44,8 @@ export function NotificationsView({ audience }: { audience: Audience }): ReactNo
           {t('markAllRead')}
         </button>
       </div>
+
+      <PushSwitch />
 
       <div role="group" aria-label={t('filtersLabel')} className="mb-5 flex gap-2">
         {NOTIFICATION_FILTERS.map((value) => (

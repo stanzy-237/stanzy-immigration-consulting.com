@@ -11,10 +11,20 @@ export type Audience = 'client' | 'consultant';
  * lands on the stepper (`#etapes`); a Facture on its panel or page.
  * `locale` prefixes the Client's paths; the dashboard's are short.
  */
-export function notificationHref(item: NotificationItem, audience: Audience, locale: string): string {
+/** What a link needs: the kind and the ids it points to (a listed Notification, or one just raised). */
+export type LinkTarget = Pick<NotificationItem, 'kind'> & {
+  dossier?: { id: string } | null;
+  document?: { id: string } | null;
+  comment?: { id: string } | null;
+  invoice?: { id: string } | null;
+};
+
+export function notificationHref(item: LinkTarget, audience: Audience, locale: string): string {
   const base = audience === 'client' ? `/${locale}/mon-espace` : '';
   const all = audience === 'client' ? `${base}/notifications` : '/notifications';
   if (item.kind === 'ACCOUNTS_SIGNED_UP') return '/comptes';
+  // The site's page, with its language: from admin.<site> it redirects to the site.
+  if (item.kind === 'DRAW_PUBLISHED') return `/${locale}/outils/dernier-tirage`;
   if (!item.dossier) return all;
   const dossier = `${base}/dossiers/${item.dossier.id}`;
 
