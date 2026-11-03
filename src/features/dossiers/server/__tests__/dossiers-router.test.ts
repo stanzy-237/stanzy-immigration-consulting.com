@@ -7,6 +7,8 @@ import { createCaller } from '@/server/trpc/root';
 
 const notifyClient = vi.hoisted(() => vi.fn());
 vi.mock('@/features/dossiers/server/dossier-notify', () => ({ notifyClient, notifyConsultants: vi.fn() }));
+const notifications = vi.hoisted(() => ({ notifyLater: vi.fn(), forgetComment: vi.fn(), notify: vi.fn() }));
+vi.mock('@/features/notifications/server/notify', () => notifications);
 
 /**
  * Seam: the `dossiers` tRPC router through a server-side caller, over an
@@ -173,7 +175,10 @@ function callerAs(db: ReturnType<typeof fakeDatabase>, session: CurrentSession |
   return createCaller({ prisma: db.prisma, headers: new Headers(), session });
 }
 
-beforeEach(() => notifyClient.mockClear());
+beforeEach(() => {
+  notifyClient.mockClear();
+  notifications.notifyLater.mockClear();
+});
 
 describe('opening a Dossier', () => {
   it('opens at the chosen stage, makes a User a Client and emails them', async () => {
@@ -187,6 +192,12 @@ describe('opening a Dossier', () => {
     expect(db.dossiers).toMatchObject([{ id, stage: 'profil-ee', startStage: 'profil-ee', state: 'OPEN' }]);
     expect(db.events).toMatchObject([{ kind: 'OPENED', toStage: 'profil-ee', actorId: CONSULTANT.id }]);
     expect(db.accounts.find((a) => a.id === 'acc_1')!.status).toBe('CLIENT');
+    expect(notifications.notifyLater).toHaveBeenCalledWith(expect.anything(), {
+      kind: 'DOSSIER_OPENED',
+      actorId: 'acc_stanzy',
+      recipients: ['acc_1'],
+      target: { dossierId: expect.any(String) },
+    });
     expect(notifyClient).toHaveBeenCalledWith(
       expect.objectContaining({ email: 'aminata@example.com' }),
       'ACCOMPAGNEMENT',
@@ -250,6 +261,10 @@ describe('moving a Dossier', () => {
     expect(db.dossiers[0]!.stage).toBe('compte');
     expect(db.events.at(-1)).toMatchObject({ kind: 'ADVANCED', fromStage: 'verification', toStage: 'compte' });
     expect(notifyClient).toHaveBeenCalledWith(expect.anything(), 'EDE', { kind: 'stageChanged', stage: 'compte' });
+    expect(notifications.notifyLater).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ kind: 'DOSSIER_STAGE_CHANGED', recipients: ['acc_1'], params: { stage: 'compte' } }),
+    );
   });
 
   it('refuses a move from a stage the Dossier has already left', async () => {

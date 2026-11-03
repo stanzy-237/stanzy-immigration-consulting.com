@@ -3,7 +3,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { CornerDownRight, Pencil, Reply, Trash2 } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useId, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 
 import {
   AlertDialog,
@@ -14,6 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useDocumentFocus } from '@/features/dossiers/components/document-focus';
 import { smallButton, type DocumentData } from '@/features/dossiers/components/document-styles';
 import { useDocumentsMutation } from '@/features/dossiers/hooks/use-documents-mutation';
 import { COMMENT_MAX, commentInput } from '@/features/dossiers/lib/document-schema';
@@ -188,6 +189,12 @@ function Message({
 
   const mine = comment.author.id === viewer.id;
   const pending = isOptimistic(comment);
+  // The message a link pointed to (#92): brought into view and outlined.
+  const focused = useDocumentFocus().messageId === comment.id;
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (focused) ref.current?.scrollIntoView({ block: 'center' });
+  }, [focused]);
   const canAct = open && !pending && !comment.deletedAt;
   const isReply = comment.parentId !== null;
 
@@ -201,8 +208,11 @@ function Message({
 
   return (
     <article
+      ref={ref}
+      id={`message-${comment.id}`}
       aria-busy={pending}
-      className={mine ? 'rounded-xl bg-ice-blue px-3 py-2' : 'rounded-xl bg-off-white px-3 py-2'}
+      aria-current={focused ? 'true' : undefined}
+      className={`rounded-xl px-3 py-2 ${mine ? 'bg-ice-blue' : 'bg-off-white'} ${focused ? 'ring-2 ring-rouge' : ''}`}
     >
       <header className="flex flex-wrap items-center gap-x-2 text-xs text-slate">
         {isReply ? <CornerDownRight aria-hidden={true} className="size-3" /> : null}

@@ -18,6 +18,10 @@ vi.mock('@/i18n/navigation', async (importOriginal) => ({
 vi.mock('@/features/auth/lib/auth-client', () => ({
   authClient: { useSession: vi.fn(), signOut: vi.fn() },
 }));
+// The bell has its own tests (notification-bell.test.tsx); here, only where it shows.
+vi.mock('@/features/shared/components/notification-bell', () => ({
+  NotificationBell: ({ audience }: { audience: string }) => <span data-testid={`bell-${audience}`} />,
+}));
 
 const useSession = vi.mocked(authClient.useSession);
 
@@ -242,6 +246,17 @@ describe('SiteNav', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Mon compte : Aminata Diallo' }));
       await screen.findByRole('menuitem', { name: 'Déconnexion' });
       expect(screen.queryByRole('menuitem', { name: 'Tableau de bord' })).toBeNull();
+    });
+
+    it('shows the notification bell to a signed-in Client, not to the consultant', () => {
+      signedInAs('Aminata Diallo');
+      const { unmount } = render(withIntl(<SiteNav />));
+      expect(screen.getAllByTestId('bell-client').length).toBeGreaterThan(0);
+      unmount();
+
+      signedInAs('Stanzy', 'CONSULTANT');
+      render(withIntl(<SiteNav />));
+      expect(screen.queryByTestId('bell-client')).toBeNull();
     });
 
     it('has no axe violations', async () => {

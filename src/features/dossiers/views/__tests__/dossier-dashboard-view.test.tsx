@@ -14,7 +14,7 @@ import { createTestTRPC } from '@/trpc/__tests__/test-utils';
  * it; stubs answer and record what the page sends.
  */
 const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }));
-vi.mock('next/navigation', () => ({ useRouter: () => router }));
+vi.mock('next/navigation', () => ({ useRouter: () => router, useSearchParams: () => new URLSearchParams() }));
 
 const at = (stage: string, extra: Record<string, unknown> = {}) => ({
   id: 'dos_1',

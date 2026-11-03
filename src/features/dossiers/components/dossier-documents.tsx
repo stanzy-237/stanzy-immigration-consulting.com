@@ -7,6 +7,7 @@ import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { DocumentCard } from '@/features/dossiers/components/document-card';
+import { DocumentFocusContext, type DocumentFocus } from '@/features/dossiers/components/document-focus';
 import {
   fieldClass,
   smallButton,
@@ -31,48 +32,59 @@ import { useTRPC } from '@/trpc/client';
  * upload Versions and comment; the consultant also shapes the Sections and
  * picks the Finales.
  */
-export function DossierDocuments({ dossierId, viewer }: { dossierId: string; viewer: Viewer }): ReactNode {
+export function DossierDocuments({
+  dossierId,
+  viewer,
+  focus = { documentId: null, messageId: null },
+}: {
+  dossierId: string;
+  viewer: Viewer;
+  /** What a link asked to show (#92). */
+  focus?: DocumentFocus;
+}): ReactNode {
   const t = useTranslations('Dossiers.documents');
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.dossiers.documents.sections.queryOptions({ dossierId }));
   const consultant = viewer === 'consultant';
 
   return (
-    <section aria-labelledby={`${dossierId}-documents`} className="grid gap-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 id={`${dossierId}-documents`} className="font-heading text-2xl font-bold text-navy-deep">
-            {t('title')}
-          </h2>
-          <p className="mt-1 text-sm text-slate">{consultant ? t('introConsultant') : t('introClient')}</p>
+    <DocumentFocusContext.Provider value={focus}>
+      <section id="documents" aria-labelledby={`${dossierId}-documents`} className="grid scroll-mt-20 gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 id={`${dossierId}-documents`} className="font-heading text-2xl font-bold text-navy-deep">
+              {t('title')}
+            </h2>
+            <p className="mt-1 text-sm text-slate">{consultant ? t('introConsultant') : t('introClient')}</p>
+          </div>
         </div>
-      </div>
 
-      {data.locked ? <p className="rounded-xl bg-ice-blue px-4 py-3 text-sm text-navy-deep">{t('locked')}</p> : null}
+        {data.locked ? <p className="rounded-xl bg-ice-blue px-4 py-3 text-sm text-navy-deep">{t('locked')}</p> : null}
 
-      {data.sections.length === 0 ? (
-        <p className="rounded-2xl border-2 border-dashed border-fog-light bg-white px-6 py-8 text-center text-sm text-slate">
-          {consultant ? t('emptyConsultant') : t('emptyClient')}
-        </p>
-      ) : (
-        <ul className="grid gap-4">
-          {data.sections.map((section) => (
-            <li key={section.id}>
-              <SectionCard
-                dossierId={dossierId}
-                section={section}
-                viewer={viewer}
-                me={data.viewer}
-                open={data.open}
-                locked={data.locked}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+        {data.sections.length === 0 ? (
+          <p className="rounded-2xl border-2 border-dashed border-fog-light bg-white px-6 py-8 text-center text-sm text-slate">
+            {consultant ? t('emptyConsultant') : t('emptyClient')}
+          </p>
+        ) : (
+          <ul className="grid gap-4">
+            {data.sections.map((section) => (
+              <li key={section.id}>
+                <SectionCard
+                  dossierId={dossierId}
+                  section={section}
+                  viewer={viewer}
+                  me={data.viewer}
+                  open={data.open}
+                  locked={data.locked}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
 
-      {consultant && data.open ? <AddSection dossierId={dossierId} /> : null}
-    </section>
+        {consultant && data.open ? <AddSection dossierId={dossierId} /> : null}
+      </section>{' '}
+    </DocumentFocusContext.Provider>
   );
 }
 

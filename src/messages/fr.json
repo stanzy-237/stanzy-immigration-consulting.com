@@ -2187,5 +2187,39 @@
       "DOCUMENT_FILE_INVALID": "Le fichier n’a pas été reçu correctement. Réessayez.",
       "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez."
     }
+  },
+  "Notifications": {
+    "metaTitle": "Notifications",
+    "title": "Notifications",
+    "bell": "Notifications",
+    "bellUnread": "Notifications : {count, plural, one {# non lue} other {# non lues}}",
+    "markAllRead": "Tout marquer comme lu",
+    "seeAll": "Voir toutes les notifications",
+    "empty": "Rien de nouveau pour l’instant.",
+    "emptyUnread": "Tout est lu.",
+    "loading": "Chargement des notifications",
+    "loadMore": "Charger plus",
+    "loadingMore": "Chargement…",
+    "filtersLabel": "Filtrer les notifications",
+    "filters": {
+      "ALL": "Toutes",
+      "UNREAD": "Non lues ({count})"
+    },
+    "today": "Aujourd’hui",
+    "yesterday": "Hier",
+    "unread": "non lue",
+    "someone": "Quelqu’un",
+    "reason": "Motif : {reason}",
+    "kinds": {
+      "DOSSIER_OPENED": "Votre dossier {service} est ouvert.",
+      "DOSSIER_STAGE_CHANGED": "Votre dossier {service} est passé à « {stage} ».",
+      "DOSSIER_CLOSED": "Votre dossier {service} a été clôturé.",
+      "DOCUMENT_ADDED": "{actor} a ajouté {count, plural, one {le document « {document} »} other {# documents}}.",
+      "VERSION_UPLOADED": "{actor} a téléversé {count, plural, one {une nouvelle version} other {# nouvelles versions}} de « {document} ».",
+      "MESSAGE_POSTED": "{actor} a écrit {count, plural, one {sur} other {# messages sur}} « {document} ».",
+      "INVOICE_SENT": "Nouvelle facture {number} : {total}.",
+      "INVOICE_PAID": "Paiement reçu pour la facture {number}. Merci !",
+      "PROOF_RECEIVED": "{actor} a envoyé une preuve de paiement pour la facture {number}."
+    }
   }
 }

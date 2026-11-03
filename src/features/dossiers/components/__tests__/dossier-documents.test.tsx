@@ -92,7 +92,11 @@ beforeEach(() => vi.resetAllMocks());
 /** A server that hasn't answered yet: what the screen shows meanwhile. */
 const silent = () => new Promise(() => {});
 
-function documents(viewer: Viewer, data = sections({ viewer: viewer === 'consultant' ? STANZY : CLIENT })) {
+function documents(
+  viewer: Viewer,
+  data = sections({ viewer: viewer === 'consultant' ? STANZY : CLIENT }),
+  focus?: { documentId: string | null; messageId: string | null },
+) {
   const { trpc, queryClient, wrap } = createTestTRPC({
     'dossiers.documents.sections': () => data,
     'dossiers.documents.addDocument': (input) => api.addDocument(input) ?? { id: 'doc_9' },
@@ -104,7 +108,7 @@ function documents(viewer: Viewer, data = sections({ viewer: viewer === 'consult
     'dossiers.documents.deleteComment': (input) => api.deleteComment(input),
   });
   queryClient.setQueryData(trpc.dossiers.documents.sections.queryKey({ dossierId: 'dos_1' }), data as never);
-  return render(withIntl(wrap(<DossierDocuments dossierId="dos_1" viewer={viewer} />)));
+  return render(withIntl(wrap(<DossierDocuments dossierId="dos_1" viewer={viewer} focus={focus} />)));
 }
 
 const openDocument = () => fireEvent.click(screen.getByRole('button', { name: /^Relevé N2/ }));
@@ -276,5 +280,18 @@ describe('DossierDocuments for the consultant', () => {
     documents('consultant', sections({ open: false }));
     expect(screen.queryByText('Nouvelle section')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Ajouter un document')).not.toBeInTheDocument();
+  });
+});
+
+describe('DossierDocuments from a Notification’s link', () => {
+  it('opens the Document and brings the message into view, outlined', () => {
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    documents('consultant', undefined, { documentId: 'doc_1', messageId: 'com_2' });
+
+    expect(screen.getByRole('button', { name: /^Relevé N2/ })).toHaveAttribute('aria-expanded', 'true');
+    expect(messageWith('Je le refais ce soir.')).toHaveAttribute('aria-current', 'true');
+    expect(messageWith('Le scan est flou.')).not.toHaveAttribute('aria-current');
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'center' });
   });
 });
