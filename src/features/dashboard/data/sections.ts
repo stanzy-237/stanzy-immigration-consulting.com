@@ -13,14 +13,20 @@ export type DashboardSection = {
   /** The first route segment below the dashboard it owns; null for the Aperçu. */
   segment: string | null;
   icon: LucideIcon;
+  /** The sidebar group it sits in; its label is `Dashboard.nav.groups.<group>`. */
+  group: DashboardGroup;
 };
 
+/** The sidebar's groups, in order. */
+export const DASHBOARD_GROUPS = ['general', 'clients', 'billing', 'content'] as const;
+export type DashboardGroup = (typeof DASHBOARD_GROUPS)[number];
+
 export const DASHBOARD_SECTIONS: readonly DashboardSection[] = [
-  { key: 'overview', href: '/', segment: null, icon: LayoutDashboard },
-  { key: 'dossiers', href: '/dossiers', segment: 'dossiers', icon: FolderKanban },
-  { key: 'comptes', href: '/comptes', segment: 'comptes', icon: Users },
-  { key: 'factures', href: '/factures', segment: 'factures', icon: ReceiptText },
-  { key: 'blog', href: '/blog', segment: 'blog', icon: Newspaper },
+  { key: 'overview', href: '/', segment: null, icon: LayoutDashboard, group: 'general' },
+  { key: 'dossiers', href: '/dossiers', segment: 'dossiers', icon: FolderKanban, group: 'clients' },
+  { key: 'comptes', href: '/comptes', segment: 'comptes', icon: Users, group: 'clients' },
+  { key: 'factures', href: '/factures', segment: 'factures', icon: ReceiptText, group: 'billing' },
+  { key: 'blog', href: '/blog', segment: 'blog', icon: Newspaper, group: 'content' },
 ];
 
 /** `segments` are the route segments below the dashboard's layout (`['blog', 'post_7']`). */
