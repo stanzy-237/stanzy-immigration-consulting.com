@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
-import { PdfWorkbench, type WorkbenchEngine } from '@/features/pdf-tools/components/pdf-workbench';
+import { PdfWorkbench, type OutputMeta, type WorkbenchEngine } from '@/features/pdf-tools/components/pdf-workbench';
 import { jpegOf, pdfSource, photoSource } from '@/features/pdf-tools/lib/__tests__/fixtures';
 import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 import { Download } from 'lucide-react';
@@ -29,7 +29,7 @@ const engine = (): WorkbenchEngine => ({
   }),
 });
 
-function workbench(run = vi.fn<(pdf: Uint8Array) => Promise<void>>(async () => {})) {
+function workbench(run = vi.fn<(pdf: Uint8Array, meta: OutputMeta) => Promise<void>>(async () => {})) {
   const used = engine();
   // The app's frame, for the toasts.
   const { wrap } = createTestTRPC({});
@@ -118,9 +118,42 @@ describe('PdfWorkbench', () => {
     expect(await screen.findByText(/Compressé à 85 %/)).toBeInTheDocument();
     expect(used.rasterize).toHaveBeenCalledOnce();
 
+    fireEvent.change(screen.getByLabelText('Nom du fichier'), { target: { value: 'Relevé N2' } });
     fireEvent.click(screen.getByRole('button', { name: 'Télécharger' }));
     await waitFor(() => expect(run).toHaveBeenCalledOnce());
-    const doc = await PDFDocument.load(run.mock.calls[0]![0]);
-    expect(doc.getPageCount()).toBe(2);
+    const [pdf, meta] = run.mock.calls[0]!;
+    expect((await PDFDocument.load(pdf)).getPageCount()).toBe(2);
+    expect(meta).toEqual({
+      name: 'Relevé N2.pdf',
+      pageCount: 2,
+      changes: ['compressed'],
+      quality: 0.85,
+      sourceNames: ['releve.pdf'],
+    });
+  });
+
+  it('says what was done, and names the file after the first one by default', async () => {
+    const { run } = workbench();
+    addFiles('releve.pdf', 'photo.jpg');
+    await waitFor(() => expect(pageNames()).toHaveLength(3));
+    fireEvent.click(screen.getByRole('button', { name: 'Retirer la page 2' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Tourner la page 1 vers la droite' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Télécharger' }));
+    await waitFor(() => expect(run).toHaveBeenCalledOnce());
+    expect(run.mock.calls[0]![1]).toMatchObject({
+      name: 'releve.pdf',
+      changes: ['merged', 'rotated', 'removed'],
+      quality: null,
+    });
+  });
+
+  it('clears the whole canvas once confirmed', async () => {
+    workbench();
+    addFiles('releve.pdf', 'photo.jpg');
+    await waitFor(() => expect(pageNames()).toHaveLength(3));
+    fireEvent.click(screen.getByRole('button', { name: 'Tout effacer' }));
+    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Tout effacer' }));
+    expect(await screen.findByText('Ajoutez des PDF ou des photos pour commencer.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Tout effacer' })).not.toBeInTheDocument();
   });
 });

@@ -56,6 +56,7 @@ model Account {
   paymentProofs     PaymentProof[]
   notifications     Notification[]     @relation("NotificationRecipient")
   notificationsMade Notification[]     @relation("NotificationActor")
+  pdfToolFiles      PdfToolFile[]
 
   @@map("account")
 }
@@ -642,4 +643,28 @@ model CronRun {
 
   @@id([job, day])
   @@map("cron_run")
+}
+
+/// A PDF the consultant downloaded from the Outils PDF, kept encrypted in R2 for 90 days (its history).
+model PdfToolFile {
+  id          String   @id @default(cuid())
+  name        String
+  pageCount   Int
+  /// The PDF's size in bytes, before encryption.
+  size        Int
+  /// What was done: merged, reordered, rotated, removed, compressed.
+  changes     String[]
+  /// The compression quality (0–1) when compressed.
+  quality     Float?
+  /// The names of the files it was made from.
+  sourceNames String[]
+  objectKey   String
+  wrappedKey  String
+  iv          String
+  createdById String
+  createdBy   Account  @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([createdById, createdAt])
+  @@map("pdf_tool_file")
 }

@@ -2303,7 +2303,7 @@
   },
   "PdfTools": {
     "title": "Outils PDF",
-    "intro": "Assemblez, réorganisez et compressez des PDF et des photos jusqu’à la limite d’IRCC (4 Mo par fichier). Tout se passe dans votre navigateur : rien n’est envoyé.",
+    "intro": "Assemblez, réorganisez et compressez des PDF et des photos jusqu’à la limite d’IRCC (4 Mo par fichier). Le travail se fait dans votre navigateur ; chaque PDF téléchargé est gardé chiffré 90 jours dans l’historique.",
     "add": "Ajouter des fichiers",
     "adding": "Lecture…",
     "addHint": "PDF, JPG, PNG, WebP ou HEIC ; ou déposez-les ici.",
@@ -2341,6 +2341,39 @@
       "over": "Au-dessus de la place {number}.",
       "end": "Page posée à la place {number}.",
       "cancel": "Déplacement annulé."
+    },
+    "clear": "Tout effacer",
+    "clearTitle": "Effacer tout le document ?",
+    "clearBody": "Les fichiers ajoutés et les pages disparaissent de l’outil. Les PDF déjà téléchargés restent dans l’historique.",
+    "clearConfirm": "Tout effacer",
+    "cancel": "Annuler",
+    "fileNameLabel": "Nom du fichier",
+    "history": {
+      "link": "Historique",
+      "title": "Historique des téléchargements",
+      "intro": "Chaque PDF téléchargé depuis l’outil, gardé chiffré {days} jours puis supprimé.",
+      "back": "Outils PDF",
+      "empty": "Aucun PDF téléchargé ces 90 derniers jours.",
+      "from": "À partir de : {names}",
+      "changes": "Ce qui a été fait",
+      "change": {
+        "merged": "Fusionné",
+        "reordered": "Réorganisé",
+        "rotated": "Pivoté",
+        "removed": "Pages retirées",
+        "compressed": "Compressé",
+        "compressedAt": "Compressé à {quality} %"
+      },
+      "openLabel": "Ouvrir {name}",
+      "downloadLabel": "Télécharger {name}",
+      "deleteLabel": "Supprimer {name}",
+      "deleteTitle": "Supprimer « {name} » de l’historique ?",
+      "deleteBody": "La copie gardée est effacée ; les fichiers déjà téléchargés sur votre appareil ne sont pas touchés.",
+      "delete": "Supprimer",
+      "deleted": "Retiré de l’historique",
+      "saved": "Ajouté à l’historique",
+      "saveFailed": "Téléchargé, mais pas gardé dans l’historique.",
+      "loading": "Chargement de l’historique"
     }
   }
 }

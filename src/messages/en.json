@@ -2286,7 +2286,7 @@
   },
   "PdfTools": {
     "title": "PDF tools",
-    "intro": "Merge, reorder and compress PDFs and photos down to IRCC’s limit (4 MB per file). It all happens in your browser: nothing is uploaded.",
+    "intro": "Merge, reorder and compress PDFs and photos down to IRCC’s limit (4 MB per file). The work happens in your browser; each PDF you download is kept encrypted for 90 days in the history.",
     "add": "Add files",
     "adding": "Reading…",
     "addHint": "PDF, JPG, PNG, WebP or HEIC; or drop them here.",
@@ -2324,6 +2324,39 @@
       "over": "Over position {number}.",
       "end": "Page dropped at position {number}.",
       "cancel": "Move cancelled."
+    },
+    "clear": "Clear all",
+    "clearTitle": "Clear the whole document?",
+    "clearBody": "The files added and their pages leave the tool. PDFs already downloaded stay in the history.",
+    "clearConfirm": "Clear all",
+    "cancel": "Cancel",
+    "fileNameLabel": "File name",
+    "history": {
+      "link": "History",
+      "title": "Download history",
+      "intro": "Each PDF downloaded from the tool, kept encrypted for {days} days, then deleted.",
+      "back": "PDF tools",
+      "empty": "No PDF downloaded these last 90 days.",
+      "from": "Made from: {names}",
+      "changes": "What was done",
+      "change": {
+        "merged": "Merged",
+        "reordered": "Reordered",
+        "rotated": "Rotated",
+        "removed": "Pages removed",
+        "compressed": "Compressed",
+        "compressedAt": "Compressed at {quality}%"
+      },
+      "openLabel": "Open {name}",
+      "downloadLabel": "Download {name}",
+      "deleteLabel": "Delete {name}",
+      "deleteTitle": "Delete “{name}” from the history?",
+      "deleteBody": "The kept copy is erased; files already downloaded to your device aren’t touched.",
+      "delete": "Delete",
+      "deleted": "Removed from the history",
+      "saved": "Added to the history",
+      "saveFailed": "Downloaded, but not kept in the history.",
+      "loading": "Loading the history"
     }
   }
 }

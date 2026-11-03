@@ -64,6 +64,11 @@ function fakeDatabase(invoices: Row[], accounts: Row[] = []) {
         return { count: old.length };
       },
     },
+    pdfToolFile: {
+      async findMany() {
+        return [];
+      },
+    },
     cronRun: {
       async create({ data }: { data: { job: string; day: string } }) {
         const key = `${data.job}/${data.day}`;

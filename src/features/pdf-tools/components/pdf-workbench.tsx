@@ -1,6 +1,6 @@
 'use client';
 
-import { FilePlus2, Minimize2, RotateCcw, RotateCw, Trash2, type LucideIcon } from 'lucide-react';
+import { Eraser, FilePlus2, Minimize2, RotateCcw, RotateCw, Trash2, type LucideIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import {
   closestCenter,
@@ -19,9 +19,19 @@ import { rectSortingStrategy, SortableContext, sortableKeyboardCoordinates, useS
 import { CSS } from '@dnd-kit/utilities';
 import { useEffect, useId, useRef, useState, type ChangeEvent, type HTMLAttributes, type ReactNode } from 'react';
 
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { toast } from '@/components/ui/toast';
 import { usePdfWorkbench } from '@/features/pdf-tools/hooks/use-pdf-workbench';
 import type { RasterizePdf } from '@/features/pdf-tools/lib/build-pdf';
+import type { PdfChange } from '@/features/pdf-tools/lib/history-schema';
 import { IRCC_MAX_BYTES, type Page, type Rotation, type Source } from '@/features/pdf-tools/lib/pages';
 
 /** What the workbench runs on: the browser's pdf.js in the app, stubs in tests. */
@@ -32,6 +42,21 @@ export type WorkbenchEngine = {
   thumbnail: (source: Source, index: number, rotation: Rotation) => Promise<string>;
   rasterize: RasterizePdf;
 };
+
+/** What the result was made of, for the history. */
+export type OutputMeta = {
+  name: string;
+  pageCount: number;
+  changes: PdfChange[];
+  quality: number | null;
+  sourceNames: string[];
+};
+
+/** `releve-n2.pdf` from the first file added (`releve n2.jpg`), or the given fallback. */
+export function defaultFileName(sources: Source[], fallback: string): string {
+  const first = sources[0]?.name.replace(/\.[^.]+$/, '').trim();
+  return first ? `${first}.pdf` : fallback;
+}
 
 const button =
   'inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50';
@@ -53,7 +78,7 @@ export function PdfWorkbench({
   initialSources,
 }: {
   engine: WorkbenchEngine;
-  finish: { label: string; icon: LucideIcon; run: (pdf: Uint8Array) => Promise<void> };
+  finish: { label: string; icon: LucideIcon; run: (pdf: Uint8Array, meta: OutputMeta) => Promise<void> };
   /** Files to start with (a Section's Documents). */
   initialSources?: Source[];
 }): ReactNode {
@@ -63,6 +88,8 @@ export function PdfWorkbench({
   const tool = usePdfWorkbench(engine.rasterize);
   const [adding, setAdding] = useState(false);
   const [finishing, setFinishing] = useState(false);
+  const [name, setName] = useState('');
+  const [clearing, setClearing] = useState(false);
   const started = useRef(false);
 
   useEffect(() => {
@@ -99,10 +126,24 @@ export function PdfWorkbench({
     }
   };
 
+  const fileName = (() => {
+    const typed = name.trim();
+    if (!typed) return defaultFileName(tool.sources, t('fileName'));
+    return typed.toLowerCase().endsWith('.pdf') ? typed : `${typed}.pdf`;
+  })();
+
   const done = async () => {
     setFinishing(true);
     try {
-      await finish.run(await tool.output());
+      await finish.run(await tool.output(), {
+        name: fileName,
+        pageCount: tool.pages.length,
+        changes: tool.changes,
+        quality: tool.compressed?.quality ?? null,
+        sourceNames: tool.sources
+          .filter((source) => tool.pages.some((page) => page.sourceId === source.id))
+          .map((source) => source.name),
+      });
     } finally {
       setFinishing(false);
     }
@@ -141,8 +182,43 @@ export function PdfWorkbench({
           <FilePlus2 aria-hidden={true} className="size-4" />
           {adding ? t('adding') : t('add')}
         </label>
-        <p className="text-sm text-slate">{t('addHint')}</p>
+        <p className="min-w-0 flex-1 text-sm text-slate">{t('addHint')}</p>
+        {tool.pages.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => setClearing(true)}
+            className={`${button} text-slate hover:bg-off-white hover:text-rouge`}
+          >
+            <Eraser aria-hidden={true} className="size-4" />
+            {t('clear')}
+          </button>
+        ) : null}
       </div>
+
+      <AlertDialog open={clearing} onOpenChange={setClearing}>
+        <AlertDialogContent className="gap-5 p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-heading text-xl font-bold text-navy-deep">
+              {t('clearTitle')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-slate">{t('clearBody')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-full">{t('cancel')}</AlertDialogCancel>
+            <button
+              type="button"
+              onClick={() => {
+                tool.clear();
+                setName('');
+                setClearing(false);
+              }}
+              className="rounded-full bg-rouge px-5 py-2 text-sm font-semibold text-white hover:bg-crimson"
+            >
+              {t('clearConfirm')}
+            </button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {tool.pages.length === 0 ? (
         <p className="rounded-2xl bg-white px-6 py-12 text-center text-sm text-slate">{t('empty')}</p>
@@ -190,6 +266,19 @@ export function PdfWorkbench({
           <Minimize2 aria-hidden={true} className="size-4" />
           {tool.compressing ? t('compressing') : t('compress')}
         </button>
+        <div className="w-full sm:w-56">
+          <label htmlFor={`${ids}-name`} className="sr-only">
+            {t('fileNameLabel')}
+          </label>
+          <input
+            id={`${ids}-name`}
+            value={name}
+            maxLength={120}
+            placeholder={defaultFileName(tool.sources, t('fileName'))}
+            onChange={(event) => setName(event.target.value)}
+            className="h-11 w-full rounded-full border-2 border-fog-light bg-white px-4 text-sm text-navy-deep focus:border-navy-deep focus:outline-none"
+          />
+        </div>
         <button
           type="button"
           disabled={tool.pages.length === 0 || finishing || tool.compressing}

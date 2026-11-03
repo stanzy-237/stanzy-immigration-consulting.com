@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import type { PdfChange } from '@/features/pdf-tools/lib/history-schema';
 import { buildPdf, compressPdf, compressToLimit, type RasterizePdf } from '@/features/pdf-tools/lib/build-pdf';
 import {
   IRCC_MAX_BYTES,
@@ -92,6 +93,27 @@ export function usePdfWorkbench(rasterize: RasterizePdf) {
 
   const sourceOf = useMemo(() => new Map(sources.map((source) => [source.id, source])), [sources]);
 
+  /** What was done, for the history: compared with every source's pages in the order added. */
+  const changes = useMemo((): PdfChange[] => {
+    const original = sources.flatMap((source) =>
+      Array.from({ length: source.pageCount }, (_, i) => `${source.id}:${i}`),
+    );
+    const kept = pages.map((page) => `${page.sourceId}:${page.index}`);
+    const done: PdfChange[] = [];
+    if (sources.length > 1) done.push('merged');
+    if (kept.join() !== original.filter((key) => kept.includes(key)).join()) done.push('reordered');
+    if (pages.some((page) => page.rotation !== 0)) done.push('rotated');
+    if (kept.length < original.length) done.push('removed');
+    if (compressed) done.push('compressed');
+    return done;
+  }, [sources, pages, compressed]);
+
+  /** Empties the whole canvas: files, pages and compressed copy. */
+  const clear = useCallback(() => {
+    setSources([]);
+    change(() => []);
+  }, [change]);
+
   return {
     sources,
     pages,
@@ -107,5 +129,7 @@ export function usePdfWorkbench(rasterize: RasterizePdf) {
     remove: (id: string) => change((current) => withoutPage(current, id)),
     compress,
     output,
+    changes,
+    clear,
   };
 }
