@@ -180,7 +180,10 @@ function Brand(): ReactNode {
   const folded = useSidebar().state === 'collapsed';
   return (
     <Link href="/" className="flex items-center gap-2.5 px-1 py-1.5">
-      <Image src="/logo2.png" alt="" width={502} height={468} className="size-8 shrink-0 object-contain" />
+      {/* A white disc: the logo's navy and red disappear on the navy sidebar. */}
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white p-1 shadow-sm">
+        <Image src="/logo2.png" alt="" width={502} height={468} className="size-full object-contain" />
+      </span>
       {folded ? (
         <span className="sr-only">{t('title')}</span>
       ) : (
