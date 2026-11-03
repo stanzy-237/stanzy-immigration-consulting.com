@@ -1413,12 +1413,17 @@
       "label": "Sections du tableau de bord",
       "overview": "Aperçu",
       "blog": "Blog",
-      "openMenu": "Ouvrir le menu du tableau de bord",
-      "menuTitle": "Tableau de bord",
-      "close": "Fermer le menu",
       "dossiers": "Dossiers",
       "factures": "Factures",
-      "comptes": "Comptes"
+      "comptes": "Comptes",
+      "toggle": "Afficher ou replier le menu",
+      "groups": {
+        "general": "Général",
+        "clients": "Clients",
+        "billing": "Facturation",
+        "content": "Contenus"
+      },
+      "close": "Fermer le menu"
     },
     "viewSite": "Voir le site",
     "overview": {

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
 
 import { requireConsultant } from '@/features/auth/server/guards';
 import { DashboardShell } from '@/features/dashboard/components/dashboard-shell';
@@ -17,8 +18,10 @@ export async function generateMetadata({ params }: { params: LocaleParams }): Pr
 export default async function DashboardLayout({ children, params }: { children: React.ReactNode; params: LocaleParams }) {
   const { locale } = await params;
   const session = await requireConsultant({ locale, next: '/tableau-de-bord' });
+  // The sidebar opens folded or not, as the consultant left it (shadcn's cookie).
+  const sidebarOpen = (await cookies()).get('sidebar_state')?.value !== 'false';
   return (
-    <DashboardShell name={session.account.name} siteUrl={`${siteUrl()}/${locale}`}>
+    <DashboardShell name={session.account.name} siteUrl={`${siteUrl()}/${locale}`} defaultOpen={sidebarOpen}>
       {children}
     </DashboardShell>
   );
