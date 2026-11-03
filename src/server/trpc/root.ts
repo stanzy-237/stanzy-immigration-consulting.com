@@ -3,6 +3,7 @@ import { blogRouter } from '@/features/blog/server/blog-router';
 import { budgetRouter } from '@/features/budget/server/budget-router';
 import { checklistRouter } from '@/features/checklist/server/checklist-router';
 import { crsRouter } from '@/features/crs/server/crs-router';
+import { accountsRouter } from '@/features/accounts/server/accounts-router';
 import { invoicesRouter } from '@/features/invoices/server/invoices-router';
 import { notificationsRouter } from '@/features/notifications/server/notifications-router';
 import { dossiersRouter } from '@/features/dossiers/server/dossiers-router';
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
   checklist: checklistRouter,
   crs: crsRouter,
   dossiers: dossiersRouter,
+  accounts: accountsRouter,
   invoices: invoicesRouter,
   notifications: notificationsRouter,
   draws: drawsRouter,

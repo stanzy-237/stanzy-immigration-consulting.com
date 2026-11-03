@@ -1417,7 +1417,8 @@
       "menuTitle": "Tableau de bord",
       "close": "Fermer le menu",
       "dossiers": "Dossiers",
-      "factures": "Factures"
+      "factures": "Factures",
+      "comptes": "Comptes"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -2074,6 +2075,14 @@
         "subject": "{client} a envoyé une preuve de paiement ({number})",
         "body": "{client} a téléversé une preuve de paiement pour la facture {number} ({total}). Vérifiez-la, puis marquez la facture payée.",
         "cta": "Ouvrir la facture"
+      },
+      "dueSoon": {
+        "subject": "Rappel : facture {number} à régler avant le {due}",
+        "body": "Votre facture {number} ({total}) arrive à échéance le {due}."
+      },
+      "overdue": {
+        "subject": "Facture {number} : l’échéance est passée",
+        "body": "L’échéance de votre facture {number} ({total}) était le {due}. Si vous avez déjà payé, il vous suffit de téléverser votre preuve de paiement."
       }
     },
     "list": {
@@ -2219,7 +2228,37 @@
       "MESSAGE_POSTED": "{actor} a écrit {count, plural, one {sur} other {# messages sur}} « {document} ».",
       "INVOICE_SENT": "Nouvelle facture {number} : {total}.",
       "INVOICE_PAID": "Paiement reçu pour la facture {number}. Merci !",
-      "PROOF_RECEIVED": "{actor} a envoyé une preuve de paiement pour la facture {number}."
+      "PROOF_RECEIVED": "{actor} a envoyé une preuve de paiement pour la facture {number}.",
+      "INVOICE_DUE_SOON": "Votre facture {number} ({total}) arrive à échéance dans 3 jours.",
+      "INVOICE_OVERDUE": "L’échéance de votre facture {number} ({total}) est passée.",
+      "INVOICE_LATE": "La facture {number} de {client} est en retard.",
+      "ACCOUNTS_SIGNED_UP": "{count, plural, one {# nouveau compte} other {# nouveaux comptes}} hier."
     }
+  },
+  "Accounts": {
+    "title": "Comptes",
+    "search": "Rechercher par nom ou email",
+    "statusLabel": "Filtrer par statut",
+    "statuses": {
+      "ALL": "Tous",
+      "USER": "Utilisateur",
+      "LEAD": "Prospect",
+      "CLIENT": "Client"
+    },
+    "empty": "Aucun compte ne correspond.",
+    "count": "{count, plural, one {# compte} other {# comptes}}",
+    "countLimited": "Les {shown} plus récents sur {total} : affinez la recherche.",
+    "columns": {
+      "name": "Nom",
+      "status": "Statut",
+      "signedUp": "Inscription",
+      "language": "Langue"
+    },
+    "back": "Tous les comptes",
+    "signedUpOn": "inscrit le {date}",
+    "openDossier": "Ouvrir un dossier",
+    "dossiers": "Dossiers",
+    "noDossier": "Aucun dossier pour ce compte.",
+    "loading": "Chargement des comptes"
   }
 }

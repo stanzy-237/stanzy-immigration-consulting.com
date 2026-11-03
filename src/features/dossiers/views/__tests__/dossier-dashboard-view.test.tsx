@@ -155,3 +155,21 @@ describe('DossierNewView', () => {
     await waitFor(() => expect(router.push).toHaveBeenCalledWith('/dossiers/dos_9'));
   });
 });
+
+describe('DossierNewView from an Account’s page', () => {
+  it('starts with that Account chosen', () => {
+    const { trpc, queryClient, wrap } = createTestTRPC({});
+    queryClient.setQueryData(trpc.accounts.dashboard.get.queryKey({ id: 'acc_1' }), {
+      id: 'acc_1',
+      name: 'Aminata Diallo',
+      email: 'aminata@example.com',
+      status: 'LEAD',
+      locale: 'fr',
+      createdAt: new Date('2026-10-01'),
+      dossiers: [],
+    } as never);
+    render(withIntl(wrap(<DossierNewView accountId="acc_1" />)));
+    expect(screen.getByText('Aminata Diallo')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Changer' })).toBeInTheDocument();
+  });
+});
