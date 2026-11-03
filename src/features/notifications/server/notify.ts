@@ -10,8 +10,8 @@ export type NotificationTarget = { dossierId?: string; documentId?: string; comm
 
 export type NotificationEvent = {
   kind: NotificationKind;
-  /** Who did it: never notified of their own action. */
-  actorId: string;
+  /** Who did it: never notified of their own action. Null for what the app does on its own (a daily reminder). */
+  actorId: string | null;
   /** Account ids, or every consultant Account. */
   recipients: string[] | 'CONSULTANTS';
   target: NotificationTarget;

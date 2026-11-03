@@ -102,3 +102,39 @@ export function proofReceivedEmail(opts: {
     url: opts.url,
   });
 }
+
+/**
+ * Reminds the Client of a sent Facture: `dueSoon` 3 days before its due
+ * date, `overdue` the day it passed (#92). The button opens their Factures.
+ */
+export function invoiceReminderEmail(opts: {
+  to: string;
+  name: string;
+  locale: unknown;
+  kind: 'dueSoon' | 'overdue';
+  invoice: InvoiceFacts;
+  url: string;
+}): EmailMessage {
+  const { locale, t } = translator(opts.locale);
+  const { invoice } = opts;
+  const values = {
+    number: invoice.number,
+    total: formatMoney(invoice.total, invoice.currency, locale),
+    due: invoice.dueDate
+      ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+          invoice.dueDate,
+        )
+      : '',
+  };
+  return renderEmail({
+    to: opts.to,
+    subject: t(`Invoices.emails.${opts.kind}.subject`, values),
+    lines: [
+      t('Dossiers.emails.greeting', { name: opts.name }),
+      t(`Invoices.emails.${opts.kind}.body`, values),
+      t('Invoices.emails.sent.proof'),
+    ],
+    cta: t('Dossiers.emails.cta'),
+    url: opts.url,
+  });
+}

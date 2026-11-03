@@ -14,6 +14,7 @@ export type Audience = 'client' | 'consultant';
 export function notificationHref(item: NotificationItem, audience: Audience, locale: string): string {
   const base = audience === 'client' ? `/${locale}/mon-espace` : '';
   const all = audience === 'client' ? `${base}/notifications` : '/notifications';
+  if (item.kind === 'ACCOUNTS_SIGNED_UP') return '/comptes';
   if (!item.dossier) return all;
   const dossier = `${base}/dossiers/${item.dossier.id}`;
 

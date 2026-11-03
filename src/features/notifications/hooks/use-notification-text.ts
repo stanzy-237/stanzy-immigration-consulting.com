@@ -16,7 +16,9 @@ export function useNotificationText() {
     const service = item.dossier ? dossiers(`services.${item.dossier.service}`) : '';
     const values = {
       actor: actorName(item, t('someone')),
-      count: item.count,
+      // The sign-ups summary carries its own count; grouped Notifications, how many they gathered.
+      count: item.kind === 'ACCOUNTS_SIGNED_UP' ? Number(item.params.count ?? 0) : item.count,
+      client: item.params.client ?? '',
       document: item.document?.title ?? '',
       service,
       stage:

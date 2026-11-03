@@ -1400,7 +1400,8 @@
       "menuTitle": "Dashboard",
       "close": "Close the menu",
       "dossiers": "Files",
-      "factures": "Invoices"
+      "factures": "Invoices",
+      "comptes": "Accounts"
     },
     "viewSite": "View the site",
     "overview": {
@@ -2057,6 +2058,14 @@
         "subject": "{client} sent a proof of payment ({number})",
         "body": "{client} uploaded a proof of payment for invoice {number} ({total}). Check it, then mark the invoice paid.",
         "cta": "Open the invoice"
+      },
+      "dueSoon": {
+        "subject": "Reminder: invoice {number} is due by {due}",
+        "body": "Your invoice {number} ({total}) is due on {due}."
+      },
+      "overdue": {
+        "subject": "Invoice {number}: the due date has passed",
+        "body": "Your invoice {number} ({total}) was due on {due}. If you have already paid, just upload your proof of payment."
       }
     },
     "list": {
@@ -2202,7 +2211,37 @@
       "MESSAGE_POSTED": "{actor} wrote {count, plural, one {on} other {# messages on}} “{document}”.",
       "INVOICE_SENT": "New invoice {number}: {total}.",
       "INVOICE_PAID": "Payment received for invoice {number}. Thank you!",
-      "PROOF_RECEIVED": "{actor} sent a proof of payment for invoice {number}."
+      "PROOF_RECEIVED": "{actor} sent a proof of payment for invoice {number}.",
+      "INVOICE_DUE_SOON": "Your invoice {number} ({total}) is due in 3 days.",
+      "INVOICE_OVERDUE": "Your invoice {number} ({total}) is past its due date.",
+      "INVOICE_LATE": "Invoice {number} for {client} is overdue.",
+      "ACCOUNTS_SIGNED_UP": "{count, plural, one {# new account} other {# new accounts}} yesterday."
     }
+  },
+  "Accounts": {
+    "title": "Accounts",
+    "search": "Search by name or email",
+    "statusLabel": "Filter by status",
+    "statuses": {
+      "ALL": "All",
+      "USER": "User",
+      "LEAD": "Lead",
+      "CLIENT": "Client"
+    },
+    "empty": "No account matches.",
+    "count": "{count, plural, one {# account} other {# accounts}}",
+    "countLimited": "The {shown} newest of {total}: narrow the search.",
+    "columns": {
+      "name": "Name",
+      "status": "Status",
+      "signedUp": "Signed up",
+      "language": "Language"
+    },
+    "back": "All accounts",
+    "signedUpOn": "signed up on {date}",
+    "openDossier": "Open a file",
+    "dossiers": "Files",
+    "noDossier": "No files for this account.",
+    "loading": "Loading the accounts"
   }
 }

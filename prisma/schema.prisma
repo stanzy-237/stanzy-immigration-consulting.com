@@ -508,25 +508,28 @@ enum InvoiceStatus {
 
 /// A Facture, for one Dossier. Amounts are in the currency's minor unit (XAF has none, CAD and EUR cents).
 model Invoice {
-  id            String          @id @default(cuid())
+  id                String          @id @default(cuid())
   /// STZ-<year>-<0001>, given when it is sent, so drafts never burn a number.
-  number        String?         @unique
-  dossierId     String
-  dossier       Dossier         @relation(fields: [dossierId], references: [id], onDelete: Restrict)
-  currency      InvoiceCurrency @default(XAF)
-  status        InvoiceStatus   @default(DRAFT)
-  dueDate       DateTime?
+  number            String?         @unique
+  dossierId         String
+  dossier           Dossier         @relation(fields: [dossierId], references: [id], onDelete: Restrict)
+  currency          InvoiceCurrency @default(XAF)
+  status            InvoiceStatus   @default(DRAFT)
+  dueDate           DateTime?
   /// Printed under the lines: payment instructions, a note to the Client.
-  notes         String?
-  lines         InvoiceLine[]
-  proofs        PaymentProof[]
-  notifications Notification[]
-  sentAt        DateTime?
-  paidAt        DateTime?
-  cancelledAt   DateTime?
-  cancelReason  String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  notes             String?
+  lines             InvoiceLine[]
+  proofs            PaymentProof[]
+  notifications     Notification[]
+  sentAt            DateTime?
+  paidAt            DateTime?
+  cancelledAt       DateTime?
+  cancelReason      String?
+  /// When the Client was reminded the due date is near, and that it passed (#92); each once.
+  dueSoonRemindedAt DateTime?
+  overdueRemindedAt DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
   @@index([dossierId, createdAt])
   @@index([status, updatedAt])
@@ -585,6 +588,14 @@ enum NotificationKind {
   INVOICE_SENT
   INVOICE_PAID
   PROOF_RECEIVED
+  /// To the Client, 3 days before a sent Facture's due date.
+  INVOICE_DUE_SOON
+  /// To the Client, the day a sent Facture becomes overdue.
+  INVOICE_OVERDUE
+  /// To the consultant, the same day: « En retard ».
+  INVOICE_LATE
+  /// To the consultant, once a day: the accounts created the day before.
+  ACCOUNTS_SIGNED_UP
 }
 
 /// One line in an Account's notification center. Repeats by the same actor on the same target, while unread and within 30 minutes, raise `count` instead of adding lines.
@@ -615,4 +626,14 @@ model Notification {
   @@index([recipientId, updatedAt])
   @@index([recipientId, readAt])
   @@map("notification")
+}
+
+/// One run of a daily job on one day (Douala time), so a second call that day does nothing (#92).
+model CronRun {
+  job       String
+  day       String
+  createdAt DateTime @default(now())
+
+  @@id([job, day])
+  @@map("cron_run")
 }

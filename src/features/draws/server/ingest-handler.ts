@@ -1,8 +1,5 @@
-import { createHash, timingSafeEqual } from 'node:crypto';
-
 import type { IngestReport } from '@/features/draws/server/ingest-draws';
-
-const digest = (value: string) => createHash('sha256').update(value).digest();
+import { isCronCall } from '@/server/cron-auth';
 
 /**
  * The feed the workflow sent in the body, if it looks like IRCC's (an object
@@ -34,9 +31,7 @@ export function createIngestHandler(deps: {
     if (!deps.secret) {
       return Response.json({ error: 'CRON_SECRET is not configured' }, { status: 503 });
     }
-    const given = request.headers.get('authorization') ?? '';
-    // Compare digests so the check takes the same time whatever was sent.
-    if (!timingSafeEqual(digest(given), digest(`Bearer ${deps.secret}`))) {
+    if (!isCronCall(request, deps.secret)) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
     try {

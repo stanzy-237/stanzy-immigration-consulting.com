@@ -1,6 +1,8 @@
 'use client';
 
 import {
+  AlarmClock,
+  CalendarClock,
   CheckCircle2,
   FileCheck,
   FilePlus,
@@ -9,6 +11,7 @@ import {
   MessageSquare,
   ReceiptText,
   Upload,
+  UserPlus,
   Waypoints,
   type LucideIcon,
 } from 'lucide-react';
@@ -33,6 +36,10 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   INVOICE_SENT: ReceiptText,
   INVOICE_PAID: CheckCircle2,
   PROOF_RECEIVED: FileCheck,
+  INVOICE_DUE_SOON: CalendarClock,
+  INVOICE_OVERDUE: AlarmClock,
+  INVOICE_LATE: AlarmClock,
+  ACCOUNTS_SIGNED_UP: UserPlus,
 };
 
 /**

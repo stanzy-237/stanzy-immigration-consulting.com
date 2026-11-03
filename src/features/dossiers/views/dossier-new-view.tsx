@@ -1,11 +1,12 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useDeferredValue, useId, useState, type FormEvent, type ReactNode } from 'react';
 
+import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { SERVICE_TYPES, WORKFLOWS, type ServiceType } from '@/features/dossiers/data/workflows';
@@ -26,13 +27,39 @@ type Account = { id: string; name: string; email: string; status: 'USER' | 'LEAD
  * Until the Demandes d'intérêt (#81) and orders (#80, #83) open Dossiers
  * themselves, this is how the consultant starts one.
  */
-export function DossierNewView(): ReactNode {
+export function DossierNewView({ accountId }: { accountId?: string }): ReactNode {
+  if (!accountId) return <DossierNewForm initialAccount={null} />;
+  return (
+    <QueryBoundary fallback={<NewSkeleton />}>
+      <PreselectedAccount accountId={accountId} />
+    </QueryBoundary>
+  );
+}
+
+/** Opened from an Account's page in « Comptes » (#92): that Account is already chosen. */
+function PreselectedAccount({ accountId }: { accountId: string }): ReactNode {
+  const trpc = useTRPC();
+  const { data } = useSuspenseQuery(trpc.accounts.dashboard.get.queryOptions({ id: accountId }));
+  return <DossierNewForm initialAccount={{ id: data.id, name: data.name, email: data.email, status: data.status }} />;
+}
+
+function NewSkeleton(): ReactNode {
+  const t = useTranslations('Dossiers.new');
+  return (
+    <div role="status" className="mx-auto max-w-2xl">
+      <span className="sr-only">{t('loading')}</span>
+      <Skeleton aria-hidden={true} className="h-96 rounded-2xl" />
+    </div>
+  );
+}
+
+function DossierNewForm({ initialAccount }: { initialAccount: Account | null }): ReactNode {
   const t = useTranslations('Dossiers');
   const ids = useId();
   const router = useRouter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const [account, setAccount] = useState<Account | null>(null);
+  const [account, setAccount] = useState<Account | null>(initialAccount);
   const [service, setService] = useState<ServiceType>('ACCOMPAGNEMENT');
   const [startStage, setStartStage] = useState<string>(WORKFLOWS.ACCOMPAGNEMENT[0]);
   const [missingAccount, setMissingAccount] = useState(false);
@@ -56,14 +83,21 @@ export function DossierNewView(): ReactNode {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <Link href="/dossiers" className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate hover:text-navy-deep">
+      <Link
+        href="/dossiers"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate hover:text-navy-deep"
+      >
         <ArrowLeft aria-hidden={true} className="size-4" />
         {t('detail.back')}
       </Link>
       <h1 className="font-heading text-3xl font-bold text-navy-deep">{t('new.title')}</h1>
       <p className="mt-1 text-sm text-slate">{t('new.intro')}</p>
 
-      <form onSubmit={submit} noValidate className="mt-6 grid gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
+      <form
+        onSubmit={submit}
+        noValidate
+        className="mt-6 grid gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm"
+      >
         <AccountPicker
           id={`${ids}-account`}
           value={account}
@@ -163,7 +197,11 @@ function AccountPicker({
               {value.email} · {t(`accountStatus.${value.status}`)}
             </span>
           </span>
-          <button type="button" onClick={() => onChange(null)} className="shrink-0 text-sm font-semibold text-rouge hover:text-crimson">
+          <button
+            type="button"
+            onClick={() => onChange(null)}
+            className="shrink-0 text-sm font-semibold text-rouge hover:text-crimson"
+          >
             {t('change')}
           </button>
         </div>
