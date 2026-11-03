@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { invoiceReminderEmail } from '@/features/invoices/lib/invoice-emails';
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { notify } from '@/features/notifications/server/notify';
+import { purgeOldPdfToolFiles } from '@/features/pdf-tools/server/purge';
 import { toLocale } from '@/i18n/routing';
 import type { Mailer } from '@/server/email/mailer';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -24,7 +25,14 @@ const addDays = (day: string, days: number): string =>
 /** The calendar day a due date stands for: stored at midnight UTC of the day picked. */
 const dueDay = (dueDate: Date): string => dueDate.toISOString().slice(0, 10);
 
-export type DailyReport = { dueSoon: number; overdue: number; signups: number | null; deleted: number };
+export type DailyReport = {
+  dueSoon: number;
+  overdue: number;
+  signups: number | null;
+  deleted: number;
+  /** Outils PDF history files past 90 days. */
+  pdfFilesPurged: number;
+};
 
 /**
  * The daily round (#92), safe to run more than once a day:
@@ -33,6 +41,7 @@ export type DailyReport = { dueSoon: number; overdue: number; signups: number | 
  *   it is « En retard »; each reminder once, a late run catching up.
  * - The accounts created the day before, summed up for the consultant, once a day.
  * - Read Notifications older than 6 months, deleted.
+ * - Outils PDF history files older than 90 days, deleted with their copies.
  */
 export async function runDailyJobs(deps: {
   db: Db;
@@ -43,7 +52,7 @@ export async function runDailyJobs(deps: {
 }): Promise<DailyReport> {
   const { db, now } = deps;
   const today = doualaDay(now);
-  const report: DailyReport = { dueSoon: 0, overdue: 0, signups: null, deleted: 0 };
+  const report: DailyReport = { dueSoon: 0, overdue: 0, signups: null, deleted: 0, pdfFilesPurged: 0 };
 
   const invoices = await db.invoice.findMany({
     where: { status: 'SENT', dueDate: { not: null }, overdueRemindedAt: null },
@@ -130,6 +139,7 @@ export async function runDailyJobs(deps: {
     where: { readAt: { lt: new Date(now.getTime() - READ_KEPT_MS) } },
   });
   report.deleted = count;
+  report.pdfFilesPurged = await purgeOldPdfToolFiles(db, now);
   return report;
 }
 

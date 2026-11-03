@@ -1,4 +1,4 @@
-import { FolderKanban, LayoutDashboard, Newspaper, ReceiptText, Users, type LucideIcon } from 'lucide-react';
+import { FileStack, FolderKanban, LayoutDashboard, Newspaper, ReceiptText, Users, type LucideIcon } from 'lucide-react';
 
 /**
  * The Tableau de bord's sections, in sidebar order. A new section (Leads,
@@ -7,7 +7,7 @@ import { FolderKanban, LayoutDashboard, Newspaper, ReceiptText, Users, type Luci
  */
 export type DashboardSection = {
   /** Its label is `Dashboard.nav.<key>`. */
-  key: 'overview' | 'dossiers' | 'comptes' | 'factures' | 'blog';
+  key: 'overview' | 'dossiers' | 'comptes' | 'factures' | 'outils-pdf' | 'blog';
   /** Its address on the dashboard's subdomain. */
   href: string;
   /** The first route segment below the dashboard it owns; null for the Aperçu. */
@@ -18,7 +18,7 @@ export type DashboardSection = {
 };
 
 /** The sidebar's groups, in order. */
-export const DASHBOARD_GROUPS = ['general', 'clients', 'billing', 'content'] as const;
+export const DASHBOARD_GROUPS = ['general', 'clients', 'billing', 'tools', 'content'] as const;
 export type DashboardGroup = (typeof DASHBOARD_GROUPS)[number];
 
 export const DASHBOARD_SECTIONS: readonly DashboardSection[] = [
@@ -26,6 +26,7 @@ export const DASHBOARD_SECTIONS: readonly DashboardSection[] = [
   { key: 'dossiers', href: '/dossiers', segment: 'dossiers', icon: FolderKanban, group: 'clients' },
   { key: 'comptes', href: '/comptes', segment: 'comptes', icon: Users, group: 'clients' },
   { key: 'factures', href: '/factures', segment: 'factures', icon: ReceiptText, group: 'billing' },
+  { key: 'outils-pdf', href: '/outils-pdf', segment: 'outils-pdf', icon: FileStack, group: 'tools' },
   { key: 'blog', href: '/blog', segment: 'blog', icon: Newspaper, group: 'content' },
 ];
 

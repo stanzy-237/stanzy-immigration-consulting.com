@@ -5,6 +5,7 @@ import { checklistRouter } from '@/features/checklist/server/checklist-router';
 import { crsRouter } from '@/features/crs/server/crs-router';
 import { accountsRouter } from '@/features/accounts/server/accounts-router';
 import { invoicesRouter } from '@/features/invoices/server/invoices-router';
+import { pdfToolsRouter } from '@/features/pdf-tools/server/history-router';
 import { notificationsRouter } from '@/features/notifications/server/notifications-router';
 import { dossiersRouter } from '@/features/dossiers/server/dossiers-router';
 import { drawsRouter } from '@/features/draws/server/draws-router';
@@ -26,6 +27,7 @@ export const appRouter = createTRPCRouter({
   accounts: accountsRouter,
   invoices: invoicesRouter,
   notifications: notificationsRouter,
+  pdfTools: pdfToolsRouter,
   draws: drawsRouter,
   health: healthRouter,
   parcours: parcoursRouter,
