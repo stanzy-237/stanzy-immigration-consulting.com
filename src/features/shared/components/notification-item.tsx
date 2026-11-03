@@ -6,9 +6,11 @@ import {
   CheckCircle2,
   FileCheck,
   FilePlus,
+  FileSignature,
   FolderOpen,
   Lock,
   Megaphone,
+  PenLine,
   MessageSquare,
   ReceiptText,
   Upload,
@@ -42,6 +44,8 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   INVOICE_LATE: AlarmClock,
   ACCOUNTS_SIGNED_UP: UserPlus,
   DRAW_PUBLISHED: Megaphone,
+  SIGNATURE_REQUESTED: PenLine,
+  DOCUMENT_SIGNED: FileSignature,
 };
 
 /**

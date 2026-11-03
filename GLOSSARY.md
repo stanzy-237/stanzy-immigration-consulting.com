@@ -177,6 +177,13 @@ The service agreement for a Dossier, made from its service's template (French or
 **Avenant** (Amendment):
 A change to a signed Contrat, signed the same way and numbered after it (CTR-2026-0001-A1). A signed Contrat itself never changes.
 
+**Demande de signature** (Signature request):
+A PDF Version of a Document that the consultant sends to the Client to sign online (a lettre d'explication, a déclaration…), with the fields placed on it: Signature, Nom complet, Date, and optionally the consultant's signature with the company stamp. Only the Client holding the Dossier signs it, in « Mon espace ». Once signed, the signed PDF becomes the Document's next Version. One waits per Document at a time; the consultant can cancel it to send a corrected one. Contrats use the same signing.
+_Avoid_: "e-signature", "envelope".
+
+**Certificat de signature** (Signature certificate):
+The last page added to a signed PDF: who signed (the name typed and the Account), when (Douala time), the IP address and device, and the SHA-256 fingerprint of the original PDF, which shows whether it was changed.
+
 **Recette** (Income):
 Money the practice received, in the consultant's Finances: a Facture marked Payée (added by itself) or an entry made by hand.
 _Avoid_: "Dépense" (that is a Client's budget entry).

@@ -8,6 +8,7 @@ import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DocumentCard } from '@/features/dossiers/components/document-card';
 import { DocumentFocusContext, type DocumentFocus } from '@/features/dossiers/components/document-focus';
+import { NewSignatureLink, SignatureAlert } from '@/features/dossiers/components/document-signature';
 import {
   fieldClass,
   smallButton,
@@ -57,7 +58,15 @@ export function DossierDocuments({
             </h2>
             <p className="mt-1 text-sm text-slate">{consultant ? t('introConsultant') : t('introClient')}</p>
           </div>
+          {consultant && data.open ? <NewSignatureLink dossierId={dossierId} /> : null}
         </div>
+
+        {!consultant && data.open ? (
+          <SignatureAlert
+            dossierId={dossierId}
+            documents={data.sections.flatMap((section) => section.documents)}
+          />
+        ) : null}
 
         {data.locked ? <p className="rounded-xl bg-ice-blue px-4 py-3 text-sm text-navy-deep">{t('locked')}</p> : null}
 

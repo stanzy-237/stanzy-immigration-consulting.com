@@ -18,11 +18,15 @@ export type DossierChange =
   | { kind: 'stageChanged'; stage: string }
   | { kind: 'closed'; reason: string }
   | { kind: 'newVersion'; document: string }
-  | { kind: 'comment'; document: string; excerpt: string };
+  | { kind: 'comment'; document: string; excerpt: string }
+  | { kind: 'signatureRequested'; document: string }
+  | { kind: 'signed'; document: string };
 
 /** What the Client did, as the consultant is told. */
 export type ClientActivity =
-  { kind: 'clientUpload'; document: string } | { kind: 'clientComment'; document: string; excerpt: string };
+  | { kind: 'clientUpload'; document: string }
+  | { kind: 'clientComment'; document: string; excerpt: string }
+  | { kind: 'clientSigned'; document: string };
 
 /** A comment as quoted in an email: its first 200 characters. */
 export const excerptOf = (body: string): string => (body.length > 200 ? `${body.slice(0, 199)}…` : body);
@@ -72,7 +76,9 @@ export function dossierEmail(opts: {
         ? t('emails.newVersion.body', { service, document: change.document })
         : change.kind === 'comment'
           ? t('emails.comment.body', { service, document: change.document, excerpt: change.excerpt })
-          : t(`emails.${change.kind}.body`, {
+          : change.kind === 'signatureRequested' || change.kind === 'signed'
+            ? t(`emails.${change.kind}.body`, { service, document: change.document })
+            : t(`emails.${change.kind}.body`, {
               service,
               stage: t(`stages.${opts.service}.${change.stage}` as never),
             });
@@ -105,8 +111,8 @@ export function consultantEmail(opts: {
   const { activity, client } = opts;
   const service = t(`services.${opts.service}`);
   const body =
-    activity.kind === 'clientUpload'
-      ? t('consultantEmails.clientUpload.body', { client, service, document: activity.document })
+    activity.kind === 'clientUpload' || activity.kind === 'clientSigned'
+      ? t(`consultantEmails.${activity.kind}.body`, { client, service, document: activity.document })
       : t('consultantEmails.clientComment.body', {
           client,
           service,

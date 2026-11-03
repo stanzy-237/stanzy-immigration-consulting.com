@@ -10,6 +10,7 @@ import { notificationsRouter } from '@/features/notifications/server/notificatio
 import { dossiersRouter } from '@/features/dossiers/server/dossiers-router';
 import { drawsRouter } from '@/features/draws/server/draws-router';
 import { parcoursRouter } from '@/features/parcours/server/parcours-router';
+import { signaturesRouter } from '@/features/signatures/server/signatures-router';
 
 import { healthRouter } from './routers/health';
 import { createCallerFactory, createTRPCRouter } from './trpc';
@@ -31,6 +32,7 @@ export const appRouter = createTRPCRouter({
   draws: drawsRouter,
   health: healthRouter,
   parcours: parcoursRouter,
+  signatures: signaturesRouter,
 });
 
 export type AppRouter = typeof appRouter;

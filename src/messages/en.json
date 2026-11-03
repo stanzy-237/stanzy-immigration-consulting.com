@@ -1408,7 +1408,8 @@
         "tools": "Tools"
       },
       "close": "Close the menu",
-      "outils-pdf": "PDF tools"
+      "outils-pdf": "PDF tools",
+      "signatures": "Signatures"
     },
     "viewSite": "View the site",
     "overview": {
@@ -1825,6 +1826,14 @@
       "comment": {
         "subject": "New comment in your {service} file",
         "body": "Stanzy commented on “{document}” in your {service} file: “{excerpt}”"
+      },
+      "signatureRequested": {
+        "subject": "A document to sign in your {service} file",
+        "body": "Stanzy sent you “{document}” to sign in your {service} file. Open your space to read it and sign it online."
+      },
+      "signed": {
+        "subject": "Document signed in your {service} file",
+        "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file."
       }
     },
     "dashboard": {
@@ -1925,6 +1934,10 @@
       "clientComment": {
         "subject": "{client} commented on “{document}”",
         "body": "{client} commented on “{document}” in their {service} file: “{excerpt}”"
+      },
+      "clientSigned": {
+        "subject": "{client} signed “{document}”",
+        "body": "{client} signed “{document}” in their {service} file. The signed PDF was added as a new version of the document."
       }
     },
     "documents": {
@@ -2223,7 +2236,9 @@
       "INVOICE_OVERDUE": "Your invoice {number} ({total}) is past its due date.",
       "INVOICE_LATE": "Invoice {number} for {client} is overdue.",
       "ACCOUNTS_SIGNED_UP": "{count, plural, one {# new account} other {# new accounts}} yesterday.",
-      "DRAW_PUBLISHED": "New Express Entry draw #{round}: {invitations} invitations, {crs} points minimum."
+      "DRAW_PUBLISHED": "New Express Entry draw #{round}: {invitations} invitations, {crs} points minimum.",
+      "SIGNATURE_REQUESTED": "Stanzy asks you to sign “{document}”.",
+      "DOCUMENT_SIGNED": "{actor} signed “{document}”."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2238,7 +2253,9 @@
       "INVOICE_DUE_SOON": "Invoice reminder.",
       "INVOICE_OVERDUE": "Invoice reminder.",
       "INVOICE_LATE": "An invoice is overdue.",
-      "ACCOUNTS_SIGNED_UP": "New accounts."
+      "ACCOUNTS_SIGNED_UP": "New accounts.",
+      "SIGNATURE_REQUESTED": "A document to sign.",
+      "DOCUMENT_SIGNED": "A document was signed."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -2357,6 +2374,159 @@
       "saved": "Added to the history",
       "saveFailed": "Downloaded, but not kept in the history.",
       "loading": "Loading the history"
+    }
+  },
+  "Signatures": {
+    "fields": {
+      "SIGNATURE": "Signature",
+      "NAME": "Full name",
+      "DATE": "Date",
+      "STAMP": "Stanzy signature & stamp"
+    },
+    "errors": {
+      "SIGNATURE_PDF_ONLY": "Only a PDF can be sent for signature.",
+      "SIGNATURE_PDF_UNREADABLE": "This PDF is damaged or password-protected: export it again and retry.",
+      "SIGNATURE_FIELD_OUTSIDE": "A field is placed outside the document.",
+      "SIGNATURE_FIELD_MISSING": "Place at least one Signature field.",
+      "SIGNATURE_ALREADY_PENDING": "A signature request is already waiting on this document: cancel it first.",
+      "SIGNATURE_ASSETS_MISSING": "Add your signature and the stamp in “Signatures” first.",
+      "SIGNATURE_NOT_PENDING": "This request is no longer waiting for a signature.",
+      "SIGNATURE_NOT_YOURS": "Only the holder of the file can sign this document.",
+      "SIGNATURE_DOCUMENT_CHANGED": "The document changed after it was sent: ask Stanzy to send it again.",
+      "SIGNATURE_IMAGE_INVALID": "The signature could not be read. Clear it and sign again.",
+      "DOSSIER_CLOSED": "This file is closed: it can no longer change.",
+      "DOSSIER_FILES_UNCONFIGURED": "File storage isn’t enabled yet. Try again later.",
+      "UNKNOWN": "That didn’t work. Try again."
+    },
+    "certificate": {
+      "title": "Signature certificate",
+      "document": "Document",
+      "dossier": "File",
+      "signedBy": "Signed by (name typed)",
+      "account": "Account",
+      "signedAt": "Date and time",
+      "signedAtValue": "{when} (Douala time, UTC+1)",
+      "ip": "IP address",
+      "device": "Device",
+      "fingerprint": "SHA-256 fingerprint of the original document",
+      "reference": "Request reference",
+      "stamp": "Stanzy signature and stamp",
+      "stampValue": "Applied by Stanzy Immigration Consulting",
+      "unknown": "Unknown",
+      "note": "Electronic signature collected by Stanzy Immigration Consulting. The signer read the document, ticked “I have read and accept”, typed their name and drew their signature. The fingerprint shows whether the original document was changed.",
+      "fileSuffix": "signed"
+    },
+    "new": {
+      "metaTitle": "Request a signature",
+      "title": "Request a signature",
+      "back": "Back to the file",
+      "intro": "The client will read this PDF in their space and sign it online. The signed PDF becomes a new version of the document.",
+      "pick": {
+        "title": "1. The PDF to sign",
+        "existing": "Pick a PDF already in the file, or upload one.",
+        "noPdf": "No PDF in this file yet.",
+        "version": "V{number} · {file}",
+        "choose": "Choose",
+        "or": "or",
+        "section": "Section",
+        "documentTitle": "Document name",
+        "documentPlaceholder": "Letter of explanation",
+        "file": "PDF file",
+        "upload": "Upload and continue",
+        "uploading": "Uploading…",
+        "pdfOnly": "Choose a PDF file.",
+        "noSection": "Add a section to the file first."
+      },
+      "place": {
+        "title": "2. Place the fields",
+        "hint": "Pick a field, then tap the page where it goes. Drag a field to move it.",
+        "tools": "Field to place",
+        "remove": "Remove the {field} field",
+        "page": "Page {number}",
+        "count": "{count, plural, =0 {No field placed} one {# field placed} other {# fields placed}}",
+        "needSignature": "Place at least one Signature field.",
+        "needAssets": "Add your signature and the stamp in “Signatures” to use this field.",
+        "change": "Change PDF"
+      },
+      "send": "Send for signature",
+      "sending": "Sending…",
+      "loadingPdf": "Opening the PDF",
+      "pdfFailed": "The PDF could not be opened. Try again.",
+      "sent": "Signature request sent"
+    },
+    "sign": {
+      "metaTitle": "Sign a document",
+      "back": "Back to the file",
+      "title": "Sign “{document}”",
+      "intro": "Read the document to the end. The framed areas will be filled with your signature, your name and the date.",
+      "fieldHere": "{field} here",
+      "accept": "I have read the document and agree to sign it electronically.",
+      "name": "Your full name",
+      "nameHint": "As it appears on your passport.",
+      "pad": "Your signature",
+      "padHint": "Sign inside the frame with your mouse or finger.",
+      "padLabel": "Signature area",
+      "clear": "Clear",
+      "submit": "Sign the document",
+      "signing": "Signing…",
+      "signed": "Document signed",
+      "needAccept": "Tick “I have read…” to sign.",
+      "needSignature": "Draw your signature in the frame.",
+      "alreadySigned": "You signed this document on {date}.",
+      "notWaiting": "This document is no longer waiting for a signature.",
+      "openSigned": "See the signed document",
+      "change": {
+        "open": "Ask for a change",
+        "title": "Ask for a change",
+        "body": "Your message goes to Stanzy in the document’s conversation. Stanzy will send you a corrected version.",
+        "label": "What needs to change",
+        "send": "Send",
+        "cancel": "Cancel",
+        "prefix": "Change requested before signing: {message}",
+        "sent": "Request sent to Stanzy"
+      }
+    },
+    "dashboard": {
+      "metaTitle": "Signatures",
+      "title": "Signatures",
+      "intro": "Your signature and the company stamp, and the documents waiting for a client’s signature.",
+      "assets": {
+        "title": "Your signature and the stamp",
+        "hint": "Applied where you place the “Stanzy signature & stamp” field. A PNG with a transparent background is best, 2 MB at most.",
+        "SIGNATURE": "Your signature",
+        "STAMP": "Company stamp",
+        "missing": "Not added yet",
+        "updated": "Added on {date}",
+        "add": "Add",
+        "replace": "Replace",
+        "uploading": "Uploading…",
+        "saved": "Image saved",
+        "failed": "The image could not be saved. PNG or JPEG, 2 MB at most.",
+        "preview": "Preview: {label}"
+      },
+      "pending": {
+        "title": "Waiting for signature",
+        "empty": "No document is waiting for a signature.",
+        "sentOn": "Sent on {date}",
+        "open": "Open"
+      },
+      "loading": "Loading signatures"
+    },
+    "card": {
+      "pendingConsultant": "Signature pending",
+      "pendingClient": "To sign",
+      "sign": "Sign",
+      "request": "Request signature",
+      "requestLabel": "Request a signature on version V{number}",
+      "signedBadge": "Signed",
+      "cancel": "Cancel request",
+      "cancelTitle": "Cancel the signature request?",
+      "cancelBody": "The client will no longer be able to sign this document. You can send a corrected version.",
+      "keep": "Keep",
+      "confirmCancel": "Cancel request",
+      "cancelled": "Signature request cancelled",
+      "alert": "{count, plural, one {One document is waiting for your signature} other {# documents are waiting for your signature}}",
+      "newRequest": "Request a signature"
     }
   }
 }

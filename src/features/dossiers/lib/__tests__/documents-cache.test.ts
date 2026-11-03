@@ -41,6 +41,7 @@ const data = (comments: ReturnType<typeof comment>[] = []): SectionsData => ({
           addedBy: { name: 'Stanzy', role: 'CONSULTANT' },
           versions: [],
           comments,
+          signatures: [],
         },
       ],
     },

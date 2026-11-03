@@ -57,6 +57,7 @@ const sections = (extra: { locked?: boolean; open?: boolean; viewer?: typeof CLI
               size: 1_200_000,
               createdAt: new Date('2026-10-21T10:00:00Z'),
               uploadedBy: person('Aminata Diallo'),
+              signedFor: null,
             },
             {
               id: 'ver_2',
@@ -66,12 +67,14 @@ const sections = (extra: { locked?: boolean; open?: boolean; viewer?: typeof CLI
               size: 900_000,
               createdAt: new Date('2026-10-22T10:00:00Z'),
               uploadedBy: person('Stanzy', 'CONSULTANT'),
+              signedFor: null,
             },
           ],
           comments: [
             message('com_1', null, STANZY, 'Le scan est flou.'),
             message('com_2', 'com_1', CLIENT, 'Je le refais ce soir.'),
           ],
+          signatures: [],
         },
       ],
     },
@@ -293,5 +296,66 @@ describe('DossierDocuments from a Notification’s link', () => {
     expect(messageWith('Je le refais ce soir.')).toHaveAttribute('aria-current', 'true');
     expect(messageWith('Le scan est flou.')).not.toHaveAttribute('aria-current');
     expect(scrollIntoView).toHaveBeenCalledWith({ block: 'center' });
+  });
+});
+
+describe('Demandes de signature on the documents', () => {
+  /** Relevé N2 waiting for the Client's signature; its V1 the signed PDF of an earlier Demande. */
+  const waitingData = (viewer: typeof CLIENT | typeof STANZY) => {
+    const data = sections({ viewer });
+    const document = data.sections[0]!.documents[0]!;
+    document.signatures = [{ id: 'sig_1', versionId: 'ver_2' }] as never;
+    document.versions[0]!.signedFor = { id: 'sig_0' } as never;
+    return data;
+  };
+
+  it('asks the Client to sign, from the list and from the Document', () => {
+    documents('client', waitingData(CLIENT));
+    expect(screen.getByText('Un document attend votre signature')).toBeInTheDocument();
+    const links = screen.getAllByRole('link', { name: 'Signer' });
+    expect(links).toHaveLength(2);
+    for (const link of links) expect(link).toHaveAttribute('href', '/fr/mon-espace/dossiers/dos_1/signer/sig_1');
+    expect(screen.getByText('À signer')).toBeInTheDocument();
+    openDocument();
+    expect(screen.getByText('Signée')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Faire signer/ })).not.toBeInTheDocument();
+  });
+
+  it('lets the consultant send a PDF Version for signature', () => {
+    documents('consultant');
+    expect(screen.getByRole('link', { name: 'Demander une signature' })).toHaveAttribute(
+      'href',
+      '/dossiers/dos_1/signature',
+    );
+    openDocument();
+    expect(screen.getByRole('link', { name: 'Faire signer la version V2' })).toHaveAttribute(
+      'href',
+      '/dossiers/dos_1/signature?version=ver_2',
+    );
+  });
+
+  it('shows the consultant the Demande waiting, and cancels it', async () => {
+    const cancel = vi.fn();
+    const data = waitingData(STANZY);
+    const { trpc, queryClient, wrap } = createTestTRPC({
+      'dossiers.documents.sections': () => data,
+      'signatures.cancel': (input) => cancel(input),
+      'signatures.pending': () => [],
+    });
+    queryClient.setQueryData(trpc.dossiers.documents.sections.queryKey({ dossierId: 'dos_1' }), data as never);
+    render(withIntl(wrap(<DossierDocuments dossierId="dos_1" viewer="consultant" />)));
+    expect(screen.getByText('Signature en attente')).toBeInTheDocument();
+    openDocument();
+    // One Demande at a time: no new one while it waits.
+    expect(screen.queryByRole('link', { name: /Faire signer/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Annuler la demande' }));
+    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Annuler la demande' }));
+    await waitFor(() => expect(cancel).toHaveBeenCalledWith({ id: 'sig_1' }));
+    expect(await screen.findByText('Demande de signature annulée')).toBeInTheDocument();
+  });
+
+  it('offers no signing in a closed Dossier', () => {
+    documents('client', { ...waitingData(CLIENT), open: false });
+    expect(screen.queryByRole('link', { name: 'Signer' })).not.toBeInTheDocument();
   });
 });

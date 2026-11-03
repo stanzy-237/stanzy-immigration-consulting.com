@@ -52,6 +52,7 @@ export const withDocument = (data: SectionsData, input: { sectionId: string; tit
               addedBy: { name: data.viewer.name, role: data.viewer.role },
               versions: [],
               comments: [],
+              signatures: [],
             },
           ],
         }
