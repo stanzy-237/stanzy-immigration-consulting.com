@@ -69,6 +69,11 @@ function fakeDatabase(invoices: Row[], accounts: Row[] = []) {
         return [];
       },
     },
+    meetingRecording: {
+      async findMany() {
+        return [];
+      },
+    },
     charge: {
       async findMany() {
         return [];

@@ -61,6 +61,8 @@ model Account {
   signaturesSigned  SignatureRequest[] @relation("SignatureSigner")
   contractsSent     Contract[]         @relation("ContractSender")
   contractsSigned   Contract[]         @relation("ContractSigner")
+  meetingsPlanned   Meeting[]
+  meetingConsents   MeetingConsent[]
   dossierMessages   DossierMessage[]
   incomesEntered    Income[]           @relation("IncomeCreator")
   chargesEntered    Charge[]           @relation("ChargeCreator")
@@ -389,6 +391,7 @@ model Dossier {
   sections      DossierSection[]
   invoices      Invoice[]
   contracts     Contract[]
+  meetings      Meeting[]
   messages      DossierMessage[]
   incomes       Income[]
   charges       Charge[]
@@ -627,6 +630,12 @@ enum NotificationKind {
   CONTRACT_SENT
   /// To the consultant: the Client signed a Contrat or an Avenant.
   CONTRACT_SIGNED
+  /// To the Client: a Réunion planned, moved or cancelled (#94).
+  MEETING_SCHEDULED
+  MEETING_MOVED
+  MEETING_CANCELLED
+  /// To the Client the day before and 15 minutes before; to the consultant 15 minutes before.
+  MEETING_REMINDER
   /// To the other side: a message in the Dossier's « Messages » (#94).
   DOSSIER_MESSAGE
   /// To the Client, 3 then 7 days after a Demande de signature, if unsigned.
@@ -844,6 +853,82 @@ model Contract {
   @@index([dossierId, sentAt])
   @@index([status, sentAt])
   @@map("contract")
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  CANCELLED
+}
+
+/// GLOSSARY: Réunion (#94). A video meeting planned from a Dossier, held in
+/// the app on Stream Video, recorded and transcribed unless switched off.
+model Meeting {
+  id                String             @id @default(cuid())
+  dossierId         String
+  dossier           Dossier            @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  subject           String
+  startsAt          DateTime
+  durationMinutes   Int
+  /// Recorded and transcribed; the consultant may switch it off for one Réunion.
+  recording         Boolean            @default(true)
+  status            MeetingStatus      @default(SCHEDULED)
+  /// The consultant's private notes; the Client never sees them.
+  notes             String?
+  plannedById       String
+  plannedBy         Account            @relation(fields: [plannedById], references: [id], onDelete: Restrict)
+  cancelledAt       DateTime?
+  cancelReason      String?
+  /// When each reminder went out; moving the Réunion clears them.
+  remindedDayBefore DateTime?
+  remindedSoon      DateTime?
+  consents          MeetingConsent[]
+  recordings        MeetingRecording[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([dossierId, startsAt])
+  @@index([status, startsAt])
+  @@map("meeting")
+}
+
+/// « Cette réunion est enregistrée »: accepted by someone before joining, with the time.
+model MeetingConsent {
+  id         String   @id @default(cuid())
+  meetingId  String
+  meeting    Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  accountId  String
+  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  acceptedAt DateTime @default(now())
+
+  @@unique([meetingId, accountId])
+  @@map("meeting_consent")
+}
+
+enum MeetingFileKind {
+  RECORDING
+  TRANSCRIPTION
+}
+
+/// GLOSSARY: Enregistrement, Transcription. A file Stream made of a Réunion,
+/// stored in the private bucket through Stream's external storage; for the
+/// consultant only, kept until 2 years after the Dossier is closed.
+model MeetingRecording {
+  id        String          @id @default(cuid())
+  meetingId String
+  meeting   Meeting         @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  kind      MeetingFileKind
+  /// Stream's file name, and where it put the file: its own address (valid about 2 weeks) and, once found, our bucket's key.
+  filename  String
+  url       String
+  objectKey String?
+  startedAt DateTime
+  endedAt   DateTime
+  /// A Transcription's words, for searching.
+  text      String?
+  createdAt DateTime        @default(now())
+
+  @@unique([meetingId, kind, filename])
+  @@map("meeting_recording")
 }
 
 /// GLOSSARY: Messages du dossier (#94). The Dossier's general conversation

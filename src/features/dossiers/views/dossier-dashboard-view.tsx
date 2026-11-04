@@ -38,6 +38,7 @@ export function DossierDashboardView({
   invoices,
   finances,
   contracts,
+  meetings,
 }: {
   id: string;
   invoices?: ReactNode;
@@ -45,6 +46,8 @@ export function DossierDashboardView({
   finances?: ReactNode;
   /** The Contrat panel (#96), passed in by the route. */
   contracts?: ReactNode;
+  /** The Réunions panel (#94), passed in by the route. */
+  meetings?: ReactNode;
 }): ReactNode {
   const t = useTranslations('Dossiers.detail');
   // A Notification's link (#92): the Document to unfold, the message to highlight.
@@ -64,6 +67,7 @@ export function DossierDashboardView({
       </QueryBoundary>
       {invoices ? <div className="mt-10">{invoices}</div> : null}
       {finances ? <div className="mt-6">{finances}</div> : null}
+      {meetings ? <div className="mt-10">{meetings}</div> : null}
       {contracts ? <div className="mt-10">{contracts}</div> : null}
       <div className="mt-10">
         <QueryBoundary fallback={<DossierMessagesSkeleton />}>

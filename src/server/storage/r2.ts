@@ -77,6 +77,18 @@ export async function presignUpload(bucket: Bucket, key: string, contentType: st
   return signed.url;
 }
 
+/**
+ * A short-lived address to read a private object straight from R2: for files
+ * too large to pass through our routes (a Réunion's Enregistrement, #94).
+ * Only ever given to the consultant, after the route checked who asks.
+ */
+export async function presignDownload(bucket: Bucket, key: string, seconds = 5 * 60): Promise<string> {
+  const url = new URL(objectUrl(bucket, key));
+  url.searchParams.set('X-Amz-Expires', String(seconds));
+  const signed = await r2().client.sign(new Request(url, { method: 'GET' }), { aws: { signQuery: true } });
+  return signed.url;
+}
+
 /** The stored object's size in bytes, or null when it isn't there. */
 export async function objectSize(bucket: Bucket, key: string): Promise<number | null> {
   const response = await r2().client.fetch(objectUrl(bucket, key), { method: 'HEAD' });

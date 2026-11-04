@@ -1838,14 +1838,14 @@
         "subject": "Document signed in your {service} file",
         "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file."
       },
-      "message": {
-        "subject": "New message in your {service} file",
-        "body": "Stanzy wrote to you in your {service} file: “{excerpt}”"
-      },
       "signatureReminder": {
         "subject": "Reminder: a document to sign in your {service} file",
         "body": "“{document}” is still waiting for your signature in your {service} file. Open your space to read it and sign it online.",
         "cta": "Sign the document"
+      },
+      "message": {
+        "subject": "New message in your {service} file",
+        "body": "Stanzy wrote to you in your {service} file: “{excerpt}”"
       }
     },
     "dashboard": {
@@ -2305,9 +2305,13 @@
       "DOCUMENT_SIGNED": "{actor} signed “{document}”.",
       "CONTRACT_SENT": "Stanzy sent you {number} to sign.",
       "CONTRACT_SIGNED": "{actor} signed {number}.",
-      "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file.",
+      "MEETING_SCHEDULED": "Meeting “{subject}” planned on {date}.",
+      "MEETING_MOVED": "Meeting “{subject}” moved to {date}.",
+      "MEETING_CANCELLED": "Meeting “{subject}” cancelled.",
+      "MEETING_REMINDER": "{soon, select, true {The meeting “{subject}” starts soon.} other {Reminder: meeting “{subject}” on {date}.}}",
       "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
-      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature."
+      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature.",
+      "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2327,9 +2331,13 @@
       "DOCUMENT_SIGNED": "A document was signed.",
       "CONTRACT_SENT": "A contract to sign.",
       "CONTRACT_SIGNED": "A contract was signed.",
-      "DOSSIER_MESSAGE": "New message in a file.",
+      "MEETING_SCHEDULED": "New meeting.",
+      "MEETING_MOVED": "A meeting changed.",
+      "MEETING_CANCELLED": "A meeting was cancelled.",
+      "MEETING_REMINDER": "Meeting reminder.",
       "SIGNATURE_REMINDER": "A document is waiting for your signature.",
-      "CONTRACT_REMINDER": "A contract is waiting for your signature."
+      "CONTRACT_REMINDER": "A contract is waiting for your signature.",
+      "DOSSIER_MESSAGE": "New message in a file."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -2803,6 +2811,131 @@
       "openSigned": "Open the signed contract"
     },
     "stageWarning": "The contract isn’t signed yet."
+  },
+  "Meetings": {
+    "emails": {
+      "greeting": "Hello {name},",
+      "when": "{when} (Douala time)",
+      "reason": "Reason: {reason}",
+      "recorded": "This meeting will be recorded and transcribed: you’ll be asked to accept before joining.",
+      "join": "Join the meeting",
+      "openDossier": "Open my file",
+      "scheduled": {
+        "subject": "Meeting planned: {subject}",
+        "body": "Stanzy invites you to a video meeting “{subject}” on {when}, for {minutes} minutes. It takes place in your space: the button below opens it 15 minutes before."
+      },
+      "moved": {
+        "subject": "Meeting moved: {subject}",
+        "body": "The meeting “{subject}” has changed: it will take place on {when}, for {minutes} minutes."
+      },
+      "cancelled": {
+        "subject": "Meeting cancelled: {subject}",
+        "body": "The meeting “{subject}” planned on {when} is cancelled."
+      },
+      "dayBefore": {
+        "subject": "Tomorrow: {subject}",
+        "body": "Reminder: your meeting “{subject}” takes place on {when}."
+      },
+      "soon": {
+        "subject": "In 15 minutes: {subject}",
+        "body": "Your meeting “{subject}” starts soon, on {when}. You can join it now."
+      }
+    },
+    "panel": {
+      "title": "Meetings",
+      "introClient": "Your video meetings with Stanzy. To ask for one, write in Messages.",
+      "introConsultant": "Video meetings with the client, recorded and transcribed for you only.",
+      "plan": "Plan a meeting",
+      "empty": "No meetings.",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "cancelled": "Cancelled",
+      "join": "Join",
+      "joinLabel": "Join “{subject}”",
+      "opensSoon": "The room opens 15 minutes before.",
+      "recorded": "Recorded",
+      "notRecorded": "Not recorded",
+      "minutes": "{minutes} min",
+      "edit": "Edit",
+      "editLabel": "Edit “{subject}”",
+      "cancel": "Cancel",
+      "cancelLabel": "Cancel “{subject}”",
+      "notes": "Notes (for you only)",
+      "notesLabel": "Notes on “{subject}”",
+      "notesSave": "Save notes",
+      "recording": "Recording of {date}",
+      "transcription": "Transcription",
+      "showTranscript": "Read the transcription",
+      "hideTranscript": "Hide the transcription",
+      "noFiles": "No recording yet: it arrives a few minutes after the end.",
+      "search": "Search the transcriptions",
+      "searchPlaceholder": "A word said during a meeting",
+      "noResults": "Nothing found.",
+      "results": "{count, plural, one {# meeting} other {# meetings}}",
+      "unconfigured": "Video isn’t set up on this site yet: meetings can be planned, not joined yet.",
+      "loading": "Loading meetings",
+      "reason": "Reason: {reason}"
+    },
+    "form": {
+      "newTitle": "Plan a meeting",
+      "editTitle": "Edit the meeting",
+      "body": "The client gets it by email and in their bell, then a reminder the day before and 15 minutes before.",
+      "subject": "Subject",
+      "subjectPlaceholder": "E.g. proof of funds review",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "minutes": "{minutes} minutes",
+      "recording": "Record and transcribe",
+      "recordingHint": "Everyone accepts the recording before joining. Untick for a meeting without recording.",
+      "timezone": "In this device’s time ({zone}).",
+      "inPast": "Choose a time to come.",
+      "cancel": "Cancel",
+      "save": "Plan",
+      "saveEdit": "Save",
+      "saving": "Sending…"
+    },
+    "cancelDialog": {
+      "title": "Cancel the meeting?",
+      "body": "The client is told by email and in their bell.",
+      "reason": "Reason (optional)",
+      "keep": "Keep",
+      "confirm": "Cancel the meeting"
+    },
+    "room": {
+      "back": "Back to the file",
+      "loading": "Getting the room ready",
+      "recordedTitle": "This meeting is recorded",
+      "recordedBody": "The video, the sound and a written transcription are kept with the file, for Stanzy only, until 2 years after it closes.",
+      "accept": "I accept that the meeting is recorded",
+      "acceptedOn": "Accepted on {date}.",
+      "notRecorded": "This meeting isn’t recorded.",
+      "join": "Join",
+      "joining": "Connecting…",
+      "notOpen": "The room opens 15 minutes before the start.",
+      "over": "This meeting is over.",
+      "cancelled": "This meeting was cancelled.",
+      "unconfigured": "Video isn’t set up on this site yet.",
+      "recordingNow": "Recording",
+      "left": "You left the meeting.",
+      "rejoin": "Back to the meeting",
+      "failed": "Couldn’t connect. Check the camera and microphone, then try again."
+    },
+    "toast": {
+      "scheduled": "Meeting planned",
+      "updated": "Meeting updated",
+      "cancelled": "Meeting cancelled",
+      "notes": "Notes saved"
+    },
+    "errors": {
+      "MEETING_IN_PAST": "Choose a time to come.",
+      "MEETING_NOT_SCHEDULED": "This meeting is cancelled.",
+      "MEETING_NOT_OPEN": "The room isn’t open.",
+      "MEETING_CONSENT_REQUIRED": "Accept the recording to join.",
+      "MEETINGS_UNCONFIGURED": "Video isn’t set up on this site yet.",
+      "DOSSIER_CLOSED": "This file is closed.",
+      "UNKNOWN": "Something went wrong. Try again."
+    }
   },
   "Finances": {
     "title": "Finances",

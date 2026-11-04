@@ -1,4 +1,4 @@
-import { useLocale, useTranslations } from 'next-intl';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 
 import { formatMoney } from '@/features/invoices/lib/money';
 import { actorName, type NotificationItem } from '@/features/notifications/lib/notification-links';
@@ -11,6 +11,7 @@ export function useNotificationText() {
   const t = useTranslations('Notifications');
   const dossiers = useTranslations('Dossiers');
   const locale = useLocale();
+  const format = useFormatter();
 
   return (item: NotificationItem): { title: string; detail: string | null } => {
     const service = item.dossier ? dossiers(`services.${item.dossier.service}`) : '';
@@ -31,6 +32,18 @@ export function useNotificationText() {
       // A Facture's number, or a Contrat's (kept in its params).
       number: item.invoice?.number ?? item.params.number ?? '',
       total: item.invoice ? formatMoney(item.invoice.total, item.invoice.currency, locale) : '',
+      // A Réunion's subject and moment (#94), in the reader's own time.
+      subject: item.params.subject ?? '',
+      date: item.params.startsAt
+        ? format.dateTime(new Date(item.params.startsAt), {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : '',
+      soon: item.params.soon === 'true' ? 'true' : 'false',
     };
     const detail =
       item.kind === 'MESSAGE_POSTED' && item.comment?.body

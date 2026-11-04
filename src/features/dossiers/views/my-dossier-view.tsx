@@ -25,11 +25,14 @@ export function MyDossierView({
   id,
   invoices,
   contracts,
+  meetings,
 }: {
   id: string;
   invoices?: ReactNode;
   /** The Contrat panel (#96), passed in by the route. */
   contracts?: ReactNode;
+  /** The Réunions panel (#94), passed in by the route. */
+  meetings?: ReactNode;
 }): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
   // A Notification's link (#92): the Document to unfold, the message to highlight.
@@ -52,6 +55,7 @@ export function MyDossierView({
               <MyDossierHeader id={id} />
             </QueryBoundary>
           </div>
+          {meetings}
           {contracts}
           {invoices}
           <QueryBoundary fallback={<DossierMessagesSkeleton />}>
