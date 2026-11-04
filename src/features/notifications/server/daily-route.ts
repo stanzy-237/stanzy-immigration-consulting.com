@@ -7,7 +7,8 @@ import { appMailer } from '@/server/email/app-mailer';
 
 /**
  * POST /api/cron/daily, called every morning by .github/workflows/daily-jobs.yml
- * with CRON_SECRET: Facture reminders, the sign-ups summary, the clean-up (#92).
+ * with CRON_SECRET: Facture and signature reminders, the sign-ups summary, the
+ * clean-up (#92, #96).
  */
 export async function POST(request: Request): Promise<Response> {
   if (!env.CRON_SECRET) return Response.json({ error: 'CRON_SECRET is not configured' }, { status: 503 });

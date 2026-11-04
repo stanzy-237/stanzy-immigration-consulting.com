@@ -1840,6 +1840,11 @@
       "message": {
         "subject": "New message in your {service} file",
         "body": "Stanzy wrote to you in your {service} file: “{excerpt}”"
+      },
+      "signatureReminder": {
+        "subject": "Reminder: a document to sign in your {service} file",
+        "body": "“{document}” is still waiting for your signature in your {service} file. Open your space to read it and sign it online.",
+        "cta": "Sign the document"
       }
     },
     "dashboard": {
@@ -2299,7 +2304,9 @@
       "DOCUMENT_SIGNED": "{actor} signed “{document}”.",
       "CONTRACT_SENT": "Stanzy sent you {number} to sign.",
       "CONTRACT_SIGNED": "{actor} signed {number}.",
-      "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file."
+      "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file.",
+      "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
+      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2319,7 +2326,9 @@
       "DOCUMENT_SIGNED": "A document was signed.",
       "CONTRACT_SENT": "A contract to sign.",
       "CONTRACT_SIGNED": "A contract was signed.",
-      "DOSSIER_MESSAGE": "New message in a file."
+      "DOSSIER_MESSAGE": "New message in a file.",
+      "SIGNATURE_REMINDER": "A document is waiting for your signature.",
+      "CONTRACT_REMINDER": "A contract is waiting for your signature."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -2672,6 +2681,11 @@
         "subject": "{client} signed {number}",
         "body": "{client} signed “{title}” ({number}) for their {service} file. The signed PDF is attached.",
         "cta": "Open the file"
+      },
+      "reminder": {
+        "subject": "Reminder: {number} to sign",
+        "body": "“{title}” ({number}) is still waiting for your signature, for your {service} file. Read it and sign it online.",
+        "cta": "Read and sign"
       }
     },
     "panel": {

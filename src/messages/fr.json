@@ -1857,6 +1857,11 @@
       "message": {
         "subject": "Nouveau message dans votre dossier {service}",
         "body": "Stanzy vous a écrit dans votre dossier {service} : « {excerpt} »"
+      },
+      "signatureReminder": {
+        "subject": "Rappel : un document à signer dans votre dossier {service}",
+        "body": "« {document} » attend toujours votre signature dans votre dossier {service}. Ouvrez votre espace pour le lire et le signer en ligne.",
+        "cta": "Signer le document"
       }
     },
     "dashboard": {
@@ -2316,7 +2321,9 @@
       "DOCUMENT_SIGNED": "{actor} a signé « {document} ».",
       "CONTRACT_SENT": "Stanzy vous a envoyé {number} à signer.",
       "CONTRACT_SIGNED": "{actor} a signé {number}.",
-      "DOSSIER_MESSAGE": "{actor} a écrit {count, plural, one {un message} other {# messages}} dans le dossier {service}."
+      "DOSSIER_MESSAGE": "{actor} a écrit {count, plural, one {un message} other {# messages}} dans le dossier {service}.",
+      "SIGNATURE_REMINDER": "Rappel : « {document} » attend votre signature.",
+      "CONTRACT_REMINDER": "Rappel : {number} attend votre signature."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2336,7 +2343,9 @@
       "DOCUMENT_SIGNED": "Un document a été signé.",
       "CONTRACT_SENT": "Un contrat à signer.",
       "CONTRACT_SIGNED": "Un contrat a été signé.",
-      "DOSSIER_MESSAGE": "Nouveau message dans un dossier."
+      "DOSSIER_MESSAGE": "Nouveau message dans un dossier.",
+      "SIGNATURE_REMINDER": "Un document attend votre signature.",
+      "CONTRACT_REMINDER": "Un contrat attend votre signature."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",
@@ -2689,6 +2698,11 @@
         "subject": "{client} a signé {number}",
         "body": "{client} a signé « {title} » ({number}) pour son dossier {service}. Le PDF signé est en pièce jointe.",
         "cta": "Ouvrir le dossier"
+      },
+      "reminder": {
+        "subject": "Rappel : {number} à signer",
+        "body": "« {title} » ({number}) attend toujours votre signature, pour votre dossier {service}. Lisez-le et signez-le en ligne.",
+        "cta": "Lire et signer"
       }
     },
     "panel": {
