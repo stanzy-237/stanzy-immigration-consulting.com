@@ -17,6 +17,7 @@ import {
 import { toast } from '@/components/ui/toast';
 import { DocumentConversation } from '@/features/dossiers/components/document-conversation';
 import { useDocumentFocus } from '@/features/dossiers/components/document-focus';
+import { DocumentNeeds, NeedBadges } from '@/features/dossiers/components/document-needs';
 import {
   CancelSignature,
   RequestSignatureLink,
@@ -94,6 +95,7 @@ export function DocumentCard({
               {t('finalBadge', { number: final.number })}
             </span>
           ) : null}
+          <NeedBadges document={document} />
           <SignatureBadge document={document} viewer={viewer} />
           <ChevronDown
             aria-hidden={true}
@@ -115,6 +117,7 @@ export function DocumentCard({
 
       {expanded ? (
         <div id={`${ids}-panel`} className="grid gap-5 border-t border-fog-light p-4">
+          <DocumentNeeds dossierId={dossierId} document={document} viewer={viewer} open={open} />
           <div>
             <h4 className="text-sm font-semibold text-navy-deep">{t('versions')}</h4>
             {document.versions.length === 0 ? (

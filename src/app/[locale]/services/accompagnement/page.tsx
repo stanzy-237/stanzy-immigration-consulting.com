@@ -1,7 +1,6 @@
-import { Users } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { ServicePlaceholderView } from '@/features/service-placeholder/views/service-placeholder-view';
+import { AccompagnementView } from '@/features/accompagnement/views/accompagnement-view';
 import type { LocaleParams } from '@/i18n/routing';
 
 export async function generateMetadata({
@@ -24,5 +23,5 @@ export default async function Page({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ServicePlaceholderView nameKey="accompagnementName" icon={Users} />;
+  return <AccompagnementView />;
 }

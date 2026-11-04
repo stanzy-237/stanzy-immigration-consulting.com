@@ -17,8 +17,8 @@ export type LinkTarget = Pick<NotificationItem, 'kind'> & {
   document?: { id: string } | null;
   comment?: { id: string } | null;
   invoice?: { id: string } | null;
-  /** A Demande de signature's id (SIGNATURE_*), a Contrat's (CONTRACT_*), a Réunion's (MEETING_*). */
-  params?: { requestId?: string; contractId?: string; meetingId?: string };
+  /** A Demande de signature's id (SIGNATURE_*), a Contrat's (CONTRACT_*), a Réunion's (MEETING_*), a Demande d'intérêt's (INTEREST_*). */
+  params?: { requestId?: string; contractId?: string; meetingId?: string; interestId?: string };
 };
 
 export function notificationHref(item: LinkTarget, audience: Audience, locale: string): string {
@@ -27,6 +27,9 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
   if (item.kind === 'ACCOUNTS_SIGNED_UP') return '/comptes';
   // The site's page, with its language: from admin.<site> it redirects to the site.
   if (item.kind === 'DRAW_PUBLISHED') return `/${locale}/outils/dernier-tirage`;
+  // A Demande d'intérêt (#81): the consultant's decision page, the User's own status.
+  if (item.kind === 'INTEREST_SUBMITTED') return item.params?.interestId ? `/demandes/${item.params.interestId}` : '/demandes';
+  if (item.kind === 'INTEREST_REJECTED') return `${base}/accompagnement`;
   if (!item.dossier) return all;
   const dossier = `${base}/dossiers/${item.dossier.id}`;
 

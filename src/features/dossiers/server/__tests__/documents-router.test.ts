@@ -148,6 +148,8 @@ function fakeDatabase() {
       },
     },
   };
+  // No Demande d'intérêt (#81): « Stanzy s'en charge » isn't offered.
+  prisma.interestRequest = { findFirst: async () => null };
   prisma.$transaction = (fn: (tx: unknown) => Promise<unknown>) => fn(prisma);
   return { prisma: prisma as unknown as TRPCContext['prisma'], tables };
 }

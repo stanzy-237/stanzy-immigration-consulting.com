@@ -28,6 +28,7 @@ const data = (comments: ReturnType<typeof comment>[] = []): SectionsData => ({
   viewer: { id: 'acc_1', name: 'Aminata Diallo', role: 'MEMBER' },
   open: true,
   locked: false,
+  stanzy: false,
   sections: [
     {
       id: 'sec_1',
@@ -42,6 +43,11 @@ const data = (comments: ReturnType<typeof comment>[] = []): SectionsData => ({
           versions: [],
           comments,
           signatures: [],
+          kind: null,
+          need: null,
+          missing: false,
+          clientNote: null,
+          stanzyRequests: [],
         },
       ],
     },

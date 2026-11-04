@@ -1411,6 +1411,7 @@
       "outils-pdf": "PDF tools",
       "signatures": "Signatures",
       "contrats": "Contracts",
+      "demandes": "Expressions of interest",
       "finances": "Finances"
     },
     "viewSite": "View the site",
@@ -2305,12 +2306,16 @@
       "DOCUMENT_SIGNED": "{actor} signed “{document}”.",
       "CONTRACT_SENT": "Stanzy sent you {number} to sign.",
       "CONTRACT_SIGNED": "{actor} signed {number}.",
+      "INTEREST_SUBMITTED": "{client} sent an expression of interest (level {level}).",
+      "INTEREST_REJECTED": "Your Accompagnement request wasn’t accepted.",
+      "STANZY_REQUESTED": "{actor} asks Stanzy to get “{document}”.",
+      "STANZY_DECLINED": "Stanzy won’t be able to get “{document}”.",
+      "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
+      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature.",
       "MEETING_SCHEDULED": "Meeting “{subject}” planned on {date}.",
       "MEETING_MOVED": "Meeting “{subject}” moved to {date}.",
       "MEETING_CANCELLED": "Meeting “{subject}” cancelled.",
       "MEETING_REMINDER": "{soon, select, true {The meeting “{subject}” starts soon.} other {Reminder: meeting “{subject}” on {date}.}}",
-      "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
-      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature.",
       "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file."
     },
     "push": {
@@ -2331,12 +2336,16 @@
       "DOCUMENT_SIGNED": "A document was signed.",
       "CONTRACT_SENT": "A contract to sign.",
       "CONTRACT_SIGNED": "A contract was signed.",
+      "INTEREST_SUBMITTED": "New expression of interest.",
+      "INTEREST_REJECTED": "An answer to your request.",
+      "STANZY_REQUESTED": "A document to get.",
+      "STANZY_DECLINED": "A document to get yourself.",
+      "SIGNATURE_REMINDER": "A document is waiting for your signature.",
+      "CONTRACT_REMINDER": "A contract is waiting for your signature.",
       "MEETING_SCHEDULED": "New meeting.",
       "MEETING_MOVED": "A meeting changed.",
       "MEETING_CANCELLED": "A meeting was cancelled.",
       "MEETING_REMINDER": "Meeting reminder.",
-      "SIGNATURE_REMINDER": "A document is waiting for your signature.",
-      "CONTRACT_REMINDER": "A contract is waiting for your signature.",
       "DOSSIER_MESSAGE": "New message in a file."
     },
     "pushSwitch": {
@@ -2811,6 +2820,245 @@
       "openSigned": "Open the signed contract"
     },
     "stageWarning": "The contract isn’t signed yet."
+  },
+  "Accompagnement": {
+    "emails": {
+      "greeting": "Hello {name},",
+      "reason": "Reason: {reason}",
+      "submitted": {
+        "subject": "New expression of interest: {client}",
+        "body": "{client} sent an Express Entry Accompagnement request. Level worked out: {level}.",
+        "cta": "See the request"
+      },
+      "approved": {
+        "subject": "Your Accompagnement request is accepted",
+        "body": "Good news: Stanzy will guide you. Your file is open at the “{stage}” stage, with the list of documents to prepare.",
+        "next": "The invoice follows separately. In your space, see what’s missing and ask your questions.",
+        "cta": "Open my file"
+      },
+      "rejected": {
+        "subject": "Your Accompagnement request",
+        "body": "Stanzy can’t take your request forward for now.",
+        "again": "You can send a new request when your situation changes.",
+        "cta": "See my request"
+      },
+      "stanzyRequested": {
+        "subject": "{client} asks Stanzy to get a document",
+        "body": "{client} asks Stanzy to get “{document}”.",
+        "cta": "Open the file"
+      },
+      "stanzyDeclined": {
+        "subject": "“{document}”: to get yourself",
+        "body": "Stanzy won’t be able to get “{document}” for you: it’s still yours to provide.",
+        "cta": "See the document"
+      }
+    },
+    "page": {
+      "eyebrow": "Express Entry Accompagnement",
+      "title": "From your profile to permanent residence",
+      "lead": "Stanzy guides you through the whole Express Entry journey, from wherever you are: language test, ECA, profile, invitation, permanent residence application, up to COPR.",
+      "apply": "Send a request",
+      "consult": "Book a consultation",
+      "noConsult": "No consultation needed first: the request is enough to start.",
+      "stagesTitle": "The 10 stages",
+      "levelsTitle": "Wherever you start from",
+      "levels": {
+        "A": {
+          "title": "Level A · Beginner",
+          "body": "You’re starting out: we prepare the language test and the ECA together."
+        },
+        "B": {
+          "title": "Level B · Prerequisites done",
+          "body": "Language test and ECA done: we create your Express Entry profile."
+        },
+        "C": {
+          "title": "Level C · Profile created",
+          "body": "You’re in the pool, invited or not: we prepare what comes next."
+        }
+      },
+      "howTitle": "How it works",
+      "how": {
+        "1": "You fill in the expression of interest, like an IRCC form, in 10 minutes.",
+        "2": "Stanzy reviews it and answers by email.",
+        "3": "Your file opens at the right stage, with the list of documents to prepare.",
+        "4": "You follow everything in your space: documents, messages, meetings."
+      }
+    },
+    "form": {
+      "title": "Expression of interest",
+      "lead": "Answer as on an IRCC form. Your Checklist and CRS calculator answers are carried over.",
+      "steps": {
+        "situation": "Your situation",
+        "progress": "Where you stand",
+        "documents": "Your documents"
+      },
+      "stepOf": "Step {step} of 3: {name}",
+      "next": "Continue",
+      "back": "Back",
+      "submit": "Send my request",
+      "submitting": "Sending…",
+      "age": "Age",
+      "citizenship": "Citizenship",
+      "residence": "Country of residence",
+      "residences": {
+        "CM": "Cameroon",
+        "CA": "Canada",
+        "OTHER": "Another country"
+      },
+      "residenceOther": "Which one?",
+      "languageTest": "Language test taken",
+      "languageTests": {
+        "none": "Not yet",
+        "tcf": "TCF Canada",
+        "tef": "TEF Canada",
+        "ielts": "IELTS General Training",
+        "celpip": "CELPIP-General",
+        "pte": "PTE Core"
+      },
+      "ede": "I’ve done my ECA (WES, IQAS…)",
+      "eeProfile": "I’ve created my Express Entry profile",
+      "ita": "I’ve received an invitation to apply (ITA)",
+      "itaDate": "Date of the invitation",
+      "invalid": "Check the fields marked.",
+      "documentsIntro": "For each area, say where you stand. A note helps Stanzy prepare your file.",
+      "areas": {
+        "identity": "Identity (passport, birth certificate…)",
+        "studies": "Studies (diplomas, transcripts, ECA)",
+        "language": "Language (test results)",
+        "work": "Work (reference letters, payslips…)",
+        "funds": "Proof of funds",
+        "police": "Police certificates",
+        "family": "Family (marriage, union, children)"
+      },
+      "answers": {
+        "have": "I have it",
+        "missing": "I don’t have it",
+        "unsure": "Not sure",
+        "stanzy": "Stanzy takes care of it"
+      },
+      "stanzyHint": "“Stanzy takes care of it”: Stanzy gets the document for you, billed separately (in Cameroon only).",
+      "note": "Note on “{area}” (optional)",
+      "notePlaceholder": "What worries you, what’s missing…"
+    },
+    "status": {
+      "title": "Express Entry Accompagnement",
+      "pending": "Your request of {date} is being reviewed. Stanzy answers by email.",
+      "approved": "Your request is accepted: your file is open.",
+      "openDossier": "Open my file",
+      "rejected": "Your request of {date} wasn’t accepted.",
+      "again": "Send a new request",
+      "signIn": "Sign in to send your request.",
+      "loading": "Loading your request"
+    },
+    "dashboard": {
+      "title": "Expressions of interest",
+      "intro": "Express Entry Accompagnement requests: the level worked out, the answers, your decision.",
+      "filters": {
+        "SUBMITTED": "To review",
+        "APPROVED": "Accepted",
+        "REJECTED": "Rejected",
+        "ALL": "All"
+      },
+      "filterLabel": "Show",
+      "empty": "No requests.",
+      "status": {
+        "SUBMITTED": "To review",
+        "APPROVED": "Accepted",
+        "REJECTED": "Rejected"
+      },
+      "levels": {
+        "A": "A · Beginner",
+        "B": "B · Prerequisites done",
+        "C": "C · Profile created"
+      },
+      "open": "See",
+      "openLabel": "See {name}’s request",
+      "back": "All requests",
+      "sentOn": "Sent on {date}",
+      "decidedOn": "Decided on {date} by {name}",
+      "loading": "Loading requests",
+      "situation": "Situation",
+      "progress": "Where they stand",
+      "documents": "Documents",
+      "yes": "Yes",
+      "no": "No",
+      "people": "Family",
+      "maritalStatus": "Marital status",
+      "spouseAccompanying": "Spouse coming along",
+      "children": "Children",
+      "studies": "Studies",
+      "foreignEducation": "Studies abroad",
+      "canadianEducation": "Studies in Canada",
+      "jobs": "Jobs",
+      "countries": "Countries lived in (police)",
+      "levelComputed": "Level worked out: {level}",
+      "levelChoose": "Level chosen",
+      "stage": "The file will open at the “{stage}” stage.",
+      "approve": "Accept and open the file",
+      "approving": "Opening…",
+      "reject": "Reject",
+      "rejectTitle": "Reject the request?",
+      "rejectBody": "They get an email and can send a new request.",
+      "rejectReason": "Reason (optional)",
+      "rejectConfirm": "Reject",
+      "keep": "Keep",
+      "rejectedWith": "Reason: {reason}",
+      "history": "Earlier requests",
+      "dossier": "Open the file",
+      "invoice": "Create the invoice",
+      "next": "Send the invoice: the amount is your quote.",
+      "decision": "Your decision"
+    },
+    "document": {
+      "mandatory": "★ Mandatory",
+      "recommended": "Recommended",
+      "missing": "Missing",
+      "clientNote": "Client’s note: {note}",
+      "yourNote": "Your note: {note}",
+      "tcf": "Prepare the TCF",
+      "ede": "Do my ECA"
+    },
+    "stanzy": {
+      "ask": "Stanzy takes care of it",
+      "askLabel": "Ask Stanzy to get “{document}”",
+      "askHint": "Stanzy gets this document for you, billed separately.",
+      "status": {
+        "REQUESTED": "Asked of Stanzy",
+        "ACCEPTED": "Accepted by Stanzy",
+        "ASSIGNED": "Under way at Stanzy",
+        "DECLINED": "To get yourself"
+      },
+      "panelTitle": "Documents for Stanzy to get",
+      "panelIntro": "What the client asked Stanzy to get. Accepting (an invoice line at the catalogue price) and handing to a partner come with Document services and Missions.",
+      "decline": "Decline",
+      "declineLabel": "Decline “{document}”",
+      "declineTitle": "Decline this request?",
+      "declineBody": "The client is told and gets the document themselves.",
+      "declineNote": "Note to the client (optional)",
+      "declineConfirm": "Decline",
+      "keep": "Keep",
+      "loading": "Loading requests"
+    },
+    "toast": {
+      "sent": "Request sent",
+      "approved": "File opened",
+      "rejected": "Request rejected",
+      "stanzyAsked": "Asked of Stanzy",
+      "stanzyDeclined": "Request declined"
+    },
+    "errors": {
+      "INTEREST_NOT_ELIGIBLE": "This account can’t send a request.",
+      "INTEREST_ALREADY_CLIENT": "An Accompagnement is already under way.",
+      "INTEREST_PENDING": "A request is already being reviewed.",
+      "INTEREST_NOT_PENDING": "This request was already handled.",
+      "STANZY_CLIENT_ONLY": "Only the client makes this request.",
+      "STANZY_CAMEROON_ONLY": "“Stanzy takes care of it” is for Cameroon only.",
+      "STANZY_NOT_MISSING": "This document is no longer missing.",
+      "STANZY_ALREADY_ASKED": "Already asked of Stanzy.",
+      "STANZY_NOT_PENDING": "This request was already handled.",
+      "DOSSIER_CLOSED": "This file is closed.",
+      "UNKNOWN": "Something went wrong. Try again."
+    }
   },
   "Meetings": {
     "emails": {

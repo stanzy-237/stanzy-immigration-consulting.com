@@ -19,6 +19,13 @@ const item = (extra: Partial<NotificationItem>): NotificationItem =>
   }) as NotificationItem;
 
 describe('where a Notification leads', () => {
+  it('opens a Demande d’intérêt for the consultant, and its status for the User', () => {
+    const sent = item({ kind: 'INTEREST_SUBMITTED', dossier: null, params: { interestId: 'int_1' } });
+    expect(notificationHref(sent, 'consultant', 'fr')).toBe('/demandes/int_1');
+    const rejected = item({ kind: 'INTEREST_REJECTED', dossier: null });
+    expect(notificationHref(rejected, 'client', 'fr')).toBe('/fr/mon-espace/accompagnement');
+  });
+
   it('opens a Réunion on its room, or the Réunions once cancelled', () => {
     const planned = item({ kind: 'MEETING_SCHEDULED', params: { meetingId: 'm_1' } });
     expect(notificationHref(planned, 'client', 'fr')).toBe('/fr/mon-espace/dossiers/dos_1/reunions/m_1');

@@ -53,6 +53,11 @@ export const withDocument = (data: SectionsData, input: { sectionId: string; tit
               versions: [],
               comments: [],
               signatures: [],
+              kind: null,
+              need: null,
+              missing: false,
+              clientNote: null,
+              stanzyRequests: [],
             },
           ],
         }

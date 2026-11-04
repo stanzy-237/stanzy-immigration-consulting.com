@@ -61,6 +61,9 @@ model Account {
   signaturesSigned  SignatureRequest[] @relation("SignatureSigner")
   contractsSent     Contract[]         @relation("ContractSender")
   contractsSigned   Contract[]         @relation("ContractSigner")
+  interestRequests  InterestRequest[]
+  interestsDecided  InterestRequest[]  @relation("InterestDecider")
+  stanzyRequests    StanzyRequest[]
   meetingsPlanned   Meeting[]
   meetingConsents   MeetingConsent[]
   dossierMessages   DossierMessage[]
@@ -391,6 +394,7 @@ model Dossier {
   sections      DossierSection[]
   invoices      Invoice[]
   contracts     Contract[]
+  interest      InterestRequest?
   meetings      Meeting[]
   messages      DossierMessage[]
   incomes       Income[]
@@ -458,6 +462,14 @@ model DossierDocument {
   comments       DocumentComment[]
   notifications  Notification[]
   signatures     SignatureRequest[]
+  /// Made from the Checklist at approval (#81): its document, ★ Obligatoire or Recommandé.
+  kind           String?
+  need           String?
+  /// The Client said they don't have it yet: « Manquant » until a Version comes.
+  missing        Boolean            @default(false)
+  /// The Client's note from their Demande d'intérêt, for this document's area.
+  clientNote     String?
+  stanzyRequests StanzyRequest[]
   createdAt      DateTime           @default(now())
 
   @@index([sectionId, createdAt])
@@ -630,6 +642,14 @@ enum NotificationKind {
   CONTRACT_SENT
   /// To the consultant: the Client signed a Contrat or an Avenant.
   CONTRACT_SIGNED
+  /// To the consultant: a new Demande d'intérêt (#81).
+  INTEREST_SUBMITTED
+  /// To the User: their Demande d'intérêt was not accepted.
+  INTEREST_REJECTED
+  /// To the consultant: a Client asked Stanzy to get a Document.
+  STANZY_REQUESTED
+  /// To the Client: Stanzy won't get that Document.
+  STANZY_DECLINED
   /// To the Client: a Réunion planned, moved or cancelled (#94).
   MEETING_SCHEDULED
   MEETING_MOVED
@@ -853,6 +873,73 @@ model Contract {
   @@index([dossierId, sentAt])
   @@index([status, sentAt])
   @@map("contract")
+}
+
+enum InterestStatus {
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+/// A, B or C: how far an Accompagnement candidate already is (GLOSSARY: Niveau).
+enum InterestLevel {
+  A
+  B
+  C
+}
+
+/// GLOSSARY: Demande d'intérêt (#81). Kept after the decision, as history.
+model InterestRequest {
+  id            String         @id @default(cuid())
+  accountId     String
+  account       Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  status        InterestStatus @default(SUBMITTED)
+  /// The answers: the Checklist's, where they stand, and each document area (src/features/accompagnement/lib/interest-schema.ts).
+  answers       Json
+  /// Worked out from the answers; the consultant's choice, if any, wins.
+  level         InterestLevel
+  levelOverride InterestLevel?
+  /// Where they live: « Stanzy s'en charge » is for Cameroon only.
+  residence     String
+  rejectReason  String?
+  decidedById   String?
+  decidedBy     Account?       @relation("InterestDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt     DateTime?
+  /// The Accompagnement Dossier its approval opened.
+  dossierId     String?        @unique
+  dossier       Dossier?       @relation(fields: [dossierId], references: [id], onDelete: SetNull)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([status, createdAt])
+  @@index([accountId, createdAt])
+  @@map("interest_request")
+}
+
+/// Demandé, then Accepté and Assigné once Services documentaires (#80) and Missions (#42) exist; or Refusé.
+enum StanzyRequestStatus {
+  REQUESTED
+  ACCEPTED
+  ASSIGNED
+  DECLINED
+}
+
+/// « Stanzy s'en charge » (#81): a Client in Cameroon asks Stanzy to get a missing Document.
+model StanzyRequest {
+  id            String              @id @default(cuid())
+  documentId    String
+  document      DossierDocument     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  status        StanzyRequestStatus @default(REQUESTED)
+  requestedById String
+  requestedBy   Account             @relation(fields: [requestedById], references: [id], onDelete: Restrict)
+  /// Why the consultant declined: the Client gets the Document themselves.
+  declineNote   String?
+  decidedAt     DateTime?
+  createdAt     DateTime            @default(now())
+
+  @@index([documentId, status])
+  @@index([status, createdAt])
+  @@map("stanzy_request")
 }
 
 enum MeetingStatus {

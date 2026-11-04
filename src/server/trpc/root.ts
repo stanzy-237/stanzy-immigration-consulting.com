@@ -1,3 +1,4 @@
+import { accompagnementRouter } from '@/features/accompagnement/server/accompagnement-router';
 import { authRouter } from '@/features/auth/server/auth-router';
 import { blogRouter } from '@/features/blog/server/blog-router';
 import { budgetRouter } from '@/features/budget/server/budget-router';
@@ -22,6 +23,7 @@ import { createCallerFactory, createTRPCRouter } from './trpc';
  * The root tRPC router. Feature routers are mounted here as the app grows.
  */
 export const appRouter = createTRPCRouter({
+  accompagnement: accompagnementRouter,
   auth: authRouter,
   blog: blogRouter,
   budget: budgetRouter,
