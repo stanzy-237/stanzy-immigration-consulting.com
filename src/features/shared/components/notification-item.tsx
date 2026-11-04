@@ -50,6 +50,7 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   DOCUMENT_SIGNED: FileSignature,
   CONTRACT_SENT: ScrollText,
   CONTRACT_SIGNED: FileCheck2,
+  DOSSIER_MESSAGE: MessageSquare,
   SIGNATURE_REMINDER: PenLine,
   CONTRACT_REMINDER: ScrollText,
 };

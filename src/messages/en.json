@@ -1834,14 +1834,18 @@
         "body": "Stanzy sent you “{document}” to sign in your {service} file. Open your space to read it and sign it online.",
         "cta": "Sign the document"
       },
+      "signed": {
+        "subject": "Document signed in your {service} file",
+        "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file."
+      },
+      "message": {
+        "subject": "New message in your {service} file",
+        "body": "Stanzy wrote to you in your {service} file: “{excerpt}”"
+      },
       "signatureReminder": {
         "subject": "Reminder: a document to sign in your {service} file",
         "body": "“{document}” is still waiting for your signature in your {service} file. Open your space to read it and sign it online.",
         "cta": "Sign the document"
-      },
-      "signed": {
-        "subject": "Document signed in your {service} file",
-        "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file."
       }
     },
     "dashboard": {
@@ -1946,6 +1950,10 @@
       "clientSigned": {
         "subject": "{client} signed “{document}”",
         "body": "{client} signed “{document}” in their {service} file. The signed PDF was added as a new version of the document."
+      },
+      "clientMessage": {
+        "subject": "{client} wrote to you",
+        "body": "{client} wrote to you in their {service} file: “{excerpt}”"
       }
     },
     "documents": {
@@ -2039,6 +2047,54 @@
           "edited": "Message edited",
           "deleted": "Message deleted"
         }
+      }
+    },
+    "messages": {
+      "title": "Messages",
+      "introClient": "A question about your file in general? Write here. For a specific document, use its conversation.",
+      "introConsultant": "The general conversation with the client, apart from the documents.",
+      "empty": "No messages yet.",
+      "label": "Write a message",
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "reply": "Reply",
+      "replyLabel": "Reply to {name}",
+      "replyPlaceholder": "Your reply…",
+      "edit": "Edit",
+      "editLabel": "Edit your message",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleteTitle": "Delete this message?",
+      "deleteBody": "It disappears with its files, for you and for the other person.",
+      "deleteBodyWithReplies": "Its replies stay: it will show “Message deleted”, without its files.",
+      "deleted": "Message deleted",
+      "edited": "edited",
+      "sending": "sending…",
+      "you": "You",
+      "error": "Write a message or attach a file.",
+      "attach": "Attach files",
+      "attachHint": "PDFs or images, {max} at most, encrypted before sending.",
+      "removeFile": "Remove {name}",
+      "tooMany": "{max} files at most per message.",
+      "closed": "This file is closed: the messages stay readable.",
+      "loading": "Loading messages",
+      "openFile": "Open {name}",
+      "toast": {
+        "sent": "Message sent",
+        "replied": "Reply sent",
+        "edited": "Message edited",
+        "deleted": "Message deleted"
+      },
+      "errors": {
+        "MESSAGE_EMPTY": "Write a message or attach a file.",
+        "COMMENT_NOT_YOURS": "Only its author can edit this message.",
+        "DOSSIER_CLOSED": "This file is closed.",
+        "DOCUMENT_FILE_TYPE": "Only PDFs and images are accepted.",
+        "DOCUMENT_FILE_TOO_LARGE": "A file is too large.",
+        "DOCUMENT_FILE_INVALID": "A file couldn’t be sent. Try again.",
+        "DOSSIER_FILES_UNCONFIGURED": "File storage isn’t set up on this site.",
+        "UNKNOWN": "Something went wrong. Try again."
       }
     }
   },
@@ -2249,6 +2305,7 @@
       "DOCUMENT_SIGNED": "{actor} signed “{document}”.",
       "CONTRACT_SENT": "Stanzy sent you {number} to sign.",
       "CONTRACT_SIGNED": "{actor} signed {number}.",
+      "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file.",
       "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
       "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature."
     },
@@ -2270,6 +2327,7 @@
       "DOCUMENT_SIGNED": "A document was signed.",
       "CONTRACT_SENT": "A contract to sign.",
       "CONTRACT_SIGNED": "A contract was signed.",
+      "DOSSIER_MESSAGE": "New message in a file.",
       "SIGNATURE_REMINDER": "A document is waiting for your signature.",
       "CONTRACT_REMINDER": "A contract is waiting for your signature."
     },
@@ -2615,11 +2673,6 @@
         "body": "Stanzy sent you the amendment “{title}” ({number}) to your contract, for your {service} file. Read it and sign it online.",
         "cta": "Read and sign"
       },
-      "reminder": {
-        "subject": "Reminder: {number} to sign",
-        "body": "“{title}” ({number}) is still waiting for your signature, for your {service} file. Read it and sign it online.",
-        "cta": "Read and sign"
-      },
       "signed": {
         "subject": "Your signed contract {number}",
         "body": "You signed “{title}” ({number}). Here it is attached, with its signature certificate. You can find it in your space at any time.",
@@ -2629,6 +2682,11 @@
         "subject": "{client} signed {number}",
         "body": "{client} signed “{title}” ({number}) for their {service} file. The signed PDF is attached.",
         "cta": "Open the file"
+      },
+      "reminder": {
+        "subject": "Reminder: {number} to sign",
+        "body": "“{title}” ({number}) is still waiting for your signature, for your {service} file. Read it and sign it online.",
+        "cta": "Read and sign"
       }
     },
     "panel": {

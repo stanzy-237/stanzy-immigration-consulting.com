@@ -19,6 +19,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { DossierDocuments, DossierDocumentsSkeleton } from '@/features/dossiers/components/dossier-documents';
+import { DossierMessages, DossierMessagesSkeleton } from '@/features/dossiers/components/dossier-messages';
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
 import { CLOSE_REASON_MAX, closeDossierInput } from '@/features/dossiers/lib/dossier-schema';
 import { nextStage, previousStage } from '@/features/dossiers/lib/workflow';
@@ -64,6 +65,11 @@ export function DossierDashboardView({
       {invoices ? <div className="mt-10">{invoices}</div> : null}
       {finances ? <div className="mt-6">{finances}</div> : null}
       {contracts ? <div className="mt-10">{contracts}</div> : null}
+      <div className="mt-10">
+        <QueryBoundary fallback={<DossierMessagesSkeleton />}>
+          <DossierMessages dossierId={id} viewer="consultant" />
+        </QueryBoundary>
+      </div>
       <div className="mt-10">
         <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
           <DossierDocuments dossierId={id} viewer="consultant" focus={focus} />

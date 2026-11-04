@@ -7,7 +7,14 @@ import type { TRPCContext } from '@/server/trpc/context';
 type Db = TRPCContext['prisma'];
 
 /** What a Notification points to; deleting the Document or the message removes it. */
-export type NotificationTarget = { dossierId?: string; documentId?: string; commentId?: string; invoiceId?: string };
+export type NotificationTarget = {
+  dossierId?: string;
+  documentId?: string;
+  commentId?: string;
+  invoiceId?: string;
+  /** A Dossier message (#94). */
+  messageId?: string;
+};
 
 export type NotificationEvent = {
   kind: NotificationKind;
@@ -26,6 +33,7 @@ export const GROUP_WINDOW_MS = 30 * 60 * 1000;
 /** Which repeats are grouped, and on what: messages and Versions per Document, added Documents per Dossier. */
 const GROUP_ON: Partial<Record<NotificationKind, 'documentId' | 'dossierId'>> = {
   MESSAGE_POSTED: 'documentId',
+  DOSSIER_MESSAGE: 'dossierId',
   VERSION_UPLOADED: 'documentId',
   DOCUMENT_ADDED: 'dossierId',
 };

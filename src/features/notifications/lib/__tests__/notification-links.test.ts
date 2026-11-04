@@ -19,6 +19,12 @@ const item = (extra: Partial<NotificationItem>): NotificationItem =>
   }) as NotificationItem;
 
 describe('where a Notification leads', () => {
+  it('opens the Dossier’s messages', () => {
+    const n = item({ kind: 'DOSSIER_MESSAGE' });
+    expect(notificationHref(n, 'client', 'fr')).toBe('/fr/mon-espace/dossiers/dos_1#messages');
+    expect(notificationHref(n, 'consultant', 'fr')).toBe('/dossiers/dos_1#messages');
+  });
+
   it('opens the Document and highlights the message', () => {
     const n = item({ document: { id: 'doc_1', title: 'Relevé N2' }, comment: { id: 'com_9', body: 'Flou' } });
     expect(notificationHref(n, 'client', 'fr')).toBe(

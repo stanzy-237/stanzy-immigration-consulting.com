@@ -44,6 +44,7 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
     return `${dossier}/contrats/${item.params.contractId}`;
   }
   if (contract || item.kind === 'CONTRACT_SIGNED') return `${dossier}#contrats`;
+  if (item.kind === 'DOSSIER_MESSAGE') return `${dossier}#messages`;
   if (item.invoice) return audience === 'client' ? `${dossier}#factures` : `/factures/${item.invoice.id}`;
   if (item.document) {
     const message = item.comment ? `&message=${item.comment.id}` : '';
