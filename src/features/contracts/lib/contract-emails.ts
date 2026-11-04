@@ -16,16 +16,20 @@ const translator = (locale: unknown) => {
   return createTranslator({ locale: lang, messages: MESSAGES[lang] });
 };
 
-/** To the Client: a Contrat (or an Avenant) to read and sign; the button opens it on its fields. */
+/**
+ * To the Client: a Contrat (or an Avenant) to read and sign, or the reminder
+ * of one still unsigned (#96); the button opens it on its fields.
+ */
 export function contractSentEmail(opts: {
   to: string;
   name: string;
   locale: unknown;
   contract: Contract;
   url: string;
+  reminder?: boolean;
 }): EmailMessage {
   const t = translator(opts.locale);
-  const kind = opts.contract.amendment ? 'amendmentSent' : 'sent';
+  const kind = opts.reminder ? 'reminder' : opts.contract.amendment ? 'amendmentSent' : 'sent';
   const values = {
     number: opts.contract.number,
     title: opts.contract.title,

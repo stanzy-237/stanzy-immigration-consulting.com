@@ -1833,6 +1833,11 @@
         "body": "Stanzy sent you “{document}” to sign in your {service} file. Open your space to read it and sign it online.",
         "cta": "Sign the document"
       },
+      "signatureReminder": {
+        "subject": "Reminder: a document to sign in your {service} file",
+        "body": "“{document}” is still waiting for your signature in your {service} file. Open your space to read it and sign it online.",
+        "cta": "Sign the document"
+      },
       "signed": {
         "subject": "Document signed in your {service} file",
         "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file."
@@ -2242,7 +2247,9 @@
       "SIGNATURE_REQUESTED": "Stanzy asks you to sign “{document}”.",
       "DOCUMENT_SIGNED": "{actor} signed “{document}”.",
       "CONTRACT_SENT": "Stanzy sent you {number} to sign.",
-      "CONTRACT_SIGNED": "{actor} signed {number}."
+      "CONTRACT_SIGNED": "{actor} signed {number}.",
+      "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
+      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2261,7 +2268,9 @@
       "SIGNATURE_REQUESTED": "A document to sign.",
       "DOCUMENT_SIGNED": "A document was signed.",
       "CONTRACT_SENT": "A contract to sign.",
-      "CONTRACT_SIGNED": "A contract was signed."
+      "CONTRACT_SIGNED": "A contract was signed.",
+      "SIGNATURE_REMINDER": "A document is waiting for your signature.",
+      "CONTRACT_REMINDER": "A contract is waiting for your signature."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -2603,6 +2612,11 @@
       "amendmentSent": {
         "subject": "Amendment {number} to sign",
         "body": "Stanzy sent you the amendment “{title}” ({number}) to your contract, for your {service} file. Read it and sign it online.",
+        "cta": "Read and sign"
+      },
+      "reminder": {
+        "subject": "Reminder: {number} to sign",
+        "body": "“{title}” ({number}) is still waiting for your signature, for your {service} file. Read it and sign it online.",
         "cta": "Read and sign"
       },
       "signed": {
