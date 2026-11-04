@@ -2,6 +2,8 @@
 
 import {
   AlarmClock,
+  CalendarX2,
+  Video,
   CalendarClock,
   CheckCircle2,
   FileCheck,
@@ -50,6 +52,10 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   DOCUMENT_SIGNED: FileSignature,
   CONTRACT_SENT: ScrollText,
   CONTRACT_SIGNED: FileCheck2,
+  MEETING_SCHEDULED: Video,
+  MEETING_MOVED: CalendarClock,
+  MEETING_CANCELLED: CalendarX2,
+  MEETING_REMINDER: AlarmClock,
 };
 
 /**

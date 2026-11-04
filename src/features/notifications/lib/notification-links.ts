@@ -18,7 +18,7 @@ export type LinkTarget = Pick<NotificationItem, 'kind'> & {
   comment?: { id: string } | null;
   invoice?: { id: string } | null;
   /** A Demande de signature's id (SIGNATURE_REQUESTED), a Contrat's (CONTRACT_*). */
-  params?: { requestId?: string; contractId?: string };
+  params?: { requestId?: string; contractId?: string; meetingId?: string };
 };
 
 export function notificationHref(item: LinkTarget, audience: Audience, locale: string): string {
@@ -39,6 +39,12 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
     return `${dossier}/contrats/${item.params.contractId}`;
   }
   if (item.kind === 'CONTRACT_SENT' || item.kind === 'CONTRACT_SIGNED') return `${dossier}#contrats`;
+  // A Réunion opens on its room; cancelled, on the Dossier's Réunions.
+  if (item.kind.startsWith('MEETING_')) {
+    return item.kind !== 'MEETING_CANCELLED' && item.params?.meetingId
+      ? `${dossier}/reunions/${item.params.meetingId}`
+      : `${dossier}#reunions`;
+  }
   if (item.invoice) return audience === 'client' ? `${dossier}#factures` : `/factures/${item.invoice.id}`;
   if (item.document) {
     const message = item.comment ? `&message=${item.comment.id}` : '';

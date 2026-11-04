@@ -2259,7 +2259,11 @@
       "SIGNATURE_REQUESTED": "Stanzy vous demande de signer « {document} ».",
       "DOCUMENT_SIGNED": "{actor} a signé « {document} ».",
       "CONTRACT_SENT": "Stanzy vous a envoyé {number} à signer.",
-      "CONTRACT_SIGNED": "{actor} a signé {number}."
+      "CONTRACT_SIGNED": "{actor} a signé {number}.",
+      "MEETING_SCHEDULED": "Réunion « {subject} » planifiée le {date}.",
+      "MEETING_MOVED": "Réunion « {subject} » déplacée au {date}.",
+      "MEETING_CANCELLED": "Réunion « {subject} » annulée.",
+      "MEETING_REMINDER": "{soon, select, true {La réunion « {subject} » commence bientôt.} other {Rappel : réunion « {subject} » le {date}.}}"
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2278,7 +2282,11 @@
       "SIGNATURE_REQUESTED": "Un document à signer.",
       "DOCUMENT_SIGNED": "Un document a été signé.",
       "CONTRACT_SENT": "Un contrat à signer.",
-      "CONTRACT_SIGNED": "Un contrat a été signé."
+      "CONTRACT_SIGNED": "Un contrat a été signé.",
+      "MEETING_SCHEDULED": "Nouvelle réunion.",
+      "MEETING_MOVED": "Une réunion a changé.",
+      "MEETING_CANCELLED": "Une réunion est annulée.",
+      "MEETING_REMINDER": "Rappel de réunion."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",
@@ -2747,5 +2755,130 @@
       "openSigned": "Ouvrir le contrat signé"
     },
     "stageWarning": "Le contrat n’est pas encore signé."
+  },
+  "Meetings": {
+    "emails": {
+      "greeting": "Bonjour {name},",
+      "when": "{when} (heure de Douala)",
+      "reason": "Motif : {reason}",
+      "recorded": "Cette réunion sera enregistrée et transcrite : on vous demandera d’accepter avant d’entrer.",
+      "join": "Rejoindre la réunion",
+      "openDossier": "Ouvrir mon dossier",
+      "scheduled": {
+        "subject": "Réunion planifiée : {subject}",
+        "body": "Stanzy vous propose une réunion vidéo « {subject} » le {when}, pour {minutes} minutes. Elle se tient dans votre espace : le bouton ci-dessous l’ouvre 15 minutes avant."
+      },
+      "moved": {
+        "subject": "Réunion déplacée : {subject}",
+        "body": "La réunion « {subject} » change : elle aura lieu le {when}, pour {minutes} minutes."
+      },
+      "cancelled": {
+        "subject": "Réunion annulée : {subject}",
+        "body": "La réunion « {subject} » prévue le {when} est annulée."
+      },
+      "dayBefore": {
+        "subject": "Demain : {subject}",
+        "body": "Rappel : votre réunion « {subject} » a lieu le {when}."
+      },
+      "soon": {
+        "subject": "Dans 15 minutes : {subject}",
+        "body": "Votre réunion « {subject} » commence bientôt, le {when}. Vous pouvez la rejoindre dès maintenant."
+      }
+    },
+    "panel": {
+      "title": "Réunions",
+      "introClient": "Vos réunions vidéo avec Stanzy. Pour en demander une, écrivez dans les Messages.",
+      "introConsultant": "Les réunions vidéo avec le client, enregistrées et transcrites pour vous seul.",
+      "plan": "Planifier une réunion",
+      "empty": "Aucune réunion.",
+      "upcoming": "À venir",
+      "past": "Passées",
+      "cancelled": "Annulée",
+      "join": "Rejoindre",
+      "joinLabel": "Rejoindre « {subject} »",
+      "opensSoon": "La salle ouvre 15 minutes avant.",
+      "recorded": "Enregistrée",
+      "notRecorded": "Sans enregistrement",
+      "minutes": "{minutes} min",
+      "edit": "Modifier",
+      "editLabel": "Modifier « {subject} »",
+      "cancel": "Annuler",
+      "cancelLabel": "Annuler « {subject} »",
+      "notes": "Notes (pour vous seul)",
+      "notesLabel": "Notes sur « {subject} »",
+      "notesSave": "Enregistrer les notes",
+      "recording": "Enregistrement du {date}",
+      "transcription": "Transcription",
+      "showTranscript": "Lire la transcription",
+      "hideTranscript": "Masquer la transcription",
+      "noFiles": "Pas encore d’enregistrement : il arrive quelques minutes après la fin.",
+      "search": "Chercher dans les transcriptions",
+      "searchPlaceholder": "Un mot dit pendant une réunion",
+      "noResults": "Rien trouvé.",
+      "results": "{count, plural, one {# réunion} other {# réunions}}",
+      "unconfigured": "La visio n’est pas encore configurée sur ce site : les réunions peuvent être planifiées, pas encore rejointes.",
+      "loading": "Chargement des réunions",
+      "reason": "Motif : {reason}"
+    },
+    "form": {
+      "newTitle": "Planifier une réunion",
+      "editTitle": "Modifier la réunion",
+      "body": "Le client la reçoit par email et dans sa cloche, puis un rappel la veille et 15 minutes avant.",
+      "subject": "Objet",
+      "subjectPlaceholder": "Ex. : point sur la preuve de fonds",
+      "date": "Date",
+      "time": "Heure",
+      "duration": "Durée",
+      "minutes": "{minutes} minutes",
+      "recording": "Enregistrer et transcrire",
+      "recordingHint": "Chacun accepte l’enregistrement avant d’entrer. Décochez pour une réunion sans enregistrement.",
+      "timezone": "À l’heure de cet appareil ({zone}).",
+      "inPast": "Choisissez un moment à venir.",
+      "cancel": "Annuler",
+      "save": "Planifier",
+      "saveEdit": "Enregistrer",
+      "saving": "Envoi…"
+    },
+    "cancelDialog": {
+      "title": "Annuler la réunion ?",
+      "body": "Le client est prévenu par email et dans sa cloche.",
+      "reason": "Motif (facultatif)",
+      "keep": "Garder",
+      "confirm": "Annuler la réunion"
+    },
+    "room": {
+      "back": "Retour au dossier",
+      "loading": "Préparation de la salle",
+      "recordedTitle": "Cette réunion est enregistrée",
+      "recordedBody": "L’image, le son et une transcription écrite sont gardés avec le dossier, pour Stanzy seulement, jusqu’à 2 ans après sa clôture.",
+      "accept": "J’accepte que la réunion soit enregistrée",
+      "acceptedOn": "Accepté le {date}.",
+      "notRecorded": "Cette réunion n’est pas enregistrée.",
+      "join": "Rejoindre",
+      "joining": "Connexion…",
+      "notOpen": "La salle ouvre 15 minutes avant le début.",
+      "over": "Cette réunion est terminée.",
+      "cancelled": "Cette réunion a été annulée.",
+      "unconfigured": "La visio n’est pas encore configurée sur ce site.",
+      "recordingNow": "Enregistrement en cours",
+      "left": "Vous avez quitté la réunion.",
+      "rejoin": "Revenir dans la réunion",
+      "failed": "Connexion impossible. Vérifiez la caméra et le micro, puis réessayez."
+    },
+    "toast": {
+      "scheduled": "Réunion planifiée",
+      "updated": "Réunion modifiée",
+      "cancelled": "Réunion annulée",
+      "notes": "Notes enregistrées"
+    },
+    "errors": {
+      "MEETING_IN_PAST": "Choisissez un moment à venir.",
+      "MEETING_NOT_SCHEDULED": "Cette réunion est annulée.",
+      "MEETING_NOT_OPEN": "La salle n’est pas ouverte.",
+      "MEETING_CONSENT_REQUIRED": "Acceptez l’enregistrement pour entrer.",
+      "MEETINGS_UNCONFIGURED": "La visio n’est pas encore configurée sur ce site.",
+      "DOSSIER_CLOSED": "Le dossier est clôturé.",
+      "UNKNOWN": "Une erreur est survenue. Réessayez."
+    }
   }
 }

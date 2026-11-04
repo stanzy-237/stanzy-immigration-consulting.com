@@ -95,6 +95,12 @@ const schema = z.object({
   R2_PUBLIC_BUCKET: z.string().min(1).optional(),
   // Where the public bucket is served: its custom domain, or its r2.dev address.
   NEXT_PUBLIC_R2_PUBLIC_URL: z.string().url().optional(),
+  // Stream Video (#94): Réunions, their Enregistrement and Transcription.
+  // The key and secret of the Stream app (dashboard → the app → API keys);
+  // the secret also verifies Stream's webhooks. Optional: without them the
+  // Réunions can be planned but not joined. Set both or neither.
+  STREAM_API_KEY: z.string().min(1).optional(),
+  STREAM_API_SECRET: z.string().min(1).optional(),
 }).superRefine((value, ctx) => {
   if (process.env.VERCEL_ENV === 'production' && !value.BETTER_AUTH_URL) {
     ctx.addIssue({
@@ -133,12 +139,14 @@ const schema = z.object({
   for (const [key, other] of [
     ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'],
     ['GOOGLE_CLIENT_SECRET', 'GOOGLE_CLIENT_ID'],
+    ['STREAM_API_KEY', 'STREAM_API_SECRET'],
+    ['STREAM_API_SECRET', 'STREAM_API_KEY'],
   ] as const) {
     if (value[other] && !value[key]) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: [key],
-        message: `Required when ${other} is set (both come from the same Google OAuth client)`,
+        message: `Required when ${other} is set (both come from the same ${key.startsWith('STREAM') ? 'Stream app' : 'Google OAuth client'})`,
       });
     }
   }

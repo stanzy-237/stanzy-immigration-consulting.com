@@ -19,6 +19,15 @@ const item = (extra: Partial<NotificationItem>): NotificationItem =>
   }) as NotificationItem;
 
 describe('where a Notification leads', () => {
+  it('opens a Réunion on its room, or the Réunions once cancelled', () => {
+    const planned = item({ kind: 'MEETING_SCHEDULED', params: { meetingId: 'm_1' } });
+    expect(notificationHref(planned, 'client', 'fr')).toBe('/fr/mon-espace/dossiers/dos_1/reunions/m_1');
+    const soon = item({ kind: 'MEETING_REMINDER', params: { meetingId: 'm_1' } });
+    expect(notificationHref(soon, 'consultant', 'fr')).toBe('/dossiers/dos_1/reunions/m_1');
+    const cancelled = item({ kind: 'MEETING_CANCELLED', params: { meetingId: 'm_1' } });
+    expect(notificationHref(cancelled, 'client', 'en')).toBe('/en/mon-espace/dossiers/dos_1#reunions');
+  });
+
   it('opens the Document and highlights the message', () => {
     const n = item({ document: { id: 'doc_1', title: 'Relevé N2' }, comment: { id: 'com_9', body: 'Flou' } });
     expect(notificationHref(n, 'client', 'fr')).toBe(

@@ -6,6 +6,7 @@ import { crsRouter } from '@/features/crs/server/crs-router';
 import { accountsRouter } from '@/features/accounts/server/accounts-router';
 import { contractsRouter } from '@/features/contracts/server/contracts-router';
 import { invoicesRouter } from '@/features/invoices/server/invoices-router';
+import { meetingsRouter } from '@/features/meetings/server/meetings-router';
 import { pdfToolsRouter } from '@/features/pdf-tools/server/history-router';
 import { notificationsRouter } from '@/features/notifications/server/notifications-router';
 import { dossiersRouter } from '@/features/dossiers/server/dossiers-router';
@@ -29,6 +30,7 @@ export const appRouter = createTRPCRouter({
   dossiers: dossiersRouter,
   accounts: accountsRouter,
   invoices: invoicesRouter,
+  meetings: meetingsRouter,
   notifications: notificationsRouter,
   pdfTools: pdfToolsRouter,
   draws: drawsRouter,

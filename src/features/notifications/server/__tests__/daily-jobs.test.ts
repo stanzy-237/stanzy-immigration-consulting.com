@@ -69,6 +69,11 @@ function fakeDatabase(invoices: Row[], accounts: Row[] = []) {
         return [];
       },
     },
+    meetingRecording: {
+      async findMany() {
+        return [];
+      },
+    },
     cronRun: {
       async create({ data }: { data: { job: string; day: string } }) {
         const key = `${data.job}/${data.day}`;
