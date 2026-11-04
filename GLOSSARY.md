@@ -174,6 +174,9 @@ Accompagnement, Vérification and Services documentaires have no Devis: the quot
 **Contrat** (Service contract):
 The service agreement for a Dossier, made from its service's template (French or English), numbered CTR-<year>-<0001> when sent, carrying the consultant's signature and the company stamp, and signed online by the Client (the Account holding the Dossier) in « Mon espace ». Locked once signed.
 
+**Modèle de contrat** (Contract template):
+The text of a service's Contrat in one language, written by the consultant in the Tableau de bord, with blanks (`{client}`, `{service}`, `{prix}`, `{echeancier}`, `{date}`, `{numero}`) filled in when a Contrat is sent. The price and échéancier are entered at each sending, never in the template.
+
 **Avenant** (Amendment):
 A change to a signed Contrat, signed the same way and numbered after it (CTR-2026-0001-A1). A signed Contrat itself never changes.
 

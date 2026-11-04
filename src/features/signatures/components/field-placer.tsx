@@ -4,7 +4,7 @@ import { CalendarDays, PenLine, Stamp, Type, X, type LucideIcon } from 'lucide-r
 import { useTranslations } from 'next-intl';
 import { useId, useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 
-import { fieldStyle, PdfPages } from '@/features/signatures/components/pdf-pages';
+import { fieldStyle, PdfPages } from '@/features/shared/components/signing/pdf-pages';
 import {
   FIELD_KINDS,
   FIELD_SIZES,

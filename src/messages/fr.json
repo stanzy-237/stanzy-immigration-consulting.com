@@ -1426,7 +1426,8 @@
       },
       "close": "Fermer le menu",
       "outils-pdf": "Outils PDF",
-      "signatures": "Signatures"
+      "signatures": "Signatures",
+      "contrats": "Contrats"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -2256,7 +2257,9 @@
       "ACCOUNTS_SIGNED_UP": "{count, plural, one {# nouveau compte} other {# nouveaux comptes}} hier.",
       "DRAW_PUBLISHED": "Nouveau tirage Entrée Express n° {round} : {invitations} invitations, {crs} points minimum.",
       "SIGNATURE_REQUESTED": "Stanzy vous demande de signer « {document} ».",
-      "DOCUMENT_SIGNED": "{actor} a signé « {document} »."
+      "DOCUMENT_SIGNED": "{actor} a signé « {document} ».",
+      "CONTRACT_SENT": "Stanzy vous a envoyé {number} à signer.",
+      "CONTRACT_SIGNED": "{actor} a signé {number}."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2273,7 +2276,9 @@
       "INVOICE_LATE": "Une facture est en retard.",
       "ACCOUNTS_SIGNED_UP": "Nouveaux comptes.",
       "SIGNATURE_REQUESTED": "Un document à signer.",
-      "DOCUMENT_SIGNED": "Un document a été signé."
+      "DOCUMENT_SIGNED": "Un document a été signé.",
+      "CONTRACT_SENT": "Un contrat à signer.",
+      "CONTRACT_SIGNED": "Un contrat a été signé."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",
@@ -2572,5 +2577,175 @@
       "alert": "{count, plural, one {Un document attend votre signature} other {# documents attendent votre signature}}",
       "newRequest": "Demander une signature"
     }
+  },
+  "Contracts": {
+    "status": {
+      "SENT": "En attente de signature",
+      "SIGNED": "Signé",
+      "CANCELLED": "Annulé"
+    },
+    "errors": {
+      "CONTRACT_TEMPLATE_MISSING": "Aucun modèle pour ce service dans cette langue : écrivez-le dans Contrats → Modèles.",
+      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et le cachet dans « Signatures ».",
+      "CONTRACT_ALREADY_SENT": "Un contrat attend déjà la signature du client : annulez-le d’abord.",
+      "CONTRACT_ALREADY_SIGNED": "Le contrat est déjà signé : envoyez un avenant.",
+      "CONTRACT_NOT_SIGNED": "Un avenant ne s’envoie qu’une fois le contrat signé.",
+      "AMENDMENT_ALREADY_SENT": "Un avenant attend déjà la signature du client : annulez-le d’abord.",
+      "CONTRACT_NOT_PENDING": "Ce contrat n’attend plus de signature.",
+      "CONTRACT_NOT_YOURS": "Seul le titulaire du dossier peut signer ce contrat.",
+      "SIGNATURE_DOCUMENT_CHANGED": "Le contrat a changé depuis l’envoi : demandez à Stanzy de vous le renvoyer.",
+      "SIGNATURE_IMAGE_INVALID": "La signature n’a pas pu être lue. Effacez-la et signez de nouveau.",
+      "DOSSIER_CLOSED": "Ce dossier est clôturé : il ne peut plus changer.",
+      "DOSSIER_FILES_UNCONFIGURED": "L’enregistrement des fichiers n’est pas encore activé. Réessayez plus tard.",
+      "UNKNOWN": "L’opération n’a pas abouti. Réessayez."
+    },
+    "pdf": {
+      "client": "Le Client",
+      "company": "Pour Stanzy Immigration Consulting",
+      "signature": "Signature",
+      "name": "Nom complet",
+      "date": "Date",
+      "page": "Page {page} / {pages}",
+      "number": "Contrat n° {number}",
+      "amendmentOf": "Avenant n° {n} au contrat {number}",
+      "signedSuffix": "signe"
+    },
+    "emails": {
+      "greeting": "Bonjour {name},",
+      "sent": {
+        "subject": "Votre contrat {number} à signer",
+        "body": "Stanzy vous a envoyé « {title} » ({number}) pour votre dossier {service}. Lisez-le et signez-le en ligne.",
+        "cta": "Lire et signer"
+      },
+      "amendmentSent": {
+        "subject": "Avenant {number} à signer",
+        "body": "Stanzy vous a envoyé l’avenant « {title} » ({number}) à votre contrat, pour votre dossier {service}. Lisez-le et signez-le en ligne.",
+        "cta": "Lire et signer"
+      },
+      "signed": {
+        "subject": "Votre contrat signé {number}",
+        "body": "Vous avez signé « {title} » ({number}). Le voici en pièce jointe, avec son certificat de signature. Vous le retrouvez à tout moment dans votre espace.",
+        "cta": "Voir mon espace"
+      },
+      "consultantSigned": {
+        "subject": "{client} a signé {number}",
+        "body": "{client} a signé « {title} » ({number}) pour son dossier {service}. Le PDF signé est en pièce jointe.",
+        "cta": "Ouvrir le dossier"
+      }
+    },
+    "panel": {
+      "title": "Contrat",
+      "new": "Envoyer le contrat",
+      "amendment": "Envoyer un avenant",
+      "emptyConsultant": "Aucun contrat envoyé pour ce dossier.",
+      "emptyClient": "Aucun contrat pour le moment.",
+      "unsigned": "Contrat non signé",
+      "signedPill": "Contrat signé",
+      "sentOn": "Envoyé le {date}",
+      "signedOn": "Signé le {date} par {name}",
+      "cancelledOn": "Annulé le {date}",
+      "reason": "Motif : {reason}",
+      "price": "{amount} · {schedule}",
+      "pdf": "PDF",
+      "pdfLabel": "Ouvrir le PDF de {number}",
+      "signedPdf": "PDF signé",
+      "signedPdfLabel": "Ouvrir le PDF signé de {number}",
+      "sign": "Signer",
+      "signLabel": "Signer {number}",
+      "cancel": "Annuler",
+      "cancelLabel": "Annuler {number}",
+      "loading": "Chargement des contrats",
+      "amendmentOf": "Avenant au {number}",
+      "waiting": "Le contrat {number} attend votre signature."
+    },
+    "send": {
+      "title": "Envoyer le contrat",
+      "body": "Rédigé à partir du modèle du service, dans la langue choisie, avec votre signature et le cachet. Le client le signe en ligne.",
+      "locale": "Langue",
+      "fr": "Français",
+      "en": "Anglais",
+      "amount": "Prix",
+      "currency": "Devise",
+      "schedule": "Échéancier",
+      "schedulePlaceholder": "50 % à la signature, 50 % au dépôt",
+      "submit": "Envoyer au client",
+      "sending": "Envoi…",
+      "cancel": "Annuler",
+      "invalidAmount": "Indiquez un montant valide."
+    },
+    "amendment": {
+      "title": "Envoyer un avenant",
+      "body": "L’avenant modifie le contrat {number}. Le client le signe de la même façon.",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "Avenant : ajout du conjoint au dossier",
+      "text": "Texte",
+      "textHint": "# Titre de section, - puce, une ligne vide entre les paragraphes.",
+      "submit": "Envoyer l’avenant",
+      "cancel": "Annuler"
+    },
+    "cancel": {
+      "title": "Annuler {number} ?",
+      "body": "Le client ne pourra plus le signer. Vous pourrez en envoyer un corrigé.",
+      "reason": "Motif (facultatif)",
+      "keep": "Garder",
+      "confirm": "Annuler le contrat"
+    },
+    "toast": {
+      "sent": "{number} envoyé au client",
+      "cancelled": "Contrat annulé",
+      "saved": "Modèle enregistré",
+      "signed": "Contrat signé"
+    },
+    "templates": {
+      "metaTitle": "Modèles de contrat",
+      "title": "Modèles de contrat",
+      "back": "Contrats",
+      "intro": "Un modèle par service et par langue. Les blancs entre accolades sont remplis à l’envoi ; le prix et l’échéancier se saisissent à chaque envoi.",
+      "service": "Service",
+      "locale": "Langue",
+      "fr": "Français",
+      "en": "Anglais",
+      "missing": "Pas encore de modèle",
+      "updated": "Modifié le {date}",
+      "titleLabel": "Titre du contrat",
+      "titlePlaceholder": "Contrat de prestation de services",
+      "text": "Texte",
+      "format": "# Titre de section, - puce, une ligne vide entre les paragraphes.",
+      "blanks": "Blancs",
+      "blank": {
+        "client": "nom du client",
+        "service": "service",
+        "prix": "prix",
+        "echeancier": "échéancier",
+        "date": "date d’envoi",
+        "numero": "numéro du contrat"
+      },
+      "unknown": "Blancs inconnus, laissés tels quels : {list}",
+      "preview": "Aperçu PDF",
+      "previewing": "Aperçu…",
+      "previewFailed": "L’aperçu n’a pas pu être créé.",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "loading": "Chargement des modèles"
+    },
+    "dashboard": {
+      "metaTitle": "Contrats",
+      "title": "Contrats",
+      "intro": "Les contrats et avenants envoyés, et leur signature.",
+      "templates": "Modèles",
+      "empty": "Aucun contrat envoyé pour le moment.",
+      "open": "Ouvrir le dossier",
+      "loading": "Chargement des contrats"
+    },
+    "sign": {
+      "metaTitle": "Signer un contrat",
+      "back": "Retour au dossier",
+      "title": "Signer « {title} »",
+      "intro": "Lisez le contrat jusqu’au bout, puis cliquez sur chaque zone encadrée pour la remplir. Terminez avec « Terminer ».",
+      "alreadySigned": "Vous avez signé ce contrat le {date}.",
+      "notWaiting": "Ce contrat n’attend plus de signature.",
+      "openSigned": "Ouvrir le contrat signé"
+    },
+    "stageWarning": "Le contrat n’est pas encore signé."
   }
 }

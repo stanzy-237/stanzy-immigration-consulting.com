@@ -59,6 +59,8 @@ model Account {
   pdfToolFiles      PdfToolFile[]
   signatureRequests SignatureRequest[] @relation("SignatureRequester")
   signaturesSigned  SignatureRequest[] @relation("SignatureSigner")
+  contractsSent     Contract[]         @relation("ContractSender")
+  contractsSigned   Contract[]         @relation("ContractSigner")
 
   @@map("account")
 }
@@ -383,6 +385,7 @@ model Dossier {
   events        DossierEvent[]
   sections      DossierSection[]
   invoices      Invoice[]
+  contracts     Contract[]
   notifications Notification[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
@@ -614,6 +617,10 @@ enum NotificationKind {
   SIGNATURE_REQUESTED
   /// To the consultant: the Client signed.
   DOCUMENT_SIGNED
+  /// To the Client: a Contrat or an Avenant to sign.
+  CONTRACT_SENT
+  /// To the consultant: the Client signed a Contrat or an Avenant.
+  CONTRACT_SIGNED
 }
 
 /// One line in an Account's notification center. Repeats by the same actor on the same target, while unread and within 30 minutes, raise `count` instead of adding lines.
@@ -735,4 +742,88 @@ model SigningAsset {
   updatedAt   DateTime         @updatedAt
 
   @@map("signing_asset")
+}
+
+/// A service contract template (#96), per service and language, written in the Tableau de bord.
+/// Its blanks ({client}, {prix}…) are filled in when a Contrat is sent. Prices never live here.
+model ContractTemplate {
+  id        String      @id @default(cuid())
+  service   ServiceType
+  /// `fr` | `en`.
+  locale    String
+  title     String
+  body      String
+  updatedAt DateTime    @updatedAt
+
+  @@unique([service, locale])
+  @@map("contract_template")
+}
+
+enum ContractStatus {
+  SENT
+  SIGNED
+  CANCELLED
+}
+
+/// The Contrats' numbers per year (CTR-<year>-<0001>), given when sent.
+model ContractCounter {
+  year Int @id
+  last Int
+
+  @@map("contract_counter")
+}
+
+/// A Contrat for a Dossier, or an Avenant to one (`parentId`), sent with the
+/// consultant's signature and stamp and signed online by the Client (#96).
+/// Its PDF is encrypted in R2 (ADR 0007); once signed, the signed PDF with
+/// its Certificat de signature too. A signed Contrat never changes.
+model Contract {
+  id               String           @id @default(cuid())
+  /// CTR-2026-0001, or CTR-2026-0001-A1 for an Avenant.
+  number           String           @unique
+  dossierId        String
+  dossier          Dossier          @relation(fields: [dossierId], references: [id], onDelete: Restrict)
+  /// The Contrat this Avenant changes.
+  parentId         String?
+  parent           Contract?        @relation("Amendments", fields: [parentId], references: [id], onDelete: Restrict)
+  amendments       Contract[]       @relation("Amendments")
+  /// `fr` | `en`: the Client's language when sent.
+  locale           String
+  title            String
+  /// The text as sent, its blanks filled in: what the Client signs.
+  body             String
+  /// Price, in the currency's minor unit, and the échéancier; a Contrat's only.
+  amount           Int?
+  currency         InvoiceCurrency?
+  schedule         String?
+  status           ContractStatus   @default(SENT)
+  /// The PDF sent, with the consultant's signature and stamp.
+  objectKey        String
+  wrappedKey       String
+  iv               String
+  size             Int
+  /// SHA-256 (hex) of that PDF, checked again before signing.
+  fingerprint      String
+  /// The Client's fields on it: `{ kind, page, x, y, width, height }[]`.
+  fields           Json
+  /// The signed PDF, with its Certificat de signature.
+  signedObjectKey  String?
+  signedWrappedKey String?
+  signedIv         String?
+  signedSize       Int?
+  signedById       String?
+  signedBy         Account?         @relation("ContractSigner", fields: [signedById], references: [id], onDelete: Restrict)
+  signedName       String?
+  signedAt         DateTime?
+  signedIp         String?
+  signedDevice     String?
+  sentById         String
+  sentBy           Account          @relation("ContractSender", fields: [sentById], references: [id], onDelete: Restrict)
+  sentAt           DateTime         @default(now())
+  cancelledAt      DateTime?
+  cancelReason     String?
+
+  @@index([dossierId, sentAt])
+  @@index([status, sentAt])
+  @@map("contract")
 }

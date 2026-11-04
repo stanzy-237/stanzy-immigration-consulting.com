@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import type { KeyboardEvent, MouseEvent, ReactNode } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { usePdfPages } from '@/features/signatures/hooks/use-pdf-pages';
+import { usePdfPages } from '@/features/shared/hooks/use-pdf-pages';
 
 /**
  * A PDF's pages one under the other, as the Client reads it before signing
