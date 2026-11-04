@@ -10,7 +10,8 @@ import type { ReactNode } from 'react';
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InvoiceDetail } from '@/features/invoices/components/invoice-detail';
-import { InvoiceForm, type DossierOption } from '@/features/invoices/components/invoice-form';
+import { InvoiceForm } from '@/features/invoices/components/invoice-form';
+import type { DossierOption } from '@/features/shared/components/dossier-picker';
 import { useTRPC } from '@/trpc/client';
 
 /** One Facture in the Tableau de bord: the form while it is a Brouillon, then what was sent. */

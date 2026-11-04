@@ -29,16 +29,19 @@ import { useTRPC } from '@/trpc/client';
 
 /**
  * One Dossier in the Tableau de bord: its stages, the moves the consultant
- * can make, its history and documents. `invoices` and `contracts` are the
- * Factures and Contrat panels the route passes in.
+ * can make, its history and documents. `invoices`, `finances` and `contracts`
+ * are the Factures, Finances and Contrat panels the route passes in.
  */
 export function DossierDashboardView({
   id,
   invoices,
+  finances,
   contracts,
 }: {
   id: string;
   invoices?: ReactNode;
+  /** What the Dossier brought in and cost (#95), passed in by the route. */
+  finances?: ReactNode;
   /** The Contrat panel (#96), passed in by the route. */
   contracts?: ReactNode;
 }): ReactNode {
@@ -59,6 +62,7 @@ export function DossierDashboardView({
         <DossierDetail id={id} />
       </QueryBoundary>
       {invoices ? <div className="mt-10">{invoices}</div> : null}
+      {finances ? <div className="mt-6">{finances}</div> : null}
       {contracts ? <div className="mt-10">{contracts}</div> : null}
       <div className="mt-10">
         <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
