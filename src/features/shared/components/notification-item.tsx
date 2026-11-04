@@ -56,6 +56,7 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   MEETING_MOVED: CalendarClock,
   MEETING_CANCELLED: CalendarX2,
   MEETING_REMINDER: AlarmClock,
+  DOSSIER_MESSAGE: MessageSquare,
   SIGNATURE_REMINDER: PenLine,
   CONTRACT_REMINDER: ScrollText,
 };

@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DossierDocuments, DossierDocumentsSkeleton } from '@/features/dossiers/components/dossier-documents';
+import { DossierMessages, DossierMessagesSkeleton } from '@/features/dossiers/components/dossier-messages';
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
@@ -57,6 +58,9 @@ export function MyDossierView({
           {meetings}
           {contracts}
           {invoices}
+          <QueryBoundary fallback={<DossierMessagesSkeleton />}>
+            <DossierMessages dossierId={id} viewer="client" />
+          </QueryBoundary>
           <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
             <DossierDocuments dossierId={id} viewer="client" focus={focus} />
           </QueryBoundary>

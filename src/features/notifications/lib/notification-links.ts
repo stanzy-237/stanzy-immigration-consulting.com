@@ -44,6 +44,7 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
     return `${dossier}/contrats/${item.params.contractId}`;
   }
   if (contract || item.kind === 'CONTRACT_SIGNED') return `${dossier}#contrats`;
+  if (item.kind === 'DOSSIER_MESSAGE') return `${dossier}#messages`;
   // A Réunion opens on its room; cancelled, on the Dossier's Réunions.
   if (item.kind.startsWith('MEETING_')) {
     return item.kind !== 'MEETING_CANCELLED' && item.params?.meetingId

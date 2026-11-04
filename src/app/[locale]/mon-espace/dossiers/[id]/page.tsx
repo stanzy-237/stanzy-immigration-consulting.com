@@ -22,6 +22,7 @@ export default async function Page({ params }: { params: Params }) {
   await requireSession({ locale, next: `/mon-espace/dossiers/${id}` });
   prefetch(trpc.dossiers.myDossier.queryOptions({ id }));
   prefetch(trpc.dossiers.documents.sections.queryOptions({ dossierId: id }));
+  prefetch(trpc.dossiers.messages.list.queryOptions({ dossierId: id }));
   prefetch(trpc.invoices.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.contracts.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.meetings.forDossier.queryOptions({ dossierId: id }));

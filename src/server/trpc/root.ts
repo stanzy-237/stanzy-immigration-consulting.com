@@ -11,6 +11,7 @@ import { pdfToolsRouter } from '@/features/pdf-tools/server/history-router';
 import { notificationsRouter } from '@/features/notifications/server/notifications-router';
 import { dossiersRouter } from '@/features/dossiers/server/dossiers-router';
 import { drawsRouter } from '@/features/draws/server/draws-router';
+import { financesRouter } from '@/features/finances/server/finances-router';
 import { parcoursRouter } from '@/features/parcours/server/parcours-router';
 import { signaturesRouter } from '@/features/signatures/server/signatures-router';
 
@@ -28,6 +29,7 @@ export const appRouter = createTRPCRouter({
   contracts: contractsRouter,
   crs: crsRouter,
   dossiers: dossiersRouter,
+  finances: financesRouter,
   accounts: accountsRouter,
   invoices: invoicesRouter,
   meetings: meetingsRouter,

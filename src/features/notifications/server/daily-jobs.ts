@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 
+import { makeMonthlyCopies } from '@/features/finances/server/repeat-charges';
 import { invoiceReminderEmail } from '@/features/invoices/lib/invoice-emails';
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { purgeOldMeetingFiles } from '@/features/meetings/server/purge';
@@ -34,6 +35,8 @@ export type DailyReport = {
   pdfFilesPurged: number;
   /** Réunion files of Dossiers closed more than 2 years ago (#94). */
   meetingFilesPurged: number;
+  /** Monthly Charges copied into this month (#95). */
+  chargesRepeated: number;
 };
 
 /**
@@ -47,6 +50,7 @@ export type DailyReport = {
  * - Read Notifications older than 6 months, deleted.
  * - Outils PDF history files older than 90 days, deleted with their copies.
  * - Enregistrements and Transcriptions of Dossiers closed 2 years ago, deleted.
+ * - Monthly Charges, copied into this month once their day comes (#95).
  */
 export async function runDailyJobs(deps: {
   db: Db;
@@ -66,6 +70,7 @@ export async function runDailyJobs(deps: {
     deleted: 0,
     pdfFilesPurged: 0,
     meetingFilesPurged: 0,
+    chargesRepeated: 0,
   };
 
   const invoices = await db.invoice.findMany({
@@ -156,6 +161,7 @@ export async function runDailyJobs(deps: {
   report.deleted = count;
   report.pdfFilesPurged = await purgeOldPdfToolFiles(db, now);
   report.meetingFilesPurged = await purgeOldMeetingFiles(db, now);
+  report.chargesRepeated = await makeMonthlyCopies(db, today);
   return report;
 }
 

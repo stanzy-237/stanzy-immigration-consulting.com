@@ -19,6 +19,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { DossierDocuments, DossierDocumentsSkeleton } from '@/features/dossiers/components/dossier-documents';
+import { DossierMessages, DossierMessagesSkeleton } from '@/features/dossiers/components/dossier-messages';
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
 import { CLOSE_REASON_MAX, closeDossierInput } from '@/features/dossiers/lib/dossier-schema';
 import { nextStage, previousStage } from '@/features/dossiers/lib/workflow';
@@ -29,17 +30,20 @@ import { useTRPC } from '@/trpc/client';
 
 /**
  * One Dossier in the Tableau de bord: its stages, the moves the consultant
- * can make, its history and documents. `invoices` and `contracts` are the
- * Factures and Contrat panels the route passes in.
+ * can make, its history and documents. `invoices`, `finances` and `contracts`
+ * are the Factures, Finances and Contrat panels the route passes in.
  */
 export function DossierDashboardView({
   id,
   invoices,
+  finances,
   contracts,
   meetings,
 }: {
   id: string;
   invoices?: ReactNode;
+  /** What the Dossier brought in and cost (#95), passed in by the route. */
+  finances?: ReactNode;
   /** The Contrat panel (#96), passed in by the route. */
   contracts?: ReactNode;
   /** The Réunions panel (#94), passed in by the route. */
@@ -62,8 +66,14 @@ export function DossierDashboardView({
         <DossierDetail id={id} />
       </QueryBoundary>
       {invoices ? <div className="mt-10">{invoices}</div> : null}
+      {finances ? <div className="mt-6">{finances}</div> : null}
       {meetings ? <div className="mt-10">{meetings}</div> : null}
       {contracts ? <div className="mt-10">{contracts}</div> : null}
+      <div className="mt-10">
+        <QueryBoundary fallback={<DossierMessagesSkeleton />}>
+          <DossierMessages dossierId={id} viewer="consultant" />
+        </QueryBoundary>
+      </div>
       <div className="mt-10">
         <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
           <DossierDocuments dossierId={id} viewer="consultant" focus={focus} />
