@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 
+import { makeMonthlyCopies } from '@/features/finances/server/repeat-charges';
 import { invoiceReminderEmail } from '@/features/invoices/lib/invoice-emails';
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { notify } from '@/features/notifications/server/notify';
@@ -32,6 +33,8 @@ export type DailyReport = {
   deleted: number;
   /** Outils PDF history files past 90 days. */
   pdfFilesPurged: number;
+  /** Monthly Charges copied into this month (#95). */
+  chargesRepeated: number;
 };
 
 /**
@@ -42,6 +45,7 @@ export type DailyReport = {
  * - The accounts created the day before, summed up for the consultant, once a day.
  * - Read Notifications older than 6 months, deleted.
  * - Outils PDF history files older than 90 days, deleted with their copies.
+ * - Monthly Charges, copied into this month once their day comes (#95).
  */
 export async function runDailyJobs(deps: {
   db: Db;
@@ -52,7 +56,14 @@ export async function runDailyJobs(deps: {
 }): Promise<DailyReport> {
   const { db, now } = deps;
   const today = doualaDay(now);
-  const report: DailyReport = { dueSoon: 0, overdue: 0, signups: null, deleted: 0, pdfFilesPurged: 0 };
+  const report: DailyReport = {
+    dueSoon: 0,
+    overdue: 0,
+    signups: null,
+    deleted: 0,
+    pdfFilesPurged: 0,
+    chargesRepeated: 0,
+  };
 
   const invoices = await db.invoice.findMany({
     where: { status: 'SENT', dueDate: { not: null }, overdueRemindedAt: null },
@@ -140,6 +151,7 @@ export async function runDailyJobs(deps: {
   });
   report.deleted = count;
   report.pdfFilesPurged = await purgeOldPdfToolFiles(db, now);
+  report.chargesRepeated = await makeMonthlyCopies(db, today);
   return report;
 }
 

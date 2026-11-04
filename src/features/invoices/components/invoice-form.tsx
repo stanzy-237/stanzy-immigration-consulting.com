@@ -377,7 +377,7 @@ export function InvoiceForm({ draft }: { draft: InvoiceDraft }): ReactNode {
 }
 
 /** Finds an open Dossier by its Client's name or email; once chosen, shows it with « Changer ». */
-function DossierPicker({
+export function DossierPicker({
   id,
   value,
   invalid,
