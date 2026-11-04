@@ -24,7 +24,7 @@ import { FinancesHeader } from '@/features/finances/components/finances-header';
 import { useFinanceErrors } from '@/features/finances/hooks/use-finance-errors';
 import { NOTE_MAX } from '@/features/finances/lib/finance-schema';
 import { receiptUrl, uploadReceipt } from '@/features/finances/lib/finance-urls';
-import { DossierPicker, type DossierOption } from '@/features/invoices/components/invoice-form';
+import { DossierPicker, type DossierOption } from '@/features/shared/components/dossier-picker';
 import { formatMoney, minorToInput, toMinor, type Currency } from '@/features/invoices/lib/money';
 import { doualaDay } from '@/features/notifications/lib/douala-days';
 import { useTRPC } from '@/trpc/client';
