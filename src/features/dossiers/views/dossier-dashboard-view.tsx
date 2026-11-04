@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowLeft, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, FileWarning, Lock } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useId, useState, type ReactNode } from 'react';
@@ -29,10 +29,19 @@ import { useTRPC } from '@/trpc/client';
 
 /**
  * One Dossier in the Tableau de bord: its stages, the moves the consultant
- * can make, its history and documents. `invoices` is the Factures panel the
- * route passes in.
+ * can make, its history and documents. `invoices` and `contracts` are the
+ * Factures and Contrat panels the route passes in.
  */
-export function DossierDashboardView({ id, invoices }: { id: string; invoices?: ReactNode }): ReactNode {
+export function DossierDashboardView({
+  id,
+  invoices,
+  contracts,
+}: {
+  id: string;
+  invoices?: ReactNode;
+  /** The Contrat panel (#96), passed in by the route. */
+  contracts?: ReactNode;
+}): ReactNode {
   const t = useTranslations('Dossiers.detail');
   // A Notification's link (#92): the Document to unfold, the message to highlight.
   const params = useSearchParams();
@@ -50,6 +59,7 @@ export function DossierDashboardView({ id, invoices }: { id: string; invoices?: 
         <DossierDetail id={id} />
       </QueryBoundary>
       {invoices ? <div className="mt-10">{invoices}</div> : null}
+      {contracts ? <div className="mt-10">{contracts}</div> : null}
       <div className="mt-10">
         <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
           <DossierDocuments dossierId={id} viewer="consultant" focus={focus} />
@@ -61,6 +71,7 @@ export function DossierDashboardView({ id, invoices }: { id: string; invoices?: 
 
 function DossierDetail({ id }: { id: string }): ReactNode {
   const t = useTranslations('Dossiers');
+  const contracts = useTranslations('Contracts');
   const format = useFormatter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -133,7 +144,18 @@ function DossierDetail({ id }: { id: string }): ReactNode {
             {dossier.account.email} · {t('detail.openedOn', { date: date(dossier.createdAt) })}
           </p>
         </div>
-        <DossierStatePill dossier={dossier} />
+        <div className="flex flex-wrap items-center gap-2">
+          {open && !dossier.contractSigned ? (
+            <a
+              href="#contrats"
+              className="inline-flex items-center gap-1 rounded-full bg-honey-tint px-3 py-1 text-xs font-semibold text-honey"
+            >
+              <FileWarning aria-hidden={true} className="size-3.5" />
+              {contracts('panel.unsigned')}
+            </a>
+          ) : null}
+          <DossierStatePill dossier={dossier} />
+        </div>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -166,6 +188,10 @@ function DossierDetail({ id }: { id: string }): ReactNode {
               ) : (
                 <p className="text-sm font-semibold text-leaf">{t('detail.lastStage')}</p>
               )}
+              {/* A warning, not a lock: the stage still moves. */}
+              {next && !dossier.contractSigned ? (
+                <p className="text-xs font-semibold text-honey">{contracts('stageWarning')}</p>
+              ) : null}
               <button
                 type="button"
                 onClick={() => setClosing(true)}

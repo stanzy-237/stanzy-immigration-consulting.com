@@ -16,10 +16,20 @@ import { Link } from '@/i18n/navigation';
 import { useTRPC } from '@/trpc/client';
 
 /**
- * One of the Client's Dossiers in « Mon espace »: its stages, its Factures
- * (`invoices`, passed in by the route), then its Sections and Documents.
+ * One of the Client's Dossiers in « Mon espace »: its stages, its Contrat
+ * and Factures (`contracts`, `invoices`, passed in by the route), then its
+ * Sections and Documents.
  */
-export function MyDossierView({ id, invoices }: { id: string; invoices?: ReactNode }): ReactNode {
+export function MyDossierView({
+  id,
+  invoices,
+  contracts,
+}: {
+  id: string;
+  invoices?: ReactNode;
+  /** The Contrat panel (#96), passed in by the route. */
+  contracts?: ReactNode;
+}): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
   // A Notification's link (#92): the Document to unfold, the message to highlight.
   const params = useSearchParams();
@@ -41,6 +51,7 @@ export function MyDossierView({ id, invoices }: { id: string; invoices?: ReactNo
               <MyDossierHeader id={id} />
             </QueryBoundary>
           </div>
+          {contracts}
           {invoices}
           <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
             <DossierDocuments dossierId={id} viewer="client" focus={focus} />

@@ -134,10 +134,13 @@ export const dossiersRouter = createTRPCRouter({
               actor: { select: { name: true } },
             },
           },
+          // Its Contrat signed (#96)? « Contrat non signé » warns until then, without blocking.
+          contracts: { where: { parentId: null, status: 'SIGNED' }, select: { id: true }, take: 1 },
         },
       });
       if (!dossier) throw notFound();
-      return dossier;
+      const { contracts, ...rest } = dossier;
+      return { ...rest, contractSigned: contracts.length > 0 };
     }),
 
     /** Accounts a Dossier can be opened for: members (not Partners or the consultant), by name or email. */

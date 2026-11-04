@@ -28,7 +28,8 @@ export function useNotificationText() {
         item.dossier && item.params.stage
           ? dossiers(`stages.${item.dossier.service}.${item.params.stage}` as never)
           : '',
-      number: item.invoice?.number ?? '',
+      // A Facture's number, or a Contrat's (kept in its params).
+      number: item.invoice?.number ?? item.params.number ?? '',
       total: item.invoice ? formatMoney(item.invoice.total, item.invoice.currency, locale) : '',
     };
     const detail =

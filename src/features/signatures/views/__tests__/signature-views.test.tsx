@@ -14,7 +14,7 @@ import { createTestTRPC } from '@/trpc/__tests__/test-utils';
  * as the routes prefetch it. pdf.js and the drawing canvas are stubbed: the
  * PDF has two drawn pages, and « drawing » hands over a PNG.
  */
-vi.mock('@/features/signatures/hooks/use-pdf-pages', () => ({
+vi.mock('@/features/shared/hooks/use-pdf-pages', () => ({
   usePdfPages: () => ({
     pages: [
       { src: 'data:image/jpeg;base64,AA==', width: 595, height: 842 },
@@ -24,7 +24,7 @@ vi.mock('@/features/signatures/hooks/use-pdf-pages', () => ({
     failed: false,
   }),
 }));
-vi.mock('@/features/signatures/components/signature-pad', () => ({
+vi.mock('@/features/shared/components/signing/signature-pad', () => ({
   SignaturePad: ({ ink, onChange }: { ink: string; onChange: (png: string | null) => void }) => (
     <button type="button" onClick={() => onChange(`data:image/png;base64,${ink}`)}>
       draw

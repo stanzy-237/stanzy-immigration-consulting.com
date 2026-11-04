@@ -1409,7 +1409,8 @@
       },
       "close": "Close the menu",
       "outils-pdf": "PDF tools",
-      "signatures": "Signatures"
+      "signatures": "Signatures",
+      "contrats": "Contracts"
     },
     "viewSite": "View the site",
     "overview": {
@@ -2239,7 +2240,9 @@
       "ACCOUNTS_SIGNED_UP": "{count, plural, one {# new account} other {# new accounts}} yesterday.",
       "DRAW_PUBLISHED": "New Express Entry draw #{round}: {invitations} invitations, {crs} points minimum.",
       "SIGNATURE_REQUESTED": "Stanzy asks you to sign “{document}”.",
-      "DOCUMENT_SIGNED": "{actor} signed “{document}”."
+      "DOCUMENT_SIGNED": "{actor} signed “{document}”.",
+      "CONTRACT_SENT": "Stanzy sent you {number} to sign.",
+      "CONTRACT_SIGNED": "{actor} signed {number}."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2256,7 +2259,9 @@
       "INVOICE_LATE": "An invoice is overdue.",
       "ACCOUNTS_SIGNED_UP": "New accounts.",
       "SIGNATURE_REQUESTED": "A document to sign.",
-      "DOCUMENT_SIGNED": "A document was signed."
+      "DOCUMENT_SIGNED": "A document was signed.",
+      "CONTRACT_SENT": "A contract to sign.",
+      "CONTRACT_SIGNED": "A contract was signed."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -2555,5 +2560,175 @@
       "alert": "{count, plural, one {One document is waiting for your signature} other {# documents are waiting for your signature}}",
       "newRequest": "Request a signature"
     }
+  },
+  "Contracts": {
+    "status": {
+      "SENT": "Waiting for signature",
+      "SIGNED": "Signed",
+      "CANCELLED": "Cancelled"
+    },
+    "errors": {
+      "CONTRACT_TEMPLATE_MISSING": "No template for this service in this language: write it in Contracts → Templates.",
+      "SIGNATURE_ASSETS_MISSING": "Add your signature and the stamp in “Signatures” first.",
+      "CONTRACT_ALREADY_SENT": "A contract is already waiting for the client’s signature: cancel it first.",
+      "CONTRACT_ALREADY_SIGNED": "The contract is already signed: send an amendment.",
+      "CONTRACT_NOT_SIGNED": "An amendment can only be sent once the contract is signed.",
+      "AMENDMENT_ALREADY_SENT": "An amendment is already waiting for the client’s signature: cancel it first.",
+      "CONTRACT_NOT_PENDING": "This contract is no longer waiting for a signature.",
+      "CONTRACT_NOT_YOURS": "Only the holder of the file can sign this contract.",
+      "SIGNATURE_DOCUMENT_CHANGED": "The contract changed after it was sent: ask Stanzy to send it again.",
+      "SIGNATURE_IMAGE_INVALID": "The signature could not be read. Clear it and sign again.",
+      "DOSSIER_CLOSED": "This file is closed: it can no longer change.",
+      "DOSSIER_FILES_UNCONFIGURED": "File storage isn’t enabled yet. Try again later.",
+      "UNKNOWN": "That didn’t work. Try again."
+    },
+    "pdf": {
+      "client": "The Client",
+      "company": "For Stanzy Immigration Consulting",
+      "signature": "Signature",
+      "name": "Full name",
+      "date": "Date",
+      "page": "Page {page} / {pages}",
+      "number": "Contract no. {number}",
+      "amendmentOf": "Amendment no. {n} to contract {number}",
+      "signedSuffix": "signed"
+    },
+    "emails": {
+      "greeting": "Hello {name},",
+      "sent": {
+        "subject": "Your contract {number} to sign",
+        "body": "Stanzy sent you “{title}” ({number}) for your {service} file. Read it and sign it online.",
+        "cta": "Read and sign"
+      },
+      "amendmentSent": {
+        "subject": "Amendment {number} to sign",
+        "body": "Stanzy sent you the amendment “{title}” ({number}) to your contract, for your {service} file. Read it and sign it online.",
+        "cta": "Read and sign"
+      },
+      "signed": {
+        "subject": "Your signed contract {number}",
+        "body": "You signed “{title}” ({number}). Here it is attached, with its signature certificate. You can find it in your space at any time.",
+        "cta": "See my space"
+      },
+      "consultantSigned": {
+        "subject": "{client} signed {number}",
+        "body": "{client} signed “{title}” ({number}) for their {service} file. The signed PDF is attached.",
+        "cta": "Open the file"
+      }
+    },
+    "panel": {
+      "title": "Contract",
+      "new": "Send the contract",
+      "amendment": "Send an amendment",
+      "emptyConsultant": "No contract sent for this file.",
+      "emptyClient": "No contract yet.",
+      "unsigned": "Contract not signed",
+      "signedPill": "Contract signed",
+      "sentOn": "Sent on {date}",
+      "signedOn": "Signed on {date} by {name}",
+      "cancelledOn": "Cancelled on {date}",
+      "reason": "Reason: {reason}",
+      "price": "{amount} · {schedule}",
+      "pdf": "PDF",
+      "pdfLabel": "Open the PDF of {number}",
+      "signedPdf": "Signed PDF",
+      "signedPdfLabel": "Open the signed PDF of {number}",
+      "sign": "Sign",
+      "signLabel": "Sign {number}",
+      "cancel": "Cancel",
+      "cancelLabel": "Cancel {number}",
+      "loading": "Loading contracts",
+      "amendmentOf": "Amendment to {number}",
+      "waiting": "Contract {number} is waiting for your signature."
+    },
+    "send": {
+      "title": "Send the contract",
+      "body": "Written from the service’s template, in the chosen language, with your signature and the stamp. The client signs it online.",
+      "locale": "Language",
+      "fr": "French",
+      "en": "English",
+      "amount": "Price",
+      "currency": "Currency",
+      "schedule": "Payment schedule",
+      "schedulePlaceholder": "50% on signing, 50% on submission",
+      "submit": "Send to the client",
+      "sending": "Sending…",
+      "cancel": "Cancel",
+      "invalidAmount": "Enter a valid amount."
+    },
+    "amendment": {
+      "title": "Send an amendment",
+      "body": "The amendment changes contract {number}. The client signs it the same way.",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Amendment: adding the spouse to the file",
+      "text": "Text",
+      "textHint": "# Section title, - bullet, a blank line between paragraphs.",
+      "submit": "Send the amendment",
+      "cancel": "Cancel"
+    },
+    "cancel": {
+      "title": "Cancel {number}?",
+      "body": "The client will no longer be able to sign it. You can send a corrected one.",
+      "reason": "Reason (optional)",
+      "keep": "Keep",
+      "confirm": "Cancel the contract"
+    },
+    "toast": {
+      "sent": "{number} sent to the client",
+      "cancelled": "Contract cancelled",
+      "saved": "Template saved",
+      "signed": "Contract signed"
+    },
+    "templates": {
+      "metaTitle": "Contract templates",
+      "title": "Contract templates",
+      "back": "Contracts",
+      "intro": "One template per service and language. The blanks in braces are filled in when sent; the price and payment schedule are entered each time.",
+      "service": "Service",
+      "locale": "Language",
+      "fr": "French",
+      "en": "English",
+      "missing": "No template yet",
+      "updated": "Changed on {date}",
+      "titleLabel": "Contract title",
+      "titlePlaceholder": "Service agreement",
+      "text": "Text",
+      "format": "# Section title, - bullet, a blank line between paragraphs.",
+      "blanks": "Blanks",
+      "blank": {
+        "client": "client’s name",
+        "service": "service",
+        "prix": "price",
+        "echeancier": "payment schedule",
+        "date": "date sent",
+        "numero": "contract number"
+      },
+      "unknown": "Unknown blanks, left as written: {list}",
+      "preview": "PDF preview",
+      "previewing": "Previewing…",
+      "previewFailed": "The preview could not be made.",
+      "save": "Save",
+      "saving": "Saving…",
+      "loading": "Loading templates"
+    },
+    "dashboard": {
+      "metaTitle": "Contracts",
+      "title": "Contracts",
+      "intro": "The contracts and amendments sent, and their signature.",
+      "templates": "Templates",
+      "empty": "No contract sent yet.",
+      "open": "Open the file",
+      "loading": "Loading contracts"
+    },
+    "sign": {
+      "metaTitle": "Sign a contract",
+      "back": "Back to the file",
+      "title": "Sign “{title}”",
+      "intro": "Read the contract to the end, then click each framed area to fill it in. Finish with “Finish”.",
+      "alreadySigned": "You signed this contract on {date}.",
+      "notWaiting": "This contract is no longer waiting for a signature.",
+      "openSigned": "Open the signed contract"
+    },
+    "stageWarning": "The contract isn’t signed yet."
   }
 }

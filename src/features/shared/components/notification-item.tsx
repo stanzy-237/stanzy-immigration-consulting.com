@@ -7,9 +7,11 @@ import {
   FileCheck,
   FilePlus,
   FileSignature,
+  FileCheck2,
   FolderOpen,
   Lock,
   Megaphone,
+  ScrollText,
   PenLine,
   MessageSquare,
   ReceiptText,
@@ -46,6 +48,8 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   DRAW_PUBLISHED: Megaphone,
   SIGNATURE_REQUESTED: PenLine,
   DOCUMENT_SIGNED: FileSignature,
+  CONTRACT_SENT: ScrollText,
+  CONTRACT_SIGNED: FileCheck2,
 };
 
 /**
