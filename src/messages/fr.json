@@ -1853,6 +1853,10 @@
       "signed": {
         "subject": "Document signé dans votre dossier {service}",
         "body": "Vous avez signé « {document} ». Le document signé, avec son certificat de signature, est dans votre dossier {service}."
+      },
+      "message": {
+        "subject": "Nouveau message dans votre dossier {service}",
+        "body": "Stanzy vous a écrit dans votre dossier {service} : « {excerpt} »"
       }
     },
     "dashboard": {
@@ -1957,6 +1961,10 @@
       "clientSigned": {
         "subject": "{client} a signé « {document} »",
         "body": "{client} a signé « {document} » dans son dossier {service}. Le PDF signé est ajouté comme nouvelle version du document."
+      },
+      "clientMessage": {
+        "subject": "{client} vous a écrit",
+        "body": "{client} vous a écrit dans son dossier {service} : « {excerpt} »"
       }
     },
     "documents": {
@@ -2050,6 +2058,54 @@
           "edited": "Message modifié",
           "deleted": "Message supprimé"
         }
+      }
+    },
+    "messages": {
+      "title": "Messages",
+      "introClient": "Une question sur votre dossier en général ? Écrivez ici. Pour un document précis, passez par ses échanges.",
+      "introConsultant": "L’échange général avec le client, à part des documents.",
+      "empty": "Aucun message pour l’instant.",
+      "label": "Écrire un message",
+      "placeholder": "Écrire un message…",
+      "send": "Envoyer",
+      "reply": "Répondre",
+      "replyLabel": "Répondre à {name}",
+      "replyPlaceholder": "Votre réponse…",
+      "edit": "Modifier",
+      "editLabel": "Modifier votre message",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "deleteTitle": "Supprimer ce message ?",
+      "deleteBody": "Il disparaît avec ses fichiers, pour vous comme pour l’autre personne.",
+      "deleteBodyWithReplies": "Ses réponses restent : il s’affichera « Message supprimé », sans ses fichiers.",
+      "deleted": "Message supprimé",
+      "edited": "modifié",
+      "sending": "envoi…",
+      "you": "Vous",
+      "error": "Écrivez un message ou joignez un fichier.",
+      "attach": "Joindre des fichiers",
+      "attachHint": "PDF ou images, {max} au plus, chiffrés avant l’envoi.",
+      "removeFile": "Retirer {name}",
+      "tooMany": "{max} fichiers au plus par message.",
+      "closed": "Le dossier est clôturé : les messages restent lisibles.",
+      "loading": "Chargement des messages",
+      "openFile": "Ouvrir {name}",
+      "toast": {
+        "sent": "Message envoyé",
+        "replied": "Réponse envoyée",
+        "edited": "Message modifié",
+        "deleted": "Message supprimé"
+      },
+      "errors": {
+        "MESSAGE_EMPTY": "Écrivez un message ou joignez un fichier.",
+        "COMMENT_NOT_YOURS": "Seul l’auteur peut modifier ce message.",
+        "DOSSIER_CLOSED": "Le dossier est clôturé.",
+        "DOCUMENT_FILE_TYPE": "Seuls les PDF et les images sont acceptés.",
+        "DOCUMENT_FILE_TOO_LARGE": "Un fichier est trop lourd.",
+        "DOCUMENT_FILE_INVALID": "Un fichier n’a pas pu être envoyé. Réessayez.",
+        "DOSSIER_FILES_UNCONFIGURED": "Le stockage des fichiers n’est pas configuré sur ce site.",
+        "UNKNOWN": "Une erreur est survenue. Réessayez."
       }
     }
   },
@@ -2259,7 +2315,8 @@
       "SIGNATURE_REQUESTED": "Stanzy vous demande de signer « {document} ».",
       "DOCUMENT_SIGNED": "{actor} a signé « {document} ».",
       "CONTRACT_SENT": "Stanzy vous a envoyé {number} à signer.",
-      "CONTRACT_SIGNED": "{actor} a signé {number}."
+      "CONTRACT_SIGNED": "{actor} a signé {number}.",
+      "DOSSIER_MESSAGE": "{actor} a écrit {count, plural, one {un message} other {# messages}} dans le dossier {service}."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2278,7 +2335,8 @@
       "SIGNATURE_REQUESTED": "Un document à signer.",
       "DOCUMENT_SIGNED": "Un document a été signé.",
       "CONTRACT_SENT": "Un contrat à signer.",
-      "CONTRACT_SIGNED": "Un contrat a été signé."
+      "CONTRACT_SIGNED": "Un contrat a été signé.",
+      "DOSSIER_MESSAGE": "Nouveau message dans un dossier."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",

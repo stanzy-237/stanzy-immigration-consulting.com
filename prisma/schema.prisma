@@ -61,6 +61,7 @@ model Account {
   signaturesSigned  SignatureRequest[] @relation("SignatureSigner")
   contractsSent     Contract[]         @relation("ContractSender")
   contractsSigned   Contract[]         @relation("ContractSigner")
+  dossierMessages   DossierMessage[]
 
   @@map("account")
 }
@@ -386,6 +387,7 @@ model Dossier {
   sections      DossierSection[]
   invoices      Invoice[]
   contracts     Contract[]
+  messages      DossierMessage[]
   notifications Notification[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
@@ -621,6 +623,8 @@ enum NotificationKind {
   CONTRACT_SENT
   /// To the consultant: the Client signed a Contrat or an Avenant.
   CONTRACT_SIGNED
+  /// To the other side: a message in the Dossier's « Messages » (#94).
+  DOSSIER_MESSAGE
 }
 
 /// One line in an Account's notification center. Repeats by the same actor on the same target, while unread and within 30 minutes, raise `count` instead of adding lines.
@@ -640,6 +644,8 @@ model Notification {
   comment     DocumentComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
   invoiceId   String?
   invoice     Invoice?         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  messageId   String?
+  message     DossierMessage?  @relation(fields: [messageId], references: [id], onDelete: Cascade)
   /// What the text needs beyond the relations: a stage key, a closing reason.
   params      Json             @default("{}")
   count       Int              @default(1)
@@ -826,4 +832,47 @@ model Contract {
   @@index([dossierId, sentAt])
   @@index([status, sentAt])
   @@map("contract")
+}
+
+/// GLOSSARY: Messages du dossier (#94). The Dossier's general conversation
+/// between its Client and the consultant, apart from the Documents'.
+model DossierMessage {
+  id            String               @id @default(cuid())
+  dossierId     String
+  dossier       Dossier              @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  /// The message this one replies to; replies to a reply attach to its message.
+  parentId      String?
+  parent        DossierMessage?      @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       DossierMessage[]     @relation("MessageReplies")
+  authorId      String
+  author        Account              @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  /// May be empty when files are attached.
+  body          String
+  files         DossierMessageFile[]
+  notifications Notification[]
+  editedAt      DateTime?
+  /// Deleted while it had replies: kept as « Message supprimé », without its words or files.
+  deletedAt     DateTime?
+  createdAt     DateTime             @default(now())
+
+  @@index([dossierId, createdAt])
+  @@index([parentId])
+  @@map("dossier_message")
+}
+
+/// A file attached to a Dossier message, encrypted in the private bucket (ADR 0007).
+model DossierMessageFile {
+  id          String         @id @default(cuid())
+  messageId   String
+  message     DossierMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  fileName    String
+  contentType String
+  size        Int
+  objectKey   String
+  wrappedKey  String
+  iv          String
+  createdAt   DateTime       @default(now())
+
+  @@index([messageId])
+  @@map("dossier_message_file")
 }

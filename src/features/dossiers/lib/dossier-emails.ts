@@ -19,6 +19,7 @@ export type DossierChange =
   | { kind: 'closed'; reason: string }
   | { kind: 'newVersion'; document: string }
   | { kind: 'comment'; document: string; excerpt: string }
+  | { kind: 'message'; excerpt: string }
   | { kind: 'signatureRequested'; document: string }
   | { kind: 'signed'; document: string };
 
@@ -26,6 +27,7 @@ export type DossierChange =
 export type ClientActivity =
   | { kind: 'clientUpload'; document: string }
   | { kind: 'clientComment'; document: string; excerpt: string }
+  | { kind: 'clientMessage'; excerpt: string }
   | { kind: 'clientSigned'; document: string };
 
 /** A comment as quoted in an email: its first 200 characters. */
@@ -76,6 +78,8 @@ export function dossierEmail(opts: {
         ? t('emails.newVersion.body', { service, document: change.document })
         : change.kind === 'comment'
           ? t('emails.comment.body', { service, document: change.document, excerpt: change.excerpt })
+          : change.kind === 'message'
+            ? t('emails.message.body', { service, excerpt: change.excerpt })
           : change.kind === 'signatureRequested' || change.kind === 'signed'
             ? t(`emails.${change.kind}.body`, { service, document: change.document })
             : t(`emails.${change.kind}.body`, {
@@ -113,16 +117,19 @@ export function consultantEmail(opts: {
   const body =
     activity.kind === 'clientUpload' || activity.kind === 'clientSigned'
       ? t(`consultantEmails.${activity.kind}.body`, { client, service, document: activity.document })
-      : t('consultantEmails.clientComment.body', {
-          client,
-          service,
-          document: activity.document,
-          excerpt: activity.excerpt,
-        });
+      : activity.kind === 'clientMessage'
+        ? t('consultantEmails.clientMessage.body', { client, service, excerpt: activity.excerpt })
+        : t('consultantEmails.clientComment.body', {
+            client,
+            service,
+            document: activity.document,
+            excerpt: activity.excerpt,
+          });
+  const document = 'document' in activity ? activity.document : '';
 
   return renderEmail({
     to: opts.to,
-    subject: t(`consultantEmails.${activity.kind}.subject`, { client, document: activity.document }),
+    subject: t(`consultantEmails.${activity.kind}.subject`, { client, document }),
     lines: [body],
     cta: t('consultantEmails.cta'),
     url: opts.url,
