@@ -1851,6 +1851,11 @@
         "body": "Stanzy vous a envoyé « {document} » à signer dans votre dossier {service}. Ouvrez votre espace pour le lire et le signer en ligne.",
         "cta": "Signer le document"
       },
+      "signatureReminder": {
+        "subject": "Rappel : un document à signer dans votre dossier {service}",
+        "body": "« {document} » attend toujours votre signature dans votre dossier {service}. Ouvrez votre espace pour le lire et le signer en ligne.",
+        "cta": "Signer le document"
+      },
       "signed": {
         "subject": "Document signé dans votre dossier {service}",
         "body": "Vous avez signé « {document} ». Le document signé, avec son certificat de signature, est dans votre dossier {service}."
@@ -2260,7 +2265,9 @@
       "SIGNATURE_REQUESTED": "Stanzy vous demande de signer « {document} ».",
       "DOCUMENT_SIGNED": "{actor} a signé « {document} ».",
       "CONTRACT_SENT": "Stanzy vous a envoyé {number} à signer.",
-      "CONTRACT_SIGNED": "{actor} a signé {number}."
+      "CONTRACT_SIGNED": "{actor} a signé {number}.",
+      "SIGNATURE_REMINDER": "Rappel : « {document} » attend votre signature.",
+      "CONTRACT_REMINDER": "Rappel : {number} attend votre signature."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2279,7 +2286,9 @@
       "SIGNATURE_REQUESTED": "Un document à signer.",
       "DOCUMENT_SIGNED": "Un document a été signé.",
       "CONTRACT_SENT": "Un contrat à signer.",
-      "CONTRACT_SIGNED": "Un contrat a été signé."
+      "CONTRACT_SIGNED": "Un contrat a été signé.",
+      "SIGNATURE_REMINDER": "Un document attend votre signature.",
+      "CONTRACT_REMINDER": "Un contrat attend votre signature."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",
@@ -2621,6 +2630,11 @@
       "amendmentSent": {
         "subject": "Avenant {number} à signer",
         "body": "Stanzy vous a envoyé l’avenant « {title} » ({number}) à votre contrat, pour votre dossier {service}. Lisez-le et signez-le en ligne.",
+        "cta": "Lire et signer"
+      },
+      "reminder": {
+        "subject": "Rappel : {number} à signer",
+        "body": "« {title} » ({number}) attend toujours votre signature, pour votre dossier {service}. Lisez-le et signez-le en ligne.",
         "cta": "Lire et signer"
       },
       "signed": {

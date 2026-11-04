@@ -625,6 +625,10 @@ enum NotificationKind {
   CONTRACT_SENT
   /// To the consultant: the Client signed a Contrat or an Avenant.
   CONTRACT_SIGNED
+  /// To the Client, 3 then 7 days after a Demande de signature, if unsigned.
+  SIGNATURE_REMINDER
+  /// To the Client, 3 then 7 days after a Contrat or an Avenant, if unsigned.
+  CONTRACT_REMINDER
 }
 
 /// One line in an Account's notification center. Repeats by the same actor on the same target, while unread and within 30 minutes, raise `count` instead of adding lines.
@@ -724,6 +728,8 @@ model SignatureRequest {
   signedIp        String?
   signedDevice    String?
   cancelledAt     DateTime?
+  /// Reminders sent to the Client: 1 at 3 days, 2 at 7 days, then none.
+  reminders       Int                    @default(0)
   createdAt       DateTime               @default(now())
 
   @@index([documentId, status])
@@ -826,6 +832,8 @@ model Contract {
   sentAt           DateTime         @default(now())
   cancelledAt      DateTime?
   cancelReason     String?
+  /// Reminders sent to the Client: 1 at 3 days, 2 at 7 days, then none.
+  reminders        Int              @default(0)
 
   @@index([dossierId, sentAt])
   @@index([status, sentAt])

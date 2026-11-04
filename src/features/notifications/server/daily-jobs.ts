@@ -3,8 +3,10 @@ import { Prisma } from '@prisma/client';
 import { makeMonthlyCopies } from '@/features/finances/server/repeat-charges';
 import { invoiceReminderEmail } from '@/features/invoices/lib/invoice-emails';
 import { invoiceTotal } from '@/features/invoices/lib/money';
+import { addDays, doualaDay } from '@/features/notifications/lib/douala-days';
 import { notify } from '@/features/notifications/server/notify';
 import { purgeOldPdfToolFiles } from '@/features/pdf-tools/server/purge';
+import { remindUnsigned } from '@/features/signatures/server/sign-reminders';
 import { toLocale } from '@/i18n/routing';
 import type { Mailer } from '@/server/email/mailer';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -15,13 +17,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 /** Read Notifications older than this are deleted (#92); unread ones stay. */
 export const READ_KEPT_MS = 183 * DAY_MS;
 
-/** `YYYY-MM-DD` of `date` in Douala, where the practice works (UTC+1, no summer time). */
-export const doualaDay = (date: Date): string =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(date);
-
-/** `YYYY-MM-DD` `days` after `day`. */
-const addDays = (day: string, days: number): string =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + days * DAY_MS).toISOString().slice(0, 10);
+export { doualaDay };
 
 /** The calendar day a due date stands for: stored at midnight UTC of the day picked. */
 const dueDay = (dueDate: Date): string => dueDate.toISOString().slice(0, 10);
@@ -29,6 +25,9 @@ const dueDay = (dueDate: Date): string => dueDate.toISOString().slice(0, 10);
 export type DailyReport = {
   dueSoon: number;
   overdue: number;
+  /** Demandes de signature and Contrats still unsigned, reminded to the Client. */
+  signatureReminders: number;
+  contractReminders: number;
   signups: number | null;
   deleted: number;
   /** Outils PDF history files past 90 days. */
@@ -42,6 +41,8 @@ export type DailyReport = {
  * - Factures still « Envoyée »: the Client is reminded 3 days before the due
  *   date and on the day after it (bell and email), and the consultant told
  *   it is « En retard »; each reminder once, a late run catching up.
+ * - Demandes de signature and Contrats still unsigned: the Client is reminded
+ *   3 and 7 days after sending (bell and email), then never again.
  * - The accounts created the day before, summed up for the consultant, once a day.
  * - Read Notifications older than 6 months, deleted.
  * - Outils PDF history files older than 90 days, deleted with their copies.
@@ -59,6 +60,8 @@ export async function runDailyJobs(deps: {
   const report: DailyReport = {
     dueSoon: 0,
     overdue: 0,
+    signatureReminders: 0,
+    contractReminders: 0,
     signups: null,
     deleted: 0,
     pdfFilesPurged: 0,
@@ -144,6 +147,7 @@ export async function runDailyJobs(deps: {
     }
   }
 
+  Object.assign(report, await remindUnsigned(deps));
   report.signups = await summarizeSignups(db, now, addDays(today, -1));
 
   const { count } = await db.notification.deleteMany({
