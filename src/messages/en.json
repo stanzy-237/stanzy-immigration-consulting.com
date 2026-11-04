@@ -1836,6 +1836,11 @@
       "signed": {
         "subject": "Document signed in your {service} file",
         "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file."
+      },
+      "signatureReminder": {
+        "subject": "Reminder: a document to sign in your {service} file",
+        "body": "“{document}” is still waiting for your signature in your {service} file. Open your space to read it and sign it online.",
+        "cta": "Sign the document"
       }
     },
     "dashboard": {
@@ -2246,7 +2251,9 @@
       "MEETING_SCHEDULED": "Meeting “{subject}” planned on {date}.",
       "MEETING_MOVED": "Meeting “{subject}” moved to {date}.",
       "MEETING_CANCELLED": "Meeting “{subject}” cancelled.",
-      "MEETING_REMINDER": "{soon, select, true {The meeting “{subject}” starts soon.} other {Reminder: meeting “{subject}” on {date}.}}"
+      "MEETING_REMINDER": "{soon, select, true {The meeting “{subject}” starts soon.} other {Reminder: meeting “{subject}” on {date}.}}",
+      "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
+      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2269,7 +2276,9 @@
       "MEETING_SCHEDULED": "New meeting.",
       "MEETING_MOVED": "A meeting changed.",
       "MEETING_CANCELLED": "A meeting was cancelled.",
-      "MEETING_REMINDER": "Meeting reminder."
+      "MEETING_REMINDER": "Meeting reminder.",
+      "SIGNATURE_REMINDER": "A document is waiting for your signature.",
+      "CONTRACT_REMINDER": "A contract is waiting for your signature."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -2622,6 +2631,11 @@
         "subject": "{client} signed {number}",
         "body": "{client} signed “{title}” ({number}) for their {service} file. The signed PDF is attached.",
         "cta": "Open the file"
+      },
+      "reminder": {
+        "subject": "Reminder: {number} to sign",
+        "body": "“{title}” ({number}) is still waiting for your signature, for your {service} file. Read it and sign it online.",
+        "cta": "Read and sign"
       }
     },
     "panel": {

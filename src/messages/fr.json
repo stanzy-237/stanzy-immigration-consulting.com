@@ -1853,6 +1853,11 @@
       "signed": {
         "subject": "Document signé dans votre dossier {service}",
         "body": "Vous avez signé « {document} ». Le document signé, avec son certificat de signature, est dans votre dossier {service}."
+      },
+      "signatureReminder": {
+        "subject": "Rappel : un document à signer dans votre dossier {service}",
+        "body": "« {document} » attend toujours votre signature dans votre dossier {service}. Ouvrez votre espace pour le lire et le signer en ligne.",
+        "cta": "Signer le document"
       }
     },
     "dashboard": {
@@ -2263,7 +2268,9 @@
       "MEETING_SCHEDULED": "Réunion « {subject} » planifiée le {date}.",
       "MEETING_MOVED": "Réunion « {subject} » déplacée au {date}.",
       "MEETING_CANCELLED": "Réunion « {subject} » annulée.",
-      "MEETING_REMINDER": "{soon, select, true {La réunion « {subject} » commence bientôt.} other {Rappel : réunion « {subject} » le {date}.}}"
+      "MEETING_REMINDER": "{soon, select, true {La réunion « {subject} » commence bientôt.} other {Rappel : réunion « {subject} » le {date}.}}",
+      "SIGNATURE_REMINDER": "Rappel : « {document} » attend votre signature.",
+      "CONTRACT_REMINDER": "Rappel : {number} attend votre signature."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2286,7 +2293,9 @@
       "MEETING_SCHEDULED": "Nouvelle réunion.",
       "MEETING_MOVED": "Une réunion a changé.",
       "MEETING_CANCELLED": "Une réunion est annulée.",
-      "MEETING_REMINDER": "Rappel de réunion."
+      "MEETING_REMINDER": "Rappel de réunion.",
+      "SIGNATURE_REMINDER": "Un document attend votre signature.",
+      "CONTRACT_REMINDER": "Un contrat attend votre signature."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",
@@ -2639,6 +2648,11 @@
         "subject": "{client} a signé {number}",
         "body": "{client} a signé « {title} » ({number}) pour son dossier {service}. Le PDF signé est en pièce jointe.",
         "cta": "Ouvrir le dossier"
+      },
+      "reminder": {
+        "subject": "Rappel : {number} à signer",
+        "body": "« {title} » ({number}) attend toujours votre signature, pour votre dossier {service}. Lisez-le et signez-le en ligne.",
+        "cta": "Lire et signer"
       }
     },
     "panel": {
