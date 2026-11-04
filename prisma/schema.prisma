@@ -64,6 +64,11 @@ model Account {
   interestRequests  InterestRequest[]
   interestsDecided  InterestRequest[]  @relation("InterestDecider")
   stanzyRequests    StanzyRequest[]
+  meetingsPlanned   Meeting[]
+  meetingConsents   MeetingConsent[]
+  dossierMessages   DossierMessage[]
+  incomesEntered    Income[]           @relation("IncomeCreator")
+  chargesEntered    Charge[]           @relation("ChargeCreator")
 
   @@map("account")
 }
@@ -390,6 +395,10 @@ model Dossier {
   invoices      Invoice[]
   contracts     Contract[]
   interest      InterestRequest?
+  meetings      Meeting[]
+  messages      DossierMessage[]
+  incomes       Income[]
+  charges       Charge[]
   notifications Notification[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
@@ -641,6 +650,14 @@ enum NotificationKind {
   STANZY_REQUESTED
   /// To the Client: Stanzy won't get that Document.
   STANZY_DECLINED
+  /// To the Client: a Réunion planned, moved or cancelled (#94).
+  MEETING_SCHEDULED
+  MEETING_MOVED
+  MEETING_CANCELLED
+  /// To the Client the day before and 15 minutes before; to the consultant 15 minutes before.
+  MEETING_REMINDER
+  /// To the other side: a message in the Dossier's « Messages » (#94).
+  DOSSIER_MESSAGE
   /// To the Client, 3 then 7 days after a Demande de signature, if unsigned.
   SIGNATURE_REMINDER
   /// To the Client, 3 then 7 days after a Contrat or an Avenant, if unsigned.
@@ -664,6 +681,8 @@ model Notification {
   comment     DocumentComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
   invoiceId   String?
   invoice     Invoice?         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  messageId   String?
+  message     DossierMessage?  @relation(fields: [messageId], references: [id], onDelete: Cascade)
   /// What the text needs beyond the relations: a stage key, a closing reason.
   params      Json             @default("{}")
   count       Int              @default(1)
@@ -921,4 +940,210 @@ model StanzyRequest {
   @@index([documentId, status])
   @@index([status, createdAt])
   @@map("stanzy_request")
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  CANCELLED
+}
+
+/// GLOSSARY: Réunion (#94). A video meeting planned from a Dossier, held in
+/// the app on Stream Video, recorded and transcribed unless switched off.
+model Meeting {
+  id                String             @id @default(cuid())
+  dossierId         String
+  dossier           Dossier            @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  subject           String
+  startsAt          DateTime
+  durationMinutes   Int
+  /// Recorded and transcribed; the consultant may switch it off for one Réunion.
+  recording         Boolean            @default(true)
+  status            MeetingStatus      @default(SCHEDULED)
+  /// The consultant's private notes; the Client never sees them.
+  notes             String?
+  plannedById       String
+  plannedBy         Account            @relation(fields: [plannedById], references: [id], onDelete: Restrict)
+  cancelledAt       DateTime?
+  cancelReason      String?
+  /// When each reminder went out; moving the Réunion clears them.
+  remindedDayBefore DateTime?
+  remindedSoon      DateTime?
+  consents          MeetingConsent[]
+  recordings        MeetingRecording[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([dossierId, startsAt])
+  @@index([status, startsAt])
+  @@map("meeting")
+}
+
+/// « Cette réunion est enregistrée »: accepted by someone before joining, with the time.
+model MeetingConsent {
+  id         String   @id @default(cuid())
+  meetingId  String
+  meeting    Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  accountId  String
+  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  acceptedAt DateTime @default(now())
+
+  @@unique([meetingId, accountId])
+  @@map("meeting_consent")
+}
+
+enum MeetingFileKind {
+  RECORDING
+  TRANSCRIPTION
+}
+
+/// GLOSSARY: Enregistrement, Transcription. A file Stream made of a Réunion,
+/// stored in the private bucket through Stream's external storage; for the
+/// consultant only, kept until 2 years after the Dossier is closed.
+model MeetingRecording {
+  id        String          @id @default(cuid())
+  meetingId String
+  meeting   Meeting         @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  kind      MeetingFileKind
+  /// Stream's file name, and where it put the file: its own address (valid about 2 weeks) and, once found, our bucket's key.
+  filename  String
+  url       String
+  objectKey String?
+  startedAt DateTime
+  endedAt   DateTime
+  /// A Transcription's words, for searching.
+  text      String?
+  createdAt DateTime        @default(now())
+
+  @@unique([meetingId, kind, filename])
+  @@map("meeting_recording")
+}
+
+/// GLOSSARY: Messages du dossier (#94). The Dossier's general conversation
+/// between its Client and the consultant, apart from the Documents'.
+model DossierMessage {
+  id            String               @id @default(cuid())
+  dossierId     String
+  dossier       Dossier              @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  /// The message this one replies to; replies to a reply attach to its message.
+  parentId      String?
+  parent        DossierMessage?      @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       DossierMessage[]     @relation("MessageReplies")
+  authorId      String
+  author        Account              @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  /// May be empty when files are attached.
+  body          String
+  files         DossierMessageFile[]
+  notifications Notification[]
+  editedAt      DateTime?
+  /// Deleted while it had replies: kept as « Message supprimé », without its words or files.
+  deletedAt     DateTime?
+  createdAt     DateTime             @default(now())
+
+  @@index([dossierId, createdAt])
+  @@index([parentId])
+  @@map("dossier_message")
+}
+
+/// A file attached to a Dossier message, encrypted in the private bucket (ADR 0007).
+model DossierMessageFile {
+  id          String         @id @default(cuid())
+  messageId   String
+  message     DossierMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  fileName    String
+  contentType String
+  size        Int
+  objectKey   String
+  wrappedKey  String
+  iv          String
+  createdAt   DateTime       @default(now())
+
+  @@index([messageId])
+  @@map("dossier_message_file")
+}
+
+/// GLOSSARY: Recette, entered by hand (#95): cash, a payment outside the
+/// platform. A Facture marked Payée is a Recette by itself and has no row here.
+model Income {
+  id          String          @id @default(cuid())
+  /// In the currency's minor unit, like Factures.
+  amount      Int
+  currency    InvoiceCurrency
+  /// The day it came in.
+  date        DateTime        @db.Date
+  /// The service it pays for, or where it came from otherwise.
+  service     ServiceType?
+  source      String?
+  dossierId   String?
+  dossier     Dossier?        @relation(fields: [dossierId], references: [id], onDelete: SetNull)
+  note        String?
+  createdById String
+  createdBy   Account         @relation("IncomeCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([date])
+  @@index([dossierId])
+  @@map("income")
+}
+
+/// A Charge's category (#95); the consultant edits the list. Archived ones
+/// keep their Charges but aren't offered any more.
+model ChargeCategory {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  position   Int       @default(0)
+  archivedAt DateTime?
+  charges    Charge[]
+  createdAt  DateTime  @default(now())
+
+  @@map("charge_category")
+}
+
+/// GLOSSARY: Charge (#95). One that repeats every month is the model its
+/// monthly copies are made from by the daily round.
+model Charge {
+  id                 String          @id @default(cuid())
+  amount             Int
+  currency           InvoiceCurrency
+  date               DateTime        @db.Date
+  categoryId         String
+  category           ChargeCategory  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  dossierId          String?
+  dossier            Dossier?        @relation(fields: [dossierId], references: [id], onDelete: SetNull)
+  note               String?
+  /// A model: copied every month on the same day until switched off.
+  repeatsMonthly     Boolean         @default(false)
+  /// A copy: its model, and the `YYYY-MM` it was made for (each once).
+  repeatOfId         String?
+  repeatOf           Charge?         @relation("ChargeRepeats", fields: [repeatOfId], references: [id], onDelete: SetNull)
+  copies             Charge[]        @relation("ChargeRepeats")
+  repeatMonth        String?
+  /// The receipt, encrypted in the private bucket (ADR 0007).
+  receiptFileName    String?
+  receiptContentType String?
+  receiptSize        Int?
+  receiptObjectKey   String?
+  receiptWrappedKey  String?
+  receiptIv          String?
+  createdById        String
+  createdBy          Account         @relation("ChargeCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@unique([repeatOfId, repeatMonth])
+  @@index([date])
+  @@index([dossierId])
+  @@index([repeatsMonthly])
+  @@map("charge")
+}
+
+/// What 1 CAD is worth in XAF for a month (#95), entered by the consultant.
+/// EUR needs none: it is fixed at 655.957.
+model CadRate {
+  /// `YYYY-MM`.
+  month     String   @id
+  xafPerCad Decimal  @db.Decimal(12, 4)
+  updatedAt DateTime @updatedAt
+
+  @@map("cad_rate")
 }

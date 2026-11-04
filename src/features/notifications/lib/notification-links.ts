@@ -17,8 +17,8 @@ export type LinkTarget = Pick<NotificationItem, 'kind'> & {
   document?: { id: string } | null;
   comment?: { id: string } | null;
   invoice?: { id: string } | null;
-  /** A Demande de signature's id (SIGNATURE_*), a Contrat's (CONTRACT_*), a Demande d'intérêt's (INTEREST_*). */
-  params?: { requestId?: string; contractId?: string; interestId?: string };
+  /** A Demande de signature's id (SIGNATURE_*), a Contrat's (CONTRACT_*), a Réunion's (MEETING_*), a Demande d'intérêt's (INTEREST_*). */
+  params?: { requestId?: string; contractId?: string; meetingId?: string; interestId?: string };
 };
 
 export function notificationHref(item: LinkTarget, audience: Audience, locale: string): string {
@@ -47,6 +47,13 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
     return `${dossier}/contrats/${item.params.contractId}`;
   }
   if (contract || item.kind === 'CONTRACT_SIGNED') return `${dossier}#contrats`;
+  if (item.kind === 'DOSSIER_MESSAGE') return `${dossier}#messages`;
+  // A Réunion opens on its room; cancelled, on the Dossier's Réunions.
+  if (item.kind.startsWith('MEETING_')) {
+    return item.kind !== 'MEETING_CANCELLED' && item.params?.meetingId
+      ? `${dossier}/reunions/${item.params.meetingId}`
+      : `${dossier}#reunions`;
+  }
   if (item.invoice) return audience === 'client' ? `${dossier}#factures` : `/factures/${item.invoice.id}`;
   if (item.document) {
     const message = item.comment ? `&message=${item.comment.id}` : '';

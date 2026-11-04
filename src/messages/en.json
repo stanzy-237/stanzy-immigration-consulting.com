@@ -1411,7 +1411,8 @@
       "outils-pdf": "PDF tools",
       "signatures": "Signatures",
       "contrats": "Contracts",
-      "demandes": "Expressions of interest"
+      "demandes": "Expressions of interest",
+      "finances": "Finances"
     },
     "viewSite": "View the site",
     "overview": {
@@ -1842,6 +1843,10 @@
         "subject": "Reminder: a document to sign in your {service} file",
         "body": "“{document}” is still waiting for your signature in your {service} file. Open your space to read it and sign it online.",
         "cta": "Sign the document"
+      },
+      "message": {
+        "subject": "New message in your {service} file",
+        "body": "Stanzy wrote to you in your {service} file: “{excerpt}”"
       }
     },
     "dashboard": {
@@ -1946,6 +1951,10 @@
       "clientSigned": {
         "subject": "{client} signed “{document}”",
         "body": "{client} signed “{document}” in their {service} file. The signed PDF was added as a new version of the document."
+      },
+      "clientMessage": {
+        "subject": "{client} wrote to you",
+        "body": "{client} wrote to you in their {service} file: “{excerpt}”"
       }
     },
     "documents": {
@@ -2039,6 +2048,54 @@
           "edited": "Message edited",
           "deleted": "Message deleted"
         }
+      }
+    },
+    "messages": {
+      "title": "Messages",
+      "introClient": "A question about your file in general? Write here. For a specific document, use its conversation.",
+      "introConsultant": "The general conversation with the client, apart from the documents.",
+      "empty": "No messages yet.",
+      "label": "Write a message",
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "reply": "Reply",
+      "replyLabel": "Reply to {name}",
+      "replyPlaceholder": "Your reply…",
+      "edit": "Edit",
+      "editLabel": "Edit your message",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleteTitle": "Delete this message?",
+      "deleteBody": "It disappears with its files, for you and for the other person.",
+      "deleteBodyWithReplies": "Its replies stay: it will show “Message deleted”, without its files.",
+      "deleted": "Message deleted",
+      "edited": "edited",
+      "sending": "sending…",
+      "you": "You",
+      "error": "Write a message or attach a file.",
+      "attach": "Attach files",
+      "attachHint": "PDFs or images, {max} at most, encrypted before sending.",
+      "removeFile": "Remove {name}",
+      "tooMany": "{max} files at most per message.",
+      "closed": "This file is closed: the messages stay readable.",
+      "loading": "Loading messages",
+      "openFile": "Open {name}",
+      "toast": {
+        "sent": "Message sent",
+        "replied": "Reply sent",
+        "edited": "Message edited",
+        "deleted": "Message deleted"
+      },
+      "errors": {
+        "MESSAGE_EMPTY": "Write a message or attach a file.",
+        "COMMENT_NOT_YOURS": "Only its author can edit this message.",
+        "DOSSIER_CLOSED": "This file is closed.",
+        "DOCUMENT_FILE_TYPE": "Only PDFs and images are accepted.",
+        "DOCUMENT_FILE_TOO_LARGE": "A file is too large.",
+        "DOCUMENT_FILE_INVALID": "A file couldn’t be sent. Try again.",
+        "DOSSIER_FILES_UNCONFIGURED": "File storage isn’t set up on this site.",
+        "UNKNOWN": "Something went wrong. Try again."
       }
     }
   },
@@ -2254,7 +2311,12 @@
       "STANZY_REQUESTED": "{actor} asks Stanzy to get “{document}”.",
       "STANZY_DECLINED": "Stanzy won’t be able to get “{document}”.",
       "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
-      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature."
+      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature.",
+      "MEETING_SCHEDULED": "Meeting “{subject}” planned on {date}.",
+      "MEETING_MOVED": "Meeting “{subject}” moved to {date}.",
+      "MEETING_CANCELLED": "Meeting “{subject}” cancelled.",
+      "MEETING_REMINDER": "{soon, select, true {The meeting “{subject}” starts soon.} other {Reminder: meeting “{subject}” on {date}.}}",
+      "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2279,7 +2341,12 @@
       "STANZY_REQUESTED": "A document to get.",
       "STANZY_DECLINED": "A document to get yourself.",
       "SIGNATURE_REMINDER": "A document is waiting for your signature.",
-      "CONTRACT_REMINDER": "A contract is waiting for your signature."
+      "CONTRACT_REMINDER": "A contract is waiting for your signature.",
+      "MEETING_SCHEDULED": "New meeting.",
+      "MEETING_MOVED": "A meeting changed.",
+      "MEETING_CANCELLED": "A meeting was cancelled.",
+      "MEETING_REMINDER": "Meeting reminder.",
+      "DOSSIER_MESSAGE": "New message in a file."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -2991,6 +3058,286 @@
       "STANZY_NOT_PENDING": "This request was already handled.",
       "DOSSIER_CLOSED": "This file is closed.",
       "UNKNOWN": "Something went wrong. Try again."
+    }
+  },
+  "Meetings": {
+    "emails": {
+      "greeting": "Hello {name},",
+      "when": "{when} (Douala time)",
+      "reason": "Reason: {reason}",
+      "recorded": "This meeting will be recorded and transcribed: you’ll be asked to accept before joining.",
+      "join": "Join the meeting",
+      "openDossier": "Open my file",
+      "scheduled": {
+        "subject": "Meeting planned: {subject}",
+        "body": "Stanzy invites you to a video meeting “{subject}” on {when}, for {minutes} minutes. It takes place in your space: the button below opens it 15 minutes before."
+      },
+      "moved": {
+        "subject": "Meeting moved: {subject}",
+        "body": "The meeting “{subject}” has changed: it will take place on {when}, for {minutes} minutes."
+      },
+      "cancelled": {
+        "subject": "Meeting cancelled: {subject}",
+        "body": "The meeting “{subject}” planned on {when} is cancelled."
+      },
+      "dayBefore": {
+        "subject": "Tomorrow: {subject}",
+        "body": "Reminder: your meeting “{subject}” takes place on {when}."
+      },
+      "soon": {
+        "subject": "In 15 minutes: {subject}",
+        "body": "Your meeting “{subject}” starts soon, on {when}. You can join it now."
+      }
+    },
+    "panel": {
+      "title": "Meetings",
+      "introClient": "Your video meetings with Stanzy. To ask for one, write in Messages.",
+      "introConsultant": "Video meetings with the client, recorded and transcribed for you only.",
+      "plan": "Plan a meeting",
+      "empty": "No meetings.",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "cancelled": "Cancelled",
+      "join": "Join",
+      "joinLabel": "Join “{subject}”",
+      "opensSoon": "The room opens 15 minutes before.",
+      "recorded": "Recorded",
+      "notRecorded": "Not recorded",
+      "minutes": "{minutes} min",
+      "edit": "Edit",
+      "editLabel": "Edit “{subject}”",
+      "cancel": "Cancel",
+      "cancelLabel": "Cancel “{subject}”",
+      "notes": "Notes (for you only)",
+      "notesLabel": "Notes on “{subject}”",
+      "notesSave": "Save notes",
+      "recording": "Recording of {date}",
+      "transcription": "Transcription",
+      "showTranscript": "Read the transcription",
+      "hideTranscript": "Hide the transcription",
+      "noFiles": "No recording yet: it arrives a few minutes after the end.",
+      "search": "Search the transcriptions",
+      "searchPlaceholder": "A word said during a meeting",
+      "noResults": "Nothing found.",
+      "results": "{count, plural, one {# meeting} other {# meetings}}",
+      "unconfigured": "Video isn’t set up on this site yet: meetings can be planned, not joined yet.",
+      "loading": "Loading meetings",
+      "reason": "Reason: {reason}"
+    },
+    "form": {
+      "newTitle": "Plan a meeting",
+      "editTitle": "Edit the meeting",
+      "body": "The client gets it by email and in their bell, then a reminder the day before and 15 minutes before.",
+      "subject": "Subject",
+      "subjectPlaceholder": "E.g. proof of funds review",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "minutes": "{minutes} minutes",
+      "recording": "Record and transcribe",
+      "recordingHint": "Everyone accepts the recording before joining. Untick for a meeting without recording.",
+      "timezone": "In this device’s time ({zone}).",
+      "inPast": "Choose a time to come.",
+      "cancel": "Cancel",
+      "save": "Plan",
+      "saveEdit": "Save",
+      "saving": "Sending…"
+    },
+    "cancelDialog": {
+      "title": "Cancel the meeting?",
+      "body": "The client is told by email and in their bell.",
+      "reason": "Reason (optional)",
+      "keep": "Keep",
+      "confirm": "Cancel the meeting"
+    },
+    "room": {
+      "back": "Back to the file",
+      "loading": "Getting the room ready",
+      "recordedTitle": "This meeting is recorded",
+      "recordedBody": "The video, the sound and a written transcription are kept with the file, for Stanzy only, until 2 years after it closes.",
+      "accept": "I accept that the meeting is recorded",
+      "acceptedOn": "Accepted on {date}.",
+      "notRecorded": "This meeting isn’t recorded.",
+      "join": "Join",
+      "joining": "Connecting…",
+      "notOpen": "The room opens 15 minutes before the start.",
+      "over": "This meeting is over.",
+      "cancelled": "This meeting was cancelled.",
+      "unconfigured": "Video isn’t set up on this site yet.",
+      "recordingNow": "Recording",
+      "left": "You left the meeting.",
+      "rejoin": "Back to the meeting",
+      "failed": "Couldn’t connect. Check the camera and microphone, then try again."
+    },
+    "toast": {
+      "scheduled": "Meeting planned",
+      "updated": "Meeting updated",
+      "cancelled": "Meeting cancelled",
+      "notes": "Notes saved"
+    },
+    "errors": {
+      "MEETING_IN_PAST": "Choose a time to come.",
+      "MEETING_NOT_SCHEDULED": "This meeting is cancelled.",
+      "MEETING_NOT_OPEN": "The room isn’t open.",
+      "MEETING_CONSENT_REQUIRED": "Accept the recording to join.",
+      "MEETINGS_UNCONFIGURED": "Video isn’t set up on this site yet.",
+      "DOSSIER_CLOSED": "This file is closed.",
+      "UNKNOWN": "Something went wrong. Try again."
+    }
+  },
+  "Finances": {
+    "title": "Finances",
+    "intro": "The practice’s income and expenses, in FCFA. Only you can see them.",
+    "nav": {
+      "overview": "Overview",
+      "incomes": "Income",
+      "charges": "Expenses",
+      "settings": "Settings",
+      "label": "Finance sections"
+    },
+    "year": {
+      "label": "Year {year}",
+      "previous": "Previous year",
+      "next": "Next year"
+    },
+    "export": "Export as CSV",
+    "loading": "Loading finances",
+    "overview": {
+      "income": "Income",
+      "charges": "Expenses",
+      "net": "Result",
+      "months": "By month",
+      "month": "Month",
+      "byService": "Income by service",
+      "byCategory": "Expenses by category",
+      "otherSource": "Other sources",
+      "nothing": "Nothing in {year}.",
+      "margins": "Margin per file",
+      "marginsIntro": "Since each file opened: what it brought in, what it cost.",
+      "noMargins": "No file has income or expenses yet.",
+      "dossier": "File",
+      "margin": "Margin",
+      "missingRates": "CAD rate missing for {months}: CAD amounts in those months aren’t counted.",
+      "setRates": "Enter the rates"
+    },
+    "form": {
+      "amount": "Amount",
+      "currency": "Currency",
+      "day": "Date",
+      "invalidAmount": "Enter a valid amount.",
+      "dossier": "File (optional)",
+      "note": "Note (optional)",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "incomes": {
+      "intro": "Paid invoices add themselves. Add here what was paid outside the platform.",
+      "add": "Add income",
+      "new": "New income",
+      "edit": "Edit income",
+      "empty": "No income in {year}.",
+      "service": "Service",
+      "otherService": "Other: name the source",
+      "source": "Source",
+      "sourcePlaceholder": "E.g. training, one-off advice",
+      "invoice": "Invoice {number}",
+      "invoiceHint": "Paid: comes from the invoice, edited only there."
+    },
+    "charges": {
+      "intro": "The practice’s expenses. A monthly expense comes back by itself every month, on the same day.",
+      "add": "Add an expense",
+      "new": "New expense",
+      "edit": "Edit expense",
+      "empty": "No expenses in {year}.",
+      "category": "Category",
+      "repeats": "Repeats every month",
+      "repeatsHint": "A copy is added every month, on the same day, while the box stays ticked.",
+      "monthly": "Every month",
+      "copy": "Monthly copy",
+      "receipt": "Receipt (optional)",
+      "receiptHint": "PDF or image, encrypted before sending.",
+      "receiptKept": "Receipt attached: {name}",
+      "removeReceipt": "Remove the receipt",
+      "keepReceipt": "Keep the receipt",
+      "openReceipt": "Open the receipt for {label}"
+    },
+    "row": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "editLabel": "Edit: {label}",
+      "deleteLabel": "Delete: {label}",
+      "deleteIncome": "Delete this income?",
+      "deleteCharge": "Delete this expense?",
+      "deleteBody": "It leaves the totals. Monthly copies already made stay.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "settings": {
+      "categories": "Expense categories",
+      "categoriesIntro": "An archived category stays on its expenses but is no longer offered.",
+      "newCategory": "New category",
+      "add": "Add",
+      "rename": "Rename",
+      "renameLabel": "Name of “{name}”",
+      "save": "Save",
+      "cancel": "Cancel",
+      "archive": "Archive",
+      "restore": "Restore",
+      "archived": "Archived",
+      "count": "{count, plural, =0 {no expenses} one {# expense} other {# expenses}}",
+      "rates": "CAD → FCFA rates",
+      "ratesIntro": "What 1 CAD is worth in FCFA, month by month. The euro is fixed: 655.957 FCFA.",
+      "rateLabel": "Rate for {month}",
+      "rateSave": "Save",
+      "rateClear": "Clear",
+      "needed": "Needed: CAD amounts this month",
+      "invalidRate": "Enter a positive number.",
+      "renameAction": "Rename “{name}”",
+      "archiveAction": "Archive “{name}”",
+      "restoreAction": "Restore “{name}”"
+    },
+    "toast": {
+      "incomeSaved": "Income saved",
+      "incomeDeleted": "Income deleted",
+      "chargeSaved": "Expense saved",
+      "chargeDeleted": "Expense deleted",
+      "categorySaved": "Category saved",
+      "rateSaved": "Rate saved",
+      "rateCleared": "Rate cleared"
+    },
+    "errors": {
+      "INCOME_SOURCE_MISSING": "Choose a service or name the source.",
+      "FINANCE_DOSSIER_UNKNOWN": "This file no longer exists.",
+      "CHARGE_CATEGORY_CLOSED": "This category is archived: choose another one.",
+      "CHARGE_CATEGORY_TAKEN": "A category already has this name.",
+      "CHARGE_COPY_CANNOT_REPEAT": "A monthly copy doesn’t repeat: edit the original expense.",
+      "DOCUMENT_FILE_TYPE": "The receipt must be a PDF or an image.",
+      "DOCUMENT_FILE_TOO_LARGE": "The receipt is too large.",
+      "DOCUMENT_FILE_INVALID": "The receipt couldn’t be saved. Try again.",
+      "DOSSIER_FILES_UNCONFIGURED": "File storage isn’t set up on this site.",
+      "UNKNOWN": "Something went wrong. Try again."
+    },
+    "csv": {
+      "date": "Date",
+      "type": "Type",
+      "amount": "Amount",
+      "currency": "Currency",
+      "xaf": "Amount FCFA",
+      "label": "Service or category",
+      "client": "Client",
+      "invoice": "Invoice",
+      "note": "Note",
+      "income": "Income",
+      "charge": "Expense"
+    },
+    "dossier": {
+      "title": "File finances",
+      "income": "Income",
+      "charges": "Expenses",
+      "margin": "Margin",
+      "unconverted": "Some CAD amounts are waiting for their month’s rate.",
+      "open": "See finances"
     }
   }
 }

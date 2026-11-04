@@ -13,6 +13,7 @@ import { isStageOf, nextStage, previousStage } from '@/features/dossiers/lib/wor
 import { notifyClient } from '@/features/dossiers/server/dossier-notify';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { documentsRouter } from '@/features/dossiers/server/documents-router';
+import { messagesRouter } from '@/features/dossiers/server/messages-router';
 import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 
@@ -105,6 +106,7 @@ export const dossiersRouter = createTRPCRouter({
   }),
 
   documents: documentsRouter,
+  messages: messagesRouter,
 
   dashboard: createTRPCRouter({
     /** Every Dossier in `state`, last changed first. */

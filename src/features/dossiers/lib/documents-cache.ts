@@ -125,8 +125,8 @@ export const withoutComment = (data: SectionsData, input: { id: string }): Secti
     return { ...document, comments: orphaned ? left.filter((comment) => comment.id !== parent.id) : left };
   });
 
-/** A conversation as threads: each comment, then its replies, oldest first. */
-export function threadsOf(comments: Comment[]): { comment: Comment; replies: Comment[] }[] {
+/** A conversation as threads: each comment (or Dossier message), then its replies, oldest first. */
+export function threadsOf<T extends { id: string; parentId: string | null }>(comments: T[]): { comment: T; replies: T[] }[] {
   return comments
     .filter((comment) => comment.parentId === null)
     .map((comment) => ({ comment, replies: comments.filter((reply) => reply.parentId === comment.id) }));

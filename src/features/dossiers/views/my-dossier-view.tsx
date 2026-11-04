@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DossierDocuments, DossierDocumentsSkeleton } from '@/features/dossiers/components/dossier-documents';
+import { DossierMessages, DossierMessagesSkeleton } from '@/features/dossiers/components/dossier-messages';
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
@@ -24,11 +25,14 @@ export function MyDossierView({
   id,
   invoices,
   contracts,
+  meetings,
 }: {
   id: string;
   invoices?: ReactNode;
   /** The Contrat panel (#96), passed in by the route. */
   contracts?: ReactNode;
+  /** The Réunions panel (#94), passed in by the route. */
+  meetings?: ReactNode;
 }): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
   // A Notification's link (#92): the Document to unfold, the message to highlight.
@@ -51,8 +55,12 @@ export function MyDossierView({
               <MyDossierHeader id={id} />
             </QueryBoundary>
           </div>
+          {meetings}
           {contracts}
           {invoices}
+          <QueryBoundary fallback={<DossierMessagesSkeleton />}>
+            <DossierMessages dossierId={id} viewer="client" />
+          </QueryBoundary>
           <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
             <DossierDocuments dossierId={id} viewer="client" focus={focus} />
           </QueryBoundary>
