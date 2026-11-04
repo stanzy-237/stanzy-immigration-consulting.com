@@ -20,6 +20,7 @@ import { finalesLocked } from '@/features/dossiers/lib/workflow';
 import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { documentFor, dossierFor, isConsultant, sectionFor, writable } from '@/features/dossiers/server/dossier-access';
 import { notifyClient, notifyConsultants } from '@/features/dossiers/server/dossier-notify';
+import { livesInCameroon } from '@/features/accompagnement/server/residence';
 import { forgetComment, notifyLater } from '@/features/notifications/server/notify';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -58,6 +59,17 @@ export const documentsRouter = createTRPCRouter({
             createdAt: true,
             finalVersionId: true,
             addedBy: person,
+            // Made from the Demande d'intérêt (#81): its Checklist document, ★ need, « Manquant », the Client's note.
+            kind: true,
+            need: true,
+            missing: true,
+            clientNote: true,
+            /** The latest « Stanzy s'en charge » request on it, if any. */
+            stanzyRequests: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+              select: { id: true, status: true, declineNote: true },
+            },
             versions: {
               orderBy: { number: 'asc' },
               select: {
@@ -95,6 +107,8 @@ export const documentsRouter = createTRPCRouter({
       viewer: { id: ctx.session.account.id, name: ctx.session.account.name, role: ctx.session.account.role },
       open: dossier.state === 'OPEN',
       locked: finalesLocked(dossier.service, dossier.stage),
+      /** The Client may ask « Stanzy s'en charge » on a missing Document: in Cameroon only. */
+      stanzy: !isConsultant(ctx.session) && (await livesInCameroon(ctx.prisma, dossier.accountId)),
       // A deleted comment keeps its place in the conversation, not its words.
       sections: sections.map((section) => ({
         ...section,

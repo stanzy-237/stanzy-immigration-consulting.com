@@ -36,11 +36,14 @@ export function DossierDashboardView({
   id,
   invoices,
   contracts,
+  stanzy,
 }: {
   id: string;
   invoices?: ReactNode;
   /** The Contrat panel (#96), passed in by the route. */
   contracts?: ReactNode;
+  /** « Documents à obtenir par Stanzy » (#81), passed in by the route. */
+  stanzy?: ReactNode;
 }): ReactNode {
   const t = useTranslations('Dossiers.detail');
   // A Notification's link (#92): the Document to unfold, the message to highlight.
@@ -60,6 +63,7 @@ export function DossierDashboardView({
       </QueryBoundary>
       {invoices ? <div className="mt-10">{invoices}</div> : null}
       {contracts ? <div className="mt-10">{contracts}</div> : null}
+      {stanzy ? <div className="mt-10 empty:hidden">{stanzy}</div> : null}
       <div className="mt-10">
         <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
           <DossierDocuments dossierId={id} viewer="consultant" focus={focus} />

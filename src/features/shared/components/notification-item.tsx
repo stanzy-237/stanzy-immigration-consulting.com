@@ -2,6 +2,9 @@
 
 import {
   AlarmClock,
+  HandHelping,
+  Inbox,
+  UserX,
   CalendarClock,
   CheckCircle2,
   FileCheck,
@@ -50,6 +53,10 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   DOCUMENT_SIGNED: FileSignature,
   CONTRACT_SENT: ScrollText,
   CONTRACT_SIGNED: FileCheck2,
+  INTEREST_SUBMITTED: Inbox,
+  INTEREST_REJECTED: UserX,
+  STANZY_REQUESTED: HandHelping,
+  STANZY_DECLINED: HandHelping,
 };
 
 /**

@@ -19,6 +19,7 @@ export function useNotificationText() {
       // The sign-ups summary carries its own count; grouped Notifications, how many they gathered.
       count: item.kind === 'ACCOUNTS_SIGNED_UP' ? Number(item.params.count ?? 0) : item.count,
       client: item.params.client ?? '',
+      level: item.params.level ?? '',
       round: item.params.round ?? '',
       crs: item.params.crs ?? '',
       invitations: item.params.invitations ? new Intl.NumberFormat(locale).format(Number(item.params.invitations)) : '',

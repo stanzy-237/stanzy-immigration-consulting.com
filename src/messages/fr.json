@@ -1427,7 +1427,8 @@
       "close": "Fermer le menu",
       "outils-pdf": "Outils PDF",
       "signatures": "Signatures",
-      "contrats": "Contrats"
+      "contrats": "Contrats",
+      "demandes": "Demandes d’intérêt"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -2259,7 +2260,11 @@
       "SIGNATURE_REQUESTED": "Stanzy vous demande de signer « {document} ».",
       "DOCUMENT_SIGNED": "{actor} a signé « {document} ».",
       "CONTRACT_SENT": "Stanzy vous a envoyé {number} à signer.",
-      "CONTRACT_SIGNED": "{actor} a signé {number}."
+      "CONTRACT_SIGNED": "{actor} a signé {number}.",
+      "INTEREST_SUBMITTED": "{client} a envoyé une demande d’intérêt (niveau {level}).",
+      "INTEREST_REJECTED": "Votre demande d’accompagnement n’a pas été retenue.",
+      "STANZY_REQUESTED": "{actor} demande à Stanzy d’obtenir « {document} ».",
+      "STANZY_DECLINED": "Stanzy ne pourra pas obtenir « {document} »."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2278,7 +2283,11 @@
       "SIGNATURE_REQUESTED": "Un document à signer.",
       "DOCUMENT_SIGNED": "Un document a été signé.",
       "CONTRACT_SENT": "Un contrat à signer.",
-      "CONTRACT_SIGNED": "Un contrat a été signé."
+      "CONTRACT_SIGNED": "Un contrat a été signé.",
+      "INTEREST_SUBMITTED": "Nouvelle demande d’intérêt.",
+      "INTEREST_REJECTED": "Réponse à votre demande.",
+      "STANZY_REQUESTED": "Un document à obtenir.",
+      "STANZY_DECLINED": "Un document à obtenir vous-même."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",
@@ -2747,5 +2756,244 @@
       "openSigned": "Ouvrir le contrat signé"
     },
     "stageWarning": "Le contrat n’est pas encore signé."
+  },
+  "Accompagnement": {
+    "emails": {
+      "greeting": "Bonjour {name},",
+      "reason": "Motif : {reason}",
+      "submitted": {
+        "subject": "Nouvelle demande d’intérêt : {client}",
+        "body": "{client} a envoyé une demande d’Accompagnement Entrée Express. Niveau calculé : {level}.",
+        "cta": "Voir la demande"
+      },
+      "approved": {
+        "subject": "Votre demande d’accompagnement est acceptée",
+        "body": "Bonne nouvelle : Stanzy vous accompagne. Votre dossier est ouvert à l’étape « {stage} », avec la liste des documents à préparer.",
+        "next": "La facture suit à part. Dans votre espace, voyez ce qui manque et posez vos questions.",
+        "cta": "Ouvrir mon dossier"
+      },
+      "rejected": {
+        "subject": "Votre demande d’accompagnement",
+        "body": "Stanzy ne peut pas donner suite à votre demande pour le moment.",
+        "again": "Vous pouvez envoyer une nouvelle demande quand votre situation change.",
+        "cta": "Voir ma demande"
+      },
+      "stanzyRequested": {
+        "subject": "{client} demande à Stanzy d’obtenir un document",
+        "body": "{client} demande à Stanzy d’obtenir « {document} ».",
+        "cta": "Ouvrir le dossier"
+      },
+      "stanzyDeclined": {
+        "subject": "« {document} » : à obtenir par vous-même",
+        "body": "Stanzy ne pourra pas obtenir « {document} » pour vous : il reste à fournir de votre côté.",
+        "cta": "Voir le document"
+      }
+    },
+    "page": {
+      "eyebrow": "Accompagnement Entrée Express",
+      "title": "De votre profil jusqu’à la résidence permanente",
+      "lead": "Stanzy vous guide dans tout le parcours Entrée Express, là où vous en êtes : test de langue, EDE, profil, invitation, demande de résidence permanente, jusqu’à la COPR.",
+      "apply": "Faire une demande",
+      "consult": "Réserver une consultation",
+      "noConsult": "Pas besoin de consultation avant : la demande suffit pour commencer.",
+      "stagesTitle": "Les 10 étapes",
+      "levelsTitle": "Quel que soit votre point de départ",
+      "levels": {
+        "A": {
+          "title": "Niveau A · Débutant",
+          "body": "Vous commencez : on prépare le test de langue et l’EDE ensemble."
+        },
+        "B": {
+          "title": "Niveau B · Prérequis faits",
+          "body": "Test de langue et EDE faits : on crée votre profil Entrée Express."
+        },
+        "C": {
+          "title": "Niveau C · Profil créé",
+          "body": "Vous êtes dans le bassin, invité ou non : on prépare la suite."
+        }
+      },
+      "howTitle": "Comment ça marche",
+      "how": {
+        "1": "Vous remplissez la demande d’intérêt, comme un formulaire d’IRCC, en 10 minutes.",
+        "2": "Stanzy l’étudie et vous répond par email.",
+        "3": "Votre dossier s’ouvre à la bonne étape, avec la liste des documents à préparer.",
+        "4": "Vous suivez tout dans votre espace : documents, messages, réunions."
+      }
+    },
+    "form": {
+      "title": "Demande d’intérêt",
+      "lead": "Répondez comme sur un formulaire d’IRCC. Vos réponses à la Checklist et au calculateur CRS sont reprises.",
+      "steps": {
+        "situation": "Votre situation",
+        "progress": "Où vous en êtes",
+        "documents": "Vos documents"
+      },
+      "stepOf": "Étape {step} sur 3 : {name}",
+      "next": "Continuer",
+      "back": "Retour",
+      "submit": "Envoyer ma demande",
+      "submitting": "Envoi…",
+      "age": "Âge",
+      "citizenship": "Nationalité",
+      "residence": "Pays de résidence",
+      "residences": {
+        "CM": "Cameroun",
+        "CA": "Canada",
+        "OTHER": "Autre pays"
+      },
+      "residenceOther": "Lequel ?",
+      "languageTest": "Test de langue passé",
+      "languageTests": {
+        "none": "Pas encore",
+        "tcf": "TCF Canada",
+        "tef": "TEF Canada",
+        "ielts": "IELTS General Training",
+        "celpip": "CELPIP-General",
+        "pte": "PTE Core"
+      },
+      "ede": "J’ai fait mon EDE (WES, IQAS…)",
+      "eeProfile": "J’ai créé mon profil Entrée Express",
+      "ita": "J’ai reçu une invitation à présenter une demande (ITA)",
+      "itaDate": "Date de l’invitation",
+      "invalid": "Vérifiez les champs signalés.",
+      "documentsIntro": "Pour chaque domaine, dites où vous en êtes. Une note aide Stanzy à préparer votre dossier.",
+      "areas": {
+        "identity": "Identité (passeport, acte de naissance…)",
+        "studies": "Études (diplômes, relevés, EDE)",
+        "language": "Langue (résultats du test)",
+        "work": "Travail (lettres d’emploi, fiches de paie…)",
+        "funds": "Preuve de fonds",
+        "police": "Certificats de police",
+        "family": "Famille (mariage, union, enfants)"
+      },
+      "answers": {
+        "have": "Je l’ai",
+        "missing": "Je ne l’ai pas",
+        "unsure": "Pas sûr",
+        "stanzy": "Stanzy s’en charge"
+      },
+      "stanzyHint": "« Stanzy s’en charge » : Stanzy obtient le document pour vous, facturé à part (au Cameroun seulement).",
+      "note": "Note sur « {area} » (facultatif)",
+      "notePlaceholder": "Ce qui vous inquiète, ce qui manque…"
+    },
+    "status": {
+      "title": "Accompagnement Entrée Express",
+      "pending": "Votre demande du {date} est à l’étude. Stanzy vous répond par email.",
+      "approved": "Votre demande est acceptée : votre dossier est ouvert.",
+      "openDossier": "Ouvrir mon dossier",
+      "rejected": "Votre demande du {date} n’a pas été retenue.",
+      "again": "Faire une nouvelle demande",
+      "signIn": "Connectez-vous pour faire votre demande.",
+      "loading": "Chargement de votre demande"
+    },
+    "dashboard": {
+      "title": "Demandes d’intérêt",
+      "intro": "Les demandes d’Accompagnement Entrée Express : le niveau calculé, les réponses, votre décision.",
+      "filters": {
+        "SUBMITTED": "À traiter",
+        "APPROVED": "Acceptées",
+        "REJECTED": "Refusées",
+        "ALL": "Toutes"
+      },
+      "filterLabel": "Afficher",
+      "empty": "Aucune demande.",
+      "status": {
+        "SUBMITTED": "À traiter",
+        "APPROVED": "Acceptée",
+        "REJECTED": "Refusée"
+      },
+      "levels": {
+        "A": "A · Débutant",
+        "B": "B · Prérequis faits",
+        "C": "C · Profil créé"
+      },
+      "open": "Voir",
+      "openLabel": "Voir la demande de {name}",
+      "back": "Toutes les demandes",
+      "sentOn": "Envoyée le {date}",
+      "decidedOn": "Décidée le {date} par {name}",
+      "loading": "Chargement des demandes",
+      "situation": "Situation",
+      "progress": "Où en est la personne",
+      "documents": "Documents",
+      "yes": "Oui",
+      "no": "Non",
+      "people": "Famille",
+      "maritalStatus": "État civil",
+      "spouseAccompanying": "Conjoint qui accompagne",
+      "children": "Enfants",
+      "studies": "Études",
+      "foreignEducation": "Études à l’étranger",
+      "canadianEducation": "Études au Canada",
+      "jobs": "Emplois",
+      "countries": "Pays de résidence (police)",
+      "levelComputed": "Niveau calculé : {level}",
+      "levelChoose": "Niveau retenu",
+      "stage": "Le dossier s’ouvrira à l’étape « {stage} ».",
+      "approve": "Accepter et ouvrir le dossier",
+      "approving": "Ouverture…",
+      "reject": "Refuser",
+      "rejectTitle": "Refuser la demande ?",
+      "rejectBody": "La personne reçoit un email et peut envoyer une nouvelle demande.",
+      "rejectReason": "Motif (facultatif)",
+      "rejectConfirm": "Refuser",
+      "keep": "Garder",
+      "rejectedWith": "Motif : {reason}",
+      "history": "Demandes précédentes",
+      "dossier": "Ouvrir le dossier",
+      "invoice": "Créer la facture",
+      "next": "Envoyez la facture : le montant est votre devis.",
+      "decision": "Votre décision"
+    },
+    "document": {
+      "mandatory": "★ Obligatoire",
+      "recommended": "Recommandé",
+      "missing": "Manquant",
+      "clientNote": "Note du client : {note}",
+      "yourNote": "Votre note : {note}",
+      "tcf": "Préparer le TCF",
+      "ede": "Faire mon EDE"
+    },
+    "stanzy": {
+      "ask": "Stanzy s’en charge",
+      "askLabel": "Demander à Stanzy d’obtenir « {document} »",
+      "askHint": "Stanzy obtient ce document pour vous, facturé à part.",
+      "status": {
+        "REQUESTED": "Demandé à Stanzy",
+        "ACCEPTED": "Accepté par Stanzy",
+        "ASSIGNED": "En cours chez Stanzy",
+        "DECLINED": "À obtenir par vous"
+      },
+      "panelTitle": "Documents à obtenir par Stanzy",
+      "panelIntro": "Ce que le client a demandé à Stanzy d’obtenir. Accepter (ligne de facture au prix du catalogue) et confier à un partenaire arrivent avec les Services documentaires et les Missions.",
+      "decline": "Refuser",
+      "declineLabel": "Refuser « {document} »",
+      "declineTitle": "Refuser cette demande ?",
+      "declineBody": "Le client est prévenu et obtient le document lui-même.",
+      "declineNote": "Note au client (facultatif)",
+      "declineConfirm": "Refuser",
+      "keep": "Garder",
+      "loading": "Chargement des demandes"
+    },
+    "toast": {
+      "sent": "Demande envoyée",
+      "approved": "Dossier ouvert",
+      "rejected": "Demande refusée",
+      "stanzyAsked": "Demandé à Stanzy",
+      "stanzyDeclined": "Demande refusée"
+    },
+    "errors": {
+      "INTEREST_NOT_ELIGIBLE": "Ce compte ne peut pas faire de demande.",
+      "INTEREST_ALREADY_CLIENT": "Un accompagnement est déjà en cours.",
+      "INTEREST_PENDING": "Une demande est déjà à l’étude.",
+      "INTEREST_NOT_PENDING": "Cette demande a déjà été traitée.",
+      "STANZY_CLIENT_ONLY": "Seul le client fait cette demande.",
+      "STANZY_CAMEROON_ONLY": "« Stanzy s’en charge » est réservé au Cameroun.",
+      "STANZY_NOT_MISSING": "Ce document n’est plus manquant.",
+      "STANZY_ALREADY_ASKED": "Déjà demandé à Stanzy.",
+      "STANZY_NOT_PENDING": "Cette demande a déjà été traitée.",
+      "DOSSIER_CLOSED": "Le dossier est clôturé.",
+      "UNKNOWN": "Une erreur est survenue. Réessayez."
+    }
   }
 }
