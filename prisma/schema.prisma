@@ -62,6 +62,8 @@ model Account {
   contractsSent     Contract[]         @relation("ContractSender")
   contractsSigned   Contract[]         @relation("ContractSigner")
   dossierMessages   DossierMessage[]
+  incomesEntered    Income[]           @relation("IncomeCreator")
+  chargesEntered    Charge[]           @relation("ChargeCreator")
 
   @@map("account")
 }
@@ -388,6 +390,8 @@ model Dossier {
   invoices      Invoice[]
   contracts     Contract[]
   messages      DossierMessage[]
+  incomes       Income[]
+  charges       Charge[]
   notifications Notification[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
@@ -883,4 +887,91 @@ model DossierMessageFile {
 
   @@index([messageId])
   @@map("dossier_message_file")
+}
+
+/// GLOSSARY: Recette, entered by hand (#95): cash, a payment outside the
+/// platform. A Facture marked Payée is a Recette by itself and has no row here.
+model Income {
+  id          String          @id @default(cuid())
+  /// In the currency's minor unit, like Factures.
+  amount      Int
+  currency    InvoiceCurrency
+  /// The day it came in.
+  date        DateTime        @db.Date
+  /// The service it pays for, or where it came from otherwise.
+  service     ServiceType?
+  source      String?
+  dossierId   String?
+  dossier     Dossier?        @relation(fields: [dossierId], references: [id], onDelete: SetNull)
+  note        String?
+  createdById String
+  createdBy   Account         @relation("IncomeCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([date])
+  @@index([dossierId])
+  @@map("income")
+}
+
+/// A Charge's category (#95); the consultant edits the list. Archived ones
+/// keep their Charges but aren't offered any more.
+model ChargeCategory {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  position   Int       @default(0)
+  archivedAt DateTime?
+  charges    Charge[]
+  createdAt  DateTime  @default(now())
+
+  @@map("charge_category")
+}
+
+/// GLOSSARY: Charge (#95). One that repeats every month is the model its
+/// monthly copies are made from by the daily round.
+model Charge {
+  id                 String          @id @default(cuid())
+  amount             Int
+  currency           InvoiceCurrency
+  date               DateTime        @db.Date
+  categoryId         String
+  category           ChargeCategory  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  dossierId          String?
+  dossier            Dossier?        @relation(fields: [dossierId], references: [id], onDelete: SetNull)
+  note               String?
+  /// A model: copied every month on the same day until switched off.
+  repeatsMonthly     Boolean         @default(false)
+  /// A copy: its model, and the `YYYY-MM` it was made for (each once).
+  repeatOfId         String?
+  repeatOf           Charge?         @relation("ChargeRepeats", fields: [repeatOfId], references: [id], onDelete: SetNull)
+  copies             Charge[]        @relation("ChargeRepeats")
+  repeatMonth        String?
+  /// The receipt, encrypted in the private bucket (ADR 0007).
+  receiptFileName    String?
+  receiptContentType String?
+  receiptSize        Int?
+  receiptObjectKey   String?
+  receiptWrappedKey  String?
+  receiptIv          String?
+  createdById        String
+  createdBy          Account         @relation("ChargeCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@unique([repeatOfId, repeatMonth])
+  @@index([date])
+  @@index([dossierId])
+  @@index([repeatsMonthly])
+  @@map("charge")
+}
+
+/// What 1 CAD is worth in XAF for a month (#95), entered by the consultant.
+/// EUR needs none: it is fixed at 655.957.
+model CadRate {
+  /// `YYYY-MM`.
+  month     String   @id
+  xafPerCad Decimal  @db.Decimal(12, 4)
+  updatedAt DateTime @updatedAt
+
+  @@map("cad_rate")
 }

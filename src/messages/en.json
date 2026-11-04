@@ -1410,7 +1410,8 @@
       "close": "Close the menu",
       "outils-pdf": "PDF tools",
       "signatures": "Signatures",
-      "contrats": "Contracts"
+      "contrats": "Contracts",
+      "finances": "Finances"
     },
     "viewSite": "View the site",
     "overview": {
@@ -2802,5 +2803,160 @@
       "openSigned": "Open the signed contract"
     },
     "stageWarning": "The contract isn’t signed yet."
+  },
+  "Finances": {
+    "title": "Finances",
+    "intro": "The practice’s income and expenses, in FCFA. Only you can see them.",
+    "nav": {
+      "overview": "Overview",
+      "incomes": "Income",
+      "charges": "Expenses",
+      "settings": "Settings",
+      "label": "Finance sections"
+    },
+    "year": {
+      "label": "Year {year}",
+      "previous": "Previous year",
+      "next": "Next year"
+    },
+    "export": "Export as CSV",
+    "loading": "Loading finances",
+    "overview": {
+      "income": "Income",
+      "charges": "Expenses",
+      "net": "Result",
+      "months": "By month",
+      "month": "Month",
+      "byService": "Income by service",
+      "byCategory": "Expenses by category",
+      "otherSource": "Other sources",
+      "nothing": "Nothing in {year}.",
+      "margins": "Margin per file",
+      "marginsIntro": "Since each file opened: what it brought in, what it cost.",
+      "noMargins": "No file has income or expenses yet.",
+      "dossier": "File",
+      "margin": "Margin",
+      "missingRates": "CAD rate missing for {months}: CAD amounts in those months aren’t counted.",
+      "setRates": "Enter the rates"
+    },
+    "form": {
+      "amount": "Amount",
+      "currency": "Currency",
+      "day": "Date",
+      "invalidAmount": "Enter a valid amount.",
+      "dossier": "File (optional)",
+      "note": "Note (optional)",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "incomes": {
+      "intro": "Paid invoices add themselves. Add here what was paid outside the platform.",
+      "add": "Add income",
+      "new": "New income",
+      "edit": "Edit income",
+      "empty": "No income in {year}.",
+      "service": "Service",
+      "otherService": "Other: name the source",
+      "source": "Source",
+      "sourcePlaceholder": "E.g. training, one-off advice",
+      "invoice": "Invoice {number}",
+      "invoiceHint": "Paid: comes from the invoice, edited only there."
+    },
+    "charges": {
+      "intro": "The practice’s expenses. A monthly expense comes back by itself every month, on the same day.",
+      "add": "Add an expense",
+      "new": "New expense",
+      "edit": "Edit expense",
+      "empty": "No expenses in {year}.",
+      "category": "Category",
+      "repeats": "Repeats every month",
+      "repeatsHint": "A copy is added every month, on the same day, while the box stays ticked.",
+      "monthly": "Every month",
+      "copy": "Monthly copy",
+      "receipt": "Receipt (optional)",
+      "receiptHint": "PDF or image, encrypted before sending.",
+      "receiptKept": "Receipt attached: {name}",
+      "removeReceipt": "Remove the receipt",
+      "keepReceipt": "Keep the receipt",
+      "openReceipt": "Open the receipt for {label}"
+    },
+    "row": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "editLabel": "Edit: {label}",
+      "deleteLabel": "Delete: {label}",
+      "deleteIncome": "Delete this income?",
+      "deleteCharge": "Delete this expense?",
+      "deleteBody": "It leaves the totals. Monthly copies already made stay.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "settings": {
+      "categories": "Expense categories",
+      "categoriesIntro": "An archived category stays on its expenses but is no longer offered.",
+      "newCategory": "New category",
+      "add": "Add",
+      "rename": "Rename",
+      "renameLabel": "Name of “{name}”",
+      "save": "Save",
+      "cancel": "Cancel",
+      "archive": "Archive",
+      "restore": "Restore",
+      "archived": "Archived",
+      "count": "{count, plural, =0 {no expenses} one {# expense} other {# expenses}}",
+      "rates": "CAD → FCFA rates",
+      "ratesIntro": "What 1 CAD is worth in FCFA, month by month. The euro is fixed: 655.957 FCFA.",
+      "rateLabel": "Rate for {month}",
+      "rateSave": "Save",
+      "rateClear": "Clear",
+      "needed": "Needed: CAD amounts this month",
+      "invalidRate": "Enter a positive number.",
+      "renameAction": "Rename “{name}”",
+      "archiveAction": "Archive “{name}”",
+      "restoreAction": "Restore “{name}”"
+    },
+    "toast": {
+      "incomeSaved": "Income saved",
+      "incomeDeleted": "Income deleted",
+      "chargeSaved": "Expense saved",
+      "chargeDeleted": "Expense deleted",
+      "categorySaved": "Category saved",
+      "rateSaved": "Rate saved",
+      "rateCleared": "Rate cleared"
+    },
+    "errors": {
+      "INCOME_SOURCE_MISSING": "Choose a service or name the source.",
+      "FINANCE_DOSSIER_UNKNOWN": "This file no longer exists.",
+      "CHARGE_CATEGORY_CLOSED": "This category is archived: choose another one.",
+      "CHARGE_CATEGORY_TAKEN": "A category already has this name.",
+      "CHARGE_COPY_CANNOT_REPEAT": "A monthly copy doesn’t repeat: edit the original expense.",
+      "DOCUMENT_FILE_TYPE": "The receipt must be a PDF or an image.",
+      "DOCUMENT_FILE_TOO_LARGE": "The receipt is too large.",
+      "DOCUMENT_FILE_INVALID": "The receipt couldn’t be saved. Try again.",
+      "DOSSIER_FILES_UNCONFIGURED": "File storage isn’t set up on this site.",
+      "UNKNOWN": "Something went wrong. Try again."
+    },
+    "csv": {
+      "date": "Date",
+      "type": "Type",
+      "amount": "Amount",
+      "currency": "Currency",
+      "xaf": "Amount FCFA",
+      "label": "Service or category",
+      "client": "Client",
+      "invoice": "Invoice",
+      "note": "Note",
+      "income": "Income",
+      "charge": "Expense"
+    },
+    "dossier": {
+      "title": "File finances",
+      "income": "Income",
+      "charges": "Expenses",
+      "margin": "Margin",
+      "unconverted": "Some CAD amounts are waiting for their month’s rate.",
+      "open": "See finances"
+    }
   }
 }

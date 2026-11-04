@@ -1427,7 +1427,8 @@
       "close": "Fermer le menu",
       "outils-pdf": "Outils PDF",
       "signatures": "Signatures",
-      "contrats": "Contrats"
+      "contrats": "Contrats",
+      "finances": "Finances"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -2819,5 +2820,160 @@
       "openSigned": "Ouvrir le contrat signé"
     },
     "stageWarning": "Le contrat n’est pas encore signé."
+  },
+  "Finances": {
+    "title": "Finances",
+    "intro": "Les recettes et les charges du cabinet, en FCFA. Vous seul les voyez.",
+    "nav": {
+      "overview": "Vue d’ensemble",
+      "incomes": "Recettes",
+      "charges": "Charges",
+      "settings": "Réglages",
+      "label": "Sections des finances"
+    },
+    "year": {
+      "label": "Année {year}",
+      "previous": "Année précédente",
+      "next": "Année suivante"
+    },
+    "export": "Exporter en CSV",
+    "loading": "Chargement des finances",
+    "overview": {
+      "income": "Recettes",
+      "charges": "Charges",
+      "net": "Résultat",
+      "months": "Par mois",
+      "month": "Mois",
+      "byService": "Recettes par service",
+      "byCategory": "Charges par catégorie",
+      "otherSource": "Autres sources",
+      "nothing": "Rien en {year}.",
+      "margins": "Marge par dossier",
+      "marginsIntro": "Depuis l’ouverture de chaque dossier : ce qu’il a rapporté, ce qu’il a coûté.",
+      "noMargins": "Aucun dossier n’a encore de recette ni de charge.",
+      "dossier": "Dossier",
+      "margin": "Marge",
+      "missingRates": "Taux CAD manquant pour {months} : les montants en CAD de ces mois ne sont pas comptés.",
+      "setRates": "Saisir les taux"
+    },
+    "form": {
+      "amount": "Montant",
+      "currency": "Devise",
+      "day": "Date",
+      "invalidAmount": "Saisissez un montant valide.",
+      "dossier": "Dossier (facultatif)",
+      "note": "Note (facultatif)",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…"
+    },
+    "incomes": {
+      "intro": "Les factures payées s’ajoutent d’elles-mêmes. Ajoutez ici ce qui est payé hors de la plateforme.",
+      "add": "Ajouter une recette",
+      "new": "Nouvelle recette",
+      "edit": "Modifier la recette",
+      "empty": "Aucune recette en {year}.",
+      "service": "Service",
+      "otherService": "Autre : préciser la source",
+      "source": "Source",
+      "sourcePlaceholder": "Ex. : formation, conseil ponctuel",
+      "invoice": "Facture {number}",
+      "invoiceHint": "Payée : vient de la facture, modifiable seulement là."
+    },
+    "charges": {
+      "intro": "Les dépenses du cabinet. Une charge mensuelle revient d’elle-même chaque mois, le même jour.",
+      "add": "Ajouter une charge",
+      "new": "Nouvelle charge",
+      "edit": "Modifier la charge",
+      "empty": "Aucune charge en {year}.",
+      "category": "Catégorie",
+      "repeats": "Revient chaque mois",
+      "repeatsHint": "Une copie s’ajoute chaque mois, le même jour, tant que la case reste cochée.",
+      "monthly": "Chaque mois",
+      "copy": "Copie mensuelle",
+      "receipt": "Reçu (facultatif)",
+      "receiptHint": "PDF ou image, chiffré avant l’envoi.",
+      "receiptKept": "Reçu joint : {name}",
+      "removeReceipt": "Retirer le reçu",
+      "keepReceipt": "Garder le reçu",
+      "openReceipt": "Voir le reçu de {label}"
+    },
+    "row": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "editLabel": "Modifier : {label}",
+      "deleteLabel": "Supprimer : {label}",
+      "deleteIncome": "Supprimer cette recette ?",
+      "deleteCharge": "Supprimer cette charge ?",
+      "deleteBody": "Elle disparaît des totaux. Les copies mensuelles déjà faites restent.",
+      "confirm": "Supprimer",
+      "cancel": "Annuler"
+    },
+    "settings": {
+      "categories": "Catégories de charges",
+      "categoriesIntro": "Une catégorie archivée reste sur ses charges mais n’est plus proposée.",
+      "newCategory": "Nouvelle catégorie",
+      "add": "Ajouter",
+      "rename": "Renommer",
+      "renameLabel": "Nom de « {name} »",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "archive": "Archiver",
+      "restore": "Rétablir",
+      "archived": "Archivée",
+      "count": "{count, plural, =0 {aucune charge} one {# charge} other {# charges}}",
+      "rates": "Taux CAD → FCFA",
+      "ratesIntro": "Ce que vaut 1 $ CA en FCFA, mois par mois. L’euro est fixe : 655,957 FCFA.",
+      "rateLabel": "Taux de {month}",
+      "rateSave": "Enregistrer",
+      "rateClear": "Effacer",
+      "needed": "Requis : des montants en CAD ce mois-ci",
+      "invalidRate": "Saisissez un nombre positif.",
+      "renameAction": "Renommer « {name} »",
+      "archiveAction": "Archiver « {name} »",
+      "restoreAction": "Rétablir « {name} »"
+    },
+    "toast": {
+      "incomeSaved": "Recette enregistrée",
+      "incomeDeleted": "Recette supprimée",
+      "chargeSaved": "Charge enregistrée",
+      "chargeDeleted": "Charge supprimée",
+      "categorySaved": "Catégorie enregistrée",
+      "rateSaved": "Taux enregistré",
+      "rateCleared": "Taux effacé"
+    },
+    "errors": {
+      "INCOME_SOURCE_MISSING": "Choisissez un service ou indiquez la source.",
+      "FINANCE_DOSSIER_UNKNOWN": "Ce dossier n’existe plus.",
+      "CHARGE_CATEGORY_CLOSED": "Cette catégorie est archivée : choisissez-en une autre.",
+      "CHARGE_CATEGORY_TAKEN": "Une catégorie porte déjà ce nom.",
+      "CHARGE_COPY_CANNOT_REPEAT": "Une copie mensuelle ne se répète pas : modifiez la charge d’origine.",
+      "DOCUMENT_FILE_TYPE": "Le reçu doit être un PDF ou une image.",
+      "DOCUMENT_FILE_TOO_LARGE": "Le reçu est trop lourd.",
+      "DOCUMENT_FILE_INVALID": "Le reçu n’a pas pu être enregistré. Réessayez.",
+      "DOSSIER_FILES_UNCONFIGURED": "Le stockage des fichiers n’est pas configuré sur ce site.",
+      "UNKNOWN": "Une erreur est survenue. Réessayez."
+    },
+    "csv": {
+      "date": "Date",
+      "type": "Type",
+      "amount": "Montant",
+      "currency": "Devise",
+      "xaf": "Montant FCFA",
+      "label": "Service ou catégorie",
+      "client": "Client",
+      "invoice": "Facture",
+      "note": "Note",
+      "income": "Recette",
+      "charge": "Charge"
+    },
+    "dossier": {
+      "title": "Finances du dossier",
+      "income": "Recettes",
+      "charges": "Charges",
+      "margin": "Marge",
+      "unconverted": "Des montants en CAD attendent leur taux du mois.",
+      "open": "Voir les finances"
+    }
   }
 }
