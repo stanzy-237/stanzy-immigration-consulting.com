@@ -57,6 +57,8 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   INTEREST_REJECTED: UserX,
   STANZY_REQUESTED: HandHelping,
   STANZY_DECLINED: HandHelping,
+  SIGNATURE_REMINDER: PenLine,
+  CONTRACT_REMINDER: ScrollText,
 };
 
 /**

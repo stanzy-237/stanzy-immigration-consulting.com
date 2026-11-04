@@ -54,6 +54,17 @@ describe('where a Notification leads', () => {
     expect(notificationHref(signed, 'consultant', 'fr')).toBe('/dossiers/dos_1?document=doc_1#documents');
   });
 
+  it('opens a reminder on what is left to sign', () => {
+    const request = item({
+      kind: 'SIGNATURE_REMINDER',
+      document: { id: 'doc_1', title: 'Lettre explicative' },
+      params: { requestId: 'sig_1' },
+    });
+    expect(notificationHref(request, 'client', 'fr')).toBe('/fr/mon-espace/dossiers/dos_1/signer/sig_1');
+    const contract = item({ kind: 'CONTRACT_REMINDER', params: { contractId: 'ctr_1' } });
+    expect(notificationHref(contract, 'client', 'en')).toBe('/en/mon-espace/dossiers/dos_1/contrats/ctr_1');
+  });
+
   it('lands a stage change on the stepper', () => {
     expect(notificationHref(item({ kind: 'DOSSIER_STAGE_CHANGED' }), 'client', 'fr')).toBe(
       '/fr/mon-espace/dossiers/dos_1#etapes',

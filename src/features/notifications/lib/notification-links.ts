@@ -17,7 +17,7 @@ export type LinkTarget = Pick<NotificationItem, 'kind'> & {
   document?: { id: string } | null;
   comment?: { id: string } | null;
   invoice?: { id: string } | null;
-  /** A Demande de signature's id (SIGNATURE_REQUESTED), a Contrat's (CONTRACT_*). */
+  /** A Demande de signature's id (SIGNATURE_*), a Contrat's (CONTRACT_*), a Demande d'intérêt's (INTEREST_*). */
   params?: { requestId?: string; contractId?: string; interestId?: string };
 };
 
@@ -34,14 +34,19 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
   const dossier = `${base}/dossiers/${item.dossier.id}`;
 
   // The document to sign, open on its fields.
-  if (item.kind === 'SIGNATURE_REQUESTED' && audience === 'client' && item.params?.requestId) {
+  if (
+    (item.kind === 'SIGNATURE_REQUESTED' || item.kind === 'SIGNATURE_REMINDER') &&
+    audience === 'client' &&
+    item.params?.requestId
+  ) {
     return `${dossier}/signer/${item.params.requestId}`;
   }
   // A Contrat to sign opens on its fields; otherwise the Dossier's Contrat panel.
-  if (item.kind === 'CONTRACT_SENT' && audience === 'client' && item.params?.contractId) {
+  const contract = item.kind === 'CONTRACT_SENT' || item.kind === 'CONTRACT_REMINDER';
+  if (contract && audience === 'client' && item.params?.contractId) {
     return `${dossier}/contrats/${item.params.contractId}`;
   }
-  if (item.kind === 'CONTRACT_SENT' || item.kind === 'CONTRACT_SIGNED') return `${dossier}#contrats`;
+  if (contract || item.kind === 'CONTRACT_SIGNED') return `${dossier}#contrats`;
   if (item.invoice) return audience === 'client' ? `${dossier}#factures` : `/factures/${item.invoice.id}`;
   if (item.document) {
     const message = item.comment ? `&message=${item.comment.id}` : '';

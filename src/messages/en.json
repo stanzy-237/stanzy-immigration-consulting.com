@@ -1837,6 +1837,11 @@
       "signed": {
         "subject": "Document signed in your {service} file",
         "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file."
+      },
+      "signatureReminder": {
+        "subject": "Reminder: a document to sign in your {service} file",
+        "body": "“{document}” is still waiting for your signature in your {service} file. Open your space to read it and sign it online.",
+        "cta": "Sign the document"
       }
     },
     "dashboard": {
@@ -2247,7 +2252,9 @@
       "INTEREST_SUBMITTED": "{client} sent an expression of interest (level {level}).",
       "INTEREST_REJECTED": "Your Accompagnement request wasn’t accepted.",
       "STANZY_REQUESTED": "{actor} asks Stanzy to get “{document}”.",
-      "STANZY_DECLINED": "Stanzy won’t be able to get “{document}”."
+      "STANZY_DECLINED": "Stanzy won’t be able to get “{document}”.",
+      "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
+      "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2270,7 +2277,9 @@
       "INTEREST_SUBMITTED": "New expression of interest.",
       "INTEREST_REJECTED": "An answer to your request.",
       "STANZY_REQUESTED": "A document to get.",
-      "STANZY_DECLINED": "A document to get yourself."
+      "STANZY_DECLINED": "A document to get yourself.",
+      "SIGNATURE_REMINDER": "A document is waiting for your signature.",
+      "CONTRACT_REMINDER": "A contract is waiting for your signature."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -2623,6 +2632,11 @@
         "subject": "{client} signed {number}",
         "body": "{client} signed “{title}” ({number}) for their {service} file. The signed PDF is attached.",
         "cta": "Open the file"
+      },
+      "reminder": {
+        "subject": "Reminder: {number} to sign",
+        "body": "“{title}” ({number}) is still waiting for your signature, for your {service} file. Read it and sign it online.",
+        "cta": "Read and sign"
       }
     },
     "panel": {
