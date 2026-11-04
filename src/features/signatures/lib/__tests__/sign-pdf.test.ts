@@ -49,6 +49,13 @@ describe('signPdf', () => {
     expect(doc.getPage(2).getWidth()).toBeCloseTo(595.28);
   });
 
+  it('leaves a document for IRCC as it was, the signature aside, without a Certificat', async () => {
+    const signed = await signPdf(await letterOf(2), data({ certificate: null }));
+    const doc = await PDFDocument.load(signed);
+    expect(doc.getPageCount()).toBe(2);
+    expect(doc.getPage(1).getSize()).toEqual({ width: 600, height: 800 });
+  });
+
   it('prints the Certificat on the letterhead when given', async () => {
     const letterhead = await PDFDocument.create();
     letterhead.addPage([500, 700]);
@@ -147,4 +154,19 @@ describe('the request input', () => {
 
 it('names the signed file after the original', () => {
   expect(signedFileName('Lettre explicative.pdf', 'signe')).toBe('Lettre explicative-signe.pdf');
+});
+
+describe('resizing a placed field', async () => {
+  const { resized } = await import('@/features/signatures/components/field-placer');
+  const field = { key: 'f', kind: 'SIGNATURE' as const, page: 0, x: 0.2, y: 0.2, width: 0.3, height: 0.1 };
+
+  it('keeps the opposite corner where it was', () => {
+    expect(resized(field, 'se', 0.1, 0.05)).toMatchObject({ x: 0.2, y: 0.2, width: expect.closeTo(0.4), height: expect.closeTo(0.15) });
+    expect(resized(field, 'nw', -0.1, -0.1)).toMatchObject({ x: expect.closeTo(0.1), y: expect.closeTo(0.1), width: expect.closeTo(0.4), height: expect.closeTo(0.2) });
+  });
+
+  it('stays on the page and never shrinks past its floor', () => {
+    expect(resized(field, 'se', 1, 1)).toMatchObject({ width: expect.closeTo(0.8), height: expect.closeTo(0.8) });
+    expect(resized(field, 'ne', -1, 1)).toMatchObject({ width: expect.closeTo(0.04), height: expect.closeTo(0.02), y: expect.closeTo(0.28) });
+  });
 });

@@ -18,7 +18,7 @@ import {
   SIGNATURE_IMAGE_PREFIX,
   type SignatureField,
 } from '@/features/signatures/lib/signature-schema';
-import { certificateFor } from '@/features/signatures/server/certificate';
+import { signingWords } from '@/features/signatures/server/certificate';
 import { openSigningAssets, signingAssetStatus } from '@/features/signatures/server/signing-assets';
 import type { CurrentSession } from '@/server/auth/session';
 import { writeObject } from '@/server/storage/r2';
@@ -106,6 +106,8 @@ export const signaturesRouter = createTRPCRouter({
       signedName: request.signedName,
       document: { id: request.document.id, title: request.document.title, section: request.document.section.title },
       dossier: { id: dossier.id, service: dossier.service, open: dossier.state === 'OPEN' },
+      /** The name the Client's Account goes by, offered for the Nom complet. */
+      signerName: dossier.account.name,
       /** Only the Client holding the Dossier signs, never the consultant for them. */
       canSign: request.status === 'PENDING' && dossier.state === 'OPEN' && dossier.accountId === ctx.session.account.id,
     };
@@ -163,12 +165,20 @@ export const signaturesRouter = createTRPCRouter({
       select: { id: true },
     });
 
-    notifyClient(dossier.account, dossier.service, { kind: 'signatureRequested', document: document.title }, dossier.id);
+    // The email's button and the Notification open the document to sign.
+    notifyClient(
+      dossier.account,
+      dossier.service,
+      { kind: 'signatureRequested', document: document.title },
+      dossier.id,
+      `/signer/${request.id}`,
+    );
     notifyLater(ctx.prisma, {
       kind: 'SIGNATURE_REQUESTED',
       actorId: ctx.session.account.id,
       recipients: [dossier.accountId],
       target: { dossierId: dossier.id, documentId: document.id },
+      params: { requestId: request.id },
     });
     return request;
   }),
@@ -215,16 +225,8 @@ export const signaturesRouter = createTRPCRouter({
       ip: clientIp(ctx.headers),
       device: (ctx.headers.get('user-agent') ?? '').slice(0, 300),
     };
-    const certificate = await certificateFor({
-      locale: dossier.account.locale,
-      document: request.document.title,
-      service: dossier.service,
-      account: dossier.account,
-      fingerprint,
-      requestId: request.id,
-      stamped: consultant !== null,
-      ...evidence,
-    });
+    // A document for IRCC stays as it was, the signature aside: the evidence stays here, with the Demande.
+    const words = signingWords(dossier.account.locale, signedAt);
 
     let signed: Uint8Array;
     try {
@@ -232,10 +234,10 @@ export const signaturesRouter = createTRPCRouter({
         fields,
         signature: fromBase64(input.signature.slice(SIGNATURE_IMAGE_PREFIX.length)),
         name: input.name,
-        date: certificate.date,
+        date: words.date,
         consultant,
-        certificate: certificate.page,
-        letterhead: certificate.letterhead,
+        certificate: null,
+        letterhead: null,
       });
     } catch (error) {
       if (error instanceof Error && error.message.startsWith('SIGNATURE_')) throw refuse(error.message);
@@ -261,7 +263,7 @@ export const signaturesRouter = createTRPCRouter({
       const { ciphertext, key, iv } = await encryptFile(signed.slice().buffer as ArrayBuffer);
       await writeObject('private', objectKey, ciphertext, { contentType: ENCRYPTED_CONTENT_TYPE });
       const version = await nextVersion(ctx.prisma, request.document.id, {
-        fileName: signedFileName(request.version.fileName, certificate.suffix),
+        fileName: signedFileName(request.version.fileName, words.suffix),
         contentType: 'application/pdf',
         size: signed.byteLength,
         objectKey,

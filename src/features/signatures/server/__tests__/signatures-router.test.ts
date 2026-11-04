@@ -179,10 +179,12 @@ describe('sending a PDF for signature', () => {
       'ACCOMPAGNEMENT',
       { kind: 'signatureRequested', document: 'Lettre explicative' },
       'dos_1',
+      // The email's button opens the document to sign.
+      `/signer/${id}`,
     );
     expect(notifications.notifyLater).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ kind: 'SIGNATURE_REQUESTED', recipients: ['acc_1'] }),
+      expect.objectContaining({ kind: 'SIGNATURE_REQUESTED', recipients: ['acc_1'], params: { requestId: id } }),
     );
   });
 
@@ -218,7 +220,7 @@ describe('signing', () => {
     return (await consultant().create({ versionId, fields: [SIGN_FIELD, { ...SIGN_FIELD, kind: 'DATE', page: 1 }] })).id;
   }
 
-  it('makes the signed PDF, with its Certificat, the Document’s next Version', async () => {
+  it('makes the signed PDF the Document’s next Version, with no page added', async () => {
     const id = await waiting();
     await client().sign({ id, name: 'Aminata Diallo', signature: SIGNATURE, accepted: true });
 
@@ -238,7 +240,8 @@ describe('signing', () => {
     expect(new TextDecoder().decode(stored.slice(0, 5))).not.toBe('%PDF-');
     const { openEncryptedFile } = await import('@/features/dossiers/server/dossier-files');
     const pdf = await PDFDocument.load(await openEncryptedFile(signed as never));
-    expect(pdf.getPageCount()).toBe(3);
+    // Submitted to IRCC as it is: the evidence stays with the Demande, not on a Certificat page.
+    expect(pdf.getPageCount()).toBe(2);
 
     expect(notify.notifyConsultants).toHaveBeenCalledWith(expect.anything(), 'Aminata Diallo', {
       kind: 'clientSigned',

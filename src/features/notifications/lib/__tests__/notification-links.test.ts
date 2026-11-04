@@ -36,6 +36,17 @@ describe('where a Notification leads', () => {
     expect(notificationHref(n, 'consultant', 'fr')).toBe('/factures/inv_1');
   });
 
+  it('opens a document to sign on its fields, and shows the consultant the signed Document', () => {
+    const requested = item({
+      kind: 'SIGNATURE_REQUESTED',
+      document: { id: 'doc_1', title: 'Lettre explicative' },
+      params: { requestId: 'sig_1' },
+    });
+    expect(notificationHref(requested, 'client', 'fr')).toBe('/fr/mon-espace/dossiers/dos_1/signer/sig_1');
+    const signed = item({ kind: 'DOCUMENT_SIGNED', document: { id: 'doc_1', title: 'Lettre explicative' } });
+    expect(notificationHref(signed, 'consultant', 'fr')).toBe('/dossiers/dos_1?document=doc_1#documents');
+  });
+
   it('lands a stage change on the stepper', () => {
     expect(notificationHref(item({ kind: 'DOSSIER_STAGE_CHANGED' }), 'client', 'fr')).toBe(
       '/fr/mon-espace/dossiers/dos_1#etapes',

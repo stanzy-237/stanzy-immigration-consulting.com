@@ -17,8 +17,12 @@ export type SignPdfData = {
   date: string;
   /** The consultant's signature and the company stamp, for STAMP fields. */
   consultant: { signature: ImageFile; stamp: ImageFile } | null;
-  /** The Certificat de signature, the last page: a title, label/value rows, a closing note. */
-  certificate: { title: string; rows: [string, string][]; note: string };
+  /**
+   * The Certificat de signature, added as the last page: a title, label/value
+   * rows, a closing note. Contrats only: a document for IRCC stays as it was,
+   * the signature aside (null).
+   */
+  certificate: { title: string; rows: [string, string][]; note: string } | null;
   /** The Stanzy letterhead (one-page PDF) the Certificat is printed on; a blank A4 page without it. */
   letterhead: Uint8Array | null;
 };
@@ -51,8 +55,8 @@ export async function fingerprintOf(bytes: ArrayBuffer | Uint8Array): Promise<st
 
 /**
  * The original PDF with the fields filled in where the consultant placed
- * them (on pages shown rotated too) and the Certificat de signature added
- * as its last page. Fields on a page it doesn't have are refused
+ * them (on pages shown rotated too), and the Certificat de signature added
+ * as its last page when given. Fields on a page it doesn't have are refused
  * (SIGNATURE_FIELD_OUTSIDE).
  */
 export async function signPdf(original: Uint8Array, data: SignPdfData): Promise<Uint8Array> {
@@ -82,7 +86,7 @@ export async function signPdf(original: Uint8Array, data: SignPdfData): Promise<
     }
   }
 
-  await addCertificate(doc, data, { regular, bold });
+  if (data.certificate) await addCertificate(doc, data.certificate, data.letterhead, { regular, bold });
   return doc.save();
 }
 
@@ -173,12 +177,13 @@ class FieldBox {
 
 async function addCertificate(
   doc: PDFDocument,
-  data: SignPdfData,
+  certificate: NonNullable<SignPdfData['certificate']>,
+  letterhead: Uint8Array | null,
   fonts: { regular: PDFFont; bold: PDFFont },
 ): Promise<void> {
   let page: PDFPage;
-  if (data.letterhead) {
-    const [copied] = await doc.copyPages(await PDFDocument.load(data.letterhead), [0]);
+  if (letterhead) {
+    const [copied] = await doc.copyPages(await PDFDocument.load(letterhead), [0]);
     page = doc.addPage(copied!);
   } else {
     page = doc.addPage(A4);
@@ -186,10 +191,10 @@ async function addCertificate(
   const { regular, bold } = fonts;
   const width = RIGHT - LEFT;
   let y = TOP - 24;
-  page.drawText(drawable(data.certificate.title.toUpperCase(), bold), { x: LEFT, y, size: 18, font: bold, color: NAVY });
+  page.drawText(drawable(certificate.title.toUpperCase(), bold), { x: LEFT, y, size: 18, font: bold, color: NAVY });
   y -= 34;
 
-  for (const [label, value] of data.certificate.rows) {
+  for (const [label, value] of certificate.rows) {
     page.drawText(drawable(label.toUpperCase(), bold), { x: LEFT, y, size: 8, font: bold, color: ROUGE });
     y -= 14;
     for (const row of wrap(value, regular, 10, width)) {
@@ -200,7 +205,7 @@ async function addCertificate(
   }
 
   y -= 6;
-  for (const row of wrap(data.certificate.note, regular, 8, width)) {
+  for (const row of wrap(certificate.note, regular, 8, width)) {
     page.drawText(row, { x: LEFT, y, size: 8, font: regular, color: SLATE });
     y -= 11;
   }

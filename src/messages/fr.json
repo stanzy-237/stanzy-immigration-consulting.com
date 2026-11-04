@@ -1846,7 +1846,8 @@
       },
       "signatureRequested": {
         "subject": "Un document à signer dans votre dossier {service}",
-        "body": "Stanzy vous a envoyé « {document} » à signer dans votre dossier {service}. Ouvrez votre espace pour le lire et le signer en ligne."
+        "body": "Stanzy vous a envoyé « {document} » à signer dans votre dossier {service}. Ouvrez votre espace pour le lire et le signer en ligne.",
+        "cta": "Signer le document"
       },
       "signed": {
         "subject": "Document signé dans votre dossier {service}",
@@ -2456,14 +2457,15 @@
       },
       "place": {
         "title": "2. Placer les champs",
-        "hint": "Choisissez un champ, puis touchez la page à l’endroit voulu. Faites glisser un champ pour le déplacer.",
+        "hint": "Choisissez un champ, puis touchez la page à l’endroit voulu. Faites glisser un champ pour le déplacer, et ses coins pour le redimensionner.",
         "tools": "Champ à placer",
         "remove": "Retirer le champ {field}",
         "page": "Page {number}",
         "count": "{count, plural, =0 {Aucun champ placé} one {# champ placé} other {# champs placés}}",
         "needSignature": "Placez au moins un champ Signature.",
         "needAssets": "Ajoutez votre signature et le cachet dans « Signatures » pour ce champ.",
-        "change": "Changer de PDF"
+        "change": "Changer de PDF",
+        "fieldKeys": "Flèches : déplacer. Alt + flèches : redimensionner. Suppr : retirer."
       },
       "send": "Envoyer pour signature",
       "sending": "Envoi…",
@@ -2475,20 +2477,16 @@
       "metaTitle": "Signer un document",
       "back": "Retour au dossier",
       "title": "Signer « {document} »",
-      "intro": "Lisez le document jusqu’au bout. Les zones encadrées seront remplies avec votre signature, votre nom et la date.",
-      "fieldHere": "{field} ici",
+      "intro": "Lisez le document, puis cliquez sur chaque zone encadrée pour la remplir. Terminez avec « Terminer ».",
       "accept": "J’ai lu le document et j’accepte de le signer électroniquement.",
       "name": "Votre nom complet",
       "nameHint": "Tel qu’il figure sur votre passeport.",
       "pad": "Votre signature",
-      "padHint": "Signez dans le cadre avec la souris ou le doigt.",
       "padLabel": "Zone de signature",
       "clear": "Effacer",
       "submit": "Signer le document",
       "signing": "Signature…",
       "signed": "Document signé",
-      "needAccept": "Cochez « J’ai lu… » pour signer.",
-      "needSignature": "Tracez votre signature dans le cadre.",
       "alreadySigned": "Vous avez signé ce document le {date}.",
       "notWaiting": "Ce document n’attend plus de signature.",
       "openSigned": "Voir le document signé",
@@ -2501,6 +2499,35 @@
         "cancel": "Annuler",
         "prefix": "Demande de modification avant signature : {message}",
         "sent": "Demande envoyée à Stanzy"
+      },
+      "prompts": {
+        "SIGNATURE": "Signer ici",
+        "NAME": "Votre nom",
+        "DATE": "Date",
+        "STAMP": "Cachet Stanzy"
+      },
+      "filledLabel": "{field} rempli : cliquer pour modifier",
+      "progress": "{done} sur {total} {total, plural, one {champ rempli} other {champs remplis}}",
+      "next": "Champ suivant",
+      "finish": "Terminer",
+      "draw": {
+        "title": "Votre signature",
+        "body": "Dessinez votre signature dans le cadre, avec la souris ou le doigt.",
+        "ink": "Encre",
+        "black": "Noire",
+        "blue": "Bleue",
+        "apply": "Appliquer",
+        "cancel": "Annuler"
+      },
+      "nameDialog": {
+        "title": "Votre nom complet",
+        "apply": "Appliquer",
+        "cancel": "Annuler"
+      },
+      "confirm": {
+        "title": "Signer « {document} » ?",
+        "body": "Votre signature, votre nom et la date seront apposés sur le document, qui deviendra une nouvelle version dans votre dossier.",
+        "cancel": "Annuler"
       }
     },
     "dashboard": {

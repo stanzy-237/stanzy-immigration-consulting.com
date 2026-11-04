@@ -84,6 +84,7 @@ export async function notify(db: Db, event: NotificationEvent, now = new Date())
         // Every consultant-bound event goes to 'CONSULTANTS'; ids name Clients.
         audience: event.recipients === 'CONSULTANTS' ? 'consultant' : 'client',
         target: event.target,
+        params: event.params,
       });
     } catch (error) {
       console.error('[notifications] could not push', event.kind, error);

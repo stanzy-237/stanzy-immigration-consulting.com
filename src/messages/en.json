@@ -1829,7 +1829,8 @@
       },
       "signatureRequested": {
         "subject": "A document to sign in your {service} file",
-        "body": "Stanzy sent you “{document}” to sign in your {service} file. Open your space to read it and sign it online."
+        "body": "Stanzy sent you “{document}” to sign in your {service} file. Open your space to read it and sign it online.",
+        "cta": "Sign the document"
       },
       "signed": {
         "subject": "Document signed in your {service} file",
@@ -2439,14 +2440,15 @@
       },
       "place": {
         "title": "2. Place the fields",
-        "hint": "Pick a field, then tap the page where it goes. Drag a field to move it.",
+        "hint": "Pick a field, then tap the page where it goes. Drag a field to move it, and its corners to resize it.",
         "tools": "Field to place",
         "remove": "Remove the {field} field",
         "page": "Page {number}",
         "count": "{count, plural, =0 {No field placed} one {# field placed} other {# fields placed}}",
         "needSignature": "Place at least one Signature field.",
         "needAssets": "Add your signature and the stamp in “Signatures” to use this field.",
-        "change": "Change PDF"
+        "change": "Change PDF",
+        "fieldKeys": "Arrows: move. Alt + arrows: resize. Delete: remove."
       },
       "send": "Send for signature",
       "sending": "Sending…",
@@ -2458,20 +2460,16 @@
       "metaTitle": "Sign a document",
       "back": "Back to the file",
       "title": "Sign “{document}”",
-      "intro": "Read the document to the end. The framed areas will be filled with your signature, your name and the date.",
-      "fieldHere": "{field} here",
+      "intro": "Read the document, then click each framed area to fill it in. Finish with “Finish”.",
       "accept": "I have read the document and agree to sign it electronically.",
       "name": "Your full name",
       "nameHint": "As it appears on your passport.",
       "pad": "Your signature",
-      "padHint": "Sign inside the frame with your mouse or finger.",
       "padLabel": "Signature area",
       "clear": "Clear",
       "submit": "Sign the document",
       "signing": "Signing…",
       "signed": "Document signed",
-      "needAccept": "Tick “I have read…” to sign.",
-      "needSignature": "Draw your signature in the frame.",
       "alreadySigned": "You signed this document on {date}.",
       "notWaiting": "This document is no longer waiting for a signature.",
       "openSigned": "See the signed document",
@@ -2484,6 +2482,35 @@
         "cancel": "Cancel",
         "prefix": "Change requested before signing: {message}",
         "sent": "Request sent to Stanzy"
+      },
+      "prompts": {
+        "SIGNATURE": "Sign here",
+        "NAME": "Your name",
+        "DATE": "Date",
+        "STAMP": "Stanzy stamp"
+      },
+      "filledLabel": "{field} filled: click to change",
+      "progress": "{done} of {total} {total, plural, one {field filled} other {fields filled}}",
+      "next": "Next field",
+      "finish": "Finish",
+      "draw": {
+        "title": "Your signature",
+        "body": "Draw your signature inside the frame, with your mouse or finger.",
+        "ink": "Ink",
+        "black": "Black",
+        "blue": "Blue",
+        "apply": "Apply",
+        "cancel": "Cancel"
+      },
+      "nameDialog": {
+        "title": "Your full name",
+        "apply": "Apply",
+        "cancel": "Cancel"
+      },
+      "confirm": {
+        "title": "Sign “{document}”?",
+        "body": "Your signature, name and date will be applied to the document, which becomes a new version in your file.",
+        "cancel": "Cancel"
       }
     },
     "dashboard": {

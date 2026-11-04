@@ -16,7 +16,20 @@ const LETTERHEAD = join(process.cwd(), 'src/features/invoices/assets/letterhead.
 let letterhead: Promise<Uint8Array | null> | null = null;
 
 /**
- * The Certificat de signature (#96) in the Client's language: who signed,
+ * What a signed PDF prints, in the Client's language: the day DATE fields
+ * show (Douala) and the signed file's name suffix (« signe »).
+ */
+export function signingWords(localeValue: string, signedAt: Date): { date: string; suffix: string } {
+  const locale = toLocale(localeValue);
+  const t = createTranslator({ locale, messages: MESSAGES[locale] });
+  return {
+    date: new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeZone: 'Africa/Douala' }).format(signedAt),
+    suffix: t('Signatures.certificate.fileSuffix'),
+  };
+}
+
+/**
+ * The Certificat de signature (#96), for Contrats, in the Client's language: who signed,
  * when (Douala time), from where, and the original PDF's fingerprint; also
  * the date DATE fields print and the signed file's name suffix.
  */
@@ -65,8 +78,7 @@ export async function certificateFor(opts: {
 
   return {
     page: { title: t('Signatures.certificate.title'), rows, note: t('Signatures.certificate.note') },
-    date: new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeZone: 'Africa/Douala' }).format(opts.signedAt),
-    suffix: t('Signatures.certificate.fileSuffix'),
+    ...signingWords(opts.locale, opts.signedAt),
     letterhead: await letterhead,
   };
 }

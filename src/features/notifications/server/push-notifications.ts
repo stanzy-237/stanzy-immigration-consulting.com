@@ -31,6 +31,7 @@ export async function pushNotification(
     recipientId: string;
     audience: Audience;
     target: NotificationTarget;
+    params?: Record<string, string>;
   },
   send: PushSender | null = appPushSender(),
 ): Promise<void> {
@@ -45,6 +46,7 @@ export async function pushNotification(
     document: notification.target.documentId ? { id: notification.target.documentId } : null,
     comment: notification.target.commentId ? { id: notification.target.commentId } : null,
     invoice: notification.target.invoiceId ? { id: notification.target.invoiceId } : null,
+    params: notification.params,
   };
   const gone: string[] = [];
   for (const device of devices) {

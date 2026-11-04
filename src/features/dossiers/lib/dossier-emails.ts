@@ -87,7 +87,7 @@ export function dossierEmail(opts: {
     to: opts.to,
     subject: t(`emails.${change.kind}.subject`, { service }),
     lines: [t('emails.greeting', { name: opts.name }), body],
-    cta: t('emails.cta'),
+    cta: change.kind === 'signatureRequested' ? t('emails.signatureRequested.cta') : t('emails.cta'),
     url: opts.url,
   });
 }

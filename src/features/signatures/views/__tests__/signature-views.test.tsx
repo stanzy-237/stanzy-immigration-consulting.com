@@ -25,8 +25,8 @@ vi.mock('@/features/signatures/hooks/use-pdf-pages', () => ({
   }),
 }));
 vi.mock('@/features/signatures/components/signature-pad', () => ({
-  SignaturePad: ({ onChange }: { onChange: (png: string | null) => void }) => (
-    <button type="button" onClick={() => onChange('data:image/png;base64,AAAA')}>
+  SignaturePad: ({ ink, onChange }: { ink: string; onChange: (png: string | null) => void }) => (
+    <button type="button" onClick={() => onChange(`data:image/png;base64,${ink}`)}>
       draw
     </button>
   ),
@@ -59,7 +59,9 @@ const request = (extra: Record<string, unknown> = {}) => ({
   status: 'PENDING',
   fields: [
     { kind: 'SIGNATURE', page: 0, x: 0.1, y: 0.8, width: 0.3, height: 0.07 },
+    { kind: 'NAME', page: 0, x: 0.1, y: 0.9, width: 0.3, height: 0.03 },
     { kind: 'DATE', page: 1, x: 0.6, y: 0.9, width: 0.2, height: 0.03 },
+    { kind: 'STAMP', page: 1, x: 0.1, y: 0.8, width: 0.36, height: 0.12 },
   ],
   versionId: 'ver_2',
   fileName: 'lettre.pdf',
@@ -68,6 +70,7 @@ const request = (extra: Record<string, unknown> = {}) => ({
   signedName: null,
   document: { id: 'doc_1', title: 'Lettre explicative', section: 'Lettres' },
   dossier: { id: 'dos_1', service: 'ACCOMPAGNEMENT', open: true },
+  signerName: 'Aminata Diallo',
   canSign: true,
   ...extra,
 });
@@ -79,35 +82,78 @@ function signView(data = request(), handlers: Record<string, (input: never) => u
 }
 
 describe('SignView, for the Client', () => {
-  it('shows where each field goes and signs once accepted, named and drawn', async () => {
+  it('fills each field on a click, then signs once confirmed', async () => {
     const sign = vi.fn();
     const { container } = signView(request(), { 'signatures.sign': (input) => sign(input) });
     expect(screen.getByRole('heading', { name: 'Signer « Lettre explicative »' })).toBeInTheDocument();
-    expect(screen.getByText('Signature ici')).toBeInTheDocument();
-    expect(screen.getByText('Date ici')).toBeInTheDocument();
+    // The consultant's stamp is drawn by the server: not one of the Client's fields.
+    expect(screen.getByText('0 sur 3 champs remplis')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Terminer' })).not.toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
 
-    fireEvent.change(screen.getByLabelText('Votre nom complet'), { target: { value: 'Aminata Diallo' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Signer le document' }));
-    expect(screen.getByRole('alert')).toHaveTextContent('Cochez « J’ai lu… » pour signer.');
+    // The signature: a dialog to draw it, in blue unless black is chosen.
+    fireEvent.click(screen.getByRole('button', { name: 'Signer ici' }));
+    const draw = screen.getByRole('dialog', { name: 'Votre signature' });
+    expect(within(draw).getByRole('radio', { name: 'Bleue' })).toBeChecked();
+    expect(within(draw).getByRole('button', { name: 'Appliquer' })).toBeDisabled();
+    fireEvent.click(within(draw).getByRole('radio', { name: 'Noire' }));
+    fireEvent.click(within(draw).getByRole('button', { name: 'draw' }));
+    fireEvent.click(within(draw).getByRole('button', { name: 'Appliquer' }));
+    expect(screen.getByRole('button', { name: 'Signature rempli : cliquer pour modifier' })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('checkbox'));
-    fireEvent.click(screen.getByRole('button', { name: 'Signer le document' }));
-    expect(screen.getByRole('alert')).toHaveTextContent('Tracez votre signature dans le cadre.');
+    // The name, offered as the Account goes by; the date, on a click.
+    fireEvent.click(screen.getByRole('button', { name: 'Votre nom' }));
+    const naming = screen.getByRole('dialog');
+    expect(within(naming).getByLabelText('Votre nom complet')).toHaveValue('Aminata Diallo');
+    fireEvent.click(within(naming).getByRole('button', { name: 'Appliquer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Date' }));
+    expect(screen.getByText('3 sur 3 champs remplis')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'draw' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Signer le document' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Terminer' }));
+    const confirm = screen.getByRole('alertdialog');
+    const submit = within(confirm).getByRole('button', { name: 'Signer le document' });
+    expect(submit).toBeDisabled();
+    fireEvent.click(within(confirm).getByRole('checkbox'));
+    fireEvent.click(submit);
     await waitFor(() =>
       expect(sign).toHaveBeenCalledWith({
         id: 'sig_1',
         name: 'Aminata Diallo',
-        signature: 'data:image/png;base64,AAAA',
+        signature: 'data:image/png;base64,black',
         accepted: true,
       }),
     );
     expect(await screen.findByText('Document signé')).toBeInTheDocument();
     expect(router.push).toHaveBeenCalledWith('/mon-espace/dossiers/dos_1?document=doc_1#documents');
   }, 30_000);
+
+  it('reuses the signature drawn once, and asks the name at the end when no field holds it', async () => {
+    const sign = vi.fn();
+    const twoSignatures = request({
+      fields: [
+        { kind: 'SIGNATURE', page: 0, x: 0.1, y: 0.8, width: 0.3, height: 0.07 },
+        { kind: 'SIGNATURE', page: 1, x: 0.1, y: 0.8, width: 0.3, height: 0.07 },
+      ],
+    });
+    signView(twoSignatures, { 'signatures.sign': (input) => sign(input) });
+    const [first, second] = screen.getAllByRole('button', { name: 'Signer ici' });
+    fireEvent.click(first!);
+    fireEvent.click(screen.getByRole('button', { name: 'draw' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Appliquer' }));
+    // The second one fills at once, with the same signature.
+    fireEvent.click(second!);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('2 sur 2 champs remplis')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Terminer' }));
+    const confirm = screen.getByRole('alertdialog');
+    fireEvent.change(within(confirm).getByLabelText('Votre nom complet'), { target: { value: 'Aminata K. Diallo' } });
+    fireEvent.click(within(confirm).getByRole('checkbox'));
+    fireEvent.click(within(confirm).getByRole('button', { name: 'Signer le document' }));
+    await waitFor(() =>
+      expect(sign).toHaveBeenCalledWith(expect.objectContaining({ name: 'Aminata K. Diallo', signature: 'data:image/png;base64,blue' })),
+    );
+  });
 
   it('asks for a change in the Document’s conversation', async () => {
     const comment = vi.fn();
@@ -225,6 +271,26 @@ describe('SignatureRequestNewView, for the consultant', () => {
     expect(await screen.findByText('Demande de signature envoyée')).toBeInTheDocument();
     expect(router.push).toHaveBeenCalledWith('/dossiers/dos_1?document=doc_1#documents');
   }, 30_000);
+
+  it('resizes a field from its corner, with the keyboard too', () => {
+    search.value = 'version=ver_2';
+    const create = vi.fn();
+    newView(undefined, create);
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Signature · Page 1' }), { key: 'Enter' });
+    const field = screen.getByRole('group', { name: 'Signature' });
+    // Alt + → widens it by 1 % of the page; → alone moves it.
+    fireEvent.keyDown(field, { key: 'ArrowRight', altKey: true });
+    fireEvent.keyDown(field, { key: 'ArrowRight' });
+    fireEvent.click(screen.getByRole('button', { name: 'Envoyer pour signature' }));
+    return waitFor(() =>
+      expect(create).toHaveBeenCalledWith({
+        versionId: 'ver_2',
+        fields: [
+          { kind: 'SIGNATURE', page: 0, x: expect.closeTo(0.36), y: expect.closeTo(0.465), width: expect.closeTo(0.31), height: expect.closeTo(0.07) },
+        ],
+      }),
+    );
+  });
 
   it('starts on the Version chosen from its Document, and removes a field', () => {
     search.value = 'version=ver_2';
