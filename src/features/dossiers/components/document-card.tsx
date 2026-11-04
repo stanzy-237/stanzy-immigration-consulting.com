@@ -17,6 +17,13 @@ import {
 import { toast } from '@/components/ui/toast';
 import { DocumentConversation } from '@/features/dossiers/components/document-conversation';
 import { useDocumentFocus } from '@/features/dossiers/components/document-focus';
+import {
+  CancelSignature,
+  RequestSignatureLink,
+  SignatureBadge,
+  SignedBadge,
+  SignLink,
+} from '@/features/dossiers/components/document-signature';
 import { smallButton, type DocumentData, type Viewer } from '@/features/dossiers/components/document-styles';
 import { useDocumentsMutation } from '@/features/dossiers/hooks/use-documents-mutation';
 import { DOCUMENT_FILE_TYPES } from '@/features/dossiers/lib/document-schema';
@@ -59,6 +66,8 @@ export function DocumentCard({
   const pending = isOptimistic(document);
   const final = document.versions.find((version) => version.id === document.finalVersionId);
   const latest = document.versions.at(-1);
+  // The Demande de signature waiting on it (#96), if any.
+  const waiting = document.signatures[0];
 
   return (
     <div className="rounded-xl border border-fog-light">
@@ -85,11 +94,13 @@ export function DocumentCard({
               {t('finalBadge', { number: final.number })}
             </span>
           ) : null}
+          <SignatureBadge document={document} viewer={viewer} />
           <ChevronDown
             aria-hidden={true}
             className={expanded ? 'size-4 shrink-0 rotate-180 text-slate' : 'size-4 shrink-0 text-slate'}
           />
         </button>
+        {!consultant && open && waiting ? <SignLink dossierId={dossierId} requestId={waiting.id} /> : null}
         {consultant && open && !pending ? (
           <button
             type="button"
@@ -127,7 +138,11 @@ export function DocumentCard({
                         })}
                       </span>
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span className="flex flex-wrap items-center gap-1">
+                      {version.signedFor ? <SignedBadge /> : null}
+                      {consultant && open && !waiting && version.contentType === 'application/pdf' ? (
+                        <RequestSignatureLink dossierId={dossierId} versionId={version.id} number={version.number} />
+                      ) : null}
                       {consultant ? (
                         <FinaleToggle
                           dossierId={dossierId}
@@ -155,6 +170,11 @@ export function DocumentCard({
                 ))}
               </ol>
             )}
+            {consultant && open && waiting ? (
+              <div className="mt-3">
+                <CancelSignature dossierId={dossierId} requestId={waiting.id} />
+              </div>
+            ) : null}
             {open && !pending ? (
               <UploadVersion dossierId={dossierId} documentId={document.id} title={document.title} />
             ) : null}

@@ -178,7 +178,7 @@ export async function renderInvoicePdf(letterhead: Uint8Array, data: InvoicePdfD
 }
 
 /** `value` without what the standard font can't draw (and with plain spaces). */
-function drawable(value: string, font: PDFFont): string {
+export function drawable(value: string, font: PDFFont): string {
   const supported = new Set(font.getCharacterSet());
   return [...value.replace(/[  \t]/g, ' ')].filter((char) => supported.has(char.codePointAt(0)!)).join('');
 }

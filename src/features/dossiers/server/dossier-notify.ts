@@ -17,13 +17,15 @@ import { appMailer } from '@/server/email/app-mailer';
  * Emails the Client about a change to their Dossier, after the response so
  * the consultant's click doesn't wait on Resend. A failed send is logged:
  * the change itself is already saved. With `dossierId`, the button opens that
- * Dossier in « Mon espace ».
+ * Dossier in « Mon espace » (`subpath` further into it).
  */
 export function notifyClient(
   client: { email: string; name: string; locale: string },
   service: ServiceType,
   change: DossierChange,
   dossierId?: string,
+  /** Further into the Dossier: `/signer/<id>` opens a Demande de signature. */
+  subpath = '',
 ): void {
   const locale = toLocale(client.locale);
   after(async () => {
@@ -35,7 +37,7 @@ export function notifyClient(
           locale,
           service,
           change,
-          url: `${siteUrl()}/${locale}/mon-espace${dossierId ? `/dossiers/${dossierId}` : ''}`,
+          url: `${siteUrl()}/${locale}/mon-espace${dossierId ? `/dossiers/${dossierId}${subpath}` : ''}`,
         }),
       );
     } catch (error) {

@@ -131,6 +131,9 @@
   --color-ink: var(--ink);
   --color-ink-deep: var(--ink-deep);
   --color-whatsapp: var(--whatsapp);
+  /* The two inks a Client signs with (#96): black and ballpoint blue. */
+  --color-pen-black: #111111;
+  --color-pen-blue: #1d3fb8;
   --color-iris: var(--iris);
   --color-iris-tint: var(--iris-tint);
   --color-iris-line: var(--iris-line);

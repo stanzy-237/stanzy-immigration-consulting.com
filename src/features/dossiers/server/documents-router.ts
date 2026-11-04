@@ -68,8 +68,12 @@ export const documentsRouter = createTRPCRouter({
                 size: true,
                 createdAt: true,
                 uploadedBy: person,
+                /** The Demande de signature this Version is the signed PDF of (#96). */
+                signedFor: { select: { id: true } },
               },
             },
+            /** The Demande de signature waiting, if any (#96). */
+            signatures: { where: { status: 'PENDING' }, select: { id: true, versionId: true }, take: 1 },
             comments: {
               orderBy: { createdAt: 'asc' },
               select: {
@@ -313,7 +317,7 @@ async function commentFor(prisma: Db, session: CurrentSession, id: string) {
  * Saves the Document's next Version number. Two uploads at once can pick the
  * same number: the unique index refuses the second, which takes the next one.
  */
-async function nextVersion(
+export async function nextVersion(
   prisma: Db,
   documentId: string,
   data: Omit<Prisma.DocumentVersionUncheckedCreateInput, 'documentId' | 'number'>,

@@ -12,7 +12,8 @@ import type { Rotation, Source } from '@/features/pdf-tools/lib/pages';
 type PdfJs = typeof import('pdfjs-dist');
 let pdfjs: Promise<PdfJs> | null = null;
 
-function loadPdfJs(): Promise<PdfJs> {
+/** pdf.js, loaded once on first use, with its worker. */
+export function loadPdfJs(): Promise<PdfJs> {
   pdfjs ??= import('pdfjs-dist').then((lib) => {
     lib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
     return lib;

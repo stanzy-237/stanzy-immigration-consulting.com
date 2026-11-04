@@ -57,6 +57,8 @@ model Account {
   notifications     Notification[]     @relation("NotificationRecipient")
   notificationsMade Notification[]     @relation("NotificationActor")
   pdfToolFiles      PdfToolFile[]
+  signatureRequests SignatureRequest[] @relation("SignatureRequester")
+  signaturesSigned  SignatureRequest[] @relation("SignatureSigner")
 
   @@map("account")
 }
@@ -431,19 +433,20 @@ model DossierSection {
 
 /// One Document in a Section (diplôme, relevé de notes…), with its Versions and one comment thread.
 model DossierDocument {
-  id             String            @id @default(cuid())
+  id             String             @id @default(cuid())
   sectionId      String
-  section        DossierSection    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  section        DossierSection     @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   title          String
   addedById      String
-  addedBy        Account           @relation(fields: [addedById], references: [id], onDelete: Restrict)
+  addedBy        Account            @relation(fields: [addedById], references: [id], onDelete: Restrict)
   /// The Version the consultant marked Finale.
-  finalVersionId String?           @unique
-  finalVersion   DocumentVersion?  @relation("FinalVersion", fields: [finalVersionId], references: [id], onDelete: SetNull)
-  versions       DocumentVersion[] @relation("Versions")
+  finalVersionId String?            @unique
+  finalVersion   DocumentVersion?   @relation("FinalVersion", fields: [finalVersionId], references: [id], onDelete: SetNull)
+  versions       DocumentVersion[]  @relation("Versions")
   comments       DocumentComment[]
   notifications  Notification[]
-  createdAt      DateTime          @default(now())
+  signatures     SignatureRequest[]
+  createdAt      DateTime           @default(now())
 
   @@index([sectionId, createdAt])
   @@map("dossier_document")
@@ -451,10 +454,10 @@ model DossierDocument {
 
 /// One uploaded file of a Document (V1, V2…). Stored encrypted in R2 (ADR 0007, #87).
 model DocumentVersion {
-  id           String           @id @default(cuid())
+  id           String             @id @default(cuid())
   documentId   String
-  document     DossierDocument  @relation("Versions", fields: [documentId], references: [id], onDelete: Cascade)
-  finalOf      DossierDocument? @relation("FinalVersion")
+  document     DossierDocument    @relation("Versions", fields: [documentId], references: [id], onDelete: Cascade)
+  finalOf      DossierDocument?   @relation("FinalVersion")
   number       Int
   fileName     String
   contentType  String
@@ -466,8 +469,12 @@ model DocumentVersion {
   wrappedKey   String
   iv           String
   uploadedById String
-  uploadedBy   Account          @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
-  createdAt    DateTime         @default(now())
+  uploadedBy   Account            @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+  /// The Demandes de signature sent with this Version as the original.
+  signatures   SignatureRequest[] @relation("SignatureOriginal")
+  /// The Demande de signature this Version is the signed result of.
+  signedFor    SignatureRequest?  @relation("SignatureSigned")
+  createdAt    DateTime           @default(now())
 
   @@unique([documentId, number])
   @@map("document_version")
@@ -603,6 +610,10 @@ enum NotificationKind {
   ACCOUNTS_SIGNED_UP
   /// A new Tirage, for Accounts with Alertes tirages on.
   DRAW_PUBLISHED
+  /// To the Client: a Demande de signature to sign.
+  SIGNATURE_REQUESTED
+  /// To the consultant: the Client signed.
+  DOCUMENT_SIGNED
 }
 
 /// One line in an Account's notification center. Repeats by the same actor on the same target, while unread and within 30 minutes, raise `count` instead of adding lines.
@@ -667,4 +678,61 @@ model PdfToolFile {
 
   @@index([createdById, createdAt])
   @@map("pdf_tool_file")
+}
+
+enum SignatureRequestStatus {
+  PENDING
+  SIGNED
+  CANCELLED
+}
+
+/// A PDF the Client signs online (#96): a Version of a Document, with the fields
+/// the consultant placed. Signing makes the signed PDF the Document's next Version.
+model SignatureRequest {
+  id              String                 @id @default(cuid())
+  documentId      String
+  document        DossierDocument        @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  /// The PDF sent for signature.
+  versionId       String
+  version         DocumentVersion        @relation("SignatureOriginal", fields: [versionId], references: [id], onDelete: Cascade)
+  /// SHA-256 (hex) of the original PDF, checked again before signing.
+  fingerprint     String
+  /// Where the fields sit: `{ kind, page, x, y, width, height }[]`, in fractions of the page from its top left.
+  fields          Json
+  status          SignatureRequestStatus @default(PENDING)
+  requestedById   String
+  requestedBy     Account                @relation("SignatureRequester", fields: [requestedById], references: [id], onDelete: Restrict)
+  /// The signed PDF, once signed.
+  signedVersionId String?                @unique
+  signedVersion   DocumentVersion?       @relation("SignatureSigned", fields: [signedVersionId], references: [id], onDelete: SetNull)
+  signedById      String?
+  signedBy        Account?               @relation("SignatureSigner", fields: [signedById], references: [id], onDelete: Restrict)
+  /// The Certificat de signature: the name typed, when, from where.
+  signedName      String?
+  signedAt        DateTime?
+  signedIp        String?
+  signedDevice    String?
+  cancelledAt     DateTime?
+  createdAt       DateTime               @default(now())
+
+  @@index([documentId, status])
+  @@index([status, createdAt])
+  @@map("signature_request")
+}
+
+enum SigningAssetKind {
+  SIGNATURE
+  STAMP
+}
+
+/// The consultant's signature and the company stamp (cachet), uploaded once, encrypted in R2 (#96).
+model SigningAsset {
+  kind        SigningAssetKind @id
+  contentType String
+  objectKey   String
+  wrappedKey  String
+  iv          String
+  updatedAt   DateTime         @updatedAt
+
+  @@map("signing_asset")
 }

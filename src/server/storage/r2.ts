@@ -91,16 +91,24 @@ export async function readObject(bucket: Bucket, key: string): Promise<ArrayBuff
   return response.arrayBuffer();
 }
 
-/** Writes from the server (scripts, migrations); the app's uploads go straight from the browser. */
+/**
+ * Writes from the server (a signed PDF, the consultant's signature); the
+ * browser's uploads go straight to R2. The address is signed first and the
+ * bytes go on the call itself: a body carried by a prepared Request reaches
+ * R2 as a stream of unknown length, which it refuses (411, under Next.js).
+ */
 export async function writeObject(
   bucket: Bucket,
   key: string,
-  body: BodyInit,
+  body: ArrayBuffer | Uint8Array<ArrayBuffer>,
   options: { contentType: string; cacheControl?: string },
 ): Promise<void> {
   const headers: Record<string, string> = { 'Content-Type': options.contentType };
   if (options.cacheControl) headers['Cache-Control'] = options.cacheControl;
-  const response = await r2().client.fetch(objectUrl(bucket, key), { method: 'PUT', body, headers });
+  const url = new URL(objectUrl(bucket, key));
+  url.searchParams.set('X-Amz-Expires', String(UPLOAD_SECONDS));
+  const signed = await r2().client.sign(new Request(url, { method: 'PUT', headers }), { aws: { signQuery: true } });
+  const response = await fetch(signed.url, { method: 'PUT', body, headers });
   if (!response.ok) throw new Error(`STORAGE_WRITE_FAILED ${response.status}`);
 }
 

@@ -17,6 +17,8 @@ export type LinkTarget = Pick<NotificationItem, 'kind'> & {
   document?: { id: string } | null;
   comment?: { id: string } | null;
   invoice?: { id: string } | null;
+  /** A Demande de signature's id, for SIGNATURE_REQUESTED. */
+  params?: { requestId?: string };
 };
 
 export function notificationHref(item: LinkTarget, audience: Audience, locale: string): string {
@@ -28,6 +30,10 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
   if (!item.dossier) return all;
   const dossier = `${base}/dossiers/${item.dossier.id}`;
 
+  // The document to sign, open on its fields.
+  if (item.kind === 'SIGNATURE_REQUESTED' && audience === 'client' && item.params?.requestId) {
+    return `${dossier}/signer/${item.params.requestId}`;
+  }
   if (item.invoice) return audience === 'client' ? `${dossier}#factures` : `/factures/${item.invoice.id}`;
   if (item.document) {
     const message = item.comment ? `&message=${item.comment.id}` : '';

@@ -1425,7 +1425,8 @@
         "tools": "Outils"
       },
       "close": "Fermer le menu",
-      "outils-pdf": "Outils PDF"
+      "outils-pdf": "Outils PDF",
+      "signatures": "Signatures"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -1842,6 +1843,15 @@
       "comment": {
         "subject": "Nouveau commentaire dans votre dossier {service}",
         "body": "Stanzy a commenté « {document} » dans votre dossier {service} : « {excerpt} »"
+      },
+      "signatureRequested": {
+        "subject": "Un document à signer dans votre dossier {service}",
+        "body": "Stanzy vous a envoyé « {document} » à signer dans votre dossier {service}. Ouvrez votre espace pour le lire et le signer en ligne.",
+        "cta": "Signer le document"
+      },
+      "signed": {
+        "subject": "Document signé dans votre dossier {service}",
+        "body": "Vous avez signé « {document} ». Le document signé, avec son certificat de signature, est dans votre dossier {service}."
       }
     },
     "dashboard": {
@@ -1942,6 +1952,10 @@
       "clientComment": {
         "subject": "{client} a commenté « {document} »",
         "body": "{client} a commenté « {document} » dans son dossier {service} : « {excerpt} »"
+      },
+      "clientSigned": {
+        "subject": "{client} a signé « {document} »",
+        "body": "{client} a signé « {document} » dans son dossier {service}. Le PDF signé est ajouté comme nouvelle version du document."
       }
     },
     "documents": {
@@ -2240,7 +2254,9 @@
       "INVOICE_OVERDUE": "L’échéance de votre facture {number} ({total}) est passée.",
       "INVOICE_LATE": "La facture {number} de {client} est en retard.",
       "ACCOUNTS_SIGNED_UP": "{count, plural, one {# nouveau compte} other {# nouveaux comptes}} hier.",
-      "DRAW_PUBLISHED": "Nouveau tirage Entrée Express n° {round} : {invitations} invitations, {crs} points minimum."
+      "DRAW_PUBLISHED": "Nouveau tirage Entrée Express n° {round} : {invitations} invitations, {crs} points minimum.",
+      "SIGNATURE_REQUESTED": "Stanzy vous demande de signer « {document} ».",
+      "DOCUMENT_SIGNED": "{actor} a signé « {document} »."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2255,7 +2271,9 @@
       "INVOICE_DUE_SOON": "Rappel de facture.",
       "INVOICE_OVERDUE": "Rappel de facture.",
       "INVOICE_LATE": "Une facture est en retard.",
-      "ACCOUNTS_SIGNED_UP": "Nouveaux comptes."
+      "ACCOUNTS_SIGNED_UP": "Nouveaux comptes.",
+      "SIGNATURE_REQUESTED": "Un document à signer.",
+      "DOCUMENT_SIGNED": "Un document a été signé."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",
@@ -2374,6 +2392,185 @@
       "saved": "Ajouté à l’historique",
       "saveFailed": "Téléchargé, mais pas gardé dans l’historique.",
       "loading": "Chargement de l’historique"
+    }
+  },
+  "Signatures": {
+    "fields": {
+      "SIGNATURE": "Signature",
+      "NAME": "Nom complet",
+      "DATE": "Date",
+      "STAMP": "Signature et cachet Stanzy"
+    },
+    "errors": {
+      "SIGNATURE_PDF_ONLY": "Seul un PDF peut être envoyé pour signature.",
+      "SIGNATURE_PDF_UNREADABLE": "Ce PDF est endommagé ou protégé par un mot de passe : exportez-le de nouveau puis réessayez.",
+      "SIGNATURE_FIELD_OUTSIDE": "Un champ est placé hors du document.",
+      "SIGNATURE_FIELD_MISSING": "Placez au moins un champ Signature.",
+      "SIGNATURE_ALREADY_PENDING": "Une demande de signature attend déjà sur ce document : annulez-la d’abord.",
+      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et le cachet dans « Signatures ».",
+      "SIGNATURE_NOT_PENDING": "Cette demande n’attend plus de signature.",
+      "SIGNATURE_NOT_YOURS": "Seul le titulaire du dossier peut signer ce document.",
+      "SIGNATURE_DOCUMENT_CHANGED": "Le document a changé depuis l’envoi : demandez à Stanzy de vous le renvoyer.",
+      "SIGNATURE_IMAGE_INVALID": "La signature n’a pas pu être lue. Effacez-la et signez de nouveau.",
+      "DOSSIER_CLOSED": "Ce dossier est clôturé : il ne peut plus changer.",
+      "DOSSIER_FILES_UNCONFIGURED": "L’enregistrement des fichiers n’est pas encore activé. Réessayez plus tard.",
+      "UNKNOWN": "L’opération n’a pas abouti. Réessayez."
+    },
+    "certificate": {
+      "title": "Certificat de signature",
+      "document": "Document",
+      "dossier": "Dossier",
+      "signedBy": "Signé par (nom saisi)",
+      "account": "Compte",
+      "signedAt": "Date et heure",
+      "signedAtValue": "{when} (heure de Douala, UTC+1)",
+      "ip": "Adresse IP",
+      "device": "Appareil",
+      "fingerprint": "Empreinte SHA-256 du document original",
+      "reference": "Référence de la demande",
+      "stamp": "Signature et cachet de Stanzy",
+      "stampValue": "Apposés par Stanzy Immigration Consulting",
+      "unknown": "Inconnu",
+      "note": "Signature électronique recueillie par Stanzy Immigration Consulting. Le signataire a lu le document, coché « J’ai lu et j’accepte », saisi son nom et tracé sa signature. L’empreinte permet de vérifier que le document original n’a pas été modifié.",
+      "fileSuffix": "signe"
+    },
+    "new": {
+      "metaTitle": "Demander une signature",
+      "title": "Demander une signature",
+      "back": "Retour au dossier",
+      "intro": "Le client lira ce PDF dans son espace et le signera en ligne. Le PDF signé deviendra une nouvelle version du document.",
+      "pick": {
+        "title": "1. Le PDF à signer",
+        "existing": "Choisissez un PDF déjà dans le dossier, ou téléversez-en un.",
+        "noPdf": "Aucun PDF dans ce dossier pour le moment.",
+        "version": "V{number} · {file}",
+        "choose": "Choisir",
+        "or": "ou",
+        "section": "Section",
+        "documentTitle": "Nom du document",
+        "documentPlaceholder": "Lettre explicative",
+        "file": "Fichier PDF",
+        "upload": "Téléverser et continuer",
+        "uploading": "Envoi…",
+        "pdfOnly": "Choisissez un fichier PDF.",
+        "noSection": "Ajoutez d’abord une section au dossier."
+      },
+      "place": {
+        "title": "2. Placer les champs",
+        "hint": "Choisissez un champ, puis touchez la page à l’endroit voulu. Faites glisser un champ pour le déplacer, et ses coins pour le redimensionner.",
+        "tools": "Champ à placer",
+        "remove": "Retirer le champ {field}",
+        "page": "Page {number}",
+        "count": "{count, plural, =0 {Aucun champ placé} one {# champ placé} other {# champs placés}}",
+        "needSignature": "Placez au moins un champ Signature.",
+        "needAssets": "Ajoutez votre signature et le cachet dans « Signatures » pour ce champ.",
+        "change": "Changer de PDF",
+        "fieldKeys": "Flèches : déplacer. Alt + flèches : redimensionner. Suppr : retirer."
+      },
+      "send": "Envoyer pour signature",
+      "sending": "Envoi…",
+      "loadingPdf": "Ouverture du PDF",
+      "pdfFailed": "Le PDF n’a pas pu être ouvert. Réessayez.",
+      "sent": "Demande de signature envoyée"
+    },
+    "sign": {
+      "metaTitle": "Signer un document",
+      "back": "Retour au dossier",
+      "title": "Signer « {document} »",
+      "intro": "Lisez le document, puis cliquez sur chaque zone encadrée pour la remplir. Terminez avec « Terminer ».",
+      "accept": "J’ai lu le document et j’accepte de le signer électroniquement.",
+      "name": "Votre nom complet",
+      "nameHint": "Tel qu’il figure sur votre passeport.",
+      "pad": "Votre signature",
+      "padLabel": "Zone de signature",
+      "clear": "Effacer",
+      "submit": "Signer le document",
+      "signing": "Signature…",
+      "signed": "Document signé",
+      "alreadySigned": "Vous avez signé ce document le {date}.",
+      "notWaiting": "Ce document n’attend plus de signature.",
+      "openSigned": "Voir le document signé",
+      "change": {
+        "open": "Demander une modification",
+        "title": "Demander une modification",
+        "body": "Votre message sera envoyé à Stanzy dans la discussion du document. Stanzy vous renverra une version corrigée.",
+        "label": "Ce qui doit changer",
+        "send": "Envoyer",
+        "cancel": "Annuler",
+        "prefix": "Demande de modification avant signature : {message}",
+        "sent": "Demande envoyée à Stanzy"
+      },
+      "prompts": {
+        "SIGNATURE": "Signer ici",
+        "NAME": "Votre nom",
+        "DATE": "Date",
+        "STAMP": "Cachet Stanzy"
+      },
+      "filledLabel": "{field} rempli : cliquer pour modifier",
+      "progress": "{done} sur {total} {total, plural, one {champ rempli} other {champs remplis}}",
+      "next": "Champ suivant",
+      "finish": "Terminer",
+      "draw": {
+        "title": "Votre signature",
+        "body": "Dessinez votre signature dans le cadre, avec la souris ou le doigt.",
+        "ink": "Encre",
+        "black": "Noire",
+        "blue": "Bleue",
+        "apply": "Appliquer",
+        "cancel": "Annuler"
+      },
+      "nameDialog": {
+        "title": "Votre nom complet",
+        "apply": "Appliquer",
+        "cancel": "Annuler"
+      },
+      "confirm": {
+        "title": "Signer « {document} » ?",
+        "body": "Votre signature, votre nom et la date seront apposés sur le document, qui deviendra une nouvelle version dans votre dossier.",
+        "cancel": "Annuler"
+      }
+    },
+    "dashboard": {
+      "metaTitle": "Signatures",
+      "title": "Signatures",
+      "intro": "Votre signature et le cachet de l’entreprise, et les documents qui attendent la signature d’un client.",
+      "assets": {
+        "title": "Votre signature et le cachet",
+        "hint": "Ils sont apposés là où vous placez le champ « Signature et cachet Stanzy ». PNG à fond transparent de préférence, 2 Mo au plus.",
+        "SIGNATURE": "Votre signature",
+        "STAMP": "Cachet de l’entreprise",
+        "missing": "Pas encore ajouté",
+        "updated": "Ajouté le {date}",
+        "add": "Ajouter",
+        "replace": "Remplacer",
+        "uploading": "Envoi…",
+        "saved": "Image enregistrée",
+        "failed": "L’image n’a pas pu être enregistrée. PNG ou JPEG, 2 Mo au plus.",
+        "preview": "Aperçu : {label}"
+      },
+      "pending": {
+        "title": "En attente de signature",
+        "empty": "Aucun document n’attend de signature.",
+        "sentOn": "Envoyé le {date}",
+        "open": "Ouvrir"
+      },
+      "loading": "Chargement des signatures"
+    },
+    "card": {
+      "pendingConsultant": "Signature en attente",
+      "pendingClient": "À signer",
+      "sign": "Signer",
+      "request": "Faire signer",
+      "requestLabel": "Faire signer la version V{number}",
+      "signedBadge": "Signée",
+      "cancel": "Annuler la demande",
+      "cancelTitle": "Annuler la demande de signature ?",
+      "cancelBody": "Le client ne pourra plus signer ce document. Vous pourrez envoyer une version corrigée.",
+      "keep": "Garder",
+      "confirmCancel": "Annuler la demande",
+      "cancelled": "Demande de signature annulée",
+      "alert": "{count, plural, one {Un document attend votre signature} other {# documents attendent votre signature}}",
+      "newRequest": "Demander une signature"
     }
   }
 }
