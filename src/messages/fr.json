@@ -2114,6 +2114,21 @@
         "DOSSIER_FILES_UNCONFIGURED": "Le stockage des fichiers n’est pas configuré sur ce site.",
         "UNKNOWN": "Une erreur est survenue. Réessayez."
       }
+    },
+    "tabs": {
+      "label": "Sections du dossier",
+      "apercu": "Aperçu",
+      "documents": "Documents",
+      "messages": "Messages",
+      "reunions": "Réunions",
+      "facturation": "Facturation",
+      "counts": {
+        "documents": "{count, plural, one {document manquant} other {documents manquants}}",
+        "messages": "{count, plural, one {message} other {messages}}",
+        "reunions": "{count, plural, one {réunion à venir} other {réunions à venir}}",
+        "facturation": "{count, plural, one {facture à régler} other {factures à régler}}"
+      },
+      "stage": "Étape : {stage}"
     }
   },
   "Invoices": {
