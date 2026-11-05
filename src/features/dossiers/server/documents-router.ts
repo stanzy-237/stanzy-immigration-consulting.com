@@ -3,6 +3,9 @@ import { TRPCError } from '@trpc/server';
 import { after } from 'next/server';
 import { z } from 'zod';
 
+import { DOCUMENT_GUIDES } from '@/features/checklist/data/document-guides';
+import type { DocumentId } from '@/features/checklist/lib/build-checklist';
+
 import {
   addDocumentInput,
   addSectionInput,
@@ -22,6 +25,7 @@ import { documentFor, dossierFor, isConsultant, sectionFor, writable } from '@/f
 import { notifyClient, notifyConsultants } from '@/features/dossiers/server/dossier-notify';
 import { livesInCameroon } from '@/features/accompagnement/server/residence';
 import { forgetComment, notifyLater } from '@/features/notifications/server/notify';
+import { routing, type Locale } from '@/i18n/routing';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
@@ -33,6 +37,16 @@ const notFound = (): TRPCError => new TRPCError({ code: 'NOT_FOUND' });
 type Db = TRPCContext['prisma'];
 
 const person = { select: { name: true, role: true } } as const;
+
+type Titles = Record<Locale, string>;
+
+/** A Checklist document's name in each language; null for one the consultant named. */
+function titlesOf(kind: string | null): Titles | null {
+  if (!kind || !(kind in DOCUMENT_GUIDES.fr)) return null;
+  return Object.fromEntries(
+    routing.locales.map((locale) => [locale, DOCUMENT_GUIDES[locale][kind as DocumentId].name]),
+  ) as Titles;
+}
 
 /**
  * A Dossier's Sections IRCC, Documents, Versions and comments (GLOSSARY:
@@ -51,6 +65,7 @@ export const documentsRouter = createTRPCRouter({
       select: {
         id: true,
         title: true,
+        titles: true,
         documents: {
           orderBy: { createdAt: 'asc' },
           select: {
@@ -110,10 +125,13 @@ export const documentsRouter = createTRPCRouter({
       /** The Client may ask « Stanzy s'en charge » on a missing Document: in Cameroon only. */
       stanzy: !isConsultant(ctx.session) && (await livesInCameroon(ctx.prisma, dossier.accountId)),
       // A deleted comment keeps its place in the conversation, not its words.
+      // Made from the Checklist, a Section and its Documents are named in each language (`titles`).
       sections: sections.map((section) => ({
         ...section,
+        titles: section.titles as Titles | null,
         documents: section.documents.map((document) => ({
           ...document,
+          titles: titlesOf(document.kind),
           comments: document.comments.map((comment) => (comment.deletedAt ? { ...comment, body: '' } : comment)),
         })),
       })),
@@ -138,7 +156,7 @@ export const documentsRouter = createTRPCRouter({
   renameSection: consultantProcedure.input(renameSectionInput).mutation(async ({ ctx, input }) => {
     const section = await sectionFor(ctx.prisma, ctx.session, input.id);
     writable(section.dossier);
-    await ctx.prisma.dossierSection.update({ where: { id: section.id }, data: { title: input.title } });
+    await ctx.prisma.dossierSection.update({ where: { id: section.id }, data: { title: input.title, titles: Prisma.DbNull } });
   }),
 
   /** Only an empty Section: DOSSIER_SECTION_NOT_EMPTY otherwise, so no file goes with it by accident. */

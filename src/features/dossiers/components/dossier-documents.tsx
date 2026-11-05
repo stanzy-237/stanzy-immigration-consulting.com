@@ -2,7 +2,7 @@
 
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { FolderPlus, Pencil, Trash2 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,6 +17,7 @@ import {
 } from '@/features/dossiers/components/document-styles';
 import { useDocumentsMutation } from '@/features/dossiers/hooks/use-documents-mutation';
 import {
+  inLanguage,
   renamedSection,
   withDocument,
   withoutSection,
@@ -45,7 +46,11 @@ export function DossierDocuments({
 }): ReactNode {
   const t = useTranslations('Dossiers.documents');
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(trpc.dossiers.documents.sections.queryOptions({ dossierId }));
+  const locale = useLocale();
+  const { data } = useSuspenseQuery({
+    ...trpc.dossiers.documents.sections.queryOptions({ dossierId }),
+    select: inLanguage(locale),
+  });
   const consultant = viewer === 'consultant';
 
   return (

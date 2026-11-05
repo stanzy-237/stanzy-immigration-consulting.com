@@ -234,7 +234,13 @@ export const accompagnementRouter = createTRPCRouter({
           section.documents.map((document) => ({ id: crypto.randomUUID(), sectionId, document })),
         );
         await tx.dossierSection.createMany({
-          data: sections.map(({ id, section, position }) => ({ id, dossierId: created.id, title: section.title, position })),
+          data: sections.map(({ id, section, position }) => ({
+            id,
+            dossierId: created.id,
+            title: section.title,
+            titles: section.titles,
+            position,
+          })),
         });
         await tx.dossierDocument.createMany({
           data: documents.map(({ id, sectionId, document }) => ({

@@ -441,6 +441,8 @@ model DossierSection {
   dossierId String
   dossier   Dossier           @relation(fields: [dossierId], references: [id], onDelete: Cascade)
   title     String
+  /// `{ fr, en }`, when made from the Checklist (#81): shown in the viewer's language. A rename clears it.
+  titles    Json?
   position  Int
   documents DossierDocument[]
   createdAt DateTime          @default(now())

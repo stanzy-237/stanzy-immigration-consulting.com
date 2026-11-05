@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   editedComment,
+  inLanguage,
+  renamedSection,
   threadsOf,
   withComment,
   withDocument,
@@ -33,10 +35,12 @@ const data = (comments: ReturnType<typeof comment>[] = []): SectionsData => ({
     {
       id: 'sec_1',
       title: 'Diplômes',
+      titles: null,
       documents: [
         {
           id: 'doc_1',
           title: 'Licence',
+          titles: null,
           createdAt: at,
           finalVersionId: null,
           addedBy: { name: 'Stanzy', role: 'CONSULTANT' },
@@ -111,5 +115,35 @@ describe('threads', () => {
       ['c1', ['r1', 'r2']],
       ['c2', []],
     ]);
+  });
+});
+
+describe('the names in the viewer’s language', () => {
+  it('reads a Section and a Document made from the Checklist in English, and keeps a name the consultant gave', () => {
+    const base = data();
+    const section = base.sections[0]!;
+    const state: SectionsData = {
+      ...base,
+      sections: [
+        {
+          ...section,
+          titles: { fr: 'Diplômes – Requérant principal', en: 'Diplomas – Principal applicant' },
+          documents: [
+            { ...section.documents[0]!, titles: { fr: 'Diplôme', en: 'Diploma' } },
+            { ...section.documents[0]!, id: 'doc_2', title: 'Attestation maison' },
+          ],
+        },
+      ],
+    };
+    const english = inLanguage('en')(state).sections[0]!;
+    expect(english.title).toBe('Diplomas – Principal applicant');
+    expect(english.documents.map((document) => document.title)).toEqual(['Diploma', 'Attestation maison']);
+    expect(inLanguage('fr')(state).sections[0]!.documents[0]!.title).toBe('Diplôme');
+  });
+
+  it('clears a Section’s names when the consultant renames it', () => {
+    const state: SectionsData = { ...data(), sections: [{ ...data().sections[0]!, titles: { fr: 'A', en: 'B' } }] };
+    const renamed = renamedSection(state, { id: 'sec_1', title: 'Preuve de fonds' });
+    expect(inLanguage('en')(renamed).sections[0]!.title).toBe('Preuve de fonds');
   });
 });
