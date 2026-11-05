@@ -185,8 +185,8 @@ beforeEach(() => {
 });
 
 describe('the Client’s documents', () => {
-  it('adds a Document, uploads Versions numbered in order, and the consultant is told', async () => {
-    const { id } = await as(asAminata).addDocument({ sectionId: 'sec_1', title: 'Relevé N2' });
+  it('uploads Versions to a Document numbered in order, and the consultant is told', async () => {
+    const { id } = await as(asConsultant).addDocument({ sectionId: 'sec_1', title: 'Relevé N2' });
     expect(await as(asAminata).addVersion(version(id))).toMatchObject({ number: 1 });
     expect(await as(asAminata).addVersion(version(id))).toMatchObject({ number: 2 });
 
@@ -200,17 +200,17 @@ describe('the Client’s documents', () => {
 
     const { sections, open, locked } = await as(asAminata).sections({ dossierId: 'dos_1' });
     expect({ open, locked }).toEqual({ open: true, locked: false });
-    expect(sections[0]!.documents[0]!.addedBy).toEqual({ name: 'Aminata Diallo', role: 'MEMBER' });
+    expect(sections[0]!.documents[0]!.addedBy).toEqual({ name: 'Stanzy', role: 'CONSULTANT' });
   });
 
   it('hides another Account’s Dossier as if it didn’t exist', async () => {
     await expect(as(asBob).sections({ dossierId: 'dos_1' })).rejects.toMatchObject({ code: 'NOT_FOUND' });
-    await expect(as(asBob).addDocument({ sectionId: 'sec_1', title: 'Intrus' })).rejects.toMatchObject({
-      code: 'NOT_FOUND',
-    });
   });
 
-  it('leaves the Sections, deletions and Finales to the consultant', async () => {
+  it('leaves the Sections, the Documents, deletions and Finales to the consultant', async () => {
+    await expect(as(asAminata).addDocument({ sectionId: 'sec_1', title: 'Relevé N2' })).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    });
     await expect(as(asAminata).addSection({ dossierId: 'dos_1', title: 'Preuve de fonds' })).rejects.toMatchObject({
       code: 'FORBIDDEN',
     });
@@ -221,7 +221,7 @@ describe('the Client’s documents', () => {
   });
 
   it('refuses a file outside the Dossier’s folder or not the size announced', async () => {
-    const { id } = await as(asAminata).addDocument({ sectionId: 'sec_1', title: 'Relevé N2' });
+    const { id } = await as(asConsultant).addDocument({ sectionId: 'sec_1', title: 'Relevé N2' });
     for (const elsewhere of ['dossiers/dos_closed/5f1c.bin', 'dossiers/dos_1/../dos_closed/5f1c.bin']) {
       await expect(as(asAminata).addVersion(version(id, { objectKey: elsewhere }))).rejects.toMatchObject({
         message: 'DOCUMENT_FILE_INVALID',
@@ -255,7 +255,7 @@ describe('the consultant’s documents', () => {
   });
 
   it('marks a Finale until the Dossier moves past « Vérification et dépôt »', async () => {
-    const { id } = await as(asAminata).addDocument({ sectionId: 'sec_1', title: 'Licence' });
+    const { id } = await as(asConsultant).addDocument({ sectionId: 'sec_1', title: 'Licence' });
     const v1 = await as(asAminata).addVersion(version(id));
     await as(asConsultant).setFinal({ documentId: id, versionId: v1.id });
     expect(db.tables.dossierDocument!.find((d) => d.id === id)).toMatchObject({ finalVersionId: v1.id });
@@ -296,7 +296,7 @@ describe('the consultant’s documents', () => {
   });
 
   it('deletes a Document with its files', async () => {
-    const { id } = await as(asAminata).addDocument({ sectionId: 'sec_1', title: 'Doublon' });
+    const { id } = await as(asConsultant).addDocument({ sectionId: 'sec_1', title: 'Doublon' });
     await as(asAminata).addVersion(version(id));
     await as(asConsultant).deleteDocument({ id });
     expect(db.tables.dossierDocument!.some((d) => d.id === id)).toBe(false);

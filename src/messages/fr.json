@@ -1980,8 +1980,8 @@
     },
     "documents": {
       "title": "Documents",
-      "introConsultant": "Les Sections IRCC du dossier, comme les cases de téléversement du portail. Le Client voit tout et peut ajouter ses fichiers.",
-      "introClient": "Vos documents, rangés comme sur le portail d’IRCC. Ajoutez ce que vous avez déjà ; Stanzy prépare les versions finales.",
+      "introConsultant": "Les Sections IRCC du dossier, comme les cases de téléversement du portail. Le Client voit tout et téléverse ses fichiers ; vous seul ajoutez des documents.",
+      "introClient": "Vos documents, rangés comme sur le portail d’IRCC. Téléversez chaque fichier dans son document ; Stanzy ajoute les documents et prépare les versions finales.",
       "locked": "Le dossier a passé l’étape de dépôt : les versions finales sont figées.",
       "emptyConsultant": "Aucune section pour l’instant. Ajoutez-en une ci-dessous (« Diplômes – Requérant principal », « Preuve de fonds »…).",
       "emptyClient": "Stanzy n’a pas encore préparé les sections de votre dossier.",
@@ -1993,7 +1993,6 @@
       "renameSection": "Renommer la section {title}",
       "deleteSection": "Supprimer la section {title}",
       "documentTitle": "Ajouter un document",
-      "documentHint": "Vous avez déjà ce document ? Nommez-le, puis téléversez le fichier.",
       "addDocument": "Ajouter",
       "titleError": "Indiquez un nom (2 caractères au moins).",
       "save": "Enregistrer",
@@ -2871,7 +2870,7 @@
       "approved": {
         "subject": "Votre demande d’accompagnement est acceptée",
         "body": "Bonne nouvelle : Stanzy vous accompagne. Votre dossier est ouvert à l’étape « {stage} », avec la liste des documents à préparer.",
-        "next": "La facture suit à part. Dans votre espace, voyez ce qui manque et posez vos questions.",
+        "next": "Votre contrat d’accompagnement suit : signez-le en ligne dans votre espace, la facture viendra ensuite. Vous y verrez aussi ce qui manque et pourrez poser vos questions.",
         "cta": "Ouvrir mon dossier"
       },
       "rejected": {
@@ -3049,8 +3048,9 @@
       "rejectedWith": "Motif : {reason}",
       "history": "Demandes précédentes",
       "dossier": "Ouvrir le dossier",
+      "contract": "Envoyer le contrat d’accompagnement",
       "invoice": "Créer la facture",
-      "next": "Envoyez la facture : le montant est votre devis.",
+      "next": "D’abord le contrat d’accompagnement : le Client le signe en ligne. Ensuite, la facture (le montant est votre devis).",
       "decision": "Votre décision",
       "crs": "Score CRS"
     },

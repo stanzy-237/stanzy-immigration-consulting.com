@@ -2,7 +2,7 @@
 
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { FolderPlus, Pencil, Trash2 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,6 +17,7 @@ import {
 } from '@/features/dossiers/components/document-styles';
 import { useDocumentsMutation } from '@/features/dossiers/hooks/use-documents-mutation';
 import {
+  inLanguage,
   renamedSection,
   withDocument,
   withoutSection,
@@ -29,8 +30,8 @@ import { useTRPC } from '@/trpc/client';
 
 /**
  * A Dossier's Sections IRCC and their Documents, for the consultant in the
- * Tableau de bord and for the Client in « Mon espace ». Both add Documents,
- * upload Versions and comment; the consultant also shapes the Sections and
+ * Tableau de bord and for the Client in « Mon espace ». Both upload Versions
+ * and comment; the consultant alone shapes the Sections, adds Documents and
  * picks the Finales.
  */
 export function DossierDocuments({
@@ -45,7 +46,11 @@ export function DossierDocuments({
 }): ReactNode {
   const t = useTranslations('Dossiers.documents');
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(trpc.dossiers.documents.sections.queryOptions({ dossierId }));
+  const locale = useLocale();
+  const { data } = useSuspenseQuery({
+    ...trpc.dossiers.documents.sections.queryOptions({ dossierId }),
+    select: inLanguage(locale),
+  });
   const consultant = viewer === 'consultant';
 
   return (
@@ -192,11 +197,10 @@ function SectionCard({
         </ul>
       )}
 
-      {open && !pending ? (
+      {consultant && open && !pending ? (
         <div className="mt-4 border-t border-off-white pt-4">
           <TitleForm
             label={t('documentTitle')}
-            hint={consultant ? undefined : t('documentHint')}
             submitLabel={t('addDocument')}
             dossierId={dossierId}
             mutation="addDocument"

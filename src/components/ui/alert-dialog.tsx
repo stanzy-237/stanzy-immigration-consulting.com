@@ -41,12 +41,13 @@ function AlertDialogOverlay({
 function AlertDialogContent({
   className,
   size = "default",
+  container,
   ...props
 }: AlertDialogPrimitive.Popup.Props & {
   size?: "default" | "sm"
-}) {
+} & Pick<AlertDialogPrimitive.Portal.Props, "container">) {
   return (
-    <AlertDialogPortal>
+    <AlertDialogPortal container={container}>
       <AlertDialogOverlay />
       <AlertDialogPrimitive.Popup
         data-slot="alert-dialog-content"

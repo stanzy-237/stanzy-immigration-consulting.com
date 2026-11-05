@@ -77,6 +77,11 @@ describe('the Dossier plan', () => {
     );
     expect(sections.map((section) => section.title)).toContain('Preuve de ressources financières suffisantes – Requérant principal');
     expect(sections.map((section) => section.title)).toContain('Relevé d’emploi – Comptable – Requérant principal');
+    // Named in each language too, for whoever reads the Dossier.
+    expect(sections.find((section) => section.title.startsWith('Preuve de ressources'))!.titles).toEqual({
+      fr: 'Preuve de ressources financières suffisantes – Requérant principal',
+      en: expect.stringMatching(/– Principal applicant$/),
+    });
 
     const funds = sections.find((section) => section.title.startsWith('Preuve de ressources'))!;
     expect(funds.documents[0]).toMatchObject({

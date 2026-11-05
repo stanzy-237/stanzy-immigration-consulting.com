@@ -21,13 +21,13 @@ const mapDocument = (data: SectionsData, documentId: string, change: (document: 
 
 export const withSection = (data: SectionsData, input: { title: string }): SectionsData => ({
   ...data,
-  sections: [...data.sections, { id: optimisticId(), title: input.title.trim(), documents: [] }],
+  sections: [...data.sections, { id: optimisticId(), title: input.title.trim(), titles: null, documents: [] }],
 });
 
 export const renamedSection = (data: SectionsData, input: { id: string; title: string }): SectionsData => ({
   ...data,
   sections: data.sections.map((section) =>
-    section.id === input.id ? { ...section, title: input.title.trim() } : section,
+    section.id === input.id ? { ...section, title: input.title.trim(), titles: null } : section,
   ),
 });
 
@@ -47,6 +47,7 @@ export const withDocument = (data: SectionsData, input: { sectionId: string; tit
             {
               id: optimisticId(),
               title: input.title.trim(),
+              titles: null,
               createdAt: new Date(),
               finalVersionId: null,
               addedBy: { name: data.viewer.name, role: data.viewer.role },
@@ -131,3 +132,17 @@ export function threadsOf<T extends { id: string; parentId: string | null }>(com
     .filter((comment) => comment.parentId === null)
     .map((comment) => ({ comment, replies: comments.filter((reply) => reply.parentId === comment.id) }));
 }
+
+/** The Sections and Documents named in the viewer's language, where they have one (`titles`). */
+export const inLanguage =
+  (locale: string) =>
+  (data: SectionsData): SectionsData => {
+    const pick = <T extends { title: string; titles: Partial<Record<string, string>> | null }>(item: T): T => {
+      const title = item.titles?.[locale];
+      return title ? { ...item, title } : item;
+    };
+    return {
+      ...data,
+      sections: data.sections.map((section) => ({ ...pick(section), documents: section.documents.map(pick) })),
+    };
+  };
