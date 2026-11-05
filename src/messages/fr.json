@@ -1977,8 +1977,8 @@
     },
     "documents": {
       "title": "Documents",
-      "introConsultant": "Les Sections IRCC du dossier, comme les cases de téléversement du portail. Le Client voit tout et peut ajouter ses fichiers.",
-      "introClient": "Vos documents, rangés comme sur le portail d’IRCC. Ajoutez ce que vous avez déjà ; Stanzy prépare les versions finales.",
+      "introConsultant": "Les Sections IRCC du dossier, comme les cases de téléversement du portail. Le Client voit tout et téléverse ses fichiers ; vous seul ajoutez des documents.",
+      "introClient": "Vos documents, rangés comme sur le portail d’IRCC. Téléversez chaque fichier dans son document ; Stanzy ajoute les documents et prépare les versions finales.",
       "locked": "Le dossier a passé l’étape de dépôt : les versions finales sont figées.",
       "emptyConsultant": "Aucune section pour l’instant. Ajoutez-en une ci-dessous (« Diplômes – Requérant principal », « Preuve de fonds »…).",
       "emptyClient": "Stanzy n’a pas encore préparé les sections de votre dossier.",
@@ -1990,7 +1990,6 @@
       "renameSection": "Renommer la section {title}",
       "deleteSection": "Supprimer la section {title}",
       "documentTitle": "Ajouter un document",
-      "documentHint": "Vous avez déjà ce document ? Nommez-le, puis téléversez le fichier.",
       "addDocument": "Ajouter",
       "titleError": "Indiquez un nom (2 caractères au moins).",
       "save": "Enregistrer",

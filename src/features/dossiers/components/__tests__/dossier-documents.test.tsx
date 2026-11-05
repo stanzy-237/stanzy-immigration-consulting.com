@@ -139,14 +139,9 @@ describe('DossierDocuments for the Client', () => {
     expect(await axe(container)).toHaveNoViolations();
   }, 30_000);
 
-  it('adds a Document they already have', async () => {
+  it('leaves adding Documents to Stanzy', () => {
     documents('client');
-    fireEvent.change(screen.getByLabelText('Ajouter un document'), { target: { value: 'Attestation de diplôme' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Ajouter' }));
-    await waitFor(() =>
-      expect(api.addDocument).toHaveBeenCalledWith({ sectionId: 'sec_1', title: 'Attestation de diplôme' }),
-    );
-    expect(await screen.findByText('Document ajouté')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Ajouter un document')).not.toBeInTheDocument();
   });
 
   it('uploads a Version: encrypted and sent first, then recorded', async () => {
@@ -282,6 +277,16 @@ describe('DossierDocuments for the consultant', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Ajouter la section' }));
     expect(await screen.findByRole('heading', { name: 'Preuve de fonds' })).toBeInTheDocument();
     await waitFor(() => expect(api.addSection).toHaveBeenCalledWith({ dossierId: 'dos_1', title: 'Preuve de fonds' }));
+  });
+
+  it('adds a Document to a Section', async () => {
+    documents('consultant');
+    fireEvent.change(screen.getByLabelText('Ajouter un document'), { target: { value: 'Attestation de diplôme' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter' }));
+    await waitFor(() =>
+      expect(api.addDocument).toHaveBeenCalledWith({ sectionId: 'sec_1', title: 'Attestation de diplôme' }),
+    );
+    expect(await screen.findByText('Document ajouté')).toBeInTheDocument();
   });
 
   it('offers nothing to change in a closed Dossier', () => {

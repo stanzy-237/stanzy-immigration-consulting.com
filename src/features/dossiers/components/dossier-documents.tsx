@@ -29,8 +29,8 @@ import { useTRPC } from '@/trpc/client';
 
 /**
  * A Dossier's Sections IRCC and their Documents, for the consultant in the
- * Tableau de bord and for the Client in « Mon espace ». Both add Documents,
- * upload Versions and comment; the consultant also shapes the Sections and
+ * Tableau de bord and for the Client in « Mon espace ». Both upload Versions
+ * and comment; the consultant alone shapes the Sections, adds Documents and
  * picks the Finales.
  */
 export function DossierDocuments({
@@ -192,11 +192,10 @@ function SectionCard({
         </ul>
       )}
 
-      {open && !pending ? (
+      {consultant && open && !pending ? (
         <div className="mt-4 border-t border-off-white pt-4">
           <TitleForm
             label={t('documentTitle')}
-            hint={consultant ? undefined : t('documentHint')}
             submitLabel={t('addDocument')}
             dossierId={dossierId}
             mutation="addDocument"

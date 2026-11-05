@@ -151,23 +151,14 @@ export const documentsRouter = createTRPCRouter({
     await ctx.prisma.dossierSection.delete({ where: { id: section.id } });
   }),
 
-  /** « J'ai ce document »: the Client or the consultant adds a Document, labelled with who added it. */
-  addDocument: protectedProcedure.input(addDocumentInput).mutation(async ({ ctx, input }) => {
+  /** The consultant only: Stanzy decides what a Dossier holds; the Client uploads Versions to it. */
+  addDocument: consultantProcedure.input(addDocumentInput).mutation(async ({ ctx, input }) => {
     const section = await sectionFor(ctx.prisma, ctx.session, input.sectionId);
     writable(section.dossier);
-    const document = await ctx.prisma.dossierDocument.create({
+    return ctx.prisma.dossierDocument.create({
       data: { sectionId: section.id, title: input.title, addedById: ctx.session.account.id },
       select: { id: true },
     });
-    if (!isConsultant(ctx.session)) {
-      notifyLater(ctx.prisma, {
-        kind: 'DOCUMENT_ADDED',
-        actorId: ctx.session.account.id,
-        recipients: 'CONSULTANTS',
-        target: { dossierId: section.dossier.id, documentId: document.id },
-      });
-    }
-    return document;
   }),
 
   /** The consultant only; its Versions and comments go with it, and its files leave Blob. */

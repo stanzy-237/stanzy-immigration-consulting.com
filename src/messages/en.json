@@ -1960,8 +1960,8 @@
     },
     "documents": {
       "title": "Documents",
-      "introConsultant": "The file’s IRCC Sections, like the portal’s upload boxes. The Client sees everything and can add their files.",
-      "introClient": "Your documents, grouped as on the IRCC portal. Add what you already have; Stanzy prepares the final versions.",
+      "introConsultant": "The file’s IRCC Sections, like the portal’s upload boxes. The Client sees everything and uploads their files; only you add documents.",
+      "introClient": "Your documents, grouped as on the IRCC portal. Upload each file to its document; Stanzy adds the documents and prepares the final versions.",
       "locked": "The file is past the submission stage: the final versions are locked.",
       "emptyConsultant": "No sections yet. Add one below (“Education – Principal applicant”, “Proof of funds”…).",
       "emptyClient": "Stanzy hasn’t set up your file’s sections yet.",
@@ -1973,7 +1973,6 @@
       "renameSection": "Rename section {title}",
       "deleteSection": "Delete section {title}",
       "documentTitle": "Add a document",
-      "documentHint": "Already have this document? Name it, then upload the file.",
       "addDocument": "Add",
       "titleError": "Enter a name (at least 2 characters).",
       "save": "Save",
