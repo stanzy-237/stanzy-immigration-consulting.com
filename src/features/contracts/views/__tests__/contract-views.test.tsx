@@ -27,6 +27,8 @@ vi.mock('@/features/shared/components/signing/signature-pad', () => ({
 vi.mock('@/features/landing/components/site-nav', () => ({ SiteNav: () => null }));
 vi.mock('@/features/landing/components/site-footer', () => ({ SiteFooter: () => null }));
 const router = vi.hoisted(() => ({ push: vi.fn() }));
+const search = vi.hoisted(() => ({ params: new URLSearchParams() }));
+vi.mock('next/navigation', () => ({ useSearchParams: () => search.params }));
 vi.mock('@/i18n/navigation', () => ({
   Link: ({ href, children, ...props }: { href: string; children: ReactNode }) => (
     <a href={`/fr${href}`} {...props}>
@@ -36,7 +38,10 @@ vi.mock('@/i18n/navigation', () => ({
   useRouter: () => router,
 }));
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  search.params = new URLSearchParams();
+});
 
 const contract = (extra: Record<string, unknown> = {}) => ({
   id: 'ctr_1',
@@ -94,6 +99,18 @@ describe('the Contrat panel, for the consultant', () => {
     );
     expect(await screen.findByText('CTR-2026-0009 envoyé au client')).toBeInTheDocument();
   }, 30_000);
+
+  it('opens « Envoyer le contrat » at once when coming from an approved Demande', () => {
+    search.params = new URLSearchParams('onglet=facturation&contrat=nouveau');
+    panel('consultant', { open: true, locale: 'fr', signed: false, contracts: [] });
+    expect(within(screen.getByRole('dialog')).getByRole('button', { name: 'Envoyer au client' })).toBeInTheDocument();
+  });
+
+  it('opens nothing on its own once a Contrat is out', () => {
+    search.params = new URLSearchParams('contrat=nouveau');
+    panel('consultant', { open: true, locale: 'fr', signed: false, contracts: [contract()] });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
 
   it('cancels one not signed yet, and offers an Avenant once signed', async () => {
     const cancel = vi.fn();

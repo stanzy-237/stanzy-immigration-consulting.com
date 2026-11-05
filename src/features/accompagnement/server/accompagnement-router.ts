@@ -183,7 +183,8 @@ export const accompagnementRouter = createTRPCRouter({
     /**
      * Approves at the Niveau chosen: the Accompagnement Dossier opens at its
      * stage with its Sections and Documents, the Account becomes a Client,
-     * and the User is told. The invoice is the consultant's next step.
+     * and the User is told. The Contrat d'accompagnement is the
+     * consultant's next step, then the invoice.
      */
     approve: consultantProcedure.input(decideInput).mutation(async ({ ctx, input }) => {
       const interest = await ctx.prisma.interestRequest.findUnique({

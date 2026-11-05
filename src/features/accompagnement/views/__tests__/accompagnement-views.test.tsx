@@ -135,4 +135,18 @@ describe('a Demande d’intérêt, for the consultant', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Accepter et ouvrir le dossier' }));
     await waitFor(() => expect(approve).toHaveBeenCalledWith({ id: 'int_1', level: 'C' }));
   });
+
+  it('once approved, sends the Contrat d’accompagnement first, then the invoice', () => {
+    const approved = { ...interest, status: 'APPROVED', dossierId: 'dos_1', decidedAt: new Date('2026-11-05') };
+    const { trpc, queryClient, wrap } = createTestTRPC({ 'accompagnement.dashboard.get': () => approved });
+    queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), approved as never);
+    render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
+
+    const links = screen.getAllByRole('link').map((link) => link.textContent);
+    expect(links.indexOf('Envoyer le contrat d’accompagnement')).toBeLessThan(links.indexOf('Créer la facture'));
+    expect(screen.getByRole('link', { name: 'Envoyer le contrat d’accompagnement' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/dossiers/dos_1?onglet=facturation&contrat=nouveau'),
+    );
+  });
 });

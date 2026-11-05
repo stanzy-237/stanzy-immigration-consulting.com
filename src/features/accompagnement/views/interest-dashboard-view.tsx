@@ -219,7 +219,7 @@ function Decision({ interest }: { interest: Interest }): ReactNode {
   );
 }
 
-/** Once approved: the Dossier, and the invoice to send next. */
+/** Once approved: the Dossier, the Contrat d'accompagnement to send first, then the invoice. */
 function Approved({ dossierId }: { dossierId: string }): ReactNode {
   const t = useTranslations('Accompagnement.dashboard');
   return (
@@ -233,8 +233,14 @@ function Approved({ dossierId }: { dossierId: string }): ReactNode {
           {t('dossier')}
         </Link>
         <Link
-          href={`/factures/nouvelle?dossier=${dossierId}`}
+          href={`/dossiers/${dossierId}?onglet=facturation&contrat=nouveau#contrats`}
           className="inline-flex h-11 items-center rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson"
+        >
+          {t('contract')}
+        </Link>
+        <Link
+          href={`/factures/nouvelle?dossier=${dossierId}`}
+          className="inline-flex h-11 items-center rounded-full px-4 text-sm font-semibold text-navy-deep hover:bg-white"
         >
           {t('invoice')}
         </Link>

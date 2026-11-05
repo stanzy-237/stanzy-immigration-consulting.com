@@ -2867,7 +2867,7 @@
       "approved": {
         "subject": "Votre demande d’accompagnement est acceptée",
         "body": "Bonne nouvelle : Stanzy vous accompagne. Votre dossier est ouvert à l’étape « {stage} », avec la liste des documents à préparer.",
-        "next": "La facture suit à part. Dans votre espace, voyez ce qui manque et posez vos questions.",
+        "next": "Votre contrat d’accompagnement suit : signez-le en ligne dans votre espace, la facture viendra ensuite. Vous y verrez aussi ce qui manque et pourrez poser vos questions.",
         "cta": "Ouvrir mon dossier"
       },
       "rejected": {
@@ -3039,8 +3039,9 @@
       "rejectedWith": "Motif : {reason}",
       "history": "Demandes précédentes",
       "dossier": "Ouvrir le dossier",
+      "contract": "Envoyer le contrat d’accompagnement",
       "invoice": "Créer la facture",
-      "next": "Envoyez la facture : le montant est votre devis.",
+      "next": "D’abord le contrat d’accompagnement : le Client le signe en ligne. Ensuite, la facture (le montant est votre devis).",
       "decision": "Votre décision"
     },
     "document": {

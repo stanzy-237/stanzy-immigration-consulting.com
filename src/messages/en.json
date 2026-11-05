@@ -2850,7 +2850,7 @@
       "approved": {
         "subject": "Your Accompagnement request is accepted",
         "body": "Good news: Stanzy will guide you. Your file is open at the “{stage}” stage, with the list of documents to prepare.",
-        "next": "The invoice follows separately. In your space, see what’s missing and ask your questions.",
+        "next": "Your support contract follows: sign it online in your space, then the invoice comes. There you’ll also see what’s missing and can ask your questions.",
         "cta": "Open my file"
       },
       "rejected": {
@@ -3022,8 +3022,9 @@
       "rejectedWith": "Reason: {reason}",
       "history": "Earlier requests",
       "dossier": "Open the file",
+      "contract": "Send the support contract",
       "invoice": "Create the invoice",
-      "next": "Send the invoice: the amount is your quote.",
+      "next": "First the support contract: the Client signs it online. Then the invoice (the amount is your quote).",
       "decision": "Your decision"
     },
     "document": {
