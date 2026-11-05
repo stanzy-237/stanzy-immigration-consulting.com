@@ -16,18 +16,22 @@ import {
   decideInput,
   interestAnswersSchema,
   interestListInput,
+  itaDateInput,
   levelOf,
   REASON_MAX,
   rejectInput,
   startStageOf,
   type InterestAnswers,
+  type SavedCrs,
 } from '@/features/accompagnement/lib/interest-schema';
 import { livesInCameroon } from '@/features/accompagnement/server/residence';
 import { transitionAccountStatus } from '@/features/auth/server/account-status';
+import { computeCrs } from '@/features/crs/lib/compute-crs';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
 import { dossierFor, isConsultant, writable } from '@/features/dossiers/server/dossier-access';
 import { notifyLater } from '@/features/notifications/server/notify';
+import { rulesInForceOn } from '@/features/shared/lib/rules-version';
 import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
 import en from '@/messages/en.json';
@@ -67,6 +71,10 @@ const openAccompagnement = (db: Db, accountId: string) =>
     select: { id: true },
   });
 
+/** The CRS a Demande saved, if it was sent with one. */
+const crsOf = (answers: Prisma.JsonValue): SavedCrs | null =>
+  (answers as unknown as Partial<InterestAnswers> | null)?.crs ?? null;
+
 const listed = {
   id: true,
   status: true,
@@ -86,17 +94,45 @@ const listed = {
  * missing Document are recorded here; prices and Missions come with #80 and #42.
  */
 export const accompagnementRouter = createTRPCRouter({
-  /** The viewer's latest Demande, and their open Accompagnement Dossier if any. */
+  /** The viewer's latest Demande with the CRS score it gave them, and their open Accompagnement Dossier if any. */
   mine: protectedProcedure.query(async ({ ctx }) => {
     const [latest, dossier] = await Promise.all([
       ctx.prisma.interestRequest.findFirst({
         where: { accountId: ctx.session.account.id },
         orderBy: { createdAt: 'desc' },
-        select: { id: true, status: true, rejectReason: true, dossierId: true, createdAt: true, decidedAt: true },
+        select: {
+          id: true,
+          status: true,
+          rejectReason: true,
+          dossierId: true,
+          createdAt: true,
+          decidedAt: true,
+          answers: true,
+        },
       }),
       openAccompagnement(ctx.prisma, ctx.session.account.id),
     ]);
-    return { latest, dossierId: dossier?.id ?? null };
+    if (!latest) return { latest: null, dossierId: dossier?.id ?? null };
+    const { answers, ...rest } = latest;
+    return { latest: { ...rest, crsScore: crsOf(answers)?.total ?? null }, dossierId: dossier?.id ?? null };
+  }),
+
+  /**
+   * An Accompagnement Dossier's Aperçu: the CRS score its Demande gave, and
+   * the ITA's day the 60 days count from. Null for any other Dossier.
+   */
+  overview: protectedProcedure.input(dossierRefInput).query(async ({ ctx, input }) => {
+    const dossier = await dossierFor(ctx.prisma, ctx.session, input.dossierId);
+    if (dossier.service !== 'ACCOMPAGNEMENT') return null;
+    const [row, interest] = await Promise.all([
+      ctx.prisma.dossier.findUniqueOrThrow({ where: { id: dossier.id }, select: { itaDate: true } }),
+      ctx.prisma.interestRequest.findUnique({ where: { dossierId: dossier.id }, select: { answers: true } }),
+    ]);
+    return {
+      itaDate: row.itaDate,
+      crsScore: interest ? (crsOf(interest.answers)?.total ?? null) : null,
+      open: dossier.state === 'OPEN',
+    };
   }),
 
   /** Sends a Demande d'intérêt: the User becomes a Lead, the consultant is told. One waits at a time. */
@@ -111,11 +147,16 @@ export const accompagnementRouter = createTRPCRouter({
     if (pending) throw refuse('INTEREST_PENDING');
 
     const level = levelOf(input);
+    // Their CRS score, worked out here under the rules in force: what the form showed, never what it sent.
+    const rules = rulesInForceOn(new Date());
+    const scored = computeCrs(input.crs, { rules });
+    if (!scored.ok) throw refuse('INTEREST_CRS_INVALID');
+    const answers: InterestAnswers = { ...input, crs: { profile: input.crs, rules, total: scored.breakdown.total } };
     const interest = await ctx.prisma.$transaction(async (tx) => {
       const created = await tx.interestRequest.create({
         data: {
           accountId: account.id,
-          answers: input as unknown as Prisma.InputJsonValue,
+          answers: answers as unknown as Prisma.InputJsonValue,
           level,
           residence: input.progress.residence,
         },
@@ -145,7 +186,7 @@ export const accompagnementRouter = createTRPCRouter({
       target: {},
       params: { interestId: interest.id, client: account.name, level },
     });
-    return interest;
+    return { ...interest, crsScore: scored.breakdown.total };
   }),
 
   dashboard: createTRPCRouter({
@@ -223,6 +264,7 @@ export const accompagnementRouter = createTRPCRouter({
             service: 'ACCOMPAGNEMENT',
             stage,
             startStage: stage,
+            itaDate: answers.progress.ita ? answers.progress.itaDate : null,
             events: { create: { kind: 'OPENED', toStage: stage, actorId: consultantId } },
           },
           select: { id: true },
@@ -280,6 +322,14 @@ export const accompagnementRouter = createTRPCRouter({
         target: { dossierId: dossier.id },
       });
       return dossier;
+    }),
+
+    /** Sets or clears the ITA's day of an open Accompagnement Dossier: the 60 days count from it. */
+    setItaDate: consultantProcedure.input(itaDateInput).mutation(async ({ ctx, input }) => {
+      const dossier = await dossierFor(ctx.prisma, ctx.session, input.dossierId);
+      writable(dossier);
+      if (dossier.service !== 'ACCOMPAGNEMENT') throw refuse('INTEREST_NOT_ACCOMPAGNEMENT');
+      await ctx.prisma.dossier.update({ where: { id: dossier.id }, data: { itaDate: input.itaDate } });
     }),
 
     /** Rejects with an optional reason; the User stays as they are and may send another. */

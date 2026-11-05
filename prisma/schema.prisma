@@ -389,6 +389,9 @@ model Dossier {
   stage         String
   /// The stage it opened at; the ones before it are « Déjà fait ».
   startStage    String
+  /// Accompagnement: the ITA's day (`YYYY-MM-DD`), from the Demande d'intérêt or set later by the consultant.
+  /// The 60 days to submit the demande de résidence permanente count from it.
+  itaDate       String?
   state         DossierState     @default(OPEN)
   closedAt      DateTime?
   closedReason  String?

@@ -2908,9 +2908,10 @@
       "steps": {
         "situation": "Your situation",
         "progress": "Where you stand",
+        "crs": "Your CRS score",
         "documents": "Your documents"
       },
-      "stepOf": "Step {step} of 3: {name}",
+      "stepOf": "Step {step} of 4: {name}",
       "next": "Continue",
       "back": "Back",
       "submit": "Send my request",
@@ -2956,7 +2957,9 @@
       },
       "stanzyHint": "“Stanzy takes care of it”: Stanzy gets the document for you, billed separately (in Cameroon only).",
       "note": "Note on “{area}” (optional)",
-      "notePlaceholder": "What worries you, what’s missing…"
+      "notePlaceholder": "What worries you, what’s missing…",
+      "crsIntro": "The CRS Calculator’s questions, already filled in if you saved a simulation. Your score updates with each answer.",
+      "crsLive": "Your CRS score"
     },
     "status": {
       "title": "Express Entry Accompagnement",
@@ -2966,7 +2969,10 @@
       "rejected": "Your request of {date} wasn’t accepted.",
       "again": "Send a new request",
       "signIn": "Sign in to send your request.",
-      "loading": "Loading your request"
+      "loading": "Loading your request",
+      "score": "Your CRS score",
+      "scoreHint": "Worked out with the rules in force on the day of your request. Stanzy uses it to prepare your file.",
+      "points": "points"
     },
     "dashboard": {
       "title": "Expressions of interest",
@@ -3025,7 +3031,8 @@
       "dossier": "Open the file",
       "invoice": "Create the invoice",
       "next": "Send the invoice: the amount is your quote.",
-      "decision": "Your decision"
+      "decision": "Your decision",
+      "crs": "CRS score"
     },
     "document": {
       "mandatory": "★ Mandatory",
@@ -3075,7 +3082,23 @@
       "STANZY_ALREADY_ASKED": "Already asked of Stanzy.",
       "STANZY_NOT_PENDING": "This request was already handled.",
       "DOSSIER_CLOSED": "This file is closed.",
-      "UNKNOWN": "Something went wrong. Try again."
+      "UNKNOWN": "Something went wrong. Try again.",
+      "INTEREST_CRS_INVALID": "Check your CRS answers: the score can’t be worked out.",
+      "INTEREST_NOT_ACCOMPAGNEMENT": "This file isn’t a support file.",
+      "INVALID_DATE": "Enter a valid date."
+    },
+    "overview": {
+      "crs": "CRS score from the request",
+      "crsNone": "No CRS score: the request was sent before the CRS step.",
+      "ita": "Invitation to apply (ITA)",
+      "itaNone": "No ITA yet. Once it arrives, the 60 days to submit the permanent residence application will show here.",
+      "daysLeft": "{days, plural, =0 {Last day} one {# day left} other {# days left}}",
+      "deadline": "ITA received on {ita} · submit by {last} at the latest",
+      "expired": "The 60-day window has passed (ITA of {ita}).",
+      "setIta": "ITA date",
+      "save": "Save",
+      "clear": "Remove",
+      "saved": "ITA date saved"
     }
   },
   "Meetings": {

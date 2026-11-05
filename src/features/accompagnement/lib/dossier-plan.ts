@@ -29,7 +29,7 @@ export type PlannedSection = { title: string; documents: PlannedDocument[] };
  * area: « Je ne l'ai pas » or « Stanzy s'en charge » makes them Manquant,
  * and the area's note goes with them.
  */
-export function planDossier(answers: InterestAnswers, locale: unknown): PlannedSection[] {
+export function planDossier(answers: Pick<InterestAnswers, 'checklist' | 'areas'>, locale: unknown): PlannedSection[] {
   const lang = toLocale(locale);
   const t = createTranslator({ locale: lang, messages: MESSAGES[lang], namespace: 'Checklist.list' });
   const guides = DOCUMENT_GUIDES[lang];

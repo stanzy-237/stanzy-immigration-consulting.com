@@ -283,6 +283,7 @@ function Answers({ interest }: { interest: Interest }): ReactNode {
           [t('form.ede'), yes(progress.ede)],
           [t('form.eeProfile'), yes(progress.eeProfile)],
           [t('form.ita'), progress.ita ? `${yes(true)}${progress.itaDate ? ` · ${progress.itaDate}` : ''}` : yes(false)],
+          ...(interest.answers.crs ? [[t('dashboard.crs'), String(interest.answers.crs.total)] as [string, string]] : []),
         ]),
       )}
       {section(

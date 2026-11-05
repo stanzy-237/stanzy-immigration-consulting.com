@@ -20,16 +20,19 @@ import { useTRPC } from '@/trpc/client';
 
 /**
  * One of the Client's Dossiers in « Mon espace »: a header always in view,
- * then tabs (Aperçu, Documents, Messages, Réunions, Facturation). The
- * Contrat, Factures and Réunions are passed in by the route.
+ * then tabs (Aperçu, Documents, Messages, Réunions, Facturation). The top
+ * of the Aperçu, the Contrat, Factures and Réunions are passed in by the route.
  */
 export function MyDossierView({
   id,
+  overview,
   invoices,
   contracts,
   meetings,
 }: {
   id: string;
+  /** The top of the Aperçu (#81: CRS score, ITA countdown), passed in by the route. */
+  overview?: ReactNode;
   invoices?: ReactNode;
   /** The Contrat panel (#96), passed in by the route. */
   contracts?: ReactNode;
@@ -62,9 +65,12 @@ export function MyDossierView({
             counts={counts}
             panels={{
               apercu: (
-                <QueryBoundary fallback={<HeaderSkeleton />}>
-                  <MyDossierStages id={id} />
-                </QueryBoundary>
+                <>
+                  {overview}
+                  <QueryBoundary fallback={<HeaderSkeleton />}>
+                    <MyDossierStages id={id} />
+                  </QueryBoundary>
+                </>
               ),
               documents: (
                 <QueryBoundary fallback={<DossierDocumentsSkeleton />}>

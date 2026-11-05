@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import type { DocumentId } from '@/features/checklist/lib/build-checklist';
 import { checklistFormSchema, type ChecklistForm } from '@/features/checklist/lib/checklist-form';
+import type { CrsProfile } from '@/features/crs/lib/compute-crs';
+import { crsProfileSchema } from '@/features/crs/lib/profile-schema';
 import type { StageKey } from '@/features/dossiers/data/workflows';
 
 export const NOTE_MAX = 500;
@@ -21,6 +23,8 @@ export const RESIDENCES = ['CM', 'CA', 'OTHER'] as const;
 export const LEVELS = ['A', 'B', 'C'] as const;
 export type Level = (typeof LEVELS)[number];
 
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
 /** Where the candidate stands today: what sets the Niveau. */
 export const progressSchema = z.object({
   age: z.number().int().min(16).max(80),
@@ -34,7 +38,7 @@ export const progressSchema = z.object({
   eeProfile: z.boolean(),
   ita: z.boolean(),
   /** `YYYY-MM-DD`, when an ITA was received. */
-  itaDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+  itaDate: z.string().regex(DAY).nullable(),
 });
 export type Progress = z.infer<typeof progressSchema>;
 
@@ -42,9 +46,9 @@ const areaSchema = z.object({ answer: z.enum(AREA_ANSWERS), note: z.string().tri
 export const areasSchema = z.object(Object.fromEntries(AREAS.map((area) => [area, areaSchema])) as Record<Area, typeof areaSchema>);
 export type Areas = z.infer<typeof areasSchema>;
 
-/** The Demande d'intérêt as saved. « Stanzy s'en charge » only from Cameroon. */
+/** The Demande d'intérêt as sent: with their CRS answers, scored on the server. « Stanzy s'en charge » only from Cameroon. */
 export const interestAnswersSchema = z
-  .object({ checklist: checklistFormSchema, progress: progressSchema, areas: areasSchema })
+  .object({ checklist: checklistFormSchema, progress: progressSchema, areas: areasSchema, crs: crsProfileSchema })
   .refine(
     (answers) => answers.progress.residence === 'CM' || AREAS.every((area) => answers.areas[area].answer !== 'stanzy'),
     { message: 'INTEREST_STANZY_CAMEROON_ONLY', path: ['areas'] },
@@ -53,7 +57,16 @@ export const interestAnswersSchema = z
     message: 'INTEREST_ITA_WITHOUT_PROFILE',
     path: ['progress', 'ita'],
   });
-export type InterestAnswers = { checklist: ChecklistForm; progress: Progress; areas: Areas };
+/** The Demande as the form sends it. */
+export type InterestInput = z.infer<typeof interestAnswersSchema>;
+
+/** Their CRS answers and the score the rules in force gave them when sent. */
+export type SavedCrs = { profile: CrsProfile; rules: string; total: number };
+/** As saved; a Demande sent before the CRS step (#81) has no `crs`. */
+export type InterestAnswers = { checklist: ChecklistForm; progress: Progress; areas: Areas; crs?: SavedCrs };
+
+/** The consultant sets or clears the ITA date of an Accompagnement Dossier. */
+export const itaDateInput = z.object({ dossierId: z.string().min(1), itaDate: z.string().regex(DAY).nullable() });
 
 export const decideInput = z.object({ id: z.string().min(1), level: z.enum(LEVELS) });
 export const rejectInput = z.object({ id: z.string().min(1), reason: z.string().trim().max(REASON_MAX) });

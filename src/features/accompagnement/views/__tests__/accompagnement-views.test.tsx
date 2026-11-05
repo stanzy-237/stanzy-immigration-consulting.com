@@ -7,6 +7,7 @@ import { axe } from 'vitest-axe';
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { DEFAULT_CHECKLIST_FORM } from '@/features/checklist/lib/checklist-form';
 import { AREAS, DEFAULT_PROGRESS } from '@/features/accompagnement/lib/interest-schema';
+import { DossierOverviewView } from '@/features/accompagnement/views/dossier-overview-view';
 import { InterestDashboardView } from '@/features/accompagnement/views/interest-dashboard-view';
 import { InterestView } from '@/features/accompagnement/views/interest-view';
 import { createTestTRPC } from '@/trpc/__tests__/test-utils';
@@ -45,20 +46,28 @@ function client(mine: unknown, handlers: Record<string, (input: never) => unknow
 }
 
 describe('the Demande d’intérêt, for the User', () => {
-  it('goes through the three steps and sends the answers', async () => {
+  it('goes through the four steps, their CRS scored as they go, and sends the answers', async () => {
     const submit = vi.fn();
     const { container } = client({ latest: null, dossierId: null }, { 'accompagnement.submit': (input) => submit(input) ?? { id: 'int_1' } });
-    expect(screen.getByText('Étape 1 sur 3 : Votre situation')).toBeInTheDocument();
+    expect(screen.getByText('Étape 1 sur 4 : Votre situation')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
     fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
 
-    expect(await screen.findByText('Étape 2 sur 3 : Où vous en êtes')).toBeInTheDocument();
+    expect(await screen.findByText('Étape 2 sur 4 : Où vous en êtes')).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('Nationalité'), { target: { value: 'Camerounaise' } });
     fireEvent.change(screen.getByLabelText('Test de langue passé'), { target: { value: 'tcf' } });
     fireEvent.click(screen.getByLabelText('J’ai fait mon EDE (WES, IQAS…)'));
     fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
 
-    expect(await screen.findByText('Étape 3 sur 3 : Vos documents')).toBeInTheDocument();
+    expect(await screen.findByText('Étape 3 sur 4 : Votre score CRS')).toBeInTheDocument();
+    const live = screen.getByRole('status');
+    expect(live).toHaveTextContent(/\d+/);
+    const before = live.textContent;
+    fireEvent.click(screen.getByLabelText(/Désignation provinciale/));
+    expect(screen.getByRole('status').textContent).not.toBe(before);
+    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
+
+    expect(await screen.findByText('Étape 4 sur 4 : Vos documents')).toBeInTheDocument();
     const funds = screen.getByRole('group', { name: 'Preuve de fonds' });
     fireEvent.click(within(funds).getByLabelText('Stanzy s’en charge'));
     fireEvent.change(within(funds).getByLabelText(/Note sur/), { target: { value: 'Relevé de 4 mois' } });
@@ -69,6 +78,7 @@ describe('the Demande d’intérêt, for the User', () => {
         checklist: saved,
         progress: { ...DEFAULT_PROGRESS, citizenship: 'Camerounaise', languageTest: 'tcf', ede: true },
         areas: expect.objectContaining({ funds: { answer: 'stanzy', note: 'Relevé de 4 mois' } }),
+        crs: expect.objectContaining({ age: 30, provincialNomination: true }),
       }),
     );
   });
@@ -79,16 +89,27 @@ describe('the Demande d’intérêt, for the User', () => {
     fireEvent.change(await screen.findByLabelText('Nationalité'), { target: { value: 'Camerounaise' } });
     fireEvent.change(screen.getByLabelText('Pays de résidence'), { target: { value: 'CA' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
-    expect(await screen.findByText('Étape 3 sur 3 : Vos documents')).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole('button', { name: /Continuer/ }));
+    expect(await screen.findByText('Étape 4 sur 4 : Vos documents')).toBeInTheDocument();
     expect(screen.queryByLabelText('Stanzy s’en charge')).not.toBeInTheDocument();
   });
 
   it('says where a sent Demande stands', () => {
     const { unmount } = client({
-      latest: { id: 'int_1', status: 'SUBMITTED', rejectReason: null, dossierId: null, createdAt: new Date('2026-11-04'), decidedAt: null },
+      latest: {
+        id: 'int_1',
+        status: 'SUBMITTED',
+        rejectReason: null,
+        dossierId: null,
+        createdAt: new Date('2026-11-04'),
+        decidedAt: null,
+        crsScore: 478,
+      },
       dossierId: null,
     });
     expect(screen.getByText(/est à l’étude/)).toBeInTheDocument();
+    // The end of the form: their CRS score.
+    expect(screen.getByRole('heading', { name: 'Votre score CRS' }).parentElement).toHaveTextContent('478 points');
     unmount();
     client({ latest: null, dossierId: 'dos_1' });
     expect(screen.getByRole('link', { name: 'Ouvrir mon dossier' })).toHaveAttribute('href', '/fr/mon-espace/dossiers/dos_1');
@@ -134,5 +155,43 @@ describe('a Demande d’intérêt, for the consultant', () => {
     expect(screen.getByText('Le dossier s’ouvrira à l’étape « Dans le bassin ».')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Accepter et ouvrir le dossier' }));
     await waitFor(() => expect(approve).toHaveBeenCalledWith({ id: 'int_1', level: 'C' }));
+  });
+});
+
+describe('the Accompagnement Dossier’s Aperçu', () => {
+  const daysAgo = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+  function overview(viewer: 'consultant' | 'client', data: unknown, handlers: Record<string, (input: never) => unknown> = {}) {
+    const { trpc, queryClient, wrap } = createTestTRPC({ 'accompagnement.overview': () => data, ...handlers });
+    queryClient.setQueryData(trpc.accompagnement.overview.queryKey({ dossierId: 'dos_1' }), data as never);
+    return render(withIntl(wrap(<DossierOverviewView dossierId="dos_1" viewer={viewer} />)));
+  }
+
+  it('shows the Client their CRS score and the days left of the 60 since the ITA', async () => {
+    const { container } = overview('client', { crsScore: 478, itaDate: daysAgo(10), open: true });
+    expect(screen.getByText('478')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', { name: /jours restants/ })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Date de l’ITA')).not.toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('says when the 60 days are over', () => {
+    overview('client', { crsScore: null, itaDate: daysAgo(90), open: true });
+    expect(screen.getByText(/Le délai de 60 jours est dépassé/)).toBeInTheDocument();
+  });
+
+  it('lets the consultant set the ITA date once it arrives', async () => {
+    const set = vi.fn();
+    overview('consultant', { crsScore: 478, itaDate: null, open: true }, {
+      'accompagnement.dashboard.setItaDate': (input) => set(input),
+    });
+    expect(screen.getByText(/Pas encore d’ITA/)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Date de l’ITA'), { target: { value: '2026-11-01' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
+    await waitFor(() => expect(set).toHaveBeenCalledWith({ dossierId: 'dos_1', itaDate: '2026-11-01' }));
+  });
+
+  it('shows nothing for another service', () => {
+    const { container } = overview('client', null);
+    expect(container).toBeEmptyDOMElement();
   });
 });
