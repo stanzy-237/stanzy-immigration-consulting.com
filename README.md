@@ -22,6 +22,8 @@ cp .env.example .env   # then fill in your Neon connection strings
 npm run db:generate    # generate the Prisma client
 ./scripts/setup-auth.sh  # auth secret, Resend, Vercel env, migration (guided)
 ./scripts/setup-google-sign-in.sh  # Google OAuth client (optional)
+./scripts/setup-stream.sh      # Stream Video for Réunions: keys, R2 storage, webhook (optional)
+./scripts/test-walkthrough.sh  # try Accompagnement, Messages, Réunions, Finances, reminders in the browser
 npm run dev            # http://localhost:3000 → redirects to /fr
 ```
 

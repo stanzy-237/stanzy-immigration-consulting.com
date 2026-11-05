@@ -2098,6 +2098,21 @@
         "DOSSIER_FILES_UNCONFIGURED": "File storage isn’t set up on this site.",
         "UNKNOWN": "Something went wrong. Try again."
       }
+    },
+    "tabs": {
+      "label": "File sections",
+      "apercu": "Overview",
+      "documents": "Documents",
+      "messages": "Messages",
+      "reunions": "Meetings",
+      "facturation": "Billing",
+      "counts": {
+        "documents": "{count, plural, one {missing document} other {missing documents}}",
+        "messages": "{count, plural, one {message} other {messages}}",
+        "reunions": "{count, plural, one {upcoming meeting} other {upcoming meetings}}",
+        "facturation": "{count, plural, one {invoice to pay} other {invoices to pay}}"
+      },
+      "stage": "Stage: {stage}"
     }
   },
   "Invoices": {

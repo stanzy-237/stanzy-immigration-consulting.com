@@ -21,6 +21,8 @@ import { toast } from '@/components/ui/toast';
 import { DossierDocuments, DossierDocumentsSkeleton } from '@/features/dossiers/components/dossier-documents';
 import { DossierMessages, DossierMessagesSkeleton } from '@/features/dossiers/components/dossier-messages';
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
+import { DossierTabs } from '@/features/dossiers/components/dossier-tabs';
+import { useDossierCounts } from '@/features/dossiers/hooks/use-dossier-counts';
 import { CLOSE_REASON_MAX, closeDossierInput } from '@/features/dossiers/lib/dossier-schema';
 import { nextStage, previousStage } from '@/features/dossiers/lib/workflow';
 import { optimisticUpdate } from '@/lib/optimistic-list';
@@ -29,9 +31,10 @@ import Link from 'next/link';
 import { useTRPC } from '@/trpc/client';
 
 /**
- * One Dossier in the Tableau de bord: its stages, the moves the consultant
- * can make, its history and documents. `invoices`, `finances` and `contracts`
- * are the Factures, Finances and Contrat panels the route passes in.
+ * One Dossier in the Tableau de bord: a header always in view, then tabs
+ * (Aperçu, Documents, Messages, Réunions, Facturation) so one subject shows
+ * at a time. `invoices`, `finances`, `contracts`, `meetings` and `stanzy` are
+ * the other features' panels the route passes in.
  */
 export function DossierDashboardView({
   id,
@@ -56,6 +59,7 @@ export function DossierDashboardView({
   // A Notification's link (#92): the Document to unfold, the message to highlight.
   const params = useSearchParams();
   const focus = { documentId: params.get('document'), messageId: params.get('message') };
+  const counts = useDossierCounts(id);
   return (
     <div className="mx-auto max-w-5xl">
       <Link
@@ -66,24 +70,72 @@ export function DossierDashboardView({
         {t('back')}
       </Link>
       <QueryBoundary fallback={<DossierSkeleton />}>
-        <DossierDetail id={id} />
+        <DossierHeader id={id} />
+        <DossierTabs
+          counts={counts}
+          panels={{
+            apercu: <DossierDetail id={id} />,
+            documents: (
+              <>
+                {stanzy ? <div className="empty:hidden">{stanzy}</div> : null}
+                <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
+                  <DossierDocuments dossierId={id} viewer="consultant" focus={focus} />
+                </QueryBoundary>
+              </>
+            ),
+            messages: (
+              <QueryBoundary fallback={<DossierMessagesSkeleton />}>
+                <DossierMessages dossierId={id} viewer="consultant" />
+              </QueryBoundary>
+            ),
+            reunions: meetings,
+            facturation: (
+              <>
+                {invoices}
+                {contracts}
+                {finances}
+              </>
+            ),
+          }}
+        />
       </QueryBoundary>
-      {invoices ? <div className="mt-10">{invoices}</div> : null}
-      {finances ? <div className="mt-6">{finances}</div> : null}
-      {meetings ? <div className="mt-10">{meetings}</div> : null}
-      {contracts ? <div className="mt-10">{contracts}</div> : null}
-      {stanzy ? <div className="mt-10 empty:hidden">{stanzy}</div> : null}
-      <div className="mt-10">
-        <QueryBoundary fallback={<DossierMessagesSkeleton />}>
-          <DossierMessages dossierId={id} viewer="consultant" />
-        </QueryBoundary>
-      </div>
-      <div className="mt-10">
-        <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
-          <DossierDocuments dossierId={id} viewer="consultant" focus={focus} />
-        </QueryBoundary>
-      </div>
     </div>
+  );
+}
+
+/** Always above the tabs: the Client, the service, the current stage and what needs attention. */
+function DossierHeader({ id }: { id: string }): ReactNode {
+  const t = useTranslations('Dossiers');
+  const contracts = useTranslations('Contracts');
+  const format = useFormatter();
+  const trpc = useTRPC();
+  const { data: dossier } = useSuspenseQuery(trpc.dossiers.dashboard.get.queryOptions({ id }));
+  const date = (value: Date) => format.dateTime(value, { day: 'numeric', month: 'long', year: 'numeric' });
+  return (
+    <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <p className="text-sm font-semibold uppercase tracking-wider text-rouge">{t(`services.${dossier.service}`)}</p>
+        <h1 className="font-heading text-3xl font-bold text-navy-deep">{dossier.account.name}</h1>
+        <p className="mt-1 text-sm text-slate">
+          {dossier.account.email} · {t('detail.openedOn', { date: date(dossier.createdAt) })}
+        </p>
+        <p className="mt-1 text-sm font-semibold text-navy-deep">
+          {t('tabs.stage', { stage: t(`stages.${dossier.service}.${dossier.stage}` as never) })}
+        </p>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {dossier.state === 'OPEN' && !dossier.contractSigned ? (
+          <a
+            href="#contrats"
+            className="inline-flex items-center gap-1 rounded-full bg-honey-tint px-3 py-1 text-xs font-semibold text-honey"
+          >
+            <FileWarning aria-hidden={true} className="size-3.5" />
+            {contracts('panel.unsigned')}
+          </a>
+        ) : null}
+        <DossierStatePill dossier={dossier} />
+      </div>
+    </header>
   );
 }
 
@@ -152,30 +204,6 @@ function DossierDetail({ id }: { id: string }): ReactNode {
 
   return (
     <>
-      <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wider text-rouge">
-            {t(`services.${dossier.service}`)}
-          </p>
-          <h1 className="font-heading text-3xl font-bold text-navy-deep">{dossier.account.name}</h1>
-          <p className="mt-1 text-sm text-slate">
-            {dossier.account.email} · {t('detail.openedOn', { date: date(dossier.createdAt) })}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {open && !dossier.contractSigned ? (
-            <a
-              href="#contrats"
-              className="inline-flex items-center gap-1 rounded-full bg-honey-tint px-3 py-1 text-xs font-semibold text-honey"
-            >
-              <FileWarning aria-hidden={true} className="size-3.5" />
-              {contracts('panel.unsigned')}
-            </a>
-          ) : null}
-          <DossierStatePill dossier={dossier} />
-        </div>
-      </header>
-
       <div className="grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm lg:col-span-2">
           <div id="etapes" className="scroll-mt-20">
