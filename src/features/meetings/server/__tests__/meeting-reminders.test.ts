@@ -18,7 +18,7 @@ function fakeDatabase(meetings: Row[]) {
       findMany: async () =>
         meetings
           .filter((m) => m.status === 'SCHEDULED' && !m.remindedSoon)
-          .map((m) => ({ ...m, dossier: { account: client } })),
+          .map((m) => ({ ...m, participants: [{ account: client }] })),
       updateMany: async ({ where, data }: { where: Record<string, unknown>; data: Row }) => {
         const field = 'remindedSoon' in where ? 'remindedSoon' : 'remindedDayBefore';
         const row = meetings.find((m) => m.id === where.id && !m[field]);

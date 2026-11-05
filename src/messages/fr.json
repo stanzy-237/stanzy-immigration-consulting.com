@@ -1429,7 +1429,8 @@
       "signatures": "Signatures",
       "contrats": "Contrats",
       "demandes": "Demandes d’intérêt",
-      "finances": "Finances"
+      "finances": "Finances",
+      "reunions": "Réunions"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -2333,7 +2334,8 @@
       "MEETING_MOVED": "Réunion « {subject} » déplacée au {date}.",
       "MEETING_CANCELLED": "Réunion « {subject} » annulée.",
       "MEETING_REMINDER": "{soon, select, true {La réunion « {subject} » commence bientôt.} other {Rappel : réunion « {subject} » le {date}.}}",
-      "DOSSIER_MESSAGE": "{actor} a écrit {count, plural, one {un message} other {# messages}} dans le dossier {service}."
+      "DOSSIER_MESSAGE": "{actor} a écrit {count, plural, one {un message} other {# messages}} dans le dossier {service}.",
+      "MEETING_JOIN_REQUEST": "{client} demande à entrer dans « {subject} »."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2363,7 +2365,8 @@
       "MEETING_MOVED": "Une réunion a changé.",
       "MEETING_CANCELLED": "Une réunion est annulée.",
       "MEETING_REMINDER": "Rappel de réunion.",
-      "DOSSIER_MESSAGE": "Nouveau message dans un dossier."
+      "DOSSIER_MESSAGE": "Nouveau message dans un dossier.",
+      "MEETING_JOIN_REQUEST": "Quelqu’un demande à entrer."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",
@@ -3104,6 +3107,10 @@
       "soon": {
         "subject": "Dans 15 minutes : {subject}",
         "body": "Votre réunion « {subject} » commence bientôt, le {when}. Vous pouvez la rejoindre dès maintenant."
+      },
+      "instant": {
+        "subject": "Stanzy vous attend : {subject}",
+        "body": "Stanzy a ouvert une réunion vidéo « {subject} », maintenant. Rejoignez-la avec le bouton ci-dessous."
       }
     },
     "panel": {
@@ -3199,7 +3206,176 @@
       "MEETING_CONSENT_REQUIRED": "Acceptez l’enregistrement pour entrer.",
       "MEETINGS_UNCONFIGURED": "La visio n’est pas encore configurée sur ce site.",
       "DOSSIER_CLOSED": "Le dossier est clôturé.",
-      "UNKNOWN": "Une erreur est survenue. Réessayez."
+      "UNKNOWN": "Une erreur est survenue. Réessayez.",
+      "MEETING_PARTICIPANT_UNKNOWN": "Une personne invitée n’existe plus.",
+      "MEETING_REQUEST_DECIDED": "Cette demande a déjà été traitée."
+    },
+    "hub": {
+      "nav": {
+        "label": "Sections des réunions",
+        "home": "Accueil",
+        "upcoming": "À venir",
+        "past": "Passées",
+        "recordings": "Enregistrements",
+        "personal": "Salle personnelle"
+      },
+      "home": {
+        "next": "Prochaine réunion à {time} · {subject}",
+        "noNext": "Aucune réunion prévue",
+        "tiles": {
+          "instant": {
+            "title": "Nouvelle réunion",
+            "body": "Démarrer maintenant"
+          },
+          "join": {
+            "title": "Rejoindre",
+            "body": "Avec un lien d’invitation"
+          },
+          "plan": {
+            "title": "Planifier",
+            "body": "Préparer une réunion"
+          },
+          "recordings": {
+            "title": "Enregistrements",
+            "body": "Revoir les réunions"
+          }
+        },
+        "today": "Réunions d’aujourd’hui",
+        "seeAll": "Tout voir",
+        "noToday": "Aucune réunion aujourd’hui."
+      },
+      "list": {
+        "upcoming": "Réunions à venir",
+        "past": "Réunions passées",
+        "emptyUpcoming": "Aucune réunion à venir.",
+        "emptyPast": "Aucune réunion passée.",
+        "loading": "Chargement des réunions"
+      },
+      "card": {
+        "start": "Démarrer",
+        "startLabel": "Démarrer « {subject} »",
+        "copy": "Copier l’invitation",
+        "copyLabel": "Copier l’invitation de « {subject} »",
+        "copied": "Invitation copiée",
+        "dossier": "Dossier de {name}",
+        "instant": "Instantanée",
+        "cancelled": "Annulée",
+        "ended": "Terminée",
+        "recordings": "{count, plural, one {# enregistrement} other {# enregistrements}}",
+        "nobody": "Aucun participant",
+        "more": "et {count} autres",
+        "invitation": "Invitation à la réunion « {subject} » ({when}) : {link}"
+      },
+      "recordings": {
+        "empty": "Aucun enregistrement pour l’instant : ils arrivent quelques minutes après la fin d’une réunion enregistrée.",
+        "play": "Lire",
+        "playLabel": "Lire l’enregistrement de « {subject} »",
+        "transcribed": "Transcrite",
+        "open": "Voir la réunion",
+        "duration": "{minutes} min"
+      },
+      "personal": {
+        "intro": "Votre salle toujours ouverte. Partagez son lien : les personnes qui ne sont pas invitées attendent que vous les fassiez entrer.",
+        "topic": "Nom",
+        "link": "Lien d’invitation",
+        "start": "Entrer dans la salle",
+        "copy": "Copier l’invitation",
+        "edit": "Modifier",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "recording": "Enregistrer et transcrire",
+        "newLink": "Nouveau lien",
+        "newLinkTitle": "Changer de lien ?",
+        "newLinkBody": "L’ancien lien ne fonctionnera plus.",
+        "confirm": "Changer",
+        "recorded": "Enregistrée",
+        "notRecorded": "Sans enregistrement"
+      },
+      "instant": {
+        "title": "Nouvelle réunion",
+        "body": "Elle commence maintenant. Les personnes invitées reçoivent un email et une notification ; vous pouvez aussi copier le lien une fois dans la salle.",
+        "subject": "Objet (facultatif)",
+        "start": "Démarrer",
+        "starting": "Ouverture…"
+      },
+      "join": {
+        "title": "Rejoindre une réunion",
+        "body": "Collez le lien d’invitation.",
+        "link": "Lien d’invitation",
+        "invalid": "Ce lien n’est pas une invitation valide.",
+        "go": "Rejoindre",
+        "cancel": "Annuler"
+      },
+      "created": {
+        "title": "Réunion planifiée",
+        "body": "Les personnes invitées ont reçu l’invitation. Vous pouvez aussi copier le lien.",
+        "copy": "Copier l’invitation",
+        "close": "Fermer"
+      },
+      "people": {
+        "label": "Participants",
+        "hint": "Clients et partenaires, chacun avec son compte. Avec le lien, les autres peuvent demander à entrer.",
+        "search": "Chercher par nom ou email",
+        "remove": "Retirer {name}",
+        "noMatch": "Personne ne correspond.",
+        "partner": "Partenaire",
+        "loading": "Recherche"
+      },
+      "form": {
+        "description": "Description (facultatif)",
+        "dossier": "Dossier (facultatif)",
+        "noDossier": "Sans dossier"
+      },
+      "invitation": {
+        "title": "Invitation à une réunion",
+        "ask": "Demander à entrer",
+        "asking": "Envoi…",
+        "waiting": "Votre demande est envoyée : Stanzy va vous faire entrer. Gardez cette page ouverte.",
+        "refused": "Votre demande n’a pas été acceptée.",
+        "over": "Cette réunion est terminée.",
+        "cancelled": "Cette réunion a été annulée.",
+        "loading": "Chargement de l’invitation",
+        "open": "Ouvrir la salle"
+      },
+      "waiting": {
+        "title": "Demandent à entrer",
+        "admit": "Faire entrer",
+        "admitLabel": "Faire entrer {name}",
+        "refuse": "Refuser",
+        "refuseLabel": "Refuser {name}"
+      },
+      "room": {
+        "layout": "Disposition",
+        "layouts": {
+          "grid": "Grille",
+          "speakerLeft": "Intervenant à gauche",
+          "speakerRight": "Intervenant à droite",
+          "speakerTop": "Intervenant en haut"
+        },
+        "sort": "Ordre",
+        "sorts": {
+          "default": "Qui parle en premier",
+          "screen": "Écrans partagés d’abord",
+          "name": "Par nom"
+        },
+        "participants": "Participants",
+        "blur": "Flouter l’arrière-plan",
+        "unblur": "Retirer le flou",
+        "settings": "Micro, caméra et haut-parleur",
+        "fullscreen": "Plein écran",
+        "exitFullscreen": "Quitter le plein écran",
+        "leave": "Quitter",
+        "endTitle": "Quitter la réunion ?",
+        "endBody": "« Terminer pour tous » ferme la réunion pour chacun et arrête l’enregistrement.",
+        "endAll": "Terminer pour tous",
+        "leaveOnly": "Quitter seulement",
+        "ended": "La réunion est terminée.",
+        "copyInvite": "Copier l’invitation",
+        "dossier": "Ouvrir le dossier",
+        "close": "Fermer",
+        "back": "Retour aux réunions",
+        "timer": "Durée"
+      }
     }
   },
   "Finances": {

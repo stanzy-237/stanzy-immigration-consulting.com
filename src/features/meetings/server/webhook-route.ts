@@ -54,7 +54,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
-    select: { id: true, dossier: { select: { account: { select: { id: true, name: true } } } } },
+    select: { id: true, participants: { select: { account: { select: { id: true, name: true } } } } },
   });
   if (!meeting) return new Response(null, { status: 204 });
 
@@ -63,7 +63,7 @@ export async function POST(request: Request): Promise<Response> {
   if (kind === 'TRANSCRIPTION') {
     const consultants = await prisma.account.findMany({ where: { role: 'CONSULTANT' }, select: { id: true, name: true } });
     const names = Object.fromEntries(
-      [meeting.dossier.account, ...consultants].map((person) => [person.id, person.name]),
+      [...meeting.participants.map(({ account }) => account), ...consultants].map((person) => [person.id, person.name]),
     );
     try {
       const response = await fetch(file.url);

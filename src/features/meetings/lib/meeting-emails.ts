@@ -8,7 +8,7 @@ import type { EmailMessage } from '@/server/email/mailer';
 
 const MESSAGES = { fr, en } as const;
 
-export type MeetingEmailKind = 'scheduled' | 'moved' | 'cancelled' | 'dayBefore' | 'soon';
+export type MeetingEmailKind = 'scheduled' | 'instant' | 'moved' | 'cancelled' | 'dayBefore' | 'soon';
 
 /** « mardi 10 novembre 2026 à 14:00 (heure de Douala) »: where the practice is. */
 export function meetingWhen(startsAt: Date, locale: unknown): string {

@@ -11,6 +11,8 @@ const KNOWN = [
   'MEETING_CONSENT_REQUIRED',
   'MEETINGS_UNCONFIGURED',
   'DOSSIER_CLOSED',
+  'MEETING_PARTICIPANT_UNKNOWN',
+  'MEETING_REQUEST_DECIDED',
 ];
 
 /** Toasts why a Réunion action was refused. */

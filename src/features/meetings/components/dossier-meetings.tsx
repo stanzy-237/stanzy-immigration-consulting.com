@@ -5,7 +5,7 @@ import { CalendarPlus, Circle, FileText, Pencil, Search, Video, XCircle } from '
 import { useFormatter, useNow, useTranslations } from 'next-intl';
 // The consultant's links stay on admin.<site>'s short paths (see dashboard-host).
 import NextLink from 'next/link';
-import { useDeferredValue, useId, useState, type FormEvent, type ReactNode } from 'react';
+import { useDeferredValue, useId, useState, type ReactNode } from 'react';
 
 import {
   AlertDialog,
@@ -16,20 +16,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
+import { MeetingForm } from '@/features/meetings/components/meeting-form';
 import { useMeetingErrors } from '@/features/meetings/hooks/use-meeting-errors';
 import {
   clientRoomPath,
   consultantRoomPath,
-  DURATIONS,
   isJoinable,
   isPast,
   NOTES_MAX,
   REASON_MAX,
   recordingUrl,
-  SUBJECT_MAX,
 } from '@/features/meetings/lib/meeting-schema';
 import { Link } from '@/i18n/navigation';
 import { useTRPC } from '@/trpc/client';
@@ -44,7 +43,6 @@ const area =
   'w-full rounded-xl border-2 border-fog-light bg-white px-3.5 py-2.5 text-sm font-normal text-navy-deep focus:border-navy-deep focus:outline-none';
 const primary =
   'inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson disabled:opacity-50';
-const secondary = 'inline-flex h-11 items-center rounded-full px-4 text-sm font-semibold text-navy-deep hover:bg-off-white';
 const small =
   'inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-navy-deep hover:bg-off-white';
 
@@ -103,7 +101,6 @@ export function DossierMeetings({ dossierId, viewer }: { dossierId: string; view
             {upcoming.map((meeting) => (
               <MeetingCard
                 key={meeting.id}
-                dossierId={dossierId}
                 meeting={meeting}
                 viewer={viewer}
                 open={data.open}
@@ -119,7 +116,6 @@ export function DossierMeetings({ dossierId, viewer }: { dossierId: string; view
             {past.map((meeting) => (
               <MeetingCard
                 key={meeting.id}
-                dossierId={dossierId}
                 meeting={meeting}
                 viewer={viewer}
                 open={data.open}
@@ -142,6 +138,7 @@ export function DossierMeetings({ dossierId, viewer }: { dossierId: string; view
               dossierId={dossierId}
               meeting={editing === 'new' ? null : editing}
               onDone={() => setEditing(null)}
+              onCancel={() => setEditing(null)}
             />
           ) : null}
         </DialogContent>
@@ -161,7 +158,6 @@ function MeetingList({ title, children }: { title: string; children: ReactNode }
 }
 
 function MeetingCard({
-  dossierId,
   meeting,
   viewer,
   open,
@@ -169,7 +165,6 @@ function MeetingCard({
   onEdit,
   onCancel,
 }: {
-  dossierId: string;
   meeting: Meeting;
   viewer: Viewer;
   open: boolean;
@@ -221,7 +216,7 @@ function MeetingCard({
             {joinable ? (
               consultant ? (
                 <NextLink
-                  href={consultantRoomPath(dossierId, meeting.id)}
+                  href={consultantRoomPath(meeting.id)}
                   aria-label={t('joinLabel', { subject: meeting.subject })}
                   className={joinClass}
                 >
@@ -230,7 +225,7 @@ function MeetingCard({
                 </NextLink>
               ) : (
                 <Link
-                  href={clientRoomPath(dossierId, meeting.id)}
+                  href={clientRoomPath(meeting.id)}
                   aria-label={t('joinLabel', { subject: meeting.subject })}
                   className={joinClass}
                 >
@@ -266,27 +261,29 @@ function MeetingCard({
           </div>
         ) : null}
       </div>
-      {consultant && !cancelled ? <ConsultantPart dossierId={dossierId} meeting={meeting} upcoming={upcoming} /> : null}
+      {consultant && !cancelled ? <ConsultantPart meeting={meeting} upcoming={upcoming} /> : null}
     </li>
   );
 }
 
-/** What only the consultant sees under a Réunion: notes, and once held, its files. */
-function ConsultantPart({
-  dossierId,
-  meeting,
-  upcoming,
-}: {
-  dossierId: string;
-  meeting: Meeting;
-  upcoming: boolean;
-}): ReactNode {
+/** A Réunion as the notes and files part needs it. */
+export type NotedMeeting = {
+  id: string;
+  subject: string;
+  recording: boolean;
+  notes: string | null;
+  recordings: Meeting['recordings'];
+};
+
+/** What only the consultant sees under a Réunion: notes, and once held, its files. Also on its room's page. */
+export function ConsultantPart({ meeting, upcoming }: { meeting: NotedMeeting; upcoming: boolean }): ReactNode {
   const t = useTranslations('Meetings.panel');
   const toasts = useTranslations('Meetings.toast');
   const format = useFormatter();
   const ids = useId();
   const trpc = useTRPC();
-  const refresh = useRefresh(dossierId);
+  const queryClient = useQueryClient();
+  const refresh = () => void queryClient.invalidateQueries({ queryKey: trpc.meetings.pathKey() });
   const failed = useMeetingErrors();
   const [notes, setNotes] = useState(meeting.notes ?? '');
   const [reading, setReading] = useState<string | null>(null);
@@ -428,159 +425,6 @@ function TranscriptSearch({ dossierId }: { dossierId: string }): ReactNode {
         </div>
       ) : null}
     </div>
-  );
-}
-
-const pad = (value: number) => String(value).padStart(2, '0');
-const dateInput = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-const timeInput = (date: Date) => `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-
-/** Plans a Réunion, or moves one: subject, day and time (this device's), duration, recording. */
-function MeetingForm({
-  dossierId,
-  meeting,
-  onDone,
-}: {
-  dossierId: string;
-  meeting: Meeting | null;
-  onDone: () => void;
-}): ReactNode {
-  const t = useTranslations('Meetings');
-  const ids = useId();
-  const trpc = useTRPC();
-  const refresh = useRefresh(dossierId);
-  const failed = useMeetingErrors();
-  // A new Réunion starts tomorrow at 10:00, on this device's clock.
-  const [initial] = useState(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(10, 0, 0, 0);
-    return meeting?.startsAt ?? tomorrow;
-  });
-  const [subject, setSubject] = useState(meeting?.subject ?? '');
-  const [date, setDate] = useState(dateInput(initial));
-  const [time, setTime] = useState(timeInput(initial));
-  const [duration, setDuration] = useState<number>(meeting?.durationMinutes ?? 30);
-  const [recording, setRecording] = useState(meeting?.recording ?? true);
-  const [inPast, setInPast] = useState(false);
-  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const done = (title: string) => ({
-    onSuccess: () => {
-      refresh();
-      toast.add({ title, type: 'success' as const });
-      onDone();
-    },
-    onError: failed,
-  });
-  const schedule = useMutation(trpc.meetings.schedule.mutationOptions(done(t('toast.scheduled'))));
-  const update = useMutation(trpc.meetings.update.mutationOptions(done(t('toast.updated'))));
-  const pending = schedule.isPending || update.isPending;
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const startsAt = new Date(`${date}T${time}`);
-    const moved = !meeting || startsAt.getTime() !== meeting.startsAt.getTime();
-    const past = Number.isNaN(startsAt.getTime()) || (moved && startsAt.getTime() < Date.now());
-    setInPast(past);
-    if (past) return;
-    const fields = { subject: subject.trim(), startsAt, durationMinutes: duration, recording };
-    if (meeting) update.mutate({ id: meeting.id, ...fields });
-    else schedule.mutate({ dossierId, ...fields });
-  };
-
-  return (
-    <form onSubmit={submit} className="grid gap-4">
-      <DialogHeader>
-        <DialogTitle className="font-heading text-xl font-bold text-navy-deep">
-          {meeting ? t('form.editTitle') : t('form.newTitle')}
-        </DialogTitle>
-        <DialogDescription className="text-sm text-slate">{t('form.body')}</DialogDescription>
-      </DialogHeader>
-      <label htmlFor={`${ids}-subject`} className="grid gap-1 text-sm font-semibold text-navy-deep">
-        {t('form.subject')}
-        <input
-          id={`${ids}-subject`}
-          required={true}
-          minLength={2}
-          maxLength={SUBJECT_MAX}
-          value={subject}
-          placeholder={t('form.subjectPlaceholder')}
-          onChange={(event) => setSubject(event.target.value)}
-          className={field}
-        />
-      </label>
-      <div className="grid grid-cols-2 gap-3">
-        <label htmlFor={`${ids}-date`} className="grid gap-1 text-sm font-semibold text-navy-deep">
-          {t('form.date')}
-          <input
-            id={`${ids}-date`}
-            type="date"
-            required={true}
-            value={date}
-            aria-invalid={inPast}
-            aria-describedby={`${ids}-zone`}
-            onChange={(event) => setDate(event.target.value)}
-            className={field}
-          />
-        </label>
-        <label htmlFor={`${ids}-time`} className="grid gap-1 text-sm font-semibold text-navy-deep">
-          {t('form.time')}
-          <input
-            id={`${ids}-time`}
-            type="time"
-            required={true}
-            step={300}
-            value={time}
-            aria-invalid={inPast}
-            aria-describedby={`${ids}-zone`}
-            onChange={(event) => setTime(event.target.value)}
-            className={field}
-          />
-        </label>
-      </div>
-      <p id={`${ids}-zone`} className={inPast ? '-mt-2 text-sm text-crimson' : '-mt-2 text-xs text-slate'}>
-        {inPast ? t('form.inPast') : t('form.timezone', { zone })}
-      </p>
-      <label htmlFor={`${ids}-duration`} className="grid gap-1 text-sm font-semibold text-navy-deep">
-        {t('form.duration')}
-        <select
-          id={`${ids}-duration`}
-          value={duration}
-          onChange={(event) => setDuration(Number(event.target.value))}
-          className={field}
-        >
-          {DURATIONS.map((minutes) => (
-            <option key={minutes} value={minutes}>
-              {t('form.minutes', { minutes })}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label htmlFor={`${ids}-recording`} className="flex items-start gap-3 text-sm text-navy-deep">
-        <input
-          id={`${ids}-recording`}
-          type="checkbox"
-          checked={recording}
-          aria-describedby={`${ids}-recording-hint`}
-          onChange={(event) => setRecording(event.target.checked)}
-          className="mt-0.5 size-5 accent-rouge"
-        />
-        <span>
-          <span className="font-semibold">{t('form.recording')}</span>
-          <span id={`${ids}-recording-hint`} className="block text-xs text-slate">
-            {t('form.recordingHint')}
-          </span>
-        </span>
-      </label>
-      <div className="flex justify-end gap-2">
-        <button type="button" onClick={onDone} className={secondary}>
-          {t('form.cancel')}
-        </button>
-        <button type="submit" disabled={pending} className={primary}>
-          {pending ? t('form.saving') : meeting ? t('form.saveEdit') : t('form.save')}
-        </button>
-      </div>
-    </form>
   );
 }
 

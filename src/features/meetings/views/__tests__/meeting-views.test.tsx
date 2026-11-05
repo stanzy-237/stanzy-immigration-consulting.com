@@ -6,7 +6,9 @@ import { axe } from 'vitest-axe';
 
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { DossierMeetingsView } from '@/features/meetings/views/dossier-meetings-view';
+import { InvitationView } from '@/features/meetings/views/invitation-view';
 import { MeetingRoomView } from '@/features/meetings/views/meeting-room-view';
+import { MeetingsHomeView } from '@/features/meetings/views/meetings-home-view';
 import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /** Seam: the Réunion screens with their data in the cache; Stream's call is stubbed. */
@@ -21,7 +23,9 @@ vi.mock('@/i18n/navigation', () => ({
       {children}
     </a>
   ),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -31,6 +35,12 @@ afterEach(() => vi.useRealTimers());
 
 const meeting = (extra: Record<string, unknown> = {}) => ({
   id: 'm_1',
+  kind: 'SCHEDULED',
+  dossierId: 'dos_1',
+  description: null,
+  endedAt: null,
+  inviteToken: null,
+  participants: [{ account: { id: 'acc_1', name: 'Aminata Diallo', email: 'a@x.com', locale: 'fr', role: 'MEMBER' } }],
   subject: 'Point sur la preuve de fonds',
   startsAt: new Date('2026-11-11T13:00:00Z'),
   durationMinutes: 30,
@@ -54,7 +64,7 @@ describe('the Réunions panel', () => {
     const { container } = panel('client', [meeting(), meeting({ id: 'm_2', subject: 'Plus tard', startsAt: new Date('2026-11-20T13:00:00Z') })]);
     expect(screen.getByRole('link', { name: 'Rejoindre « Point sur la preuve de fonds »' })).toHaveAttribute(
       'href',
-      '/fr/mon-espace/dossiers/dos_1/reunions/m_1',
+      '/fr/mon-espace/reunions/m_1',
     );
     expect(screen.getByText('La salle ouvre 15 minutes avant.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Planifier une réunion' })).not.toBeInTheDocument();
@@ -77,9 +87,11 @@ describe('the Réunions panel', () => {
       expect(schedule).toHaveBeenCalledWith({
         dossierId: 'dos_1',
         subject: 'Point EDE',
+        description: null,
         startsAt: new Date('2026-11-12T10:00'),
         durationMinutes: 45,
         recording: true,
+        participantIds: [],
       }),
     );
   });
@@ -104,9 +116,8 @@ describe('the Réunions panel', () => {
 describe('the room', () => {
   const room = (extra: Record<string, unknown> = {}) => ({
     ...meeting(),
-    dossierId: 'dos_1',
     plannedById: 'acc_stanzy',
-    dossier: { id: 'dos_1', service: 'ACCOMPAGNEMENT' },
+    consultant: null,
     joinable: true,
     past: false,
     consentedAt: null,
@@ -116,7 +127,7 @@ describe('the room', () => {
   function open(data: unknown, handlers: Record<string, (input: never) => unknown> = {}) {
     const { trpc, queryClient, wrap } = createTestTRPC({ 'meetings.room': () => data, ...handlers });
     queryClient.setQueryData(trpc.meetings.room.queryKey({ id: 'm_1' }), data as never);
-    return render(withIntl(wrap(<MeetingRoomView dossierId="dos_1" meetingId="m_1" viewer="client" />)));
+    return render(withIntl(wrap(<MeetingRoomView meetingId="m_1" viewer="client" />)));
   }
 
   it('asks to accept the recording before joining', async () => {
@@ -141,5 +152,64 @@ describe('the room', () => {
     unmount();
     open(room({ status: 'CANCELLED', joinable: false }));
     expect(screen.getByText('Cette réunion a été annulée.')).toBeInTheDocument();
+  });
+});
+
+describe('the Réunions section', () => {
+  const hubMeeting = (extra: Record<string, unknown> = {}) => ({
+    ...meeting(),
+    startsAt: new Date('2026-11-11T13:10:00Z'),
+    inviteToken: 'abcdefghijklmnopqrstuvwxyz012345',
+    notes: null,
+    plannedById: 'acc_stanzy',
+    dossier: { id: 'dos_1', service: 'ACCOMPAGNEMENT', account: { name: 'Aminata Diallo' } },
+    ...extra,
+  });
+
+  it('shows the time, the next Réunion and today’s, with « Démarrer » and « Copier l’invitation »', async () => {
+    const data = { meetings: [hubMeeting()], next: { id: 'm_1', subject: 'Point sur la preuve de fonds', startsAt: new Date('2026-11-11T13:10:00Z') } };
+    const { trpc, queryClient, wrap } = createTestTRPC({ 'meetings.dashboard.today': () => data });
+    queryClient.setQueryData(trpc.meetings.dashboard.today.queryKey(), data as never);
+    const writeText = vi.fn(async () => {});
+    Object.assign(navigator, { clipboard: { writeText } });
+    const { container } = render(withIntl(wrap(<MeetingsHomeView />)));
+
+    expect(screen.getByText(/Prochaine réunion à .* · Point sur la preuve de fonds/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Nouvelle réunion/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Démarrer « Point sur la preuve de fonds »' })).toHaveAttribute('href', '/reunions/m_1');
+    expect(await axe(container)).toHaveNoViolations();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Copier l’invitation de « Point sur la preuve de fonds »' }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/fr/reunion/abcdefghijklmnopqrstuvwxyz012345')));
+  });
+
+  it('lets someone with the link ask to enter, then wait', async () => {
+    let viewer = 'NONE';
+    const request = vi.fn();
+    const invitation = () => ({
+      id: 'm_1',
+      kind: 'INSTANT',
+      subject: 'Point rapide',
+      startsAt: new Date('2026-11-11T12:50:00Z'),
+      durationMinutes: 60,
+      status: 'SCHEDULED',
+      endedAt: null,
+      past: false,
+      viewer,
+    });
+    const { trpc, queryClient, wrap } = createTestTRPC({
+      'meetings.invitation.get': () => invitation(),
+      'meetings.invitation.request': (input) => {
+        request(input);
+        viewer = 'PENDING';
+        return { status: 'PENDING' };
+      },
+    });
+    queryClient.setQueryData(trpc.meetings.invitation.get.queryKey({ token: 'abcdefghijklmnopqrstuvwxyz012345' }), invitation() as never);
+    render(withIntl(wrap(<InvitationView token="abcdefghijklmnopqrstuvwxyz012345" />)));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Demander à entrer' }));
+    await waitFor(() => expect(request).toHaveBeenCalledWith({ token: 'abcdefghijklmnopqrstuvwxyz012345' }));
+    expect(await screen.findByText(/Votre demande est envoyée/)).toBeInTheDocument();
   });
 });
