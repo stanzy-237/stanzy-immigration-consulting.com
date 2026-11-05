@@ -232,32 +232,36 @@ sql() {
 
 run_wizard() {
 
-TOTAL_STAGES=15
+TOTAL_STAGES=18
 
-banner "Walkthrough: everything built on 4 November (#105–#109)"
+banner "Walkthrough: Accompagnement, the Dossier's tabs, Messages, Réunions, Finances, reminders"
 
 # ── 1 ─────────────────────────────────────────────────────────────────────
 stage "Before we start"
 say "You'll test, in the browser on your dev server, as the consultant and as a test Client:"
 note "  • Accompagnement: Demande d'intérêt, Niveau, Dossier, « Stanzy s'en charge » (#109)"
-note "  • Messages du dossier (#107) · Réunions (#108) · Finances (#106) · signature reminders (#105)"
+note "  • The Dossier in tabs (#111) · Messages du dossier (#107)"
+note "  • Réunions: the section, instant Réunions, the invitation link, the room (#108, #112)"
+note "  • Finances (#106) · signature reminders (#105)"
 say ""
 warn "Your $ENV_FILE sends real emails (Resend) and uses the database in DATABASE_URL."
 note "Use a test Client account with an email you can read. If that database is also"
-note "production, the daily job (stage 13 and 14) emails every client who has a reminder due."
+note "production, the daily job (stages 16 and 17) emails every client who has a reminder due."
 say ""
 say "At each check, answer y or n: what didn't work is listed at the end."
 pause
 
 # ── 2 ─────────────────────────────────────────────────────────────────────
 stage "The database is up to date"
-say "Five migrations came with this work (Finances, Messages, Réunions, Accompagnement, reminders)."
+say "Six migrations came with this work (Finances, Messages, Réunions twice, Accompagnement, reminders)."
 if confirm "Apply them now (npx prisma migrate deploy, then prisma generate)?"; then
   npx prisma migrate deploy && npx prisma generate >/dev/null && printf '  %s✓ migrations applied%s\n' "$GREEN" "$RESET"
 else
   SKIPPED+=("apply the migrations: npx prisma migrate deploy && npx prisma generate")
 fi
 step "Restart « npm run dev » (Ctrl+C, then again) so it uses the new tables."
+note "If a page says « Unknown argument … », the dev server kept the old client: stop it, run"
+note "  rm -rf .next   then   npm run dev   again."
 pause "Press Enter once the dev server is running"
 
 # ── 3 ─────────────────────────────────────────────────────────────────────
@@ -267,6 +271,8 @@ step "Window 1, the Tableau de bord ($ADMIN): signed in as the consultant."
 step "Window 2, a PRIVATE window: $SITE, signed in as a test Client (a plain account,"
 step "  without an Accompagnement Dossier yet). Create one if needed: $SITE/inscription"
 note "Keep both open: the walkthrough says « Consultant » or « Client » for each step."
+note "For stage 12 (the waiting room), a second test account helps: another browser, or sign the"
+note "  Client out and in as someone else when you get there."
 pause
 
 # ── 4 ─────────────────────────────────────────────────────────────────────
@@ -293,70 +299,111 @@ step "Client: the email « Votre demande d'accompagnement est acceptée » and t
 check "The Client was told"
 
 # ── 6 ─────────────────────────────────────────────────────────────────────
-stage "#109 · The Dossier's Documents"
-step "Client: Mon espace → the new Accompagnement Dossier → « Documents »."
+stage "#111 · The Dossier in tabs"
+step "Consultant: open the new Dossier. Above: the Client, the service, « Étape : … », « Contrat non signé »."
+step "Five tabs: Aperçu (stages, « Étape suivante », history), Documents, Messages, Réunions, Facturation."
+step "« Documents » shows a red number: the missing Documents. Click each tab: one subject at a time,"
+step "  and the address gets ?onglet=… (reload: the same tab opens)."
+step "Click « Contrat non signé »: it opens « Facturation » on the Contrat."
+step "Client: Mon espace → the Dossier: the same tabs, without Finances."
+check "Tabs on both sides, counts, the tab kept in the address"
+
+# ── 7 ─────────────────────────────────────────────────────────────────────
+stage "#109 · Client: the Documents tab"
+step "Client: the Dossier → « Documents »."
 step "Sections like « Études … – Requérant principal », each Document ★ Obligatoire or Recommandé."
 step "« Lettre de la banque »: « Manquant », « Demandé à Stanzy ». Open it: « Votre note : … »."
 step "« Résultats du test de langue »: Manquant; inside, « Préparer le TCF » (the academy)."
 step "Pick another Manquant Document with no request: « Stanzy s'en charge » → it says « Demandé à Stanzy »."
 check "Badges, notes, TCF link and « Stanzy s'en charge »"
-step "Upload a file on a Manquant Document: « Manquant » goes away."
+step "Upload a file on a Manquant Document: « Manquant » goes away (and the tab's count goes down)."
 check "« Manquant » goes once a Version is there"
 
-# ── 7 ─────────────────────────────────────────────────────────────────────
+# ── 8 ─────────────────────────────────────────────────────────────────────
 stage "#109 · Consultant: « Documents à obtenir par Stanzy »"
-step "Consultant: open the same Dossier in the Tableau de bord."
-step "Below the Contrat panel: « Documents à obtenir par Stanzy » with the requests (« Demandé à Stanzy »)."
+step "Consultant: the Dossier → « Documents »: at the top, « Documents à obtenir par Stanzy »."
 step "« Refuser » one, with a note. The Client gets an email and the bell; the Document says"
 step "  « À obtenir par vous · <note> » and offers « Stanzy s'en charge » again."
 check "Declining a Stanzy request"
 step "On a Document, the consultant sees « Note du client : … »."
 check "The consultant sees the Client's notes"
 
-# ── 8 ─────────────────────────────────────────────────────────────────────
-stage "#107 · Messages du dossier"
-step "Client: in the Dossier, « Messages » (above the Documents): write a message, attach a PDF, « Envoyer »."
-step "Consultant: the bell « … a écrit un message » (and the email); the Dossier's « Messages » shows it."
+# ── 9 ─────────────────────────────────────────────────────────────────────
+stage "#107 · The Messages tab"
+step "Client: the Dossier → « Messages »: write a message, attach a PDF, « Envoyer »."
+step "Consultant: the bell « … a écrit un message » (and the email); its link opens the « Messages » tab."
 step "Open the attachment: it opens decrypted. Reply under it (« Répondre »)."
 step "Client: edit your own message (it shows « modifié »); the consultant's has no « Modifier » or « Supprimer »."
 step "Consultant: delete the Client's first message: with its reply, it stays as « Message supprimé »."
 check "Messages: send, file, reply, edit, delete, notifications"
 
-# ── 9 ─────────────────────────────────────────────────────────────────────
-stage "#108 · Réunions: plan one"
+# ── 10 ────────────────────────────────────────────────────────────────────
+stage "#112 · Réunions: the section and planning"
 if [[ -z "$(_existing STREAM_API_KEY || true)" ]]; then
   warn "STREAM_API_KEY isn't in $ENV_FILE: Réunions can be planned, not joined."
   note "Run ./scripts/setup-stream.sh first to try the call itself."
 fi
-step "Consultant: Dossier → « Réunions » → « Planifier une réunion »:"
-step "  today, in 5 minutes, 15 minutes, « Enregistrer et transcrire » ticked → « Planifier »."
-step "Client: the email « Réunion planifiée : … » (Douala time) and the bell; Mon espace shows it."
-check "Planning a Réunion and telling the Client"
-
-# ── 10 ────────────────────────────────────────────────────────────────────
-stage "#108 · Réunions: join from both sides"
-step "Both: « Rejoindre » (it shows 15 minutes before the start)."
-step "« Cette réunion est enregistrée »: tick « J'accepte… », « Rejoindre », allow camera and micro."
-step "Both should see each other; share a screen from the controls; « Enregistrement en cours » shows."
-step "Leave from both sides. Consultant: write a note under the Réunion → « Enregistrer les notes »."
-check "Joining, consent, screen sharing, recording badge"
-note "With the webhook set (setup-stream.sh stage 6), a few minutes after the end the consultant"
-note "sees « Enregistrement du … » and « Lire la transcription », and can search what was said."
-check "Recording and transcription arrived (needs the webhook; answer n otherwise)"
+open_url "$ADMIN/reunions"
+step "Consultant: « Réunions » in the sidebar. Accueil: the time, « Prochaine réunion … », 4 tiles,"
+step "  « Réunions d'aujourd'hui »; tabs À venir, Passées, Enregistrements, Salle personnelle."
+step "« Planifier »: today in 5 minutes, 15 minutes, Participants: search the test Client and add them,"
+step "  Dossier: the test Dossier, « Enregistrer et transcrire » ticked → « Planifier »."
+step "« Réunion planifiée » → « Copier l'invitation »: paste it somewhere: a sentence with a link"
+step "  to $SITE/reunion/… (the site, not admin)."
+step "« À venir »: the card, with the Client's initials, « Démarrer » and « Copier l'invitation »."
+step "Client: the email « Réunion planifiée : … » (Douala time) and the bell; the Dossier's « Réunions » tab shows it."
+check "Planning from the section, the invitation, the Client told"
 
 # ── 11 ────────────────────────────────────────────────────────────────────
+stage "#112 · The room, from both sides"
+step "Both: « Rejoindre » / « Démarrer » (it opens 15 minutes before the start)."
+step "« Cette réunion est enregistrée »: tick « J'accepte… », « Rejoindre », allow camera and micro."
+step "Consultant, in the room, try each control at the bottom:"
+step "  disposition (Grille, Intervenant à gauche / à droite / en haut), ordre (Qui parle, Écrans d'abord, Par nom),"
+step "  participants (the list on the right), blur, micro/caméra/haut-parleur, plein écran, réactions."
+step "On a tile, its menu (⋮): « Pin » (Stream's own words, in English): that person comes first."
+step "Share a screen; « Enregistrement en cours » and the timer show at the top."
+check "Layouts, order, pinning, participants, blur, devices, fullscreen, recording"
+step "Consultant: « Quitter » → « Terminer pour tous »: the Client's room says « La réunion est terminée »."
+check "« Terminer pour tous » ends it for the Client too"
+step "Consultant: the Réunion's page (« Passées » → it): write a note → « Enregistrer les notes »."
+note "With the webhook set (setup-stream.sh stage 6, or a cloudflared tunnel), a few minutes after the end"
+note "« Enregistrement du … » and « Lire la transcription » appear, and « Enregistrements » lists it."
+check "Recording and transcription arrived (needs the webhook; answer n otherwise)"
+
+# ── 12 ────────────────────────────────────────────────────────────────────
+stage "#112 · Instant Réunion, invitation link, waiting room"
+step "Consultant: Accueil → « Nouvelle réunion », no participant, subject « Test lien » → « Démarrer »:"
+step "  you're in the room. At the top, « Copier l'invitation »."
+step "Second account (not invited), signed in, opens that link: « Demander à entrer » → it waits."
+step "Consultant: the bell « … demande à entrer » and, in the room, « Demandent à entrer » → « Faire entrer »."
+step "The second account's page goes on to the room by itself; they accept the recording and join."
+check "The waiting room lets someone in"
+step "Try again with « Refuser »: their page says the request wasn't accepted."
+step "Signed out, the link asks to sign in first."
+check "Refusing, and signed-in only"
+
+# ── 13 ────────────────────────────────────────────────────────────────────
+stage "#112 · Salle personnelle and Enregistrements"
+open_url "$ADMIN/reunions/salle-personnelle"
+step "Consultant: « Salle personnelle »: its name, its link. « Copier l'invitation », « Modifier » (rename,"
+step "  recording), « Nouveau lien » (the old link stops working). « Entrer dans la salle » opens it any time."
+step "« Enregistrements »: each recording with « Lire » (it plays) and « Voir la réunion »."
+check "Salle personnelle and Enregistrements"
+
+# ── 14 ────────────────────────────────────────────────────────────────────
 stage "#108 · Reminders, moving, cancelling"
-step "Consultant: plan another Réunion starting in 10 minutes."
+step "Consultant: plan another Réunion (from the section or the Dossier's « Réunions » tab) in 10 minutes."
 if confirm "Run the reminders round now (POST /api/cron/meetings)?"; then
   run_cron meetings || true
   step "Client: « Dans 15 minutes : … » by email and in the bell; the consultant's bell too."
   check "The 15-minute reminder"
 fi
-step "Consultant: « Modifier » → move it to tomorrow: the Client gets « Réunion déplacée »."
+step "Consultant: on the card (Dossier « Réunions » tab) « Modifier » → move it to tomorrow: « Réunion déplacée »."
 step "Then « Annuler » with a reason: the Client gets « Réunion annulée » with the reason."
 check "Moving and cancelling tell the Client"
 
-# ── 12 ────────────────────────────────────────────────────────────────────
+# ── 15 ────────────────────────────────────────────────────────────────────
 stage "#106 · Finances: Recettes"
 open_url "$ADMIN/finances"
 step "Consultant: send the invoice of stage 5 (any amount, XAF) and mark it « Payée »."
@@ -366,7 +413,7 @@ step "« Vue d'ensemble »: a yellow « Taux CAD manquant pour <mois> »."
 step "« Réglages » → this month's CAD rate (e.g. 440) → « Enregistrer »: the warning goes, totals include it."
 check "Recettes, paid invoice, CAD rate"
 
-# ── 13 ────────────────────────────────────────────────────────────────────
+# ── 16 ────────────────────────────────────────────────────────────────────
 stage "#106 · Finances: Charges and margin"
 step "« Charges » → « Ajouter une charge »: Loyer, dated 2 months ago, « Revient chaque mois », a receipt (PDF)."
 step "Another: « Frais payés pour un client », linked to the test Client's Dossier."
@@ -375,15 +422,15 @@ if confirm "Run the daily round now (makes the monthly copies; also sends any re
   run_cron daily || true
   step "« Charges »: the rent has 2 « Copie mensuelle » rows (last month and this month, if its day came)."
 fi
-step "The Dossier page (Tableau de bord): « Finances du dossier » shows Recettes, Charges, Marge."
+step "The Dossier → « Facturation »: « Finances du dossier » shows Recettes, Charges, Marge."
 step "« Vue d'ensemble » → « Exporter en CSV »: it opens in a spreadsheet, accents right."
 step "« Réglages »: rename a category, archive one: it's no longer offered for a new Charge."
 check "Charges, monthly copies, Dossier margin, CSV, categories"
 
-# ── 14 ────────────────────────────────────────────────────────────────────
+# ── 17 ────────────────────────────────────────────────────────────────────
 stage "#105 · Signature reminders (3 and 7 days)"
 say "A reminder goes 3 days after sending. We'll back-date ONE test request by 3 days."
-step "Consultant: in the test Dossier, send a « Demande de signature » on a PDF Version (Documents)."
+step "Consultant: in the test Dossier, « Documents », send a « Demande de signature » on a PDF Version."
 step "Client: open the email or the bell's link; copy its address (…/signer/<id>)."
 ask SIGN_LINK "Paste that link (or leave empty to skip):" || true
 if [[ "${SIGN_LINK:-}" =~ /signer/([A-Za-z0-9]+) ]]; then
@@ -400,7 +447,7 @@ fi
 note "Contrats get the same reminders (…/contrats/<id>): back-date contract.\"sentAt\" the same way to try."
 pause
 
-# ── 15 ────────────────────────────────────────────────────────────────────
+# ── 18 ────────────────────────────────────────────────────────────────────
 stage "Done"
 printf '  %s✓ %s check(s) passed%s\n' "$GREEN" "${#PASSED[@]}" "$RESET"
 for item in "${PASSED[@]}"; do note "    ✓ $item"; done
