@@ -1,32 +1,33 @@
 import { after } from 'next/server';
 
-import { clientRoomPath } from '@/features/meetings/lib/meeting-schema';
 import { meetingEmail, type MeetingEmailKind } from '@/features/meetings/lib/meeting-emails';
+import { clientRoomPath } from '@/features/meetings/lib/meeting-schema';
 import { toLocale } from '@/i18n/routing';
 import type { Mailer } from '@/server/email/mailer';
 
-type Client = { email: string; name: string; locale: string };
-type MeetingFacts = {
+/** Someone invited: a Client or a partner, with their account. */
+export type Person = { id: string; email: string; name: string; locale: string };
+export type MeetingFacts = {
   id: string;
-  dossierId: string;
+  dossierId: string | null;
   subject: string;
   startsAt: Date;
   durationMinutes: number;
   recording: boolean;
 };
 
-/** The Client's link: the room, or the Dossier's Réunions once cancelled. */
-export function clientMeetingUrl(siteUrl: string, client: Client, meeting: MeetingFacts, kind: MeetingEmailKind): string {
-  const base = `${siteUrl}/${toLocale(client.locale)}`;
-  return kind === 'cancelled'
-    ? `${base}/mon-espace/dossiers/${meeting.dossierId}#reunions`
-    : `${base}${clientRoomPath(meeting.dossierId, meeting.id)}`;
+/** Their link: the room, or once cancelled the Dossier's Réunions (or the room's page, saying so). */
+export function participantUrl(siteUrl: string, person: Person, meeting: MeetingFacts, kind: MeetingEmailKind): string {
+  const base = `${siteUrl}/${toLocale(person.locale)}`;
+  return kind === 'cancelled' && meeting.dossierId
+    ? `${base}/mon-espace/dossiers/${meeting.dossierId}?onglet=reunions`
+    : `${base}${clientRoomPath(meeting.id)}`;
 }
 
-/** Emails the Client about a Réunion; a failure is logged, never thrown. */
-export async function emailClient(
+/** Emails one participant about a Réunion; a failure is logged, never thrown. */
+export async function emailParticipant(
   deps: { mailer: Mailer; siteUrl: string },
-  client: Client,
+  person: Person,
   meeting: MeetingFacts,
   kind: MeetingEmailKind,
   reason?: string | null,
@@ -34,29 +35,32 @@ export async function emailClient(
   try {
     await deps.mailer.send(
       meetingEmail({
-        to: client.email,
-        name: client.name,
-        locale: client.locale,
+        to: person.email,
+        name: person.name,
+        locale: person.locale,
         kind,
         meeting,
         reason,
-        url: clientMeetingUrl(deps.siteUrl, client, meeting, kind),
+        url: participantUrl(deps.siteUrl, person, meeting, kind),
       }),
     );
   } catch (error) {
-    console.error('[meetings] could not email the Client', meeting.id, kind, error);
+    console.error('[meetings] could not email a participant', meeting.id, kind, error);
   }
 }
 
-/** The same, after the response, so the consultant's click doesn't wait. */
-export function emailClientLater(
+/** The same for each of them, after the response, so the consultant's click doesn't wait. */
+export function emailParticipantsLater(
   deps: { mailer: Mailer; siteUrl: string },
-  client: Client,
+  people: Person[],
   meeting: MeetingFacts,
   kind: MeetingEmailKind,
   reason?: string | null,
 ): void {
-  after(() => emailClient(deps, client, meeting, kind, reason));
+  if (people.length === 0) return;
+  after(async () => {
+    for (const person of people) await emailParticipant(deps, person, meeting, kind, reason);
+  });
 }
 
 /** What a Réunion Notification's text and link need. */

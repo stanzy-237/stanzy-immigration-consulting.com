@@ -1412,7 +1412,8 @@
       "signatures": "Signatures",
       "contrats": "Contracts",
       "demandes": "Expressions of interest",
-      "finances": "Finances"
+      "finances": "Finances",
+      "reunions": "Meetings"
     },
     "viewSite": "View the site",
     "overview": {
@@ -2331,7 +2332,8 @@
       "MEETING_MOVED": "Meeting “{subject}” moved to {date}.",
       "MEETING_CANCELLED": "Meeting “{subject}” cancelled.",
       "MEETING_REMINDER": "{soon, select, true {The meeting “{subject}” starts soon.} other {Reminder: meeting “{subject}” on {date}.}}",
-      "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file."
+      "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file.",
+      "MEETING_JOIN_REQUEST": "{client} asks to join “{subject}”."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2361,7 +2363,8 @@
       "MEETING_MOVED": "A meeting changed.",
       "MEETING_CANCELLED": "A meeting was cancelled.",
       "MEETING_REMINDER": "Meeting reminder.",
-      "DOSSIER_MESSAGE": "New message in a file."
+      "DOSSIER_MESSAGE": "New message in a file.",
+      "MEETING_JOIN_REQUEST": "Someone asks to join."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -3102,6 +3105,10 @@
       "soon": {
         "subject": "In 15 minutes: {subject}",
         "body": "Your meeting “{subject}” starts soon, on {when}. You can join it now."
+      },
+      "instant": {
+        "subject": "Stanzy is waiting for you: {subject}",
+        "body": "Stanzy opened a video meeting “{subject}”, now. Join it with the button below."
       }
     },
     "panel": {
@@ -3197,7 +3204,176 @@
       "MEETING_CONSENT_REQUIRED": "Accept the recording to join.",
       "MEETINGS_UNCONFIGURED": "Video isn’t set up on this site yet.",
       "DOSSIER_CLOSED": "This file is closed.",
-      "UNKNOWN": "Something went wrong. Try again."
+      "UNKNOWN": "Something went wrong. Try again.",
+      "MEETING_PARTICIPANT_UNKNOWN": "Someone invited no longer exists.",
+      "MEETING_REQUEST_DECIDED": "This request was already handled."
+    },
+    "hub": {
+      "nav": {
+        "label": "Meeting sections",
+        "home": "Home",
+        "upcoming": "Upcoming",
+        "past": "Past",
+        "recordings": "Recordings",
+        "personal": "Personal room"
+      },
+      "home": {
+        "next": "Next meeting at {time} · {subject}",
+        "noNext": "No meeting planned",
+        "tiles": {
+          "instant": {
+            "title": "New meeting",
+            "body": "Start now"
+          },
+          "join": {
+            "title": "Join",
+            "body": "With an invitation link"
+          },
+          "plan": {
+            "title": "Plan",
+            "body": "Prepare a meeting"
+          },
+          "recordings": {
+            "title": "Recordings",
+            "body": "Watch meetings again"
+          }
+        },
+        "today": "Today’s meetings",
+        "seeAll": "See all",
+        "noToday": "No meetings today."
+      },
+      "list": {
+        "upcoming": "Upcoming meetings",
+        "past": "Past meetings",
+        "emptyUpcoming": "No upcoming meetings.",
+        "emptyPast": "No past meetings.",
+        "loading": "Loading meetings"
+      },
+      "card": {
+        "start": "Start",
+        "startLabel": "Start “{subject}”",
+        "copy": "Copy invitation",
+        "copyLabel": "Copy the invitation to “{subject}”",
+        "copied": "Invitation copied",
+        "dossier": "{name}’s file",
+        "instant": "Instant",
+        "cancelled": "Cancelled",
+        "ended": "Ended",
+        "recordings": "{count, plural, one {# recording} other {# recordings}}",
+        "nobody": "No participants",
+        "more": "and {count} more",
+        "invitation": "Invitation to the meeting “{subject}” ({when}): {link}"
+      },
+      "recordings": {
+        "empty": "No recordings yet: they arrive a few minutes after a recorded meeting ends.",
+        "play": "Play",
+        "playLabel": "Play the recording of “{subject}”",
+        "transcribed": "Transcribed",
+        "open": "See the meeting",
+        "duration": "{minutes} min"
+      },
+      "personal": {
+        "intro": "Your room, always open. Share its link: people who aren’t invited wait until you let them in.",
+        "topic": "Name",
+        "link": "Invitation link",
+        "start": "Enter the room",
+        "copy": "Copy invitation",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "recording": "Record and transcribe",
+        "newLink": "New link",
+        "newLinkTitle": "Change the link?",
+        "newLinkBody": "The old link will stop working.",
+        "confirm": "Change",
+        "recorded": "Recorded",
+        "notRecorded": "Not recorded"
+      },
+      "instant": {
+        "title": "New meeting",
+        "body": "It starts now. The people invited get an email and a notification; you can also copy the link once in the room.",
+        "subject": "Subject (optional)",
+        "start": "Start",
+        "starting": "Opening…"
+      },
+      "join": {
+        "title": "Join a meeting",
+        "body": "Paste the invitation link.",
+        "link": "Invitation link",
+        "invalid": "This link isn’t a valid invitation.",
+        "go": "Join",
+        "cancel": "Cancel"
+      },
+      "created": {
+        "title": "Meeting planned",
+        "body": "The people invited received the invitation. You can also copy the link.",
+        "copy": "Copy invitation",
+        "close": "Close"
+      },
+      "people": {
+        "label": "Participants",
+        "hint": "Clients and partners, each with their account. With the link, others can ask to join.",
+        "search": "Search by name or email",
+        "remove": "Remove {name}",
+        "noMatch": "Nobody matches.",
+        "partner": "Partner",
+        "loading": "Searching"
+      },
+      "form": {
+        "description": "Description (optional)",
+        "dossier": "File (optional)",
+        "noDossier": "No file"
+      },
+      "invitation": {
+        "title": "Meeting invitation",
+        "ask": "Ask to join",
+        "asking": "Sending…",
+        "waiting": "Your request is sent: Stanzy will let you in. Keep this page open.",
+        "refused": "Your request wasn’t accepted.",
+        "over": "This meeting is over.",
+        "cancelled": "This meeting was cancelled.",
+        "loading": "Loading the invitation",
+        "open": "Open the room"
+      },
+      "waiting": {
+        "title": "Asking to join",
+        "admit": "Let in",
+        "admitLabel": "Let {name} in",
+        "refuse": "Refuse",
+        "refuseLabel": "Refuse {name}"
+      },
+      "room": {
+        "layout": "Layout",
+        "layouts": {
+          "grid": "Grid",
+          "speakerLeft": "Speaker on the left",
+          "speakerRight": "Speaker on the right",
+          "speakerTop": "Speaker on top"
+        },
+        "sort": "Order",
+        "sorts": {
+          "default": "Who speaks first",
+          "screen": "Shared screens first",
+          "name": "By name"
+        },
+        "participants": "Participants",
+        "blur": "Blur the background",
+        "unblur": "Remove the blur",
+        "settings": "Microphone, camera and speaker",
+        "fullscreen": "Full screen",
+        "exitFullscreen": "Exit full screen",
+        "leave": "Leave",
+        "endTitle": "Leave the meeting?",
+        "endBody": "“End for everyone” closes the meeting for each person and stops the recording.",
+        "endAll": "End for everyone",
+        "leaveOnly": "Leave only",
+        "ended": "The meeting has ended.",
+        "copyInvite": "Copy invitation",
+        "dossier": "Open the file",
+        "close": "Close",
+        "back": "Back to meetings",
+        "timer": "Duration"
+      }
     }
   },
   "Finances": {

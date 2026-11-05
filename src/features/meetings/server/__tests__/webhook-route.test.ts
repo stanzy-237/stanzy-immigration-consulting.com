@@ -21,7 +21,7 @@ beforeEach(() => {
   stream.stream.mockReturnValue({ verifyWebhook: (_body: string, signature: string) => signature === 'good' });
   db.prisma.meeting.findUnique.mockResolvedValue({
     id: 'm_1',
-    dossier: { account: { id: 'acc_1', name: 'Aminata Diallo' } },
+    participants: [{ account: { id: 'acc_1', name: 'Aminata Diallo' } }],
   });
   db.prisma.account.findMany.mockResolvedValue([{ id: 'acc_stanzy', name: 'Stanzy' }]);
 });

@@ -1,12 +1,7 @@
-import { MeetingRoomView } from '@/features/meetings/views/meeting-room-view';
-import { HydrateClient, prefetch, trpc } from '@/trpc/server';
+import { redirect } from 'next/navigation';
 
-export default async function Page({ params }: { params: Promise<{ id: string; meetingId: string }> }) {
-  const { id, meetingId } = await params;
-  prefetch(trpc.meetings.room.queryOptions({ id: meetingId }));
-  return (
-    <HydrateClient>
-      <MeetingRoomView dossierId={id} meetingId={meetingId} viewer="consultant" />
-    </HydrateClient>
-  );
+// Réunions have their own room now, with or without a Dossier: links sent before land there.
+export default async function Page({ params }: { params: Promise<{ meetingId: string }> }) {
+  const { meetingId } = await params;
+  redirect(`/reunions/${meetingId}`);
 }

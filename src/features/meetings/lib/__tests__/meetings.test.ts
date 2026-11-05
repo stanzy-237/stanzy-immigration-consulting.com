@@ -28,7 +28,14 @@ describe('the room', () => {
   });
 
   it('takes only the durations offered', () => {
-    const base = { dossierId: 'dos_1', subject: 'Point', startsAt: '2026-11-10T13:00:00Z', recording: true };
+    const base = {
+      dossierId: 'dos_1',
+      subject: 'Point',
+      description: null,
+      participantIds: [],
+      startsAt: '2026-11-10T13:00:00Z',
+      recording: true,
+    };
     expect(scheduleInput.safeParse({ ...base, durationMinutes: 30 }).success).toBe(true);
     expect(scheduleInput.safeParse({ ...base, durationMinutes: 37 }).success).toBe(false);
   });

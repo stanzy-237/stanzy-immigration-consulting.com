@@ -25,20 +25,20 @@ datasource db {
 
 /// One person's login on the platform (GLOSSARY: Account).
 model Account {
-  id                String             @id
+  id                String               @id
   name              String
-  email             String             @unique
-  emailVerified     Boolean            @default(false)
+  email             String               @unique
+  emailVerified     Boolean              @default(false)
   image             String?
   /// Language the Account signed up in; drives email copy. `fr` | `en`.
-  locale            String             @default("fr")
+  locale            String               @default("fr")
   /// Commercial journey; moves forward only (src/features/auth/lib/account-status.ts).
-  status            AccountStatus      @default(USER)
+  status            AccountStatus        @default(USER)
   /// Access level; CONSULTANT comes only from CONSULTANT_EMAILS, PARTNER only
   /// from the consultant.
-  role              AccountRole        @default(MEMBER)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  role              AccountRole          @default(MEMBER)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
   sessions          Session[]
   identities        AuthIdentity[]
   crsSimulations    CrsSimulation[]
@@ -54,21 +54,23 @@ model Account {
   documentVersions  DocumentVersion[]
   documentComments  DocumentComment[]
   paymentProofs     PaymentProof[]
-  notifications     Notification[]     @relation("NotificationRecipient")
-  notificationsMade Notification[]     @relation("NotificationActor")
+  notifications     Notification[]       @relation("NotificationRecipient")
+  notificationsMade Notification[]       @relation("NotificationActor")
   pdfToolFiles      PdfToolFile[]
-  signatureRequests SignatureRequest[] @relation("SignatureRequester")
-  signaturesSigned  SignatureRequest[] @relation("SignatureSigner")
-  contractsSent     Contract[]         @relation("ContractSender")
-  contractsSigned   Contract[]         @relation("ContractSigner")
+  signatureRequests SignatureRequest[]   @relation("SignatureRequester")
+  signaturesSigned  SignatureRequest[]   @relation("SignatureSigner")
+  contractsSent     Contract[]           @relation("ContractSender")
+  contractsSigned   Contract[]           @relation("ContractSigner")
   interestRequests  InterestRequest[]
-  interestsDecided  InterestRequest[]  @relation("InterestDecider")
+  interestsDecided  InterestRequest[]    @relation("InterestDecider")
   stanzyRequests    StanzyRequest[]
   meetingsPlanned   Meeting[]
   meetingConsents   MeetingConsent[]
+  meetingsInvited   MeetingParticipant[]
+  meetingRequests   MeetingJoinRequest[]
   dossierMessages   DossierMessage[]
-  incomesEntered    Income[]           @relation("IncomeCreator")
-  chargesEntered    Charge[]           @relation("ChargeCreator")
+  incomesEntered    Income[]             @relation("IncomeCreator")
+  chargesEntered    Charge[]             @relation("ChargeCreator")
 
   @@map("account")
 }
@@ -656,6 +658,8 @@ enum NotificationKind {
   MEETING_CANCELLED
   /// To the Client the day before and 15 minutes before; to the consultant 15 minutes before.
   MEETING_REMINDER
+  /// To the consultant: someone with the invitation link asks to join.
+  MEETING_JOIN_REQUEST
   /// To the other side: a message in the Dossier's « Messages » (#94).
   DOSSIER_MESSAGE
   /// To the Client, 3 then 7 days after a Demande de signature, if unsigned.
@@ -942,6 +946,13 @@ model StanzyRequest {
   @@map("stanzy_request")
 }
 
+/// Planned ahead, started at once (« Réunion instantanée »), or the consultant's Salle personnelle, always open.
+enum MeetingKind {
+  SCHEDULED
+  INSTANT
+  PERSONAL
+}
+
 enum MeetingStatus {
   SCHEDULED
   CANCELLED
@@ -950,19 +961,26 @@ enum MeetingStatus {
 /// GLOSSARY: Réunion (#94). A video meeting planned from a Dossier, held in
 /// the app on Stream Video, recorded and transcribed unless switched off.
 model Meeting {
-  id                String             @id @default(cuid())
-  dossierId         String
-  dossier           Dossier            @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  id                String               @id @default(cuid())
+  /// The Dossier it is about, if any: a Réunion can also stand on its own (a partner, a prospect).
+  dossierId         String?
+  dossier           Dossier?             @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  kind              MeetingKind          @default(SCHEDULED)
   subject           String
+  description       String?
+  /// The invitation link's secret: whoever is signed in and has it may ask to join.
+  inviteToken       String               @unique
+  /// « Terminer pour tous »: the call is over for everyone.
+  endedAt           DateTime?
   startsAt          DateTime
   durationMinutes   Int
   /// Recorded and transcribed; the consultant may switch it off for one Réunion.
-  recording         Boolean            @default(true)
-  status            MeetingStatus      @default(SCHEDULED)
+  recording         Boolean              @default(true)
+  status            MeetingStatus        @default(SCHEDULED)
   /// The consultant's private notes; the Client never sees them.
   notes             String?
   plannedById       String
-  plannedBy         Account            @relation(fields: [plannedById], references: [id], onDelete: Restrict)
+  plannedBy         Account              @relation(fields: [plannedById], references: [id], onDelete: Restrict)
   cancelledAt       DateTime?
   cancelReason      String?
   /// When each reminder went out; moving the Réunion clears them.
@@ -970,8 +988,10 @@ model Meeting {
   remindedSoon      DateTime?
   consents          MeetingConsent[]
   recordings        MeetingRecording[]
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  participants      MeetingParticipant[]
+  joinRequests      MeetingJoinRequest[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
 
   @@index([dossierId, startsAt])
   @@index([status, startsAt])
@@ -1146,4 +1166,40 @@ model CadRate {
   updatedAt DateTime @updatedAt
 
   @@map("cad_rate")
+}
+
+/// Who is invited to a Réunion besides the consultant: Clients and partners, each with an account.
+model MeetingParticipant {
+  id        String   @id @default(cuid())
+  meetingId String
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([meetingId, accountId])
+  @@index([accountId])
+  @@map("meeting_participant")
+}
+
+enum JoinRequestStatus {
+  PENDING
+  ADMITTED
+  REFUSED
+}
+
+/// Someone signed in, with the invitation link, but not invited: they wait until the consultant lets them in.
+model MeetingJoinRequest {
+  id        String            @id @default(cuid())
+  meetingId String
+  meeting   Meeting           @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  accountId String
+  account   Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  status    JoinRequestStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  decidedAt DateTime?
+
+  @@unique([meetingId, accountId])
+  @@index([meetingId, status])
+  @@map("meeting_join_request")
 }

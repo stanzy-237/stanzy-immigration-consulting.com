@@ -30,6 +30,11 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
   // A Demande d'intérêt (#81): the consultant's decision page, the User's own status.
   if (item.kind === 'INTEREST_SUBMITTED') return item.params?.interestId ? `/demandes/${item.params.interestId}` : '/demandes';
   if (item.kind === 'INTEREST_REJECTED') return `${base}/accompagnement`;
+  // A Réunion, with a Dossier or not, opens on its room; cancelled, on the Dossier's Réunions if any.
+  if (item.kind.startsWith('MEETING_') && item.params?.meetingId) {
+    if (item.kind === 'MEETING_CANCELLED' && item.dossier) return `${base}/dossiers/${item.dossier.id}?onglet=reunions`;
+    return `${base}/reunions/${item.params.meetingId}`;
+  }
   if (!item.dossier) return all;
   const dossier = `${base}/dossiers/${item.dossier.id}`;
 
@@ -48,12 +53,6 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
   }
   if (contract || item.kind === 'CONTRACT_SIGNED') return `${dossier}#contrats`;
   if (item.kind === 'DOSSIER_MESSAGE') return `${dossier}#messages`;
-  // A Réunion opens on its room; cancelled, on the Dossier's Réunions.
-  if (item.kind.startsWith('MEETING_')) {
-    return item.kind !== 'MEETING_CANCELLED' && item.params?.meetingId
-      ? `${dossier}/reunions/${item.params.meetingId}`
-      : `${dossier}#reunions`;
-  }
   if (item.invoice) return audience === 'client' ? `${dossier}#factures` : `/factures/${item.invoice.id}`;
   if (item.document) {
     const message = item.comment ? `&message=${item.comment.id}` : '';

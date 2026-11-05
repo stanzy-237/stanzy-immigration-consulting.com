@@ -62,11 +62,14 @@ A User whom the consultant is onboarding — typically after they booked a consu
 A paid, booked appointment between a User and the consultant, and the primary funnel into becoming a Client. Booked through an embedded external scheduler (Cal.com) in v1.
 
 **Réunion** (Meeting):
-A video meeting the consultant schedules from a Dossier, held in the app, between the Client and the consultant only. Recorded unless the consultant turns it off, after everyone accepted it.
+A video meeting held in the app between the consultant and the people invited, each with an account (Clients, partners): planned ahead, started at once (« Réunion instantanée »), or in the Salle personnelle. About a Dossier (its Client invited) or on its own. Someone with the invitation link but not invited asks to enter and waits until the consultant lets them in. Recorded unless the consultant turns it off, after everyone accepted it; « Terminer pour tous » ends it for everyone.
 _Avoid_: "Consultation" (a paid appointment a prospect books on Cal.com).
 
+**Salle personnelle** (Personal room):
+The consultant's Réunion that is always open, with its own invitation link, which the consultant can change.
+
 **Enregistrement** (Recording):
-The video of a Réunion, kept with the Dossier for the consultant only, until 2 years after the Dossier is closed.
+The video of a Réunion, for the consultant only: kept until 2 years after its Dossier is closed, or 2 years after the recording for a Réunion outside any Dossier.
 
 **Transcription**:
 The searchable text of a recorded Réunion, kept with its Enregistrement, for the consultant only.

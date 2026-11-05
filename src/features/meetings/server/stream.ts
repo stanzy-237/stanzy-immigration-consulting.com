@@ -20,6 +20,11 @@ export function stream(): StreamClient {
 
 type Person = { id: string; name: string; consultant: boolean };
 
+/** « Terminer pour tous »: Stream closes the call for everyone in it and stops its recording. */
+export async function endRoom(meetingId: string): Promise<void> {
+  await stream().video.call('default', callIdOf(meetingId)).end();
+}
+
 /**
  * Gets a Réunion's call ready and lets `viewer` in: the Dossier's Client and
  * the consultants as its members, recorded and transcribed (in the Client's
@@ -51,8 +56,11 @@ export async function openRoom(opts: {
       settings_override: settings,
     },
   });
-  // The recording switch may have changed since the call was made.
+  // The recording switch may have changed since the call was made, and people let in since.
   await call.update({ settings_override: settings });
+  await call.updateCallMembers({
+    update_members: opts.people.map((person) => ({ user_id: person.id, role: person.consultant ? 'host' : 'call_member' })),
+  });
   return {
     apiKey: env.STREAM_API_KEY!,
     token: streamClient.generateCallToken({

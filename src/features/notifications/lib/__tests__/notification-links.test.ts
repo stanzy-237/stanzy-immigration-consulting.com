@@ -28,11 +28,16 @@ describe('where a Notification leads', () => {
 
   it('opens a Réunion on its room, or the Réunions once cancelled', () => {
     const planned = item({ kind: 'MEETING_SCHEDULED', params: { meetingId: 'm_1' } });
-    expect(notificationHref(planned, 'client', 'fr')).toBe('/fr/mon-espace/dossiers/dos_1/reunions/m_1');
+    expect(notificationHref(planned, 'client', 'fr')).toBe('/fr/mon-espace/reunions/m_1');
     const soon = item({ kind: 'MEETING_REMINDER', params: { meetingId: 'm_1' } });
-    expect(notificationHref(soon, 'consultant', 'fr')).toBe('/dossiers/dos_1/reunions/m_1');
+    expect(notificationHref(soon, 'consultant', 'fr')).toBe('/reunions/m_1');
     const cancelled = item({ kind: 'MEETING_CANCELLED', params: { meetingId: 'm_1' } });
-    expect(notificationHref(cancelled, 'client', 'en')).toBe('/en/mon-espace/dossiers/dos_1#reunions');
+    expect(notificationHref(cancelled, 'client', 'en')).toBe('/en/mon-espace/dossiers/dos_1?onglet=reunions');
+    // Outside any Dossier, and someone asking to join.
+    const alone = item({ kind: 'MEETING_SCHEDULED', dossier: null, params: { meetingId: 'm_2' } });
+    expect(notificationHref(alone, 'client', 'fr')).toBe('/fr/mon-espace/reunions/m_2');
+    const asking = item({ kind: 'MEETING_JOIN_REQUEST', dossier: null, params: { meetingId: 'm_2' } });
+    expect(notificationHref(asking, 'consultant', 'fr')).toBe('/reunions/m_2');
   });
 
   it('opens the Dossier’s messages', () => {
