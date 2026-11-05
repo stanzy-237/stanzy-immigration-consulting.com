@@ -31,7 +31,7 @@ import {
   useCallStateHooks,
   type Call,
 } from '@stream-io/video-react-sdk';
-import { Circle, Droplet, LayoutGrid, ListOrdered, Maximize, Minimize, PhoneOff, Sparkles, Users } from 'lucide-react';
+import { Circle, Droplet, LayoutGrid, ListOrdered, Maximize, Minimize, PhoneOff, Sparkles, Users, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
@@ -40,13 +40,13 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -67,7 +67,7 @@ const SORTS = {
 type Sort = keyof typeof SORTS;
 
 const control =
-  'inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 aria-pressed:bg-white aria-pressed:text-navy-deep';
+  'inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 aria-pressed:bg-white aria-pressed:text-navy-deep';
 
 /**
  * The live Réunion on Stream Video, in the browser only: the tiles in the
@@ -189,10 +189,13 @@ function Room({
 
   return (
     <StreamTheme className="str-video">
-      <div ref={frame} className="flex min-h-160 flex-col overflow-hidden rounded-2xl bg-navy-deep text-white">
-        <header className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-          <p className="min-w-0 truncate font-heading font-bold">{subject}</p>
-          <div className="flex items-center gap-2 text-xs">
+      <div
+        ref={frame}
+        className="flex min-h-120 flex-col overflow-hidden rounded-2xl bg-navy-deep text-white md:min-h-160"
+      >
+        <header className="flex items-center justify-between gap-2 px-3 py-3 md:px-4">
+          <p className="min-w-0 flex-1 truncate font-heading text-sm font-bold md:text-base">{subject}</p>
+          <div className="flex shrink-0 items-center gap-1.5 text-xs">
             <RecordingBadge />
             <Timer label={t('timer')} />
             <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1">
@@ -202,8 +205,8 @@ function Room({
           </div>
         </header>
 
-        <div className="flex min-h-0 flex-1 gap-3 px-3">
-          <div className="min-w-0 flex-1">
+        <div className="flex min-h-0 flex-1 flex-col gap-3 px-2 md:flex-row md:px-3">
+          <div className="min-h-72 min-w-0 flex-1">
             {layout === 'grid' ? (
               <PaginatedGridLayout />
             ) : (
@@ -213,7 +216,7 @@ function Room({
             )}
           </div>
           {people || aside ? (
-            <aside className="hidden w-72 shrink-0 flex-col gap-3 overflow-y-auto rounded-xl bg-white/5 p-2 md:flex">
+            <aside className="flex max-h-72 w-full shrink-0 flex-col gap-3 overflow-y-auto rounded-xl bg-white/5 p-2 md:max-h-none md:w-72">
               {aside}
               {people ? <CallParticipantsList onClose={() => setPeople(false)} /> : null}
             </aside>
@@ -221,12 +224,12 @@ function Room({
         </div>
 
         {settings ? (
-          <div className="mx-3 mt-3 rounded-xl bg-white/5 p-3">
+          <div className="mx-2 mt-3 overflow-x-auto rounded-xl bg-white/5 p-3 md:mx-3">
             <DeviceSettings />
           </div>
         ) : null}
 
-        <footer className="flex flex-wrap items-center justify-center gap-2 px-3 py-3">
+        <footer className="flex flex-wrap items-center justify-center gap-1.5 px-2 py-3 md:gap-2 md:px-3">
           <ToggleAudioPublishingButton />
           <ToggleVideoPublishingButton />
           <ScreenShareButton />
@@ -237,30 +240,34 @@ function Room({
             <DropdownMenuTrigger aria-label={t('layout')} title={t('layout')} className={control}>
               <LayoutGrid aria-hidden={true} className="size-5" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-60">
-              <DropdownMenuLabel>{t('layout')}</DropdownMenuLabel>
-              <DropdownMenuRadioGroup value={layout} onValueChange={(value) => setLayout(value as Layout)}>
-                {LAYOUTS.map((key) => (
-                  <DropdownMenuRadioItem key={key} value={key}>
-                    {t(`layouts.${key}`)}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
+            <DropdownMenuContent align="center" container={frame} className="w-60">
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>{t('layout')}</DropdownMenuLabel>
+                <DropdownMenuRadioGroup value={layout} onValueChange={(value) => setLayout(value as Layout)}>
+                  {LAYOUTS.map((key) => (
+                    <DropdownMenuRadioItem key={key} value={key}>
+                      {t(`layouts.${key}`)}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
             <DropdownMenuTrigger aria-label={t('sort')} title={t('sort')} className={control}>
               <ListOrdered aria-hidden={true} className="size-5" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-60">
-              <DropdownMenuLabel>{t('sort')}</DropdownMenuLabel>
-              <DropdownMenuRadioGroup value={sort} onValueChange={(value) => setSort(value as Sort)}>
-                {(Object.keys(SORTS) as Sort[]).map((key) => (
-                  <DropdownMenuRadioItem key={key} value={key}>
-                    {t(`sorts.${key}`)}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
+            <DropdownMenuContent align="center" container={frame} className="w-60">
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>{t('sort')}</DropdownMenuLabel>
+                <DropdownMenuRadioGroup value={sort} onValueChange={(value) => setSort(value as Sort)}>
+                  {(Object.keys(SORTS) as Sort[]).map((key) => (
+                    <DropdownMenuRadioItem key={key} value={key}>
+                      {t(`sorts.${key}`)}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
           <button
@@ -295,29 +302,38 @@ function Room({
           <button
             type="button"
             onClick={leave}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson"
+            aria-label={t('leave')}
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-rouge px-4 text-sm font-semibold text-white hover:bg-crimson md:px-5"
           >
             <PhoneOff aria-hidden={true} className="size-5" />
-            {t('leave')}
+            <span className="hidden sm:inline">{t('leave')}</span>
           </button>
         </footer>
       </div>
 
       <AlertDialog open={leaving} onOpenChange={setLeaving}>
-        <AlertDialogContent className="gap-4 p-6">
-          <AlertDialogHeader>
+        <AlertDialogContent container={frame} className="gap-5 p-6">
+          <AlertDialogCancel
+            variant="ghost"
+            size="icon"
+            aria-label={t('close')}
+            title={t('close')}
+            className="absolute top-3 right-3 rounded-full text-slate hover:text-navy-deep"
+          >
+            <X aria-hidden={true} className="size-5" />
+          </AlertDialogCancel>
+          <AlertDialogHeader className="place-items-start pr-8 text-left">
             <AlertDialogTitle className="font-heading text-xl font-bold text-navy-deep">{t('endTitle')}</AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-slate">{t('endBody')}</AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-wrap gap-2">
-            <AlertDialogCancel className="rounded-full">{t('close')}</AlertDialogCancel>
+          <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => {
                 setLeaving(false);
                 void call?.leave().then(onLeave);
               }}
-              className="rounded-full border-2 border-navy-deep px-5 py-2 text-sm font-semibold text-navy-deep hover:bg-off-white"
+              className="rounded-full border-2 border-navy-deep px-3 py-2 text-sm leading-tight font-semibold text-navy-deep hover:bg-off-white"
             >
               {t('leaveOnly')}
             </button>
@@ -327,11 +343,11 @@ function Room({
                 setLeaving(false);
                 void onEndForAll();
               }}
-              className="rounded-full bg-rouge px-5 py-2 text-sm font-semibold text-white hover:bg-crimson"
+              className="rounded-full bg-rouge px-3 py-2 text-sm leading-tight font-semibold text-white hover:bg-crimson"
             >
               {t('endAll')}
             </button>
-          </AlertDialogFooter>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </StreamTheme>
