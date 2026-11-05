@@ -59,7 +59,8 @@ export function DossierContracts({
   const [sending, setSending] = useState(false);
   const [amending, setAmending] = useState<Contract | null>(null);
 
-  const main = data.contracts.filter((contract) => !contract.parentId);
+  // The Dossier's own Contrat; a Service documentaire's (#80) stands apart.
+  const main = data.contracts.filter((contract) => !contract.parentId && !contract.stanzyRequestId);
   const live = main.find((contract) => contract.status !== 'CANCELLED');
   const pendingAmendment = data.contracts.some((contract) => contract.parentId && contract.status === 'SENT');
   const waiting = data.contracts.filter((contract) => contract.status === 'SENT');

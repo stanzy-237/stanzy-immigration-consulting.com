@@ -224,7 +224,7 @@ The list a Client follows to submit on the IRCC portal: each Section IRCC under 
 Assessment of foreign credentials through recognized bodies such as WES or IQAS, to make them count for Entrée Express. Offered for diplomas issued in Cameroon; Stanzy handles every step up to the report, starting from a Demande de devis.
 
 **Services documentaires** (Document services):
-Documents Stanzy obtains for a Client in Cameroon at catalogue prices (preuve de fonds, certificat de police, attestation CNPS, compte salaire, ACF, pack expérience pro), usually through a Partner's Mission. Requested with « Stanzy s'en charge ». Never on a public page; shown to Clients in « Mon espace » and to anyone holding a Lien partagé. The only priced offering.
+Documents Stanzy obtains for a Client in Cameroon at catalogue prices (preuve de fonds, certificat de police, attestation CNPS, compte salaire, ACF, pack expérience pro), usually through a Partner's Mission. Requested with « Stanzy s'en charge », which on any Document leads to the service's page in « Mon espace »: its conditions, contract and price, which the Client accepts. Each needs its own Contrat (apart from the Dossier's) and invoice line, sent when the consultant takes the request on. Never on a public page; shown to Clients in Cameroon in « Mon espace » and to anyone holding a Lien partagé. The only priced offering; its prices live only in the catalogue (Tableau de bord).
 
 **ACF** (Attestation de conformité fiscale):
 A Cameroonian tax compliance certificate, one of the Services documentaires.

@@ -33,6 +33,8 @@ export function filledContract(opts: {
   template: { title: string; body: string };
   client: string;
   service: ServiceType;
+  /** A Service documentaire's name (#80), in place of the Dossier's service. */
+  serviceName?: string;
   amount: number;
   currency: Currency;
   schedule: string;
@@ -43,7 +45,7 @@ export function filledContract(opts: {
   const t = createTranslator({ locale, messages: MESSAGES[locale] });
   const values = {
     client: opts.client,
-    service: t(`Dossiers.services.${opts.service}`),
+    service: opts.serviceName ?? t(`Dossiers.services.${opts.service}`),
     prix: formatMoney(opts.amount, opts.currency, locale),
     echeancier: opts.schedule,
     date: longDate(locale, opts.sentAt),

@@ -18,6 +18,13 @@ vi.mock('@/server/email/app-mailer', () => mailer);
 const notifications = vi.hoisted(() => ({ notifyLater: vi.fn(), forgetComment: vi.fn(), notify: vi.fn() }));
 vi.mock('@/features/notifications/server/notify', () => notifications);
 vi.mock('next/server', () => ({ after: (fn: () => unknown) => fn() }));
+const contracts = vi.hoisted(() => ({ sendServiceContract: vi.fn() }));
+vi.mock('@/features/contracts/server/contracts-router', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/contracts/server/contracts-router')>()),
+  sendServiceContract: contracts.sendServiceContract,
+}));
+const invoices = vi.hoisted(() => ({ addDraftInvoiceLine: vi.fn() }));
+vi.mock('@/features/invoices/server/draft-lines', () => invoices);
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -40,6 +47,10 @@ function fakeDatabase() {
   const sections: Row[] = [];
   const documents: Row[] = [];
   const stanzy: Row[] = [];
+  const services: Row[] = [
+    { id: 'svc_police', slug: 'certificat-de-police', active: true, documentKinds: ['policeCertificate'], name: { fr: 'Certificat de police', en: 'Police certificate' }, contractTitle: { fr: 'Contrat : police', en: 'Contract: police' }, contractBody: { fr: 'Texte {prix}', en: 'Text {prix}' } },
+    { id: 'svc_off', slug: 'ancien', active: false, documentKinds: ['passport'], name: { fr: 'Ancien', en: 'Old' }, contractTitle: { fr: '', en: '' }, contractBody: { fr: '', en: '' } },
+  ];
   let seq = 0;
   let clock = Date.parse('2026-11-04T09:00:00Z');
   const account = (id: unknown) => accounts.find((a) => a.id === id)!;
@@ -140,13 +151,18 @@ function fakeDatabase() {
         const row = stanzy.find((s) => s.id === where.id);
         if (!row) return null;
         const document = documents.find((d) => d.id === row.documentId)!;
-        return { ...row, document: { ...document, section: { dossierId: document.dossierId } } };
+        const service = services.find((s) => s.id === row.serviceId) ?? null;
+        return { ...row, service, document: { ...document, section: { dossierId: document.dossierId } } };
       },
       updateMany: async ({ where, data }: { where: { id: string; status: string }; data: Row }) => {
         const row = stanzy.find((s) => s.id === where.id && s.status === where.status);
         if (row) Object.assign(row, data);
         return { count: row ? 1 : 0 };
       },
+    },
+    documentService: {
+      findMany: async ({ where }: { where: { active: boolean } }) => services.filter((s) => s.active === where.active),
+      findUnique: async ({ where }: { where: { id: string } }) => services.find((s) => s.id === where.id) ?? null,
     },
     $transaction: async (fn: (tx: unknown) => unknown) => fn(db),
   };
@@ -276,40 +292,95 @@ describe('« Stanzy s’en charge »', () => {
     return setup;
   }
 
-  it('lets the Client in Cameroon ask for a missing Document, once, and tells the consultant', async () => {
+  const ask = (documentId: string, serviceId = 'svc_police') => ({ documentId, serviceId, accepted: true as const });
+
+  it('goes through the service, its conditions accepted, once per Document, and tells the consultant', async () => {
     const { db, documents, stanzy } = await approved();
     const police = documents.find((d) => d.kind === 'policeCertificate')!;
-    await callerFor(db, user()).accompagnement.stanzy.request({ documentId: police.id });
-    expect(stanzy).toEqual([expect.objectContaining({ documentId: police.id, status: 'REQUESTED' })]);
+    await callerFor(db, user()).accompagnement.stanzy.request(ask(police.id));
+    expect(stanzy).toEqual([
+      expect.objectContaining({ documentId: police.id, serviceId: 'svc_police', status: 'REQUESTED', acceptedAt: expect.any(Date) }),
+    ]);
     expect(notifications.notifyLater).toHaveBeenCalledWith(db, expect.objectContaining({ kind: 'STANZY_REQUESTED', recipients: 'CONSULTANTS' }));
-    await expect(callerFor(db, user()).accompagnement.stanzy.request({ documentId: police.id })).rejects.toMatchObject({
+    await expect(callerFor(db, user()).accompagnement.stanzy.request(ask(police.id))).rejects.toMatchObject({
       message: 'STANZY_ALREADY_ASKED',
     });
+  });
 
+  it('is for any Document without its Finale, through a service still offered', async () => {
+    const { db, documents } = await approved();
     const passport = documents.find((d) => d.kind === 'passport')!;
-    await expect(callerFor(db, user()).accompagnement.stanzy.request({ documentId: passport.id })).rejects.toMatchObject({
-      message: 'STANZY_NOT_MISSING',
+    await expect(callerFor(db, user()).accompagnement.stanzy.request(ask(passport.id, 'svc_off'))).rejects.toMatchObject({
+      message: 'SERVICE_UNAVAILABLE',
+    });
+    passport.finalVersionId = 'ver_1';
+    await expect(callerFor(db, user()).accompagnement.stanzy.request(ask(passport.id))).rejects.toMatchObject({
+      message: 'STANZY_DOCUMENT_FINAL',
     });
   });
 
   it('is for Cameroon only, and for the Client only', async () => {
     const { db, documents } = await approved('CA');
     const police = documents.find((d) => d.kind === 'policeCertificate')!;
-    await expect(callerFor(db, user()).accompagnement.stanzy.request({ documentId: police.id })).rejects.toMatchObject({
+    await expect(callerFor(db, user()).accompagnement.stanzy.request(ask(police.id))).rejects.toMatchObject({
       message: 'STANZY_CAMEROON_ONLY',
     });
-    await expect(callerFor(db, consultant).accompagnement.stanzy.request({ documentId: police.id })).rejects.toMatchObject({
+    await expect(callerFor(db, consultant).accompagnement.stanzy.request(ask(police.id))).rejects.toMatchObject({
       message: 'STANZY_CLIENT_ONLY',
     });
+    await expect(callerFor(db, user('acc_2', 'Bob Other')).accompagnement.stanzy.request(ask(police.id))).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
+  });
+
+  it('from the Demande, goes to the service that gets the document', async () => {
+    const setup = fakeDatabase();
+    const { id } = await callerFor(setup.db, user()).accompagnement.submit(
+      answers({ areas: { ...areas, police: { answer: 'stanzy', note: '' } } }),
+    );
+    await callerFor(setup.db, consultant).accompagnement.dashboard.approve({ id, level: 'B' });
+    const police = setup.documents.find((d) => d.kind === 'policeCertificate')!;
+    expect(setup.stanzy).toEqual([expect.objectContaining({ documentId: police.id, serviceId: 'svc_police' })]);
+  });
+
+  it('once taken on, sends the service’s own Contrat and adds its line to the draft invoice', async () => {
+    const { db, documents, stanzy } = await approved();
+    const police = documents.find((d) => d.kind === 'policeCertificate')!;
+    const { id } = await callerFor(db, user()).accompagnement.stanzy.request(ask(police.id));
+    contracts.sendServiceContract.mockResolvedValue({ id: 'ctr_9', number: 'CTR-2026-0009' });
+    invoices.addDraftInvoiceLine.mockResolvedValue({ invoiceId: 'inv_3' });
+
     await expect(
-      callerFor(db, user('acc_2', 'Bob Other')).accompagnement.stanzy.request({ documentId: police.id }),
-    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+      callerFor(db, user()).accompagnement.stanzy.accept({ id, locale: 'fr', amount: 30_000, schedule: '100 %' }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    const done = await callerFor(db, consultant).accompagnement.stanzy.accept({ id, locale: 'en', amount: 30_000, schedule: '100%' });
+    expect(done).toEqual({ contract: { id: 'ctr_9', number: 'CTR-2026-0009' }, invoiceId: 'inv_3' });
+    expect(contracts.sendServiceContract).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ id: police.dossierId }),
+      expect.objectContaining({
+        stanzyRequestId: id,
+        locale: 'en',
+        serviceName: 'Police certificate',
+        template: { title: 'Contract: police', body: 'Text {prix}' },
+        amount: 30_000,
+      }),
+    );
+    expect(invoices.addDraftInvoiceLine).toHaveBeenCalledWith(expect.anything(), police.dossierId, {
+      description: `Police certificate – ${police.title as string}`,
+      quantity: 1,
+      unitAmount: 30_000,
+    });
+    expect(stanzy[0]).toMatchObject({ status: 'ACCEPTED' });
+    await expect(
+      callerFor(db, consultant).accompagnement.stanzy.accept({ id, locale: 'fr', amount: 30_000, schedule: '100 %' }),
+    ).rejects.toMatchObject({ message: 'STANZY_NOT_PENDING' });
   });
 
   it('lets the consultant decline with a note; the Client is told and may ask again', async () => {
     const { db, documents, stanzy } = await approved();
     const police = documents.find((d) => d.kind === 'policeCertificate')!;
-    const { id } = await callerFor(db, user()).accompagnement.stanzy.request({ documentId: police.id });
+    const { id } = await callerFor(db, user()).accompagnement.stanzy.request(ask(police.id));
     await callerFor(db, consultant).accompagnement.stanzy.decline({ id, note: 'À demander au commissariat' });
     expect(stanzy[0]).toMatchObject({ status: 'DECLINED', declineNote: 'À demander au commissariat' });
     expect(mailer.appMailer.send).toHaveBeenLastCalledWith(

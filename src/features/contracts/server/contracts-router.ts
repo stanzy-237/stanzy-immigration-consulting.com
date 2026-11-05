@@ -41,6 +41,7 @@ const listed = {
   title: true,
   status: true,
   parentId: true,
+  stanzyRequestId: true,
   amount: true,
   currency: true,
   schedule: true,
@@ -113,8 +114,10 @@ export const contractsRouter = createTRPCRouter({
     return {
       open: dossier.state === 'OPEN',
       locale: dossier.account.locale,
-      /** Whether a Contrat (not an Avenant) is signed: « Contrat non signé » until then. */
-      signed: contracts.some((contract) => !contract.parentId && contract.status === 'SIGNED'),
+      /** Whether the Dossier's Contrat (not an Avenant, nor a service's) is signed: « Contrat non signé » until then. */
+      signed: contracts.some(
+        (contract) => !contract.parentId && !contract.stanzyRequestId && contract.status === 'SIGNED',
+      ),
       contracts,
     };
   }),
@@ -157,7 +160,7 @@ export const contractsRouter = createTRPCRouter({
     const dossier = await dossierFor(ctx.prisma, ctx.session, input.dossierId);
     writable(dossier);
     const current = await ctx.prisma.contract.findFirst({
-      where: { dossierId: dossier.id, parentId: null, status: { in: ['SENT', 'SIGNED'] } },
+      where: { dossierId: dossier.id, parentId: null, stanzyRequestId: null, status: { in: ['SENT', 'SIGNED'] } },
       select: { status: true },
     });
     if (current) throw refuse(current.status === 'SIGNED' ? 'CONTRACT_ALREADY_SIGNED' : 'CONTRACT_ALREADY_SENT');
@@ -344,6 +347,51 @@ export const contractsRouter = createTRPCRouter({
   }),
 });
 
+/**
+ * A Service documentaire's own Contrat (#80), for the « Stanzy s'en charge »
+ * it answers: the service's text in `locale`, its blanks filled, numbered and
+ * signed like the Dossier's Contrat but apart from it.
+ */
+export async function sendServiceContract(
+  ctx: { prisma: Db; session: CurrentSession },
+  dossier: DossierRow,
+  opts: {
+    stanzyRequestId: string;
+    locale: string;
+    template: { title: string; body: string };
+    serviceName: string;
+    amount: number;
+    currency: 'XAF';
+    schedule: string;
+  },
+): Promise<{ id: string; number: string }> {
+  const consultant = await assets(ctx.prisma);
+  const sentAt = new Date();
+  const number = await nextNumber(ctx.prisma, sentAt.getUTCFullYear());
+  const text = filledContract({
+    locale: opts.locale,
+    template: opts.template,
+    client: dossier.account.name,
+    service: dossier.service,
+    serviceName: opts.serviceName,
+    amount: opts.amount,
+    currency: opts.currency,
+    schedule: opts.schedule,
+    number,
+    sentAt,
+  });
+  const contract = await issue(ctx, dossier, {
+    number,
+    locale: opts.locale,
+    ...text,
+    amendment: null,
+    sentAt,
+    consultant,
+    data: { amount: opts.amount, currency: opts.currency, schedule: opts.schedule, stanzyRequestId: opts.stanzyRequestId },
+  });
+  return { id: contract.id, number };
+}
+
 /** A Contrat in a Dossier `session` reaches; a cancelled one doesn't exist for the Client. */
 async function contractFor(prisma: Db, session: CurrentSession, id: string) {
   const contract = await prisma.contract.findUnique({ where: { id }, select: full });
@@ -385,7 +433,12 @@ async function issue(
     amendment: { rank: number; of: string; parentId: string } | null;
     sentAt: Date;
     consultant: Awaited<ReturnType<typeof assets>>;
-    data: { amount?: number; currency?: Prisma.ContractCreateInput['currency']; schedule?: string };
+    data: {
+      amount?: number;
+      currency?: Prisma.ContractCreateInput['currency'];
+      schedule?: string;
+      stanzyRequestId?: string;
+    };
   },
 ) {
   const { bytes, fields } = await contractPdf({

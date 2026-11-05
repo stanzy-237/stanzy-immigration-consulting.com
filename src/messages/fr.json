@@ -1430,7 +1430,8 @@
       "contrats": "Contrats",
       "demandes": "Demandes d’intérêt",
       "finances": "Finances",
-      "reunions": "Réunions"
+      "reunions": "Réunions",
+      "services": "Services documentaires"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -1954,7 +1955,9 @@
       "metaTitleDossier": "Mon dossier",
       "back": "Mon espace",
       "openDossier": "Voir le dossier et ses documents",
-      "loadingDossier": "Chargement du dossier"
+      "loadingDossier": "Chargement du dossier",
+      "services": "Services documentaires",
+      "servicesHint": "Preuve de fonds, certificat de police, CNPS… obtenus par Stanzy."
     },
     "consultantEmails": {
       "cta": "Ouvrir le dossier",
@@ -3063,7 +3066,7 @@
     "stanzy": {
       "ask": "Stanzy s’en charge",
       "askLabel": "Demander à Stanzy d’obtenir « {document} »",
-      "askHint": "Stanzy obtient ce document pour vous, facturé à part.",
+      "askHint": "Un contrat et une facture à part : voyez les conditions et le prix du service.",
       "status": {
         "REQUESTED": "Demandé à Stanzy",
         "ACCEPTED": "Accepté par Stanzy",
@@ -3079,7 +3082,26 @@
       "declineNote": "Note au client (facultatif)",
       "declineConfirm": "Refuser",
       "keep": "Garder",
-      "loading": "Chargement des demandes"
+      "loading": "Chargement des demandes",
+      "conditionsAccepted": "conditions acceptées",
+      "noService": "Aucun service documentaire ne couvre encore ce document.",
+      "contract": "Contrat {number} : {status, select, SENT {à signer} SIGNED {signé} other {annulé}}",
+      "accept": "Envoyer le contrat et la facture",
+      "pickService": "Service documentaire pour « {document} »",
+      "chooseService": "Choisir le service…",
+      "acceptTitle": "Prendre en charge ce document",
+      "acceptBody": "Le contrat du service « {service} » part au client pour « {document} », à signer en ligne. Le même montant s’ajoute à la facture brouillon du dossier.",
+      "language": "Langue du contrat",
+      "base": "Montant à justifier (FCFA)",
+      "amount": "Prix (FCFA)",
+      "schedule": "Échéancier",
+      "defaultSchedule": "100 % à la signature",
+      "acceptInvalid": "Indiquez un prix et un échéancier.",
+      "acceptInvoice": "Vérifiez ensuite la facture brouillon, puis envoyez-la depuis Facturation.",
+      "accepting": "Envoi…",
+      "acceptConfirm": "Envoyer le contrat",
+      "accepted": "Contrat {number} envoyé ; ligne ajoutée à la facture brouillon",
+      "openInvoice": "Voir la facture"
     },
     "toast": {
       "sent": "Demande envoyée",
@@ -3102,7 +3124,11 @@
       "UNKNOWN": "Une erreur est survenue. Réessayez.",
       "INTEREST_CRS_INVALID": "Vérifiez vos réponses CRS : le score ne peut pas être calculé.",
       "INTEREST_NOT_ACCOMPAGNEMENT": "Ce dossier n’est pas un accompagnement.",
-      "INVALID_DATE": "Indiquez une date valide."
+      "INVALID_DATE": "Indiquez une date valide.",
+      "STANZY_DOCUMENT_FINAL": "Ce document a déjà sa version finale.",
+      "SERVICE_UNAVAILABLE": "Ce service n’est plus proposé.",
+      "STANZY_NO_SERVICE": "Choisissez d’abord le service documentaire.",
+      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et votre cachet (Signatures)."
     },
     "overview": {
       "crs": "Score CRS de la demande",
@@ -3569,6 +3595,119 @@
       "margin": "Marge",
       "unconverted": "Des montants en CAD attendent leur taux du mois.",
       "open": "Voir les finances"
+    }
+  },
+  "DocumentServices": {
+    "blanks": {
+      "client": "votre nom",
+      "service": "le service",
+      "prix": "le prix",
+      "echeancier": "l’échéancier",
+      "date": "la date",
+      "numero": "le numéro"
+    },
+    "mine": {
+      "title": "Services documentaires",
+      "back": "Mon espace",
+      "cameroon": "Pour les clients au Cameroun",
+      "lead": "Stanzy obtient pour vous les documents les plus longs à réunir. Chaque service a ses conditions, son contrat et son prix.",
+      "choose": "Choisissez le service qui obtient ce document : vous lirez ses conditions et son contrat avant de confirmer.",
+      "unavailable": "Les services documentaires sont réservés aux clients qui résident au Cameroun.",
+      "empty": "Aucun service n’est proposé pour l’instant.",
+      "see": "Voir le service",
+      "loading": "Chargement des services",
+      "steps": {
+        "choose": {
+          "title": "Vous choisissez",
+          "body": "Depuis un document de votre dossier, « Stanzy s’en charge » vous mène au service."
+        },
+        "sign": {
+          "title": "Vous signez",
+          "body": "Stanzy vous envoie le contrat du service à signer en ligne, puis la facture."
+        },
+        "deliver": {
+          "title": "Stanzy livre",
+          "body": "Le document arrive dans votre dossier, prêt pour IRCC."
+        }
+      }
+    },
+    "service": {
+      "back": "Tous les services",
+      "unavailable": "Ce service est réservé aux clients qui résident au Cameroun.",
+      "provides": "Ce que vous fournissez",
+      "turnaround": "Délai habituel",
+      "conditions": "Conditions",
+      "contract": "Le contrat",
+      "contractIntro": "Le texte que vous signerez en ligne. Les passages entre crochets sont remplis à l’envoi.",
+      "price": "Prix",
+      "priceNote": "Facturé à part de votre accompagnement, après la signature du contrat.",
+      "for": "Pour votre document :",
+      "accept": "J’ai lu les conditions et le contrat, et je demande à Stanzy d’obtenir ce document.",
+      "ask": "Stanzy s’en charge",
+      "asking": "Envoi…",
+      "next": "Stanzy vous envoie ensuite le contrat à signer, puis la facture.",
+      "asked": "Demande envoyée à Stanzy",
+      "documentGone": "Ce document n’est plus à demander : il a sa version finale ou une demande est déjà en cours.",
+      "howTo": "Pour le demander, ouvrez le document dans votre dossier et choisissez « Stanzy s’en charge ».",
+      "loading": "Chargement du service"
+    },
+    "dashboard": {
+      "title": "Services documentaires",
+      "intro": "Les documents que Stanzy obtient pour les clients au Cameroun. Les prix ne vivent qu’ici ; les clients voient les services actifs dans « Mon espace ».",
+      "new": "Nouveau service",
+      "empty": "Aucun service pour l’instant.",
+      "starters": "{count, plural, one {# service de départ manque} other {# services de départ manquent}} (preuve de fonds, certificat de police, CNPS…). Ajoutez-les inactifs, puis fixez leurs prix.",
+      "addStarters": "Ajouter les services de départ",
+      "startersAdded": "{count, plural, =0 {Rien à ajouter} one {# service ajouté} other {# services ajoutés}}",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "noPrice": "Prix à fixer",
+      "requests": "{count, plural, =0 {aucune demande} one {# demande} other {# demandes}}",
+      "error": "Une erreur est survenue. Réessayez.",
+      "loading": "Chargement du catalogue"
+    },
+    "edit": {
+      "back": "Services documentaires",
+      "title": "Modifier le service",
+      "newTitle": "Nouveau service",
+      "languages": {
+        "fr": "Français",
+        "en": "Anglais"
+      },
+      "slug": "Adresse",
+      "slugHint": "En minuscules et tirets, par exemple « certificat-de-police » : /mon-espace/services/certificat-de-police.",
+      "active": "Proposé aux clients",
+      "name": "Nom",
+      "summary": "Description",
+      "priceTitle": "Prix",
+      "priceKind": "Type de prix",
+      "kinds": {
+        "FIXED": "Prix fixe",
+        "PERCENT": "Pourcentage"
+      },
+      "priceFixed": "Prix (FCFA)",
+      "pricePercent": "Pourcentage du montant à justifier (0 à {max} %)",
+      "unit": "Unité",
+      "detailsTitle": "Ce que le client lit avant d’accepter",
+      "provides": "Ce que le client fournit",
+      "turnaround": "Délai habituel",
+      "conditions": "Conditions",
+      "contractTitle": "Contrat du service",
+      "blanks": "Les mêmes blancs qu’un modèle de contrat : {blanks}. Titres avec #, listes avec -.",
+      "contractName": "Titre du contrat",
+      "contractBody": "Texte du contrat",
+      "documents": "Documents obtenus",
+      "documentsHint": "« Stanzy s’en charge » sur l’un de ces documents mène à ce service.",
+      "invalid": "Vérifiez les champs : adresse, nom et contrat dans les deux langues, et un prix valide.",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Service enregistré",
+      "loading": "Chargement du service",
+      "errors": {
+        "SERVICE_SLUG_TAKEN": "Cette adresse est déjà prise par un autre service.",
+        "SERVICE_PERCENT_TOO_HIGH": "Le pourcentage ne peut pas dépasser 100 %.",
+        "UNKNOWN": "Une erreur est survenue. Réessayez."
+      }
     }
   }
 }

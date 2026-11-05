@@ -876,6 +876,9 @@ model Contract {
   cancelReason     String?
   /// Reminders sent to the Client: 1 at 3 days, 2 at 7 days, then none.
   reminders        Int              @default(0)
+  /// A Service documentaire's own Contrat (#80), for the « Stanzy s'en charge » it answers; not the Dossier's Contrat.
+  stanzyRequestId  String?          @unique
+  stanzyRequest    StanzyRequest?   @relation(fields: [stanzyRequestId], references: [id], onDelete: Restrict)
 
   @@index([dossierId, sentAt])
   @@index([status, sentAt])
@@ -942,6 +945,13 @@ model StanzyRequest {
   /// Why the consultant declined: the Client gets the Document themselves.
   declineNote   String?
   decidedAt     DateTime?
+  /// The Service documentaire that gets it (#80); null when none covers this Document yet.
+  serviceId     String?
+  service       DocumentService?    @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  /// When the Client accepted the service's conditions and contract, from its page.
+  acceptedAt    DateTime?
+  /// The service's Contrat, sent when the consultant accepts.
+  contract      Contract?
   createdAt     DateTime            @default(now())
 
   @@index([documentId, status])
@@ -1206,3 +1216,44 @@ model MeetingJoinRequest {
   @@index([meetingId, status])
   @@map("meeting_join_request")
 }
+
+// ─── Services documentaires (#80) ───────────────────────────────────────────
+
+/// FIXED: a price in XAF; PERCENT: a share of an amount (the funds to justify), in hundredths of a percent.
+enum PriceKind {
+  FIXED
+  PERCENT
+}
+
+/// GLOSSARY: Services documentaires. A document Stanzy obtains for Clients in Cameroon, at a price set
+/// in the Tableau de bord. Prices live here only, never in code. Texts are `{ fr, en }`.
+model DocumentService {
+  id            String          @id @default(cuid())
+  /// Its address in « Mon espace » (`/mon-espace/services/<slug>`).
+  slug          String          @unique
+  active        Boolean         @default(false)
+  position      Int
+  name          Json
+  summary       Json
+  /// What the Client must provide, the turnaround and the conditions, shown before they accept.
+  provides      Json
+  turnaround    Json
+  conditions    Json
+  /// The service's own contract, with the same blanks as a Modèle de contrat ({client}, {prix}…).
+  contractTitle Json
+  contractBody  Json
+  priceKind     PriceKind
+  /// XAF for FIXED; hundredths of a percent for PERCENT (250 = 2.5 %).
+  price         Int
+  /// « par dossier », « par pays et par personne »…
+  unit          Json
+  /// The Checklist documents it gets (`passport`, `policeCertificate`…): « Stanzy s'en charge » on one leads here.
+  documentKinds String[]
+  requests      StanzyRequest[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([active, position])
+  @@map("document_service")
+}
+

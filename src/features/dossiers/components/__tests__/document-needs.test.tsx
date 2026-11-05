@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -37,7 +37,12 @@ const document = (id: string, title: string, extra: Record<string, unknown> = {}
   ...extra,
 });
 
-function open(viewer: Viewer, stanzy: boolean, ask = vi.fn()) {
+const catalogue = {
+  available: true,
+  services: [{ id: 'svc_1', slug: 'preuve-de-fonds', documentKinds: ['bankLetter', 'bankStatements'] }],
+};
+
+function open(viewer: Viewer, stanzy: boolean) {
   const data = {
     viewer: viewer === 'client' ? { id: 'acc_1', name: 'Aminata Diallo', role: 'MEMBER' } : { id: 'acc_stanzy', name: 'Stanzy', role: 'CONSULTANT' },
     open: true,
@@ -57,9 +62,10 @@ function open(viewer: Viewer, stanzy: boolean, ask = vi.fn()) {
   };
   const { trpc, queryClient, wrap } = createTestTRPC({
     'dossiers.documents.sections': () => data,
-    'accompagnement.stanzy.request': (input) => ask(input) ?? { id: 'stz_1' },
+    'documentServices.list': () => catalogue,
   });
   queryClient.setQueryData(trpc.dossiers.documents.sections.queryKey({ dossierId: 'dos_1' }), data as never);
+  queryClient.setQueryData(trpc.documentServices.list.queryKey(), catalogue as never);
   return render(withIntl(wrap(<DossierDocuments dossierId="dos_1" viewer={viewer} />)));
 }
 
@@ -71,21 +77,31 @@ describe('Documents made from the Demande d’intérêt', () => {
     expect(screen.getAllByText('Manquant')).toHaveLength(2);
   });
 
-  it('lets a Client in Cameroon ask Stanzy for a missing one, with their note', async () => {
-    const ask = vi.fn();
-    const { container } = open('client', true, ask);
+  it('leads a Client in Cameroon to the service that gets the document: its conditions, contract and price', async () => {
+    const { container } = open('client', true);
     fireEvent.click(screen.getByRole('button', { name: /^Lettre de la banque/ }));
     expect(screen.getByText('Votre note : Relevé de 4 mois')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
-    fireEvent.click(screen.getByRole('button', { name: 'Demander à Stanzy d’obtenir « Lettre de la banque »' }));
-    await waitFor(() => expect(ask).toHaveBeenCalledWith({ documentId: 'doc_1' }));
+    expect(screen.getByRole('link', { name: 'Demander à Stanzy d’obtenir « Lettre de la banque »' })).toHaveAttribute(
+      'href',
+      '/fr/mon-espace/services/preuve-de-fonds?document=doc_1',
+    );
+  });
+
+  it('offers it on any document without its Finale, leading to the catalogue when no service covers it', () => {
+    open('client', true);
+    fireEvent.click(screen.getByRole('button', { name: /^Résultats du test de langue/ }));
+    expect(screen.getByRole('link', { name: 'Demander à Stanzy d’obtenir « Résultats du test de langue »' })).toHaveAttribute(
+      'href',
+      '/fr/mon-espace/services?document=doc_2',
+    );
   });
 
   it('points a missing language test to the TCF, and has no Stanzy button outside Cameroon', () => {
     open('client', false);
     fireEvent.click(screen.getByRole('button', { name: /^Résultats du test de langue/ }));
     expect(screen.getByRole('link', { name: /Préparer le TCF/ })).toHaveAttribute('href', 'https://tcf-express-academy.com');
-    expect(screen.queryByRole('button', { name: /Demander à Stanzy/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Demander à Stanzy/ })).not.toBeInTheDocument();
   });
 
   it('shows the consultant the Client’s note', () => {
