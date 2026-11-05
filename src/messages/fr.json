@@ -2917,7 +2917,55 @@
         "2": "Stanzy l’étudie et vous répond par email.",
         "3": "Votre dossier s’ouvre à la bonne étape, avec la liste des documents à préparer.",
         "4": "Vous suivez tout dans votre espace : documents, messages, réunions."
-      }
+      },
+      "badges": {
+        "noConsult": "Pas de consultation obligatoire avant",
+        "languages": "En français ou en anglais",
+        "everywhere": "Au Cameroun, au Canada ou ailleurs"
+      },
+      "heroImageAlt": "Toronto et la tour CN vues depuis un parc au bord du lac",
+      "chips": {
+        "crs": "Votre score CRS dès la demande",
+        "ita": "60 jours après l’ITA, comptés pour vous",
+        "minutes": "Pour remplir la demande"
+      },
+      "featuresEyebrow": "Ce qui est compris",
+      "featuresTitle": "Un dossier en ligne, et Stanzy à vos côtés à chaque étape",
+      "features": {
+        "dossier": {
+          "title": "Votre dossier en ligne",
+          "body": "Les sections d’IRCC, la liste de vos documents, ce qui manque et ce qui est prêt, en un coup d’œil."
+        },
+        "crs": {
+          "title": "Votre score CRS",
+          "body": "Calculé dans votre demande avec les règles en vigueur, pour savoir où vous en êtes face aux tirages."
+        },
+        "ita": {
+          "title": "Le compte à rebours de l’ITA",
+          "body": "Dès l’invitation, les 60 jours pour soumettre votre demande de résidence permanente s’affichent dans votre dossier."
+        },
+        "messages": {
+          "title": "Des échanges suivis",
+          "body": "Une question générale ou sur un document précis : tout reste écrit, au même endroit."
+        },
+        "meetings": {
+          "title": "Des réunions vidéo",
+          "body": "Pour faire le point de vive voix, directement depuis votre espace."
+        },
+        "contract": {
+          "title": "Un contrat clair, signé en ligne",
+          "body": "Le contrat d’accompagnement d’abord, la facture ensuite : vous savez à quoi vous vous engagez."
+        }
+      },
+      "stanzyNote": "Au Cameroun, Stanzy peut aussi obtenir certains documents pour vous (preuve de fonds, certificat de police, CNPS…) : chacun a son contrat et sa facture.",
+      "levelsEyebrow": "Votre point de départ",
+      "levelsLead": "Votre demande d’intérêt indique où vous en êtes ; votre dossier s’ouvre directement à la bonne étape.",
+      "startsAt": "Commence à : {stage}",
+      "stagesLead": "Le parcours complet, de l’évaluation à la COPR. Les étapes déjà faites sont marquées « Déjà fait ».",
+      "howEyebrow": "Pour commencer",
+      "howImageAlt": "Une personne remplit un formulaire à son bureau",
+      "ctaTitle": "Prêt à avancer vers la résidence permanente ?",
+      "ctaBody": "Envoyez votre demande d’intérêt : Stanzy l’étudie et vous répond par email."
     },
     "form": {
       "title": "Demande d’intérêt",

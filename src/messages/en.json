@@ -2900,7 +2900,55 @@
         "2": "Stanzy reviews it and answers by email.",
         "3": "Your file opens at the right stage, with the list of documents to prepare.",
         "4": "You follow everything in your space: documents, messages, meetings."
-      }
+      },
+      "badges": {
+        "noConsult": "No consultation required first",
+        "languages": "In French or English",
+        "everywhere": "In Cameroon, Canada or elsewhere"
+      },
+      "heroImageAlt": "Toronto and the CN Tower seen from a lakeside park",
+      "chips": {
+        "crs": "Your CRS score from the request",
+        "ita": "60 days after the ITA, counted for you",
+        "minutes": "To fill in the request"
+      },
+      "featuresEyebrow": "What’s included",
+      "featuresTitle": "An online file, and Stanzy beside you at every step",
+      "features": {
+        "dossier": {
+          "title": "Your online file",
+          "body": "IRCC’s sections, your list of documents, what’s missing and what’s ready, at a glance."
+        },
+        "crs": {
+          "title": "Your CRS score",
+          "body": "Worked out in your request under the rules in force, so you know where you stand against the draws."
+        },
+        "ita": {
+          "title": "The ITA countdown",
+          "body": "From the invitation, the 60 days to submit your permanent residence application show in your file."
+        },
+        "messages": {
+          "title": "Conversations that follow through",
+          "body": "A general question or one about a specific document: everything stays written, in one place."
+        },
+        "meetings": {
+          "title": "Video meetings",
+          "body": "To catch up face to face, straight from your space."
+        },
+        "contract": {
+          "title": "A clear contract, signed online",
+          "body": "The support contract first, then the invoice: you know what you’re committing to."
+        }
+      },
+      "stanzyNote": "In Cameroon, Stanzy can also get some documents for you (proof of funds, police certificate, CNPS…): each has its own contract and invoice.",
+      "levelsEyebrow": "Your starting point",
+      "levelsLead": "Your expression of interest says where you are; your file opens straight at the right stage.",
+      "startsAt": "Starts at: {stage}",
+      "stagesLead": "The whole journey, from assessment to COPR. Stages already done are marked “Already done”.",
+      "howEyebrow": "To get started",
+      "howImageAlt": "A person filling in a form at their desk",
+      "ctaTitle": "Ready to move towards permanent residence?",
+      "ctaBody": "Send your expression of interest: Stanzy reviews it and answers by email."
     },
     "form": {
       "title": "Expression of interest",
