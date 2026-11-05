@@ -2924,9 +2924,10 @@
       "steps": {
         "situation": "Votre situation",
         "progress": "Où vous en êtes",
+        "crs": "Votre score CRS",
         "documents": "Vos documents"
       },
-      "stepOf": "Étape {step} sur 3 : {name}",
+      "stepOf": "Étape {step} sur 4 : {name}",
       "next": "Continuer",
       "back": "Retour",
       "submit": "Envoyer ma demande",
@@ -2972,7 +2973,9 @@
       },
       "stanzyHint": "« Stanzy s’en charge » : Stanzy obtient le document pour vous, facturé à part (au Cameroun seulement).",
       "note": "Note sur « {area} » (facultatif)",
-      "notePlaceholder": "Ce qui vous inquiète, ce qui manque…"
+      "notePlaceholder": "Ce qui vous inquiète, ce qui manque…",
+      "crsIntro": "Les questions du Calculateur CRS, déjà remplies si vous avez enregistré une simulation. Votre score se met à jour à chaque réponse.",
+      "crsLive": "Votre score CRS"
     },
     "status": {
       "title": "Accompagnement Entrée Express",
@@ -2982,7 +2985,10 @@
       "rejected": "Votre demande du {date} n’a pas été retenue.",
       "again": "Faire une nouvelle demande",
       "signIn": "Connectez-vous pour faire votre demande.",
-      "loading": "Chargement de votre demande"
+      "loading": "Chargement de votre demande",
+      "score": "Votre score CRS",
+      "scoreHint": "Calculé avec les règles en vigueur le jour de votre demande. Stanzy s’en sert pour préparer votre dossier.",
+      "points": "points"
     },
     "dashboard": {
       "title": "Demandes d’intérêt",
@@ -3042,7 +3048,8 @@
       "contract": "Envoyer le contrat d’accompagnement",
       "invoice": "Créer la facture",
       "next": "D’abord le contrat d’accompagnement : le Client le signe en ligne. Ensuite, la facture (le montant est votre devis).",
-      "decision": "Votre décision"
+      "decision": "Votre décision",
+      "crs": "Score CRS"
     },
     "document": {
       "mandatory": "★ Obligatoire",
@@ -3092,7 +3099,23 @@
       "STANZY_ALREADY_ASKED": "Déjà demandé à Stanzy.",
       "STANZY_NOT_PENDING": "Cette demande a déjà été traitée.",
       "DOSSIER_CLOSED": "Le dossier est clôturé.",
-      "UNKNOWN": "Une erreur est survenue. Réessayez."
+      "UNKNOWN": "Une erreur est survenue. Réessayez.",
+      "INTEREST_CRS_INVALID": "Vérifiez vos réponses CRS : le score ne peut pas être calculé.",
+      "INTEREST_NOT_ACCOMPAGNEMENT": "Ce dossier n’est pas un accompagnement.",
+      "INVALID_DATE": "Indiquez une date valide."
+    },
+    "overview": {
+      "crs": "Score CRS de la demande",
+      "crsNone": "Pas de score CRS : la demande a été envoyée avant l’étape CRS.",
+      "ita": "Invitation à présenter une demande (ITA)",
+      "itaNone": "Pas encore d’ITA. Dès qu’elle arrive, les 60 jours pour soumettre la demande de résidence permanente s’afficheront ici.",
+      "daysLeft": "{days, plural, =0 {Dernier jour} one {# jour restant} other {# jours restants}}",
+      "deadline": "ITA reçue le {ita} · à soumettre au plus tard le {last}",
+      "expired": "Le délai de 60 jours est dépassé (ITA du {ita}).",
+      "setIta": "Date de l’ITA",
+      "save": "Enregistrer",
+      "clear": "Retirer",
+      "saved": "Date de l’ITA enregistrée"
     }
   },
   "Meetings": {

@@ -33,7 +33,7 @@ export type PlannedSection = { title: string; titles: Titles; documents: Planned
  * and the area's note goes with them. Each Section is also named in every
  * language (`titles`), so it reads in whichever one the viewer uses.
  */
-export function planDossier(answers: InterestAnswers, locale: unknown): PlannedSection[] {
+export function planDossier(answers: Pick<InterestAnswers, 'checklist' | 'areas'>, locale: unknown): PlannedSection[] {
   const lang = toLocale(locale);
   const guides = DOCUMENT_GUIDES[lang];
   const namers = routing.locales.map((code) => [code, sectionNamer(code)] as const);

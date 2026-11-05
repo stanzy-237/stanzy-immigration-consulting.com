@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { DossierOverviewView } from '@/features/accompagnement/views/dossier-overview-view';
 import { requireSession } from '@/features/auth/server/guards';
 import { MyDossierView } from '@/features/dossiers/views/my-dossier-view';
 import { DossierContractsView } from '@/features/contracts/views/dossier-contracts-view';
@@ -26,10 +27,12 @@ export default async function Page({ params }: { params: Params }) {
   prefetch(trpc.invoices.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.contracts.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.meetings.forDossier.queryOptions({ dossierId: id }));
+  prefetch(trpc.accompagnement.overview.queryOptions({ dossierId: id }));
   return (
     <HydrateClient>
       <MyDossierView
         id={id}
+        overview={<DossierOverviewView dossierId={id} viewer="client" />}
         invoices={<DossierInvoicesView dossierId={id} viewer="client" />}
         contracts={<DossierContractsView dossierId={id} viewer="client" />}
         meetings={<DossierMeetingsView dossierId={id} viewer="client" />}

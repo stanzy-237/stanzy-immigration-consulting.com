@@ -33,11 +33,12 @@ import { useTRPC } from '@/trpc/client';
 /**
  * One Dossier in the Tableau de bord: a header always in view, then tabs
  * (Aperçu, Documents, Messages, Réunions, Facturation) so one subject shows
- * at a time. `invoices`, `finances`, `contracts`, `meetings` and `stanzy` are
- * the other features' panels the route passes in.
+ * at a time. `overview`, `invoices`, `finances`, `contracts`, `meetings` and
+ * `stanzy` are the other features' panels the route passes in.
  */
 export function DossierDashboardView({
   id,
+  overview,
   invoices,
   finances,
   contracts,
@@ -45,6 +46,8 @@ export function DossierDashboardView({
   stanzy,
 }: {
   id: string;
+  /** The top of the Aperçu (#81: CRS score, ITA countdown), passed in by the route. */
+  overview?: ReactNode;
   invoices?: ReactNode;
   /** What the Dossier brought in and cost (#95), passed in by the route. */
   finances?: ReactNode;
@@ -74,7 +77,12 @@ export function DossierDashboardView({
         <DossierTabs
           counts={counts}
           panels={{
-            apercu: <DossierDetail id={id} />,
+            apercu: (
+              <>
+                {overview}
+                <DossierDetail id={id} />
+              </>
+            ),
             documents: (
               <>
                 {stanzy ? <div className="empty:hidden">{stanzy}</div> : null}

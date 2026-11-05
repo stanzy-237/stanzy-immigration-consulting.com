@@ -1,7 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_CHECKLIST_FORM } from '@/features/checklist/lib/checklist-form';
-import { AREAS, DEFAULT_PROGRESS, type InterestAnswers } from '@/features/accompagnement/lib/interest-schema';
+import {
+  AREAS,
+  DEFAULT_PROGRESS,
+  type InterestAnswers,
+  type InterestInput,
+} from '@/features/accompagnement/lib/interest-schema';
+import { DEFAULT_FORM, toProfile } from '@/features/crs/lib/crs-form';
 import { sessionFor } from '@/server/auth/__tests__/fixtures';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -62,8 +68,8 @@ function fakeDatabase() {
           .filter((i) => (where.status ? i.status === where.status : true))
           .filter((i) => (where.accountId ? i.accountId === where.accountId && i.id !== (where.id as unknown as { not: string }).not : true))
           .map((i) => ({ ...i, account: account(i.accountId) })),
-      findUnique: async ({ where }: { where: { id: string } }) => {
-        const row = interests.find((i) => i.id === where.id);
+      findUnique: async ({ where }: { where: { id?: string; dossierId?: string } }) => {
+        const row = interests.find((i) => (where.id ? i.id === where.id : i.dossierId === where.dossierId));
         return row ? { ...row, account: account(row.accountId), decidedBy: null } : null;
       },
       create: async ({ data }: { data: Row }) => {
@@ -84,6 +90,10 @@ function fakeDatabase() {
       findFirst: async ({ where }: { where: Row }) =>
         dossiers.find((d) => d.accountId === where.accountId && d.service === where.service && d.state === where.state) ?? null,
       findUnique: async ({ where }: { where: { id: string } }) => dossierRow(where.id),
+      findUniqueOrThrow: async ({ where }: { where: { id: string } }) => dossierRow(where.id)!,
+      update: async ({ where, data }: { where: { id: string }; data: Row }) => {
+        Object.assign(dossiers.find((d) => d.id === where.id)!, data);
+      },
       create: async ({ data }: { data: Row }) => {
         const id = `dos_${++seq}`;
         const { events: _events, ...rest } = data;
@@ -149,10 +159,11 @@ const callerFor = (db: TRPCContext['prisma'], session: CurrentSession) =>
   createCaller({ prisma: db, session, headers: new Headers() } as unknown as TRPCContext);
 
 const areas = Object.fromEntries(AREAS.map((area) => [area, { answer: 'have', note: '' }])) as InterestAnswers['areas'];
-const answers = (extra: Partial<InterestAnswers> = {}): InterestAnswers => ({
+const answers = (extra: Partial<InterestInput> = {}): InterestInput => ({
   checklist: { ...DEFAULT_CHECKLIST_FORM, jobs: [{ title: 'Comptable', inCanada: false, selfEmployed: false }], countries: ['Cameroun'] },
   progress: { ...DEFAULT_PROGRESS, citizenship: 'Camerounaise', languageTest: 'tcf', ede: true },
   areas,
+  crs: toProfile(DEFAULT_FORM),
   ...extra,
 });
 
@@ -173,6 +184,21 @@ describe('the Demande d’intérêt', () => {
       params: { interestId: id, client: 'Aminata Diallo', level: 'B' },
     });
     expect((await callerFor(db, user()).accompagnement.mine()).latest).toMatchObject({ id, status: 'SUBMITTED' });
+  });
+
+  it('scores their CRS answers itself and gives the score back, once sent and afterwards', async () => {
+    const { db, interests } = fakeDatabase();
+    const sent = await callerFor(db, user()).accompagnement.submit(answers());
+    expect(sent.crsScore).toBeGreaterThan(0);
+    expect((interests[0]!.answers as InterestAnswers).crs).toMatchObject({ total: sent.crsScore, rules: '2026-11-03' });
+    expect((await callerFor(db, user()).accompagnement.mine()).latest).toMatchObject({ crsScore: sent.crsScore });
+  });
+
+  it('refuses CRS answers the engine can’t score', async () => {
+    const { db } = fakeDatabase();
+    await expect(
+      callerFor(db, user()).accompagnement.submit(answers({ crs: { ...toProfile(DEFAULT_FORM), age: 150 } })),
+    ).rejects.toBeTruthy();
   });
 
   it('waits for one Demande at a time', async () => {
@@ -224,7 +250,7 @@ describe('the Demande d’intérêt', () => {
     expect(mailer.appMailer.send).toHaveBeenLastCalledWith(
       expect.objectContaining({ to: 'aminata@example.com', text: expect.stringContaining('Motif : Profil trop jeune') }),
     );
-    await expect(callerFor(db, user()).accompagnement.submit(answers())).resolves.toEqual({ id: expect.any(String) });
+    await expect(callerFor(db, user()).accompagnement.submit(answers())).resolves.toMatchObject({ id: expect.any(String) });
   });
 
   it('is decided by the consultant only', async () => {
@@ -292,5 +318,37 @@ describe('« Stanzy s’en charge »', () => {
     await expect(callerFor(db, consultant).accompagnement.stanzy.decline({ id, note: '' })).rejects.toMatchObject({
       message: 'STANZY_NOT_PENDING',
     });
+  });
+});
+
+describe('the Accompagnement Dossier’s Aperçu', () => {
+  it('counts the 60 days from the ITA the Demande gave, and the consultant can change it', async () => {
+    const { db, dossiers } = fakeDatabase();
+    const { id, crsScore } = await callerFor(db, user()).accompagnement.submit(
+      answers({ progress: { ...DEFAULT_PROGRESS, citizenship: 'Camerounaise', eeProfile: true, ita: true, itaDate: '2026-10-20' } }),
+    );
+    const dossier = await callerFor(db, consultant).accompagnement.dashboard.approve({ id, level: 'C' });
+    expect(dossiers[0]).toMatchObject({ itaDate: '2026-10-20' });
+
+    expect(await callerFor(db, user()).accompagnement.overview({ dossierId: dossier.id })).toEqual({
+      itaDate: '2026-10-20',
+      crsScore,
+      open: true,
+    });
+
+    await expect(
+      callerFor(db, user()).accompagnement.dashboard.setItaDate({ dossierId: dossier.id, itaDate: '2026-11-01' }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await callerFor(db, consultant).accompagnement.dashboard.setItaDate({ dossierId: dossier.id, itaDate: '2026-11-01' });
+    expect(dossiers[0]).toMatchObject({ itaDate: '2026-11-01' });
+  });
+
+  it('hides another Account’s Dossier', async () => {
+    const { db } = fakeDatabase();
+    const { id } = await callerFor(db, user()).accompagnement.submit(answers());
+    const dossier = await callerFor(db, consultant).accompagnement.dashboard.approve({ id, level: 'B' });
+    await expect(
+      callerFor(db, user('acc_2', 'Bob Other')).accompagnement.overview({ dossierId: dossier.id }),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
   });
 });

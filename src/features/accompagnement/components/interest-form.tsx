@@ -1,9 +1,9 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, Send } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Gauge, Send } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useId, useState, type FormEvent, type ReactNode } from 'react';
+import { useId, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 
 import { toast } from '@/components/ui/toast';
 import {
@@ -21,8 +21,11 @@ import {
   type Progress,
 } from '@/features/accompagnement/lib/interest-schema';
 import { choosePrefill, type ChecklistForm } from '@/features/checklist/lib/checklist-form';
-import { fromProfile } from '@/features/crs/lib/crs-form';
+import { computeCrs } from '@/features/crs/lib/compute-crs';
+import { DEFAULT_FORM, fromProfile, toProfile, type CrsForm } from '@/features/crs/lib/crs-form';
 import { ChecklistFields } from '@/features/shared/components/checklist-fields';
+import { CrsFields } from '@/features/shared/components/crs-fields';
+import { rulesInForceOn } from '@/features/shared/lib/rules-version';
 import { useTRPC } from '@/trpc/client';
 
 const field =
@@ -33,14 +36,16 @@ const primary =
 const secondary =
   'inline-flex h-12 items-center gap-2 rounded-full px-5 font-heading text-body font-bold text-navy-deep hover:bg-off-white';
 
-type Step = 'situation' | 'progress' | 'documents';
-const STEPS: Step[] = ['situation', 'progress', 'documents'];
+type Step = 'situation' | 'progress' | 'crs' | 'documents';
+const STEPS: Step[] = ['situation', 'progress', 'crs', 'documents'];
 
 /**
- * The Demande d'intérêt (#81), in three steps: the Checklist's questions
+ * The Demande d'intérêt (#81), in four steps: the Checklist's questions
  * (prefilled from the Account's Checklist, else its latest CRS Simulation),
- * where they stand (test, EDE, profile, ITA), then each document area with
- * a note. « Stanzy s'en charge » shows for Cameroon only.
+ * where they stand (test, EDE, profile, ITA), their CRS answers with the
+ * score as they go (prefilled from that Simulation), then each document area
+ * with a note. « Stanzy s'en charge » shows for Cameroon only. Once sent,
+ * the page gives their CRS score.
  */
 export function InterestForm({ onSent }: { onSent: () => void }): ReactNode {
   const trpc = useTRPC();
@@ -64,6 +69,7 @@ export function InterestForm({ onSent }: { onSent: () => void }): ReactNode {
     <Steps
       prefill={prefill}
       progress={{ ...DEFAULT_PROGRESS, ...(crs ? progressFromCrs(crs) : {}) }}
+      crs={crs}
       onSent={onSent}
     />
   );
@@ -72,10 +78,13 @@ export function InterestForm({ onSent }: { onSent: () => void }): ReactNode {
 function Steps({
   prefill,
   progress: initialProgress,
+  crs: savedCrs,
   onSent,
 }: {
   prefill: ReturnType<typeof choosePrefill>;
   progress: Progress;
+  /** Their latest CRS Simulation's answers, if any. */
+  crs: CrsForm | null;
   onSent: () => void;
 }): ReactNode {
   const t = useTranslations('Accompagnement.form');
@@ -85,6 +94,7 @@ function Steps({
   const [situation, setSituation] = useState<ChecklistForm>(prefill.answers);
   const [progress, setProgress] = useState<Progress>(initialProgress);
   const [areas, setAreas] = useState<Areas>(DEFAULT_AREAS);
+  const [crsForm, setCrsForm] = useState<CrsForm | null>(savedCrs);
   const errors = useTranslations('Accompagnement.errors');
   const toasts = useTranslations('Accompagnement.toast');
   const submit = useMutation(
@@ -132,8 +142,17 @@ function Steps({
                 ) as Areas,
               );
             }
-            setStep('documents');
+            // Without a Simulation, the CRS step starts from the age they just gave.
+            setCrsForm((current) => current ?? { ...DEFAULT_FORM, age: String(next.age) });
+            setStep('crs');
           }}
+        />
+      ) : step === 'crs' && crsForm ? (
+        <CrsStep
+          value={crsForm}
+          onChange={setCrsForm}
+          onBack={() => setStep('progress')}
+          onNext={() => setStep('documents')}
         />
       ) : (
         <DocumentsStep
@@ -141,8 +160,8 @@ function Steps({
           cameroon={progress.residence === 'CM'}
           pending={submit.isPending}
           onChange={setAreas}
-          onBack={() => setStep('progress')}
-          onSubmit={() => submit.mutate({ checklist: situation, progress, areas })}
+          onBack={() => setStep('crs')}
+          onSubmit={() => submit.mutate({ checklist: situation, progress, areas, crs: toProfile(crsForm ?? DEFAULT_FORM) })}
         />
       )}
     </div>
@@ -289,6 +308,63 @@ function ProgressStep({
           {t('back')}
         </button>
         <button type="submit" className={primary}>
+          {t('next')}
+          <ArrowRight aria-hidden={true} className="size-4" />
+        </button>
+      </div>
+    </form>
+  );
+}
+
+/** Their CRS answers, the score updating as they go: the calculator's own questions. */
+function CrsStep({
+  value,
+  onChange,
+  onBack,
+  onNext,
+}: {
+  value: CrsForm;
+  onChange: (form: CrsForm) => void;
+  onBack: () => void;
+  onNext: () => void;
+}): ReactNode {
+  const t = useTranslations('Accompagnement.form');
+  const rules = rulesInForceOn(new Date());
+  const result = useMemo(() => computeCrs(toProfile(value), { rules }), [value, rules]);
+
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (result.ok) onNext();
+      }}
+      noValidate
+      className="grid gap-4"
+    >
+      <p className="text-body text-slate">{t('crsIntro')}</p>
+      <div
+        role="status"
+        aria-live="polite"
+        className="sticky top-20 z-10 flex items-center justify-between gap-3 rounded-2xl bg-navy-deep px-5 py-4 text-white shadow-md"
+      >
+        <span className="flex items-center gap-2 text-sm font-semibold">
+          <Gauge aria-hidden={true} className="size-5 text-rose" />
+          {t('crsLive')}
+        </span>
+        <span className="font-heading text-3xl font-bold tabular-nums">{result.ok ? result.breakdown.total : '—'}</span>
+      </div>
+      <CrsFields form={value} onChange={onChange} rules={rules} result={result} />
+      {result.ok ? null : (
+        <p role="alert" className="text-sm font-medium text-rouge">
+          {t('invalid')}
+        </p>
+      )}
+      <div className="flex flex-wrap justify-between gap-2">
+        <button type="button" onClick={onBack} className={secondary}>
+          <ArrowLeft aria-hidden={true} className="size-4" />
+          {t('back')}
+        </button>
+        <button type="submit" disabled={!result.ok} className={primary}>
           {t('next')}
           <ArrowRight aria-hidden={true} className="size-4" />
         </button>

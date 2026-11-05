@@ -8,8 +8,9 @@ import {
   interestAnswersSchema,
   levelOf,
   startStageOf,
-  type InterestAnswers,
+  type InterestInput,
 } from '@/features/accompagnement/lib/interest-schema';
+import { DEFAULT_FORM, toProfile } from '@/features/crs/lib/crs-form';
 
 const progress = {
   age: 29,
@@ -22,13 +23,19 @@ const progress = {
   ita: false,
   itaDate: null,
 };
-const areas = Object.fromEntries(AREAS.map((area) => [area, { answer: 'have', note: '' }])) as InterestAnswers['areas'];
+const areas = Object.fromEntries(AREAS.map((area) => [area, { answer: 'have', note: '' }])) as InterestInput['areas'];
 const checklist = {
   ...DEFAULT_CHECKLIST_FORM,
   jobs: [{ title: 'Comptable', inCanada: false, selfEmployed: false }],
   countries: ['Cameroun'],
 };
-const answers = (extra: Partial<InterestAnswers> = {}): InterestAnswers => ({ checklist, progress, areas, ...extra });
+const answers = (extra: Partial<InterestInput> = {}): InterestInput => ({
+  checklist,
+  progress,
+  areas,
+  crs: toProfile(DEFAULT_FORM),
+  ...extra,
+});
 
 describe('the Niveau', () => {
   it('is A from the start, B with the language test and the EDE, C once in the pool', () => {
