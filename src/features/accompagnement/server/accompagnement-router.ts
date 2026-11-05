@@ -26,6 +26,10 @@ import {
 } from '@/features/accompagnement/lib/interest-schema';
 import { livesInCameroon } from '@/features/accompagnement/server/residence';
 import { transitionAccountStatus } from '@/features/auth/server/account-status';
+import { SCHEDULE_MAX } from '@/features/contracts/lib/contract-schema';
+import { sendServiceContract } from '@/features/contracts/server/contracts-router';
+import { textIn } from '@/features/document-services/lib/service-schema';
+import { addDraftInvoiceLine } from '@/features/invoices/server/draft-lines';
 import { computeCrs } from '@/features/crs/lib/compute-crs';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
@@ -245,6 +249,13 @@ export const accompagnementRouter = createTRPCRouter({
       const answers = interest.answers as unknown as InterestAnswers;
       const stage = startStageOf(input.level, answers.progress.ita);
       const plan = planDossier(answers, interest.account.locale);
+      // « Stanzy s'en charge » from the Demande goes to the Service documentaire that gets that document, if any.
+      const catalogue = await ctx.prisma.documentService.findMany({
+        where: { active: true },
+        orderBy: { position: 'asc' },
+        select: { id: true, documentKinds: true },
+      });
+      const serviceFor = (kind: string) => catalogue.find((service) => service.documentKinds.includes(kind))?.id ?? null;
       const { account } = interest;
       const consultantId = ctx.session.account.id;
 
@@ -300,7 +311,11 @@ export const accompagnementRouter = createTRPCRouter({
         const asked = documents.filter(({ document }) => document.stanzy);
         if (asked.length > 0) {
           await tx.stanzyRequest.createMany({
-            data: asked.map(({ id }) => ({ documentId: id, requestedById: account.id })),
+            data: asked.map(({ id, document }) => ({
+              documentId: id,
+              requestedById: account.id,
+              serviceId: serviceFor(document.kind),
+            })),
           });
         }
         await tx.interestRequest.update({ where: { id: interest.id }, data: { dossierId: created.id } });
@@ -389,59 +404,149 @@ export const accompagnementRouter = createTRPCRouter({
           status: true,
           declineNote: true,
           createdAt: true,
+          acceptedAt: true,
           document: { select: { id: true, title: true, section: { select: { title: true } } } },
+          service: { select: { id: true, slug: true, name: true, priceKind: true, price: true, unit: true } },
+          contract: { select: { id: true, number: true, status: true } },
         },
       });
     }),
 
     /**
-     * The Client in Cameroon asks Stanzy to get a missing Document (no
-     * Version yet); the consultant is told. One request at a time.
+     * The Client in Cameroon asks Stanzy to get a Document of their Dossier
+     * through a Service documentaire (#80), from its page, having accepted its
+     * conditions and contract; the consultant is told. One request at a time,
+     * and not once the Document has its Finale.
      */
-    request: protectedProcedure.input(z.object({ documentId: z.string().min(1) })).mutation(async ({ ctx, input }) => {
-      const document = await ctx.prisma.dossierDocument.findUnique({
-        where: { id: input.documentId },
-        select: {
-          id: true,
-          title: true,
-          missing: true,
-          section: { select: { dossierId: true } },
-          _count: { select: { versions: true } },
-          stanzyRequests: { where: { status: { in: [...OPEN_STANZY] } }, select: { id: true } },
-        },
-      });
-      if (!document) throw notFound();
-      const dossier = await dossierFor(ctx.prisma, ctx.session, document.section.dossierId);
-      writable(dossier);
-      if (isConsultant(ctx.session) || dossier.accountId !== ctx.session.account.id) throw refuse('STANZY_CLIENT_ONLY');
-      if (!(await livesInCameroon(ctx.prisma, dossier.accountId))) throw refuse('STANZY_CAMEROON_ONLY');
-      if (!document.missing || document._count.versions > 0) throw refuse('STANZY_NOT_MISSING');
-      if (document.stanzyRequests.length > 0) throw refuse('STANZY_ALREADY_ASKED');
+    request: protectedProcedure
+      .input(z.object({ documentId: z.string().min(1), serviceId: z.string().min(1), accepted: z.literal(true) }))
+      .mutation(async ({ ctx, input }) => {
+        const document = await ctx.prisma.dossierDocument.findUnique({
+          where: { id: input.documentId },
+          select: {
+            id: true,
+            title: true,
+            finalVersionId: true,
+            section: { select: { dossierId: true } },
+            stanzyRequests: { where: { status: { in: [...OPEN_STANZY] } }, select: { id: true } },
+          },
+        });
+        if (!document) throw notFound();
+        const dossier = await dossierFor(ctx.prisma, ctx.session, document.section.dossierId);
+        writable(dossier);
+        if (isConsultant(ctx.session) || dossier.accountId !== ctx.session.account.id) throw refuse('STANZY_CLIENT_ONLY');
+        if (!(await livesInCameroon(ctx.prisma, dossier.accountId))) throw refuse('STANZY_CAMEROON_ONLY');
+        if (document.finalVersionId) throw refuse('STANZY_DOCUMENT_FINAL');
+        if (document.stanzyRequests.length > 0) throw refuse('STANZY_ALREADY_ASKED');
+        const service = await ctx.prisma.documentService.findUnique({ where: { id: input.serviceId }, select: { active: true } });
+        if (!service?.active) throw refuse('SERVICE_UNAVAILABLE');
 
-      const request = await ctx.prisma.stanzyRequest.create({
-        data: { documentId: document.id, requestedById: ctx.session.account.id },
-        select: { id: true },
-      });
-      const client = dossier.account.name;
-      mailLater('a Stanzy request', async () =>
-        (await consultants(ctx.prisma)).map((consultant) =>
-          stanzyRequestedEmail({
-            to: consultant.email,
-            locale: consultant.locale,
-            client,
-            document: document.title,
-            url: `${dashboardOrigin(siteUrl())}/dossiers/${dossier.id}#stanzy`,
-          }),
-        ),
-      );
-      notifyLater(ctx.prisma, {
-        kind: 'STANZY_REQUESTED',
-        actorId: ctx.session.account.id,
-        recipients: 'CONSULTANTS',
-        target: { dossierId: dossier.id, documentId: document.id },
-      });
-      return request;
-    }),
+        const request = await ctx.prisma.stanzyRequest.create({
+          data: {
+            documentId: document.id,
+            requestedById: ctx.session.account.id,
+            serviceId: input.serviceId,
+            acceptedAt: new Date(),
+          },
+          select: { id: true },
+        });
+        const client = dossier.account.name;
+        mailLater('a Stanzy request', async () =>
+          (await consultants(ctx.prisma)).map((consultant) =>
+            stanzyRequestedEmail({
+              to: consultant.email,
+              locale: consultant.locale,
+              client,
+              document: document.title,
+              url: `${dashboardOrigin(siteUrl())}/dossiers/${dossier.id}#stanzy`,
+            }),
+          ),
+        );
+        notifyLater(ctx.prisma, {
+          kind: 'STANZY_REQUESTED',
+          actorId: ctx.session.account.id,
+          recipients: 'CONSULTANTS',
+          target: { dossierId: dossier.id, documentId: document.id },
+        });
+        return request;
+      }),
+
+    /**
+     * The consultant takes the request on: the service's own Contrat goes to
+     * the Client to sign (in `locale`, at `amount` with its échéancier), and a
+     * line for it joins the Dossier's draft invoice, to check and send.
+     */
+    accept: consultantProcedure
+      .input(
+        z.object({
+          id: z.string().min(1),
+          locale: z.enum(['fr', 'en']),
+          amount: z.number().int().positive().max(1_000_000_000),
+          schedule: z.string().trim().min(1).max(SCHEDULE_MAX),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const request = await ctx.prisma.stanzyRequest.findUnique({
+          where: { id: input.id },
+          select: {
+            id: true,
+            status: true,
+            document: { select: { title: true, section: { select: { dossierId: true } } } },
+            service: { select: { name: true, contractTitle: true, contractBody: true } },
+          },
+        });
+        if (!request) throw notFound();
+        const dossier = await dossierFor(ctx.prisma, ctx.session, request.document.section.dossierId);
+        writable(dossier);
+        if (request.status !== 'REQUESTED') throw refuse('STANZY_NOT_PENDING');
+        if (!request.service) throw refuse('STANZY_NO_SERVICE');
+
+        const serviceName = textIn(request.service.name, input.locale);
+        const contract = await sendServiceContract(ctx, dossier, {
+          stanzyRequestId: request.id,
+          locale: input.locale,
+          template: {
+            title: textIn(request.service.contractTitle, input.locale),
+            body: textIn(request.service.contractBody, input.locale),
+          },
+          serviceName,
+          amount: input.amount,
+          currency: 'XAF',
+          schedule: input.schedule,
+        });
+        const { invoiceId } = await ctx.prisma.$transaction(async (tx) => {
+          const { count } = await tx.stanzyRequest.updateMany({
+            where: { id: request.id, status: 'REQUESTED' },
+            data: { status: 'ACCEPTED', decidedAt: new Date() },
+          });
+          if (count === 0) throw refuse('STANZY_NOT_PENDING');
+          return addDraftInvoiceLine(tx, dossier.id, {
+            description: `${serviceName} – ${request.document.title}`,
+            quantity: 1,
+            unitAmount: input.amount,
+          });
+        });
+        return { contract, invoiceId };
+      }),
+
+    /** The consultant picks the Service documentaire for a request that has none (made before the catalogue covered it). */
+    setService: consultantProcedure
+      .input(z.object({ id: z.string().min(1), serviceId: z.string().min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        const request = await ctx.prisma.stanzyRequest.findUnique({
+          where: { id: input.id },
+          select: { id: true, document: { select: { section: { select: { dossierId: true } } } } },
+        });
+        if (!request) throw notFound();
+        writable(await dossierFor(ctx.prisma, ctx.session, request.document.section.dossierId));
+        const service = await ctx.prisma.documentService.findUnique({ where: { id: input.serviceId }, select: { id: true } });
+        if (!service) throw notFound();
+        const { count } = await ctx.prisma.stanzyRequest.updateMany({
+          where: { id: request.id, status: 'REQUESTED' },
+          data: { serviceId: service.id },
+        });
+        if (count === 0) throw refuse('STANZY_NOT_PENDING');
+      }),
 
     /** The consultant declines, with a note: the Client gets the Document themselves. */
     decline: consultantProcedure

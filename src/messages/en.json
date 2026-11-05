@@ -1413,7 +1413,8 @@
       "contrats": "Contracts",
       "demandes": "Expressions of interest",
       "finances": "Finances",
-      "reunions": "Meetings"
+      "reunions": "Meetings",
+      "services": "Document services"
     },
     "viewSite": "View the site",
     "overview": {
@@ -1937,7 +1938,9 @@
       "metaTitleDossier": "My file",
       "back": "My space",
       "openDossier": "See the file and its documents",
-      "loadingDossier": "Loading the file"
+      "loadingDossier": "Loading the file",
+      "services": "Document services",
+      "servicesHint": "Proof of funds, police certificate, CNPS… obtained by Stanzy."
     },
     "consultantEmails": {
       "cta": "Open the file",
@@ -3046,7 +3049,7 @@
     "stanzy": {
       "ask": "Stanzy takes care of it",
       "askLabel": "Ask Stanzy to get “{document}”",
-      "askHint": "Stanzy gets this document for you, billed separately.",
+      "askHint": "A separate contract and invoice: see the service’s conditions and price.",
       "status": {
         "REQUESTED": "Asked of Stanzy",
         "ACCEPTED": "Accepted by Stanzy",
@@ -3062,7 +3065,26 @@
       "declineNote": "Note to the client (optional)",
       "declineConfirm": "Decline",
       "keep": "Keep",
-      "loading": "Loading requests"
+      "loading": "Loading requests",
+      "conditionsAccepted": "conditions accepted",
+      "noService": "No document service covers this document yet.",
+      "contract": "Contract {number}: {status, select, SENT {to sign} SIGNED {signed} other {cancelled}}",
+      "accept": "Send the contract and invoice",
+      "pickService": "Document service for “{document}”",
+      "chooseService": "Choose the service…",
+      "acceptTitle": "Take this document on",
+      "acceptBody": "The “{service}” service contract goes to the client for “{document}”, to sign online. The same amount joins the file’s draft invoice.",
+      "language": "Contract language",
+      "base": "Amount to justify (FCFA)",
+      "amount": "Price (FCFA)",
+      "schedule": "Payment schedule",
+      "defaultSchedule": "100% on signing",
+      "acceptInvalid": "Enter a price and a payment schedule.",
+      "acceptInvoice": "Then check the draft invoice and send it from Billing.",
+      "accepting": "Sending…",
+      "acceptConfirm": "Send the contract",
+      "accepted": "Contract {number} sent; line added to the draft invoice",
+      "openInvoice": "See the invoice"
     },
     "toast": {
       "sent": "Request sent",
@@ -3085,7 +3107,11 @@
       "UNKNOWN": "Something went wrong. Try again.",
       "INTEREST_CRS_INVALID": "Check your CRS answers: the score can’t be worked out.",
       "INTEREST_NOT_ACCOMPAGNEMENT": "This file isn’t a support file.",
-      "INVALID_DATE": "Enter a valid date."
+      "INVALID_DATE": "Enter a valid date.",
+      "STANZY_DOCUMENT_FINAL": "This document already has its final version.",
+      "SERVICE_UNAVAILABLE": "This service is no longer offered.",
+      "STANZY_NO_SERVICE": "Choose the document service first.",
+      "SIGNATURE_ASSETS_MISSING": "First add your signature and stamp (Signatures)."
     },
     "overview": {
       "crs": "CRS score from the request",
@@ -3552,6 +3578,119 @@
       "margin": "Margin",
       "unconverted": "Some CAD amounts are waiting for their month’s rate.",
       "open": "See finances"
+    }
+  },
+  "DocumentServices": {
+    "blanks": {
+      "client": "your name",
+      "service": "the service",
+      "prix": "the price",
+      "echeancier": "the schedule",
+      "date": "the date",
+      "numero": "the number"
+    },
+    "mine": {
+      "title": "Document services",
+      "back": "My space",
+      "cameroon": "For clients in Cameroon",
+      "lead": "Stanzy gets the documents that take longest to gather for you. Each service has its own conditions, contract and price.",
+      "choose": "Choose the service that gets this document: you’ll read its conditions and contract before confirming.",
+      "unavailable": "Document services are for clients who live in Cameroon.",
+      "empty": "No service is offered yet.",
+      "see": "See the service",
+      "loading": "Loading the services",
+      "steps": {
+        "choose": {
+          "title": "You choose",
+          "body": "From a document in your file, “Stanzy takes care of it” leads you to the service."
+        },
+        "sign": {
+          "title": "You sign",
+          "body": "Stanzy sends you the service contract to sign online, then the invoice."
+        },
+        "deliver": {
+          "title": "Stanzy delivers",
+          "body": "The document arrives in your file, ready for IRCC."
+        }
+      }
+    },
+    "service": {
+      "back": "All services",
+      "unavailable": "This service is for clients who live in Cameroon.",
+      "provides": "What you provide",
+      "turnaround": "Usual turnaround",
+      "conditions": "Conditions",
+      "contract": "The contract",
+      "contractIntro": "The text you’ll sign online. The parts in brackets are filled in when it’s sent.",
+      "price": "Price",
+      "priceNote": "Billed apart from your support, once the contract is signed.",
+      "for": "For your document:",
+      "accept": "I’ve read the conditions and the contract, and I ask Stanzy to get this document.",
+      "ask": "Stanzy takes care of it",
+      "asking": "Sending…",
+      "next": "Stanzy then sends you the contract to sign, then the invoice.",
+      "asked": "Request sent to Stanzy",
+      "documentGone": "This document can’t be requested any more: it has its final version or a request is under way.",
+      "howTo": "To request it, open the document in your file and choose “Stanzy takes care of it”.",
+      "loading": "Loading the service"
+    },
+    "dashboard": {
+      "title": "Document services",
+      "intro": "The documents Stanzy gets for clients in Cameroon. Prices live only here; clients see the active services in “My space”.",
+      "new": "New service",
+      "empty": "No service yet.",
+      "starters": "{count, plural, one {# starting service is missing} other {# starting services are missing}} (proof of funds, police certificate, CNPS…). Add them inactive, then set their prices.",
+      "addStarters": "Add the starting services",
+      "startersAdded": "{count, plural, =0 {Nothing to add} one {# service added} other {# services added}}",
+      "active": "Active",
+      "inactive": "Inactive",
+      "noPrice": "Price to set",
+      "requests": "{count, plural, =0 {no requests} one {# request} other {# requests}}",
+      "error": "Something went wrong. Try again.",
+      "loading": "Loading the catalogue"
+    },
+    "edit": {
+      "back": "Document services",
+      "title": "Edit the service",
+      "newTitle": "New service",
+      "languages": {
+        "fr": "French",
+        "en": "English"
+      },
+      "slug": "Address",
+      "slugHint": "Lowercase and hyphens, e.g. “certificat-de-police”: /mon-espace/services/certificat-de-police.",
+      "active": "Offered to clients",
+      "name": "Name",
+      "summary": "Description",
+      "priceTitle": "Price",
+      "priceKind": "Price type",
+      "kinds": {
+        "FIXED": "Fixed price",
+        "PERCENT": "Percentage"
+      },
+      "priceFixed": "Price (FCFA)",
+      "pricePercent": "Percentage of the amount to justify (0 to {max}%)",
+      "unit": "Unit",
+      "detailsTitle": "What the client reads before accepting",
+      "provides": "What the client provides",
+      "turnaround": "Usual turnaround",
+      "conditions": "Conditions",
+      "contractTitle": "Service contract",
+      "blanks": "The same blanks as a contract template: {blanks}. Headings with #, lists with -.",
+      "contractName": "Contract title",
+      "contractBody": "Contract text",
+      "documents": "Documents it gets",
+      "documentsHint": "“Stanzy takes care of it” on one of these documents leads to this service.",
+      "invalid": "Check the fields: address, name and contract in both languages, and a valid price.",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Service saved",
+      "loading": "Loading the service",
+      "errors": {
+        "SERVICE_SLUG_TAKEN": "This address is already another service’s.",
+        "SERVICE_PERCENT_TOO_HIGH": "The percentage can’t be over 100%.",
+        "UNKNOWN": "Something went wrong. Try again."
+      }
     }
   }
 }

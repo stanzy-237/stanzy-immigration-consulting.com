@@ -137,7 +137,7 @@ export const dossiersRouter = createTRPCRouter({
             },
           },
           // Its Contrat signed (#96)? « Contrat non signé » warns until then, without blocking.
-          contracts: { where: { parentId: null, status: 'SIGNED' }, select: { id: true }, take: 1 },
+          contracts: { where: { parentId: null, stanzyRequestId: null, status: 'SIGNED' }, select: { id: true }, take: 1 },
         },
       });
       if (!dossier) throw notFound();

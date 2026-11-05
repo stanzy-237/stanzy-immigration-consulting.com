@@ -1,7 +1,7 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowRight, FolderOpen } from 'lucide-react';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { ArrowRight, FileCheck2, FolderOpen } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -16,7 +16,8 @@ import { useTRPC } from '@/trpc/client';
 
 /**
  * « Mon espace »: the signed-in Account's Dossiers, each with its stages and
- * a link to its documents and invoices.
+ * a link to its documents and invoices; for a Client in Cameroon, the
+ * Services documentaires too (#80).
  */
 export function MySpaceView(): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
@@ -27,6 +28,7 @@ export function MySpaceView(): ReactNode {
         <div className="mx-auto max-w-3xl">
           <h1 className="font-heading text-3xl font-bold text-navy-deep md:text-4xl">{t('title')}</h1>
           <p className="mt-2 text-slate">{t('subtitle')}</p>
+          <ServicesLink />
           <div className="mt-8">
             <QueryBoundary fallback={<MyDossiersSkeleton />}>
               <MyDossiers />
@@ -36,6 +38,29 @@ export function MySpaceView(): ReactNode {
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+/** The Services documentaires, once there are some for this Account (Cameroon only). */
+function ServicesLink(): ReactNode {
+  const t = useTranslations('Dossiers.mySpace');
+  const trpc = useTRPC();
+  const { data } = useQuery(trpc.documentServices.list.queryOptions());
+  if (!data?.available || data.services.length === 0) return null;
+  return (
+    <Link
+      href="/mon-espace/services"
+      className="group mt-6 flex items-center gap-4 rounded-2xl bg-navy-deep p-5 text-white shadow-md hover:bg-navy-80"
+    >
+      <span aria-hidden={true} className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/10">
+        <FileCheck2 className="size-6 text-rose" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-heading font-bold">{t('services')}</span>
+        <span className="block text-sm text-ice-blue">{t('servicesHint')}</span>
+      </span>
+      <ArrowRight aria-hidden={true} className="size-5 transition-transform group-hover:translate-x-0.5" />
+    </Link>
   );
 }
 

@@ -1,11 +1,10 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { ExternalLink, HandHelping } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
-import { toast } from '@/components/ui/toast';
 import { helpFor } from '@/features/accompagnement/lib/interest-schema';
 import { smallButton, type DocumentData, type Viewer } from '@/features/dossiers/components/document-styles';
 import { TCF_ACADEMY_URL } from '@/features/shared/data/links';
@@ -48,9 +47,12 @@ export function NeedBadges({ document }: { document: DocumentData }): ReactNode 
 }
 
 /**
- * Inside a Document made from the Demande d'intérêt: the Client's note, where
- * to get a missing one (the TCF academy, the EDE service), and for a Client
- * in Cameroon « Stanzy s'en charge ».
+ * Inside a Document: the Client's note from the Demande d'intérêt, where to
+ * get a missing one (the TCF academy, the EDE service), and for a Client in
+ * Cameroon « Stanzy s'en charge » on any Document without its Finale. That
+ * needs its own contract and invoice, so it leads to the Service documentaire
+ * that gets this document (its conditions, contract and price, #80), or to
+ * the catalogue when none does.
  */
 export function DocumentNeeds({
   dossierId,
@@ -65,26 +67,19 @@ export function DocumentNeeds({
 }): ReactNode {
   const t = useTranslations('Accompagnement');
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
   const locale = useLocale();
   const { data } = useQuery({ ...trpc.dossiers.documents.sections.queryOptions({ dossierId }), select: inLanguage(locale) });
   const client = viewer === 'client';
   const missing = isMissing(document);
   const help = missing && client ? helpFor(document.kind) : null;
   const request = document.stanzyRequests[0];
-  const canAsk = client && open && Boolean(data?.stanzy) && missing && (!request || request.status === 'DECLINED');
-  const ask = useMutation(
-    trpc.accompagnement.stanzy.request.mutationOptions({
-      onSuccess: () => {
-        void queryClient.invalidateQueries({ queryKey: trpc.dossiers.documents.sections.queryKey({ dossierId }) });
-        toast.add({ title: t('toast.stanzyAsked'), type: 'success' });
-      },
-      onError: (error) => {
-        const known = t.has(`errors.${error.message}`);
-        toast.add({ title: t(known ? `errors.${error.message}` : 'errors.UNKNOWN'), type: known ? 'warning' : 'error' });
-      },
-    }),
-  );
+  const canAsk =
+    client && open && Boolean(data?.stanzy) && !document.finalVersionId && (!request || request.status === 'DECLINED');
+  const { data: catalogue } = useQuery({ ...trpc.documentServices.list.queryOptions(), enabled: canAsk });
+  const service = document.kind
+    ? catalogue?.services.find((candidate) => candidate.documentKinds.includes(document.kind ?? ''))
+    : undefined;
+  const askHref = `/mon-espace/services${service ? `/${service.slug}` : ''}?document=${document.id}`;
 
   if (!document.clientNote && !help && !canAsk && request?.status !== 'DECLINED') return null;
   return (
@@ -118,17 +113,15 @@ export function DocumentNeeds({
             </Link>
           ) : null}
           {canAsk ? (
-            <button
-              type="button"
-              disabled={ask.isPending}
-              onClick={() => ask.mutate({ documentId: document.id })}
+            <Link
+              href={askHref}
               aria-label={t('stanzy.askLabel', { document: document.title })}
               aria-describedby={`${document.id}-stanzy-hint`}
               className={`${smallButton} h-9 border border-navy-deep text-navy-deep hover:bg-navy-deep hover:text-white`}
             >
               <HandHelping aria-hidden={true} className="size-4" />
               {t('stanzy.ask')}
-            </button>
+            </Link>
           ) : null}
           {canAsk ? (
             <span id={`${document.id}-stanzy-hint`} className="text-xs text-slate">

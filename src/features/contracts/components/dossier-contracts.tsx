@@ -59,7 +59,8 @@ export function DossierContracts({
   const { data } = useSuspenseQuery(trpc.contracts.forDossier.queryOptions({ dossierId }));
   const consultant = viewer === 'consultant';
   const search = useSearchParams();
-  const main = data.contracts.filter((contract) => !contract.parentId);
+  // The Dossier's own Contrat; a Service documentaire's (#80) stands apart.
+  const main = data.contracts.filter((contract) => !contract.parentId && !contract.stanzyRequestId);
   const live = main.find((contract) => contract.status !== 'CANCELLED');
   const [sending, setSending] = useState(
     () => consultant && data.open && !live && search.get('contrat') === 'nouveau',
