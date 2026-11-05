@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ExternalLink, HandHelping } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { toast } from '@/components/ui/toast';
@@ -10,6 +10,7 @@ import { helpFor } from '@/features/accompagnement/lib/interest-schema';
 import { smallButton, type DocumentData, type Viewer } from '@/features/dossiers/components/document-styles';
 import { TCF_ACADEMY_URL } from '@/features/shared/data/links';
 import { Link } from '@/i18n/navigation';
+import { inLanguage } from '@/features/dossiers/lib/documents-cache';
 import { useTRPC } from '@/trpc/client';
 
 /** « Manquant » while the Client said they don't have it and no Version came. */
@@ -65,7 +66,8 @@ export function DocumentNeeds({
   const t = useTranslations('Accompagnement');
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const { data } = useQuery(trpc.dossiers.documents.sections.queryOptions({ dossierId }));
+  const locale = useLocale();
+  const { data } = useQuery({ ...trpc.dossiers.documents.sections.queryOptions({ dossierId }), select: inLanguage(locale) });
   const client = viewer === 'client';
   const missing = isMissing(document);
   const help = missing && client ? helpFor(document.kind) : null;
