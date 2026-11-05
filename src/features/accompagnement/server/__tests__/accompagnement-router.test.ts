@@ -31,6 +31,7 @@ function fakeDatabase() {
   ];
   const interests: Row[] = [];
   const dossiers: Row[] = [];
+  const sections: Row[] = [];
   const documents: Row[] = [];
   const stanzy: Row[] = [];
   let seq = 0;
@@ -83,23 +84,27 @@ function fakeDatabase() {
       findFirst: async ({ where }: { where: Row }) =>
         dossiers.find((d) => d.accountId === where.accountId && d.service === where.service && d.state === where.state) ?? null,
       findUnique: async ({ where }: { where: { id: string } }) => dossierRow(where.id),
-      create: async ({ data }: { data: Row & { sections: { create: (Row & { documents: { create: Row[] } })[] } } }) => {
+      create: async ({ data }: { data: Row }) => {
         const id = `dos_${++seq}`;
-        const { sections, events: _events, ...rest } = data as Row & { sections: { create: (Row & { documents: { create: Row[] } })[] }; events: unknown };
+        const { events: _events, ...rest } = data;
         dossiers.push({ ...rest, id, state: 'OPEN' });
-        for (const section of sections.create) {
-          const sectionId = `sec_${++seq}`;
-          for (const document of section.documents.create) {
-            const { stanzyRequests, ...fields } = document as Row & { stanzyRequests?: { create: Row } };
-            const documentId = `doc_${++seq}`;
-            documents.push({ ...fields, id: documentId, sectionId, sectionTitle: section.title, dossierId: id });
-            if (stanzyRequests) stanzy.push({ ...stanzyRequests.create, id: `stz_${++seq}`, documentId, status: 'REQUESTED' });
-          }
-        }
         return { id };
       },
     },
+    dossierSection: {
+      createMany: async ({ data }: { data: Row[] }) => {
+        sections.push(...data);
+        return { count: data.length };
+      },
+    },
     dossierDocument: {
+      createMany: async ({ data }: { data: Row[] }) => {
+        for (const row of data) {
+          const section = sections.find((sec) => sec.id === row.sectionId)!;
+          documents.push({ ...row, sectionTitle: section.title, dossierId: section.dossierId });
+        }
+        return { count: data.length };
+      },
       findUnique: async ({ where }: { where: { id: string } }) => {
         const document = documents.find((d) => d.id === where.id);
         if (!document) return null;
@@ -112,6 +117,10 @@ function fakeDatabase() {
       },
     },
     stanzyRequest: {
+      createMany: async ({ data }: { data: Row[] }) => {
+        for (const row of data) stanzy.push({ ...row, id: `stz_${++seq}`, status: 'REQUESTED' });
+        return { count: data.length };
+      },
       create: async ({ data }: { data: Row }) => {
         const row = { ...data, id: `stz_${++seq}`, status: 'REQUESTED' };
         stanzy.push(row);

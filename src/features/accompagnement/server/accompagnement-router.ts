@@ -224,31 +224,41 @@ export const accompagnementRouter = createTRPCRouter({
             stage,
             startStage: stage,
             events: { create: { kind: 'OPENED', toStage: stage, actorId: consultantId } },
-            sections: {
-              create: plan.map((section, index) => ({
-                title: section.title,
-                position: index + 1,
-                documents: {
-                  create: section.documents.map((document) => ({
-                    title: document.title,
-                    kind: document.kind,
-                    need: document.need,
-                    missing: document.missing,
-                    clientNote: document.clientNote,
-                    addedById: consultantId,
-                    ...(document.stanzy ? { stanzyRequests: { create: { requestedById: account.id } } } : {}),
-                  })),
-                },
-              })),
-            },
           },
           select: { id: true },
         });
+        // One insert per table, not one per Section or Document: the database is far, and the
+        // transaction has to finish in time (an Accompagnement makes dozens of Documents).
+        const sections = plan.map((section, index) => ({ id: crypto.randomUUID(), section, position: index + 1 }));
+        const documents = sections.flatMap(({ id: sectionId, section }) =>
+          section.documents.map((document) => ({ id: crypto.randomUUID(), sectionId, document })),
+        );
+        await tx.dossierSection.createMany({
+          data: sections.map(({ id, section, position }) => ({ id, dossierId: created.id, title: section.title, position })),
+        });
+        await tx.dossierDocument.createMany({
+          data: documents.map(({ id, sectionId, document }) => ({
+            id,
+            sectionId,
+            title: document.title,
+            kind: document.kind,
+            need: document.need,
+            missing: document.missing,
+            clientNote: document.clientNote,
+            addedById: consultantId,
+          })),
+        });
+        const asked = documents.filter(({ document }) => document.stanzy);
+        if (asked.length > 0) {
+          await tx.stanzyRequest.createMany({
+            data: asked.map(({ id }) => ({ documentId: id, requestedById: account.id })),
+          });
+        }
         await tx.interestRequest.update({ where: { id: interest.id }, data: { dossierId: created.id } });
         if (account.status === 'USER') await transitionAccountStatus(tx, account.id, 'START_ONBOARDING');
         if (account.status !== 'CLIENT') await transitionAccountStatus(tx, account.id, 'OPEN_DOSSIER');
         return created;
-      });
+      }, { maxWait: 10_000, timeout: 30_000 });
 
       const lang = toLocale(account.locale);
       const stageName = createTranslator({ locale: lang, messages: { fr, en }[lang] })(
