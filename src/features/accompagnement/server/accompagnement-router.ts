@@ -224,7 +224,8 @@ export const accompagnementRouter = createTRPCRouter({
     /**
      * Approves at the Niveau chosen: the Accompagnement Dossier opens at its
      * stage with its Sections and Documents, the Account becomes a Client,
-     * and the User is told. The invoice is the consultant's next step.
+     * and the User is told. The Contrat d'accompagnement is the
+     * consultant's next step, then the invoice.
      */
     approve: consultantProcedure.input(decideInput).mutation(async ({ ctx, input }) => {
       const interest = await ctx.prisma.interestRequest.findUnique({
@@ -276,7 +277,13 @@ export const accompagnementRouter = createTRPCRouter({
           section.documents.map((document) => ({ id: crypto.randomUUID(), sectionId, document })),
         );
         await tx.dossierSection.createMany({
-          data: sections.map(({ id, section, position }) => ({ id, dossierId: created.id, title: section.title, position })),
+          data: sections.map(({ id, section, position }) => ({
+            id,
+            dossierId: created.id,
+            title: section.title,
+            titles: section.titles,
+            position,
+          })),
         });
         await tx.dossierDocument.createMany({
           data: documents.map(({ id, sectionId, document }) => ({

@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { ExternalLink, FilePlus2, PenLine, ScrollText, Send, XCircle } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
 import {
@@ -43,7 +44,8 @@ const STATUS_STYLES: Record<Contract['status'], string> = {
  * A Dossier's Contrat and its Avenants (#96). The consultant sends the
  * Contrat (from the service's template), cancels one not signed yet, and
  * sends Avenants once it is signed; the Client signs each one and opens its
- * PDF, the signed one with its Certificat de signature.
+ * PDF, the signed one with its Certificat de signature. `?contrat=nouveau`
+ * (from an approved Demande d'intérêt) opens « Envoyer le contrat » at once.
  */
 export function DossierContracts({
   dossierId,
@@ -56,11 +58,14 @@ export function DossierContracts({
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.contracts.forDossier.queryOptions({ dossierId }));
   const consultant = viewer === 'consultant';
-  const [sending, setSending] = useState(false);
-  const [amending, setAmending] = useState<Contract | null>(null);
-
+  const search = useSearchParams();
   const main = data.contracts.filter((contract) => !contract.parentId);
   const live = main.find((contract) => contract.status !== 'CANCELLED');
+  const [sending, setSending] = useState(
+    () => consultant && data.open && !live && search.get('contrat') === 'nouveau',
+  );
+  const [amending, setAmending] = useState<Contract | null>(null);
+
   const pendingAmendment = data.contracts.some((contract) => contract.parentId && contract.status === 'SENT');
   const waiting = data.contracts.filter((contract) => contract.status === 'SENT');
 

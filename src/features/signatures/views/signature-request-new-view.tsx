@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft, FileText, Send, Upload } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,6 +16,7 @@ import { uploadVersionFile, versionFileUrl } from '@/features/dossiers/lib/uploa
 import { FieldPlacer, type PlacedField } from '@/features/signatures/components/field-placer';
 import { useSignatureErrors } from '@/features/signatures/hooks/use-signature-errors';
 import type { FieldKind } from '@/features/signatures/lib/signature-schema';
+import { inLanguage } from '@/features/dossiers/lib/documents-cache';
 import { useTRPC } from '@/trpc/client';
 
 const fieldClass =
@@ -55,7 +56,11 @@ function Compose({ dossierId, initialVersion }: { dossierId: string; initialVers
   const router = useRouter();
   const queryClient = useQueryClient();
   const failed = useSignatureErrors();
-  const { data } = useSuspenseQuery(trpc.dossiers.documents.sections.queryOptions({ dossierId }));
+  const locale = useLocale();
+  const { data } = useSuspenseQuery({
+    ...trpc.dossiers.documents.sections.queryOptions({ dossierId }),
+    select: inLanguage(locale),
+  });
   const { data: assets } = useSuspenseQuery(trpc.signatures.assets.queryOptions());
   const [versionId, setVersionId] = useState(initialVersion);
   const [fields, setFields] = useState<PlacedField[]>([]);
