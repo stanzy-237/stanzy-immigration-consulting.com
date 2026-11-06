@@ -3,6 +3,23 @@ import { StreamClient } from '@stream-io/node-sdk';
 import { callIdOf } from '@/features/meetings/lib/meeting-schema';
 import { env } from '@/lib/env';
 
+/**
+ * How an Enregistrement is laid out: the speaker large, the others beside,
+ * each camera shown whole (« fit »: a phone's portrait image isn't cropped
+ * to fill a landscape tile), on the brand's navy.
+ */
+export const RECORDING_LAYOUT = {
+  name: 'spotlight' as const,
+  options: {
+    'video.scale_mode': 'fit',
+    'video.screenshare_scale_mode': 'fit',
+    'video.background_color': '#0D1F4E',
+    'layout.background_color': '#0D1F4E',
+    'participant.video_border_rounded': true,
+    'participant_label.text_color': '#FFFFFF',
+  },
+};
+
 /** How long a room's token lasts: a long Réunion, plus margin. */
 const TOKEN_SECONDS = 4 * 60 * 60;
 
@@ -42,7 +59,11 @@ export async function openRoom(opts: {
   const callId = callIdOf(opts.meeting.id);
   const call = streamClient.video.call('default', callId);
   const settings = {
-    recording: { mode: opts.meeting.recording ? ('auto-on' as const) : ('disabled' as const), quality: '720p' as const },
+    recording: {
+      mode: opts.meeting.recording ? ('auto-on' as const) : ('disabled' as const),
+      quality: '720p' as const,
+      layout: RECORDING_LAYOUT,
+    },
     transcription: {
       mode: opts.meeting.recording ? ('auto-on' as const) : ('disabled' as const),
       language: opts.language,
