@@ -107,6 +107,8 @@ describe('the Réunions panel', () => {
       }),
     ]);
     expect(screen.getByRole('link', { name: /Enregistrement du/ })).toHaveAttribute('href', '/api/meetings/recordings/r_1');
+    // Played on the page itself.
+    expect(document.querySelector('video')).toHaveAttribute('src', '/api/meetings/recordings/r_1');
     fireEvent.click(screen.getByRole('button', { name: 'Lire la transcription' }));
     expect(screen.getByText('Stanzy : Bonjour.')).toBeInTheDocument();
     expect(screen.getByLabelText('Chercher dans les transcriptions')).toBeInTheDocument();
