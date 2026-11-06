@@ -153,12 +153,17 @@ function Room({
   const calling = useCallCallingState();
   const count = useParticipantCount();
   const frame = useRef<HTMLDivElement>(null);
-  const [layout, setLayout] = useState<Layout>('speakerLeft');
+  // On a phone the others sit under the speaker, not squeezed beside them.
+  const [layout, setLayout] = useState<Layout>(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches ? 'speakerTop' : 'speakerLeft',
+  );
   const [sort, setSort] = useState<Sort>('default');
   const [people, setPeople] = useState(false);
   const [settings, setSettings] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
+  // Where the browser can't make an element fullscreen (Safari on iPhone), the room covers the screen instead.
+  const [covering, setCovering] = useState(false);
 
   // Ended by the host (here or from another device): everyone is out.
   useEffect(() => {
@@ -178,10 +183,23 @@ function Room({
     return () => document.removeEventListener('fullscreenchange', change);
   }, []);
 
+  useEffect(() => {
+    if (!covering) return;
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [covering]);
+
   const toggleFullscreen = () => {
-    if (document.fullscreenElement) void document.exitFullscreen();
-    else void frame.current?.requestFullscreen();
+    if (covering) setCovering(false);
+    else if (document.fullscreenElement) void document.exitFullscreen();
+    else if (document.fullscreenEnabled && frame.current?.requestFullscreen) {
+      frame.current.requestFullscreen().catch(() => setCovering(true));
+    } else setCovering(true);
   };
+  const expanded = fullscreen || covering;
   const leave = () => {
     if (host) setLeaving(true);
     else void call?.leave().then(onLeave);
@@ -191,11 +209,17 @@ function Room({
     <StreamTheme className="str-video">
       <div
         ref={frame}
-        className="flex min-h-120 flex-col overflow-hidden rounded-2xl bg-navy-deep text-white md:min-h-160"
+        className={
+          covering
+            ? 'fixed inset-0 z-50 flex h-dvh w-full flex-col overflow-hidden bg-navy-deep text-white'
+            : 'flex w-full min-w-0 min-h-120 flex-col overflow-hidden rounded-2xl bg-navy-deep text-white md:min-h-160'
+        }
+        // Clear of the iPhone's notch and home bar while covering the screen.
+        style={covering ? { paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' } : undefined}
       >
-        <header className="flex items-center justify-between gap-2 px-3 py-3 md:px-4">
-          <p className="min-w-0 flex-1 truncate font-heading text-sm font-bold md:text-base">{subject}</p>
-          <div className="flex shrink-0 items-center gap-1.5 text-xs">
+        <header className="flex flex-wrap items-center justify-between gap-2 px-3 py-3 md:px-4">
+          <p className="min-w-0 flex-1 basis-40 truncate font-heading text-sm font-bold md:text-base">{subject}</p>
+          <div className="flex min-w-0 flex-wrap items-center gap-1.5 text-xs">
             <RecordingBadge />
             <Timer label={t('timer')} />
             <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1">
@@ -229,81 +253,85 @@ function Room({
           </div>
         ) : null}
 
-        <footer className="flex flex-wrap items-center justify-center gap-1.5 px-2 py-3 md:gap-2 md:px-3">
-          <ToggleAudioPublishingButton />
-          <ToggleVideoPublishingButton />
-          <ScreenShareButton />
-          <ReactionsButton />
-          {host ? <RecordCallButton /> : null}
-          <BlurButton />
-          <DropdownMenu>
-            <DropdownMenuTrigger aria-label={t('layout')} title={t('layout')} className={control}>
-              <LayoutGrid aria-hidden={true} className="size-5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" container={frame} className="w-60">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>{t('layout')}</DropdownMenuLabel>
-                <DropdownMenuRadioGroup value={layout} onValueChange={(value) => setLayout(value as Layout)}>
-                  {LAYOUTS.map((key) => (
-                    <DropdownMenuRadioItem key={key} value={key}>
-                      {t(`layouts.${key}`)}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger aria-label={t('sort')} title={t('sort')} className={control}>
-              <ListOrdered aria-hidden={true} className="size-5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" container={frame} className="w-60">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>{t('sort')}</DropdownMenuLabel>
-                <DropdownMenuRadioGroup value={sort} onValueChange={(value) => setSort(value as Sort)}>
-                  {(Object.keys(SORTS) as Sort[]).map((key) => (
-                    <DropdownMenuRadioItem key={key} value={key}>
-                      {t(`sorts.${key}`)}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <button
-            type="button"
-            aria-pressed={people}
-            onClick={() => setPeople(!people)}
-            aria-label={t('participants')}
-            title={t('participants')}
-            className={control}
-          >
-            <Users aria-hidden={true} className="size-5" />
-          </button>
-          <button
-            type="button"
-            aria-pressed={settings}
-            onClick={() => setSettings(!settings)}
-            aria-label={t('settings')}
-            title={t('settings')}
-            className={control}
-          >
-            <Sparkles aria-hidden={true} className="size-5" />
-          </button>
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            aria-label={fullscreen ? t('exitFullscreen') : t('fullscreen')}
-            title={fullscreen ? t('exitFullscreen') : t('fullscreen')}
-            className={control}
-          >
-            {fullscreen ? <Minimize aria-hidden={true} className="size-5" /> : <Maximize aria-hidden={true} className="size-5" />}
-          </button>
+        {/* On a phone the controls scroll in one row; « Quitter » stays in reach at the end. */}
+        <footer className="flex items-center gap-2 px-2 py-3 md:px-3">
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto md:flex-wrap md:justify-center md:gap-2 md:overflow-visible">
+            <ToggleAudioPublishingButton />
+            <ToggleVideoPublishingButton />
+            <ScreenShareButton />
+            <ReactionsButton />
+            {host ? <RecordCallButton /> : null}
+            <BlurButton />
+            <DropdownMenu>
+              <DropdownMenuTrigger aria-label={t('layout')} title={t('layout')} className={control}>
+                <LayoutGrid aria-hidden={true} className="size-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" container={frame} className="w-60">
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>{t('layout')}</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup value={layout} onValueChange={(value) => setLayout(value as Layout)}>
+                    {LAYOUTS.map((key) => (
+                      <DropdownMenuRadioItem key={key} value={key}>
+                        {t(`layouts.${key}`)}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger aria-label={t('sort')} title={t('sort')} className={control}>
+                <ListOrdered aria-hidden={true} className="size-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" container={frame} className="w-60">
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>{t('sort')}</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup value={sort} onValueChange={(value) => setSort(value as Sort)}>
+                    {(Object.keys(SORTS) as Sort[]).map((key) => (
+                      <DropdownMenuRadioItem key={key} value={key}>
+                        {t(`sorts.${key}`)}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <button
+              type="button"
+              aria-pressed={people}
+              onClick={() => setPeople(!people)}
+              aria-label={t('participants')}
+              title={t('participants')}
+              className={control}
+            >
+              <Users aria-hidden={true} className="size-5" />
+            </button>
+            <button
+              type="button"
+              aria-pressed={settings}
+              onClick={() => setSettings(!settings)}
+              aria-label={t('settings')}
+              title={t('settings')}
+              className={control}
+            >
+              <Sparkles aria-hidden={true} className="size-5" />
+            </button>
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              aria-label={expanded ? t('exitFullscreen') : t('fullscreen')}
+              title={expanded ? t('exitFullscreen') : t('fullscreen')}
+              aria-pressed={expanded}
+              className={control}
+            >
+              {expanded ? <Minimize aria-hidden={true} className="size-5" /> : <Maximize aria-hidden={true} className="size-5" />}
+            </button>
+          </div>
           <button
             type="button"
             onClick={leave}
             aria-label={t('leave')}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-rouge px-4 text-sm font-semibold text-white hover:bg-crimson md:px-5"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-rouge px-4 text-sm font-semibold text-white hover:bg-crimson md:px-5"
           >
             <PhoneOff aria-hidden={true} className="size-5" />
             <span className="hidden sm:inline">{t('leave')}</span>
@@ -404,7 +432,10 @@ function RecordingBadge(): ReactNode {
   return (
     <p role="status" className="inline-flex items-center gap-1.5 rounded-full bg-rouge px-3 py-1 text-xs font-semibold text-white">
       <Circle aria-hidden={true} className="size-2.5 animate-pulse fill-white" />
-      {t('recordingNow')}
+      <span className="sr-only sm:not-sr-only">{t('recordingNow')}</span>
+      <span aria-hidden={true} className="sm:hidden">
+        REC
+      </span>
     </p>
   );
 }

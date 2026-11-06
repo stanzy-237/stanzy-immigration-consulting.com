@@ -2,23 +2,48 @@ import { StreamClient } from '@stream-io/node-sdk';
 
 import { callIdOf } from '@/features/meetings/lib/meeting-schema';
 import { env } from '@/lib/env';
+import { siteUrl } from '@/lib/site-url';
 
 /**
- * How an Enregistrement is laid out: the speaker large, the others beside,
- * each camera shown whole (« fit »: a phone's portrait image isn't cropped
- * to fill a landscape tile), on the brand's navy.
+ * How an Enregistrement looks, in the brand's colours: the speaker large
+ * with the others on the right, each camera shown whole (« fit »: a phone's
+ * portrait image is never cropped) on navy, the one speaking outlined in
+ * rouge, names on a soft pill, the Réunion's subject top left and the logo
+ * top right. Hex, not tokens: Stream's recorder reads plain CSS values.
  */
-export const RECORDING_LAYOUT = {
-  name: 'spotlight' as const,
-  options: {
-    'video.scale_mode': 'fit',
-    'video.screenshare_scale_mode': 'fit',
-    'video.background_color': '#0D1F4E',
-    'layout.background_color': '#0D1F4E',
-    'participant.video_border_rounded': true,
-    'participant_label.text_color': '#FFFFFF',
-  },
-};
+export function recordingLayout(subject: string) {
+  return {
+    name: 'spotlight' as const,
+    options: {
+      'layout.background_color': '#0d1f4e',
+      'layout.spotlight.participants_bar_position': 'right',
+      'video.scale_mode': 'fit',
+      'video.screenshare_scale_mode': 'fit',
+      'video.background_color': '#1a3065',
+      'participant.border_radius': '18px',
+      'participant.outline_color': '#cc1627',
+      'participant.outline_width': '3px',
+      'participant.placeholder_background_color': '#1a3065',
+      'participant_label.display': true,
+      'participant_label.text_color': '#ffffff',
+      'participant_label.background_color': 'rgba(13, 31, 78, 0.75)',
+      'participant_label.border_radius': '999px',
+      'participant_label.margin_inline': '12px',
+      'participant_label.margin_block': '12px',
+      'title.text': subject,
+      'title.font_size': '22px',
+      'title.color': '#ffffff',
+      'title.margin_inline': '24px',
+      'title.margin_block': '18px',
+      'logo.image_url': `${siteUrl()}/Logo-white-background.svg`,
+      'logo.height': '56px',
+      'logo.horizontal_position': 'right',
+      'logo.vertical_position': 'top',
+      'logo.margin_inline': '24px',
+      'logo.margin_block': '14px',
+    },
+  };
+}
 
 /** How long a room's token lasts: a long Réunion, plus margin. */
 const TOKEN_SECONDS = 4 * 60 * 60;
@@ -49,7 +74,7 @@ export async function endRoom(meetingId: string): Promise<void> {
  * this call only, so it opens no other Réunion.
  */
 export async function openRoom(opts: {
-  meeting: { id: string; recording: boolean; plannedById: string };
+  meeting: { id: string; subject: string; recording: boolean; plannedById: string };
   people: Person[];
   viewer: Person;
   language: 'fr' | 'en';
@@ -62,7 +87,7 @@ export async function openRoom(opts: {
     recording: {
       mode: opts.meeting.recording ? ('auto-on' as const) : ('disabled' as const),
       quality: '720p' as const,
-      layout: RECORDING_LAYOUT,
+      layout: recordingLayout(opts.meeting.subject),
     },
     transcription: {
       mode: opts.meeting.recording ? ('auto-on' as const) : ('disabled' as const),

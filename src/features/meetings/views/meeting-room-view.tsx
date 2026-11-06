@@ -39,7 +39,7 @@ const backClass = 'inline-flex w-fit items-center gap-1.5 text-sm font-semibold 
  */
 export function MeetingRoomView({ meetingId, viewer }: { meetingId: string; viewer: Viewer }): ReactNode {
   const content = (
-    <div className="mx-auto grid max-w-6xl gap-4">
+    <div className="mx-auto grid max-w-6xl min-w-0 grid-cols-1 gap-4">
       <QueryBoundary fallback={<RoomSkeleton />}>
         <Room meetingId={meetingId} viewer={viewer} />
       </QueryBoundary>
@@ -65,14 +65,22 @@ function Room({ meetingId, viewer }: { meetingId: string; viewer: Viewer }): Rea
   const failed = useMeetingErrors();
   const copy = useCopyInvitation();
   const consultant = viewer === 'consultant';
-  // Waiting for the room to open: asked again every 30 seconds.
-  const { data: meeting } = useSuspenseQuery({
-    ...trpc.meetings.room.queryOptions({ id: meetingId }),
-    refetchInterval: (query) => (query.state.data?.joinable ? false : 30_000),
-  });
   const [accepted, setAccepted] = useState(false);
   const [access, setAccess] = useState<RoomAccess | null>(null);
   const [state, setState] = useState<'waiting' | 'in' | 'left' | 'ended' | 'failed'>('waiting');
+  // When the consultant came out of a recorded call: its files come a minute or two later.
+  const [outAt, setOutAt] = useState<number | null>(null);
+  // Waiting for the room to open: asked again every 30 seconds. Out of a recorded call, every
+  // 20 seconds for 5 minutes, until its Enregistrement shows.
+  const { data: meeting } = useSuspenseQuery({
+    ...trpc.meetings.room.queryOptions({ id: meetingId }),
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      if (!data) return false;
+      if (outAt !== null && data.recording && data.consultant && Date.now() - outAt < 5 * 60_000) return 20_000;
+      return data.joinable ? false : 30_000;
+    },
+  });
   const join = useMutation(
     trpc.meetings.join.mutationOptions({
       onSuccess: (room) => {
@@ -83,9 +91,13 @@ function Room({ meetingId, viewer }: { meetingId: string; viewer: Viewer }): Rea
     }),
   );
   const end = useMutation(trpc.meetings.end.mutationOptions({ onError: failed }));
-  const leave = useCallback(() => setState((current) => (current === 'ended' ? current : 'left')), []);
+  const leave = useCallback(() => {
+    setState((current) => (current === 'ended' ? current : 'left'));
+    setOutAt(Date.now());
+  }, []);
   const ended = useCallback(() => {
     setState('ended');
+    setOutAt(Date.now());
     void queryClient.invalidateQueries({ queryKey: trpc.meetings.pathKey() });
   }, [queryClient, trpc]);
   const fail = useCallback(() => setState('failed'), []);
@@ -116,7 +128,7 @@ function Room({ meetingId, viewer }: { meetingId: string; viewer: Viewer }): Rea
   const heading = (
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0">
-        <h1 className="font-heading text-2xl font-bold text-navy-deep md:text-3xl">{meeting.subject}</h1>
+        <h1 className="font-heading text-2xl font-bold break-words text-navy-deep md:text-3xl">{meeting.subject}</h1>
         {personal ? null : (
           <p className="mt-1 text-sm text-slate first-letter:uppercase">
             {when} · {t('panel.minutes', { minutes: meeting.durationMinutes })}

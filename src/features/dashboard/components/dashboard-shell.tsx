@@ -64,7 +64,7 @@ export function DashboardShell({
             <NotificationBell audience="consultant" />
           </header>
           {/* SidebarInset is the page's <main>. */}
-          <div className="flex-1 px-4 py-6 sm:px-7 sm:py-8">{children}</div>
+          <div className="min-w-0 flex-1 px-4 py-6 sm:px-7 sm:py-8">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

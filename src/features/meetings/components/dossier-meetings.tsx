@@ -299,40 +299,65 @@ export function ConsultantPart({ meeting, upcoming }: { meeting: NotedMeeting; u
   const recordings = meeting.recordings.filter((file) => file.kind === 'RECORDING');
   const transcripts = meeting.recordings.filter((file) => file.kind === 'TRANSCRIPTION' && file.text);
 
+  // Its files show once there are some: also for the Salle personnelle, which is never « past ».
+  const showFiles = !upcoming || meeting.recordings.length > 0;
+
   return (
-    <div className="mt-3 grid gap-3 border-t border-fog-light pt-3">
-      {!upcoming ? (
+    <div className="mt-3 grid min-w-0 gap-3 border-t border-fog-light pt-3">
+      {showFiles ? (
         meeting.recording && meeting.recordings.length === 0 ? (
           <p className="text-xs text-slate">{t('noFiles')}</p>
         ) : (
-          <div className="flex flex-wrap gap-1.5">
-            {recordings.map((file) => (
-              <a
-                key={file.id}
-                href={recordingUrl(file.id)}
-                target="_blank"
-                rel="noopener"
-                className="inline-flex h-9 items-center gap-1.5 rounded-full border border-fog-light px-3 text-sm font-semibold text-navy-deep hover:border-navy-deep"
-              >
-                <Video aria-hidden={true} className="size-4" />
-                {t('recording', {
-                  date: format.dateTime(file.startedAt, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+          <>
+            {recordings.length > 0 ? (
+              <ul className="grid gap-3 md:grid-cols-2">
+                {recordings.map((file) => {
+                  const when = format.dateTime(file.startedAt, {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  });
+                  return (
+                    <li key={file.id} className="grid min-w-0 gap-1.5">
+                      {/* Played here: the address hands over a 5-minute link to our private copy. */}
+                      <video
+                        controls
+                        playsInline
+                        preload="metadata"
+                        src={recordingUrl(file.id)}
+                        aria-label={t('recording', { date: when })}
+                        className="aspect-video w-full rounded-xl bg-navy-deep"
+                      />
+                      <a
+                        href={recordingUrl(file.id)}
+                        target="_blank"
+                        rel="noopener"
+                        className="inline-flex w-fit items-center gap-1.5 text-xs font-semibold text-slate hover:text-navy-deep"
+                      >
+                        <Video aria-hidden={true} className="size-3.5" />
+                        {t('recording', { date: when })}
+                      </a>
+                    </li>
+                  );
                 })}
-              </a>
-            ))}
-            {transcripts.map((file) => (
-              <button
-                key={file.id}
-                type="button"
-                aria-expanded={reading === file.id}
-                onClick={() => setReading(reading === file.id ? null : file.id)}
-                className="inline-flex h-9 items-center gap-1.5 rounded-full border border-fog-light px-3 text-sm font-semibold text-navy-deep hover:border-navy-deep"
-              >
-                <FileText aria-hidden={true} className="size-4" />
-                {reading === file.id ? t('hideTranscript') : t('showTranscript')}
-              </button>
-            ))}
-          </div>
+              </ul>
+            ) : null}
+            <div className="flex flex-wrap gap-1.5">
+              {transcripts.map((file) => (
+                <button
+                  key={file.id}
+                  type="button"
+                  aria-expanded={reading === file.id}
+                  onClick={() => setReading(reading === file.id ? null : file.id)}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full border border-fog-light px-3 text-sm font-semibold text-navy-deep hover:border-navy-deep"
+                >
+                  <FileText aria-hidden={true} className="size-4" />
+                  {reading === file.id ? t('hideTranscript') : t('showTranscript')}
+                </button>
+              ))}
+            </div>
+          </>
         )
       ) : null}
       {transcripts
