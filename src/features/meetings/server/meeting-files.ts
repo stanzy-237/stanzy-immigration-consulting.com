@@ -1,7 +1,7 @@
 import { callIdOf, transcriptText } from '@/features/meetings/lib/meeting-schema';
 import { stream, streamConfigured } from '@/features/meetings/server/stream';
 import type { TRPCContext } from '@/server/trpc/context';
-import { objectSize } from '@/server/storage/r2';
+import { objectSize, readObject } from '@/server/storage/r2';
 
 type Db = TRPCContext['prisma'];
 
@@ -39,6 +39,7 @@ export async function recordMeetingFile(db: Db, meetingId: string, kind: FileKin
   });
   if (!meeting) return;
 
+  const objectKey = await storedKey(meeting.id, file.filename);
   let text: string | null = null;
   if (kind === 'TRANSCRIPTION') {
     const consultants = await db.account.findMany({ where: { role: 'CONSULTANT' }, select: { id: true, name: true } });
@@ -46,8 +47,12 @@ export async function recordMeetingFile(db: Db, meetingId: string, kind: FileKin
       [...meeting.participants.map(({ account }) => account), ...consultants].map((person) => [person.id, person.name]),
     );
     try {
-      const response = await fetch(file.url);
-      if (response.ok) text = transcriptText(await response.text(), names);
+      // With our bucket as Stream's storage, its link points into the private bucket and can't be read
+      // without our keys: read our copy; Stream's link only when there is none.
+      const jsonl = objectKey
+        ? new TextDecoder().decode(await readObject('private', objectKey))
+        : await fetch(file.url).then((response) => (response.ok ? response.text() : null));
+      if (jsonl !== null) text = transcriptText(jsonl, names);
     } catch (error) {
       console.error('[meetings] could not read a Transcription', meeting.id, error);
     }
@@ -55,7 +60,7 @@ export async function recordMeetingFile(db: Db, meetingId: string, kind: FileKin
 
   const data = {
     url: file.url,
-    objectKey: await storedKey(meeting.id, file.filename),
+    objectKey,
     startedAt: new Date(file.start_time),
     endedAt: new Date(file.end_time),
     text,
@@ -82,18 +87,25 @@ export async function syncMeetingFiles(db: Db, now = new Date()): Promise<void> 
       startsAt: { gte: since, lte: now },
       OR: [{ endedAt: { not: null } }, { kind: 'PERSONAL' }],
     },
-    select: { id: true, recordings: { select: { kind: true, filename: true } } },
+    select: { id: true, recordings: { select: { kind: true, filename: true, text: true } } },
   });
-  // Ended ones with both kinds already in need nothing more.
+  // Ended ones with both kinds in, the Transcription's words read, need nothing more.
   const pending = meetings.filter(
-    (meeting) => !(meeting.recordings.some((r) => r.kind === 'RECORDING') && meeting.recordings.some((r) => r.kind === 'TRANSCRIPTION')),
+    (meeting) =>
+      !(
+        meeting.recordings.some((r) => r.kind === 'RECORDING') &&
+        meeting.recordings.some((r) => r.kind === 'TRANSCRIPTION' && r.text !== null)
+      ),
   );
   await Promise.all(
     pending.map(async (meeting) => {
       try {
         const call = stream().video.call('default', callIdOf(meeting.id));
         const [{ recordings }, { transcriptions }] = await Promise.all([call.listRecordings(), call.listTranscriptions()]);
-        const known = new Set(meeting.recordings.map((r) => `${r.kind}:${r.filename}`));
+        // A Transcription saved without its words is read again.
+        const known = new Set(
+          meeting.recordings.filter((r) => r.kind === 'RECORDING' || r.text !== null).map((r) => `${r.kind}:${r.filename}`),
+        );
         const files = [
           ...recordings.map((file) => ({ kind: 'RECORDING' as const, file })),
           ...transcriptions.map((file) => ({ kind: 'TRANSCRIPTION' as const, file })),
