@@ -4,7 +4,7 @@
 //    so Enregistrements and Transcriptions outlive Stream's 2 weeks;
 // 2. a test write there (Stream doesn't name R2: this is the check);
 // 3. the default call type stores its files there;
-// 4. with the site's address, Stream's webhook for files ready.
+// 4. with the site's address, Stream's webhook for files ready (an event hook).
 //
 //   node --env-file=.env scripts/setup-stream.mjs [https://your-site.com]
 //
@@ -31,7 +31,8 @@ if (missing.length > 0) {
 }
 
 const site = process.argv[2]?.replace(/\/+$/, '');
-const client = new StreamClient(process.env.STREAM_API_KEY, process.env.STREAM_API_SECRET);
+// Updating the app or a call type can take Stream a few seconds: more than the SDK's 3 s default.
+const client = new StreamClient(process.env.STREAM_API_KEY, process.env.STREAM_API_SECRET, { timeout: 15_000 });
 const storage = {
   bucket: process.env.R2_PRIVATE_BUCKET,
   storage_type: 's3',
@@ -67,11 +68,23 @@ try {
   console.log('✓ Réunions store their Enregistrements and Transcriptions there');
 
   if (site) {
+    // Newer Stream apps take webhooks as event_hooks only (not webhook_url): ours replaces any
+    // earlier one to the same route, and the app's other hooks are kept.
+    const url = `${site}/api/meetings/webhook`;
+    const { app } = await client.getApp();
+    const others = (app.event_hooks ?? []).filter((hook) => !hook.webhook_url?.endsWith('/api/meetings/webhook'));
     await client.updateApp({
-      webhook_url: `${site}/api/meetings/webhook`,
-      webhook_events: ['call.recording_ready', 'call.transcription_ready'],
+      event_hooks: [
+        ...others,
+        {
+          hook_type: 'webhook',
+          enabled: true,
+          webhook_url: url,
+          event_types: ['call.recording_ready', 'call.transcription_ready'],
+        },
+      ],
     });
-    console.log(`✓ Stream's webhook → ${site}/api/meetings/webhook`);
+    console.log(`✓ Stream's webhook → ${url}`);
   } else {
     console.log('• No site address given: the webhook was left as it is.');
   }
