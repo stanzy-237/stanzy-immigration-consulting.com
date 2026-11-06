@@ -365,6 +365,13 @@
         "instagram": "Instagram",
         "whatsapp": "WhatsApp"
       }
+    },
+    "ServicesPage": {
+      "subtitle": "From consultation to permanent residence: each service moves you one step forward, with an online file and Stanzy beside you.",
+      "documentsTitle": "Document services",
+      "documentsBody": "In Cameroon, Stanzy gets the documents that take longest to gather: proof of funds, police certificate, CNPS certificate… Conditions and prices are in your space.",
+      "documentsCta": "See in My space",
+      "metaTitle": "Our services"
     }
   },
   "Auth": {
@@ -2874,14 +2881,8 @@
       }
     },
     "page": {
-      "eyebrow": "Express Entry Accompagnement",
-      "title": "From your profile to permanent residence",
-      "lead": "Stanzy guides you through the whole Express Entry journey, from wherever you are: language test, ECA, profile, invitation, permanent residence application, up to COPR.",
       "apply": "Send a request",
       "consult": "Book a consultation",
-      "noConsult": "No consultation needed first: the request is enough to start.",
-      "stagesTitle": "The 10 stages",
-      "levelsTitle": "Wherever you start from",
       "levels": {
         "A": {
           "title": "Level A · Beginner",
@@ -2903,17 +2904,7 @@
         "3": "Your file opens at the right stage, with the list of documents to prepare.",
         "4": "You follow everything in your space: documents, messages, meetings."
       },
-      "badges": {
-        "noConsult": "No consultation required first",
-        "languages": "In French or English",
-        "everywhere": "In Cameroon, Canada or elsewhere"
-      },
       "heroImageAlt": "Toronto and the CN Tower seen from a lakeside park",
-      "chips": {
-        "crs": "Your CRS score from the request",
-        "ita": "60 days after the ITA, counted for you",
-        "minutes": "To fill in the request"
-      },
       "featuresEyebrow": "What’s included",
       "featuresTitle": "An online file, and Stanzy beside you at every step",
       "features": {
@@ -2943,14 +2934,61 @@
         }
       },
       "stanzyNote": "In Cameroon, Stanzy can also get some documents for you (proof of funds, police certificate, CNPS…): each has its own contract and invoice.",
-      "levelsEyebrow": "Your starting point",
       "levelsLead": "Your expression of interest says where you are; your file opens straight at the right stage.",
       "startsAt": "Starts at: {stage}",
-      "stagesLead": "The whole journey, from assessment to COPR. Stages already done are marked “Already done”.",
-      "howEyebrow": "To get started",
-      "howImageAlt": "A person filling in a form at their desk",
-      "ctaTitle": "Ready to move towards permanent residence?",
-      "ctaBody": "Send your expression of interest: Stanzy reviews it and answers by email."
+      "hero": {
+        "eyebrow": "Support · Express Entry",
+        "headlineLead": "Your story",
+        "headlineRest": "all the way to",
+        "headlineAccent": "permanent residence.",
+        "subtitle": "Wherever you are, Stanzy writes what comes next with you: language test, ECA, profile, invitation, PR application, up to COPR.",
+        "stats": {
+          "stages": "stages, one at a time",
+          "days": "days after the ITA, counted for you",
+          "online": "online file, in FR or EN"
+        },
+        "card": {
+          "tag": "Your file",
+          "step": "Stage {current} of {total}",
+          "next": "Next stage"
+        }
+      },
+      "chapters": {
+        "one": "Chapter 1",
+        "two": "Chapter 2",
+        "three": "Chapter 3",
+        "end": "The last chapter"
+      },
+      "storyLevelsTitle": "You start where you are",
+      "storyStagesTitle": "The path, stage by stage",
+      "storyStagesLead": "Scroll: each stage lights up as you reach it. The ones you’ve already passed are marked “Already done”.",
+      "storyHowTitle": "How the story begins",
+      "storyEndTitle": "And one day, the COPR arrives.",
+      "storyEndBody": "It’s the end of the file, and the start of your life in Canada. Let’s write it together.",
+      "stageText": {
+        "evaluation": "We look at your profile, your CRS score and the program that suits you best.",
+        "test-langue": "You take the TCF (or IELTS) with a study plan aiming for the right CLB levels.",
+        "ede": "Your degrees are assessed by WES or IQAS: Stanzy prepares and follows the application.",
+        "profil-ee": "Your Express Entry profile is created, checked, and your points optimised.",
+        "bassin": "You’re in the pool. We follow every draw and improve your score.",
+        "ita": "The invitation arrives: the 60 days start, and the countdown shows in your file.",
+        "depot": "Every document is checked before you submit your PR application.",
+        "aor": "Acknowledgement, biometrics, medical exam: we guide you through each request.",
+        "ppr": "IRCC asks for your passport: the decision is positive.",
+        "copr": "You receive your COPR. Welcome to Canada."
+      },
+      "scenes": {
+        "form": "Expression of interest",
+        "mail": "Stanzy’s answer",
+        "dossier": "Your file",
+        "space": "My space",
+        "approved": "Request approved",
+        "docs": "Documents to prepare",
+        "message": "New message from Stanzy",
+        "meeting": "Meeting tomorrow 10 am"
+      },
+      "pause": "Pause the animation",
+      "play": "Play the animation"
     },
     "form": {
       "title": "Expression of interest",

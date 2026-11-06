@@ -365,6 +365,13 @@
         "instagram": "Instagram",
         "whatsapp": "WhatsApp"
       }
+    },
+    "ServicesPage": {
+      "subtitle": "De la consultation à la résidence permanente : chaque service vous fait avancer d’un pas, avec un dossier en ligne et Stanzy à vos côtés.",
+      "documentsTitle": "Services documentaires",
+      "documentsBody": "Au Cameroun, Stanzy obtient pour vous les documents les plus longs à réunir : preuve de fonds, certificat de police, attestation CNPS… Les conditions et les prix sont visibles dans votre espace.",
+      "documentsCta": "Voir dans Mon espace",
+      "metaTitle": "Nos services"
     }
   },
   "Auth": {
@@ -2891,14 +2898,8 @@
       }
     },
     "page": {
-      "eyebrow": "Accompagnement Entrée Express",
-      "title": "De votre profil jusqu’à la résidence permanente",
-      "lead": "Stanzy vous guide dans tout le parcours Entrée Express, là où vous en êtes : test de langue, EDE, profil, invitation, demande de résidence permanente, jusqu’à la COPR.",
       "apply": "Faire une demande",
       "consult": "Réserver une consultation",
-      "noConsult": "Pas besoin de consultation avant : la demande suffit pour commencer.",
-      "stagesTitle": "Les 10 étapes",
-      "levelsTitle": "Quel que soit votre point de départ",
       "levels": {
         "A": {
           "title": "Niveau A · Débutant",
@@ -2920,17 +2921,7 @@
         "3": "Votre dossier s’ouvre à la bonne étape, avec la liste des documents à préparer.",
         "4": "Vous suivez tout dans votre espace : documents, messages, réunions."
       },
-      "badges": {
-        "noConsult": "Pas de consultation obligatoire avant",
-        "languages": "En français ou en anglais",
-        "everywhere": "Au Cameroun, au Canada ou ailleurs"
-      },
       "heroImageAlt": "Toronto et la tour CN vues depuis un parc au bord du lac",
-      "chips": {
-        "crs": "Votre score CRS dès la demande",
-        "ita": "60 jours après l’ITA, comptés pour vous",
-        "minutes": "Pour remplir la demande"
-      },
       "featuresEyebrow": "Ce qui est compris",
       "featuresTitle": "Un dossier en ligne, et Stanzy à vos côtés à chaque étape",
       "features": {
@@ -2960,14 +2951,61 @@
         }
       },
       "stanzyNote": "Au Cameroun, Stanzy peut aussi obtenir certains documents pour vous (preuve de fonds, certificat de police, CNPS…) : chacun a son contrat et sa facture.",
-      "levelsEyebrow": "Votre point de départ",
       "levelsLead": "Votre demande d’intérêt indique où vous en êtes ; votre dossier s’ouvre directement à la bonne étape.",
       "startsAt": "Commence à : {stage}",
-      "stagesLead": "Le parcours complet, de l’évaluation à la COPR. Les étapes déjà faites sont marquées « Déjà fait ».",
-      "howEyebrow": "Pour commencer",
-      "howImageAlt": "Une personne remplit un formulaire à son bureau",
-      "ctaTitle": "Prêt à avancer vers la résidence permanente ?",
-      "ctaBody": "Envoyez votre demande d’intérêt : Stanzy l’étudie et vous répond par email."
+      "hero": {
+        "eyebrow": "Accompagnement · Entrée Express",
+        "headlineLead": "Votre histoire",
+        "headlineRest": "jusqu’à la",
+        "headlineAccent": "résidence permanente.",
+        "subtitle": "Où que vous en soyez, Stanzy écrit la suite avec vous : test de langue, EDE, profil, invitation, demande de RP, jusqu’à la COPR.",
+        "stats": {
+          "stages": "étapes, une à la fois",
+          "days": "jours après l’ITA, comptés pour vous",
+          "online": "dossier en ligne, en FR ou EN"
+        },
+        "card": {
+          "tag": "Votre dossier",
+          "step": "Étape {current} sur {total}",
+          "next": "Prochaine étape"
+        }
+      },
+      "chapters": {
+        "one": "Chapitre 1",
+        "two": "Chapitre 2",
+        "three": "Chapitre 3",
+        "end": "Le dernier chapitre"
+      },
+      "storyLevelsTitle": "Vous commencez là où vous en êtes",
+      "storyStagesTitle": "Le chemin, étape par étape",
+      "storyStagesLead": "Faites défiler : chaque étape s’allume quand vous y arrivez. Celles que vous avez déjà franchies sont marquées « Déjà fait ».",
+      "storyHowTitle": "Comment l’histoire commence",
+      "storyEndTitle": "Et un jour, la COPR arrive.",
+      "storyEndBody": "C’est la fin du dossier, et le début de votre vie au Canada. Écrivons-la ensemble.",
+      "stageText": {
+        "evaluation": "On regarde votre profil, votre score CRS et le programme qui vous convient le mieux.",
+        "test-langue": "Vous passez le TCF (ou l’IELTS) avec un plan de préparation pour viser les bons NCLC.",
+        "ede": "Vos diplômes sont évalués par WES ou IQAS : Stanzy prépare et suit la demande.",
+        "profil-ee": "Votre profil Entrée Express est créé, vérifié, et vos points sont optimisés.",
+        "bassin": "Vous êtes dans le bassin. On suit chaque tirage et on améliore votre score.",
+        "ita": "L’invitation arrive : les 60 jours démarrent, le compte à rebours s’affiche dans votre dossier.",
+        "depot": "Chaque document est vérifié avant que vous soumettiez votre demande de RP.",
+        "aor": "Accusé de réception, biométrie, examen médical : on vous guide à chaque convocation.",
+        "ppr": "IRCC demande votre passeport : la décision est positive.",
+        "copr": "Vous recevez votre COPR. Bienvenue au Canada."
+      },
+      "scenes": {
+        "form": "Demande d’intérêt",
+        "mail": "Réponse de Stanzy",
+        "dossier": "Votre dossier",
+        "space": "Mon espace",
+        "approved": "Demande acceptée",
+        "docs": "Documents à préparer",
+        "message": "Nouveau message de Stanzy",
+        "meeting": "Réunion demain 10 h"
+      },
+      "pause": "Mettre l’animation en pause",
+      "play": "Relancer l’animation"
     },
     "form": {
       "title": "Demande d’intérêt",
