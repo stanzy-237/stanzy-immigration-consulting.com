@@ -9,7 +9,8 @@ import {
   type ServiceTag,
 } from '@/features/landing/data/services';
 
-export function ServicesGrid(): ReactNode {
+/** The services as cards. On the Services page it is the page's heading (`h1`); on the home page, a section (`h2`). */
+export function ServicesGrid({ heading: Heading = 'h2' }: { heading?: 'h1' | 'h2' } = {}): ReactNode {
   const t = useTranslations('Home.ServicesGrid');
   const tItems = useTranslations('Home.ServicesGrid.Items');
   const tTags = useTranslations('Home.ServicesGrid.Tags');
@@ -31,14 +32,14 @@ export function ServicesGrid(): ReactNode {
               {t('eyebrow')}
             </span>
           </div>
-          <h2
+          <Heading
             id="services-grid-title"
             className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-none tracking-tight text-navy-deep"
           >
             {t('titleLead')}
             <br />
             <span className="text-rouge">{t('titleAccent')}</span>
-          </h2>
+          </Heading>
           <p className="mt-3 text-base leading-relaxed text-slate">
             {t('subtitle')}
           </p>
