@@ -18,6 +18,7 @@ import { invoiceTotal } from '@/features/invoices/lib/money';
 import { invoiceFields, invoiceFor } from '@/features/invoices/server/invoice-access';
 import { notifyInvoicePaid, notifyInvoiceSent, notifyProofReceived } from '@/features/invoices/server/invoice-notify';
 import { notifyLater } from '@/features/notifications/server/notify';
+import { trackLater } from '@/server/analytics';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 
 const byId = z.object({ id: z.string().min(1) });
@@ -228,6 +229,7 @@ export const invoicesRouter = createTRPCRouter({
       });
 
       notifyInvoiceSent({ ...draft, number, sentAt, status: 'SENT' });
+      trackLater(ctx.headers, 'invoice.sent', { service: draft.dossier.service });
       notifyLater(ctx.prisma, {
         kind: 'INVOICE_SENT',
         actorId: ctx.session.account.id,
@@ -246,6 +248,7 @@ export const invoicesRouter = createTRPCRouter({
       });
       if (count === 0) throw refuse('INVOICE_NOT_PAYABLE');
       notifyInvoicePaid({ ...printable(invoice), status: 'PAID' });
+      trackLater(ctx.headers, 'invoice.paid', { service: invoice.dossier.service });
       notifyLater(ctx.prisma, {
         kind: 'INVOICE_PAID',
         actorId: ctx.session.account.id,

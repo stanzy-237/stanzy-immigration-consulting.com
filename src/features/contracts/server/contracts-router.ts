@@ -24,6 +24,7 @@ import { fingerprintOf, signPdf } from '@/features/signatures/lib/sign-pdf';
 import { SIGNATURE_IMAGE_PREFIX, signInput, type SignatureField } from '@/features/signatures/lib/signature-schema';
 import { certificateFor } from '@/features/signatures/server/certificate';
 import { openSigningAssets } from '@/features/signatures/server/signing-assets';
+import { trackLater } from '@/server/analytics';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
@@ -193,6 +194,7 @@ export const contractsRouter = createTRPCRouter({
       consultant,
       data: { amount: input.amount, currency: input.currency, schedule: input.schedule },
     });
+    trackLater(ctx.headers, 'contract.sent', { kind: 'main', service: dossier.service });
     return { id: contract.id, number };
   }),
 
@@ -224,6 +226,7 @@ export const contractsRouter = createTRPCRouter({
       consultant,
       data: {},
     });
+    trackLater(ctx.headers, 'contract.sent', { kind: 'amendment', service: parent.dossier.service });
     return { id: contract.id, number };
   }),
 
@@ -337,6 +340,10 @@ export const contractsRouter = createTRPCRouter({
       dossierId: dossier.id,
     };
     notifyContractSigned(dossier.account, facts, signed);
+    trackLater(ctx.headers, 'contract.signed', {
+      kind: contract.stanzyRequestId ? 'service' : contract.parentId ? 'amendment' : 'main',
+      service: dossier.service,
+    });
     notifyLater(ctx.prisma, {
       kind: 'CONTRACT_SIGNED',
       actorId: ctx.session.account.id,
@@ -353,7 +360,7 @@ export const contractsRouter = createTRPCRouter({
  * signed like the Dossier's Contrat but apart from it.
  */
 export async function sendServiceContract(
-  ctx: { prisma: Db; session: CurrentSession },
+  ctx: { prisma: Db; session: CurrentSession; headers: Headers },
   dossier: DossierRow,
   opts: {
     stanzyRequestId: string;
@@ -389,6 +396,7 @@ export async function sendServiceContract(
     consultant,
     data: { amount: opts.amount, currency: opts.currency, schedule: opts.schedule, stanzyRequestId: opts.stanzyRequestId },
   });
+  trackLater(ctx.headers, 'contract.sent', { kind: 'service', service: dossier.service });
   return { id: contract.id, number };
 }
 

@@ -40,6 +40,8 @@ import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
 import en from '@/messages/en.json';
 import fr from '@/messages/fr.json';
+import { crsRange } from '@/lib/analytics';
+import { trackLater } from '@/server/analytics';
 import { appMailer } from '@/server/email/app-mailer';
 import type { EmailMessage } from '@/server/email/mailer';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -190,6 +192,11 @@ export const accompagnementRouter = createTRPCRouter({
       target: {},
       params: { interestId: interest.id, client: account.name, level },
     });
+    trackLater(ctx.headers, 'interest.submitted', {
+      level,
+      residence: input.progress.residence,
+      crs: crsRange(scored.breakdown.total),
+    });
     return { ...interest, crsScore: scored.breakdown.total };
   }),
 
@@ -337,6 +344,7 @@ export const accompagnementRouter = createTRPCRouter({
           url: `${siteUrl()}/${lang}/mon-espace/dossiers/${dossier.id}`,
         }),
       ]);
+      trackLater(ctx.headers, 'interest.approved', { level: input.level });
       notifyLater(ctx.prisma, {
         kind: 'DOSSIER_OPENED',
         actorId: consultantId,
@@ -371,6 +379,7 @@ export const accompagnementRouter = createTRPCRouter({
         },
       });
       if (count === 0) throw refuse('INTEREST_NOT_PENDING');
+      trackLater(ctx.headers, 'interest.rejected');
       const { account } = interest;
       const lang = toLocale(account.locale);
       mailLater('a rejection', async () => [
@@ -438,7 +447,10 @@ export const accompagnementRouter = createTRPCRouter({
         if (!(await livesInCameroon(ctx.prisma, dossier.accountId))) throw refuse('STANZY_CAMEROON_ONLY');
         if (document.finalVersionId) throw refuse('STANZY_DOCUMENT_FINAL');
         if (document.stanzyRequests.length > 0) throw refuse('STANZY_ALREADY_ASKED');
-        const service = await ctx.prisma.documentService.findUnique({ where: { id: input.serviceId }, select: { active: true } });
+        const service = await ctx.prisma.documentService.findUnique({
+          where: { id: input.serviceId },
+          select: { active: true, slug: true },
+        });
         if (!service?.active) throw refuse('SERVICE_UNAVAILABLE');
 
         const request = await ctx.prisma.stanzyRequest.create({
@@ -468,6 +480,7 @@ export const accompagnementRouter = createTRPCRouter({
           recipients: 'CONSULTANTS',
           target: { dossierId: dossier.id, documentId: document.id },
         });
+        trackLater(ctx.headers, 'stanzy.requested', { service: service.slug });
         return request;
       }),
 
@@ -526,6 +539,7 @@ export const accompagnementRouter = createTRPCRouter({
             unitAmount: input.amount,
           });
         });
+        trackLater(ctx.headers, 'stanzy.accepted');
         return { contract, invoiceId };
       }),
 

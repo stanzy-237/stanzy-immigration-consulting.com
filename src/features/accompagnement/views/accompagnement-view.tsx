@@ -16,6 +16,7 @@ import Image from 'next/image';
 import type { ReactNode } from 'react';
 
 import { DossierArt, JourneyArt, MapleLeaf } from '@/features/accompagnement/components/accompagnement-art';
+import { ApplyLink } from '@/features/accompagnement/components/apply-link';
 import { LEVELS, startStageOf } from '@/features/accompagnement/lib/interest-schema';
 import { WORKFLOWS } from '@/features/dossiers/data/workflows';
 import { SiteFooter } from '@/features/landing/components/site-footer';
@@ -75,10 +76,10 @@ export function AccompagnementView(): ReactNode {
               </h1>
               <p className="mt-5 max-w-xl text-body-lg text-ice-blue">{t('lead')}</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/mon-espace/accompagnement" className={applyClass}>
+                <ApplyLink from="hero" className={applyClass}>
                   {t('apply')}
                   <ArrowRight aria-hidden={true} className="size-4" />
-                </Link>
+                </ApplyLink>
                 <Link
                   href="/services/consultation"
                   className="inline-flex h-12 items-center gap-2 rounded-full border-2 border-white/40 px-7 font-heading text-body font-bold text-white hover:border-white hover:bg-white hover:text-navy-deep"
@@ -264,10 +265,10 @@ export function AccompagnementView(): ReactNode {
                   </li>
                 ))}
               </ol>
-              <Link href="/mon-espace/accompagnement" className={`mt-10 ${applyClass}`}>
+              <ApplyLink from="how" className={`mt-10 ${applyClass}`}>
                 {t('apply')}
                 <ArrowRight aria-hidden={true} className="size-4" />
-              </Link>
+              </ApplyLink>
             </div>
           </div>
         </section>
@@ -283,10 +284,10 @@ export function AccompagnementView(): ReactNode {
               </h2>
               <p className="text-body-lg text-ice-blue">{t('ctaBody')}</p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/mon-espace/accompagnement" className={applyClass}>
+                <ApplyLink from="cta" className={applyClass}>
                   {t('apply')}
                   <ArrowRight aria-hidden={true} className="size-4" />
-                </Link>
+                </ApplyLink>
                 <Link
                   href="/services/consultation"
                   className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-7 font-heading text-body font-bold text-navy-deep hover:bg-ice-blue"

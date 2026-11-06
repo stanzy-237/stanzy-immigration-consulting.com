@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft, Clock, FileText, HandHelping, ListChecks, ScrollText, ShieldCheck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,6 +13,7 @@ import { textIn } from '@/features/document-services/lib/service-schema';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { Link, useRouter } from '@/i18n/navigation';
+import { track } from '@/lib/analytics';
 import { useTRPC } from '@/trpc/client';
 
 /**
@@ -41,6 +42,7 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
   const locale = useLocale();
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.documentServices.get.queryOptions({ slug, documentId }));
+  useEffect(() => track('service.viewed', { service: slug, fromDocument: documentId !== null }), [slug, documentId]);
   const back = (
     <Link
       href={documentId ? `/mon-espace/services?document=${documentId}` : '/mon-espace/services'}

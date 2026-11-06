@@ -25,6 +25,7 @@ import { computeCrs } from '@/features/crs/lib/compute-crs';
 import { DEFAULT_FORM, fromProfile, toProfile, type CrsForm } from '@/features/crs/lib/crs-form';
 import { ChecklistFields } from '@/features/shared/components/checklist-fields';
 import { CrsFields } from '@/features/shared/components/crs-fields';
+import { useCalculatorTracking } from '@/features/shared/hooks/use-calculator-tracking';
 import { rulesInForceOn } from '@/features/shared/lib/rules-version';
 import { useTRPC } from '@/trpc/client';
 
@@ -95,6 +96,8 @@ function Steps({
   const [progress, setProgress] = useState<Progress>(initialProgress);
   const [areas, setAreas] = useState<Areas>(DEFAULT_AREAS);
   const [crsForm, setCrsForm] = useState<CrsForm | null>(savedCrs);
+  // `interest.viewed`, then `interest.started` once past the first step; the send is counted on the server.
+  const markStarted = useCalculatorTracking('interest');
   const errors = useTranslations('Accompagnement.errors');
   const toasts = useTranslations('Accompagnement.toast');
   const submit = useMutation(
@@ -121,6 +124,7 @@ function Steps({
           source={prefill.source}
           submitLabel={t('next')}
           onContinue={(answers) => {
+            markStarted();
             setSituation(answers);
             setStep('progress');
           }}
