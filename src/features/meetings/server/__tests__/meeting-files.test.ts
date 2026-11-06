@@ -6,14 +6,14 @@ import type { TRPCContext } from '@/server/trpc/context';
 const calls = vi.hoisted(() => ({ listRecordings: vi.fn(), listTranscriptions: vi.fn(), call: vi.fn() }));
 const stream = vi.hoisted(() => ({ streamConfigured: vi.fn(() => true), stream: vi.fn() }));
 vi.mock('@/features/meetings/server/stream', () => stream);
-const storage = vi.hoisted(() => ({ objectSize: vi.fn() }));
+const storage = vi.hoisted(() => ({ objectSize: vi.fn(), readObject: vi.fn() }));
 vi.mock('@/server/storage/r2', () => storage);
 
 const now = new Date('2026-11-06T20:00:00Z');
 const recording = { filename: 'rec_1.mp4', url: 'https://stream.test/rec_1.mp4', start_time: '2026-11-06T19:56:43Z', end_time: '2026-11-06T19:57:49Z' };
 const transcript = { filename: 't_1.jsonl', url: 'https://stream.test/t_1.jsonl', start_time: '2026-11-06T19:56:40Z', end_time: '2026-11-06T19:57:49Z' };
 
-function database(saved: { kind: string; filename: string }[] = []) {
+function database(saved: { kind: string; filename: string; text?: string | null }[] = []) {
   return {
     meeting: {
       findMany: vi.fn().mockResolvedValue([{ id: 'm_1', recordings: saved }]),
@@ -33,6 +33,9 @@ beforeEach(() => {
   calls.listRecordings.mockResolvedValue({ recordings: [recording] });
   calls.listTranscriptions.mockResolvedValue({ transcriptions: [transcript] });
   storage.objectSize.mockResolvedValue(25_000_000);
+  storage.readObject.mockResolvedValue(
+    new TextEncoder().encode(`${JSON.stringify({ type: 'speech', speaker_id: 'acc_stanzy', text: 'Bonjour.' })}\n`).buffer,
+  );
   vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(''));
 });
 
@@ -67,9 +70,37 @@ describe('fetching a Réunion’s files from Stream', () => {
     );
   });
 
+  it('reads a Transcription’s words from our bucket, where Stream’s link can’t be opened', async () => {
+    const db = database([{ kind: 'RECORDING', filename: 'rec_1.mp4' }]);
+    db.account.findMany.mockResolvedValue([{ id: 'acc_stanzy', name: 'Stanzy' }]);
+    await syncMeetingFiles(asDb(db), now);
+    expect(storage.readObject).toHaveBeenCalledWith('private', 'meetings/default_meeting_m_1/t_1.jsonl');
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(db.meetingRecording.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ create: expect.objectContaining({ kind: 'TRANSCRIPTION', text: 'Stanzy : Bonjour.' }) }),
+    );
+  });
+
+  it('reads again a Transcription saved without its words', async () => {
+    const db = database([
+      { kind: 'RECORDING', filename: 'rec_1.mp4' },
+      { kind: 'TRANSCRIPTION', filename: 't_1.jsonl', text: null },
+    ]);
+    await syncMeetingFiles(asDb(db), now);
+    expect(db.meetingRecording.upsert).toHaveBeenCalledTimes(1);
+    expect(db.meetingRecording.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ update: expect.objectContaining({ text: expect.stringContaining('Bonjour.') }) }),
+    );
+  });
+
   it('leaves a Réunion alone once it has both files, and survives Stream failing', async () => {
     await syncMeetingFiles(
-      asDb(database([{ kind: 'RECORDING', filename: 'rec_1.mp4' }, { kind: 'TRANSCRIPTION', filename: 't_1.jsonl' }])),
+      asDb(
+        database([
+          { kind: 'RECORDING', filename: 'rec_1.mp4' },
+          { kind: 'TRANSCRIPTION', filename: 't_1.jsonl', text: 'Stanzy : Bonjour.' },
+        ]),
+      ),
       now,
     );
     expect(calls.call).not.toHaveBeenCalled();
