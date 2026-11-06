@@ -40,13 +40,13 @@ describe('Stream’s webhook', () => {
     expect(db.prisma.meetingRecording.upsert).not.toHaveBeenCalled();
   });
 
-  it('records an Enregistrement, with its key in our bucket when Stream put it there', async () => {
+  it('records an Enregistrement, with its key where Stream filed it in our bucket', async () => {
     storage.objectSize.mockResolvedValue(1_000_000);
     expect((await call({ type: 'call.recording_ready', call_cid: 'default:meeting_m_1', call_recording: file })).status).toBe(204);
     expect(db.prisma.meetingRecording.upsert).toHaveBeenCalledWith({
       where: { meetingId_kind_filename: { meetingId: 'm_1', kind: 'RECORDING', filename: 'rec_1.mp4' } },
-      create: expect.objectContaining({ meetingId: 'm_1', kind: 'RECORDING', objectKey: 'meetings/rec_1.mp4', text: null }),
-      update: expect.objectContaining({ objectKey: 'meetings/rec_1.mp4' }),
+      create: expect.objectContaining({ meetingId: 'm_1', kind: 'RECORDING', objectKey: 'meetings/default_meeting_m_1/rec_1.mp4', text: null }),
+      update: expect.objectContaining({ objectKey: 'meetings/default_meeting_m_1/rec_1.mp4' }),
     });
   });
 

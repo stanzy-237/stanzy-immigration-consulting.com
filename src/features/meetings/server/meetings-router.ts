@@ -27,6 +27,7 @@ import {
   type MeetingFacts,
   type Person,
 } from '@/features/meetings/server/meeting-notify';
+import { syncMeetingFiles } from '@/features/meetings/server/meeting-files';
 import { endRoom, openRoom, streamConfigured } from '@/features/meetings/server/stream';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { toLocale } from '@/i18n/routing';
@@ -138,6 +139,8 @@ export const meetingsRouter = createTRPCRouter({
   forDossier: protectedProcedure.input(dossierRefInput).query(async ({ ctx, input }) => {
     const dossier = await dossierFor(ctx.prisma, ctx.session, input.dossierId);
     const consultant = isConsultant(ctx.session);
+    // Enregistrements are the consultant's: fetched from Stream when its webhook didn't bring them.
+    if (consultant) await syncMeetingFiles(ctx.prisma);
     const meetings = await ctx.prisma.meeting.findMany({
       where: { dossierId: dossier.id },
       orderBy: { startsAt: 'desc' },
@@ -155,8 +158,9 @@ export const meetingsRouter = createTRPCRouter({
 
   /** One Réunion for its room: whether it can be joined, and whether the viewer already accepted the recording. */
   room: protectedProcedure.input(byId).query(async ({ ctx, input }) => {
-    const meeting = await meetingFor(ctx.prisma, ctx.session, input.id);
     const consultant = isConsultant(ctx.session);
+    if (consultant) await syncMeetingFiles(ctx.prisma);
+    const meeting = await meetingFor(ctx.prisma, ctx.session, input.id);
     const [consent, extra] = await Promise.all([
       ctx.prisma.meetingConsent.findUnique({
         where: { meetingId_accountId: { meetingId: meeting.id, accountId: ctx.session.account.id } },
@@ -454,6 +458,7 @@ export const meetingsRouter = createTRPCRouter({
     /** Every Réunion still to come, or every one over (ended, past or cancelled), the nearest first. */
     list: consultantProcedure.input(meetingListInput).query(async ({ ctx, input }) => {
       const now = new Date();
+      if (input.list === 'past') await syncMeetingFiles(ctx.prisma, now);
       const meetings = await ctx.prisma.meeting.findMany({
         where: { kind: { not: 'PERSONAL' } },
         orderBy: { startsAt: input.list === 'upcoming' ? 'asc' : 'desc' },
@@ -467,6 +472,7 @@ export const meetingsRouter = createTRPCRouter({
 
     /** Every Enregistrement, newest first, with its Réunion and whether a Transcription came with it. */
     recordings: consultantProcedure.query(async ({ ctx }) => {
+      await syncMeetingFiles(ctx.prisma);
       const rows = await ctx.prisma.meetingRecording.findMany({
         orderBy: { startedAt: 'desc' },
         select: {

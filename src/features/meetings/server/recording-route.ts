@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 
-import { MEETING_STORAGE_PATH } from '@/features/meetings/server/webhook-route';
 import { isConsultant } from '@/features/dossiers/server/dossier-access';
+import { storedKey } from '@/features/meetings/server/meeting-files';
 import { getCurrentSession } from '@/server/auth/session';
 import { prisma } from '@/server/db/client';
-import { objectSize, presignDownload } from '@/server/storage/r2';
+import { presignDownload } from '@/server/storage/r2';
 
 /**
  * A Réunion's Enregistrement (or its Transcription's file), for the
@@ -17,18 +17,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!session || !isConsultant(session)) return new NextResponse(null, { status: 404 });
   const recording = await prisma.meetingRecording.findUnique({
     where: { id },
-    select: { id: true, filename: true, url: true, objectKey: true },
+    select: { id: true, meetingId: true, filename: true, url: true, objectKey: true },
   });
   if (!recording) return new NextResponse(null, { status: 404 });
 
   let key = recording.objectKey;
   if (!key) {
     // Stream may have finished copying it to the bucket after its webhook.
-    const candidate = `${MEETING_STORAGE_PATH}${recording.filename}`;
-    if ((await objectSize('private', candidate).catch(() => null)) !== null) {
-      key = candidate;
-      await prisma.meetingRecording.update({ where: { id: recording.id }, data: { objectKey: key } });
-    }
+    key = await storedKey(recording.meetingId, recording.filename);
+    if (key) await prisma.meetingRecording.update({ where: { id: recording.id }, data: { objectKey: key } });
   }
   const location = key ? await presignDownload('private', key) : recording.url;
   return NextResponse.redirect(location, { status: 302, headers: { 'Cache-Control': 'private, no-store' } });
