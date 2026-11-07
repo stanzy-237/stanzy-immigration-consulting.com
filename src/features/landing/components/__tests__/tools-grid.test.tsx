@@ -35,7 +35,7 @@ describe('ToolsGrid', () => {
       [/Prédiction du prochain tirage/i, '/outils/prochain-tirage'],
       [/Budget & dépenses/i, '/outils/budget'],
       [/Checklist Entrée Express/i, '/outils/checklist'],
-      [/Recherche code CNP/i, '/outils/cnp'],
+      [/Outil PDF IRCC/i, '/outils/pdf'],
     ];
     for (const [name, href] of expected) {
       const link = screen.getByRole('link', { name });
@@ -50,15 +50,15 @@ describe('ToolsGrid', () => {
     expect(screen.queryByRole('link', { name: /Clouds/i })).not.toBeInTheDocument();
   });
 
-  it('marks Recherche CNP as coming soon, last in the grid', () => {
+  it('gives Recherche CNP’s card to the Outil PDF until the search is built', () => {
     render(withIntl(<ToolsGrid />));
     const cards = screen.getAllByRole('link', { name: /^Ouvrir l'outil/ });
-    const cnp = screen.getByRole('link', { name: /Recherche code CNP — bientôt disponible/ });
+    const pdf = screen.getByRole('link', { name: /Outil PDF IRCC/ });
 
-    expect(within(cnp).getByText('Bientôt')).toBeInTheDocument();
-    expect(within(cnp).queryByText('Gratuit')).not.toBeInTheDocument();
-    expect(cards.at(-1)).toBe(cnp);
-    for (const card of cards.slice(0, -1)) expect(within(card).queryByText('Bientôt')).toBeNull();
+    expect(within(pdf).getByText('Gratuit')).toBeInTheDocument();
+    expect(cards.at(-1)).toBe(pdf);
+    expect(screen.queryByRole('link', { name: /Recherche code CNP/ })).not.toBeInTheDocument();
+    for (const card of cards) expect(within(card).queryByText('Bientôt')).toBeNull();
   });
 
   it('surfaces the live-data badge on the Dernier tirage card', () => {
@@ -71,9 +71,8 @@ describe('ToolsGrid', () => {
 
   it('shows the footer tally line', () => {
     render(withIntl(<ToolsGrid />));
-    // Recherche CNP is not built yet, so it is not counted.
-    expect(screen.getByText('9 outils')).toBeInTheDocument();
-    expect(screen.getByText(/^9 outils gratuits pour simplifier votre parcours/)).toBeInTheDocument();
+    expect(screen.getByText('10 outils')).toBeInTheDocument();
+    expect(screen.getByText(/^10 outils gratuits pour simplifier votre parcours/)).toBeInTheDocument();
     expect(
       screen.getByText(/Aucune inscription · 100% gratuits/),
     ).toBeInTheDocument();

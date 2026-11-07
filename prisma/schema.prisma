@@ -57,6 +57,7 @@ model Account {
   notifications     Notification[]       @relation("NotificationRecipient")
   notificationsMade Notification[]       @relation("NotificationActor")
   pdfToolFiles      PdfToolFile[]
+  pdfCompressions   PdfCompression[]
   signatureRequests SignatureRequest[]   @relation("SignatureRequester")
   signaturesSigned  SignatureRequest[]   @relation("SignatureSigner")
   contractsSent     Contract[]           @relation("ContractSender")
@@ -737,6 +738,18 @@ model PdfToolFile {
 
   @@index([createdById, createdAt])
   @@map("pdf_tool_file")
+}
+
+/// One compression in the public Outil PDF: an Account may make 10 per calendar month (UTC), free.
+/// Building, reordering and downloading aren't counted. A paid plan comes later, with the AI tools.
+model PdfCompression {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([accountId, createdAt])
+  @@map("pdf_compression")
 }
 
 enum SignatureRequestStatus {
