@@ -15,7 +15,16 @@ export async function generateMetadata({ params }: { params: LocaleParams }): Pr
 
 // Served on admin.<site> (src/proxy.ts). The consultant only: anyone else
 // signed in gets a 404 (ADR 0005: one guard call).
-export default async function DashboardLayout({ children, params }: { children: React.ReactNode; params: LocaleParams }) {
+export default async function DashboardLayout({
+  children,
+  modal,
+  params,
+}: {
+  children: React.ReactNode;
+  /** Parallel route: dialogs over the current page, e.g. « Ouvrir un dossier » (see @modal). */
+  modal: React.ReactNode;
+  params: LocaleParams;
+}) {
   const { locale } = await params;
   const session = await requireConsultant({ locale, next: '/tableau-de-bord' });
   // The sidebar opens folded or not, as the consultant left it (shadcn's cookie).
@@ -23,6 +32,7 @@ export default async function DashboardLayout({ children, params }: { children: 
   return (
     <DashboardShell name={session.account.name} siteUrl={`${siteUrl()}/${locale}`} defaultOpen={sidebarOpen}>
       {children}
+      {modal}
     </DashboardShell>
   );
 }

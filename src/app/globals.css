@@ -400,3 +400,26 @@
     border-radius: 1rem;
   }
 }
+
+/*
+ * Every single-choice <select>: the browser's own arrow sits hard against the
+ * edge (and differs on iPhone), so it is replaced by one chevron, centred and
+ * clear of the edge. Outside the layers on purpose, so it wins over a field's
+ * px-* padding. A shadcn NativeSelect draws its own icon.
+ */
+select:not([multiple]):not([size]):not([data-slot='native-select']) {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d1f4e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  background-size: 1rem;
+  padding-inline-end: 2.5rem;
+}
+
+/* A row that scrolls sideways without showing a scrollbar (chip filters on a phone). */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

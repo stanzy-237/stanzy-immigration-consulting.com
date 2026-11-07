@@ -78,6 +78,13 @@ describe('proxy — the Tableau de bord on admin.*', () => {
     expect(rewrittenTo(await onAdmin('/blog/post_7', SESSION_COOKIE))).toBe('/fr/tableau-de-bord/blog/post_7');
   });
 
+  it('gives Next the full path of the page the browser is on, so a dialog route can intercept', async () => {
+    const headers = new Headers({ cookie: SESSION_COOKIE, 'next-url': '/dossiers' });
+    const response = await proxy(new NextRequest(`${ADMIN}/dossiers/nouveau`, { headers }));
+    expect(rewrittenTo(response)).toBe('/fr/tableau-de-bord/dossiers/nouveau');
+    expect(response.headers.get('x-middleware-request-next-url')).toBe('/fr/tableau-de-bord/dossiers');
+  });
+
   it('sends a signed-out visitor to Connexion on the subdomain, coming back to the same page', async () => {
     const target = redirectTarget(await onAdmin('/blog?statut=brouillon'));
     expect(target?.origin).toBe(ADMIN);

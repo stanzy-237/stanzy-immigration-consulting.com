@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useDeferredValue, useId, useState, type FormEvent, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { SERVICE_TYPES, WORKFLOWS, type ServiceType } from '@/features/dossiers/data/workflows';
@@ -36,11 +37,43 @@ export function DossierNewView({ accountId }: { accountId?: string }): ReactNode
   );
 }
 
+/**
+ * « Ouvrir un dossier » as a dialog over the page it was opened from (the
+ * intercepted route); a direct visit or a refresh shows the page instead.
+ * Closing goes back to that page.
+ */
+export function DossierNewDialogView({ accountId }: { accountId?: string }): ReactNode {
+  const t = useTranslations('Dossiers.new');
+  const router = useRouter();
+  return (
+    <Dialog open onOpenChange={(open) => !open && router.back()}>
+      <DialogContent className="max-h-dvh gap-4 overflow-y-auto p-6 sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle className="font-heading text-2xl font-bold text-navy-deep">{t('title')}</DialogTitle>
+          <DialogDescription className="text-sm text-slate">{t('intro')}</DialogDescription>
+        </DialogHeader>
+        {accountId ? (
+          <QueryBoundary fallback={<Skeleton aria-hidden={true} className="h-72 rounded-2xl" />}>
+            <PreselectedAccount accountId={accountId} inDialog />
+          </QueryBoundary>
+        ) : (
+          <DossierNewForm initialAccount={null} inDialog />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 /** Opened from an Account's page in « Comptes » (#92): that Account is already chosen. */
-function PreselectedAccount({ accountId }: { accountId: string }): ReactNode {
+function PreselectedAccount({ accountId, inDialog = false }: { accountId: string; inDialog?: boolean }): ReactNode {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.accounts.dashboard.get.queryOptions({ id: accountId }));
-  return <DossierNewForm initialAccount={{ id: data.id, name: data.name, email: data.email, status: data.status }} />;
+  return (
+    <DossierNewForm
+      initialAccount={{ id: data.id, name: data.name, email: data.email, status: data.status }}
+      inDialog={inDialog}
+    />
+  );
 }
 
 function NewSkeleton(): ReactNode {
@@ -53,7 +86,14 @@ function NewSkeleton(): ReactNode {
   );
 }
 
-function DossierNewForm({ initialAccount }: { initialAccount: Account | null }): ReactNode {
+function DossierNewForm({
+  initialAccount,
+  inDialog = false,
+}: {
+  initialAccount: Account | null;
+  /** In the dialog: no back link or page title, and no card around the form. */
+  inDialog?: boolean;
+}): ReactNode {
   const t = useTranslations('Dossiers');
   const ids = useId();
   const router = useRouter();
@@ -82,21 +122,29 @@ function DossierNewForm({ initialAccount }: { initialAccount: Account | null }):
   };
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <Link
-        href="/dossiers"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate hover:text-navy-deep"
-      >
-        <ArrowLeft aria-hidden={true} className="size-4" />
-        {t('detail.back')}
-      </Link>
-      <h1 className="font-heading text-3xl font-bold text-navy-deep">{t('new.title')}</h1>
-      <p className="mt-1 text-sm text-slate">{t('new.intro')}</p>
+    <div className={inDialog ? 'min-w-0' : 'mx-auto max-w-2xl'}>
+      {inDialog ? null : (
+        <>
+          <Link
+            href="/dossiers"
+            className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-slate hover:text-navy-deep"
+          >
+            <ArrowLeft aria-hidden={true} className="size-4" />
+            {t('detail.back')}
+          </Link>
+          <h1 className="font-heading text-3xl font-bold text-navy-deep">{t('new.title')}</h1>
+          <p className="mt-1 text-sm text-slate">{t('new.intro')}</p>
+        </>
+      )}
 
       <form
         onSubmit={submit}
         noValidate
-        className="mt-6 grid grid-cols-1 gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm"
+        className={
+          inDialog
+            ? 'grid grid-cols-1 gap-5'
+            : 'mt-6 grid grid-cols-1 gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm'
+        }
       >
         <AccountPicker
           id={`${ids}-account`}

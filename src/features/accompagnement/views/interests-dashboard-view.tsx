@@ -29,7 +29,7 @@ export function InterestsDashboardView(): ReactNode {
         <h1 className="font-heading text-2xl font-bold text-navy-deep md:text-3xl">{t('title')}</h1>
         <p className="mt-1 text-sm text-slate">{t('intro')}</p>
       </div>
-      <div role="group" aria-label={t('filterLabel')} className="flex flex-wrap gap-2">
+      <div role="group" aria-label={t('filterLabel')} className="-mx-4 flex gap-2 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
         {INTEREST_FILTERS.map((value) => (
           <button
             key={value}
@@ -38,8 +38,8 @@ export function InterestsDashboardView(): ReactNode {
             onClick={() => setFilter(value)}
             className={
               filter === value
-                ? 'inline-flex h-10 items-center rounded-full bg-navy-deep px-4 text-sm font-semibold text-white'
-                : 'inline-flex h-10 items-center rounded-full border border-fog-light bg-white px-4 text-sm font-semibold text-navy-deep hover:border-navy-deep'
+                ? 'inline-flex h-10 shrink-0 items-center rounded-full bg-navy-deep px-4 text-sm font-semibold whitespace-nowrap text-white'
+                : 'inline-flex h-10 shrink-0 items-center rounded-full border border-fog-light bg-white px-4 text-sm font-semibold whitespace-nowrap text-navy-deep hover:border-navy-deep'
             }
           >
             {t(`filters.${value}`)}

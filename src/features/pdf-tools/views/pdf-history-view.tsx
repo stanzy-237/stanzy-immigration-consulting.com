@@ -54,7 +54,9 @@ function HistoryList(): ReactNode {
   const format = useFormatter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const { data: files } = useSuspenseQuery(trpc.pdfTools.history.list.queryOptions());
+  // Asked again each time the page opens: the copy prefetched with the link (or hydrated from it) can
+  // predate the PDF just downloaded, and would otherwise count as fresh for 30 seconds.
+  const { data: files } = useSuspenseQuery({ ...trpc.pdfTools.history.list.queryOptions(), staleTime: 0 });
   const [deleting, setDeleting] = useState<HistoryFile | null>(null);
   const remove = useMutation(
     trpc.pdfTools.history.delete.mutationOptions(

@@ -66,7 +66,12 @@ function Templates(): ReactNode {
 
   return (
     <div className="grid grid-cols-1 gap-5">
-      <div role="radiogroup" aria-label={t('service')} className="flex flex-wrap gap-2">
+      {/* On a phone, one line that scrolls sideways. */}
+      <div
+        role="radiogroup"
+        aria-label={t('service')}
+        className="-mx-4 flex gap-2 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+      >
         {SERVICE_TYPES.map((choice) => (
           <button
             key={choice}
@@ -76,8 +81,8 @@ function Templates(): ReactNode {
             onClick={() => setService(choice)}
             className={
               service === choice
-                ? 'inline-flex h-10 items-center gap-2 rounded-full bg-navy-deep px-4 text-sm font-semibold text-white'
-                : 'inline-flex h-10 items-center gap-2 rounded-full border border-fog-light bg-white px-4 text-sm font-semibold text-navy-deep hover:border-navy-deep'
+                ? 'inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-navy-deep px-4 text-sm font-semibold whitespace-nowrap text-white'
+                : 'inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-fog-light bg-white px-4 text-sm font-semibold whitespace-nowrap text-navy-deep hover:border-navy-deep'
             }
           >
             {services(choice)}
@@ -213,13 +218,14 @@ function TemplateForm({
 
       <div className="grid grid-cols-1 gap-2">
         <p className="text-sm font-semibold text-navy-deep">{t('blanks')}</p>
-        <ul className="flex flex-wrap gap-2">
+        {/* On a phone, two rows that scroll sideways together. */}
+        <ul className="grid auto-cols-max grid-flow-col grid-rows-2 gap-2 overflow-x-auto scrollbar-none sm:flex sm:flex-wrap">
           {CONTRACT_BLANKS.map((blank) => (
             <li key={blank}>
               <button
                 type="button"
                 onClick={() => insert(blank)}
-                className="inline-flex h-8 items-center gap-1.5 rounded-full bg-off-white px-3 text-xs text-navy-deep hover:bg-ice-blue"
+                className="inline-flex h-8 items-center gap-1.5 rounded-full bg-off-white px-3 text-xs whitespace-nowrap text-navy-deep hover:bg-ice-blue"
               >
                 <code className="font-semibold">{`{${blank}}`}</code>
                 <span className="text-slate">{t(`blank.${blank}`)}</span>
@@ -254,12 +260,13 @@ function TemplateForm({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap justify-end gap-2">
+      {/* Halves on a phone; on the right from sm up. */}
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
         <button
           type="button"
           disabled={!ready || previewing}
           onClick={preview}
-          className="inline-flex h-11 items-center gap-2 rounded-full border-2 border-navy-deep px-4 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white disabled:opacity-50"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-full border-2 border-navy-deep px-4 text-sm font-semibold whitespace-nowrap text-navy-deep hover:bg-navy-deep hover:text-white disabled:opacity-50"
         >
           <Eye aria-hidden={true} className="size-4" />
           {previewing ? t('previewing') : t('preview')}
@@ -267,7 +274,7 @@ function TemplateForm({
         <button
           type="submit"
           disabled={!ready || save.isPending}
-          className="inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson disabled:opacity-50"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-rouge px-5 text-sm font-semibold whitespace-nowrap text-white hover:bg-crimson disabled:opacity-50"
         >
           <Save aria-hidden={true} className="size-4" />
           {save.isPending ? t('saving') : t('save')}
