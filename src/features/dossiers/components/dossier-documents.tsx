@@ -137,7 +137,7 @@ function SectionCard({
 
   return (
     <article className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
-      <header className="flex flex-wrap items-center justify-between gap-2">
+      <header className="flex items-start justify-between gap-2">
         {renaming ? (
           <TitleForm
             label={t('sectionTitle')}
