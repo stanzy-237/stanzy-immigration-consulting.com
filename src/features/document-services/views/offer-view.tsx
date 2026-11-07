@@ -62,7 +62,7 @@ function OfferPage({ token, signedIn }: { token: string; signedIn: boolean }): R
         <div className="relative mx-auto grid grid-cols-1 max-w-5xl gap-4">
           <p className="text-xs font-semibold tracking-widest text-ice-blue uppercase">{t('eyebrow')}</p>
           <h1 className="max-w-3xl font-heading text-h3 font-bold sm:text-h2">{textIn(offer.name, locale)}</h1>
-          <p className="max-w-2xl text-body-lg text-ice-blue">{textIn(offer.summary, locale)}</p>
+          <p className="max-w-2xl text-body-lg whitespace-pre-line text-ice-blue">{textIn(offer.summary, locale)}</p>
         </div>
       </section>
 

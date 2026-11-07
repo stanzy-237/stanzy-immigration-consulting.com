@@ -73,7 +73,7 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
         <div className="relative mx-auto grid grid-cols-1 max-w-5xl gap-4">
           {back}
           <h1 className="max-w-3xl font-heading text-h3 font-bold sm:text-h2">{textIn(service.name, locale)}</h1>
-          <p className="max-w-2xl text-body-lg text-ice-blue">{textIn(service.summary, locale)}</p>
+          <p className="max-w-2xl text-body-lg whitespace-pre-line text-ice-blue">{textIn(service.summary, locale)}</p>
         </div>
       </section>
 
