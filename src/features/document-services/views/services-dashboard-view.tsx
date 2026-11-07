@@ -90,9 +90,9 @@ function Catalogue(): ReactNode {
             <li key={service.id} className="grid grid-cols-1 gap-2">
               <Link
                 href={`/services/${service.id}`}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-fog-light bg-white p-5 shadow-sm hover:border-navy-deep"
+                className="flex flex-col gap-3 rounded-2xl border border-fog-light bg-white p-5 shadow-sm hover:border-navy-deep sm:flex-row sm:items-center sm:justify-between sm:gap-4"
               >
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 sm:flex-1">
                   <p className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold text-navy-deep">{textIn(service.name, locale)}</span>
                     <span
@@ -110,9 +110,9 @@ function Catalogue(): ReactNode {
                   </p>
                 </div>
                 {service.price > 0 ? (
-                  <ServicePrice service={service} className="text-right" />
+                  <ServicePrice service={service} className="sm:max-w-56 sm:shrink-0 sm:text-right" />
                 ) : (
-                  <span className="rounded-full bg-honey-tint px-3 py-1 text-xs font-semibold text-honey">{t('noPrice')}</span>
+                  <span className="w-fit shrink-0 rounded-full bg-honey-tint px-3 py-1 text-xs font-semibold text-honey">{t('noPrice')}</span>
                 )}
               </Link>
               {service.active ? <ShareLink serviceId={service.id} name={textIn(service.name, locale)} /> : null}
