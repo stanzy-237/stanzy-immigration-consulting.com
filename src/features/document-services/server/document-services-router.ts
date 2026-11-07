@@ -7,11 +7,16 @@ import { STARTER_SERVICES } from '@/features/document-services/data/starter-serv
 import {
   addRequirementFileInput,
   requestRef,
+  dueOn,
   requirementFilePrefix,
   saveAnswersInput,
+  setStartInput,
 } from '@/features/document-services/lib/requirements';
 import { prerequisitesOf, saveServiceInput, slugInput } from '@/features/document-services/lib/service-schema';
-import { editableRequest, requestFor, requirementsOf } from '@/features/document-services/server/requirements';
+import { ordersRouter } from '@/features/document-services/server/orders-router';
+import { editableRequest, OPEN_STANZY, requestFor, requirementsOf } from '@/features/document-services/server/requirements';
+import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
+import { dossierFor } from '@/features/dossiers/server/dossier-access';
 import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -169,6 +174,8 @@ export const documentServicesRouter = createTRPCRouter({
    * service's questionnaire and prerequisite files, shared with the
    * consultant (and the Partner in charge, #42), never Dossier Documents.
    */
+  orders: ordersRouter,
+
   requirements: createTRPCRouter({
     get: protectedProcedure.input(requestRef).query(async ({ ctx, input }) => {
       const found = await requestFor(ctx.prisma, ctx.session, input.requestId);
@@ -181,10 +188,50 @@ export const documentServicesRouter = createTRPCRouter({
           document: { id: request.document.id, title: request.document.title },
           service: request.service ? { slug: request.service.slug, name: request.service.name } : null,
         },
-        dossier: { id: dossier.id, client: dossier.account.name },
+        dossier: { id: dossier.id, client: dossier.account.name, stage: dossier.stage, service: dossier.service },
         editable,
+        startedOn: request.startedOn,
+        dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
         ...(await requirementsOf(ctx.prisma, found)),
       };
+    }),
+
+    /**
+     * A Dossier's requests under way and where each stands: what is left to
+     * hand over and the day it is due. For the Dossier's Aperçu.
+     */
+    forDossier: protectedProcedure.input(dossierRefInput).query(async ({ ctx, input }) => {
+      const dossier = await dossierFor(ctx.prisma, ctx.session, input.dossierId);
+      const requests = await ctx.prisma.stanzyRequest.findMany({
+        where: { document: { section: { dossierId: dossier.id } }, status: { in: [...OPEN_STANZY] }, serviceId: { not: null } },
+        orderBy: { createdAt: 'asc' },
+        select: { id: true },
+      });
+      return Promise.all(
+        requests.map(async ({ id }) => {
+          const found = await requestFor(ctx.prisma, ctx.session, id);
+          const { request } = found;
+          const { items, questionsLeft, complete } = await requirementsOf(ctx.prisma, found);
+          return {
+            id: request.id,
+            status: request.status,
+            service: request.service ? { name: request.service.name } : null,
+            document: request.document.title,
+            startedOn: request.startedOn,
+            turnaroundDays: request.service?.turnaroundDays ?? null,
+            dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
+            left: items.filter((item) => item.state === 'missing').length + questionsLeft.length,
+            hasRequirements: items.length > 0 || request.service?.questionnaire !== null,
+            complete,
+          };
+        }),
+      );
+    }),
+
+    /** The consultant sets the day the work starts: the countdown runs from it. */
+    setStart: consultantProcedure.input(setStartInput).mutation(async ({ ctx, input }) => {
+      const { request } = await editableRequest(ctx.prisma, ctx.session, input.requestId);
+      await ctx.prisma.stanzyRequest.update({ where: { id: request.id }, data: { startedOn: input.startedOn } });
     }),
 
     /** Saves the questionnaire as it stands, answered or not yet. */

@@ -3787,7 +3787,13 @@
       "noPrice": "Prix à fixer",
       "requests": "{count, plural, =0 {aucune demande} one {# demande} other {# demandes}}",
       "error": "Une erreur est survenue. Réessayez.",
-      "loading": "Chargement du catalogue"
+      "loading": "Chargement du catalogue",
+      "copyLink": "Copier le lien privé",
+      "copyLinkLabel": "Copier le lien privé de {name}",
+      "renewLink": "Nouveau lien",
+      "renewLinkLabel": "Remplacer le lien privé de {name}",
+      "linkCopied": "Lien privé copié",
+      "linkRenewed": "Nouveau lien copié : l’ancien ne marche plus"
     },
     "edit": {
       "back": "Services documentaires",
@@ -3851,7 +3857,9 @@
         "proofOfFunds": "Preuve de fonds (NIU, contacts d’urgence, don)",
         "proofOfFundsNoFunds": "Preuve de fonds sans fonds (et compte UBA)"
       },
-      "questionnaireHint": "Les questions auxquelles le client répond avec sa demande."
+      "questionnaireHint": "Les questions auxquelles le client répond avec sa demande.",
+      "turnaroundDays": "Délai en jours (décompte)",
+      "turnaroundDaysHint": "À partir de la date de début que vous fixez sur la demande. Vide : pas de décompte."
     },
     "requirements": {
       "title": "Pièces à remettre",
@@ -3918,7 +3926,80 @@
       "errors": {
         "REQUIREMENTS_CLOSED": "Cette demande n’est plus en cours.",
         "UNKNOWN": "Une erreur est survenue. Réessayez."
+      },
+      "due": "Livraison prévue le {date}"
+    },
+    "offer": {
+      "metaTitle": "Service documentaire",
+      "eyebrow": "Service documentaire · lien privé",
+      "loading": "Chargement du service",
+      "prerequisitesIntro": "Ce que vous remettez à Stanzy une fois la commande confirmée, sur la page de votre demande.",
+      "priceNote": "Facturé après la signature du contrat du service.",
+      "signInFirst": "Connectez-vous ou créez votre compte pour commander ce service : votre dossier, le contrat et la facture y seront.",
+      "signIn": "Se connecter pour commander",
+      "note": "Un mot pour Stanzy (facultatif)",
+      "noteHint": "Par exemple le montant à justifier, ou la date de votre extraction du bassin.",
+      "accept": "J’ai lu les conditions et le contrat, et je commande ce service.",
+      "order": "Commander ce service",
+      "ordered": "Commande envoyée à Stanzy",
+      "next": "Stanzy confirme votre commande, puis vous envoie le contrat à signer et la facture.",
+      "pending": "Commande envoyée",
+      "pendingBody": "Stanzy la confirme sous peu : vous recevrez le contrat à signer par e-mail.",
+      "approved": "Commande confirmée",
+      "openDossier": "Ouvrir mon dossier",
+      "rejected": "Votre commande précédente n’a pas été retenue",
+      "errors": {
+        "ORDER_PENDING": "Une commande de ce service attend déjà la confirmation de Stanzy.",
+        "ORDER_NOT_ELIGIBLE": "Ce compte ne peut pas commander de service.",
+        "UNKNOWN": "Une erreur est survenue. Réessayez."
       }
+    },
+    "orders": {
+      "title": "Commandes",
+      "intro": "Les services commandés depuis leur lien privé. Confirmer ouvre le dossier du client et lui envoie le contrat du service avec la facture.",
+      "filterLabel": "Filtrer les commandes",
+      "filters": {
+        "SUBMITTED": "À traiter",
+        "APPROVED": "Confirmées",
+        "REJECTED": "Refusées"
+      },
+      "status": {
+        "SUBMITTED": "À traiter",
+        "APPROVED": "Confirmée",
+        "REJECTED": "Refusée"
+      },
+      "empty": "Aucune commande ici.",
+      "loading": "Chargement des commandes",
+      "approve": "Confirmer",
+      "approveBody": "« {service} » pour {client} : son dossier s’ouvre et le contrat part à signer.",
+      "approved": "Commande confirmée : dossier ouvert, contrat envoyé",
+      "reject": "Refuser",
+      "rejectLabel": "Refuser la commande de {name}",
+      "rejectTitle": "Refuser la commande",
+      "rejectBody": "Le client est prévenu par e-mail, avec votre note.",
+      "rejectNote": "Note pour le client (facultatif)",
+      "rejectConfirm": "Refuser",
+      "rejected": "Commande refusée",
+      "keep": "Garder",
+      "openDossier": "Ouvrir le dossier",
+      "errors": {
+        "ORDER_NOT_PENDING": "Cette commande a déjà été traitée.",
+        "UNKNOWN": "Une erreur est survenue. Réessayez."
+      }
+    },
+    "progress": {
+      "daysLeft": "{count, plural, =0 {Aujourd’hui} one {# jour restant} other {# jours restants}}",
+      "dueOn": "livraison prévue le {date}",
+      "late": "Livraison prévue le {date} : le délai est dépassé.",
+      "notStarted": "Le décompte démarre à la date de début fixée par Stanzy.",
+      "noTurnaround": "Délai à préciser par Stanzy.",
+      "startedOn": "Démarré le {date}",
+      "left": "{count, plural, =0 {Pièces à remettre} one {# élément à remettre} other {# éléments à remettre}}",
+      "allGiven": "Tout est remis",
+      "start": "Date de début",
+      "saveStart": "Enregistrer",
+      "startSaved": "Date de début enregistrée",
+      "error": "Une erreur est survenue. Réessayez."
     }
   }
 }
