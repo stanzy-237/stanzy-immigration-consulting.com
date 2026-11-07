@@ -310,7 +310,7 @@ export function ConsultantPart({ meeting, upcoming }: { meeting: NotedMeeting; u
         ) : (
           <>
             {recordings.length > 0 ? (
-              <ul className="grid gap-3 md:grid-cols-2">
+              <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {recordings.map((file) => {
                   const when = format.dateTime(file.startedAt, {
                     day: 'numeric',

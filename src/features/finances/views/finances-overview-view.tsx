@@ -51,7 +51,7 @@ function Overview({ year }: { year: number }): ReactNode {
         </p>
       ) : null}
 
-      <dl className="grid gap-3 sm:grid-cols-3">
+      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Stat label={t('income')} value={xaf(report.total.income)} />
         <Stat label={t('charges')} value={xaf(report.total.charges)} />
         <Stat label={t('net')} value={xaf(report.total.net)} negative={report.total.net < 0} />
@@ -61,20 +61,31 @@ function Overview({ year }: { year: number }): ReactNode {
         <h2 id="finances-months" className="mb-3 font-heading text-lg font-bold text-navy-deep">
           {t('months')}
         </h2>
-        <div className="overflow-x-auto">
+        <AmountRows
+          rows={report.months.map((month, index) => ({
+            key: String(index),
+            label: <span className="capitalize">{monthName(index)}</span>,
+            income: xaf(month.income),
+            charges: xaf(month.charges),
+            net: xaf(month.net),
+            negative: month.net < 0,
+          }))}
+          names={{ income: t('income'), charges: t('charges'), net: t('net') }}
+        />
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full min-w-md text-sm">
             <thead>
               <tr className="border-b border-fog-light text-left text-xs text-slate">
                 <th scope="col" className="py-2 font-semibold">
                   {t('month')}
                 </th>
-                <th scope="col" className="py-2 text-right font-semibold">
+                <th scope="col" className="py-2 pl-4 text-right font-semibold whitespace-nowrap">
                   {t('income')}
                 </th>
-                <th scope="col" className="py-2 text-right font-semibold">
+                <th scope="col" className="py-2 pl-4 text-right font-semibold whitespace-nowrap">
                   {t('charges')}
                 </th>
-                <th scope="col" className="py-2 text-right font-semibold">
+                <th scope="col" className="py-2 pl-4 text-right font-semibold whitespace-nowrap">
                   {t('net')}
                 </th>
               </tr>
@@ -85,10 +96,10 @@ function Overview({ year }: { year: number }): ReactNode {
                   <th scope="row" className="py-2 text-left font-normal text-navy-deep capitalize">
                     {monthName(index)}
                   </th>
-                  <td className="py-2 text-right text-navy-deep tabular-nums">{xaf(month.income)}</td>
-                  <td className="py-2 text-right text-navy-deep tabular-nums">{xaf(month.charges)}</td>
+                  <td className="py-2 pl-4 text-right whitespace-nowrap text-navy-deep tabular-nums">{xaf(month.income)}</td>
+                  <td className="py-2 pl-4 text-right whitespace-nowrap text-navy-deep tabular-nums">{xaf(month.charges)}</td>
                   <td
-                    className={`py-2 text-right font-semibold tabular-nums ${month.net < 0 ? 'text-crimson' : 'text-navy-deep'}`}
+                    className={`py-2 pl-4 text-right font-semibold whitespace-nowrap tabular-nums ${month.net < 0 ? 'text-crimson' : 'text-navy-deep'}`}
                   >
                     {xaf(month.net)}
                   </td>
@@ -99,7 +110,7 @@ function Overview({ year }: { year: number }): ReactNode {
         </div>
       </section>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Breakdown
           id="finances-services"
           title={t('byService')}
@@ -126,48 +137,68 @@ function Overview({ year }: { year: number }): ReactNode {
         {margins.length === 0 ? (
           <p className="text-sm text-slate">{t('noMargins')}</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-md text-sm">
-              <thead>
-                <tr className="border-b border-fog-light text-left text-xs text-slate">
-                  <th scope="col" className="py-2 font-semibold">
-                    {t('dossier')}
-                  </th>
-                  <th scope="col" className="py-2 text-right font-semibold">
-                    {t('income')}
-                  </th>
-                  <th scope="col" className="py-2 text-right font-semibold">
-                    {t('charges')}
-                  </th>
-                  <th scope="col" className="py-2 text-right font-semibold">
-                    {t('margin')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {margins.map((row) => (
-                  <tr key={row.dossierId} className="border-b border-fog-light last:border-0">
-                    <th scope="row" className="py-2 text-left font-normal">
-                      <Link
-                        href={`/dossiers/${row.dossierId}`}
-                        className="font-semibold text-navy-deep hover:text-rouge"
-                      >
-                        {row.dossier.account.name}
-                      </Link>
-                      <span className="block text-xs text-slate">{services(row.dossier.service)}</span>
+          <>
+            <AmountRows
+              rows={margins.map((row) => ({
+                key: row.dossierId,
+                label: (
+                  <>
+                    <Link href={`/dossiers/${row.dossierId}`} className="font-semibold text-navy-deep hover:text-rouge">
+                      {row.dossier.account.name}
+                    </Link>
+                    <span className="block text-xs text-slate">{services(row.dossier.service)}</span>
+                  </>
+                ),
+                income: xaf(row.income),
+                charges: xaf(row.charges),
+                net: xaf(row.net),
+                negative: row.net < 0,
+              }))}
+              names={{ income: t('income'), charges: t('charges'), net: t('margin') }}
+            />
+            <div className="hidden overflow-x-auto sm:block">
+              <table className="w-full min-w-md text-sm">
+                <thead>
+                  <tr className="border-b border-fog-light text-left text-xs text-slate">
+                    <th scope="col" className="py-2 font-semibold">
+                      {t('dossier')}
                     </th>
-                    <td className="py-2 text-right text-navy-deep tabular-nums">{xaf(row.income)}</td>
-                    <td className="py-2 text-right text-navy-deep tabular-nums">{xaf(row.charges)}</td>
-                    <td
-                      className={`py-2 text-right font-semibold tabular-nums ${row.net < 0 ? 'text-crimson' : 'text-navy-deep'}`}
-                    >
-                      {xaf(row.net)}
-                    </td>
+                    <th scope="col" className="py-2 pl-4 text-right font-semibold whitespace-nowrap">
+                      {t('income')}
+                    </th>
+                    <th scope="col" className="py-2 pl-4 text-right font-semibold whitespace-nowrap">
+                      {t('charges')}
+                    </th>
+                    <th scope="col" className="py-2 pl-4 text-right font-semibold whitespace-nowrap">
+                      {t('margin')}
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {margins.map((row) => (
+                    <tr key={row.dossierId} className="border-b border-fog-light last:border-0">
+                      <th scope="row" className="py-2 text-left font-normal">
+                        <Link
+                          href={`/dossiers/${row.dossierId}`}
+                          className="font-semibold text-navy-deep hover:text-rouge"
+                        >
+                          {row.dossier.account.name}
+                        </Link>
+                        <span className="block text-xs text-slate">{services(row.dossier.service)}</span>
+                      </th>
+                      <td className="py-2 pl-4 text-right whitespace-nowrap text-navy-deep tabular-nums">{xaf(row.income)}</td>
+                      <td className="py-2 pl-4 text-right whitespace-nowrap text-navy-deep tabular-nums">{xaf(row.charges)}</td>
+                      <td
+                        className={`py-2 pl-4 text-right font-semibold whitespace-nowrap tabular-nums ${row.net < 0 ? 'text-crimson' : 'text-navy-deep'}`}
+                      >
+                        {xaf(row.net)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
     </div>
@@ -222,12 +253,47 @@ function OverviewSkeleton(): ReactNode {
   return (
     <div role="status" className="grid grid-cols-1 gap-6">
       <span className="sr-only">{t('loading')}</span>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {[0, 1, 2].map((key) => (
           <Skeleton key={key} aria-hidden={true} className="h-20 rounded-2xl" />
         ))}
       </div>
       <Skeleton aria-hidden={true} className="h-96 rounded-2xl" />
     </div>
+  );
+}
+
+/** On a phone, a table's rows as small cards: what the row is, then its three amounts, each named. */
+function AmountRows({
+  rows,
+  names,
+}: {
+  rows: { key: string; label: ReactNode; income: string; charges: string; net: string; negative: boolean }[];
+  names: { income: string; charges: string; net: string };
+}): ReactNode {
+  return (
+    <ul className="grid grid-cols-1 gap-2 sm:hidden">
+      {rows.map((row) => (
+        <li key={row.key} className="rounded-xl bg-off-white px-3 py-2.5 text-sm">
+          <div className="text-navy-deep">{row.label}</div>
+          <dl className="mt-1.5 grid grid-cols-3 gap-2">
+            <div className="min-w-0">
+              <dt className="text-xs text-slate">{names.income}</dt>
+              <dd className="truncate text-navy-deep tabular-nums">{row.income}</dd>
+            </div>
+            <div className="min-w-0">
+              <dt className="text-xs text-slate">{names.charges}</dt>
+              <dd className="truncate text-navy-deep tabular-nums">{row.charges}</dd>
+            </div>
+            <div className="min-w-0 text-right">
+              <dt className="text-xs text-slate">{names.net}</dt>
+              <dd className={`truncate font-semibold tabular-nums ${row.negative ? 'text-crimson' : 'text-navy-deep'}`}>
+                {row.net}
+              </dd>
+            </div>
+          </dl>
+        </li>
+      ))}
+    </ul>
   );
 }

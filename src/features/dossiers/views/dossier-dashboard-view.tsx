@@ -212,7 +212,7 @@ function DossierDetail({ id }: { id: string }): ReactNode {
 
   return (
     <>
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm lg:col-span-2">
           <div id="etapes" className="scroll-mt-20">
             <StageStepper service={dossier.service} stage={dossier.stage} startStage={dossier.startStage} />
@@ -220,28 +220,31 @@ function DossierDetail({ id }: { id: string }): ReactNode {
 
           {open ? (
             <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-off-white pt-5">
-              <button
-                type="button"
-                disabled={!previous || moving}
-                onClick={() => moveBack.mutate({ id, from: dossier.stage })}
-                className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-fog-light bg-white px-4 text-sm font-semibold text-navy-deep hover:border-navy-deep disabled:opacity-50"
-              >
-                <ChevronLeft aria-hidden={true} className="size-4" />
-                {t('detail.moveBack')}
-              </button>
-              {next ? (
+              {/* Previous and next share one row, halves on a phone. */}
+              <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
                 <button
                   type="button"
-                  disabled={moving}
-                  onClick={() => advance.mutate({ id, from: dossier.stage })}
-                  className="inline-flex h-11 items-center gap-1.5 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson disabled:opacity-50"
+                  disabled={!previous || moving}
+                  onClick={() => moveBack.mutate({ id, from: dossier.stage })}
+                  className="inline-flex h-11 min-w-0 items-center justify-center gap-1.5 rounded-full border-2 border-fog-light bg-white px-3 text-sm font-semibold whitespace-nowrap text-navy-deep hover:border-navy-deep disabled:opacity-50 sm:px-4"
                 >
-                  {t('detail.advance')}
-                  <ChevronRight aria-hidden={true} className="size-4" />
+                  <ChevronLeft aria-hidden={true} className="size-4" />
+                  {t('detail.moveBack')}
                 </button>
-              ) : (
-                <p className="text-sm font-semibold text-leaf">{t('detail.lastStage')}</p>
-              )}
+                {next ? (
+                  <button
+                    type="button"
+                    disabled={moving}
+                    onClick={() => advance.mutate({ id, from: dossier.stage })}
+                    className="inline-flex h-11 min-w-0 items-center justify-center gap-1.5 rounded-full bg-rouge px-3 text-sm font-semibold whitespace-nowrap text-white hover:bg-crimson disabled:opacity-50 sm:px-5"
+                  >
+                    {t('detail.advance')}
+                    <ChevronRight aria-hidden={true} className="size-4" />
+                  </button>
+                ) : (
+                  <p className="self-center text-sm font-semibold text-leaf">{t('detail.lastStage')}</p>
+                )}
+              </div>
               {/* A warning, not a lock: the stage still moves. */}
               {next && !dossier.contractSigned ? (
                 <p className="text-xs font-semibold text-honey">{contracts('stageWarning')}</p>
@@ -388,7 +391,7 @@ function DossierSkeleton(): ReactNode {
         <Skeleton className="h-4 w-40" />
         <Skeleton className="mt-2 h-9 w-64" />
         <Skeleton className="mt-2 h-4 w-80" />
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <Skeleton className="h-96 rounded-2xl lg:col-span-2" />
           <Skeleton className="h-64 rounded-2xl" />
         </div>

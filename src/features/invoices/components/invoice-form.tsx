@@ -164,7 +164,7 @@ export function InvoiceForm({ draft }: { draft: InvoiceDraft }): ReactNode {
             if (next) setErrors((current) => ({ ...current, dossier: false }));
           }}
         />
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor={`${ids}-currency`} className={label}>
               {t('editor.currency')}
@@ -220,7 +220,7 @@ export function InvoiceForm({ draft }: { draft: InvoiceDraft }): ReactNode {
               <li
                 key={line.key}
                 aria-label={t('editor.lineNumber', { number: index + 1 })}
-                className="grid gap-3 border-b border-off-white pb-4 sm:grid-cols-12 sm:items-end"
+                className="grid grid-cols-1 gap-3 border-b border-off-white pb-4 sm:grid-cols-12 sm:items-end"
               >
                 <div className="sm:col-span-6">
                   <label htmlFor={`${ids}-${line.key}-description`} className={label}>

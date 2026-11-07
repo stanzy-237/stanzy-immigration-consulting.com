@@ -182,7 +182,8 @@ export function PdfWorkbench({
           <FilePlus2 aria-hidden={true} className="size-4" />
           {adding ? t('adding') : t('add')}
         </label>
-        <p className="min-w-0 flex-1 text-sm text-slate">{t('addHint')}</p>
+        {/* On a phone the hint takes its own line, under the buttons, instead of a one-word column. */}
+        <p className="order-last w-full text-sm text-slate sm:order-none sm:w-auto sm:min-w-0 sm:flex-1">{t('addHint')}</p>
         {tool.pages.length > 0 ? (
           <button
             type="button"
@@ -233,8 +234,9 @@ export function PdfWorkbench({
         />
       )}
 
-      <div className="sticky bottom-0 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-fog-light bg-white/95 p-4 shadow-sm backdrop-blur">
-        <div className="min-w-0 flex-1" aria-live="polite">
+      {/* Kept in view from sm up; on a phone it would hide the pages, so it sits after them. */}
+      <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-fog-light bg-white/95 p-4 shadow-sm backdrop-blur sm:sticky sm:bottom-0 sm:z-10">
+        <div className="w-full min-w-0 sm:w-auto sm:flex-1" aria-live="polite">
           <p className="font-semibold text-navy-deep">
             {t('pageCount', { count: tool.pages.length })}
             {tool.size !== null ? ` · ${mo(tool.size)}` : null}
@@ -261,7 +263,7 @@ export function PdfWorkbench({
           type="button"
           disabled={tool.pages.length === 0 || tool.compressing || tool.compressed !== null}
           onClick={() => void compress()}
-          className={`${button} border-2 border-navy-deep text-navy-deep hover:bg-navy-deep hover:text-white`}
+          className={`${button} flex-1 justify-center border-2 border-navy-deep text-navy-deep hover:bg-navy-deep hover:text-white sm:flex-none`}
         >
           <Minimize2 aria-hidden={true} className="size-4" />
           {tool.compressing ? t('compressing') : t('compress')}
@@ -283,7 +285,7 @@ export function PdfWorkbench({
           type="button"
           disabled={tool.pages.length === 0 || finishing || tool.compressing}
           onClick={() => void done()}
-          className={`${button} bg-rouge text-white hover:bg-crimson`}
+          className={`${button} flex-1 justify-center bg-rouge text-white hover:bg-crimson sm:flex-none`}
         >
           <FinishIcon aria-hidden={true} className="size-4" />
           {finish.label}

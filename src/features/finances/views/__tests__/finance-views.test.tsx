@@ -41,7 +41,10 @@ describe('the Finances overview', () => {
 
     expect(screen.getByRole('heading', { name: 'Finances' })).toBeInTheDocument();
     expect(screen.getByText(/Taux CAD manquant pour mars 2026/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Aminata Diallo' })).toHaveAttribute('href', '/dossiers/dos_1');
+    // Once in the phone's cards, once in the table (CSS picks which shows).
+    for (const link of screen.getAllByRole('link', { name: 'Aminata Diallo' })) {
+      expect(link).toHaveAttribute('href', '/dossiers/dos_1');
+    }
     expect(screen.getByRole('link', { name: 'Exporter en CSV' })).toHaveAttribute(
       'href',
       '/api/finances/export?year=2026&locale=fr',

@@ -39,7 +39,7 @@ export function HowItWorks(): ReactNode {
   }, [active, playing]);
 
   return (
-    <div className="grid items-center gap-10 lg:grid-cols-2">
+    <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
       <div className="grid grid-cols-1 gap-3">
         <ol className="grid grid-cols-1 gap-3">
           {STEPS.map((step) => {

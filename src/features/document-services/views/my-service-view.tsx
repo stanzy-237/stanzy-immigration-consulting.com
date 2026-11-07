@@ -77,7 +77,7 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
         </div>
       </section>
 
-      <div className="relative mx-auto -mt-14 grid max-w-5xl items-start gap-6 px-4 pb-16 lg:grid-cols-3">
+      <div className="relative mx-auto -mt-14 grid grid-cols-1 max-w-5xl items-start gap-6 px-4 pb-16 lg:grid-cols-3">
         <div className="grid grid-cols-1 gap-6 lg:col-span-2">
           <ul className="grid grid-cols-1 gap-4 rounded-2xl bg-white p-6 shadow-sm">
             {facts.map(({ key, icon: Icon, text }) => (

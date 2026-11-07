@@ -30,7 +30,7 @@ export function MeetingsHomeView(): ReactNode {
         <Clock />
       </QueryBoundary>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <button type="button" onClick={open('instant')} className={`${tile} bg-rouge`}>
           <Tile icon={<Plus aria-hidden={true} className="size-6" />} title={t('home.tiles.instant.title')} body={t('home.tiles.instant.body')} />
         </button>
@@ -116,7 +116,7 @@ function Today(): ReactNode {
     );
   }
   return (
-    <ul className="grid gap-4 md:grid-cols-2">
+    <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {data.meetings.map((meeting) => (
         <MeetingCard key={meeting.id} meeting={meeting} upcoming={true} />
       ))}

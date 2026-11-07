@@ -217,7 +217,7 @@ function ProgressStep({
 
   return (
     <form onSubmit={next} noValidate className={`grid gap-4 ${card}`}>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label htmlFor={`${ids}-age`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('age')}
           <input

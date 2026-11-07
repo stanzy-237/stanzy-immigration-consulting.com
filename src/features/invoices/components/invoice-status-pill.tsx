@@ -23,7 +23,7 @@ export function InvoiceStatusPill({
   const t = useTranslations('Invoices.status');
   const status = displayStatus(invoice, new Date());
   return (
-    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${PILL[status]}`}>
+    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold tracking-wider whitespace-nowrap uppercase ${PILL[status]}`}>
       {t(status)}
     </span>
   );

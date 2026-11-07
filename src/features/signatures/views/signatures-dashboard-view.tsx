@@ -46,7 +46,7 @@ function SigningAssets(): ReactNode {
         <h2 className="font-heading text-xl font-bold text-navy-deep">{t('title')}</h2>
         <p className="mt-1 text-sm text-slate">{t('hint')}</p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {ASSET_KINDS.map((kind) => (
           <AssetSlot key={kind} kind={kind} updatedAt={data[kind]} />
         ))}

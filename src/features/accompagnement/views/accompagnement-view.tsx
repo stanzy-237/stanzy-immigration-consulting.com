@@ -79,7 +79,7 @@ export function AccompagnementView(): ReactNode {
         <section aria-labelledby="accompagnement-levels" className="bg-white px-5 pb-20 md:px-7">
           <div className="mx-auto max-w-7xl border-t border-fog-light pt-20">
             <Heading id="accompagnement-levels" eyebrow={t('chapters.one')} title={t('storyLevelsTitle')} lead={t('levelsLead')} />
-            <ul className="grid gap-5 md:grid-cols-3">
+            <ul className="grid grid-cols-1 gap-5 md:grid-cols-3">
               {LEVELS.map((level, index) => {
                 const start = path.indexOf(startStageOf(level, false));
                 return (
@@ -124,7 +124,7 @@ export function AccompagnementView(): ReactNode {
         <section aria-labelledby="accompagnement-features" className="bg-white px-5 py-20 md:px-7">
           <div className="mx-auto max-w-7xl">
             <Heading id="accompagnement-features" eyebrow={t('featuresEyebrow')} title={t('featuresTitle')} />
-            <ul className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
               {FEATURES.map(({ key, icon: Icon }, index) => (
                 <li key={key}>
                   <Reveal

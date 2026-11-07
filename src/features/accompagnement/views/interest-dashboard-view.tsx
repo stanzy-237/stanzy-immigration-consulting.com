@@ -258,7 +258,7 @@ function Answers({ interest }: { interest: Interest }): ReactNode {
   const residence =
     progress.residence === 'OTHER' ? progress.residenceOther : t(`form.residences.${progress.residence}`);
   const rows = (entries: [string, string][]) => (
-    <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+    <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
       {entries.map(([term, value]) => (
         <div key={term}>
           <dt className="text-xs font-semibold text-slate">{term}</dt>
