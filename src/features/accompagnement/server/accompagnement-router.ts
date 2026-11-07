@@ -28,7 +28,8 @@ import { livesInCameroon } from '@/features/accompagnement/server/residence';
 import { transitionAccountStatus } from '@/features/auth/server/account-status';
 import { SCHEDULE_MAX } from '@/features/contracts/lib/contract-schema';
 import { sendServiceContract } from '@/features/contracts/server/contracts-router';
-import { textIn } from '@/features/document-services/lib/service-schema';
+import { textIn, type Prerequisite, type Texts } from '@/features/document-services/lib/service-schema';
+import { addPrerequisiteDocuments } from '@/features/document-services/server/prerequisites';
 import { addDraftInvoiceLine } from '@/features/invoices/server/draft-lines';
 import { computeCrs } from '@/features/crs/lib/compute-crs';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
@@ -449,18 +450,29 @@ export const accompagnementRouter = createTRPCRouter({
         if (document.stanzyRequests.length > 0) throw refuse('STANZY_ALREADY_ASKED');
         const service = await ctx.prisma.documentService.findUnique({
           where: { id: input.serviceId },
-          select: { active: true, slug: true },
+          select: { active: true, slug: true, name: true, prerequisites: true },
         });
         if (!service?.active) throw refuse('SERVICE_UNAVAILABLE');
 
-        const request = await ctx.prisma.stanzyRequest.create({
-          data: {
-            documentId: document.id,
-            requestedById: ctx.session.account.id,
-            serviceId: input.serviceId,
-            acceptedAt: new Date(),
-          },
-          select: { id: true },
+        // The request, and the service's prerequisites the Dossier lacks, to upload (#80).
+        const request = await ctx.prisma.$transaction(async (tx) => {
+          const created = await tx.stanzyRequest.create({
+            data: {
+              documentId: document.id,
+              requestedById: ctx.session.account.id,
+              serviceId: input.serviceId,
+              acceptedAt: new Date(),
+            },
+            select: { id: true },
+          });
+          await addPrerequisiteDocuments(tx, {
+            dossierId: dossier.id,
+            serviceName: service.name as unknown as Texts,
+            prerequisites: (service.prerequisites ?? []) as unknown as Prerequisite[],
+            locale: toLocale(dossier.account.locale),
+            addedById: ctx.session.account.id,
+          });
+          return created;
         });
         const client = dossier.account.name;
         mailLater('a Stanzy request', async () =>

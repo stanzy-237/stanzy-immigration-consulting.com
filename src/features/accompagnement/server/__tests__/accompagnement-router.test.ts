@@ -48,7 +48,7 @@ function fakeDatabase() {
   const documents: Row[] = [];
   const stanzy: Row[] = [];
   const services: Row[] = [
-    { id: 'svc_police', slug: 'certificat-de-police', active: true, documentKinds: ['policeCertificate'], name: { fr: 'Certificat de police', en: 'Police certificate' }, contractTitle: { fr: 'Contrat : police', en: 'Contract: police' }, contractBody: { fr: 'Texte {prix}', en: 'Text {prix}' } },
+    { id: 'svc_police', slug: 'certificat-de-police', active: true, documentKinds: ['policeCertificate'], name: { fr: 'Certificat de police', en: 'Police certificate' }, contractTitle: { fr: 'Contrat : police', en: 'Contract: police' }, contractBody: { fr: 'Texte {prix}', en: 'Text {prix}' }, prerequisites: [{ fr: 'CNI', en: 'National ID', kind: null }, { fr: 'Passeport', en: 'Passport', kind: 'passport' }] },
     { id: 'svc_off', slug: 'ancien', active: false, documentKinds: ['passport'], name: { fr: 'Ancien', en: 'Old' }, contractTitle: { fr: '', en: '' }, contractBody: { fr: '', en: '' } },
   ];
   let seq = 0;
@@ -117,8 +117,19 @@ function fakeDatabase() {
         sections.push(...data);
         return { count: data.length };
       },
+      findFirst: async ({ where }: { where: { dossierId: string } }) =>
+        [...sections].filter((sec) => sec.dossierId === where.dossierId).sort((a, b) => (b.position as number) - (a.position as number))[0] ?? null,
+      create: async ({ data }: { data: Row }) => {
+        const row = { ...data, id: `sec_${++seq}` };
+        sections.push(row);
+        return { id: row.id };
+      },
     },
     dossierDocument: {
+      findMany: async ({ where }: { where: { section: { dossierId: string } } }) =>
+        documents
+          .filter((d) => d.dossierId === where.section.dossierId)
+          .map((d) => ({ kind: d.kind ?? null, title: d.title, _count: { versions: 0 } })),
       createMany: async ({ data }: { data: Row[] }) => {
         for (const row of data) {
           const section = sections.find((sec) => sec.id === row.sectionId)!;
@@ -305,6 +316,15 @@ describe('« Stanzy s’en charge »', () => {
     await expect(callerFor(db, user()).accompagnement.stanzy.request(ask(police.id))).rejects.toMatchObject({
       message: 'STANZY_ALREADY_ASKED',
     });
+  });
+
+  it('adds the service’s prerequisites the Dossier lacks, in their own Section', async () => {
+    const { db, documents } = await approved();
+    const police = documents.find((d) => d.kind === 'policeCertificate')!;
+    await callerFor(db, user()).accompagnement.stanzy.request(ask(police.id));
+    // The passport is already in the Dossier (from the Checklist): only the CNI is added.
+    const added = documents.filter((d) => d.sectionTitle === 'Pièces pour : Certificat de police');
+    expect(added).toEqual([expect.objectContaining({ title: 'CNI', kind: null, need: 'mandatory', missing: true })]);
   });
 
   it('is for any Document without its Finale, through a service still offered', async () => {

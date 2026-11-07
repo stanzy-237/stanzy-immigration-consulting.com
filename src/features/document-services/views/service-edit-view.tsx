@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Plus, Save, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
@@ -46,6 +46,7 @@ const EMPTY: ServiceInput = {
   price: 0,
   unit: { fr: '', en: '' },
   documentKinds: [],
+  prerequisites: [],
 };
 
 type TextKey = { [K in keyof ServiceInput]: ServiceInput[K] extends Texts ? K : never }[keyof ServiceInput];
@@ -267,6 +268,69 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
           ))}
         </div>
       </fieldset>
+
+      <section className={card}>
+        <h2 className="font-heading text-lg font-bold text-navy-deep">{t('prerequisites')}</h2>
+        <p className="text-sm text-slate">{t('prerequisitesHint')}</p>
+        {form.prerequisites.length === 0 ? <p className="text-sm text-slate">{t('noPrerequisite')}</p> : null}
+        <ol className="grid grid-cols-1 gap-3">
+          {form.prerequisites.map((item, index) => {
+            const setItem = (patch: Partial<typeof item>) =>
+              update({ prerequisites: form.prerequisites.map((other, at) => (at === index ? { ...other, ...patch } : other)) });
+            return (
+              <li key={index} className="grid grid-cols-1 gap-2 rounded-xl border border-fog-light p-3 sm:grid-cols-2">
+                {(['fr', 'en'] as const).map((lang) => (
+                  <label key={lang} htmlFor={`${ids}-pre-${index}-${lang}`} className="grid gap-1 text-xs font-semibold text-slate">
+                    {t(`languages.${lang}`)}
+                    <input
+                      id={`${ids}-pre-${index}-${lang}`}
+                      value={item[lang]}
+                      maxLength={NAME_MAX}
+                      onChange={(event) => setItem({ [lang]: event.target.value })}
+                      className={field}
+                    />
+                  </label>
+                ))}
+                <div className="flex items-end gap-2 sm:col-span-2">
+                  <label htmlFor={`${ids}-pre-${index}-kind`} className="grid flex-1 gap-1 text-xs font-semibold text-slate">
+                    {t('prerequisiteKind')}
+                    <select
+                      id={`${ids}-pre-${index}-kind`}
+                      value={item.kind ?? ''}
+                      onChange={(event) => setItem({ kind: (event.target.value || null) as typeof item.kind })}
+                      className={field}
+                    >
+                      <option value="">{t('noKind')}</option>
+                      {DOCUMENTS.map((kind) => (
+                        <option key={kind} value={kind}>
+                          {DOCUMENT_GUIDES[locale][kind].name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => update({ prerequisites: form.prerequisites.filter((_, at) => at !== index) })}
+                    aria-label={t('removePrerequisite')}
+                    title={t('removePrerequisite')}
+                    className="inline-flex size-11 shrink-0 items-center justify-center rounded-full text-slate hover:bg-off-white hover:text-rouge"
+                  >
+                    <Trash2 aria-hidden={true} className="size-4" />
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+        <button
+          type="button"
+          onClick={() => update({ prerequisites: [...form.prerequisites, { fr: '', en: '', kind: null }] })}
+          className="inline-flex h-11 w-fit items-center gap-1.5 rounded-full border-2 border-navy-deep px-4 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white"
+        >
+          <Plus aria-hidden={true} className="size-4" />
+          {t('addPrerequisite')}
+        </button>
+      </section>
 
       {invalid ? (
         <p role="alert" className="text-sm font-medium text-rouge">

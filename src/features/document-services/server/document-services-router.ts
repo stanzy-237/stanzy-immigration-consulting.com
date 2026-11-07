@@ -4,7 +4,8 @@ import { z } from 'zod';
 
 import { livesInCameroon } from '@/features/accompagnement/server/residence';
 import { STARTER_SERVICES } from '@/features/document-services/data/starter-services';
-import { saveServiceInput, slugInput } from '@/features/document-services/lib/service-schema';
+import { saveServiceInput, slugInput, type Prerequisite } from '@/features/document-services/lib/service-schema';
+import { prerequisiteStates } from '@/features/document-services/server/prerequisites';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 import type { TRPCContext } from '@/server/trpc/context';
 
@@ -29,6 +30,7 @@ const shown = {
   price: true,
   unit: true,
   documentKinds: true,
+  prerequisites: true,
 } satisfies Prisma.DocumentServiceSelect;
 
 /** A Document of the viewer's own open Dossier that Stanzy could get for them, with no request under way. */
@@ -136,8 +138,11 @@ export const documentServicesRouter = createTRPCRouter({
       if (!service) throw notFound();
       const { account } = ctx.session;
       const available = account.role === 'CONSULTANT' || (await livesInCameroon(ctx.prisma, account.id));
-      if (!available) return { available, service: null, document: null };
+      if (!available) return { available, service: null, document: null, states: null };
       const document = input.documentId ? await askable(ctx.prisma, account.id, input.documentId) : null;
-      return { available, service, document };
+      // Coming from a Document: which of the service's prerequisites that Dossier already holds.
+      const prerequisites = (service.prerequisites ?? []) as unknown as Prerequisite[];
+      const states = document ? await prerequisiteStates(ctx.prisma, document.dossierId, prerequisites) : null;
+      return { available, service: { ...service, prerequisites }, document, states };
     }),
 });

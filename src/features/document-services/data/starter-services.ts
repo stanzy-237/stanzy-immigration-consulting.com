@@ -77,6 +77,7 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'PERCENT',
     unit: { fr: 'par dossier, en % du montant à justifier', en: 'per file, as a % of the amount to justify' },
     documentKinds: kinds('bankLetter', 'bankStatements'),
+    prerequisites: [],
   },
   {
     slug: 'preuve-de-fonds-sans-fonds',
@@ -102,6 +103,7 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'PERCENT',
     unit: { fr: 'par dossier, en % du montant à justifier', en: 'per file, as a % of the amount to justify' },
     documentKinds: kinds('bankLetter', 'bankStatements'),
+    prerequisites: [],
   },
   {
     slug: 'certificat-de-police',
@@ -127,6 +129,12 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par pays et par personne', en: 'per country and per person' },
     documentKinds: kinds('policeCertificate'),
+    prerequisites: [
+      { fr: 'Carte nationale d’identité (CNI)', en: 'National ID card (CNI)', kind: null },
+      { fr: 'Passeport', en: 'Passport', kind: 'passport' },
+      { fr: 'Acte de naissance', en: 'Birth certificate', kind: 'birthCertificate' },
+      { fr: 'Bulletin n° 3 (extrait de casier judiciaire)', en: 'Bulletin no. 3 (criminal record extract)', kind: null },
+    ],
   },
   {
     slug: 'attestation-cnps',
@@ -152,6 +160,7 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par emploi', en: 'per job' },
     documentKinds: kinds('socialSecurity'),
+    prerequisites: [],
   },
   {
     slug: 'compte-salaire',
@@ -177,6 +186,7 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par emploi', en: 'per job' },
     documentKinds: kinds('salaryStatements', 'payslips'),
+    prerequisites: [],
   },
   {
     slug: 'attestation-conformite-fiscale',
@@ -202,6 +212,7 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par attestation', en: 'per certificate' },
     documentKinds: kinds('selfEmployedProof'),
+    prerequisites: [],
   },
   {
     slug: 'pack-experience-pro',
@@ -227,5 +238,6 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par emploi', en: 'per job' },
     documentKinds: kinds('socialSecurity', 'salaryStatements'),
+    prerequisites: [],
   },
 ];

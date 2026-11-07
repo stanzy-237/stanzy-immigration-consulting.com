@@ -3748,7 +3748,15 @@
       "asked": "Request sent to Stanzy",
       "documentGone": "This document can’t be requested any more: it has its final version or a request is under way.",
       "howTo": "To request it, open the document in your file and choose “Stanzy takes care of it”.",
-      "loading": "Loading the service"
+      "loading": "Loading the service",
+      "prerequisites": "Documents needed",
+      "prerequisitesIntro": "What you hand over to Stanzy for this service.",
+      "prerequisitesForYou": "What you hand over to Stanzy for this service. Those missing will be added to your file, to upload.",
+      "prerequisiteStates": {
+        "held": "In your file",
+        "listed": "To upload",
+        "missing": "To provide"
+      }
     },
     "dashboard": {
       "title": "Document services",
@@ -3806,7 +3814,14 @@
         "SERVICE_SLUG_TAKEN": "This address is already another service’s.",
         "SERVICE_PERCENT_TOO_HIGH": "The percentage can’t be over 100%.",
         "UNKNOWN": "Something went wrong. Try again."
-      }
+      },
+      "prerequisites": "Documents needed",
+      "prerequisitesHint": "What the client hands over for this service. Link them to a Checklist document when they are one: the copy already in their file counts, with no duplicate.",
+      "noPrerequisite": "No document needed.",
+      "prerequisiteKind": "Checklist document (optional)",
+      "noKind": "— None —",
+      "addPrerequisite": "Add a document",
+      "removePrerequisite": "Remove this document"
     }
   }
 }

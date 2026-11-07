@@ -1264,6 +1264,9 @@ model DocumentService {
   unit          Json
   /// The Checklist documents it gets (`passport`, `policeCertificate`…): « Stanzy s'en charge » on one leads here.
   documentKinds String[]
+  /// What the Client must hand over for Stanzy to do it (police certificate: CNI, passport…):
+  /// `{ fr, en, kind }[]`, `kind` a Checklist document when it is one, so a Dossier's copy counts.
+  prerequisites Json            @default("[]")
   requests      StanzyRequest[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt

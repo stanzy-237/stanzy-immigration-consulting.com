@@ -14,6 +14,14 @@ export type Texts = Record<Locale, string>;
 
 const texts = (max: number, min = 0) => z.object({ fr: z.string().trim().min(min).max(max), en: z.string().trim().min(min).max(max) });
 
+/** A document the Client hands over for the service, named in both languages; a Checklist one when `kind` is set. */
+export const prerequisite = z.object({
+  fr: z.string().trim().min(2).max(NAME_MAX),
+  en: z.string().trim().min(2).max(NAME_MAX),
+  kind: z.enum(DOCUMENTS).nullable(),
+});
+export type Prerequisite = z.infer<typeof prerequisite>;
+
 /** A Service documentaire as the consultant writes it in the Tableau de bord (#80). */
 export const serviceInput = z
   .object({
@@ -36,6 +44,7 @@ export const serviceInput = z
     price: z.number().int().min(0).max(1_000_000_000),
     unit: texts(NAME_MAX),
     documentKinds: z.array(z.enum(DOCUMENTS)).max(DOCUMENTS.length),
+    prerequisites: z.array(prerequisite).max(20),
   })
   .refine((service) => service.priceKind === 'FIXED' || service.price <= PERCENT_MAX, {
     message: 'SERVICE_PERCENT_TOO_HIGH',

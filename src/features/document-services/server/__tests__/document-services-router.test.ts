@@ -65,6 +65,8 @@ function fakeDatabase(residence: 'CM' | 'CA' = 'CM') {
         const dossier = dossiers.find((d) => d.id === document.dossierId)!;
         return { ...pick(document), section: { dossier }, stanzyRequests: document.open };
       },
+      findMany: async () =>
+        documents.map((d) => ({ kind: d.kind, title: d.title, _count: { versions: d.kind === 'passport' ? 1 : 0 } })),
     },
   };
   return { db: db as unknown as TRPCContext['prisma'], services, documents };
@@ -125,6 +127,7 @@ describe('the catalogue, in « Mon espace »', () => {
       available: false,
       service: null,
       document: null,
+      states: null,
     });
   });
 
@@ -133,6 +136,8 @@ describe('the catalogue, in « Mon espace »', () => {
     const page = await callerFor(db, client).get({ slug: 'certificat-de-police', documentId: 'doc_police' });
     expect(page.service).toMatchObject({ slug: 'certificat-de-police', price: 30_000 });
     expect(page.document).toEqual({ id: 'doc_police', title: 'Certificat de police', kind: 'policeCertificate', dossierId: 'dos_1' });
+    // CNI, passport (held), birth certificate, bulletin n° 3.
+    expect(page.states).toEqual(['missing', 'held', 'missing', 'missing']);
     expect((await callerFor(db, client).get({ slug: 'certificat-de-police', documentId: 'doc_final' })).document).toBeNull();
     await expect(callerFor(db, client).get({ slug: 'brouillon', documentId: null })).rejects.toMatchObject({ code: 'NOT_FOUND' });
   });

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowLeft, Clock, FileText, HandHelping, ListChecks, ScrollText, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Circle, Clock, FileStack, FileText, HandHelping, ListChecks, ScrollText, ShieldCheck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useId, useState, type ReactNode } from 'react';
 
@@ -59,7 +59,7 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
       </div>
     );
   }
-  const { service, document } = data;
+  const { service, document, states } = data;
   const facts = [
     { key: 'provides', icon: ListChecks, text: textIn(service.provides, locale) },
     { key: 'turnaround', icon: Clock, text: textIn(service.turnaround, locale) },
@@ -92,6 +92,44 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
               </li>
             ))}
           </ul>
+
+          {service.prerequisites.length > 0 ? (
+            <section aria-labelledby="service-prerequisites" className="rounded-2xl bg-white p-6 shadow-sm">
+              <h2 id="service-prerequisites" className="flex items-center gap-2 font-heading text-xl font-bold text-navy-deep">
+                <FileStack aria-hidden={true} className="size-5 text-rouge" />
+                {t('prerequisites')}
+              </h2>
+              <p className="mt-1 text-sm text-slate">{document ? t('prerequisitesForYou') : t('prerequisitesIntro')}</p>
+              <ul className="mt-4 grid grid-cols-1 gap-2">
+                {service.prerequisites.map((item, index) => {
+                  const state = states?.[index];
+                  return (
+                    <li key={index} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-off-white px-4 py-3">
+                      <span className="flex items-center gap-2 text-sm font-semibold text-navy-deep">
+                        {state === 'held' ? (
+                          <CheckCircle2 aria-hidden={true} className="size-4 shrink-0 text-leaf" />
+                        ) : (
+                          <Circle aria-hidden={true} className="size-4 shrink-0 text-slate" />
+                        )}
+                        {item[locale === 'en' ? 'en' : 'fr']}
+                      </span>
+                      {state ? (
+                        <span
+                          className={
+                            state === 'held'
+                              ? 'rounded-full bg-leaf-tint px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-leaf'
+                              : 'rounded-full bg-honey-tint px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-honey'
+                          }
+                        >
+                          {t(`prerequisiteStates.${state}`)}
+                        </span>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ) : null}
 
           <section aria-labelledby="service-contract" className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 id="service-contract" className="flex items-center gap-2 font-heading text-xl font-bold text-navy-deep">

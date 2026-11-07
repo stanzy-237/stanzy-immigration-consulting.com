@@ -3765,7 +3765,15 @@
       "asked": "Demande envoyée à Stanzy",
       "documentGone": "Ce document n’est plus à demander : il a sa version finale ou une demande est déjà en cours.",
       "howTo": "Pour le demander, ouvrez le document dans votre dossier et choisissez « Stanzy s’en charge ».",
-      "loading": "Chargement du service"
+      "loading": "Chargement du service",
+      "prerequisites": "Documents nécessaires",
+      "prerequisitesIntro": "Ce que vous remettez à Stanzy pour ce service.",
+      "prerequisitesForYou": "Ce que vous remettez à Stanzy pour ce service. Ceux qui manquent s’ajouteront à votre dossier, à téléverser.",
+      "prerequisiteStates": {
+        "held": "Dans votre dossier",
+        "listed": "À téléverser",
+        "missing": "À fournir"
+      }
     },
     "dashboard": {
       "title": "Services documentaires",
@@ -3823,7 +3831,14 @@
         "SERVICE_SLUG_TAKEN": "Cette adresse est déjà prise par un autre service.",
         "SERVICE_PERCENT_TOO_HIGH": "Le pourcentage ne peut pas dépasser 100 %.",
         "UNKNOWN": "Une erreur est survenue. Réessayez."
-      }
+      },
+      "prerequisites": "Documents nécessaires",
+      "prerequisitesHint": "Ce que le client remet pour ce service. Liez-les à un document de la Checklist quand c’en est un : la copie déjà dans son dossier compte, sans doublon.",
+      "noPrerequisite": "Aucun document nécessaire.",
+      "prerequisiteKind": "Document de la Checklist (facultatif)",
+      "noKind": "— Aucun —",
+      "addPrerequisite": "Ajouter un document",
+      "removePrerequisite": "Retirer ce document"
     }
   }
 }
