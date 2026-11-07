@@ -2676,7 +2676,17 @@
         "uploading": "Uploading…",
         "saved": "Image saved",
         "failed": "The image could not be saved. PNG or JPEG, 2 MB at most.",
-        "preview": "Preview: {label}"
+        "preview": "Preview: {label}",
+        "draw": "Sign here",
+        "drawTitle": "Your signature",
+        "drawHint": "Sign in the box, with a mouse, a pen or a finger. It will appear on every contract sent.",
+        "ink": "Ink",
+        "inks": {
+          "black": "Black",
+          "blue": "Blue"
+        },
+        "cancel": "Cancel",
+        "drawSave": "Save the signature"
       },
       "pending": {
         "title": "Waiting for signature",

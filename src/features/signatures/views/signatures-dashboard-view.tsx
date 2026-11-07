@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, PenLine } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
@@ -9,7 +9,10 @@ import { useId, useState, type ChangeEvent, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/toast';
+import { SignaturePad } from '@/features/shared/components/signing/signature-pad';
+import { INKS, type Ink } from '@/features/signatures/lib/inks';
 import { ASSET_KINDS, ASSET_MAX_BYTES, ASSET_TYPES, type AssetKind } from '@/features/signatures/lib/signature-schema';
 import { useTRPC } from '@/trpc/client';
 
@@ -62,6 +65,7 @@ function AssetSlot({ kind, updatedAt }: { kind: AssetKind; updatedAt: Date | nul
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const [sending, setSending] = useState(false);
+  const [drawing, setDrawing] = useState(false);
   const label = t(kind);
 
   const choose = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +76,11 @@ function AssetSlot({ kind, updatedAt }: { kind: AssetKind; updatedAt: Date | nul
       toast.add({ title: t('failed'), type: 'warning' });
       return;
     }
+    await send(file);
+  };
+
+  /** The image to the server, encrypted there like any other: chosen from a file, or drawn here. */
+  const send = async (file: File) => {
     setSending(true);
     try {
       const form = new FormData();
@@ -117,14 +126,95 @@ function AssetSlot({ kind, updatedAt }: { kind: AssetKind; updatedAt: Date | nul
         aria-label={`${updatedAt ? t('replace') : t('add')} : ${label}`}
         className="peer sr-only"
       />
-      <label
-        htmlFor={id}
-        className="inline-flex h-10 w-fit cursor-pointer items-center gap-2 rounded-full border-2 border-navy-deep px-4 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-navy-deep peer-disabled:cursor-wait peer-disabled:opacity-50"
-      >
-        <ImagePlus aria-hidden={true} className="size-4" />
-        {sending ? t('uploading') : updatedAt ? t('replace') : t('add')}
-      </label>
+      <div className="flex flex-wrap gap-2">
+        {/* The signature can also be drawn, as on a Contrat; the stamp is an image. */}
+        {kind === 'SIGNATURE' ? (
+          <button
+            type="button"
+            disabled={sending}
+            onClick={() => setDrawing(true)}
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-navy-deep px-4 text-sm font-semibold text-white hover:bg-navy-80 disabled:opacity-50"
+          >
+            <PenLine aria-hidden={true} className="size-4" />
+            {t('draw')}
+          </button>
+        ) : null}
+        <label
+          htmlFor={id}
+          className="inline-flex h-10 w-fit cursor-pointer items-center gap-2 rounded-full border-2 border-navy-deep px-4 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-navy-deep peer-disabled:cursor-wait peer-disabled:opacity-50"
+        >
+          <ImagePlus aria-hidden={true} className="size-4" />
+          {sending ? t('uploading') : updatedAt ? t('replace') : t('add')}
+        </label>
+      </div>
+      {drawing ? (
+        <DrawSignature
+          onClose={() => setDrawing(false)}
+          onSave={async (file) => {
+            setDrawing(false);
+            await send(file);
+          }}
+        />
+      ) : null}
     </div>
+  );
+}
+
+/** The pad's PNG data URL as a file to upload. */
+function pngFile(dataUrl: string): File {
+  const bytes = Uint8Array.from(atob(dataUrl.slice(dataUrl.indexOf(',') + 1)), (char) => char.charCodeAt(0));
+  return new File([bytes], 'signature.png', { type: 'image/png' });
+}
+
+/** The consultant signs on the pad, in black or blue ink; saved as the transparent PNG the Contrats carry. */
+function DrawSignature({ onClose, onSave }: { onClose: () => void; onSave: (file: File) => Promise<void> }): ReactNode {
+  const t = useTranslations('Signatures.dashboard.assets');
+  const [ink, setInk] = useState<Ink>('black');
+  const [png, setPng] = useState<string | null>(null);
+  const hint = useId();
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-lg gap-4 p-6">
+        <DialogHeader>
+          <DialogTitle className="font-heading text-xl font-bold text-navy-deep">{t('drawTitle')}</DialogTitle>
+          <DialogDescription id={hint} className="text-sm text-slate">
+            {t('drawHint')}
+          </DialogDescription>
+        </DialogHeader>
+        <div role="radiogroup" aria-label={t('ink')} className="flex gap-2">
+          {(Object.keys(INKS) as Ink[]).map((choice) => (
+            <button
+              key={choice}
+              type="button"
+              role="radio"
+              aria-checked={ink === choice}
+              onClick={() => setInk(choice)}
+              className="inline-flex h-9 items-center gap-2 rounded-full border-2 border-fog-light px-3 text-sm font-semibold text-navy-deep aria-checked:border-navy-deep"
+            >
+              <span aria-hidden={true} className="size-3 rounded-full" style={{ backgroundColor: INKS[choice] }} />
+              {t(`inks.${choice}`)}
+            </button>
+          ))}
+        </div>
+        <SignaturePad ink={ink} onChange={setPng} describedBy={hint} />
+        <div className="flex justify-end gap-2">
+          <button type="button" onClick={onClose} className="h-11 rounded-full px-4 text-sm font-semibold text-navy-deep hover:bg-off-white">
+            {t('cancel')}
+          </button>
+          <button
+            type="button"
+            disabled={!png}
+            onClick={async () => {
+              if (!png) return;
+              await onSave(pngFile(png));
+            }}
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson disabled:opacity-50"
+          >
+            {t('drawSave')}
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

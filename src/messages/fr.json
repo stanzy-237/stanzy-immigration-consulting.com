@@ -2693,7 +2693,17 @@
         "uploading": "Envoi…",
         "saved": "Image enregistrée",
         "failed": "L’image n’a pas pu être enregistrée. PNG ou JPEG, 2 Mo au plus.",
-        "preview": "Aperçu : {label}"
+        "preview": "Aperçu : {label}",
+        "draw": "Signer ici",
+        "drawTitle": "Votre signature",
+        "drawHint": "Signez dans le cadre, à la souris, au stylet ou au doigt. Elle figurera sur chaque contrat envoyé.",
+        "ink": "Encre",
+        "inks": {
+          "black": "Noir",
+          "blue": "Bleu"
+        },
+        "cancel": "Annuler",
+        "drawSave": "Enregistrer la signature"
       },
       "pending": {
         "title": "En attente de signature",

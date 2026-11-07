@@ -7,6 +7,7 @@ import { axe } from 'vitest-axe';
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { SignatureRequestNewView } from '@/features/signatures/views/signature-request-new-view';
 import { SignView } from '@/features/signatures/views/sign-view';
+import { SignaturesDashboardView } from '@/features/signatures/views/signatures-dashboard-view';
 import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /**
@@ -306,5 +307,35 @@ describe('SignatureRequestNewView, for the consultant', () => {
     expect(screen.getByText('1 champ placé')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Retirer le champ Signature et cachet Stanzy' }));
     expect(screen.getByText('Aucun champ placé')).toBeInTheDocument();
+  });
+});
+
+describe('the consultant’s signature and stamp', () => {
+  it('draws the signature in the signing tool and saves it', async () => {
+    const posted: FormData[] = [];
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+      posted.push(init?.body as FormData);
+      return new Response(null, { status: 204 });
+    });
+    const { trpc, queryClient, wrap } = createTestTRPC({
+      'signatures.assets': () => ({ SIGNATURE: null, STAMP: null }),
+      'signatures.pending': () => [],
+    });
+    queryClient.setQueryData(trpc.signatures.assets.queryKey(), { SIGNATURE: null, STAMP: null } as never);
+    queryClient.setQueryData(trpc.signatures.pending.queryKey(), [] as never);
+    render(withIntl(wrap(<SignaturesDashboardView />)));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Signer ici' }));
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('radio', { name: /Bleu/ }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'draw' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer la signature' }));
+
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]!.get('kind')).toBe('SIGNATURE');
+    expect((posted[0]!.get('file') as File).type).toBe('image/png');
+    // The stamp is an image to upload, not drawn.
+    expect(screen.getAllByRole('button', { name: 'Signer ici' })).toHaveLength(1);
+    fetchMock.mockRestore();
   });
 });
