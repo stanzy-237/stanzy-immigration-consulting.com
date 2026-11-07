@@ -51,6 +51,7 @@ const data = (comments: ReturnType<typeof comment>[] = []): SectionsData => ({
           need: null,
           missing: false,
           clientNote: null,
+          clientForm: null,
           stanzyRequests: [],
         },
       ],

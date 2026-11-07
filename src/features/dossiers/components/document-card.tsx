@@ -1,8 +1,10 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { ChevronDown, ExternalLink, FileText, Star, Trash2, Upload } from 'lucide-react';
+import { ChevronDown, ClipboardList, ExternalLink, FileText, Star, Trash2, Upload } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
+// The Tableau de bord runs on admin.<site>: plain links to its short paths (see dashboard-host).
+import NextLink from 'next/link';
 import { useId, useState, type ChangeEvent, type ReactNode } from 'react';
 
 import {
@@ -15,6 +17,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from '@/components/ui/toast';
+import { isFormKind } from '@/features/client-forms/lib/form-schema';
 import { DocumentConversation } from '@/features/dossiers/components/document-conversation';
 import { useDocumentFocus } from '@/features/dossiers/components/document-focus';
 import { DocumentNeeds, NeedBadges } from '@/features/dossiers/components/document-needs';
@@ -30,6 +33,7 @@ import { useDocumentsMutation } from '@/features/dossiers/hooks/use-documents-mu
 import { DOCUMENT_FILE_TYPES } from '@/features/dossiers/lib/document-schema';
 import { withFinal, withoutDocument, type SectionsData } from '@/features/dossiers/lib/documents-cache';
 import { uploadVersionFile, versionFileUrl } from '@/features/dossiers/lib/upload-version';
+import { Link } from '@/i18n/navigation';
 import { isOptimistic } from '@/lib/optimistic-list';
 import { useTRPC } from '@/trpc/client';
 
@@ -120,6 +124,7 @@ export function DocumentCard({
 
       {expanded ? (
         <div id={`${ids}-panel`} className="grid grid-cols-1 gap-5 border-t border-fog-light p-4">
+          {isFormKind(document.kind) ? <FormLink dossierId={dossierId} document={document} viewer={viewer} /> : null}
           <DocumentNeeds dossierId={dossierId} document={document} viewer={viewer} open={open} />
           <div>
             <h4 className="text-sm font-semibold text-navy-deep">{t('versions')}</h4>
@@ -341,5 +346,35 @@ function DeleteDocumentDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  );
+}
+
+/**
+ * For « Historique personnel » and « Renseignements sur la famille »: the way
+ * to the form, filled in here the way IRCC asks rather than as a file.
+ */
+function FormLink({ dossierId, document, viewer }: { dossierId: string; document: DocumentData; viewer: Viewer }): ReactNode {
+  const t = useTranslations('ClientForms');
+  const label = viewer === 'client' && !document.clientForm?.complete ? t('fill') : t('open');
+  const className =
+    'flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-navy-deep bg-white px-4 py-3 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white';
+  const content = (
+    <>
+      <span className="flex items-center gap-2">
+        <ClipboardList aria-hidden={true} className="size-5" />
+        {label}
+      </span>
+      <span className="text-xs font-normal">{t('formHint')}</span>
+    </>
+  );
+  // « Mon espace » goes through the locale; the Tableau de bord has its short paths.
+  return viewer === 'client' ? (
+    <Link href={`/mon-espace/dossiers/${dossierId}/formulaires/${document.id}`} className={className}>
+      {content}
+    </Link>
+  ) : (
+    <NextLink href={`/dossiers/${dossierId}/formulaires/${document.id}`} className={className}>
+      {content}
+    </NextLink>
   );
 }

@@ -3825,5 +3825,116 @@
         "UNKNOWN": "Une erreur est survenue. Réessayez."
       }
     }
+  },
+  "ClientForms": {
+    "metaTitle": "Renseignements du client",
+    "back": "Retour au dossier",
+    "loading": "Chargement du formulaire",
+    "fill": "Remplir le formulaire",
+    "open": "Voir le formulaire",
+    "formHint": "Comme sur IRCC, période par période",
+    "badgeComplete": "Formulaire complet",
+    "badgeIncomplete": "Formulaire incomplet",
+    "badgeToFill": "Formulaire à remplir",
+    "updated": "Enregistré par {name} le {date}",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "savedState": "Enregistré",
+    "saved": "Formulaire enregistré",
+    "savedComplete": "Formulaire enregistré : rien ne manque",
+    "failed": "Enregistrement impossible. Vérifiez les dates (AAAA-MM) et réessayez.",
+    "nothingMissing": "Rien ne manque",
+    "missingCount": "{count, plural, one {# point à compléter} other {# points à compléter}}",
+    "closed": "Le dossier est clôturé : le formulaire ne peut plus changer.",
+    "history": {
+      "intro": "Ce que vous avez fait et où vous avez vécu, mois par mois, sans période vide : IRCC demande les 10 dernières années (ou depuis vos 18 ans).",
+      "birthDate": "Votre date de naissance",
+      "window": "Période à couvrir : de {from} à {to}.",
+      "activities": "Activités",
+      "activitiesIntro": "Études, emplois, travail autonome, sans emploi, recherche d’emploi, voyages… Une période sans activité se déclare aussi.",
+      "addresses": "Adresses",
+      "addressesIntro": "Chaque adresse où vous avez vécu, avec ses dates.",
+      "addActivity": "Ajouter une activité",
+      "addAddress": "Ajouter une adresse",
+      "covered": "Toute la période est couverte.",
+      "gapsLabel": "Périodes manquantes",
+      "gap": "Période manquante : {period}",
+      "fill": "Ajouter cette période",
+      "none": "Rien pour l’instant.",
+      "from": "Du (mois)",
+      "to": "Au (mois)",
+      "now": "À ce jour",
+      "kind": "Activité",
+      "remove": "Retirer",
+      "kinds": {
+        "study": "Études",
+        "work": "Emploi",
+        "selfEmployed": "Travail autonome",
+        "unemployed": "Sans emploi",
+        "jobSearch": "Recherche d’emploi",
+        "homemaker": "Au foyer",
+        "travel": "Voyage",
+        "retired": "Retraite",
+        "other": "Autre"
+      },
+      "fields": {
+        "title": "Établissement, employeur et poste, ou motif",
+        "status": "Statut dans le pays",
+        "city": "Ville",
+        "country": "Pays",
+        "line": "Adresse (numéro, rue)",
+        "province": "Région / province",
+        "postalCode": "Code postal"
+      }
+    },
+    "family": {
+      "intro": "Toute votre famille proche, qu’elle vienne au Canada ou non : conjoint, enfants (même adultes), parents, frères et sœurs.",
+      "complete": "Rien ne manque.",
+      "remove": "Retirer",
+      "choose": "Choisir…",
+      "deceased": "Décédé(e)",
+      "accompanying": "Vient au Canada",
+      "missing": {
+        "applicant": "Ajoutez le requérant principal.",
+        "mother": "Ajoutez votre mère (même décédée).",
+        "father": "Ajoutez votre père (même décédé).",
+        "details": "Chaque personne a besoin d’un nom et d’une date de naissance."
+      },
+      "add": {
+        "applicant": "Requérant principal",
+        "spouse": "Conjoint(e)",
+        "child": "Enfant",
+        "mother": "Mère",
+        "father": "Père",
+        "sibling": "Frère / sœur"
+      },
+      "relations": {
+        "applicant": "Requérant principal",
+        "spouse": "Conjoint(e)",
+        "child": "Enfant",
+        "mother": "Mère",
+        "father": "Père",
+        "sibling": "Frère / sœur"
+      },
+      "marital": {
+        "single": "Célibataire",
+        "married": "Marié(e)",
+        "commonLaw": "Union de fait",
+        "divorced": "Divorcé(e)",
+        "separated": "Séparé(e)",
+        "widowed": "Veuf / veuve",
+        "annulled": "Mariage annulé"
+      },
+      "fields": {
+        "name": "Nom complet",
+        "birthDate": "Date de naissance",
+        "birthCountry": "Pays de naissance",
+        "maritalStatus": "État civil",
+        "address": "Adresse actuelle",
+        "occupation": "Profession",
+        "deathDate": "Date du décès",
+        "deathPlace": "Lieu du décès"
+      }
+    }
   }
 }

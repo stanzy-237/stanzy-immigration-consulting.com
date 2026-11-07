@@ -3808,5 +3808,116 @@
         "UNKNOWN": "Something went wrong. Try again."
       }
     }
+  },
+  "ClientForms": {
+    "metaTitle": "Client information",
+    "back": "Back to the file",
+    "loading": "Loading the form",
+    "fill": "Fill in the form",
+    "open": "See the form",
+    "formHint": "As on IRCC, period by period",
+    "badgeComplete": "Form complete",
+    "badgeIncomplete": "Form incomplete",
+    "badgeToFill": "Form to fill in",
+    "updated": "Saved by {name} on {date}",
+    "save": "Save",
+    "saving": "Saving…",
+    "savedState": "Saved",
+    "saved": "Form saved",
+    "savedComplete": "Form saved: nothing is missing",
+    "failed": "Couldn’t save. Check the dates (YYYY-MM) and try again.",
+    "nothingMissing": "Nothing is missing",
+    "missingCount": "{count, plural, one {# item to complete} other {# items to complete}}",
+    "closed": "The file is closed: the form can’t change any more.",
+    "history": {
+      "intro": "What you did and where you lived, month by month, with no empty period: IRCC asks for the last 10 years (or since you turned 18).",
+      "birthDate": "Your date of birth",
+      "window": "Period to cover: from {from} to {to}.",
+      "activities": "Activities",
+      "activitiesIntro": "Studies, jobs, self-employment, unemployment, job search, travel… A period with no activity is declared too.",
+      "addresses": "Addresses",
+      "addressesIntro": "Every address where you lived, with its dates.",
+      "addActivity": "Add an activity",
+      "addAddress": "Add an address",
+      "covered": "The whole period is covered.",
+      "gapsLabel": "Missing periods",
+      "gap": "Missing period: {period}",
+      "fill": "Add this period",
+      "none": "Nothing yet.",
+      "from": "From (month)",
+      "to": "To (month)",
+      "now": "To date",
+      "kind": "Activity",
+      "remove": "Remove",
+      "kinds": {
+        "study": "Studies",
+        "work": "Employment",
+        "selfEmployed": "Self-employed",
+        "unemployed": "Unemployed",
+        "jobSearch": "Job search",
+        "homemaker": "Homemaker",
+        "travel": "Travel",
+        "retired": "Retired",
+        "other": "Other"
+      },
+      "fields": {
+        "title": "School, employer and position, or purpose",
+        "status": "Status in the country",
+        "city": "City",
+        "country": "Country",
+        "line": "Address (number, street)",
+        "province": "Region / province",
+        "postalCode": "Postal code"
+      }
+    },
+    "family": {
+      "intro": "All your close family, whether they come to Canada or not: spouse, children (adults too), parents, brothers and sisters.",
+      "complete": "Nothing is missing.",
+      "remove": "Remove",
+      "choose": "Choose…",
+      "deceased": "Deceased",
+      "accompanying": "Comes to Canada",
+      "missing": {
+        "applicant": "Add the principal applicant.",
+        "mother": "Add your mother (even if deceased).",
+        "father": "Add your father (even if deceased).",
+        "details": "Each person needs a name and a date of birth."
+      },
+      "add": {
+        "applicant": "Principal applicant",
+        "spouse": "Spouse",
+        "child": "Child",
+        "mother": "Mother",
+        "father": "Father",
+        "sibling": "Brother / sister"
+      },
+      "relations": {
+        "applicant": "Principal applicant",
+        "spouse": "Spouse",
+        "child": "Child",
+        "mother": "Mother",
+        "father": "Father",
+        "sibling": "Brother / sister"
+      },
+      "marital": {
+        "single": "Single",
+        "married": "Married",
+        "commonLaw": "Common-law",
+        "divorced": "Divorced",
+        "separated": "Separated",
+        "widowed": "Widowed",
+        "annulled": "Annulled marriage"
+      },
+      "fields": {
+        "name": "Full name",
+        "birthDate": "Date of birth",
+        "birthCountry": "Country of birth",
+        "maritalStatus": "Marital status",
+        "address": "Current address",
+        "occupation": "Occupation",
+        "deathDate": "Date of death",
+        "deathPlace": "Place of death"
+      }
+    }
   }
 }

@@ -79,6 +79,8 @@ export const documentsRouter = createTRPCRouter({
             need: true,
             missing: true,
             clientNote: true,
+            /** For a form Document (Historique personnel, Famille): whether it is filled in (#79). */
+            clientForm: { select: { complete: true, updatedAt: true } },
             /** The latest « Stanzy s'en charge » request on it, if any. */
             stanzyRequests: {
               orderBy: { createdAt: 'desc' },
