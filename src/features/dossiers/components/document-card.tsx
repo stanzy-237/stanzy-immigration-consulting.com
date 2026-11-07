@@ -72,7 +72,7 @@ export function DocumentCard({
 
   return (
     <div className="rounded-xl border border-fog-light">
-      <div className="flex items-center gap-2 p-3">
+      <div className="flex items-center gap-1 p-3 sm:gap-2">
         <button
           type="button"
           aria-expanded={expanded}
@@ -81,22 +81,25 @@ export function DocumentCard({
           className="flex min-w-0 flex-1 items-center gap-3 text-left"
         >
           <FileText aria-hidden={true} className="size-5 shrink-0 text-slate" />
+          {/* The name keeps the width; the badges go under it, wrapping on a phone. */}
           <span className="min-w-0 flex-1">
-            <span className="block truncate font-semibold text-navy-deep">{document.title}</span>
+            <span className="block font-semibold break-words text-navy-deep">{document.title}</span>
             <span className="block truncate text-xs text-slate">
               {t('addedBy', { name: document.addedBy.name })}
               {' · '}
               {latest ? t('versionCount', { count: document.versions.length }) : t('noVersion')}
             </span>
-          </span>
-          {final ? (
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-leaf-tint px-2.5 py-1 text-xs font-semibold text-leaf">
-              <Star aria-hidden={true} className="size-3" />
-              {t('finalBadge', { number: final.number })}
+            <span className="mt-1.5 flex flex-wrap items-center gap-1.5 empty:hidden">
+              {final ? (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-leaf-tint px-2.5 py-1 text-xs font-semibold text-leaf">
+                  <Star aria-hidden={true} className="size-3" />
+                  {t('finalBadge', { number: final.number })}
+                </span>
+              ) : null}
+              <NeedBadges document={document} />
+              <SignatureBadge document={document} viewer={viewer} />
             </span>
-          ) : null}
-          <NeedBadges document={document} />
-          <SignatureBadge document={document} viewer={viewer} />
+          </span>
           <ChevronDown
             aria-hidden={true}
             className={expanded ? 'size-4 shrink-0 rotate-180 text-slate' : 'size-4 shrink-0 text-slate'}

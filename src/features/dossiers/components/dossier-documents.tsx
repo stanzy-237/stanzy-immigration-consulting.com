@@ -137,7 +137,7 @@ function SectionCard({
 
   return (
     <article className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
-      <header className="flex flex-wrap items-center justify-between gap-2">
+      <header className="flex items-start justify-between gap-2">
         {renaming ? (
           <TitleForm
             label={t('sectionTitle')}
@@ -151,9 +151,10 @@ function SectionCard({
           />
         ) : (
           <>
-            <h3 className="font-heading text-lg font-bold text-navy-deep">{section.title}</h3>
+            {/* A long title wraps on its own; the rename and delete buttons stay beside it. */}
+            <h3 className="min-w-0 flex-1 font-heading text-lg font-bold break-words text-navy-deep">{section.title}</h3>
             {consultant && open && !pending ? (
-              <div className="flex items-center gap-1">
+              <div className="flex shrink-0 items-center gap-1">
                 <button
                   type="button"
                   onClick={() => setRenaming(true)}

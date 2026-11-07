@@ -29,7 +29,7 @@ export function FinanceSettingsView({ year }: { year: number }): ReactNode {
   return (
     <div className="mx-auto grid grid-cols-1 max-w-5xl gap-6">
       <FinancesHeader page="settings" year={year} />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <section aria-labelledby="finance-categories" className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
           <h2 id="finance-categories" className="font-heading text-lg font-bold text-navy-deep">
             {t('categories')}

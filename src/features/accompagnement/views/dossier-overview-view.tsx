@@ -42,7 +42,7 @@ function Overview({ dossierId, viewer }: { dossierId: string; viewer: 'consultan
   const { data } = useSuspenseQuery(trpc.accompagnement.overview.queryOptions({ dossierId }));
   if (!data) return null;
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <section aria-labelledby={`${dossierId}-crs`} className={`${card} flex flex-col gap-2`}>
         <h2 id={`${dossierId}-crs`} className="flex items-center gap-2 text-sm font-semibold text-slate">
           <Gauge aria-hidden={true} className="size-4 text-rouge" />
@@ -156,7 +156,7 @@ function ItaDateForm({ dossierId, itaDate }: { dossierId: string; itaDate: strin
 
 function OverviewSkeleton(): ReactNode {
   return (
-    <div aria-hidden={true} className="grid gap-4 sm:grid-cols-3">
+    <div aria-hidden={true} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <Skeleton className="h-28 rounded-2xl" />
       <Skeleton className="h-28 rounded-2xl sm:col-span-2" />
     </div>

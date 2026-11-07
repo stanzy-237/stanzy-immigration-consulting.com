@@ -83,7 +83,7 @@ export function DossierStatePill({
   const t = useTranslations('Dossiers');
   const state = displayState(dossier.service, dossier.stage, dossier.state);
   return (
-    <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${PILL[state]}`}>
+    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold tracking-wider whitespace-nowrap uppercase ${PILL[state]}`}>
       {t(`state.${state}`)}
     </span>
   );
