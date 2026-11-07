@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Plus, Save, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
@@ -18,8 +18,12 @@ import {
   CONTRACT_MAX,
   NAME_MAX,
   PERCENT_MAX,
+  PREREQUISITE_TYPES,
+  prerequisiteKey,
+  QUESTIONNAIRES,
   serviceInput,
   TEXT_MAX,
+  type Questionnaire,
   type ServiceInput,
   type Texts,
 } from '@/features/document-services/lib/service-schema';
@@ -46,6 +50,21 @@ const EMPTY: ServiceInput = {
   price: 0,
   unit: { fr: '', en: '' },
   documentKinds: [],
+  prerequisites: [],
+  questionnaire: null,
+};
+
+/** Keys for the prerequisites added in the form, from their French names; those saved keep theirs (files hang on them). */
+const withKeys = (items: ServiceInput['prerequisites']): ServiceInput['prerequisites'] => {
+  const taken = new Set(items.map((item) => item.key).filter(Boolean));
+  return items.map((item) => {
+    if (item.key) return item;
+    const base = prerequisiteKey(item.fr);
+    let key = base;
+    for (let n = 2; taken.has(key); n++) key = `${base.slice(0, 36)}-${n}`;
+    taken.add(key);
+    return { ...item, key };
+  });
 };
 
 type TextKey = { [K in keyof ServiceInput]: ServiceInput[K] extends Texts ? K : never }[keyof ServiceInput];
@@ -123,7 +142,11 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
     event.preventDefault();
     const typed = Number(price.replace(/\s/g, '').replace(',', '.'));
     const amount = form.priceKind === 'FIXED' ? Math.round(typed) : Math.round(typed * 100);
-    const parsed = serviceInput.safeParse({ ...form, price: Number.isFinite(amount) ? amount : -1 });
+    const parsed = serviceInput.safeParse({
+      ...form,
+      prerequisites: withKeys(form.prerequisites),
+      price: Number.isFinite(amount) ? amount : -1,
+    });
     setInvalid(!parsed.success);
     if (parsed.success) save.mutate({ id, service: parsed.data });
   };
@@ -267,6 +290,113 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
           ))}
         </div>
       </fieldset>
+
+      <section className={card}>
+        <h2 className="font-heading text-lg font-bold text-navy-deep">{t('prerequisites')}</h2>
+        <p className="text-sm text-slate">{t('prerequisitesHint')}</p>
+        {form.prerequisites.length === 0 ? <p className="text-sm text-slate">{t('noPrerequisite')}</p> : null}
+        <ol className="grid grid-cols-1 gap-3">
+          {form.prerequisites.map((item, index) => {
+            const setItem = (patch: Partial<typeof item>) =>
+              update({ prerequisites: form.prerequisites.map((other, at) => (at === index ? { ...other, ...patch } : other)) });
+            return (
+              <li key={index} className="grid grid-cols-1 gap-2 rounded-xl border border-fog-light p-3 sm:grid-cols-2">
+                {(['fr', 'en'] as const).map((lang) => (
+                  <label key={lang} htmlFor={`${ids}-pre-${index}-${lang}`} className="grid gap-1 text-xs font-semibold text-slate">
+                    {t(`languages.${lang}`)}
+                    <input
+                      id={`${ids}-pre-${index}-${lang}`}
+                      value={item[lang]}
+                      maxLength={NAME_MAX}
+                      onChange={(event) => setItem({ [lang]: event.target.value })}
+                      className={field}
+                    />
+                  </label>
+                ))}
+                <label htmlFor={`${ids}-pre-${index}-type`} className="grid gap-1 text-xs font-semibold text-slate">
+                  {t('prerequisiteType')}
+                  <select
+                    id={`${ids}-pre-${index}-type`}
+                    value={item.type}
+                    onChange={(event) => setItem({ type: event.target.value as typeof item.type })}
+                    className={field}
+                  >
+                    {PREREQUISITE_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {t(`prerequisiteTypes.${type}`)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label htmlFor={`${ids}-pre-${index}-when`} className="flex items-center gap-2 self-end pb-3 text-sm font-semibold text-navy-deep">
+                  <input
+                    id={`${ids}-pre-${index}-when`}
+                    type="checkbox"
+                    checked={item.when === 'donation'}
+                    onChange={(event) => setItem({ when: event.target.checked ? 'donation' : null })}
+                    className="size-5 shrink-0 accent-rouge"
+                  />
+                  {t('prerequisiteDonation')}
+                </label>
+                <div className="flex items-end gap-2 sm:col-span-2">
+                  <label htmlFor={`${ids}-pre-${index}-kind`} className="grid flex-1 gap-1 text-xs font-semibold text-slate">
+                    {t('prerequisiteKind')}
+                    <select
+                      id={`${ids}-pre-${index}-kind`}
+                      value={item.kind ?? ''}
+                      onChange={(event) => setItem({ kind: (event.target.value || null) as typeof item.kind })}
+                      className={field}
+                    >
+                      <option value="">{t('noKind')}</option>
+                      {DOCUMENTS.map((kind) => (
+                        <option key={kind} value={kind}>
+                          {DOCUMENT_GUIDES[locale][kind].name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => update({ prerequisites: form.prerequisites.filter((_, at) => at !== index) })}
+                    aria-label={t('removePrerequisite')}
+                    title={t('removePrerequisite')}
+                    className="inline-flex size-11 shrink-0 items-center justify-center rounded-full text-slate hover:bg-off-white hover:text-rouge"
+                  >
+                    <Trash2 aria-hidden={true} className="size-4" />
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+        <button
+          type="button"
+          onClick={() =>
+            update({ prerequisites: [...form.prerequisites, { key: '', fr: '', en: '', type: 'file', kind: null, when: null }] })
+          }
+          className="inline-flex h-11 w-fit items-center gap-1.5 rounded-full border-2 border-navy-deep px-4 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white"
+        >
+          <Plus aria-hidden={true} className="size-4" />
+          {t('addPrerequisite')}
+        </button>
+        <label htmlFor={`${ids}-questionnaire`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+          {t('questionnaire')}
+          <select
+            id={`${ids}-questionnaire`}
+            value={form.questionnaire ?? ''}
+            onChange={(event) => update({ questionnaire: (event.target.value || null) as Questionnaire | null })}
+            className={field}
+          >
+            <option value="">{t('noQuestionnaire')}</option>
+            {QUESTIONNAIRES.map((questionnaire) => (
+              <option key={questionnaire} value={questionnaire}>
+                {t(`questionnaires.${questionnaire}`)}
+              </option>
+            ))}
+          </select>
+          <span className="text-xs font-normal text-slate">{t('questionnaireHint')}</span>
+        </label>
+      </section>
 
       {invalid ? (
         <p role="alert" className="text-sm font-medium text-rouge">

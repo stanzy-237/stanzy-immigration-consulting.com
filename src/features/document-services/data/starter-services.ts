@@ -1,5 +1,5 @@
 import type { DocumentId } from '@/features/checklist/lib/build-checklist';
-import type { ServiceInput, Texts } from '@/features/document-services/lib/service-schema';
+import type { Prerequisite, ServiceInput, Texts } from '@/features/document-services/lib/service-schema';
 
 /**
  * The Services documentaires Stanzy starts with (#80), written once so the
@@ -8,6 +8,37 @@ import type { ServiceInput, Texts } from '@/features/document-services/lib/servi
  * each price in the Tableau de bord before turning it on.
  */
 export type StarterService = Omit<ServiceInput, 'active' | 'price'>;
+
+const file = (key: string, fr: string, en: string, kind: DocumentId | null = null): Prerequisite => ({
+  key,
+  fr,
+  en,
+  type: 'file',
+  kind,
+  when: null,
+});
+
+/**
+ * What the bank needs for a proof of funds: a photo (any, no IRCC rules),
+ * a signature on a blank page, where the Client lives and a payslip; with a
+ * donation, the donor's photo too. The questionnaire asks the rest (NIU,
+ * emergency contacts, the donor).
+ */
+const PROOF_OF_FUNDS: Prerequisite[] = [
+  file('photo', 'Photo', 'Photo', 'photo'),
+  { key: 'signature', fr: 'Signature numérique', en: 'Digital signature', type: 'signature', kind: null, when: null },
+  file('plan-de-localisation', 'Plan de localisation', 'Location map'),
+  file('bulletin-de-paie', 'Bulletin de paie', 'Payslip', 'payslips'),
+  { ...file('photo-donateur', 'Photo du donateur', 'Donor’s photo'), when: 'donation' },
+];
+
+/** The police certificate's documents (also in the migration that brought prerequisites). */
+const POLICE: Prerequisite[] = [
+  file('cni', 'Carte nationale d’identité (CNI)', 'National ID card (CNI)'),
+  file('passeport', 'Passeport', 'Passport', 'passport'),
+  file('acte-de-naissance', 'Acte de naissance', 'Birth certificate', 'birthCertificate'),
+  file('bulletin-n-3', 'Bulletin n° 3 (extrait de casier judiciaire)', 'Bulletin no. 3 (criminal record extract)'),
+];
 
 const contract = (fr: string, en: string): Texts => ({
   fr: `# Objet
@@ -77,6 +108,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'PERCENT',
     unit: { fr: 'par dossier, en % du montant à justifier', en: 'per file, as a % of the amount to justify' },
     documentKinds: kinds('bankLetter', 'bankStatements'),
+    prerequisites: PROOF_OF_FUNDS,
+    questionnaire: 'proofOfFunds',
   },
   {
     slug: 'preuve-de-fonds-sans-fonds',
@@ -102,6 +135,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'PERCENT',
     unit: { fr: 'par dossier, en % du montant à justifier', en: 'per file, as a % of the amount to justify' },
     documentKinds: kinds('bankLetter', 'bankStatements'),
+    prerequisites: PROOF_OF_FUNDS,
+    questionnaire: 'proofOfFundsNoFunds',
   },
   {
     slug: 'certificat-de-police',
@@ -127,6 +162,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par pays et par personne', en: 'per country and per person' },
     documentKinds: kinds('policeCertificate'),
+    prerequisites: POLICE,
+    questionnaire: null,
   },
   {
     slug: 'attestation-cnps',
@@ -152,6 +189,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par emploi', en: 'per job' },
     documentKinds: kinds('socialSecurity'),
+    prerequisites: [],
+    questionnaire: null,
   },
   {
     slug: 'compte-salaire',
@@ -177,6 +216,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par emploi', en: 'per job' },
     documentKinds: kinds('salaryStatements', 'payslips'),
+    prerequisites: [],
+    questionnaire: null,
   },
   {
     slug: 'attestation-conformite-fiscale',
@@ -202,6 +243,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par attestation', en: 'per certificate' },
     documentKinds: kinds('selfEmployedProof'),
+    prerequisites: [],
+    questionnaire: null,
   },
   {
     slug: 'pack-experience-pro',
@@ -227,5 +270,7 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par emploi', en: 'per job' },
     documentKinds: kinds('socialSecurity', 'salaryStatements'),
+    prerequisites: [],
+    questionnaire: null,
   },
 ];
