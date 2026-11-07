@@ -151,9 +151,10 @@ function SectionCard({
           />
         ) : (
           <>
-            <h3 className="font-heading text-lg font-bold text-navy-deep">{section.title}</h3>
+            {/* A long title wraps on its own; the rename and delete buttons stay beside it. */}
+            <h3 className="min-w-0 flex-1 font-heading text-lg font-bold break-words text-navy-deep">{section.title}</h3>
             {consultant && open && !pending ? (
-              <div className="flex items-center gap-1">
+              <div className="flex shrink-0 items-center gap-1">
                 <button
                   type="button"
                   onClick={() => setRenaming(true)}
