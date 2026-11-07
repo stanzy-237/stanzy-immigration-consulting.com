@@ -30,7 +30,7 @@ type Interest = RouterOutputs['accompagnement']['dashboard']['get'];
 export function InterestDashboardView({ id }: { id: string }): ReactNode {
   const t = useTranslations('Accompagnement.dashboard');
   return (
-    <div className="mx-auto grid max-w-4xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-4xl gap-6">
       <Link
         href="/demandes"
         className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-slate hover:text-navy-deep"
@@ -88,7 +88,7 @@ function Detail({ id }: { id: string }): ReactNode {
           <h2 id="interest-history" className="mb-2 font-heading text-lg font-bold text-navy-deep">
             {t('dashboard.history')}
           </h2>
-          <ul className="grid gap-1 text-sm">
+          <ul className="grid grid-cols-1 gap-1 text-sm">
             {interest.history.map((earlier) => (
               <li key={earlier.id}>
                 <Link href={`/demandes/${earlier.id}`} className="font-semibold text-navy-deep hover:text-rouge">
@@ -142,12 +142,12 @@ function Decision({ interest }: { interest: Interest }): ReactNode {
   const stage = startStageOf(level, interest.answers.progress.ita);
 
   return (
-    <section aria-labelledby="interest-decision" className="grid gap-4 rounded-2xl border-2 border-navy-deep bg-white p-5">
+    <section aria-labelledby="interest-decision" className="grid grid-cols-1 gap-4 rounded-2xl border-2 border-navy-deep bg-white p-5">
       <h2 id="interest-decision" className="font-heading text-lg font-bold text-navy-deep">
         {t('dashboard.decision')}
       </h2>
       <p className="text-sm text-slate">{t('dashboard.levelComputed', { level: t(`dashboard.levels.${interest.level}`) })}</p>
-      <label htmlFor={`${ids}-level`} className="grid max-w-xs gap-1 text-sm font-semibold text-navy-deep">
+      <label htmlFor={`${ids}-level`} className="grid grid-cols-1 max-w-xs gap-1 text-sm font-semibold text-navy-deep">
         {t('dashboard.levelChoose')}
         <select
           id={`${ids}-level`}
@@ -191,7 +191,7 @@ function Decision({ interest }: { interest: Interest }): ReactNode {
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-slate">{t('dashboard.rejectBody')}</AlertDialogDescription>
           </AlertDialogHeader>
-          <label htmlFor={`${ids}-reason`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+          <label htmlFor={`${ids}-reason`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
             {t('dashboard.rejectReason')}
             <textarea
               id={`${ids}-reason`}
@@ -223,7 +223,7 @@ function Decision({ interest }: { interest: Interest }): ReactNode {
 function Approved({ dossierId }: { dossierId: string }): ReactNode {
   const t = useTranslations('Accompagnement.dashboard');
   return (
-    <div className="grid gap-3 rounded-2xl bg-leaf-tint p-5">
+    <div className="grid grid-cols-1 gap-3 rounded-2xl bg-leaf-tint p-5">
       <p className="text-sm text-navy-deep">{t('next')}</p>
       <div className="flex flex-wrap gap-2">
         <Link
@@ -308,7 +308,7 @@ function Answers({ interest }: { interest: Interest }): ReactNode {
       {section(
         'documents',
         t('dashboard.documents'),
-        <ul className="grid gap-3">
+        <ul className="grid grid-cols-1 gap-3">
           {AREAS.map((area) => (
             <li key={area} className="text-sm">
               <p className="flex flex-wrap items-center gap-2">
@@ -335,7 +335,7 @@ function Answers({ interest }: { interest: Interest }): ReactNode {
 function DetailSkeleton(): ReactNode {
   const t = useTranslations('Accompagnement.dashboard');
   return (
-    <div role="status" className="grid gap-4">
+    <div role="status" className="grid grid-cols-1 gap-4">
       <span className="sr-only">{t('loading')}</span>
       <Skeleton aria-hidden={true} className="h-16 w-72 rounded-xl" />
       <Skeleton aria-hidden={true} className="h-40 rounded-2xl" />

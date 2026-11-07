@@ -45,7 +45,7 @@ export function StageStepper({
   const stages = stageStatuses(service, stage, startStage);
 
   return (
-    <ol aria-label={t('stepperLabel')} className="grid gap-1">
+    <ol aria-label={t('stepperLabel')} className="grid grid-cols-1 gap-1">
       {stages.map(({ key, status }, index) => (
         <li
           key={key}

@@ -34,7 +34,7 @@ const field =
 export function ContractTemplatesView(): ReactNode {
   const t = useTranslations('Contracts.templates');
   return (
-    <div className="mx-auto grid max-w-4xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-4xl gap-6">
       <div>
         <Link
           href="/contrats"
@@ -65,7 +65,7 @@ function Templates(): ReactNode {
   const has = (s: ServiceType, l: Locale) => templates.some((template) => template.service === s && template.locale === l);
 
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-1 gap-5">
       <div role="radiogroup" aria-label={t('service')} className="flex flex-wrap gap-2">
         {SERVICE_TYPES.map((choice) => (
           <button
@@ -191,13 +191,13 @@ function TemplateForm({
 
   return (
     <form
-      className="grid gap-4 rounded-2xl border border-fog-light bg-white p-5 shadow-sm"
+      className="grid grid-cols-1 gap-4 rounded-2xl border border-fog-light bg-white p-5 shadow-sm"
       onSubmit={(event) => {
         event.preventDefault();
         if (ready) save.mutate({ service, locale, title: title.trim(), body: body.trim() });
       }}
     >
-      <label htmlFor={`${ids}-title`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+      <label htmlFor={`${ids}-title`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
         {t('titleLabel')}
         <input
           id={`${ids}-title`}
@@ -211,7 +211,7 @@ function TemplateForm({
         />
       </label>
 
-      <div className="grid gap-2">
+      <div className="grid grid-cols-1 gap-2">
         <p className="text-sm font-semibold text-navy-deep">{t('blanks')}</p>
         <ul className="flex flex-wrap gap-2">
           {CONTRACT_BLANKS.map((blank) => (
@@ -229,7 +229,7 @@ function TemplateForm({
         </ul>
       </div>
 
-      <label htmlFor={`${ids}-body`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+      <label htmlFor={`${ids}-body`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
         {t('text')}
         <textarea
           ref={text}
@@ -280,7 +280,7 @@ function TemplateForm({
 function TemplatesSkeleton(): ReactNode {
   const t = useTranslations('Contracts.templates');
   return (
-    <div role="status" className="grid gap-4">
+    <div role="status" className="grid grid-cols-1 gap-4">
       <span className="sr-only">{t('loading')}</span>
       <Skeleton aria-hidden={true} className="h-10 w-full rounded-full" />
       <Skeleton aria-hidden={true} className="h-96 rounded-2xl" />

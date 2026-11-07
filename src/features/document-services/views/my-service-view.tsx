@@ -54,7 +54,7 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
   );
   if (!data.service) {
     return (
-      <div className="mx-auto grid max-w-3xl gap-4 px-4 py-14">
+      <div className="mx-auto grid grid-cols-1 max-w-3xl gap-4 px-4 py-14">
         <p className="rounded-2xl bg-white px-6 py-10 text-center text-sm text-slate shadow-sm">{t('unavailable')}</p>
       </div>
     );
@@ -70,7 +70,7 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
     <>
       <section className="relative overflow-hidden bg-navy-deep px-4 pt-10 pb-24 text-white md:pt-14">
         <div aria-hidden={true} className="absolute -top-24 -right-24 size-80 rounded-full bg-rouge/30 blur-3xl" />
-        <div className="relative mx-auto grid max-w-5xl gap-4">
+        <div className="relative mx-auto grid grid-cols-1 max-w-5xl gap-4">
           {back}
           <h1 className="max-w-3xl font-heading text-h3 font-bold sm:text-h2">{textIn(service.name, locale)}</h1>
           <p className="max-w-2xl text-body-lg text-ice-blue">{textIn(service.summary, locale)}</p>
@@ -78,8 +78,8 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
       </section>
 
       <div className="relative mx-auto -mt-14 grid max-w-5xl items-start gap-6 px-4 pb-16 lg:grid-cols-3">
-        <div className="grid gap-6 lg:col-span-2">
-          <ul className="grid gap-4 rounded-2xl bg-white p-6 shadow-sm">
+        <div className="grid grid-cols-1 gap-6 lg:col-span-2">
+          <ul className="grid grid-cols-1 gap-4 rounded-2xl bg-white p-6 shadow-sm">
             {facts.map(({ key, icon: Icon, text }) => (
               <li key={key} className="flex gap-4">
                 <span aria-hidden={true} className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-ice-blue">
@@ -106,8 +106,8 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
           </section>
         </div>
 
-        <aside className="grid gap-4 lg:sticky lg:top-24">
-          <div className="grid gap-3 rounded-2xl bg-white p-6 shadow-md">
+        <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
+          <div className="grid grid-cols-1 gap-3 rounded-2xl bg-white p-6 shadow-md">
             <p className="text-xs font-semibold tracking-wide text-slate uppercase">{t('price')}</p>
             <ServicePrice service={service} />
             <p className="text-xs text-slate">{t('priceNote')}</p>
@@ -161,7 +161,7 @@ function Ask({
         event.preventDefault();
         if (accepted) ask.mutate({ documentId: document.id, serviceId, accepted: true });
       }}
-      className="grid gap-4 rounded-2xl border-2 border-navy-deep bg-white p-6 shadow-md"
+      className="grid grid-cols-1 gap-4 rounded-2xl border-2 border-navy-deep bg-white p-6 shadow-md"
     >
       <p className="flex items-start gap-2 text-sm text-navy-deep">
         <FileText aria-hidden={true} className="mt-0.5 size-4 shrink-0 text-rouge" />
@@ -195,7 +195,7 @@ function Ask({
 function ServiceSkeleton(): ReactNode {
   const t = useTranslations('DocumentServices.service');
   return (
-    <div role="status" className="mx-auto grid max-w-5xl gap-4 px-4 py-14">
+    <div role="status" className="mx-auto grid grid-cols-1 max-w-5xl gap-4 px-4 py-14">
       <span className="sr-only">{t('loading')}</span>
       <Skeleton aria-hidden={true} className="h-40 rounded-2xl" />
       <Skeleton aria-hidden={true} className="h-96 rounded-2xl" />

@@ -59,7 +59,7 @@ function StanzyRequests({ dossierId }: { dossierId: string }): ReactNode {
         {t('panelTitle')}
       </h2>
       <p className="mt-1 text-sm text-slate">{t('panelIntro')}</p>
-      <ul className="mt-4 grid gap-2">
+      <ul className="mt-4 grid grid-cols-1 gap-2">
         {requests.map((request) => (
           <li
             key={request.id}
@@ -227,8 +227,8 @@ function AcceptDialog({ dossierId, request, onClose }: { dossierId: string; requ
             {t('acceptBody', { service: textIn(service.name, lang), document: request.document.title })}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={submit} noValidate className="grid gap-4">
-          <label htmlFor={`${ids}-lang`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+        <form onSubmit={submit} noValidate className="grid grid-cols-1 gap-4">
+          <label htmlFor={`${ids}-lang`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
             {t('language')}
             <select id={`${ids}-lang`} value={lang} onChange={(event) => setLang(event.target.value as 'fr' | 'en')} className={field}>
               <option value="fr">Français</option>
@@ -236,7 +236,7 @@ function AcceptDialog({ dossierId, request, onClose }: { dossierId: string; requ
             </select>
           </label>
           {service.priceKind === 'PERCENT' ? (
-            <label htmlFor={`${ids}-base`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+            <label htmlFor={`${ids}-base`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
               {t('base')}
               <input
                 id={`${ids}-base`}
@@ -252,7 +252,7 @@ function AcceptDialog({ dossierId, request, onClose }: { dossierId: string; requ
               />
             </label>
           ) : null}
-          <label htmlFor={`${ids}-amount`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+          <label htmlFor={`${ids}-amount`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
             {t('amount')}
             <input
               id={`${ids}-amount`}
@@ -263,7 +263,7 @@ function AcceptDialog({ dossierId, request, onClose }: { dossierId: string; requ
               className={field}
             />
           </label>
-          <label htmlFor={`${ids}-schedule`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+          <label htmlFor={`${ids}-schedule`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
             {t('schedule')}
             <input
               id={`${ids}-schedule`}
@@ -339,7 +339,7 @@ function DeclineDialog({
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-slate">{t('stanzy.declineBody')}</AlertDialogDescription>
         </AlertDialogHeader>
-        <label htmlFor={`${ids}-note`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={`${ids}-note`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('stanzy.declineNote')}
           <textarea
             id={`${ids}-note`}

@@ -40,7 +40,7 @@ export function DossierInvoices({
   const consultant = viewer === 'consultant';
 
   return (
-    <section id="factures" aria-labelledby={`${dossierId}-invoices`} className="grid scroll-mt-20 gap-4">
+    <section id="factures" aria-labelledby={`${dossierId}-invoices`} className="grid grid-cols-1 scroll-mt-20 gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h2 id={`${dossierId}-invoices`} className="font-heading text-2xl font-bold text-navy-deep">
           {t('title')}
@@ -60,7 +60,7 @@ export function DossierInvoices({
           {consultant ? t('empty') : t('emptyClient')}
         </p>
       ) : (
-        <ul className="grid gap-3">
+        <ul className="grid grid-cols-1 gap-3">
           {invoices.map((invoice) => (
             <li key={invoice.id}>
               <InvoiceRow invoice={invoice} consultant={consultant} />
@@ -174,7 +174,7 @@ export function DossierInvoicesSkeleton(): ReactNode {
   return (
     <div role="status">
       <span className="sr-only">{t('loading')}</span>
-      <div aria-hidden={true} className="grid gap-3">
+      <div aria-hidden={true} className="grid grid-cols-1 gap-3">
         <Skeleton className="h-8 w-40" />
         <Skeleton className="h-20 rounded-2xl" />
       </div>

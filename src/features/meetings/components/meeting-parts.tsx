@@ -30,7 +30,7 @@ export type MeetingPage = (typeof MEETING_PAGES)[number]['key'];
 export function MeetingsNav({ page, title }: { page: MeetingPage; title: string }): ReactNode {
   const t = useTranslations('Meetings.hub.nav');
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <h1 className="font-heading text-2xl font-bold text-navy-deep md:text-3xl">{title}</h1>
       <nav aria-label={t('label')} className="flex gap-1 overflow-x-auto border-b border-fog-light">
         {MEETING_PAGES.map((entry) => (
@@ -219,7 +219,7 @@ export function PeoplePicker({
   const full = value.length >= PARTICIPANTS_MAX;
 
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       <label htmlFor={`${ids}-search`} className="text-sm font-semibold text-navy-deep">
         {t('label')}
       </label>
@@ -265,7 +265,7 @@ export function PeoplePicker({
             <Skeleton aria-hidden={true} className="h-11 rounded-xl" />
           </div>
         ) : matches && matches.filter((match) => !chosen.has(match.id)).length > 0 ? (
-          <ul className="grid gap-1">
+          <ul className="grid grid-cols-1 gap-1">
             {matches
               .filter((match) => !chosen.has(match.id))
               .map((match) => (

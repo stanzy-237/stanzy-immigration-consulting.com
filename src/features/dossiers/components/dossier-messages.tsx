@@ -89,7 +89,7 @@ export function DossierMessages({ dossierId, viewer }: { dossierId: string; view
         {threads.length === 0 ? (
           <p className="text-sm text-slate">{t('empty')}</p>
         ) : (
-          <ol className="grid gap-4">
+          <ol className="grid grid-cols-1 gap-4">
             {threads.map(({ comment, replies }) => (
               <li key={comment.id}>
                 <MessageItem
@@ -101,7 +101,7 @@ export function DossierMessages({ dossierId, viewer }: { dossierId: string; view
                   onDelete={() => setDeleting(comment)}
                 />
                 {replies.length > 0 || replyingTo === comment.id ? (
-                  <ol className="mt-2 ml-4 grid gap-2 border-l-2 border-fog-light pl-3 sm:ml-8">
+                  <ol className="mt-2 ml-4 grid grid-cols-1 gap-2 border-l-2 border-fog-light pl-3 sm:ml-8">
                     {replies.map((reply) => (
                       <li key={reply.id}>
                         <MessageItem
@@ -305,7 +305,7 @@ function EditForm({
     if (words || allowEmpty) onSave(words);
   };
   return (
-    <form onSubmit={submit} noValidate className="mt-2 grid gap-1.5">
+    <form onSubmit={submit} noValidate className="mt-2 grid grid-cols-1 gap-1.5">
       <label htmlFor={id} className="sr-only">
         {t('editLabel')}
       </label>
@@ -416,7 +416,7 @@ function Composer({
   };
 
   return (
-    <form onSubmit={submit} noValidate className="grid gap-1.5">
+    <form onSubmit={submit} noValidate className="grid grid-cols-1 gap-1.5">
       <label htmlFor={id} className="sr-only">
         {label}
       </label>
@@ -503,7 +503,7 @@ function Composer({
 export function DossierMessagesSkeleton(): ReactNode {
   const t = useTranslations('Dossiers.messages');
   return (
-    <div role="status" className="grid gap-3">
+    <div role="status" className="grid grid-cols-1 gap-3">
       <span className="sr-only">{t('loading')}</span>
       <Skeleton aria-hidden={true} className="h-7 w-40 rounded-lg" />
       <Skeleton aria-hidden={true} className="h-48 rounded-2xl" />

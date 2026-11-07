@@ -114,7 +114,7 @@ export function MeetingForm({
   };
 
   return (
-    <form onSubmit={submit} className="grid gap-4">
+    <form onSubmit={submit} className="grid grid-cols-1 gap-4">
       <DialogHeader>
         <DialogTitle className="font-heading text-xl font-bold text-navy-deep">
           {meeting ? t('form.editTitle') : t('form.newTitle')}

@@ -24,7 +24,7 @@ export function InterestView(): ReactNode {
     <>
       <SiteNav />
       <main className="min-h-screen bg-off-white px-4 py-10 md:py-14">
-        <div className="mx-auto grid max-w-3xl gap-6">
+        <div className="mx-auto grid grid-cols-1 max-w-3xl gap-6">
           <Link
             href="/mon-espace"
             className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-slate hover:text-navy-deep"
@@ -70,7 +70,7 @@ function Interest(): ReactNode {
   }
   if (latest?.status === 'SUBMITTED') {
     return (
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {latest.crsScore === null ? null : <CrsScore score={latest.crsScore} />}
         <p role="status" className={`${box} text-body text-navy-deep`}>
           {t('pending', { date: date(latest.createdAt) })}
@@ -118,7 +118,7 @@ function CrsScore({ score }: { score: number }): ReactNode {
 function InterestSkeleton(): ReactNode {
   const t = useTranslations('Accompagnement.status');
   return (
-    <div role="status" className="grid gap-4">
+    <div role="status" className="grid grid-cols-1 gap-4">
       <span className="sr-only">{t('loading')}</span>
       {['h-56', 'h-40', 'h-72'].map((height) => (
         <Skeleton key={height} aria-hidden={true} className={`${height} rounded-2xl`} />

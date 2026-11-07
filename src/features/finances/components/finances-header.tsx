@@ -24,7 +24,7 @@ export function FinancesHeader({ page, year }: { page: FinancePage; year: number
   const current = FINANCE_PAGES.find((entry) => entry.key === page)!.href;
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-heading text-2xl font-bold text-navy-deep md:text-3xl">{t('title')}</h1>

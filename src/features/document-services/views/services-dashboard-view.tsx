@@ -24,7 +24,7 @@ import { useTRPC } from '@/trpc/client';
 export function ServicesDashboardView(): ReactNode {
   const t = useTranslations('DocumentServices.dashboard');
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-5xl gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-heading text-2xl font-bold text-navy-deep md:text-3xl">{t('title')}</h1>
@@ -63,7 +63,7 @@ function Catalogue(): ReactNode {
   );
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       {missing.length > 0 ? (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-dashed border-fog-light bg-white p-5">
           <p className="max-w-xl text-sm text-navy-deep">{t('starters', { count: missing.length })}</p>
@@ -81,7 +81,7 @@ function Catalogue(): ReactNode {
       {services.length === 0 ? (
         <p className="rounded-2xl bg-white px-6 py-10 text-center text-sm text-slate shadow-sm">{t('empty')}</p>
       ) : (
-        <ul className="grid gap-3">
+        <ul className="grid grid-cols-1 gap-3">
           {services.map((service) => (
             <li key={service.id}>
               <Link
@@ -122,7 +122,7 @@ function Catalogue(): ReactNode {
 function CatalogueSkeleton(): ReactNode {
   const t = useTranslations('DocumentServices.dashboard');
   return (
-    <div role="status" className="grid gap-3">
+    <div role="status" className="grid grid-cols-1 gap-3">
       <span className="sr-only">{t('loading')}</span>
       {[1, 2, 3].map((key) => (
         <Skeleton key={key} aria-hidden={true} className="h-20 rounded-2xl" />

@@ -31,7 +31,7 @@ export function SignatureRequestNewView({ dossierId }: { dossierId: string }): R
   const t = useTranslations('Signatures.new');
   const params = useSearchParams();
   return (
-    <div className="mx-auto grid max-w-4xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-4xl gap-6">
       <div>
         <Link
           href={`/dossiers/${dossierId}#documents`}
@@ -104,7 +104,7 @@ function Compose({ dossierId, initialVersion }: { dossierId: string; initialVers
 
   const hasSignature = fields.some((field) => field.kind === 'SIGNATURE');
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-1 gap-5">
       <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-fog-light bg-white p-4 shadow-sm">
         <div className="flex min-w-0 items-center gap-3">
           <FileText aria-hidden={true} className="size-5 shrink-0 text-slate" />
@@ -208,7 +208,7 @@ function PickPdf({
   };
 
   return (
-    <section className="grid gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
+    <section className="grid grid-cols-1 gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
       <div>
         <h2 className="font-heading text-xl font-bold text-navy-deep">{t('new.pick.title')}</h2>
         <p className="mt-1 text-sm text-slate">{t('new.pick.existing')}</p>
@@ -217,7 +217,7 @@ function PickPdf({
       {pdfs.length === 0 ? (
         <p className="text-sm text-slate">{t('new.pick.noPdf')}</p>
       ) : (
-        <ul className="grid gap-2">
+        <ul className="grid grid-cols-1 gap-2">
           {pdfs.map((pdf) => {
             const waiting = pdf.document.signatures.length > 0;
             return (
@@ -255,7 +255,7 @@ function PickPdf({
         <p className="text-sm text-slate">{t('new.pick.noSection')}</p>
       ) : (
         <form onSubmit={upload} className="grid gap-3 sm:grid-cols-2">
-          <label className="grid gap-1 text-sm font-semibold text-navy-deep" htmlFor={`${ids}-section`}>
+          <label className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep" htmlFor={`${ids}-section`}>
             {t('new.pick.section')}
             <select
               id={`${ids}-section`}
@@ -270,7 +270,7 @@ function PickPdf({
               ))}
             </select>
           </label>
-          <label className="grid gap-1 text-sm font-semibold text-navy-deep" htmlFor={`${ids}-title`}>
+          <label className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep" htmlFor={`${ids}-title`}>
             {t('new.pick.documentTitle')}
             <input
               id={`${ids}-title`}
@@ -283,7 +283,7 @@ function PickPdf({
               className={fieldClass}
             />
           </label>
-          <label className="grid gap-1 text-sm font-semibold text-navy-deep sm:col-span-2" htmlFor={`${ids}-file`}>
+          <label className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep sm:col-span-2" htmlFor={`${ids}-file`}>
             {t('new.pick.file')}
             <input
               id={`${ids}-file`}
@@ -311,7 +311,7 @@ function PickPdf({
 function ComposeSkeleton(): ReactNode {
   const t = useTranslations('Signatures.new');
   return (
-    <div role="status" className="grid gap-4">
+    <div role="status" className="grid grid-cols-1 gap-4">
       <span className="sr-only">{t('loadingPdf')}</span>
       <Skeleton aria-hidden={true} className="h-20 rounded-2xl" />
       <Skeleton aria-hidden={true} className="h-96 rounded-2xl" />

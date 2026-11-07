@@ -90,7 +90,7 @@ export function DossierMeetings({ dossierId, viewer }: { dossierId: string; view
       </div>
       {!data.configured ? <p className="mt-3 rounded-xl bg-honey-tint px-4 py-2 text-sm text-honey">{t('unconfigured')}</p> : null}
 
-      <div className="mt-4 grid gap-6">
+      <div className="mt-4 grid grid-cols-1 gap-6">
         {data.meetings.length === 0 ? (
           <p className="rounded-2xl border-2 border-dashed border-fog-light bg-white px-6 py-8 text-center text-sm text-slate">
             {t('empty')}
@@ -152,7 +152,7 @@ function MeetingList({ title, children }: { title: string; children: ReactNode }
   return (
     <div>
       <h3 className="mb-2 text-sm font-semibold text-slate">{title}</h3>
-      <ul className="grid gap-2">{children}</ul>
+      <ul className="grid grid-cols-1 gap-2">{children}</ul>
     </div>
   );
 }
@@ -303,7 +303,7 @@ export function ConsultantPart({ meeting, upcoming }: { meeting: NotedMeeting; u
   const showFiles = !upcoming || meeting.recordings.length > 0;
 
   return (
-    <div className="mt-3 grid min-w-0 gap-3 border-t border-fog-light pt-3">
+    <div className="mt-3 grid grid-cols-1 min-w-0 gap-3 border-t border-fog-light pt-3">
       {showFiles ? (
         meeting.recording && meeting.recordings.length === 0 ? (
           <p className="text-xs text-slate">{t('noFiles')}</p>
@@ -319,7 +319,7 @@ export function ConsultantPart({ meeting, upcoming }: { meeting: NotedMeeting; u
                     minute: '2-digit',
                   });
                   return (
-                    <li key={file.id} className="grid min-w-0 gap-1.5">
+                    <li key={file.id} className="grid grid-cols-1 min-w-0 gap-1.5">
                       {/* Played here: the address hands over a 5-minute link to our private copy. */}
                       <video
                         controls
@@ -369,7 +369,7 @@ export function ConsultantPart({ meeting, upcoming }: { meeting: NotedMeeting; u
           </div>
         ))}
       <form
-        className="grid gap-1.5"
+        className="grid grid-cols-1 gap-1.5"
         onSubmit={(event) => {
           event.preventDefault();
           save.mutate({ id: meeting.id, notes });
@@ -424,7 +424,7 @@ function TranscriptSearch({ dossierId }: { dossierId: string }): ReactNode {
         className={field}
       />
       {deferred.length >= 2 && results ? (
-        <div role="status" aria-busy={isFetching} className="mt-3 grid gap-3">
+        <div role="status" aria-busy={isFetching} className="mt-3 grid grid-cols-1 gap-3">
           {results.length === 0 ? (
             <p className="text-sm text-slate">{t('noResults')}</p>
           ) : (
@@ -436,7 +436,7 @@ function TranscriptSearch({ dossierId }: { dossierId: string }): ReactNode {
                     {result.meeting.subject} ·{' '}
                     {format.dateTime(result.meeting.startsAt, { day: 'numeric', month: 'short', year: 'numeric' })}
                   </p>
-                  <ul className="mt-1 grid gap-1">
+                  <ul className="mt-1 grid grid-cols-1 gap-1">
                     {result.lines.map((line, index) => (
                       <li key={index} className="rounded-lg bg-off-white px-2.5 py-1.5 text-sm text-navy-deep">
                         {line}
@@ -488,7 +488,7 @@ function CancelDialog({
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-slate">{t('cancelDialog.body')}</AlertDialogDescription>
         </AlertDialogHeader>
-        <label htmlFor={`${ids}-reason`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={`${ids}-reason`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('cancelDialog.reason')}
           <textarea
             id={`${ids}-reason`}
@@ -518,7 +518,7 @@ function CancelDialog({
 export function DossierMeetingsSkeleton(): ReactNode {
   const t = useTranslations('Meetings.panel');
   return (
-    <div role="status" className="grid gap-3">
+    <div role="status" className="grid grid-cols-1 gap-3">
       <span className="sr-only">{t('loading')}</span>
       <Skeleton aria-hidden={true} className="h-7 w-40 rounded-lg" />
       <Skeleton aria-hidden={true} className="h-24 rounded-2xl" />

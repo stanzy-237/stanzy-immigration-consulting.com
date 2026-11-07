@@ -33,7 +33,7 @@ export function PlanDialog({ open, onOpenChange }: { open: boolean; onOpenChange
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : close())}>
       <DialogContent showCloseButton={false} className="max-h-dvh gap-4 overflow-y-auto p-6 sm:max-w-lg">
         {created ? (
-          <div className="grid justify-items-center gap-4 text-center">
+          <div className="grid grid-cols-1 justify-items-center gap-4 text-center">
             <BadgeCheck aria-hidden={true} className="size-14 text-rouge" />
             <DialogHeader className="items-center">
               <DialogTitle className="font-heading text-xl font-bold text-navy-deep">{t('title')}</DialogTitle>
@@ -94,12 +94,12 @@ function InstantForm({ onCancel }: { onCancel: () => void }): ReactNode {
     start.mutate({ subject: subject.trim(), dossierId: null, participantIds: people.map(({ id }) => id), recording });
   };
   return (
-    <form onSubmit={submit} className="grid gap-4">
+    <form onSubmit={submit} className="grid grid-cols-1 gap-4">
       <DialogHeader>
         <DialogTitle className="font-heading text-xl font-bold text-navy-deep">{t('hub.instant.title')}</DialogTitle>
         <DialogDescription className="text-sm text-slate">{t('hub.instant.body')}</DialogDescription>
       </DialogHeader>
-      <label htmlFor={`${ids}-subject`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+      <label htmlFor={`${ids}-subject`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
         {t('hub.instant.subject')}
         <input
           id={`${ids}-subject`}
@@ -169,12 +169,12 @@ export function JoinDialog({ open, onOpenChange }: { open: boolean; onOpenChange
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="gap-4 p-6 sm:max-w-md">
-        <form onSubmit={submit} className="grid gap-4">
+        <form onSubmit={submit} className="grid grid-cols-1 gap-4">
           <DialogHeader>
             <DialogTitle className="font-heading text-xl font-bold text-navy-deep">{t('title')}</DialogTitle>
             <DialogDescription className="text-sm text-slate">{t('body')}</DialogDescription>
           </DialogHeader>
-          <label htmlFor={`${ids}-link`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+          <label htmlFor={`${ids}-link`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
             {t('link')}
             <input
               id={`${ids}-link`}

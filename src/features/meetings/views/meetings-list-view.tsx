@@ -14,7 +14,7 @@ type List = 'upcoming' | 'past';
 export function MeetingsListView({ list }: { list: List }): ReactNode {
   const t = useTranslations('Meetings.hub');
   return (
-    <div className="mx-auto grid max-w-6xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-6xl gap-6">
       <MeetingsNav page={list} title={t(`list.${list}`)} />
       <QueryBoundary fallback={<MeetingCardsSkeleton />}>
         <Cards list={list} />

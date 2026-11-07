@@ -57,7 +57,7 @@ export function StoryStages(): ReactNode {
   const path = WORKFLOWS.ACCOMPAGNEMENT;
 
   return (
-    <ol ref={list} className="relative mx-auto grid max-w-5xl gap-10 lg:gap-6">
+    <ol ref={list} className="relative mx-auto grid grid-cols-1 max-w-5xl gap-10 lg:gap-6">
       <span aria-hidden={true} className="absolute top-2 bottom-2 left-6 w-1 -translate-x-1/2 rounded-full bg-fog-light lg:left-1/2" />
       <motion.span
         aria-hidden={true}

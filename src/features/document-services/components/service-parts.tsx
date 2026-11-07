@@ -35,7 +35,7 @@ export function ContractText({ body }: { body: string }): ReactNode {
   const t = useTranslations('DocumentServices.blanks');
   const shown = body.replace(/\{(client|service|prix|echeancier|date|numero)\}/g, (_, name: string) => `[${t(name)}]`);
   return (
-    <div className="grid gap-3 text-sm leading-relaxed text-navy-deep">
+    <div className="grid grid-cols-1 gap-3 text-sm leading-relaxed text-navy-deep">
       {contractBlocks(shown).map((block, index) =>
         block.kind === 'heading' ? (
           <h3 key={index} className="pt-2 font-heading text-base font-bold">

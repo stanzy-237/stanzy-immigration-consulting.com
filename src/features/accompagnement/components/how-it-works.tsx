@@ -40,8 +40,8 @@ export function HowItWorks(): ReactNode {
 
   return (
     <div className="grid items-center gap-10 lg:grid-cols-2">
-      <div className="grid gap-3">
-        <ol className="grid gap-3">
+      <div className="grid grid-cols-1 gap-3">
+        <ol className="grid grid-cols-1 gap-3">
           {STEPS.map((step) => {
             const on = step === active;
             return (
@@ -130,10 +130,10 @@ function SceneTitle({ icon: Icon, children }: { icon: typeof Mail; children: Rea
 function FormScene(): ReactNode {
   const t = useTranslations('Accompagnement.page.scenes');
   return (
-    <div className="grid h-full content-start gap-4">
+    <div className="grid grid-cols-1 h-full content-start gap-4">
       <SceneTitle icon={FileText}>{t('form')}</SceneTitle>
       {[0.75, 0.55, 0.9].map((width, index) => (
-        <div key={index} className="grid gap-1.5">
+        <div key={index} className="grid grid-cols-1 gap-1.5">
           <span className="h-2 w-20 rounded-full bg-fog-light" />
           <div className="h-9 rounded-xl border-2 border-fog-light px-3 py-3">
             <motion.span
@@ -164,7 +164,7 @@ function FormScene(): ReactNode {
 function MailScene(): ReactNode {
   const t = useTranslations('Accompagnement.page.scenes');
   return (
-    <div className="grid h-full content-center justify-items-center gap-5">
+    <div className="grid grid-cols-1 h-full content-center justify-items-center gap-5">
       <motion.div
         initial={{ opacity: 0, y: 40, rotate: -6 }}
         animate={{ opacity: 1, y: 0, rotate: 0 }}
@@ -204,7 +204,7 @@ function DossierScene(): ReactNode {
     { width: 'w-36', state: 'bg-rouge' },
   ];
   return (
-    <div className="grid h-full content-start gap-3">
+    <div className="grid grid-cols-1 h-full content-start gap-3">
       <SceneTitle icon={FileText}>{t('dossier')}</SceneTitle>
       <motion.div {...pop(0.15)} className="flex gap-1">
         {Array.from({ length: 10 }, (_, index) => (
@@ -239,7 +239,7 @@ function DossierScene(): ReactNode {
 function SpaceScene(): ReactNode {
   const t = useTranslations('Accompagnement.page.scenes');
   return (
-    <div className="relative grid h-full content-start gap-4">
+    <div className="relative grid grid-cols-1 h-full content-start gap-4">
       <SceneTitle icon={Bell}>{t('space')}</SceneTitle>
       <motion.div {...pop(0.1)} className="flex gap-2">
         {['w-16', 'w-20', 'w-16', 'w-14'].map((width, index) => (
@@ -251,7 +251,7 @@ function SpaceScene(): ReactNode {
           <span key={index} className="h-16 rounded-xl bg-off-white" />
         ))}
       </motion.div>
-      <div className="absolute right-0 bottom-0 grid w-64 gap-2">
+      <div className="absolute right-0 bottom-0 grid grid-cols-1 w-64 gap-2">
         <motion.p
           {...pop(0.8)}
           className="flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-navy-deep shadow-lg ring-1 ring-fog-light"

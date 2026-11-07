@@ -91,11 +91,11 @@ function NotificationList({ audience, filter }: { audience: Audience; filter: No
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 gap-6">
       {days.map(({ day, items: ofDay }) => (
         <section key={day.toISOString()} aria-labelledby={`day-${day.getTime()}`}>
           <DayHeading day={day} />
-          <ul className="mt-2 grid gap-1 rounded-2xl border border-fog-light bg-white p-2 shadow-sm">
+          <ul className="mt-2 grid grid-cols-1 gap-1 rounded-2xl border border-fog-light bg-white p-2 shadow-sm">
             {ofDay.map((item) => (
               <li key={item.id}>
                 <NotificationItem
@@ -162,7 +162,7 @@ function NotificationsSkeleton(): ReactNode {
   return (
     <div role="status">
       <span className="sr-only">{t('loading')}</span>
-      <div aria-hidden={true} className="grid gap-2">
+      <div aria-hidden={true} className="grid grid-cols-1 gap-2">
         {[0, 1, 2, 3].map((row) => (
           <Skeleton key={row} className="h-16 rounded-2xl" />
         ))}

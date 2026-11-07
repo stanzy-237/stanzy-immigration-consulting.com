@@ -84,7 +84,7 @@ function ShellNavigation({ siteUrl }: { siteUrl: string }): ReactNode {
     return (
       <Drawer open={openMobile} onOpenChange={setOpenMobile} showSwipeHandle>
         <DrawerContent className="rounded-t-3xl pt-2">
-          <div className="flex items-center justify-between px-5 pt-2 pb-4">
+          <div className="flex shrink-0 items-center justify-between px-5 pt-2 pb-4">
             <DrawerTitle className="font-heading text-lg font-bold text-navy-deep">{t('title')}</DrawerTitle>
             <DrawerClose
               aria-label={t('nav.close')}
@@ -93,7 +93,8 @@ function ShellNavigation({ siteUrl }: { siteUrl: string }): ReactNode {
               <XIcon aria-hidden={true} className="size-4" />
             </DrawerClose>
           </div>
-          <div className="grid gap-4 px-4 pb-8">
+          {/* Taller than the screen on a phone: the sections scroll, down to Outils and Contenus. */}
+          <div className="grid grid-cols-1 min-h-0 flex-1 gap-4 overflow-y-auto overscroll-contain px-4 pb-8">
             <DrawerSections onNavigate={() => setOpenMobile(false)} />
             <a
               href={siteUrl}
@@ -137,7 +138,7 @@ function DrawerSections({ onNavigate }: { onNavigate: () => void }): ReactNode {
   const t = useTranslations('Dashboard.nav');
   const segments = useSelectedLayoutSegments();
   return (
-    <nav aria-label={t('label')} className="grid gap-4">
+    <nav aria-label={t('label')} className="grid grid-cols-1 gap-4">
       {DASHBOARD_GROUPS.map((group) => {
         const sections = DASHBOARD_SECTIONS.filter((section) => section.group === group);
         if (sections.length === 0) return null;

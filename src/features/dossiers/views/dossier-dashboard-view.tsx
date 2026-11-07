@@ -265,7 +265,7 @@ function DossierDetail({ id }: { id: string }): ReactNode {
 
         <section className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
           <h2 className="font-heading text-lg font-bold text-navy-deep">{t('detail.history')}</h2>
-          <ol className="mt-3 grid gap-3">
+          <ol className="mt-3 grid grid-cols-1 gap-3">
             {[...dossier.events].reverse().map((event) => (
               <li key={event.id} className="text-sm">
                 <p className="text-navy-deep">
@@ -343,7 +343,7 @@ function CloseDialog({
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-slate">{t('detail.closeBody')}</AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="grid gap-1.5">
+        <div className="grid grid-cols-1 gap-1.5">
           <label htmlFor={fieldId} className="text-sm font-semibold text-navy-deep">
             {t('detail.closeReason')}
           </label>

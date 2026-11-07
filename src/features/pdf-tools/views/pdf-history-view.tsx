@@ -75,7 +75,7 @@ function HistoryList(): ReactNode {
 
   return (
     <>
-      <ul className="grid gap-3">
+      <ul className="grid grid-cols-1 gap-3">
         {files.map((file) => (
           <li key={file.id} className="rounded-2xl border border-fog-light bg-white p-4 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -180,7 +180,7 @@ function HistorySkeleton(): ReactNode {
   return (
     <div role="status">
       <span className="sr-only">{t('loading')}</span>
-      <div aria-hidden={true} className="grid gap-3">
+      <div aria-hidden={true} className="grid grid-cols-1 gap-3">
         {[0, 1, 2].map((row) => (
           <Skeleton key={row} className="h-24 rounded-2xl" />
         ))}

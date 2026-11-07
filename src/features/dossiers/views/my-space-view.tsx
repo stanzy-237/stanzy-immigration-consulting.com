@@ -91,7 +91,7 @@ function MyDossiers(): ReactNode {
   return (
     <>
       <PushBanner />
-      <ul className="grid gap-5">
+      <ul className="grid grid-cols-1 gap-5">
         {dossiers.map((dossier) => (
           <li key={dossier.id}>
             <article className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
@@ -134,7 +134,7 @@ function MyDossiersSkeleton(): ReactNode {
   return (
     <div role="status">
       <span className="sr-only">{t('loading')}</span>
-      <div aria-hidden={true} className="grid gap-5">
+      <div aria-hidden={true} className="grid grid-cols-1 gap-5">
         <Skeleton className="h-96 rounded-2xl" />
       </div>
     </div>

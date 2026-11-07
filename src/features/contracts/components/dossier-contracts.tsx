@@ -71,7 +71,7 @@ export function DossierContracts({
   const waiting = data.contracts.filter((contract) => contract.status === 'SENT');
 
   return (
-    <section id="contrats" aria-labelledby={`${dossierId}-contracts`} className="grid scroll-mt-20 gap-4">
+    <section id="contrats" aria-labelledby={`${dossierId}-contracts`} className="grid grid-cols-1 scroll-mt-20 gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <h2 id={`${dossierId}-contracts`} className="font-heading text-2xl font-bold text-navy-deep">
@@ -128,7 +128,7 @@ export function DossierContracts({
           {consultant ? t('emptyConsultant') : t('emptyClient')}
         </p>
       ) : (
-        <ul className="grid gap-3">
+        <ul className="grid grid-cols-1 gap-3">
           {data.contracts.map((contract) => (
             <li key={contract.id}>
               <ContractRow
@@ -326,12 +326,12 @@ function SendForm({
   };
 
   return (
-    <form onSubmit={submit} className="grid gap-4">
+    <form onSubmit={submit} className="grid grid-cols-1 gap-4">
       <DialogHeader>
         <DialogTitle className="font-heading text-xl font-bold text-navy-deep">{t('send.title')}</DialogTitle>
         <DialogDescription className="text-sm text-slate">{t('send.body')}</DialogDescription>
       </DialogHeader>
-      <label htmlFor={`${ids}-locale`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+      <label htmlFor={`${ids}-locale`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
         {t('send.locale')}
         <select
           id={`${ids}-locale`}
@@ -344,7 +344,7 @@ function SendForm({
         </select>
       </label>
       <div className="grid grid-cols-3 gap-3">
-        <label htmlFor={`${ids}-amount`} className="col-span-2 grid gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={`${ids}-amount`} className="col-span-2 grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('send.amount')}
           <input
             id={`${ids}-amount`}
@@ -357,7 +357,7 @@ function SendForm({
             className={field}
           />
         </label>
-        <label htmlFor={`${ids}-currency`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={`${ids}-currency`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('send.currency')}
           <select
             id={`${ids}-currency`}
@@ -378,7 +378,7 @@ function SendForm({
           {t('send.invalidAmount')}
         </p>
       ) : null}
-      <label htmlFor={`${ids}-schedule`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+      <label htmlFor={`${ids}-schedule`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
         {t('send.schedule')}
         <textarea
           id={`${ids}-schedule`}
@@ -460,7 +460,7 @@ function AmendmentForm({
   );
   return (
     <form
-      className="grid gap-4"
+      className="grid grid-cols-1 gap-4"
       onSubmit={(event) => {
         event.preventDefault();
         send.mutate({ contractId: contract.id, title: title.trim(), body: body.trim() });
@@ -472,7 +472,7 @@ function AmendmentForm({
           {t('amendment.body', { number: contract.number })}
         </DialogDescription>
       </DialogHeader>
-      <label htmlFor={`${ids}-title`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+      <label htmlFor={`${ids}-title`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
         {t('amendment.titleLabel')}
         <input
           id={`${ids}-title`}
@@ -485,7 +485,7 @@ function AmendmentForm({
           className={field}
         />
       </label>
-      <label htmlFor={`${ids}-body`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+      <label htmlFor={`${ids}-body`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
         {t('amendment.text')}
         <textarea
           id={`${ids}-body`}
@@ -558,7 +558,7 @@ function CancelDialog({
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-slate">{t('cancel.body')}</AlertDialogDescription>
         </AlertDialogHeader>
-        <label htmlFor={id} className="grid gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={id} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('cancel.reason')}
           <input
             id={id}
@@ -592,7 +592,7 @@ export function DossierContractsSkeleton(): ReactNode {
   return (
     <div role="status">
       <span className="sr-only">{t('loading')}</span>
-      <div aria-hidden={true} className="grid gap-3">
+      <div aria-hidden={true} className="grid grid-cols-1 gap-3">
         <Skeleton className="h-8 w-40" />
         <Skeleton className="h-20 rounded-2xl" />
       </div>

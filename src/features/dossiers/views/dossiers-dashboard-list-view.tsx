@@ -118,7 +118,7 @@ function DossierList({ filter }: { filter: DossierFilter }): ReactNode {
         </table>
       </div>
 
-      <ul className="grid gap-3 md:hidden">
+      <ul className="grid grid-cols-1 gap-3 md:hidden">
         {dossiers.map((dossier) => (
           <li key={dossier.id}>
             <Link
@@ -146,7 +146,7 @@ function DossierListSkeleton(): ReactNode {
   return (
     <div role="status">
       <span className="sr-only">{t('loading')}</span>
-      <div aria-hidden={true} className="grid gap-3">
+      <div aria-hidden={true} className="grid grid-cols-1 gap-3">
         {[0, 1, 2, 3].map((row) => (
           <Skeleton key={row} className="h-16 rounded-2xl" />
         ))}

@@ -112,7 +112,7 @@ export function DossierTabs({
         })}
       </TabsList>
       {DOSSIER_TABS.map((key) => (
-        <TabsContent key={key} value={key} className="grid gap-10">
+        <TabsContent key={key} value={key} className="grid grid-cols-1 gap-10">
           {panels[key]}
         </TabsContent>
       ))}

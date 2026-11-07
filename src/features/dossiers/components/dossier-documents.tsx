@@ -55,7 +55,7 @@ export function DossierDocuments({
 
   return (
     <DocumentFocusContext.Provider value={focus}>
-      <section id="documents" aria-labelledby={`${dossierId}-documents`} className="grid scroll-mt-20 gap-4">
+      <section id="documents" aria-labelledby={`${dossierId}-documents`} className="grid grid-cols-1 scroll-mt-20 gap-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 id={`${dossierId}-documents`} className="font-heading text-2xl font-bold text-navy-deep">
@@ -80,7 +80,7 @@ export function DossierDocuments({
             {consultant ? t('emptyConsultant') : t('emptyClient')}
           </p>
         ) : (
-          <ul className="grid gap-4">
+          <ul className="grid grid-cols-1 gap-4">
             {data.sections.map((section) => (
               <li key={section.id}>
                 <SectionCard
@@ -181,7 +181,7 @@ function SectionCard({
       {section.documents.length === 0 ? (
         <p className="mt-3 text-sm text-slate">{t('noDocuments')}</p>
       ) : (
-        <ul className="mt-3 grid gap-3">
+        <ul className="mt-3 grid grid-cols-1 gap-3">
           {section.documents.map((document) => (
             <li key={document.id}>
               <DocumentCard
@@ -286,7 +286,7 @@ function TitleForm({
 
   const described = invalid ? `${id}-error` : hint ? `${id}-hint` : undefined;
   return (
-    <form onSubmit={submit} noValidate className="grid w-full gap-1.5">
+    <form onSubmit={submit} noValidate className="grid grid-cols-1 w-full gap-1.5">
       <label htmlFor={id} className="text-sm font-semibold text-navy-deep">
         {label}
       </label>
@@ -327,7 +327,7 @@ export function DossierDocumentsSkeleton(): ReactNode {
   return (
     <div role="status">
       <span className="sr-only">{t('loading')}</span>
-      <div aria-hidden={true} className="grid gap-4">
+      <div aria-hidden={true} className="grid grid-cols-1 gap-4">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-48 rounded-2xl" />
         <Skeleton className="h-48 rounded-2xl" />

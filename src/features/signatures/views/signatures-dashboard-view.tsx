@@ -21,7 +21,7 @@ import { useTRPC } from '@/trpc/client';
 export function SignaturesDashboardView(): ReactNode {
   const t = useTranslations('Signatures.dashboard');
   return (
-    <div className="mx-auto grid max-w-4xl gap-8">
+    <div className="mx-auto grid grid-cols-1 max-w-4xl gap-8">
       <div>
         <h1 className="font-heading text-2xl font-bold text-navy-deep md:text-3xl">{t('title')}</h1>
         <p className="mt-1 text-sm text-slate">{t('intro')}</p>
@@ -41,7 +41,7 @@ function SigningAssets(): ReactNode {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.signatures.assets.queryOptions());
   return (
-    <section className="grid gap-4 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
+    <section className="grid grid-cols-1 gap-4 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
       <div>
         <h2 className="font-heading text-xl font-bold text-navy-deep">{t('title')}</h2>
         <p className="mt-1 text-sm text-slate">{t('hint')}</p>
@@ -89,7 +89,7 @@ function AssetSlot({ kind, updatedAt }: { kind: AssetKind; updatedAt: Date | nul
   };
 
   return (
-    <div className="grid gap-3 rounded-xl bg-off-white p-4">
+    <div className="grid grid-cols-1 gap-3 rounded-xl bg-off-white p-4">
       <p className="text-sm font-semibold text-navy-deep">{label}</p>
       <div className="grid h-32 place-items-center rounded-lg border-2 border-dashed border-fog bg-white">
         {updatedAt ? (
@@ -135,12 +135,12 @@ function PendingRequests(): ReactNode {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.signatures.pending.queryOptions());
   return (
-    <section className="grid gap-4 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
+    <section className="grid grid-cols-1 gap-4 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
       <h2 className="font-heading text-xl font-bold text-navy-deep">{t('title')}</h2>
       {data.length === 0 ? (
         <p className="text-sm text-slate">{t('empty')}</p>
       ) : (
-        <ul className="grid gap-2">
+        <ul className="grid grid-cols-1 gap-2">
           {data.map((request) => (
             <li
               key={request.id}

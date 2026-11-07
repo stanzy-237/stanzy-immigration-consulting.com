@@ -153,8 +153,8 @@ export function InvoiceForm({ draft }: { draft: InvoiceDraft }): ReactNode {
     setLines((current) => current.map((line) => (line.key === key ? { ...line, ...patch } : line)));
 
   return (
-    <div className="grid gap-5">
-      <section className="grid gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
+    <div className="grid grid-cols-1 gap-5">
+      <section className="grid grid-cols-1 gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
         <DossierPicker
           id={`${ids}-dossier`}
           value={dossier}
@@ -203,13 +203,13 @@ export function InvoiceForm({ draft }: { draft: InvoiceDraft }): ReactNode {
 
       <fieldset
         aria-describedby={errors.lines ? `${ids}-lines-error` : undefined}
-        className="grid gap-3 rounded-2xl border border-fog-light bg-white p-5 shadow-sm"
+        className="grid grid-cols-1 gap-3 rounded-2xl border border-fog-light bg-white p-5 shadow-sm"
       >
         <legend className="sr-only">{t('editor.lines')}</legend>
         <p aria-hidden={true} className="font-heading text-lg font-bold text-navy-deep">
           {t('editor.lines')}
         </p>
-        <ol className="grid gap-4">
+        <ol className="grid grid-cols-1 gap-4">
           {lines.map((line, index) => {
             const parsed = parsedLines[index]!;
             const amount =

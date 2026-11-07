@@ -105,8 +105,8 @@ export function FieldPlacer({
     onChange(fields.map((field) => (field.key === key ? change(field) : field)));
 
   return (
-    <div className="grid gap-4">
-      <div className="sticky top-16 z-20 grid gap-2 rounded-2xl border border-fog-light bg-white/95 p-3 shadow-sm backdrop-blur">
+    <div className="grid grid-cols-1 gap-4">
+      <div className="sticky top-16 z-20 grid grid-cols-1 gap-2 rounded-2xl border border-fog-light bg-white/95 p-3 shadow-sm backdrop-blur">
         <div role="group" aria-label={t('new.place.tools')} className="flex flex-wrap gap-2">
           {FIELD_KINDS.map((kind) => {
             const Icon = ICONS[kind];

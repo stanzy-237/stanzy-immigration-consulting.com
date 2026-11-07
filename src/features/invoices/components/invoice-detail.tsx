@@ -63,7 +63,7 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }): ReactNode {
   const awaiting = isAwaitingPayment(invoice.status);
 
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-1 gap-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wider text-rouge">
@@ -82,7 +82,7 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }): ReactNode {
 
       <section className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
         <h2 className="sr-only">{t('Invoices.detail.lines')}</h2>
-        <ul className="grid gap-2">
+        <ul className="grid grid-cols-1 gap-2">
           {invoice.lines.map((line, index) => (
             <li key={index} className="flex flex-wrap justify-between gap-2 border-b border-off-white pb-2 text-sm">
               <span className="text-navy-deep">
@@ -111,7 +111,7 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }): ReactNode {
         {invoice.proofs.length === 0 ? (
           <p className="mt-2 text-sm text-slate">{t('Invoices.detail.noProofs')}</p>
         ) : (
-          <ul className="mt-2 grid gap-2">
+          <ul className="mt-2 grid grid-cols-1 gap-2">
             {invoice.proofs.map((proof) => (
               <li
                 key={proof.id}
@@ -218,7 +218,7 @@ function CancelDialog({
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-slate">{t('detail.cancelBody')}</AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="grid gap-1.5">
+        <div className="grid grid-cols-1 gap-1.5">
           <label htmlFor={fieldId} className="text-sm font-semibold text-navy-deep">
             {t('detail.reason')}
           </label>
