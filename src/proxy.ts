@@ -28,6 +28,9 @@ function requestOrigin(request: NextRequest): URL {
 /** Pages the Tableau de bord's subdomain keeps: signing in and its follow-ups. */
 const DASHBOARD_HOST_AUTH_PAGES = ['/connexion', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/verification'];
 
+/** A short path on the dashboard's subdomain (`/dossiers`) as the page Next renders (`/fr/tableau-de-bord/dossiers`). */
+const dashboardPath = (path: string): string => `/${routing.defaultLocale}${DASHBOARD_ROUTE}${path === '/' ? '' : path}`;
+
 /**
  * `admin.<site>`: its paths are the Tableau de bord's (`/blog` is
  * `/fr/tableau-de-bord/blog`), sign-in stays here, and any other page of the
@@ -57,8 +60,13 @@ function dashboardHost(request: NextRequest, origin: string): NextResponse {
   }
   // Rewritten on the request's own URL, so Next renders its page (not a proxy to another host).
   const page = request.nextUrl.clone();
-  page.pathname = `/${routing.defaultLocale}${DASHBOARD_ROUTE}${pathname === '/' ? '' : pathname}`;
-  return NextResponse.rewrite(page);
+  page.pathname = dashboardPath(pathname);
+  // Next decides whether to intercept a route (a dialog over the page, e.g. « Ouvrir un dossier »)
+  // from Next-Url, the page the browser is on: its short path here, so it gets the full one too.
+  const headers = new Headers(request.headers);
+  const from = headers.get('next-url');
+  if (from) headers.set('next-url', dashboardPath(from));
+  return NextResponse.rewrite(page, { request: { headers } });
 }
 
 /**

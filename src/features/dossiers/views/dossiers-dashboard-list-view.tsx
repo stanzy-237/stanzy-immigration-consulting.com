@@ -45,14 +45,14 @@ export function DossiersDashboardListView(): ReactNode {
         </Link>
       </div>
 
-      <div role="group" aria-label={t('filterLabel')} className="mb-5 flex flex-wrap gap-2">
+      <div role="group" aria-label={t('filterLabel')} className="mb-5 -mx-4 flex gap-2 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
         {DOSSIER_FILTERS.map((value) => (
           <button
             key={value}
             type="button"
             aria-pressed={filter === value}
             onClick={() => startTransition(() => setFilter(value))}
-            className="inline-flex h-9 items-center rounded-full border-2 border-fog-light bg-white px-4 text-sm font-semibold text-navy-deep hover:border-navy-deep aria-pressed:border-navy-deep aria-pressed:bg-navy-deep aria-pressed:text-white"
+            className="inline-flex h-9 shrink-0 whitespace-nowrap items-center rounded-full border-2 border-fog-light bg-white px-4 text-sm font-semibold text-navy-deep hover:border-navy-deep aria-pressed:border-navy-deep aria-pressed:bg-navy-deep aria-pressed:text-white"
           >
             {t(`filters.${value}`)}
           </button>

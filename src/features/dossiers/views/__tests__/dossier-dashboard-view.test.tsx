@@ -5,6 +5,7 @@ import { axe } from 'vitest-axe';
 
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { DossierDashboardView } from '@/features/dossiers/views/dossier-dashboard-view';
+import { DossierNewDialogView } from '@/features/dossiers/views/dossier-new-dialog-view';
 import { DossierNewView } from '@/features/dossiers/views/dossier-new-view';
 import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
@@ -13,7 +14,7 @@ import { createTestTRPC } from '@/trpc/__tests__/test-utils';
  * consultant uses them. The Dossier is in the cache as the route prefetches
  * it; stubs answer and record what the page sends.
  */
-const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }));
+const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), prefetch: vi.fn(), back: vi.fn() }));
 vi.mock('next/navigation', () => ({
   useRouter: () => router,
   useSearchParams: () => new URLSearchParams(),
@@ -159,6 +160,19 @@ describe('DossierNewView', () => {
       expect(api.open).toHaveBeenCalledWith({ accountId: 'acc_1', service: 'VERIFICATION', startStage: 'revue' }),
     );
     await waitFor(() => expect(router.push).toHaveBeenCalledWith('/dossiers/dos_9'));
+  });
+});
+
+describe('DossierNewDialogView', () => {
+  it('opens « Ouvrir un dossier » as a dialog over the list; closing goes back', async () => {
+    const { wrap } = createTestTRPC({ 'dossiers.dashboard.searchAccounts': () => [] });
+    render(withIntl(wrap(<DossierNewDialogView />)));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('heading', { name: 'Ouvrir un dossier' })).toBeInTheDocument();
+    expect(within(dialog).getByLabelText('Service')).toBeInTheDocument();
+    expect(within(dialog).queryByRole('link', { name: /Tous les dossiers/ })).not.toBeInTheDocument();
+    fireEvent.keyDown(dialog, { key: 'Escape' });
+    await waitFor(() => expect(router.back).toHaveBeenCalled());
   });
 });
 
