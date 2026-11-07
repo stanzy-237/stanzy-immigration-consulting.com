@@ -212,7 +212,7 @@ function DossierDetail({ id }: { id: string }): ReactNode {
 
   return (
     <>
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm lg:col-span-2">
           <div id="etapes" className="scroll-mt-20">
             <StageStepper service={dossier.service} stage={dossier.stage} startStage={dossier.startStage} />
@@ -388,7 +388,7 @@ function DossierSkeleton(): ReactNode {
         <Skeleton className="h-4 w-40" />
         <Skeleton className="mt-2 h-9 w-64" />
         <Skeleton className="mt-2 h-4 w-80" />
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <Skeleton className="h-96 rounded-2xl lg:col-span-2" />
           <Skeleton className="h-64 rounded-2xl" />
         </div>

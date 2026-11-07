@@ -54,7 +54,7 @@ export function MyServicesView({ documentId }: { documentId: string | null }): R
           <QueryBoundary fallback={<ServicesSkeleton />}>
             <Services documentId={documentId} />
           </QueryBoundary>
-          <ol className="grid gap-4 rounded-2xl bg-white p-6 shadow-sm sm:grid-cols-3">
+          <ol className="grid grid-cols-1 gap-4 rounded-2xl bg-white p-6 shadow-sm sm:grid-cols-3">
             {(['choose', 'sign', 'deliver'] as const).map((step, index) => (
               <li key={step} className="flex gap-3">
                 <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-navy-deep font-heading text-sm font-bold text-white">
@@ -87,7 +87,7 @@ function Services({ documentId }: { documentId: string | null }): ReactNode {
   }
   const query = documentId ? `?document=${documentId}` : '';
   return (
-    <ul className="grid gap-4 sm:grid-cols-2">
+    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {data.services.map((service) => (
         <li key={service.id}>
           <Link
@@ -124,7 +124,7 @@ function Services({ documentId }: { documentId: string | null }): ReactNode {
 function ServicesSkeleton(): ReactNode {
   const t = useTranslations('DocumentServices.mine');
   return (
-    <div role="status" className="grid gap-4 sm:grid-cols-2">
+    <div role="status" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <span className="sr-only">{t('loading')}</span>
       {[1, 2, 3, 4].map((key) => (
         <Skeleton key={key} aria-hidden={true} className="h-64 rounded-2xl" />

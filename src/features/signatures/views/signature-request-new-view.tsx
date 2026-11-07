@@ -254,7 +254,7 @@ function PickPdf({
       {sections.length === 0 ? (
         <p className="text-sm text-slate">{t('new.pick.noSection')}</p>
       ) : (
-        <form onSubmit={upload} className="grid gap-3 sm:grid-cols-2">
+        <form onSubmit={upload} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep" htmlFor={`${ids}-section`}>
             {t('new.pick.section')}
             <select

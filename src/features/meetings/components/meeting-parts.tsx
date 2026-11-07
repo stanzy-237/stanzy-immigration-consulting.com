@@ -188,7 +188,7 @@ export function MeetingCard({ meeting, upcoming }: { meeting: HubMeeting; upcomi
 export function MeetingCardsSkeleton(): ReactNode {
   const t = useTranslations('Meetings.hub.list');
   return (
-    <div role="status" className="grid gap-4 md:grid-cols-2">
+    <div role="status" className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <span className="sr-only">{t('loading')}</span>
       {[0, 1, 2, 3].map((key) => (
         <Skeleton key={key} aria-hidden={true} className="h-52 rounded-2xl" />

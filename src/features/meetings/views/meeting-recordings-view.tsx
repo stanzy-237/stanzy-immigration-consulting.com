@@ -38,7 +38,7 @@ function Recordings(): ReactNode {
     );
   }
   return (
-    <ul className="grid gap-4 md:grid-cols-2">
+    <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {recordings.map((recording) => {
         const minutes = Math.max(1, Math.round((recording.endedAt.getTime() - recording.startedAt.getTime()) / 60_000));
         return (

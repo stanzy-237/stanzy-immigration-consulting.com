@@ -35,7 +35,7 @@ function Cards({ list }: { list: List }): ReactNode {
     );
   }
   return (
-    <ul className="grid gap-4 md:grid-cols-2">
+    <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {meetings.map((meeting) => (
         <MeetingCard key={meeting.id} meeting={meeting} upcoming={list === 'upcoming'} />
       ))}

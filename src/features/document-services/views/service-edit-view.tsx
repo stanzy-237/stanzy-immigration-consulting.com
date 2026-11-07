@@ -131,7 +131,7 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
   const texts = (key: TextKey, label: string, opts: { max: number; rows?: number }) => (
     <fieldset className="grid grid-cols-1 gap-2">
       <legend className="mb-1 text-sm font-semibold text-navy-deep">{label}</legend>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {(['fr', 'en'] as const).map((lang) => (
           <label key={lang} htmlFor={`${ids}-${key}-${lang}`} className="grid grid-cols-1 gap-1 text-xs font-semibold text-slate">
             {t(`languages.${lang}`)}
@@ -162,7 +162,7 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
   return (
     <form onSubmit={submit} noValidate className="grid grid-cols-1 gap-5">
       <section className={card}>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label htmlFor={`${ids}-slug`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
             {t('slug')}
             <input
@@ -246,7 +246,7 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
           {t('documents')}
         </p>
         <p className="text-sm text-slate">{t('documentsHint')}</p>
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {DOCUMENTS.map((kind) => (
             <label key={kind} htmlFor={`${ids}-kind-${kind}`} className="flex items-center gap-2 text-sm text-navy-deep">
               <input
