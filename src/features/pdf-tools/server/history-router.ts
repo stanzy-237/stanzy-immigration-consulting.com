@@ -4,7 +4,10 @@ import { z } from 'zod';
 
 import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { addHistoryInput, historyFilePrefix } from '@/features/pdf-tools/lib/history-schema';
-import { consultantProcedure, createTRPCRouter } from '@/server/trpc/trpc';
+import { FREE_COMPRESSIONS_PER_MONTH, monthWindow } from '@/features/pdf-tools/lib/quota';
+import type { CurrentSession } from '@/server/auth/session';
+import type { TRPCContext } from '@/server/trpc/context';
+import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 
 const fields = {
   id: true,
@@ -22,6 +25,26 @@ const fields = {
  * encrypted in R2 (ADR 0007) for 90 days, theirs only.
  */
 export const pdfToolsRouter = createTRPCRouter({
+  /**
+   * The public Outil PDF's free allowance: 10 compressions per calendar month
+   * for each Account, counted here so it holds across devices. The consultant
+   * has no limit. Building and downloading are free and not counted.
+   */
+  quota: createTRPCRouter({
+    get: protectedProcedure.query(({ ctx }) => quotaOf(ctx.prisma, ctx.session, new Date())),
+
+    /** Counts one finished compression; PDF_QUOTA_REACHED once the month's allowance is used. */
+    use: protectedProcedure.mutation(async ({ ctx }) => {
+      const now = new Date();
+      const quota = await quotaOf(ctx.prisma, ctx.session, now);
+      if (quota.limit !== null && quota.used >= quota.limit) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'PDF_QUOTA_REACHED' });
+      }
+      await ctx.prisma.pdfCompression.create({ data: { accountId: ctx.session.account.id } });
+      return { ...quota, used: quota.used + 1 };
+    }),
+  }),
+
   history: createTRPCRouter({
     /** Newest first. */
     list: consultantProcedure.query(({ ctx }) =>
@@ -65,3 +88,12 @@ export const pdfToolsRouter = createTRPCRouter({
     }),
   }),
 });
+
+/** How many compressions the Account made this month, out of how many (null: no limit), and when it renews. */
+async function quotaOf(db: TRPCContext['prisma'], session: CurrentSession, now: Date) {
+  const { start, end } = monthWindow(now);
+  const used = await db.pdfCompression.count({
+    where: { accountId: session.account.id, createdAt: { gte: start, lt: end } },
+  });
+  return { used, limit: session.account.role === 'CONSULTANT' ? null : FREE_COMPRESSIONS_PER_MONTH, renewsAt: end };
+}

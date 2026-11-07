@@ -76,11 +76,20 @@ export function PdfWorkbench({
   engine,
   finish,
   initialSources,
+  maxSourceBytes,
+  compressGate,
 }: {
   engine: WorkbenchEngine;
   finish: { label: string; icon: LucideIcon; run: (pdf: Uint8Array, meta: OutputMeta) => Promise<void> };
   /** Files to start with (a Section's Documents). */
   initialSources?: Source[];
+  /** The heaviest file accepted (the public Outil PDF's 100 Mo); heavier ones are refused, named. */
+  maxSourceBytes?: number;
+  /**
+   * The public Outil PDF's allowance: `allow` before compressing (false stops it, having said why),
+   * `used` once a compression succeeded, and a line about what is left, under the button.
+   */
+  compressGate?: { allow: () => Promise<boolean>; used: () => Promise<void>; note?: ReactNode };
 }): ReactNode {
   const t = useTranslations('PdfTools');
   const format = useFormatter();
@@ -105,6 +114,10 @@ export function PdfWorkbench({
     setAdding(true);
     const added: Source[] = [];
     for (const file of Array.from(files)) {
+      if (maxSourceBytes !== undefined && file.size > maxSourceBytes) {
+        toast.add({ title: t('errors.tooHeavy', { name: file.name, max: mo(maxSourceBytes) }), type: 'warning' });
+        continue;
+      }
       try {
         added.push(await engine.readSource(file, file.name, `s${++sourceCount}`));
       } catch (error) {
@@ -117,9 +130,11 @@ export function PdfWorkbench({
   };
 
   const compress = async () => {
+    if (compressGate && !(await compressGate.allow())) return;
     try {
       const result = await tool.compress();
       toast.add({ title: t('toast.compressed', { size: mo(result.bytes.byteLength) }), type: 'success' });
+      await compressGate?.used();
     } catch (error) {
       const size = (error as { size?: number }).size;
       toast.add({ title: size ? t('errors.tooLarge', { size: mo(size) }) : t('errors.failed'), type: 'error' });
@@ -250,6 +265,7 @@ export function PdfWorkbench({
               {t('compressedNote', { quality: Math.round(tool.compressed.quality * 100) })}
             </p>
           ) : null}
+          {compressGate?.note ? <div className="text-xs text-slate">{compressGate.note}</div> : null}
           {tool.compressing && tool.steps.length > 0 ? (
             <p className="text-xs text-slate">
               {t('trying', {

@@ -51,7 +51,9 @@
         "budgetName": "Budget & expenses",
         "budgetDesc": "Estimate your fees and track your expenses",
         "checklistName": "Express Entry checklist",
-        "checklistDesc": "Documents to prepare and official IRCC fees"
+        "checklistDesc": "Documents to prepare and official IRCC fees",
+        "pdfName": "IRCC PDF tool",
+        "pdfDesc": "Merge and compress under 4 MB"
       },
       "Services": {
         "consultationName": "Private consultation",
@@ -110,7 +112,9 @@
         "budgetName": "Budget & expenses",
         "budgetDesc": "Estimate what your Express Entry costs — IRCC fees, tests, WES, proof of funds — then log every expense in your currency.",
         "checklistName": "Express Entry checklist",
-        "checklistDesc": "The documents to prepare before the ITA, laid out like IRCC’s, each one explained, with IRCC’s official fees."
+        "checklistDesc": "The documents to prepare before the ITA, laid out like IRCC’s, each one explained, with IRCC’s official fees.",
+        "pdfName": "IRCC PDF tool",
+        "pdfDesc": "Merge, reorder and compress your documents under IRCC’s 4 MB, in your browser."
       },
       "Badges": {
         "free": "Free",
@@ -140,7 +144,9 @@
         "badgeExpenses": "Expense log",
         "badgeDocuments": "Documents",
         "badgeBeforeIta": "Before the ITA",
-        "badgeIrccFees": "IRCC fees"
+        "badgeIrccFees": "IRCC fees",
+        "badgePdf4mo": "Under 4 MB",
+        "badgePrivate": "Private"
       },
       "metaTitle": "Free Express Entry tools",
       "metaDescription": "CRS calculator, 67 points, NCLC / CLB, draws, ITA countdown, journey, budget and document checklist: all of Stanzy's free tools for your Express Entry."
@@ -2450,7 +2456,8 @@
       "unsupported": "{name}: file type not supported.",
       "unreadable": "{name} couldn’t be read (protected or damaged PDF?).",
       "tooLarge": "Even at the strongest, the document is {size}: remove pages or split it.",
-      "failed": "Compression failed. Try again."
+      "failed": "Compression failed. Try again.",
+      "tooHeavy": "“{name}” is over {max}: choose a lighter file."
     },
     "dragLabel": "Page {number}: drag to move",
     "announce": {
@@ -2492,6 +2499,29 @@
       "saved": "Added to the history",
       "saveFailed": "Downloaded, but not kept in the history.",
       "loading": "Loading the history"
+    },
+    "public": {
+      "metaTitle": "Free PDF tool for IRCC: merge and compress under 4 MB",
+      "metaDescription": "Merge your PDFs and photos, reorder pages and compress under IRCC’s 4 MB limit. Free, in your browser: your documents never leave your device.",
+      "eyebrow": "Free tool",
+      "titleLead": "Your IRCC documents,",
+      "titleAccent": "under 4 MB.",
+      "subtitle": "Merge your PDFs and photos, reorder and rotate pages, then compress under IRCC’s limit. Everything happens in your browser.",
+      "promises": {
+        "private": "Your documents never leave your device: nothing is uploaded.",
+        "heavy": "Up to 100 MB per file: PDF, JPG, PNG, WebP or HEIC.",
+        "free": "Merge and download with no account. {count} free compressions a month with an account."
+      },
+      "download": "Download",
+      "signInToCompress": "Sign in (it’s free) to compress: your pages stay here.",
+      "quotaReached": "Your free compressions for this month are used. They come back on {date}.",
+      "noteSignedOut": "Compressing needs a free account: {count} compressions a month.",
+      "noteUnlimited": "Unlimited compressions.",
+      "noteLeft": "{left, plural, =0 {No free compressions left this month} one {# free compression left} other {# free compressions left}} out of {count}, renewed on {date}.",
+      "nextTitle": "Ready to put your file together?",
+      "nextBody": "The Checklist lists the documents IRCC asks for. With Support, Stanzy checks them with you.",
+      "checklist": "See the Checklist",
+      "accompagnement": "Get support"
     }
   },
   "Signatures": {

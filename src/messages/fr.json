@@ -51,7 +51,9 @@
         "budgetName": "Budget & dépenses",
         "budgetDesc": "Estimez vos frais et suivez vos dépenses",
         "checklistName": "Checklist Entrée Express",
-        "checklistDesc": "Documents à préparer et frais officiels IRCC"
+        "checklistDesc": "Documents à préparer et frais officiels IRCC",
+        "pdfName": "Outil PDF IRCC",
+        "pdfDesc": "Assembler et compresser sous 4 Mo"
       },
       "Services": {
         "consultationName": "Consultation privée",
@@ -110,7 +112,9 @@
         "budgetName": "Budget & dépenses",
         "budgetDesc": "Estimez le coût de votre Entrée Express — frais IRCC, tests, WES, fonds à prouver — puis notez chaque dépense dans votre devise.",
         "checklistName": "Checklist Entrée Express",
-        "checklistDesc": "Les documents à préparer avant l’ITA, présentés comme sur IRCC, expliqués un par un, avec les frais officiels d’IRCC."
+        "checklistDesc": "Les documents à préparer avant l’ITA, présentés comme sur IRCC, expliqués un par un, avec les frais officiels d’IRCC.",
+        "pdfName": "Outil PDF IRCC",
+        "pdfDesc": "Assemblez, réorganisez et compressez vos documents sous les 4 Mo d’IRCC, dans votre navigateur."
       },
       "Badges": {
         "free": "Gratuit",
@@ -140,7 +144,9 @@
         "badgeExpenses": "Journal de dépenses",
         "badgeDocuments": "Documents",
         "badgeBeforeIta": "Avant l’ITA",
-        "badgeIrccFees": "Frais IRCC"
+        "badgeIrccFees": "Frais IRCC",
+        "badgePdf4mo": "Sous 4 Mo",
+        "badgePrivate": "Privé"
       },
       "metaTitle": "Outils Entrée Express gratuits",
       "metaDescription": "Calculateur CRS, 67 points, NCLC / CLB, tirages, compte à rebours ITA, parcours, budget et checklist des documents : tous les outils gratuits de Stanzy pour votre Entrée Express."
@@ -2467,7 +2473,8 @@
       "unsupported": "{name} : type de fichier non pris en charge.",
       "unreadable": "{name} n’a pas pu être lu (PDF protégé ou abîmé ?).",
       "tooLarge": "Même au plus fort, le document fait {size} : retirez des pages ou découpez-le.",
-      "failed": "La compression a échoué. Réessayez."
+      "failed": "La compression a échoué. Réessayez.",
+      "tooHeavy": "« {name} » dépasse {max} : choisissez un fichier plus léger."
     },
     "dragLabel": "Page {number} : glisser pour déplacer",
     "announce": {
@@ -2509,6 +2516,29 @@
       "saved": "Ajouté à l’historique",
       "saveFailed": "Téléchargé, mais pas gardé dans l’historique.",
       "loading": "Chargement de l’historique"
+    },
+    "public": {
+      "metaTitle": "Outil PDF gratuit pour IRCC : assembler et compresser sous 4 Mo",
+      "metaDescription": "Assemblez vos PDF et photos, réorganisez les pages et compressez sous la limite de 4 Mo d’IRCC. Gratuit, dans votre navigateur : vos documents ne quittent pas votre appareil.",
+      "eyebrow": "Outil gratuit",
+      "titleLead": "Vos documents IRCC,",
+      "titleAccent": "sous 4 Mo.",
+      "subtitle": "Assemblez vos PDF et photos, réorganisez et pivotez les pages, puis compressez sous la limite d’IRCC. Tout se fait dans votre navigateur.",
+      "promises": {
+        "private": "Vos documents ne quittent jamais votre appareil : rien n’est envoyé.",
+        "heavy": "Jusqu’à 100 Mo par fichier : PDF, JPG, PNG, WebP ou HEIC.",
+        "free": "Assembler et télécharger sans compte. {count} compressions gratuites par mois avec un compte."
+      },
+      "download": "Télécharger",
+      "signInToCompress": "Connectez-vous (c’est gratuit) pour compresser : vos pages restent là.",
+      "quotaReached": "Vos compressions gratuites du mois sont utilisées. Elles reviennent le {date}.",
+      "noteSignedOut": "Compresser demande un compte gratuit : {count} compressions par mois.",
+      "noteUnlimited": "Compressions illimitées.",
+      "noteLeft": "{left, plural, =0 {Plus de compression gratuite ce mois-ci} one {# compression gratuite restante} other {# compressions gratuites restantes}} sur {count}, renouvelées le {date}.",
+      "nextTitle": "Votre dossier est prêt à être monté ?",
+      "nextBody": "La Checklist liste les documents à fournir à IRCC. Avec l’Accompagnement, Stanzy les vérifie avec vous.",
+      "checklist": "Voir la Checklist",
+      "accompagnement": "Être accompagné"
     }
   },
   "Signatures": {

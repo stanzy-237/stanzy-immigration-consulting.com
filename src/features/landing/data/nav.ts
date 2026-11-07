@@ -6,6 +6,7 @@ import {
   ShieldCheck,
   FileSearch,
   FileCheck,
+  FileStack,
   GanttChartSquare,
   Hourglass,
   Languages,
@@ -82,6 +83,12 @@ export const TOOL_ENTRIES: ReadonlyArray<NavMenuEntry> = [
     labelKey: 'checklistName',
     descKey: 'checklistDesc',
     href: '/outils/checklist',
+  },
+  {
+    icon: FileStack,
+    labelKey: 'pdfName',
+    descKey: 'pdfDesc',
+    href: '/outils/pdf',
   },
   // Not built yet: last, tagged « Bientôt ».
   {

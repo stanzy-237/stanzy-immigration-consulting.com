@@ -6,6 +6,7 @@ import {
   ClipboardList,
   Clock,
   Cloud,
+  FileStack,
   Languages,
   Search,
   Timer,
@@ -128,6 +129,17 @@ export const TOOLS: ReadonlyArray<Tool> = [
     freeKey: 'free',
   },
   {
+    slug: 'pdf',
+    icon: FileStack,
+    nameKey: 'pdfName',
+    descKey: 'pdfDesc',
+    href: '/outils/pdf',
+    variant: 'default',
+    badgeKeys: ['badgePdf4mo', 'badgePrivate'],
+    freeKey: 'free',
+  },
+  // The CNP search's card made way for the Outil PDF until it is built; its page stays.
+  {
     slug: 'cnp',
     icon: Search,
     nameKey: 'cnpName',
@@ -136,6 +148,7 @@ export const TOOLS: ReadonlyArray<Tool> = [
     variant: 'default',
     badgeKeys: ['badgeCnp2021', 'badgeTeer'],
     freeKey: 'free',
+    listed: false,
     comingSoon: true,
   },
   // The Coffre-fort's card made way for the NCLC / CLB calculator; its
