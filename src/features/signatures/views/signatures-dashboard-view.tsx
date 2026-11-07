@@ -160,6 +160,12 @@ function AssetSlot({ kind, updatedAt }: { kind: AssetKind; updatedAt: Date | nul
   );
 }
 
+/** The pad's PNG data URL as a file to upload. */
+function pngFile(dataUrl: string): File {
+  const bytes = Uint8Array.from(atob(dataUrl.slice(dataUrl.indexOf(',') + 1)), (char) => char.charCodeAt(0));
+  return new File([bytes], 'signature.png', { type: 'image/png' });
+}
+
 /** The consultant signs on the pad, in black or blue ink; saved as the transparent PNG the Contrats carry. */
 function DrawSignature({ onClose, onSave }: { onClose: () => void; onSave: (file: File) => Promise<void> }): ReactNode {
   const t = useTranslations('Signatures.dashboard.assets');
@@ -200,8 +206,7 @@ function DrawSignature({ onClose, onSave }: { onClose: () => void; onSave: (file
             disabled={!png}
             onClick={async () => {
               if (!png) return;
-              const blob = await (await fetch(png)).blob();
-              await onSave(new File([blob], 'signature.png', { type: 'image/png' }));
+              await onSave(pngFile(png));
             }}
             className="inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson disabled:opacity-50"
           >

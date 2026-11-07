@@ -314,7 +314,6 @@ describe('the consultant’s signature and stamp', () => {
   it('draws the signature in the signing tool and saves it', async () => {
     const posted: FormData[] = [];
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
-      if (typeof input === 'string' && input.startsWith('data:')) return new Response(new Blob(['png'], { type: 'image/png' }));
       posted.push(init?.body as FormData);
       return new Response(null, { status: 204 });
     });
