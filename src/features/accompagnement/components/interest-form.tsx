@@ -116,7 +116,7 @@ function Steps({
   const index = STEPS.indexOf(step);
 
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-1 gap-5">
       <p className="text-sm font-semibold text-slate">{t('stepOf', { step: index + 1, name: t(`steps.${step}`) })}</p>
       {step === 'situation' ? (
         <ChecklistFields
@@ -218,7 +218,7 @@ function ProgressStep({
   return (
     <form onSubmit={next} noValidate className={`grid gap-4 ${card}`}>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label htmlFor={`${ids}-age`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={`${ids}-age`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('age')}
           <input
             id={`${ids}-age`}
@@ -229,7 +229,7 @@ function ProgressStep({
             className={field}
           />
         </label>
-        <label htmlFor={`${ids}-citizenship`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={`${ids}-citizenship`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('citizenship')}
           <input
             id={`${ids}-citizenship`}
@@ -240,7 +240,7 @@ function ProgressStep({
             className={field}
           />
         </label>
-        <label htmlFor={`${ids}-residence`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={`${ids}-residence`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('residence')}
           <select
             id={`${ids}-residence`}
@@ -256,7 +256,7 @@ function ProgressStep({
           </select>
         </label>
         {form.residence === 'OTHER' ? (
-          <label htmlFor={`${ids}-other`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+          <label htmlFor={`${ids}-other`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
             {t('residenceOther')}
             <input
               id={`${ids}-other`}
@@ -268,7 +268,7 @@ function ProgressStep({
             />
           </label>
         ) : null}
-        <label htmlFor={`${ids}-test`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={`${ids}-test`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
           {t('languageTest')}
           <select
             id={`${ids}-test`}
@@ -284,12 +284,12 @@ function ProgressStep({
           </select>
         </label>
       </div>
-      <div className="grid gap-3">
+      <div className="grid grid-cols-1 gap-3">
         {check('ede', t('ede'), form.ede, (ede) => update({ ede }))}
         {check('profile', t('eeProfile'), form.eeProfile, (eeProfile) => update({ eeProfile, ita: eeProfile && form.ita }))}
         {form.eeProfile ? check('ita', t('ita'), form.ita, (ita) => update({ ita })) : null}
         {form.eeProfile && form.ita ? (
-          <label htmlFor={`${ids}-ita-date`} className="grid max-w-xs gap-1 text-sm font-semibold text-navy-deep">
+          <label htmlFor={`${ids}-ita-date`} className="grid grid-cols-1 max-w-xs gap-1 text-sm font-semibold text-navy-deep">
             {t('itaDate')}
             <input
               id={`${ids}-ita-date`}
@@ -343,7 +343,7 @@ function CrsStep({
         if (result.ok) onNext();
       }}
       noValidate
-      className="grid gap-4"
+      className="grid grid-cols-1 gap-4"
     >
       <p className="text-body text-slate">{t('crsIntro')}</p>
       <div
@@ -404,7 +404,7 @@ function DocumentsStep({
         event.preventDefault();
         onSubmit();
       }}
-      className="grid gap-4"
+      className="grid grid-cols-1 gap-4"
     >
       <p className="text-body text-slate">{t('documentsIntro')}</p>
       {cameroon ? <p className="rounded-xl bg-ice-blue px-4 py-3 text-sm text-navy-deep">{t('stanzyHint')}</p> : null}
@@ -438,7 +438,7 @@ function DocumentsStep({
               </label>
             ))}
           </div>
-          <label htmlFor={`${ids}-${area}-note`} className="mt-3 grid gap-1 text-xs font-semibold text-slate">
+          <label htmlFor={`${ids}-${area}-note`} className="mt-3 grid grid-cols-1 gap-1 text-xs font-semibold text-slate">
             {t('note', { area: t(`areas.${area}`) })}
             <textarea
               id={`${ids}-${area}-note`}

@@ -171,7 +171,7 @@ export function AccompagnementView(): ReactNode {
           <Reveal className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl">
             <Image src={CTA_IMAGE} alt="" fill unoptimized sizes="100vw" className="object-cover" />
             <div aria-hidden={true} className="absolute inset-0 bg-linear-to-r from-navy-deep via-navy-deep/90 to-navy-deep/40" />
-            <div className="relative grid gap-6 px-6 py-16 text-white sm:px-12 md:max-w-2xl">
+            <div className="relative grid grid-cols-1 gap-6 px-6 py-16 text-white sm:px-12 md:max-w-2xl">
               <p className="text-xs font-semibold tracking-widest text-rose uppercase">{t('chapters.end')}</p>
               <h2 id="accompagnement-cta" className="font-heading text-[clamp(30px,3.6vw,46px)] leading-none font-bold tracking-tight">
                 {t('storyEndTitle')}

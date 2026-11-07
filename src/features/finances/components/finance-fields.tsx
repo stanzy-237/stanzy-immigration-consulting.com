@@ -144,7 +144,7 @@ export function DeleteDialog({
 export function FinanceListSkeleton(): ReactNode {
   const t = useTranslations('Finances');
   return (
-    <div role="status" className="grid gap-2">
+    <div role="status" className="grid grid-cols-1 gap-2">
       <span className="sr-only">{t('loading')}</span>
       {[0, 1, 2].map((row) => (
         <Skeleton key={row} aria-hidden={true} className="h-20 rounded-2xl" />

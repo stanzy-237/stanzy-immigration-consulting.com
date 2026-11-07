@@ -76,7 +76,7 @@ function Countdown({ itaDate }: { itaDate: string }): ReactNode {
   if (left.expired) return <p className="text-sm font-semibold text-rouge">{t('expired', { ita: day(itaDate) })}</p>;
   const urgency = urgencyOf(left.days);
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       <p className={`font-heading text-3xl font-bold ${URGENCY_CLASSES[urgency].text}`}>
         {t('daysLeft', { days: left.days })}
       </p>
@@ -120,7 +120,7 @@ function ItaDateForm({ dossierId, itaDate }: { dossierId: string; itaDate: strin
   };
   return (
     <form onSubmit={submit} className="flex flex-wrap items-end gap-2 border-t border-off-white pt-3">
-      <label htmlFor={`${id}-ita`} className="grid gap-1 text-xs font-semibold text-slate">
+      <label htmlFor={`${id}-ita`} className="grid grid-cols-1 gap-1 text-xs font-semibold text-slate">
         {t('overview.setIta')}
         <input
           id={`${id}-ita`}

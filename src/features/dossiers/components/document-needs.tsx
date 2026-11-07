@@ -83,7 +83,7 @@ export function DocumentNeeds({
 
   if (!document.clientNote && !help && !canAsk && request?.status !== 'DECLINED') return null;
   return (
-    <div className="grid gap-2 rounded-lg bg-off-white px-3 py-2.5 text-sm">
+    <div className="grid grid-cols-1 gap-2 rounded-lg bg-off-white px-3 py-2.5 text-sm">
       {document.clientNote ? (
         <p className="text-navy-deep">
           {client ? t('document.yourNote', { note: document.clientNote }) : t('document.clientNote', { note: document.clientNote })}

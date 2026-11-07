@@ -208,7 +208,7 @@ function Room({ meetingId, viewer }: { meetingId: string; viewer: Viewer }): Rea
   else {
     const needsConsent = meeting.recording && !meeting.consentedAt;
     body = (
-      <div className="grid gap-4 rounded-2xl border border-fog-light bg-white p-6 shadow-sm">
+      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-fog-light bg-white p-6 shadow-sm">
         {state === 'left' ? <p className="text-sm text-slate">{t('room.left')}</p> : null}
         {state === 'failed' ? (
           <p role="alert" className="text-sm text-crimson">
@@ -295,9 +295,9 @@ function Waiting({ meetingId }: { meetingId: string }): ReactNode {
       <h2 id={`${meetingId}-waiting`} className="mb-2 text-sm font-bold">
         {t('title')}
       </h2>
-      <ul className="grid gap-2">
+      <ul className="grid grid-cols-1 gap-2">
         {waiting.map((request) => (
-          <li key={request.id} className="grid gap-1.5">
+          <li key={request.id} className="grid grid-cols-1 gap-1.5">
             <p className="text-sm font-semibold">
               {request.account.name} <span className="font-normal text-slate">· {request.account.email}</span>
             </p>
@@ -334,7 +334,7 @@ function Waiting({ meetingId }: { meetingId: string }): ReactNode {
 function RoomSkeleton(): ReactNode {
   const t = useTranslations('Meetings.room');
   return (
-    <div role="status" className="grid gap-4">
+    <div role="status" className="grid grid-cols-1 gap-4">
       <span className="sr-only">{t('loading')}</span>
       <Skeleton aria-hidden={true} className="h-9 w-72 rounded-lg" />
       <Skeleton aria-hidden={true} className="h-56 rounded-2xl" />

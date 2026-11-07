@@ -164,12 +164,12 @@ export function SignatureAlert({
   const waiting = documents.filter((document) => document.signatures.length > 0);
   if (waiting.length === 0) return null;
   return (
-    <div className="grid gap-3 rounded-2xl border-2 border-rouge/30 bg-blush/40 p-4">
+    <div className="grid grid-cols-1 gap-3 rounded-2xl border-2 border-rouge/30 bg-blush/40 p-4">
       <p className="flex items-center gap-2 font-semibold text-navy-deep">
         <PenLine aria-hidden={true} className="size-5 text-rouge" />
         {t('alert', { count: waiting.length })}
       </p>
-      <ul className="grid gap-2">
+      <ul className="grid grid-cols-1 gap-2">
         {waiting.map((document) => (
           <li key={document.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white px-3 py-2">
             <span className="min-w-0 truncate text-sm font-semibold text-navy-deep">{document.title}</span>

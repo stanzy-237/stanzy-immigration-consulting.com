@@ -153,7 +153,7 @@ export function PdfWorkbench({
   const FinishIcon = finish.icon;
 
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-1 gap-5">
       <div
         onDragOver={(event) => event.dataTransfer.types.includes('Files') && event.preventDefault()}
         onDrop={(event) => {

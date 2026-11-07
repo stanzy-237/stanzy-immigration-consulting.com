@@ -73,7 +73,7 @@ export function DocumentConversation({
       {threads.length === 0 ? (
         <p className="mt-2 text-sm text-slate">{t('empty')}</p>
       ) : (
-        <ol className="mt-3 grid gap-4">
+        <ol className="mt-3 grid grid-cols-1 gap-4">
           {threads.map(({ comment, replies }) => (
             <li key={comment.id}>
               <Message
@@ -85,7 +85,7 @@ export function DocumentConversation({
                 onDelete={() => setDeleting(comment)}
               />
               {replies.length > 0 || replyingTo === comment.id ? (
-                <ol className="mt-2 ml-4 grid gap-2 border-l-2 border-fog-light pl-3 sm:ml-8">
+                <ol className="mt-2 ml-4 grid grid-cols-1 gap-2 border-l-2 border-fog-light pl-3 sm:ml-8">
                   {replies.map((reply) => (
                     <li key={reply.id}>
                       <Message
@@ -310,7 +310,7 @@ function Composer({
   };
 
   return (
-    <form onSubmit={submit} noValidate className="grid gap-1.5">
+    <form onSubmit={submit} noValidate className="grid grid-cols-1 gap-1.5">
       <label htmlFor={id} className="sr-only">
         {label}
       </label>

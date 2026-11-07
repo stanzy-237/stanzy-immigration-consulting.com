@@ -34,7 +34,7 @@ const button =
 export function PersonalRoomView(): ReactNode {
   const t = useTranslations('Meetings.hub');
   return (
-    <div className="mx-auto grid max-w-6xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-6xl gap-6">
       <MeetingsNav page="personal" title={t('nav.personal')} />
       <QueryBoundary fallback={<Skeleton aria-hidden={true} className="h-64 rounded-2xl" />}>
         <PersonalRoom />
@@ -71,17 +71,17 @@ function PersonalRoom(): ReactNode {
   const link = origin ? `${origin}/${locale}${invitationPath(room.inviteToken)}` : '';
 
   return (
-    <section className="grid gap-6 rounded-2xl border border-fog-light bg-white p-6 shadow-sm">
+    <section className="grid grid-cols-1 gap-6 rounded-2xl border border-fog-light bg-white p-6 shadow-sm">
       <p className="text-sm text-slate">{t('intro')}</p>
       {editing ? (
         <form
-          className="grid gap-4"
+          className="grid grid-cols-1 gap-4"
           onSubmit={(event) => {
             event.preventDefault();
             update.mutate({ subject: subject.trim(), recording, newLink: false });
           }}
         >
-          <label htmlFor={`${ids}-subject`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+          <label htmlFor={`${ids}-subject`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
             {t('topic')}
             <input
               id={`${ids}-subject`}
@@ -117,14 +117,14 @@ function PersonalRoom(): ReactNode {
           </div>
         </form>
       ) : (
-        <dl className="grid gap-4">
-          <div className="grid gap-1 sm:flex sm:gap-8">
+        <dl className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-1 sm:flex sm:gap-8">
             <dt className="text-sm text-slate sm:w-40">{t('topic')}</dt>
             <dd className="font-semibold text-navy-deep">
               {room.subject} · <span className="font-normal text-slate">{room.recording ? t('recorded') : t('notRecorded')}</span>
             </dd>
           </div>
-          <div className="grid gap-1 sm:flex sm:gap-8">
+          <div className="grid grid-cols-1 gap-1 sm:flex sm:gap-8">
             <dt className="text-sm text-slate sm:w-40">{t('link')}</dt>
             <dd className="font-semibold break-all text-rouge">{link}</dd>
           </div>

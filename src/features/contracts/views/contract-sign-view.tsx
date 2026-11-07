@@ -28,7 +28,7 @@ export function ContractSignView({ dossierId, contractId }: { dossierId: string;
     <>
       <SiteNav />
       <main className="min-h-screen bg-off-white px-4 py-10 md:py-14">
-        <div className="mx-auto grid max-w-3xl gap-8">
+        <div className="mx-auto grid grid-cols-1 max-w-3xl gap-8">
           <Link
             href={`/mon-espace/dossiers/${dossierId}#contrats`}
             className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-slate hover:text-navy-deep"
@@ -78,7 +78,7 @@ function SignContract({ dossierId, contractId }: { dossierId: string; contractId
 
   if (!contract.canSign) {
     return (
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {heading}
         <p className="flex items-start gap-2 rounded-2xl border border-fog-light bg-white p-5 text-sm text-navy-deep shadow-sm">
           <CheckCircle2 aria-hidden={true} className="mt-0.5 size-5 shrink-0 text-leaf" />
@@ -101,7 +101,7 @@ function SignContract({ dossierId, contractId }: { dossierId: string; contractId
   }
 
   return (
-    <div className="grid gap-6 pb-24">
+    <div className="grid grid-cols-1 gap-6 pb-24">
       {heading}
       <p className="rounded-xl bg-ice-blue px-4 py-3 text-sm text-navy-deep">{t('sign.intro')}</p>
       <SigningFlow
@@ -118,7 +118,7 @@ function SignContract({ dossierId, contractId }: { dossierId: string; contractId
 
 function SignSkeleton(): ReactNode {
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <Skeleton aria-hidden={true} className="h-10 w-2/3" />
       <PdfPagesSkeleton />
     </div>

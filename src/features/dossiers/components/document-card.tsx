@@ -116,14 +116,14 @@ export function DocumentCard({
       </div>
 
       {expanded ? (
-        <div id={`${ids}-panel`} className="grid gap-5 border-t border-fog-light p-4">
+        <div id={`${ids}-panel`} className="grid grid-cols-1 gap-5 border-t border-fog-light p-4">
           <DocumentNeeds dossierId={dossierId} document={document} viewer={viewer} open={open} />
           <div>
             <h4 className="text-sm font-semibold text-navy-deep">{t('versions')}</h4>
             {document.versions.length === 0 ? (
               <p className="mt-2 text-sm text-slate">{t('noVersionHint')}</p>
             ) : (
-              <ol className="mt-2 grid gap-2">
+              <ol className="mt-2 grid grid-cols-1 gap-2">
                 {[...document.versions].reverse().map((version) => (
                   <li
                     key={version.id}

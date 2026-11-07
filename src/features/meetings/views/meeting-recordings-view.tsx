@@ -16,7 +16,7 @@ import { useTRPC } from '@/trpc/client';
 export function MeetingRecordingsView(): ReactNode {
   const t = useTranslations('Meetings.hub');
   return (
-    <div className="mx-auto grid max-w-6xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-6xl gap-6">
       <MeetingsNav page="recordings" title={t('nav.recordings')} />
       <QueryBoundary fallback={<MeetingCardsSkeleton />}>
         <Recordings />

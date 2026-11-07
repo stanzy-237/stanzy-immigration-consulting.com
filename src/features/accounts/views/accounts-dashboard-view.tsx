@@ -120,7 +120,7 @@ function AccountList({ query, status }: { query: string; status: AccountStatusFi
           </tbody>
         </table>
       </div>
-      <ul className="grid gap-3 md:hidden">
+      <ul className="grid grid-cols-1 gap-3 md:hidden">
         {data.accounts.map((account) => (
           <li key={account.id}>
             <Link
@@ -168,7 +168,7 @@ function AccountDetail({ id }: { id: string }): ReactNode {
   const date = (value: Date) => format.dateTime(value, { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-heading text-3xl font-bold text-navy-deep">{account.name}</h1>
@@ -190,7 +190,7 @@ function AccountDetail({ id }: { id: string }): ReactNode {
         {account.dossiers.length === 0 ? (
           <p className="mt-2 text-sm text-slate">{t('noDossier')}</p>
         ) : (
-          <ul className="mt-3 grid gap-2">
+          <ul className="mt-3 grid grid-cols-1 gap-2">
             {account.dossiers.map((dossier) => (
               <li key={dossier.id}>
                 <Link
@@ -217,7 +217,7 @@ function RowsSkeleton(): ReactNode {
   return (
     <div role="status">
       <span className="sr-only">{t('loading')}</span>
-      <div aria-hidden={true} className="grid gap-3">
+      <div aria-hidden={true} className="grid grid-cols-1 gap-3">
         {[0, 1, 2, 3].map((row) => (
           <Skeleton key={row} className="h-16 rounded-2xl" />
         ))}

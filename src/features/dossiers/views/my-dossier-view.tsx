@@ -48,7 +48,7 @@ export function MyDossierView({
     <>
       <SiteNav />
       <main className="min-h-screen bg-off-white px-4 py-10 md:py-14">
-        <div className="mx-auto grid max-w-3xl gap-10">
+        <div className="mx-auto grid grid-cols-1 max-w-3xl gap-10">
           <div>
             <Link
               href="/mon-espace"

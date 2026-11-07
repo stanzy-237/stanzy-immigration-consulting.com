@@ -24,7 +24,7 @@ export function InvitationView({ token }: { token: string }): ReactNode {
     <>
       <SiteNav />
       <main className="min-h-screen bg-off-white px-4 py-10 md:py-14">
-        <div className="mx-auto grid max-w-xl gap-6">
+        <div className="mx-auto grid grid-cols-1 max-w-xl gap-6">
           <QueryBoundary fallback={<InvitationSkeleton />}>
             <Invitation token={token} />
           </QueryBoundary>

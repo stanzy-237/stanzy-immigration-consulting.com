@@ -92,7 +92,7 @@ function InvoiceSkeleton(): ReactNode {
   return (
     <div role="status">
       <span className="sr-only">{t('loading')}</span>
-      <div aria-hidden={true} className="grid gap-5">
+      <div aria-hidden={true} className="grid grid-cols-1 gap-5">
         <Skeleton className="h-9 w-64" />
         <Skeleton className="h-40 rounded-2xl" />
         <Skeleton className="h-64 rounded-2xl" />

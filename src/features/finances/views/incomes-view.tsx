@@ -38,7 +38,7 @@ export function IncomesView({ year }: { year: number }): ReactNode {
   const t = useTranslations('Finances');
   const [editing, setEditing] = useState<Income | 'new' | null>(null);
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-5xl gap-6">
       <FinancesHeader page="incomes" year={year} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate">{t('incomes.intro')}</p>
@@ -91,7 +91,7 @@ function IncomeList({ year, onEdit }: { year: number; onEdit: (income: Income) =
   }
   return (
     <>
-      <ul className="grid gap-2">
+      <ul className="grid grid-cols-1 gap-2">
         {incomes.map((income) => {
           const label = income.service ? services(income.service) : (income.source ?? '');
           return (
@@ -211,7 +211,7 @@ function IncomeForm({ income, onDone }: { income: Income | null; onDone: () => v
   };
 
   return (
-    <form onSubmit={submit} className="grid gap-4">
+    <form onSubmit={submit} className="grid grid-cols-1 gap-4">
       <DialogHeader>
         <DialogTitle className="font-heading text-xl font-bold text-navy-deep">
           {income ? t('incomes.edit') : t('incomes.new')}

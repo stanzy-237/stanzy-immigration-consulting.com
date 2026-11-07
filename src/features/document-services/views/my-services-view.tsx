@@ -28,7 +28,7 @@ export function MyServicesView({ documentId }: { documentId: string | null }): R
         <section className="relative overflow-hidden bg-navy-deep px-4 pt-10 pb-24 text-white md:pt-14">
           <div aria-hidden={true} className="absolute -top-24 -right-24 size-80 rounded-full bg-rouge/30 blur-3xl" />
           <div aria-hidden={true} className="absolute -bottom-32 -left-16 size-72 rounded-full bg-steel-blue/30 blur-3xl" />
-          <div className="relative mx-auto grid max-w-5xl gap-4">
+          <div className="relative mx-auto grid grid-cols-1 max-w-5xl gap-4">
             <Link
               href="/mon-espace"
               className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-ice-blue hover:text-white"
@@ -44,7 +44,7 @@ export function MyServicesView({ documentId }: { documentId: string | null }): R
             <p className="max-w-2xl text-body-lg text-ice-blue">{t('lead')}</p>
           </div>
         </section>
-        <div className="relative mx-auto -mt-14 grid max-w-5xl gap-6 px-4 pb-16">
+        <div className="relative mx-auto -mt-14 grid grid-cols-1 max-w-5xl gap-6 px-4 pb-16">
           {documentId ? (
             <p className="flex items-start gap-3 rounded-2xl border-2 border-rose bg-blush px-5 py-4 text-sm font-semibold text-navy-deep shadow-sm">
               <HandHelping aria-hidden={true} className="mt-0.5 size-5 shrink-0 text-rouge" />
@@ -97,12 +97,12 @@ function Services({ documentId }: { documentId: string | null }): ReactNode {
             <span aria-hidden={true} className="flex size-12 items-center justify-center rounded-2xl bg-ice-blue">
               <FileCheck2 className="size-6 text-navy-deep" />
             </span>
-            <div className="grid gap-1.5">
+            <div className="grid grid-cols-1 gap-1.5">
               <h2 className="font-heading text-lg font-bold text-navy-deep">{textIn(service.name, locale)}</h2>
               <p className="line-clamp-3 text-sm text-slate">{textIn(service.summary, locale)}</p>
             </div>
             <div className="mt-auto flex flex-wrap items-end justify-between gap-3 border-t border-off-white pt-4">
-              <div className="grid gap-1">
+              <div className="grid grid-cols-1 gap-1">
                 <ServicePrice service={service} />
                 <p className="flex items-center gap-1.5 text-xs text-slate">
                   <Clock aria-hidden={true} className="size-3.5" />

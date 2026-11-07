@@ -24,7 +24,7 @@ export function InterestsDashboardView(): ReactNode {
   const t = useTranslations('Accompagnement.dashboard');
   const [filter, setFilter] = useState<Filter>('SUBMITTED');
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-5xl gap-6">
       <div>
         <h1 className="font-heading text-2xl font-bold text-navy-deep md:text-3xl">{t('title')}</h1>
         <p className="mt-1 text-sm text-slate">{t('intro')}</p>
@@ -74,7 +74,7 @@ function InterestList({ filter }: { filter: Filter }): ReactNode {
     );
   }
   return (
-    <ul aria-busy={other.isFetching} className="grid gap-2">
+    <ul aria-busy={other.isFetching} className="grid grid-cols-1 gap-2">
       {rows.map((row) => {
         const level = row.levelOverride ?? row.level;
         return (
@@ -113,7 +113,7 @@ function InterestList({ filter }: { filter: Filter }): ReactNode {
 function ListSkeleton(): ReactNode {
   const t = useTranslations('Accompagnement.dashboard');
   return (
-    <div role="status" className="grid gap-2">
+    <div role="status" className="grid grid-cols-1 gap-2">
       <span className="sr-only">{t('loading')}</span>
       {[0, 1, 2].map((row) => (
         <Skeleton key={row} aria-hidden={true} className="h-20 rounded-2xl" />

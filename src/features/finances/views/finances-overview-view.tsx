@@ -16,7 +16,7 @@ import { useTRPC } from '@/trpc/client';
 /** Finances' Vue d'ensemble (#95): the year in FCFA, per month, service and category, and each Dossier's margin. */
 export function FinancesOverviewView({ year }: { year: number }): ReactNode {
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-5xl gap-6">
       <FinancesHeader page="overview" year={year} />
       <QueryBoundary fallback={<OverviewSkeleton />}>
         <Overview year={year} />
@@ -40,7 +40,7 @@ function Overview({ year }: { year: number }): ReactNode {
   );
 
   return (
-    <div className="grid gap-6">
+    <div className="grid grid-cols-1 gap-6">
       {months.length > 0 ? (
         <p role="status" className="flex flex-wrap items-center gap-2 rounded-2xl bg-honey-tint px-4 py-3 text-sm text-honey">
           <AlertTriangle aria-hidden={true} className="size-4 shrink-0" />
@@ -204,7 +204,7 @@ function Breakdown({
       {rows.length === 0 ? (
         <p className="text-sm text-slate">{empty}</p>
       ) : (
-        <ul className="grid gap-2">
+        <ul className="grid grid-cols-1 gap-2">
           {rows.map((row) => (
             <li key={row.key} className="flex items-baseline justify-between gap-3 text-sm">
               <span className="min-w-0 truncate text-navy-deep">{row.label}</span>
@@ -220,7 +220,7 @@ function Breakdown({
 function OverviewSkeleton(): ReactNode {
   const t = useTranslations('Finances');
   return (
-    <div role="status" className="grid gap-6">
+    <div role="status" className="grid grid-cols-1 gap-6">
       <span className="sr-only">{t('loading')}</span>
       <div className="grid gap-3 sm:grid-cols-3">
         {[0, 1, 2].map((key) => (

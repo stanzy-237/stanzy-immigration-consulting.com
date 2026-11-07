@@ -59,7 +59,7 @@ type TextKey = { [K in keyof ServiceInput]: ServiceInput[K] extends Texts ? K : 
 export function ServiceEditView({ id }: { id: string | null }): ReactNode {
   const t = useTranslations('DocumentServices.edit');
   return (
-    <div className="mx-auto grid max-w-4xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-4xl gap-6">
       <div>
         <Link
           href="/services"
@@ -129,11 +129,11 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
   };
 
   const texts = (key: TextKey, label: string, opts: { max: number; rows?: number }) => (
-    <fieldset className="grid gap-2">
+    <fieldset className="grid grid-cols-1 gap-2">
       <legend className="mb-1 text-sm font-semibold text-navy-deep">{label}</legend>
       <div className="grid gap-3 md:grid-cols-2">
         {(['fr', 'en'] as const).map((lang) => (
-          <label key={lang} htmlFor={`${ids}-${key}-${lang}`} className="grid gap-1 text-xs font-semibold text-slate">
+          <label key={lang} htmlFor={`${ids}-${key}-${lang}`} className="grid grid-cols-1 gap-1 text-xs font-semibold text-slate">
             {t(`languages.${lang}`)}
             {opts.rows ? (
               <textarea
@@ -160,10 +160,10 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
   );
 
   return (
-    <form onSubmit={submit} noValidate className="grid gap-5">
+    <form onSubmit={submit} noValidate className="grid grid-cols-1 gap-5">
       <section className={card}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label htmlFor={`${ids}-slug`} className="grid gap-1 text-sm font-semibold text-navy-deep">
+          <label htmlFor={`${ids}-slug`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
             {t('slug')}
             <input
               id={`${ids}-slug`}
@@ -211,7 +211,7 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
             </button>
           ))}
         </div>
-        <label htmlFor={`${ids}-price`} className="grid max-w-xs gap-1 text-sm font-semibold text-navy-deep">
+        <label htmlFor={`${ids}-price`} className="grid grid-cols-1 max-w-xs gap-1 text-sm font-semibold text-navy-deep">
           {form.priceKind === 'FIXED' ? t('priceFixed') : t('pricePercent', { max: PERCENT_MAX / 100 })}
           <input
             id={`${ids}-price`}
@@ -290,7 +290,7 @@ function ServiceForm({ id, initial }: { id: string | null; initial: ServiceInput
 function EditSkeleton(): ReactNode {
   const t = useTranslations('DocumentServices.edit');
   return (
-    <div role="status" className="grid gap-4">
+    <div role="status" className="grid grid-cols-1 gap-4">
       <span className="sr-only">{t('loading')}</span>
       <Skeleton aria-hidden={true} className="h-48 rounded-2xl" />
       <Skeleton aria-hidden={true} className="h-64 rounded-2xl" />

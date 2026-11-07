@@ -40,7 +40,7 @@ export function ChargesView({ year }: { year: number }): ReactNode {
   const t = useTranslations('Finances');
   const [editing, setEditing] = useState<Charge | 'new' | null>(null);
   return (
-    <div className="mx-auto grid max-w-5xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-5xl gap-6">
       <FinancesHeader page="charges" year={year} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate">{t('charges.intro')}</p>
@@ -94,7 +94,7 @@ function ChargeList({ year, onEdit }: { year: number; onEdit: (charge: Charge) =
   }
   return (
     <>
-      <ul className="grid gap-2">
+      <ul className="grid grid-cols-1 gap-2">
         {charges.map((charge) => {
           const label = charge.category.name;
           return (
@@ -240,7 +240,7 @@ function ChargeForm({ charge, onDone }: { charge: Charge | null; onDone: () => v
   };
 
   return (
-    <form onSubmit={submit} className="grid gap-4">
+    <form onSubmit={submit} className="grid grid-cols-1 gap-4">
       <DialogHeader>
         <DialogTitle className="font-heading text-xl font-bold text-navy-deep">
           {charge ? t('charges.edit') : t('charges.new')}

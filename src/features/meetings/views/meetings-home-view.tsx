@@ -24,7 +24,7 @@ export function MeetingsHomeView(): ReactNode {
   const toggle = (name: Exclude<typeof dialog, null>) => (next: boolean) => setDialog(next ? name : null);
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-6">
+    <div className="mx-auto grid grid-cols-1 max-w-6xl gap-6">
       <MeetingsNav page="home" title={t('nav.home')} />
       <QueryBoundary fallback={<Skeleton aria-hidden={true} className="h-56 rounded-2xl" />}>
         <Clock />
@@ -45,7 +45,7 @@ export function MeetingsHomeView(): ReactNode {
         </Link>
       </div>
 
-      <section aria-labelledby="meetings-today" className="grid gap-4">
+      <section aria-labelledby="meetings-today" className="grid grid-cols-1 gap-4">
         <div className="flex items-baseline justify-between gap-3">
           <h2 id="meetings-today" className="font-heading text-xl font-bold text-navy-deep">
             {t('home.today')}

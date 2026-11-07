@@ -96,7 +96,7 @@ function DossierNewForm({ initialAccount }: { initialAccount: Account | null }):
       <form
         onSubmit={submit}
         noValidate
-        className="mt-6 grid gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm"
+        className="mt-6 grid grid-cols-1 gap-5 rounded-2xl border border-fog-light bg-white p-5 shadow-sm"
       >
         <AccountPicker
           id={`${ids}-account`}
@@ -233,13 +233,13 @@ function AccountPicker({
           {isPending ? (
             <div role="status">
               <span className="sr-only">{t('loading')}</span>
-              <div aria-hidden={true} className="grid gap-2">
+              <div aria-hidden={true} className="grid grid-cols-1 gap-2">
                 <Skeleton className="h-12 rounded-xl" />
                 <Skeleton className="h-12 rounded-xl" />
               </div>
             </div>
           ) : matches && matches.length > 0 ? (
-            <ul className="grid gap-1.5">
+            <ul className="grid grid-cols-1 gap-1.5">
               {matches.map((match) => (
                 <li key={match.id}>
                   <button
