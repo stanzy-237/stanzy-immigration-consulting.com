@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { helpFor } from '@/features/accompagnement/lib/interest-schema';
+import { isFormKind } from '@/features/client-forms/lib/form-schema';
 import { prerequisitesOf } from '@/features/document-services/lib/service-schema';
 import { smallButton, type DocumentData, type Viewer } from '@/features/dossiers/components/document-styles';
 import { TCF_ACADEMY_URL } from '@/features/shared/data/links';
@@ -19,6 +20,7 @@ const isMissing = (document: DocumentData) => document.missing && document.versi
 /** Beside a Document's name: ★ Obligatoire or Recommandé, « Manquant », and where a Stanzy request stands (#81). */
 export function NeedBadges({ document }: { document: DocumentData }): ReactNode {
   const t = useTranslations('Accompagnement');
+  const forms = useTranslations('ClientForms');
   const request = document.stanzyRequests[0];
   return (
     <>
@@ -33,7 +35,22 @@ export function NeedBadges({ document }: { document: DocumentData }): ReactNode 
           {document.need === 'mandatory' ? t('document.mandatory') : t('document.recommended')}
         </span>
       ) : null}
-      {isMissing(document) ? (
+      {isFormKind(document.kind) ? (
+        <span
+          className={
+            document.clientForm?.complete
+              ? 'shrink-0 rounded-full bg-leaf-tint px-2 py-0.5 text-xs font-semibold text-leaf'
+              : 'shrink-0 rounded-full bg-honey-tint px-2 py-0.5 text-xs font-semibold text-honey'
+          }
+        >
+          {document.clientForm?.complete
+            ? forms('badgeComplete')
+            : document.clientForm
+              ? forms('badgeIncomplete')
+              : forms('badgeToFill')}
+        </span>
+      ) : null}
+      {isMissing(document) && !isFormKind(document.kind) ? (
         <span className="shrink-0 rounded-full bg-honey-tint px-2 py-0.5 text-xs font-semibold text-honey">
           {t('document.missing')}
         </span>

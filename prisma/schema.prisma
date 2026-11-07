@@ -58,6 +58,7 @@ model Account {
   notificationsMade Notification[]       @relation("NotificationActor")
   pdfToolFiles      PdfToolFile[]
   pdfCompressions   PdfCompression[]
+  clientForms       ClientForm[]
   requirementFiles  RequirementFile[]
   signatureRequests SignatureRequest[]   @relation("SignatureRequester")
   signaturesSigned  SignatureRequest[]   @relation("SignatureSigner")
@@ -481,6 +482,8 @@ model DossierDocument {
   /// The Client's note from their Demande d'intérêt, for this document's area.
   clientNote     String?
   stanzyRequests StanzyRequest[]
+  /// For « Historique personnel » and « Renseignements sur la famille »: the form filled in here.
+  clientForm     ClientForm?
   createdAt      DateTime           @default(now())
 
   @@index([sectionId, createdAt])
@@ -1293,6 +1296,25 @@ model DocumentService {
 
   @@index([active, position])
   @@map("document_service")
+}
+
+/// A « Renseignements du client » Document filled in as a form, the way IRCC asks (Annexe A's
+/// periods with no gap, IMM 5406's family): its answers (src/features/client-forms/lib/form-schema.ts),
+/// and whether nothing is missing, kept at each save.
+model ClientForm {
+  id          String          @id @default(cuid())
+  documentId  String          @unique
+  document    DossierDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  /// The Document's Checklist kind: `personalHistory` or `familyInformation`.
+  kind        String
+  data        Json
+  complete    Boolean         @default(false)
+  updatedById String
+  updatedBy   Account         @relation(fields: [updatedById], references: [id], onDelete: Restrict)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("client_form")
 }
 
 /// A file the Client handed over for a Service documentaire (#80), for one of its prerequisites
