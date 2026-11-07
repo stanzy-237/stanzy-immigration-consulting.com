@@ -78,6 +78,8 @@ export const serviceInput = z
     summary: texts(TEXT_MAX),
     provides: texts(TEXT_MAX),
     turnaround: texts(NAME_MAX),
+    /** The turnaround in days, from the request's start date: the countdown the Client sees. */
+    turnaroundDays: z.number().int().min(1).max(365).nullable(),
     conditions: texts(TEXT_MAX),
     contractTitle: texts(NAME_MAX, 2),
     contractBody: texts(CONTRACT_MAX, 10),

@@ -1,12 +1,12 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { FileSignature, FileStack, HandHelping, ReceiptText } from 'lucide-react';
+import { FileSignature, FileStack, HandHelping } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: its short paths, outside next-intl's routing.
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useId, useState, type FormEvent, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import {
@@ -18,11 +18,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/toast';
 import { REASON_MAX } from '@/features/accompagnement/lib/interest-schema';
-import { SCHEDULE_MAX } from '@/features/contracts/lib/contract-schema';
-import { amountFor, PERCENT_MAX, prerequisitesOf, textIn } from '@/features/document-services/lib/service-schema';
+import { TermsDialog } from '@/features/document-services/components/terms-dialog';
+import { PERCENT_MAX, prerequisitesOf, textIn } from '@/features/document-services/lib/service-schema';
 import { formatMoney } from '@/features/invoices/lib/money';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
@@ -178,26 +177,14 @@ function ServicePicker({ dossierId, request }: { dossierId: string; request: Req
   );
 }
 
-/**
- * Taking a request on: the service's own Contrat goes to the Client in their
- * language, at the price (a percentage service needs the amount worked out
- * from the funds to justify), and the same amount joins the draft invoice.
- */
+/** Taking a request on: the service's own Contrat to the Client, and the same amount on the draft invoice. */
 function AcceptDialog({ dossierId, request, onClose }: { dossierId: string; request: Request; onClose: () => void }): ReactNode {
   const t = useTranslations('Accompagnement.stanzy');
   const errors = useTranslations('Accompagnement.errors');
-  const ids = useId();
-  const locale = useLocale();
   const router = useRouter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const service = request.service!;
-  const suggested = amountFor(service);
-  const [lang, setLang] = useState<'fr' | 'en'>(locale === 'en' ? 'en' : 'fr');
-  const [amount, setAmount] = useState(suggested === null ? '' : String(suggested));
-  const [base, setBase] = useState('');
-  const [schedule, setSchedule] = useState(t('defaultSchedule'));
-  const [invalid, setInvalid] = useState(false);
   const accept = useMutation(
     trpc.accompagnement.stanzy.accept.mutationOptions({
       onSuccess: ({ contract, invoiceId }) => {
@@ -218,96 +205,14 @@ function AcceptDialog({ dossierId, request, onClose }: { dossierId: string; requ
       },
     }),
   );
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const value = Number(amount.replace(/\s/g, ''));
-    const ok = Number.isInteger(value) && value > 0 && schedule.trim().length > 0;
-    setInvalid(!ok);
-    if (ok) accept.mutate({ id: request.id, locale: lang, amount: value, schedule: schedule.trim() });
-  };
-  const field =
-    'h-11 w-full rounded-xl border-2 border-fog-light bg-white px-3.5 text-sm font-normal text-navy-deep focus:border-navy-deep focus:outline-none';
-
   return (
-    <Dialog open onOpenChange={(next) => !next && onClose()}>
-      <DialogContent className="max-w-lg gap-4 p-6">
-        <DialogHeader>
-          <DialogTitle className="font-heading text-xl font-bold text-navy-deep">{t('acceptTitle')}</DialogTitle>
-          <DialogDescription className="text-sm text-slate">
-            {t('acceptBody', { service: textIn(service.name, lang), document: request.document.title })}
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={submit} noValidate className="grid grid-cols-1 gap-4">
-          <label htmlFor={`${ids}-lang`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
-            {t('language')}
-            <select id={`${ids}-lang`} value={lang} onChange={(event) => setLang(event.target.value as 'fr' | 'en')} className={field}>
-              <option value="fr">Français</option>
-              <option value="en">English</option>
-            </select>
-          </label>
-          {service.priceKind === 'PERCENT' ? (
-            <label htmlFor={`${ids}-base`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
-              {t('base')}
-              <input
-                id={`${ids}-base`}
-                inputMode="numeric"
-                value={base}
-                onChange={(event) => {
-                  setBase(event.target.value);
-                  const value = Number(event.target.value.replace(/\s/g, ''));
-                  const computed = Number.isFinite(value) ? amountFor(service, value) : null;
-                  if (computed !== null) setAmount(String(computed));
-                }}
-                className={field}
-              />
-            </label>
-          ) : null}
-          <label htmlFor={`${ids}-amount`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
-            {t('amount')}
-            <input
-              id={`${ids}-amount`}
-              inputMode="numeric"
-              value={amount}
-              aria-invalid={invalid && !(Number(amount) > 0)}
-              onChange={(event) => setAmount(event.target.value)}
-              className={field}
-            />
-          </label>
-          <label htmlFor={`${ids}-schedule`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
-            {t('schedule')}
-            <input
-              id={`${ids}-schedule`}
-              maxLength={SCHEDULE_MAX}
-              value={schedule}
-              onChange={(event) => setSchedule(event.target.value)}
-              className={field}
-            />
-          </label>
-          {invalid ? (
-            <p role="alert" className="text-sm font-medium text-rouge">
-              {t('acceptInvalid')}
-            </p>
-          ) : null}
-          <p className="flex items-start gap-2 rounded-xl bg-off-white px-3 py-2.5 text-xs text-slate">
-            <ReceiptText aria-hidden={true} className="mt-0.5 size-4 shrink-0" />
-            {t('acceptInvoice')}
-          </p>
-          <div className="flex flex-wrap justify-end gap-2">
-            <button type="button" onClick={onClose} className="h-11 rounded-full px-4 text-sm font-semibold text-navy-deep hover:bg-off-white">
-              {t('keep')}
-            </button>
-            <button
-              type="submit"
-              disabled={accept.isPending}
-              className="inline-flex h-11 items-center gap-1.5 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson disabled:opacity-50"
-            >
-              <FileSignature aria-hidden={true} className="size-4" />
-              {accept.isPending ? t('accepting') : t('acceptConfirm')}
-            </button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <TermsDialog
+      service={service}
+      description={(lang) => t('acceptBody', { service: textIn(service.name, lang), document: request.document.title })}
+      pending={accept.isPending}
+      onSubmit={(terms) => accept.mutate({ id: request.id, ...terms })}
+      onClose={onClose}
+    />
   );
 }
 

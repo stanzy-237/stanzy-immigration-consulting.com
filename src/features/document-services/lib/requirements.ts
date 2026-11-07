@@ -71,3 +71,22 @@ export const addRequirementFileInput = encryptedFileInput.extend({ requestId: id
 
 /** Where a requirement file opens, decrypted by the server. */
 export const requirementFileUrl = (fileId: string): string => `/api/requirements/files/${fileId}`;
+
+const DAY_IN_MS = 86_400_000;
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+const utcDay = (day: string): number => {
+  const [year = 0, month = 1, date = 1] = day.split('-').map(Number);
+  return Date.UTC(year, month - 1, date);
+};
+
+/** The consultant sets the day the work starts (proof of funds: the draw from the pool); null takes it off. */
+export const setStartInput = requestRef.extend({ startedOn: z.string().regex(DAY).nullable() });
+
+/** The day a request is due (`YYYY-MM-DD`): its start plus the service's turnaround; null without either. */
+export function dueOn(startedOn: string | null, turnaroundDays: number | null): string | null {
+  if (!startedOn || !turnaroundDays) return null;
+  return new Date(utcDay(startedOn) + turnaroundDays * DAY_IN_MS).toISOString().slice(0, 10);
+}
+
+/** Whole days from `today` to `day`, both UTC calendar days; negative once past. */
+export const daysUntil = (day: string, today: string): number => Math.round((utcDay(day) - utcDay(today)) / DAY_IN_MS);

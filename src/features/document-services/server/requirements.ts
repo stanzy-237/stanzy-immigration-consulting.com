@@ -34,9 +34,10 @@ export async function requestFor(db: Db, session: CurrentSession, requestId: str
       id: true,
       status: true,
       answers: true,
+      startedOn: true,
       createdAt: true,
       document: { select: { id: true, title: true, section: { select: { dossierId: true } } } },
-      service: { select: { slug: true, name: true, prerequisites: true, questionnaire: true } },
+      service: { select: { slug: true, name: true, prerequisites: true, questionnaire: true, turnaroundDays: true } },
     },
   });
   if (!request) throw new TRPCError({ code: 'NOT_FOUND' });

@@ -3770,7 +3770,13 @@
       "noPrice": "Price to set",
       "requests": "{count, plural, =0 {no requests} one {# request} other {# requests}}",
       "error": "Something went wrong. Try again.",
-      "loading": "Loading the catalogue"
+      "loading": "Loading the catalogue",
+      "copyLink": "Copy the private link",
+      "copyLinkLabel": "Copy {name}’s private link",
+      "renewLink": "New link",
+      "renewLinkLabel": "Replace {name}’s private link",
+      "linkCopied": "Private link copied",
+      "linkRenewed": "New link copied: the old one no longer works"
     },
     "edit": {
       "back": "Document services",
@@ -3834,7 +3840,9 @@
         "proofOfFunds": "Proof of funds (NIU, emergency contacts, gift)",
         "proofOfFundsNoFunds": "Proof of funds without funds (and UBA account)"
       },
-      "questionnaireHint": "The questions the client answers with their request."
+      "questionnaireHint": "The questions the client answers with their request.",
+      "turnaroundDays": "Turnaround in days (countdown)",
+      "turnaroundDaysHint": "From the start date you set on the request. Empty: no countdown."
     },
     "requirements": {
       "title": "Items to hand over",
@@ -3901,7 +3909,80 @@
       "errors": {
         "REQUIREMENTS_CLOSED": "This request is no longer under way.",
         "UNKNOWN": "Something went wrong. Try again."
+      },
+      "due": "Due on {date}"
+    },
+    "offer": {
+      "metaTitle": "Document service",
+      "eyebrow": "Document service · private link",
+      "loading": "Loading the service",
+      "prerequisitesIntro": "What you hand over to Stanzy once the order is confirmed, on your request’s page.",
+      "priceNote": "Invoiced after the service contract is signed.",
+      "signInFirst": "Sign in or create your account to order this service: your file, the contract and the invoice will be there.",
+      "signIn": "Sign in to order",
+      "note": "A word for Stanzy (optional)",
+      "noteHint": "For example the amount to justify, or the date you were drawn from the pool.",
+      "accept": "I have read the conditions and the contract, and I order this service.",
+      "order": "Order this service",
+      "ordered": "Order sent to Stanzy",
+      "next": "Stanzy confirms your order, then sends you the contract to sign and the invoice.",
+      "pending": "Order sent",
+      "pendingBody": "Stanzy confirms it shortly: you will get the contract to sign by email.",
+      "approved": "Order confirmed",
+      "openDossier": "Open my file",
+      "rejected": "Your previous order was not accepted",
+      "errors": {
+        "ORDER_PENDING": "An order for this service is already waiting for Stanzy’s confirmation.",
+        "ORDER_NOT_ELIGIBLE": "This account can’t order a service.",
+        "UNKNOWN": "Something went wrong. Try again."
       }
+    },
+    "orders": {
+      "title": "Orders",
+      "intro": "The services ordered through their private link. Confirming opens the client’s file and sends them the service contract with the invoice.",
+      "filterLabel": "Filter the orders",
+      "filters": {
+        "SUBMITTED": "To handle",
+        "APPROVED": "Confirmed",
+        "REJECTED": "Declined"
+      },
+      "status": {
+        "SUBMITTED": "To handle",
+        "APPROVED": "Confirmed",
+        "REJECTED": "Declined"
+      },
+      "empty": "No orders here.",
+      "loading": "Loading the orders",
+      "approve": "Confirm",
+      "approveBody": "“{service}” for {client}: their file opens and the contract goes out to sign.",
+      "approved": "Order confirmed: file opened, contract sent",
+      "reject": "Decline",
+      "rejectLabel": "Decline {name}’s order",
+      "rejectTitle": "Decline the order",
+      "rejectBody": "The client is told by email, with your note.",
+      "rejectNote": "Note for the client (optional)",
+      "rejectConfirm": "Decline",
+      "rejected": "Order declined",
+      "keep": "Keep",
+      "openDossier": "Open the file",
+      "errors": {
+        "ORDER_NOT_PENDING": "This order was already handled.",
+        "UNKNOWN": "Something went wrong. Try again."
+      }
+    },
+    "progress": {
+      "daysLeft": "{count, plural, =0 {Today} one {# day left} other {# days left}}",
+      "dueOn": "due on {date}",
+      "late": "Due on {date}: the deadline has passed.",
+      "notStarted": "The countdown starts on the start date Stanzy sets.",
+      "noTurnaround": "Turnaround to be set by Stanzy.",
+      "startedOn": "Started on {date}",
+      "left": "{count, plural, =0 {Items to hand over} one {# item to hand over} other {# items to hand over}}",
+      "allGiven": "Everything handed over",
+      "start": "Start date",
+      "saveStart": "Save",
+      "startSaved": "Start date saved",
+      "error": "Something went wrong. Try again."
     }
   }
 }

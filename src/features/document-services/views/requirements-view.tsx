@@ -23,6 +23,7 @@ import { uploadEncryptedFile } from '@/features/dossiers/lib/upload-version';
 import { SignaturePad } from '@/features/shared/components/signing/signature-pad';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
+import { utcDate } from '@/features/ita-countdown/lib/ita-deadline';
 import { INKS, type Ink } from '@/features/signatures/lib/inks';
 import { Link } from '@/i18n/navigation';
 import { useTRPC } from '@/trpc/client';
@@ -72,6 +73,8 @@ function Requirements({ requestId, viewer }: { requestId: string; viewer: 'clien
   const t = useTranslations('DocumentServices.requirements');
   const locale = useLocale();
   const trpc = useTRPC();
+  const stages = useTranslations('Dossiers.stages');
+  const format = useFormatter();
   const { data } = useSuspenseQuery(trpc.documentServices.requirements.get.queryOptions({ requestId }));
   const left = data.items.filter((item) => item.state === 'missing').length + data.questionsLeft.length;
   const backClass = 'inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-slate hover:text-navy-deep';
@@ -101,6 +104,16 @@ function Requirements({ requestId, viewer }: { requestId: string; viewer: 'clien
         </h1>
         <p className="mt-1 text-sm text-slate">
           {t('for', { document: data.request.document.title, client: data.dossier.client })}
+        </p>
+        <p className="mt-2 flex flex-wrap gap-2">
+          <span className={`${pill} bg-ice-blue text-navy-deep`}>
+            {stages(`${data.dossier.service}.${data.dossier.stage}` as never)}
+          </span>
+          {data.dueOn ? (
+            <span className={`${pill} bg-off-white text-navy-deep`}>
+              {t('due', { date: format.dateTime(utcDate(data.dueOn), { day: 'numeric', month: 'long', timeZone: 'UTC' }) })}
+            </span>
+          ) : null}
         </p>
         <p className="mt-3 text-sm text-navy-deep">{t('intro')}</p>
         <p

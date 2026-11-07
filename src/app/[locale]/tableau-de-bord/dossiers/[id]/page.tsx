@@ -1,4 +1,5 @@
 import { DossierOverviewView } from '@/features/accompagnement/views/dossier-overview-view';
+import { ServiceProgressView } from '@/features/document-services/views/service-progress-view';
 import { DossierStanzyView } from '@/features/accompagnement/views/dossier-stanzy-view';
 import { DossierDashboardView } from '@/features/dossiers/views/dossier-dashboard-view';
 import { DossierContractsView } from '@/features/contracts/views/dossier-contracts-view';
@@ -17,12 +18,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   prefetch(trpc.contracts.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.accompagnement.stanzy.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.accompagnement.overview.queryOptions({ dossierId: id }));
+  prefetch(trpc.documentServices.requirements.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.meetings.forDossier.queryOptions({ dossierId: id }));
   return (
     <HydrateClient>
       <DossierDashboardView
         id={id}
-        overview={<DossierOverviewView dossierId={id} viewer="consultant" />}
+        overview={
+          <>
+            <DossierOverviewView dossierId={id} viewer="consultant" />
+            <ServiceProgressView dossierId={id} viewer="consultant" />
+          </>
+        }
         invoices={<DossierInvoicesView dossierId={id} viewer="consultant" />}
         finances={<DossierFinancesView dossierId={id} />}
         contracts={<DossierContractsView dossierId={id} viewer="consultant" />}

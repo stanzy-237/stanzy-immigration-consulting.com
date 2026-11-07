@@ -64,6 +64,7 @@ model Account {
   contractsSent     Contract[]           @relation("ContractSender")
   contractsSigned   Contract[]           @relation("ContractSigner")
   interestRequests  InterestRequest[]
+  serviceOrders     ServiceOrder[]
   interestsDecided  InterestRequest[]    @relation("InterestDecider")
   stanzyRequests    StanzyRequest[]
   meetingsPlanned   Meeting[]
@@ -402,6 +403,7 @@ model Dossier {
   invoices      Invoice[]
   contracts     Contract[]
   interest      InterestRequest?
+  serviceOrder  ServiceOrder?
   meetings      Meeting[]
   messages      DossierMessage[]
   incomes       Income[]
@@ -968,6 +970,9 @@ model StanzyRequest {
   acceptedAt    DateTime?
   /// The service's Contrat, sent when the consultant accepts.
   contract      Contract?
+  /// The day the work starts (`YYYY-MM-DD`), set by the consultant (proof of funds: the extraction from the
+  /// pool); with the service's `turnaroundDays`, the day it is due.
+  startedOn     String?
   /// The service's questionnaire, answered by the Client (proof of funds: NIU, contacts, donation…).
   answers       Json?
   /// What the Client handed over for the service: shared with whoever does it, never a Dossier Document.
@@ -1248,37 +1253,43 @@ enum PriceKind {
 /// GLOSSARY: Services documentaires. A document Stanzy obtains for Clients in Cameroon, at a price set
 /// in the Tableau de bord. Prices live here only, never in code. Texts are `{ fr, en }`.
 model DocumentService {
-  id            String          @id @default(cuid())
+  id             String          @id @default(cuid())
   /// Its address in « Mon espace » (`/mon-espace/services/<slug>`).
-  slug          String          @unique
-  active        Boolean         @default(false)
-  position      Int
-  name          Json
-  summary       Json
+  slug           String          @unique
+  active         Boolean         @default(false)
+  position       Int
+  name           Json
+  summary        Json
   /// What the Client must provide, the turnaround and the conditions, shown before they accept.
-  provides      Json
-  turnaround    Json
-  conditions    Json
+  provides       Json
+  turnaround     Json
+  /// The turnaround in days, from the request's start date: the countdown the Client sees. Null: none shown.
+  turnaroundDays Int?
+  /// The private link's secret (`/services/offre/<token>`), sent on WhatsApp to someone who wants this
+  /// service only: they read its conditions and price and order it. Null until the consultant makes one.
+  shareToken     String?         @unique
+  conditions     Json
   /// The service's own contract, with the same blanks as a Modèle de contrat ({client}, {prix}…).
-  contractTitle Json
-  contractBody  Json
-  priceKind     PriceKind
+  contractTitle  Json
+  contractBody   Json
+  priceKind      PriceKind
   /// XAF for FIXED; hundredths of a percent for PERCENT (250 = 2.5 %).
-  price         Int
+  price          Int
   /// « par dossier », « par pays et par personne »…
-  unit          Json
+  unit           Json
   /// The Checklist documents it gets (`passport`, `policeCertificate`…): « Stanzy s'en charge » on one leads here.
-  documentKinds String[]
+  documentKinds  String[]
   /// What the Client hands over for Stanzy to do it (police certificate: CNI, passport…):
   /// `{ key, fr, en, type, kind, when }[]` (src/features/document-services/lib/service-schema.ts).
   /// `kind`: a Checklist document whose copy in the Dossier also counts (one way only: what is
   /// handed over for a service never becomes a Dossier Document). `when`: only with a donation.
-  prerequisites Json            @default("[]")
+  prerequisites  Json            @default("[]")
   /// A questionnaire the Client answers with the request: `proofOfFunds` or `proofOfFundsNoFunds`.
-  questionnaire String?
-  requests      StanzyRequest[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  questionnaire  String?
+  requests       StanzyRequest[]
+  orders         ServiceOrder[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   @@index([active, position])
   @@map("document_service")
@@ -1306,3 +1317,32 @@ model RequirementFile {
   @@map("requirement_file")
 }
 
+enum ServiceOrderStatus {
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+/// Someone who came for one Service documentaire only (#80), through its private link: they read its
+/// conditions and price and order it. Approved, it opens their Service documentaire Dossier, with the
+/// service's « Stanzy s'en charge » request on its Document, and sends the service's Contrat.
+model ServiceOrder {
+  id         String             @id @default(cuid())
+  accountId  String
+  account    Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  serviceId  String
+  service    DocumentService    @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  status     ServiceOrderStatus @default(SUBMITTED)
+  /// What the Client adds when ordering (the amount to justify…).
+  note       String?
+  /// Why the consultant turned it down, for the Client.
+  rejectNote String?
+  decidedAt  DateTime?
+  dossierId  String?            @unique
+  dossier    Dossier?           @relation(fields: [dossierId], references: [id], onDelete: SetNull)
+  createdAt  DateTime           @default(now())
+
+  @@index([status, createdAt])
+  @@index([accountId, serviceId, status])
+  @@map("service_order")
+}
