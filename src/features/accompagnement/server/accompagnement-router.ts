@@ -25,11 +25,10 @@ import {
   type SavedCrs,
 } from '@/features/accompagnement/lib/interest-schema';
 import { livesInCameroon } from '@/features/accompagnement/server/residence';
+import { acceptStanzyRequest } from '@/features/accompagnement/server/stanzy-accept';
 import { transitionAccountStatus } from '@/features/auth/server/account-status';
 import { SCHEDULE_MAX } from '@/features/contracts/lib/contract-schema';
-import { sendServiceContract } from '@/features/contracts/server/contracts-router';
-import { textIn } from '@/features/document-services/lib/service-schema';
-import { addDraftInvoiceLine } from '@/features/invoices/server/draft-lines';
+import { prerequisitesOf } from '@/features/document-services/lib/service-schema';
 import { computeCrs } from '@/features/crs/lib/compute-crs';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
@@ -415,8 +414,11 @@ export const accompagnementRouter = createTRPCRouter({
           createdAt: true,
           acceptedAt: true,
           document: { select: { id: true, title: true, section: { select: { title: true } } } },
-          service: { select: { id: true, slug: true, name: true, priceKind: true, price: true, unit: true } },
+          service: {
+            select: { id: true, slug: true, name: true, priceKind: true, price: true, unit: true, prerequisites: true, questionnaire: true },
+          },
           contract: { select: { id: true, number: true, status: true } },
+          _count: { select: { files: true } },
         },
       });
     }),
@@ -449,11 +451,11 @@ export const accompagnementRouter = createTRPCRouter({
         if (document.stanzyRequests.length > 0) throw refuse('STANZY_ALREADY_ASKED');
         const service = await ctx.prisma.documentService.findUnique({
           where: { id: input.serviceId },
-          select: { active: true, slug: true },
+          select: { active: true, slug: true, prerequisites: true, questionnaire: true },
         });
         if (!service?.active) throw refuse('SERVICE_UNAVAILABLE');
 
-        const request = await ctx.prisma.stanzyRequest.create({
+        const created = await ctx.prisma.stanzyRequest.create({
           data: {
             documentId: document.id,
             requestedById: ctx.session.account.id,
@@ -462,6 +464,11 @@ export const accompagnementRouter = createTRPCRouter({
           },
           select: { id: true },
         });
+        // What to hand over for it then has its own page (#80): never Documents of the Dossier.
+        const request = {
+          ...created,
+          requirements: prerequisitesOf(service.prerequisites).length > 0 || service.questionnaire !== null,
+        };
         const client = dossier.account.name;
         mailLater('a Stanzy request', async () =>
           (await consultants(ctx.prisma)).map((consultant) =>
@@ -511,34 +518,7 @@ export const accompagnementRouter = createTRPCRouter({
         if (!request) throw notFound();
         const dossier = await dossierFor(ctx.prisma, ctx.session, request.document.section.dossierId);
         writable(dossier);
-        if (request.status !== 'REQUESTED') throw refuse('STANZY_NOT_PENDING');
-        if (!request.service) throw refuse('STANZY_NO_SERVICE');
-
-        const serviceName = textIn(request.service.name, input.locale);
-        const contract = await sendServiceContract(ctx, dossier, {
-          stanzyRequestId: request.id,
-          locale: input.locale,
-          template: {
-            title: textIn(request.service.contractTitle, input.locale),
-            body: textIn(request.service.contractBody, input.locale),
-          },
-          serviceName,
-          amount: input.amount,
-          currency: 'XAF',
-          schedule: input.schedule,
-        });
-        const { invoiceId } = await ctx.prisma.$transaction(async (tx) => {
-          const { count } = await tx.stanzyRequest.updateMany({
-            where: { id: request.id, status: 'REQUESTED' },
-            data: { status: 'ACCEPTED', decidedAt: new Date() },
-          });
-          if (count === 0) throw refuse('STANZY_NOT_PENDING');
-          return addDraftInvoiceLine(tx, dossier.id, {
-            description: `${serviceName} – ${request.document.title}`,
-            quantity: 1,
-            unitAmount: input.amount,
-          });
-        });
+        const { contract, invoiceId } = await acceptStanzyRequest(ctx, dossier, request, input);
         trackLater(ctx.headers, 'stanzy.accepted');
         return { contract, invoiceId };
       }),

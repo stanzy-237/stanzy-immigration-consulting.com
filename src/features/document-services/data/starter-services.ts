@@ -1,5 +1,5 @@
 import type { DocumentId } from '@/features/checklist/lib/build-checklist';
-import type { ServiceInput, Texts } from '@/features/document-services/lib/service-schema';
+import type { Prerequisite, ServiceInput, Texts } from '@/features/document-services/lib/service-schema';
 
 /**
  * The Services documentaires Stanzy starts with (#80), written once so the
@@ -8,6 +8,37 @@ import type { ServiceInput, Texts } from '@/features/document-services/lib/servi
  * each price in the Tableau de bord before turning it on.
  */
 export type StarterService = Omit<ServiceInput, 'active' | 'price'>;
+
+const file = (key: string, fr: string, en: string, kind: DocumentId | null = null): Prerequisite => ({
+  key,
+  fr,
+  en,
+  type: 'file',
+  kind,
+  when: null,
+});
+
+/**
+ * What the bank needs for a proof of funds: a photo (any, no IRCC rules),
+ * a signature on a blank page, where the Client lives and a payslip; with a
+ * donation, the donor's photo too. The questionnaire asks the rest (NIU,
+ * emergency contacts, the donor).
+ */
+const PROOF_OF_FUNDS: Prerequisite[] = [
+  file('photo', 'Photo', 'Photo', 'photo'),
+  { key: 'signature', fr: 'Signature numérique', en: 'Digital signature', type: 'signature', kind: null, when: null },
+  file('plan-de-localisation', 'Plan de localisation', 'Location map'),
+  file('bulletin-de-paie', 'Bulletin de paie', 'Payslip', 'payslips'),
+  { ...file('photo-donateur', 'Photo du donateur', 'Donor’s photo'), when: 'donation' },
+];
+
+/** The police certificate's documents (also in the migration that brought prerequisites). */
+const POLICE: Prerequisite[] = [
+  file('cni', 'Carte nationale d’identité (CNI)', 'National ID card (CNI)'),
+  file('passeport', 'Passeport', 'Passport', 'passport'),
+  file('acte-de-naissance', 'Acte de naissance', 'Birth certificate', 'birthCertificate'),
+  file('bulletin-n-3', 'Bulletin n° 3 (extrait de casier judiciaire)', 'Bulletin no. 3 (criminal record extract)'),
+];
 
 const contract = (fr: string, en: string): Texts => ({
   fr: `# Objet
@@ -52,56 +83,127 @@ Contract no. {numero}, made on {date}.`,
 
 const kinds = (...ids: DocumentId[]) => ids;
 
+/**
+ * How Stanzy builds a proof of funds, from the consultant's « Budget
+ * prévisionnel » (no rates here: each service's price lives in the
+ * catalogue): two accounts, for traceability, the bank one at UBA when Stanzy
+ * provides the funds, else at the Client's bank.
+ */
+const proofOfFundsService = (bank: { fr: string; en: string }) => ({
+  fr: `# Prestation
+Le Prestataire constitue une preuve de fonds conforme aux exigences d’Immigration, Réfugiés et Citoyenneté Canada (IRCC). Il travaille avec deux comptes, pour la traçabilité, la crédibilité et la conformité des fonds.
+
+# 1. Compte en microfinance
+Documents remis :
+- Fiche d’ouverture du compte
+- Attestation de domiciliation bancaire
+- Attestation de solde bancaire
+- Historique du compte
+- Attestation de non-endettement
+- Ordre de virement de compte à compte
+
+# 2. Compte bancaire
+Pour une meilleure transférabilité des fonds, un virement est effectué du compte de la microfinance vers un compte bancaire. ${bank.fr}
+Documents remis :
+- Relevé d’identité bancaire (RIB)
+- Attestation de solde bancaire
+- Historique du compte
+
+# Délai
+Environ 3 semaines après l’extraction du Client du bassin de l’Entrée express. La procédure ne débute qu’après cette extraction. Les délais sont indicatifs et peuvent varier selon les administrations concernées.
+
+# Observations
+- Tous les documents remis sont préparés conformément aux exigences d’IRCC.
+- Toute prestation supplémentaire non mentionnée au présent contrat fait l’objet d’un devis complémentaire.`,
+  en: `# Service
+The Provider builds a proof of funds meeting the requirements of Immigration, Refugees and Citizenship Canada (IRCC). It works with two accounts, for the traceability, credibility and compliance of the funds.
+
+# 1. Microfinance account
+Documents delivered:
+- Account opening form
+- Bank domiciliation certificate
+- Bank balance certificate
+- Account history
+- Certificate of no debt
+- Account-to-account transfer order
+
+# 2. Bank account
+For better transferability of the funds, a transfer is made from the microfinance account to a bank account. ${bank.en}
+Documents delivered:
+- Bank details (RIB)
+- Bank balance certificate
+- Account history
+
+# Turnaround
+About 3 weeks after the Client is drawn from the Express Entry pool. The procedure only starts after that draw. Timings are indicative and may vary with the authorities involved.
+
+# Notes
+- All documents delivered are prepared to IRCC’s requirements.
+- Any further service not mentioned in this contract is quoted separately.`,
+});
+
+const PROOF_OF_FUNDS_TURNAROUND = { fr: 'Environ 3 semaines après l’extraction du bassin', en: 'About 3 weeks after the draw from the pool' };
+
 export const STARTER_SERVICES: StarterService[] = [
   {
     slug: 'preuve-de-fonds',
     name: { fr: 'Preuve de fonds (vous avez les fonds)', en: 'Proof of funds (you have the funds)' },
     summary: {
-      fr: 'Stanzy prépare avec votre banque la lettre et les relevés qu’IRCC attend pour l’Entrée express : montants, durée de détention, mentions obligatoires.',
-      en: 'Stanzy works with your bank on the letter and statements IRCC expects for Express Entry: amounts, holding period, required wording.',
+      fr: 'Vous avez déjà la totalité des fonds : Stanzy constitue une preuve de fonds conforme aux exigences d’IRCC, sur un compte en microfinance puis un compte dans la banque de votre choix.',
+      en: 'You already have all the funds: Stanzy builds a proof of funds meeting IRCC’s requirements, on a microfinance account then an account at the bank of your choice.',
     },
     provides: {
       fr: 'Le nom de votre banque, vos relevés des 6 derniers mois et la taille de votre famille.',
       en: 'Your bank’s name, your statements for the last 6 months and your family size.',
     },
-    turnaround: { fr: '7 à 14 jours ouvrables', en: '7 to 14 business days' },
+    turnaround: PROOF_OF_FUNDS_TURNAROUND,
+    turnaroundDays: 21,
     conditions: {
-      fr: 'Les fonds doivent être à votre nom et disponibles. Le montant à justifier suit le barème d’IRCC pour la taille de votre famille ; Stanzy le confirme avant la facture.',
-      en: 'The funds must be in your name and available. The amount to justify follows IRCC’s table for your family size; Stanzy confirms it before the invoice.',
+      fr: 'La procédure débute uniquement après votre extraction du bassin. Les fonds doivent être à votre nom et disponibles ; le montant à justifier suit le barème d’IRCC pour la taille de votre famille. Les honoraires sont un pourcentage de ce montant.',
+      en: 'The procedure only starts once you are drawn from the pool. The funds must be in your name and available; the amount to justify follows IRCC’s table for your family size. The fee is a percentage of that amount.',
     },
     contractTitle: { fr: 'Contrat de service : preuve de fonds', en: 'Service contract: proof of funds' },
-    contractBody: contract(
-      '# Prestation\nLe Prestataire obtient auprès de la banque du Client une lettre de solde et les relevés conformes aux exigences d’IRCC pour le montant à justifier convenu.',
-      '# Service\nThe Provider obtains from the Client’s bank a balance letter and statements meeting IRCC’s requirements for the agreed amount to justify.',
+    contractBody: (({ fr, en }) => contract(fr, en))(
+      proofOfFundsService({
+        fr: 'Le Client fournissant lui-même les fonds, le virement est effectué vers la banque de son choix.',
+        en: 'As the Client provides the funds, the transfer is made to the bank of their choice.',
+      }),
     ),
     priceKind: 'PERCENT',
     unit: { fr: 'par dossier, en % du montant à justifier', en: 'per file, as a % of the amount to justify' },
     documentKinds: kinds('bankLetter', 'bankStatements'),
+    prerequisites: PROOF_OF_FUNDS,
+    questionnaire: 'proofOfFunds',
   },
   {
     slug: 'preuve-de-fonds-sans-fonds',
     name: { fr: 'Preuve de fonds (vous n’avez pas les fonds)', en: 'Proof of funds (you don’t have the funds)' },
     summary: {
-      fr: 'Pour qui n’a pas encore le montant : Stanzy organise une preuve de fonds conforme, montée avec un partenaire bancaire.',
-      en: 'For those who don’t have the amount yet: Stanzy arranges a compliant proof of funds, set up with a banking partner.',
+      fr: 'Vous n’avez pas les fonds requis : Stanzy les met à disposition et constitue une preuve de fonds conforme aux exigences d’IRCC, sur un compte en microfinance puis un compte UBA.',
+      en: 'You don’t have the required funds: Stanzy provides them and builds a proof of funds meeting IRCC’s requirements, on a microfinance account then a UBA account.',
     },
     provides: {
       fr: 'Votre pièce d’identité, la taille de votre famille et la date prévue de votre profil ou de votre ITA.',
       en: 'Your ID, your family size and the expected date of your profile or ITA.',
     },
-    turnaround: { fr: '14 à 21 jours ouvrables', en: '14 to 21 business days' },
+    turnaround: PROOF_OF_FUNDS_TURNAROUND,
+    turnaroundDays: 21,
     conditions: {
-      fr: 'Le montant à justifier suit le barème d’IRCC pour la taille de votre famille ; Stanzy le confirme avant la facture. Les fonds doivent rester disponibles jusqu’à la décision d’IRCC.',
-      en: 'The amount to justify follows IRCC’s table for your family size; Stanzy confirms it before the invoice. The funds must stay available until IRCC’s decision.',
+      fr: 'La procédure débute uniquement après votre extraction du bassin. Les honoraires, un pourcentage du montant à justifier, comprennent la mise à disposition des fonds et tout le processus de constitution et de sécurisation de la preuve. Si vous avez déjà un compte UBA, il doit être fermé : un nouveau est ouvert.',
+      en: 'The procedure only starts once you are drawn from the pool. The fee, a percentage of the amount to justify, covers providing the funds and the whole process of building and securing the proof. If you already have a UBA account, it must be closed: a new one is opened.',
     },
     contractTitle: { fr: 'Contrat de service : preuve de fonds (montage)', en: 'Service contract: proof of funds (arranged)' },
-    contractBody: contract(
-      '# Prestation\nLe Prestataire organise, avec un partenaire bancaire, une preuve de fonds conforme aux exigences d’IRCC pour le montant à justifier convenu, et en remet la lettre et les relevés.',
-      '# Service\nThe Provider arranges, with a banking partner, a proof of funds meeting IRCC’s requirements for the agreed amount to justify, and delivers its letter and statements.',
+    contractBody: (({ fr, en }) => contract(fr, en))(
+      proofOfFundsService({
+        fr: 'Le Prestataire fournissant les fonds, le compte est ouvert à UBA. Le prix comprend la mise à disposition des fonds et tout le processus de constitution et de sécurisation de la preuve de fonds.',
+        en: 'As the Provider provides the funds, the account is opened at UBA. The price covers providing the funds and the whole process of building and securing the proof of funds.',
+      }),
     ),
     priceKind: 'PERCENT',
     unit: { fr: 'par dossier, en % du montant à justifier', en: 'per file, as a % of the amount to justify' },
     documentKinds: kinds('bankLetter', 'bankStatements'),
+    prerequisites: PROOF_OF_FUNDS,
+    questionnaire: 'proofOfFundsNoFunds',
   },
   {
     slug: 'certificat-de-police',
@@ -115,6 +217,7 @@ export const STARTER_SERVICES: StarterService[] = [
       en: 'Your ID, your birth certificate and the list of countries where you lived 6 months or more since age 18.',
     },
     turnaround: { fr: '5 à 15 jours ouvrables', en: '5 to 15 business days' },
+    turnaroundDays: null,
     conditions: {
       fr: 'Un certificat par pays et par personne. Les délais dépendent des autorités de chaque pays.',
       en: 'One certificate per country and per person. Timing depends on each country’s authorities.',
@@ -127,6 +230,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par pays et par personne', en: 'per country and per person' },
     documentKinds: kinds('policeCertificate'),
+    prerequisites: POLICE,
+    questionnaire: null,
   },
   {
     slug: 'attestation-cnps',
@@ -140,6 +245,7 @@ export const STARTER_SERVICES: StarterService[] = [
       en: 'Your CNPS number (if you have it), your employer’s name and your dates of employment.',
     },
     turnaround: { fr: '7 à 14 jours ouvrables', en: '7 to 14 business days' },
+    turnaroundDays: null,
     conditions: {
       fr: 'Réservé aux emplois chez un employeur affilié à la CNPS. Sinon, le service n’est pas disponible.',
       en: 'Only for jobs with an employer affiliated with the CNPS. Otherwise, the service isn’t available.',
@@ -152,6 +258,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par emploi', en: 'per job' },
     documentKinds: kinds('socialSecurity'),
+    prerequisites: [],
+    questionnaire: null,
   },
   {
     slug: 'compte-salaire',
@@ -165,6 +273,7 @@ export const STARTER_SERVICES: StarterService[] = [
       en: 'Your bank’s name, your employer’s name and your dates of employment.',
     },
     turnaround: { fr: '7 à 14 jours ouvrables', en: '7 to 14 business days' },
+    turnaroundDays: null,
     conditions: {
       fr: 'Un service par emploi. Le salaire doit être versé sur un compte bancaire à votre nom.',
       en: 'One service per job. The salary must be paid into a bank account in your name.',
@@ -177,6 +286,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par emploi', en: 'per job' },
     documentKinds: kinds('salaryStatements', 'payslips'),
+    prerequisites: [],
+    questionnaire: null,
   },
   {
     slug: 'attestation-conformite-fiscale',
@@ -190,6 +301,7 @@ export const STARTER_SERVICES: StarterService[] = [
       en: 'Your taxpayer number (NIU) and the name of the business or activity.',
     },
     turnaround: { fr: '5 à 10 jours ouvrables', en: '5 to 10 business days' },
+    turnaroundDays: null,
     conditions: {
       fr: 'Le contribuable doit être à jour de ses obligations fiscales.',
       en: 'The taxpayer must be up to date with their tax obligations.',
@@ -202,6 +314,8 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par attestation', en: 'per certificate' },
     documentKinds: kinds('selfEmployedProof'),
+    prerequisites: [],
+    questionnaire: null,
   },
   {
     slug: 'pack-experience-pro',
@@ -215,6 +329,7 @@ export const STARTER_SERVICES: StarterService[] = [
       en: 'Your CNPS number (if you have it), your employer’s and bank’s names, and your dates of employment.',
     },
     turnaround: { fr: '10 à 20 jours ouvrables', en: '10 to 20 business days' },
+    turnaroundDays: null,
     conditions: {
       fr: 'Réservé aux emplois chez un employeur affilié à la CNPS. Un pack par emploi.',
       en: 'Only for jobs with an employer affiliated with the CNPS. One pack per job.',
@@ -227,5 +342,7 @@ export const STARTER_SERVICES: StarterService[] = [
     priceKind: 'FIXED',
     unit: { fr: 'par emploi', en: 'per job' },
     documentKinds: kinds('socialSecurity', 'salaryStatements'),
+    prerequisites: [],
+    questionnaire: null,
   },
 ];

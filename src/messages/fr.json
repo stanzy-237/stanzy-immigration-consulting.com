@@ -3217,7 +3217,9 @@
       "accepting": "Envoi…",
       "acceptConfirm": "Envoyer le contrat",
       "accepted": "Contrat {number} envoyé ; ligne ajoutée à la facture brouillon",
-      "openInvoice": "Voir la facture"
+      "openInvoice": "Voir la facture",
+      "handOver": "Pièces à remettre pour ce service",
+      "requirements": "Pièces remises ({count})"
     },
     "toast": {
       "sent": "Demande envoyée",
@@ -3765,7 +3767,12 @@
       "asked": "Demande envoyée à Stanzy",
       "documentGone": "Ce document n’est plus à demander : il a sa version finale ou une demande est déjà en cours.",
       "howTo": "Pour le demander, ouvrez le document dans votre dossier et choisissez « Stanzy s’en charge ».",
-      "loading": "Chargement du service"
+      "loading": "Chargement du service",
+      "prerequisites": "Documents nécessaires",
+      "prerequisitesIntro": "Ce que vous remettez à Stanzy pour ce service.",
+      "prerequisitesForYou": "Ce que vous remettez à Stanzy pour ce service, sur une page à part après votre demande : rien ne s’ajoute à votre dossier. Un document déjà dans votre dossier compte.",
+      "ifDonation": "(si les fonds sont un don)",
+      "inDossier": "Dans votre dossier"
     },
     "dashboard": {
       "title": "Services documentaires",
@@ -3780,7 +3787,13 @@
       "noPrice": "Prix à fixer",
       "requests": "{count, plural, =0 {aucune demande} one {# demande} other {# demandes}}",
       "error": "Une erreur est survenue. Réessayez.",
-      "loading": "Chargement du catalogue"
+      "loading": "Chargement du catalogue",
+      "copyLink": "Copier le lien privé",
+      "copyLinkLabel": "Copier le lien privé de {name}",
+      "renewLink": "Nouveau lien",
+      "renewLinkLabel": "Remplacer le lien privé de {name}",
+      "linkCopied": "Lien privé copié",
+      "linkRenewed": "Nouveau lien copié : l’ancien ne marche plus"
     },
     "edit": {
       "back": "Services documentaires",
@@ -3822,8 +3835,171 @@
       "errors": {
         "SERVICE_SLUG_TAKEN": "Cette adresse est déjà prise par un autre service.",
         "SERVICE_PERCENT_TOO_HIGH": "Le pourcentage ne peut pas dépasser 100 %.",
+        "UNKNOWN": "Une erreur est survenue. Réessayez.",
+        "SERVICE_PREREQUISITE_DUPLICATE": "Deux pièces ont le même nom : renommez l’une d’elles."
+      },
+      "prerequisites": "Documents nécessaires",
+      "prerequisitesHint": "Ce que le client remet pour ce service, sur la page de sa demande : rien ne s’ajoute à son dossier. Liez une pièce à un document de la Checklist quand c’en est un : la copie déjà dans son dossier compte.",
+      "noPrerequisite": "Aucun document nécessaire.",
+      "prerequisiteKind": "Document de la Checklist (facultatif)",
+      "noKind": "— Aucun —",
+      "addPrerequisite": "Ajouter un document",
+      "removePrerequisite": "Retirer ce document",
+      "prerequisiteType": "Remise",
+      "prerequisiteTypes": {
+        "file": "Fichier (photo ou PDF)",
+        "signature": "Signature à dessiner"
+      },
+      "prerequisiteDonation": "Seulement si les fonds sont un don",
+      "questionnaire": "Questionnaire",
+      "noQuestionnaire": "— Aucun —",
+      "questionnaires": {
+        "proofOfFunds": "Preuve de fonds (NIU, contacts d’urgence, don)",
+        "proofOfFundsNoFunds": "Preuve de fonds sans fonds (et compte UBA)"
+      },
+      "questionnaireHint": "Les questions auxquelles le client répond avec sa demande.",
+      "turnaroundDays": "Délai en jours (décompte)",
+      "turnaroundDaysHint": "À partir de la date de début que vous fixez sur la demande. Vide : pas de décompte."
+    },
+    "requirements": {
+      "title": "Pièces à remettre",
+      "back": "Retour au dossier",
+      "loading": "Chargement des pièces",
+      "for": "Pour « {document} » · {client}",
+      "intro": "Ce que Stanzy et son partenaire chargé du service utilisent pour l’obtenir. Ces pièces restent avec la demande : elles ne s’ajoutent pas à votre dossier IRCC.",
+      "complete": "Tout est remis",
+      "left": "{count, plural, one {# élément à remettre} other {# éléments à remettre}}",
+      "closed": "Cette demande n’est plus en cours : les pièces se lisent, sans changement.",
+      "questionsTitle": "Vos informations",
+      "questions": {
+        "niu": "Numéro d’identifiant unique (NIU)",
+        "contacts": "Personnes à contacter en cas d’urgence",
+        "donation": "Les fonds sont-ils un don ?",
+        "donor": "Le donateur",
+        "ubaAccount": "Avez-vous déjà un compte UBA ?"
+      },
+      "niuHint": "Il figure sur votre attestation d’immatriculation fiscale.",
+      "name": "Nom complet",
+      "phone": "Téléphone",
+      "contactName": "Nom du contact {n}",
+      "contactPhone": "Téléphone du contact {n}",
+      "removeContact": "Retirer le contact {n}",
+      "addContact": "Ajouter un contact",
+      "donor": {
+        "name": "Nom du donateur",
+        "email": "E-mail du donateur",
+        "phone": "Téléphone du donateur"
+      },
+      "donorPhoto": "Ajoutez aussi la photo du donateur dans les pièces ci-dessous.",
+      "ubaClose": "Fermez ce compte avant l’ouverture : un nouveau compte UBA est ouvert à votre nom pour la preuve de fonds.",
+      "yes": "Oui",
+      "no": "Non",
+      "toAnswer": "À remplir",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Informations enregistrées",
+      "files": "Pièces",
+      "states": {
+        "given": "Remis",
+        "inDossier": "Dans votre dossier",
+        "missing": "À remettre"
+      },
+      "inDossierHint": "Votre document « {document} » du dossier compte. Vous pouvez aussi en remettre un autre ici.",
+      "anyFormat": "Une photo ou un PDF, sans format imposé.",
+      "upload": "Ajouter un fichier",
+      "sending": "Envoi…",
+      "added": "Pièce remise",
+      "removed": "Pièce retirée",
+      "remove": "Retirer {name}",
+      "sign": "Signer",
+      "signAgain": "Signer à nouveau",
+      "signTitle": "Votre signature",
+      "signHint": "Signez dans le cadre avec la souris, un stylet ou le doigt. Elle est remise sur une page blanche, en PDF.",
+      "signatureFile": "signature",
+      "ink": "Encre",
+      "inks": {
+        "black": "Noire",
+        "blue": "Bleue"
+      },
+      "cancel": "Annuler",
+      "signSave": "Remettre la signature",
+      "errors": {
+        "REQUIREMENTS_CLOSED": "Cette demande n’est plus en cours.",
+        "UNKNOWN": "Une erreur est survenue. Réessayez."
+      },
+      "due": "Livraison prévue le {date}"
+    },
+    "offer": {
+      "metaTitle": "Service documentaire",
+      "eyebrow": "Service documentaire · lien privé",
+      "loading": "Chargement du service",
+      "prerequisitesIntro": "Ce que vous remettez à Stanzy une fois la commande confirmée, sur la page de votre demande.",
+      "priceNote": "Facturé après la signature du contrat du service.",
+      "signInFirst": "Connectez-vous ou créez votre compte pour commander ce service : votre dossier, le contrat et la facture y seront.",
+      "signIn": "Se connecter pour commander",
+      "note": "Un mot pour Stanzy (facultatif)",
+      "noteHint": "Par exemple le montant à justifier, ou la date de votre extraction du bassin.",
+      "accept": "J’ai lu les conditions et le contrat, et je commande ce service.",
+      "order": "Commander ce service",
+      "ordered": "Commande envoyée à Stanzy",
+      "next": "Stanzy confirme votre commande, puis vous envoie le contrat à signer et la facture.",
+      "pending": "Commande envoyée",
+      "pendingBody": "Stanzy la confirme sous peu : vous recevrez le contrat à signer par e-mail.",
+      "approved": "Commande confirmée",
+      "openDossier": "Ouvrir mon dossier",
+      "rejected": "Votre commande précédente n’a pas été retenue",
+      "errors": {
+        "ORDER_PENDING": "Une commande de ce service attend déjà la confirmation de Stanzy.",
+        "ORDER_NOT_ELIGIBLE": "Ce compte ne peut pas commander de service.",
         "UNKNOWN": "Une erreur est survenue. Réessayez."
       }
+    },
+    "orders": {
+      "title": "Commandes",
+      "intro": "Les services commandés depuis leur lien privé. Confirmer ouvre le dossier du client et lui envoie le contrat du service avec la facture.",
+      "filterLabel": "Filtrer les commandes",
+      "filters": {
+        "SUBMITTED": "À traiter",
+        "APPROVED": "Confirmées",
+        "REJECTED": "Refusées"
+      },
+      "status": {
+        "SUBMITTED": "À traiter",
+        "APPROVED": "Confirmée",
+        "REJECTED": "Refusée"
+      },
+      "empty": "Aucune commande ici.",
+      "loading": "Chargement des commandes",
+      "approve": "Confirmer",
+      "approveBody": "« {service} » pour {client} : son dossier s’ouvre et le contrat part à signer.",
+      "approved": "Commande confirmée : dossier ouvert, contrat envoyé",
+      "reject": "Refuser",
+      "rejectLabel": "Refuser la commande de {name}",
+      "rejectTitle": "Refuser la commande",
+      "rejectBody": "Le client est prévenu par e-mail, avec votre note.",
+      "rejectNote": "Note pour le client (facultatif)",
+      "rejectConfirm": "Refuser",
+      "rejected": "Commande refusée",
+      "keep": "Garder",
+      "openDossier": "Ouvrir le dossier",
+      "errors": {
+        "ORDER_NOT_PENDING": "Cette commande a déjà été traitée.",
+        "UNKNOWN": "Une erreur est survenue. Réessayez."
+      }
+    },
+    "progress": {
+      "daysLeft": "{count, plural, =0 {Aujourd’hui} one {# jour restant} other {# jours restants}}",
+      "dueOn": "livraison prévue le {date}",
+      "late": "Livraison prévue le {date} : le délai est dépassé.",
+      "notStarted": "Le décompte démarre à la date de début fixée par Stanzy.",
+      "noTurnaround": "Délai à préciser par Stanzy.",
+      "startedOn": "Démarré le {date}",
+      "left": "{count, plural, =0 {Pièces à remettre} one {# élément à remettre} other {# éléments à remettre}}",
+      "allGiven": "Tout est remis",
+      "start": "Date de début",
+      "saveStart": "Enregistrer",
+      "startSaved": "Date de début enregistrée",
+      "error": "Une erreur est survenue. Réessayez."
     }
   },
   "ClientForms": {

@@ -48,7 +48,7 @@ function fakeDatabase() {
   const documents: Row[] = [];
   const stanzy: Row[] = [];
   const services: Row[] = [
-    { id: 'svc_police', slug: 'certificat-de-police', active: true, documentKinds: ['policeCertificate'], name: { fr: 'Certificat de police', en: 'Police certificate' }, contractTitle: { fr: 'Contrat : police', en: 'Contract: police' }, contractBody: { fr: 'Texte {prix}', en: 'Text {prix}' } },
+    { id: 'svc_police', slug: 'certificat-de-police', active: true, documentKinds: ['policeCertificate'], name: { fr: 'Certificat de police', en: 'Police certificate' }, contractTitle: { fr: 'Contrat : police', en: 'Contract: police' }, contractBody: { fr: 'Texte {prix}', en: 'Text {prix}' }, prerequisites: [{ key: 'cni', fr: 'CNI', en: 'National ID', type: 'file', kind: null, when: null }], questionnaire: null },
     { id: 'svc_off', slug: 'ancien', active: false, documentKinds: ['passport'], name: { fr: 'Ancien', en: 'Old' }, contractTitle: { fr: '', en: '' }, contractBody: { fr: '', en: '' } },
   ];
   let seq = 0;
@@ -305,6 +305,15 @@ describe('« Stanzy s’en charge »', () => {
     await expect(callerFor(db, user()).accompagnement.stanzy.request(ask(police.id))).rejects.toMatchObject({
       message: 'STANZY_ALREADY_ASKED',
     });
+  });
+
+  it('leaves what to hand over for the service off the Dossier: it has the request’s own page', async () => {
+    const { db, documents } = await approved();
+    const before = documents.length;
+    const police = documents.find((d) => d.kind === 'policeCertificate')!;
+    const request = await callerFor(db, user()).accompagnement.stanzy.request(ask(police.id));
+    expect(request).toMatchObject({ requirements: true });
+    expect(documents).toHaveLength(before);
   });
 
   it('is for any Document without its Finale, through a service still offered', async () => {

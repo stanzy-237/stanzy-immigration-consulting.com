@@ -4,7 +4,20 @@ import { z } from 'zod';
 
 import { livesInCameroon } from '@/features/accompagnement/server/residence';
 import { STARTER_SERVICES } from '@/features/document-services/data/starter-services';
-import { saveServiceInput, slugInput } from '@/features/document-services/lib/service-schema';
+import {
+  addRequirementFileInput,
+  requestRef,
+  dueOn,
+  requirementFilePrefix,
+  saveAnswersInput,
+  setStartInput,
+} from '@/features/document-services/lib/requirements';
+import { prerequisitesOf, saveServiceInput, slugInput } from '@/features/document-services/lib/service-schema';
+import { ordersRouter } from '@/features/document-services/server/orders-router';
+import { editableRequest, OPEN_STANZY, requestFor, requirementsOf } from '@/features/document-services/server/requirements';
+import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
+import { dossierFor } from '@/features/dossiers/server/dossier-access';
+import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 import type { TRPCContext } from '@/server/trpc/context';
 
@@ -29,6 +42,8 @@ const shown = {
   price: true,
   unit: true,
   documentKinds: true,
+  prerequisites: true,
+  questionnaire: true,
 } satisfies Prisma.DocumentServiceSelect;
 
 /** A Document of the viewer's own open Dossier that Stanzy could get for them, with no request under way. */
@@ -59,11 +74,13 @@ async function askable(db: Db, accountId: string, documentId: string) {
 export const documentServicesRouter = createTRPCRouter({
   dashboard: createTRPCRouter({
     /** Every service, in catalogue order, with how many requests each has had. */
-    list: consultantProcedure.query(({ ctx }) =>
-      ctx.prisma.documentService.findMany({
-        orderBy: { position: 'asc' },
-        select: { ...shown, active: true, updatedAt: true, _count: { select: { requests: true } } },
-      }),
+    list: consultantProcedure.query(async ({ ctx }) =>
+      (
+        await ctx.prisma.documentService.findMany({
+          orderBy: { position: 'asc' },
+          select: { ...shown, active: true, updatedAt: true, _count: { select: { requests: true } } },
+        })
+      ).map((service) => ({ ...service, prerequisites: prerequisitesOf(service.prerequisites) })),
     ),
 
     get: consultantProcedure.input(byId).query(async ({ ctx, input }) => {
@@ -72,7 +89,7 @@ export const documentServicesRouter = createTRPCRouter({
         select: { ...shown, active: true },
       });
       if (!service) throw notFound();
-      return service;
+      return { ...service, prerequisites: prerequisitesOf(service.prerequisites) };
     }),
 
     /** Adds a service at the end of the catalogue, or saves one. SERVICE_SLUG_TAKEN when its address is another's. */
@@ -136,8 +153,140 @@ export const documentServicesRouter = createTRPCRouter({
       if (!service) throw notFound();
       const { account } = ctx.session;
       const available = account.role === 'CONSULTANT' || (await livesInCameroon(ctx.prisma, account.id));
-      if (!available) return { available, service: null, document: null };
+      if (!available) return { available, service: null, document: null, inDossier: null };
       const document = input.documentId ? await askable(ctx.prisma, account.id, input.documentId) : null;
-      return { available, service, document };
+      const prerequisites = prerequisitesOf(service.prerequisites);
+      // Coming from a Document: the Checklist documents of that Dossier that already cover a prerequisite.
+      const kinds = prerequisites.flatMap((item) => (item.kind ? [item.kind] : []));
+      const held =
+        document && kinds.length > 0
+          ? await ctx.prisma.dossierDocument.findMany({
+              where: { section: { dossierId: document.dossierId }, kind: { in: kinds }, versions: { some: {} } },
+              select: { kind: true },
+            })
+          : [];
+      const inDossier = prerequisites.map((item) => held.some((found) => item.kind !== null && found.kind === item.kind));
+      return { available, service: { ...service, prerequisites }, document, inDossier: document ? inDossier : null };
     }),
+
+  /**
+   * What the Client hands over for a « Stanzy s'en charge » request: the
+   * service's questionnaire and prerequisite files, shared with the
+   * consultant (and the Partner in charge, #42), never Dossier Documents.
+   */
+  orders: ordersRouter,
+
+  requirements: createTRPCRouter({
+    get: protectedProcedure.input(requestRef).query(async ({ ctx, input }) => {
+      const found = await requestFor(ctx.prisma, ctx.session, input.requestId);
+      const { request, dossier, editable } = found;
+      return {
+        request: {
+          id: request.id,
+          status: request.status,
+          createdAt: request.createdAt,
+          document: { id: request.document.id, title: request.document.title },
+          service: request.service ? { slug: request.service.slug, name: request.service.name } : null,
+        },
+        dossier: { id: dossier.id, client: dossier.account.name, stage: dossier.stage, service: dossier.service },
+        editable,
+        startedOn: request.startedOn,
+        dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
+        ...(await requirementsOf(ctx.prisma, found)),
+      };
+    }),
+
+    /**
+     * A Dossier's requests under way and where each stands: what is left to
+     * hand over and the day it is due. For the Dossier's Aperçu.
+     */
+    forDossier: protectedProcedure.input(dossierRefInput).query(async ({ ctx, input }) => {
+      const dossier = await dossierFor(ctx.prisma, ctx.session, input.dossierId);
+      const requests = await ctx.prisma.stanzyRequest.findMany({
+        where: { document: { section: { dossierId: dossier.id } }, status: { in: [...OPEN_STANZY] }, serviceId: { not: null } },
+        orderBy: { createdAt: 'asc' },
+        select: { id: true },
+      });
+      return Promise.all(
+        requests.map(async ({ id }) => {
+          const found = await requestFor(ctx.prisma, ctx.session, id);
+          const { request } = found;
+          const { items, questionsLeft, complete } = await requirementsOf(ctx.prisma, found);
+          return {
+            id: request.id,
+            status: request.status,
+            service: request.service ? { name: request.service.name } : null,
+            document: request.document.title,
+            startedOn: request.startedOn,
+            turnaroundDays: request.service?.turnaroundDays ?? null,
+            dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
+            left: items.filter((item) => item.state === 'missing').length + questionsLeft.length,
+            hasRequirements: items.length > 0 || request.service?.questionnaire !== null,
+            complete,
+          };
+        }),
+      );
+    }),
+
+    /** The consultant sets the day the work starts: the countdown runs from it. */
+    setStart: consultantProcedure.input(setStartInput).mutation(async ({ ctx, input }) => {
+      const { request } = await editableRequest(ctx.prisma, ctx.session, input.requestId);
+      await ctx.prisma.stanzyRequest.update({ where: { id: request.id }, data: { startedOn: input.startedOn } });
+    }),
+
+    /** Saves the questionnaire as it stands, answered or not yet. */
+    saveAnswers: protectedProcedure.input(saveAnswersInput).mutation(async ({ ctx, input }) => {
+      const { request } = await editableRequest(ctx.prisma, ctx.session, input.requestId);
+      if (!request.service?.questionnaire) throw refuse('REQUIREMENTS_NO_QUESTIONNAIRE');
+      const { answers } = input;
+      await ctx.prisma.stanzyRequest.update({
+        where: { id: request.id },
+        // No donor without a donation; the UBA question only for the « sans fonds » service.
+        data: {
+          answers: {
+            ...answers,
+            donor: answers.donation ? answers.donor : null,
+            ubaAccount: request.service.questionnaire === 'proofOfFundsNoFunds' ? answers.ubaAccount : null,
+          },
+        },
+      });
+    }),
+
+    /** Records a file the browser encrypted and stored for one of the prerequisites (any photo or PDF). */
+    addFile: protectedProcedure.input(addRequirementFileInput).mutation(async ({ ctx, input }) => {
+      const { request } = await editableRequest(ctx.prisma, ctx.session, input.requestId);
+      if (!prerequisitesOf(request.service?.prerequisites).some((item) => item.key === input.prerequisite)) {
+        throw refuse('REQUIREMENTS_UNKNOWN');
+      }
+      const wrappedKey = await acceptEncryptedUpload(input, requirementFilePrefix(request.id));
+      return ctx.prisma.requirementFile.create({
+        data: {
+          requestId: request.id,
+          key: input.prerequisite,
+          fileName: input.fileName,
+          contentType: input.contentType,
+          size: input.size,
+          objectKey: input.objectKey,
+          wrappedKey,
+          iv: input.iv,
+          uploadedById: ctx.session.account.id,
+        },
+        select: { id: true },
+      });
+    }),
+
+    /** Removes a file handed over, and from R2. */
+    removeFile: protectedProcedure
+      .input(byId)
+      .mutation(async ({ ctx, input }) => {
+        const file = await ctx.prisma.requirementFile.findUnique({
+          where: { id: input.id },
+          select: { id: true, requestId: true, objectKey: true },
+        });
+        if (!file) throw notFound();
+        await editableRequest(ctx.prisma, ctx.session, file.requestId);
+        await ctx.prisma.requirementFile.delete({ where: { id: file.id } });
+        await deleteFiles([file.objectKey]).catch(() => undefined);
+      }),
+  }),
 });

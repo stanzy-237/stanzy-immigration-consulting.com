@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { PackagePlus, Plus } from 'lucide-react';
+import { Link2, PackagePlus, Plus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
@@ -13,13 +13,16 @@ import { toast } from '@/components/ui/toast';
 import { ServicePrice } from '@/features/document-services/components/service-parts';
 import { STARTER_SERVICES } from '@/features/document-services/data/starter-services';
 import { textIn } from '@/features/document-services/lib/service-schema';
+import { ServiceOrdersView } from '@/features/document-services/views/service-orders-view';
 import { useTRPC } from '@/trpc/client';
 
 /**
  * « Services documentaires » in the Tableau de bord (#80): the catalogue
  * Clients in Cameroon see in « Mon espace », in order, each active or not,
  * with its price. The starting services can be added in one click, inactive
- * and unpriced, for the consultant to price before turning them on.
+ * and unpriced, for the consultant to price before turning them on. Each
+ * active one has a private link to send on WhatsApp to someone who wants it
+ * alone; their orders wait above the catalogue.
  */
 export function ServicesDashboardView(): ReactNode {
   const t = useTranslations('DocumentServices.dashboard');
@@ -38,6 +41,7 @@ export function ServicesDashboardView(): ReactNode {
           {t('new')}
         </Link>
       </div>
+      <ServiceOrdersView />
       <QueryBoundary fallback={<CatalogueSkeleton />}>
         <Catalogue />
       </QueryBoundary>
@@ -83,12 +87,12 @@ function Catalogue(): ReactNode {
       ) : (
         <ul className="grid grid-cols-1 gap-3">
           {services.map((service) => (
-            <li key={service.id}>
+            <li key={service.id} className="grid grid-cols-1 gap-2">
               <Link
                 href={`/services/${service.id}`}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-fog-light bg-white p-5 shadow-sm hover:border-navy-deep"
+                className="flex flex-col gap-3 rounded-2xl border border-fog-light bg-white p-5 shadow-sm hover:border-navy-deep sm:flex-row sm:items-center sm:justify-between sm:gap-4"
               >
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 sm:flex-1">
                   <p className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold text-navy-deep">{textIn(service.name, locale)}</span>
                     <span
@@ -106,15 +110,55 @@ function Catalogue(): ReactNode {
                   </p>
                 </div>
                 {service.price > 0 ? (
-                  <ServicePrice service={service} className="text-right" />
+                  <ServicePrice service={service} className="sm:max-w-56 sm:shrink-0 sm:text-right" />
                 ) : (
-                  <span className="rounded-full bg-honey-tint px-3 py-1 text-xs font-semibold text-honey">{t('noPrice')}</span>
+                  <span className="w-fit shrink-0 rounded-full bg-honey-tint px-3 py-1 text-xs font-semibold text-honey">{t('noPrice')}</span>
                 )}
               </Link>
+              {service.active ? <ShareLink serviceId={service.id} name={textIn(service.name, locale)} /> : null}
             </li>
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+/** Copies the service's private link, made on first use; « Nouveau lien » stops the old one working. */
+function ShareLink({ serviceId, name }: { serviceId: string; name: string }): ReactNode {
+  const t = useTranslations('DocumentServices.dashboard');
+  const trpc = useTRPC();
+  const share = useMutation(trpc.documentServices.orders.dashboard.shareLink.mutationOptions());
+  const copy = async (renew: boolean) => {
+    try {
+      const { url } = await share.mutateAsync({ id: serviceId, renew });
+      await navigator.clipboard.writeText(url);
+      toast.add({ title: renew ? t('linkRenewed') : t('linkCopied'), description: url, type: 'success' });
+    } catch {
+      toast.add({ title: t('error'), type: 'error' });
+    }
+  };
+  return (
+    <div className="flex flex-wrap items-center gap-1 px-2">
+      <button
+        type="button"
+        disabled={share.isPending}
+        onClick={() => void copy(false)}
+        aria-label={t('copyLinkLabel', { name })}
+        className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-rouge hover:bg-white disabled:opacity-50"
+      >
+        <Link2 aria-hidden={true} className="size-4" />
+        {t('copyLink')}
+      </button>
+      <button
+        type="button"
+        disabled={share.isPending}
+        onClick={() => void copy(true)}
+        aria-label={t('renewLinkLabel', { name })}
+        className="inline-flex h-9 items-center rounded-full px-3 text-xs font-semibold text-slate hover:bg-white hover:text-navy-deep disabled:opacity-50"
+      >
+        {t('renewLink')}
+      </button>
     </div>
   );
 }

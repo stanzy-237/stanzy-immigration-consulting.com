@@ -85,7 +85,8 @@ export const documentsRouter = createTRPCRouter({
             stanzyRequests: {
               orderBy: { createdAt: 'desc' },
               take: 1,
-              select: { id: true, status: true, declineNote: true },
+              // Its service's questionnaire and prerequisites: whether there is anything to hand over for it.
+              select: { id: true, status: true, declineNote: true, service: { select: { questionnaire: true, prerequisites: true } } },
             },
             versions: {
               orderBy: { number: 'asc' },
