@@ -1,4 +1,4 @@
-import { DossierNewDialogView } from '@/features/dossiers/views/dossier-new-view';
+import { DossierNewDialogView } from '@/features/dossiers/views/dossier-new-dialog-view';
 import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 
 // Intercepts in-app navigation to /dossiers/nouveau and opens « Ouvrir un dossier » as a dialog

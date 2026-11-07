@@ -5,7 +5,8 @@ import { axe } from 'vitest-axe';
 
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
 import { DossierDashboardView } from '@/features/dossiers/views/dossier-dashboard-view';
-import { DossierNewDialogView, DossierNewView } from '@/features/dossiers/views/dossier-new-view';
+import { DossierNewDialogView } from '@/features/dossiers/views/dossier-new-dialog-view';
+import { DossierNewView } from '@/features/dossiers/views/dossier-new-view';
 import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /**
