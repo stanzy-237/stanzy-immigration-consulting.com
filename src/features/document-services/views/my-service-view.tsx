@@ -59,7 +59,7 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
       </div>
     );
   }
-  const { service, document, states } = data;
+  const { service, document, inDossier } = data;
   const facts = [
     { key: 'provides', icon: ListChecks, text: textIn(service.provides, locale) },
     { key: 'turnaround', icon: Clock, text: textIn(service.turnaround, locale) },
@@ -102,26 +102,23 @@ function Service({ slug, documentId }: { slug: string; documentId: string | null
               <p className="mt-1 text-sm text-slate">{document ? t('prerequisitesForYou') : t('prerequisitesIntro')}</p>
               <ul className="mt-4 grid grid-cols-1 gap-2">
                 {service.prerequisites.map((item, index) => {
-                  const state = states?.[index];
+                  const held = inDossier?.[index] ?? false;
                   return (
-                    <li key={index} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-off-white px-4 py-3">
+                    <li key={item.key} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-off-white px-4 py-3">
                       <span className="flex items-center gap-2 text-sm font-semibold text-navy-deep">
-                        {state === 'held' ? (
+                        {held ? (
                           <CheckCircle2 aria-hidden={true} className="size-4 shrink-0 text-leaf" />
                         ) : (
                           <Circle aria-hidden={true} className="size-4 shrink-0 text-slate" />
                         )}
                         {item[locale === 'en' ? 'en' : 'fr']}
+                        {item.when === 'donation' ? (
+                          <span className="text-xs font-normal text-slate">{t('ifDonation')}</span>
+                        ) : null}
                       </span>
-                      {state ? (
-                        <span
-                          className={
-                            state === 'held'
-                              ? 'rounded-full bg-leaf-tint px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-leaf'
-                              : 'rounded-full bg-honey-tint px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-honey'
-                          }
-                        >
-                          {t(`prerequisiteStates.${state}`)}
+                      {held ? (
+                        <span className="rounded-full bg-leaf-tint px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-leaf">
+                          {t('inDossier')}
                         </span>
                       ) : null}
                     </li>
@@ -180,12 +177,17 @@ function Ask({
   const [accepted, setAccepted] = useState(false);
   const ask = useMutation(
     trpc.accompagnement.stanzy.request.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (request) => {
         void queryClient.invalidateQueries({
           queryKey: trpc.dossiers.documents.sections.queryKey({ dossierId: document.dossierId }),
         });
         toast.add({ title: t('asked'), type: 'success' });
-        router.push(`/mon-espace/dossiers/${document.dossierId}?document=${document.id}#documents`);
+        // What to hand over for the service has its own page; else back to the Document.
+        router.push(
+          request.requirements
+            ? `/mon-espace/services/demandes/${request.id}`
+            : `/mon-espace/dossiers/${document.dossierId}?document=${document.id}#documents`,
+        );
       },
       onError: (error) => {
         const known = errors.has(error.message);

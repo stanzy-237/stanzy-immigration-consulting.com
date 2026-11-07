@@ -53,7 +53,7 @@ describe('the Services documentaires, for a Client', () => {
   });
 
   function page(document: unknown, ask = vi.fn()) {
-    const data = { available: true, service: police, document, states: document ? ['missing', 'held', 'missing', 'missing'] : null };
+    const data = { available: true, service: police, document, inDossier: document ? [false, true, false, false] : null };
     const { trpc, queryClient, wrap } = createTestTRPC({
       'documentServices.get': () => data,
       'accompagnement.stanzy.request': (input) => ask(input) ?? { id: 'stz_1' },
@@ -69,7 +69,7 @@ describe('the Services documentaires, for a Client', () => {
     // What to hand over, and what the Dossier already holds.
     const needed = screen.getByRole('heading', { name: 'Documents nécessaires' }).parentElement!;
     expect(within(needed).getByText('Passeport').closest('li')).toHaveTextContent('Dans votre dossier');
-    expect(within(needed).getByText('Acte de naissance').closest('li')).toHaveTextContent('À fournir');
+    expect(within(needed).getByText('Acte de naissance').closest('li')).not.toHaveTextContent('Dans votre dossier');
     expect(screen.getByText(/obtenir le document suivant : \[le service\]/)).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
 

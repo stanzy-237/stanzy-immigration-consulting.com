@@ -3217,7 +3217,9 @@
       "accepting": "Envoi…",
       "acceptConfirm": "Envoyer le contrat",
       "accepted": "Contrat {number} envoyé ; ligne ajoutée à la facture brouillon",
-      "openInvoice": "Voir la facture"
+      "openInvoice": "Voir la facture",
+      "handOver": "Pièces à remettre pour ce service",
+      "requirements": "Pièces remises ({count})"
     },
     "toast": {
       "sent": "Demande envoyée",
@@ -3768,12 +3770,9 @@
       "loading": "Chargement du service",
       "prerequisites": "Documents nécessaires",
       "prerequisitesIntro": "Ce que vous remettez à Stanzy pour ce service.",
-      "prerequisitesForYou": "Ce que vous remettez à Stanzy pour ce service. Ceux qui manquent s’ajouteront à votre dossier, à téléverser.",
-      "prerequisiteStates": {
-        "held": "Dans votre dossier",
-        "listed": "À téléverser",
-        "missing": "À fournir"
-      }
+      "prerequisitesForYou": "Ce que vous remettez à Stanzy pour ce service, sur une page à part après votre demande : rien ne s’ajoute à votre dossier. Un document déjà dans votre dossier compte.",
+      "ifDonation": "(si les fonds sont un don)",
+      "inDossier": "Dans votre dossier"
     },
     "dashboard": {
       "title": "Services documentaires",
@@ -3830,15 +3829,96 @@
       "errors": {
         "SERVICE_SLUG_TAKEN": "Cette adresse est déjà prise par un autre service.",
         "SERVICE_PERCENT_TOO_HIGH": "Le pourcentage ne peut pas dépasser 100 %.",
-        "UNKNOWN": "Une erreur est survenue. Réessayez."
+        "UNKNOWN": "Une erreur est survenue. Réessayez.",
+        "SERVICE_PREREQUISITE_DUPLICATE": "Deux pièces ont le même nom : renommez l’une d’elles."
       },
       "prerequisites": "Documents nécessaires",
-      "prerequisitesHint": "Ce que le client remet pour ce service. Liez-les à un document de la Checklist quand c’en est un : la copie déjà dans son dossier compte, sans doublon.",
+      "prerequisitesHint": "Ce que le client remet pour ce service, sur la page de sa demande : rien ne s’ajoute à son dossier. Liez une pièce à un document de la Checklist quand c’en est un : la copie déjà dans son dossier compte.",
       "noPrerequisite": "Aucun document nécessaire.",
       "prerequisiteKind": "Document de la Checklist (facultatif)",
       "noKind": "— Aucun —",
       "addPrerequisite": "Ajouter un document",
-      "removePrerequisite": "Retirer ce document"
+      "removePrerequisite": "Retirer ce document",
+      "prerequisiteType": "Remise",
+      "prerequisiteTypes": {
+        "file": "Fichier (photo ou PDF)",
+        "signature": "Signature à dessiner"
+      },
+      "prerequisiteDonation": "Seulement si les fonds sont un don",
+      "questionnaire": "Questionnaire",
+      "noQuestionnaire": "— Aucun —",
+      "questionnaires": {
+        "proofOfFunds": "Preuve de fonds (NIU, contacts d’urgence, don)",
+        "proofOfFundsNoFunds": "Preuve de fonds sans fonds (et compte UBA)"
+      },
+      "questionnaireHint": "Les questions auxquelles le client répond avec sa demande."
+    },
+    "requirements": {
+      "title": "Pièces à remettre",
+      "back": "Retour au dossier",
+      "loading": "Chargement des pièces",
+      "for": "Pour « {document} » · {client}",
+      "intro": "Ce que Stanzy et son partenaire chargé du service utilisent pour l’obtenir. Ces pièces restent avec la demande : elles ne s’ajoutent pas à votre dossier IRCC.",
+      "complete": "Tout est remis",
+      "left": "{count, plural, one {# élément à remettre} other {# éléments à remettre}}",
+      "closed": "Cette demande n’est plus en cours : les pièces se lisent, sans changement.",
+      "questionsTitle": "Vos informations",
+      "questions": {
+        "niu": "Numéro d’identifiant unique (NIU)",
+        "contacts": "Personnes à contacter en cas d’urgence",
+        "donation": "Les fonds sont-ils un don ?",
+        "donor": "Le donateur",
+        "ubaAccount": "Avez-vous déjà un compte UBA ?"
+      },
+      "niuHint": "Il figure sur votre attestation d’immatriculation fiscale.",
+      "name": "Nom complet",
+      "phone": "Téléphone",
+      "contactName": "Nom du contact {n}",
+      "contactPhone": "Téléphone du contact {n}",
+      "removeContact": "Retirer le contact {n}",
+      "addContact": "Ajouter un contact",
+      "donor": {
+        "name": "Nom du donateur",
+        "email": "E-mail du donateur",
+        "phone": "Téléphone du donateur"
+      },
+      "donorPhoto": "Ajoutez aussi la photo du donateur dans les pièces ci-dessous.",
+      "ubaClose": "Fermez ce compte avant l’ouverture : un nouveau compte UBA est ouvert à votre nom pour la preuve de fonds.",
+      "yes": "Oui",
+      "no": "Non",
+      "toAnswer": "À remplir",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Informations enregistrées",
+      "files": "Pièces",
+      "states": {
+        "given": "Remis",
+        "inDossier": "Dans votre dossier",
+        "missing": "À remettre"
+      },
+      "inDossierHint": "Votre document « {document} » du dossier compte. Vous pouvez aussi en remettre un autre ici.",
+      "anyFormat": "Une photo ou un PDF, sans format imposé.",
+      "upload": "Ajouter un fichier",
+      "sending": "Envoi…",
+      "added": "Pièce remise",
+      "removed": "Pièce retirée",
+      "remove": "Retirer {name}",
+      "sign": "Signer",
+      "signAgain": "Signer à nouveau",
+      "signTitle": "Votre signature",
+      "signHint": "Signez dans le cadre avec la souris, un stylet ou le doigt. Elle est remise sur une page blanche, en PDF.",
+      "signatureFile": "signature",
+      "ink": "Encre",
+      "inks": {
+        "black": "Noire",
+        "blue": "Bleue"
+      },
+      "cancel": "Annuler",
+      "signSave": "Remettre la signature",
+      "errors": {
+        "REQUIREMENTS_CLOSED": "Cette demande n’est plus en cours.",
+        "UNKNOWN": "Une erreur est survenue. Réessayez."
+      }
     }
   }
 }

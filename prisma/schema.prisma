@@ -58,6 +58,7 @@ model Account {
   notificationsMade Notification[]       @relation("NotificationActor")
   pdfToolFiles      PdfToolFile[]
   pdfCompressions   PdfCompression[]
+  requirementFiles  RequirementFile[]
   signatureRequests SignatureRequest[]   @relation("SignatureRequester")
   signaturesSigned  SignatureRequest[]   @relation("SignatureSigner")
   contractsSent     Contract[]           @relation("ContractSender")
@@ -967,6 +968,10 @@ model StanzyRequest {
   acceptedAt    DateTime?
   /// The service's Contrat, sent when the consultant accepts.
   contract      Contract?
+  /// The service's questionnaire, answered by the Client (proof of funds: NIU, contacts, donation…).
+  answers       Json?
+  /// What the Client handed over for the service: shared with whoever does it, never a Dossier Document.
+  files         RequirementFile[]
   createdAt     DateTime            @default(now())
 
   @@index([documentId, status])
@@ -1264,14 +1269,40 @@ model DocumentService {
   unit          Json
   /// The Checklist documents it gets (`passport`, `policeCertificate`…): « Stanzy s'en charge » on one leads here.
   documentKinds String[]
-  /// What the Client must hand over for Stanzy to do it (police certificate: CNI, passport…):
-  /// `{ fr, en, kind }[]`, `kind` a Checklist document when it is one, so a Dossier's copy counts.
+  /// What the Client hands over for Stanzy to do it (police certificate: CNI, passport…):
+  /// `{ key, fr, en, type, kind, when }[]` (src/features/document-services/lib/service-schema.ts).
+  /// `kind`: a Checklist document whose copy in the Dossier also counts (one way only: what is
+  /// handed over for a service never becomes a Dossier Document). `when`: only with a donation.
   prerequisites Json            @default("[]")
+  /// A questionnaire the Client answers with the request: `proofOfFunds` or `proofOfFundsNoFunds`.
+  questionnaire String?
   requests      StanzyRequest[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
   @@index([active, position])
   @@map("document_service")
+}
+
+/// A file the Client handed over for a Service documentaire (#80), for one of its prerequisites
+/// (`key`): encrypted in R2 (ADR 0007), for the consultant and the Partner in charge (#42).
+/// Not a Version of a Dossier Document, and never a Finale.
+model RequirementFile {
+  id           String        @id @default(cuid())
+  requestId    String
+  request      StanzyRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  key          String
+  fileName     String
+  contentType  String
+  size         Int
+  objectKey    String
+  wrappedKey   String
+  iv           String
+  uploadedById String
+  uploadedBy   Account       @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+  createdAt    DateTime      @default(now())
+
+  @@index([requestId, key])
+  @@map("requirement_file")
 }
 

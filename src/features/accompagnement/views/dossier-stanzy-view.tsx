@@ -1,9 +1,10 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { FileSignature, HandHelping, ReceiptText } from 'lucide-react';
+import { FileSignature, FileStack, HandHelping, ReceiptText } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: its short paths, outside next-intl's routing.
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
@@ -21,7 +22,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from '@/components/ui/toast';
 import { REASON_MAX } from '@/features/accompagnement/lib/interest-schema';
 import { SCHEDULE_MAX } from '@/features/contracts/lib/contract-schema';
-import { amountFor, PERCENT_MAX, textIn } from '@/features/document-services/lib/service-schema';
+import { amountFor, PERCENT_MAX, prerequisitesOf, textIn } from '@/features/document-services/lib/service-schema';
 import { formatMoney } from '@/features/invoices/lib/money';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
@@ -97,6 +98,15 @@ function StanzyRequests({ dossierId }: { dossierId: string }): ReactNode {
                   <FileSignature aria-hidden={true} className="size-3.5" />
                   {t('contract', { number: request.contract.number, status: request.contract.status })}
                 </p>
+              ) : null}
+              {request.service && (request.service.questionnaire || prerequisitesOf(request.service.prerequisites).length > 0) ? (
+                <Link
+                  href={`/dossiers/${dossierId}/services/${request.id}`}
+                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-rouge hover:text-crimson"
+                >
+                  <FileStack aria-hidden={true} className="size-4" />
+                  {t('requirements', { count: request._count.files })}
+                </Link>
               ) : null}
             </div>
             {request.status === 'REQUESTED' ? (

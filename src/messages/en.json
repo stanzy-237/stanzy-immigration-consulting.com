@@ -3200,7 +3200,9 @@
       "accepting": "Sending…",
       "acceptConfirm": "Send the contract",
       "accepted": "Contract {number} sent; line added to the draft invoice",
-      "openInvoice": "See the invoice"
+      "openInvoice": "See the invoice",
+      "handOver": "Items to hand over for this service",
+      "requirements": "Items handed over ({count})"
     },
     "toast": {
       "sent": "Request sent",
@@ -3751,12 +3753,9 @@
       "loading": "Loading the service",
       "prerequisites": "Documents needed",
       "prerequisitesIntro": "What you hand over to Stanzy for this service.",
-      "prerequisitesForYou": "What you hand over to Stanzy for this service. Those missing will be added to your file, to upload.",
-      "prerequisiteStates": {
-        "held": "In your file",
-        "listed": "To upload",
-        "missing": "To provide"
-      }
+      "prerequisitesForYou": "What you hand over to Stanzy for this service, on a page of its own once you ask: nothing is added to your file. A document already in your file counts.",
+      "ifDonation": "(if the funds are a gift)",
+      "inDossier": "In your file"
     },
     "dashboard": {
       "title": "Document services",
@@ -3813,15 +3812,96 @@
       "errors": {
         "SERVICE_SLUG_TAKEN": "This address is already another service’s.",
         "SERVICE_PERCENT_TOO_HIGH": "The percentage can’t be over 100%.",
-        "UNKNOWN": "Something went wrong. Try again."
+        "UNKNOWN": "Something went wrong. Try again.",
+        "SERVICE_PREREQUISITE_DUPLICATE": "Two items have the same name: rename one of them."
       },
       "prerequisites": "Documents needed",
-      "prerequisitesHint": "What the client hands over for this service. Link them to a Checklist document when they are one: the copy already in their file counts, with no duplicate.",
+      "prerequisitesHint": "What the client hands over for this service, on their request’s page: nothing is added to their file. Link an item to a Checklist document when it is one: the copy already in their file counts.",
       "noPrerequisite": "No document needed.",
       "prerequisiteKind": "Checklist document (optional)",
       "noKind": "— None —",
       "addPrerequisite": "Add a document",
-      "removePrerequisite": "Remove this document"
+      "removePrerequisite": "Remove this document",
+      "prerequisiteType": "Handed over as",
+      "prerequisiteTypes": {
+        "file": "File (photo or PDF)",
+        "signature": "Signature to draw"
+      },
+      "prerequisiteDonation": "Only if the funds are a gift",
+      "questionnaire": "Questionnaire",
+      "noQuestionnaire": "— None —",
+      "questionnaires": {
+        "proofOfFunds": "Proof of funds (NIU, emergency contacts, gift)",
+        "proofOfFundsNoFunds": "Proof of funds without funds (and UBA account)"
+      },
+      "questionnaireHint": "The questions the client answers with their request."
+    },
+    "requirements": {
+      "title": "Items to hand over",
+      "back": "Back to the file",
+      "loading": "Loading the items",
+      "for": "For “{document}” · {client}",
+      "intro": "What Stanzy and its partner in charge of the service use to get it. These items stay with the request: they are not added to your IRCC file.",
+      "complete": "Everything handed over",
+      "left": "{count, plural, one {# item to hand over} other {# items to hand over}}",
+      "closed": "This request is no longer under way: the items can be read, not changed.",
+      "questionsTitle": "Your details",
+      "questions": {
+        "niu": "Taxpayer number (NIU)",
+        "contacts": "People to contact in an emergency",
+        "donation": "Are the funds a gift?",
+        "donor": "The donor",
+        "ubaAccount": "Do you already have a UBA account?"
+      },
+      "niuHint": "It is on your tax registration certificate.",
+      "name": "Full name",
+      "phone": "Phone",
+      "contactName": "Contact {n}’s name",
+      "contactPhone": "Contact {n}’s phone",
+      "removeContact": "Remove contact {n}",
+      "addContact": "Add a contact",
+      "donor": {
+        "name": "Donor’s name",
+        "email": "Donor’s email",
+        "phone": "Donor’s phone"
+      },
+      "donorPhoto": "Also add the donor’s photo in the items below.",
+      "ubaClose": "Close that account before the opening: a new UBA account is opened in your name for the proof of funds.",
+      "yes": "Yes",
+      "no": "No",
+      "toAnswer": "To fill in",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Details saved",
+      "files": "Items",
+      "states": {
+        "given": "Handed over",
+        "inDossier": "In your file",
+        "missing": "To hand over"
+      },
+      "inDossierHint": "Your document “{document}” in the file counts. You can also hand over another one here.",
+      "anyFormat": "A photo or a PDF, no set format.",
+      "upload": "Add a file",
+      "sending": "Sending…",
+      "added": "Item handed over",
+      "removed": "Item removed",
+      "remove": "Remove {name}",
+      "sign": "Sign",
+      "signAgain": "Sign again",
+      "signTitle": "Your signature",
+      "signHint": "Sign in the box with a mouse, a pen or your finger. It is handed over on a blank page, as a PDF.",
+      "signatureFile": "signature",
+      "ink": "Ink",
+      "inks": {
+        "black": "Black",
+        "blue": "Blue"
+      },
+      "cancel": "Cancel",
+      "signSave": "Hand over the signature",
+      "errors": {
+        "REQUIREMENTS_CLOSED": "This request is no longer under way.",
+        "UNKNOWN": "Something went wrong. Try again."
+      }
     }
   }
 }
