@@ -2,6 +2,7 @@ import { after } from 'next/server';
 
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import type { ServiceType } from '@/features/dossiers/data/workflows';
+import { consultantInboxes } from '@/features/notifications/server/consultant-inbox';
 import {
   consultantEmail,
   dossierEmail,
@@ -54,10 +55,7 @@ export function notifyConsultants(
 ): void {
   after(async () => {
     try {
-      const consultants = await prisma.account.findMany({
-        where: { role: 'CONSULTANT' },
-        select: { email: true, locale: true },
-      });
+      const consultants = await consultantInboxes(prisma);
       const url = `${dashboardOrigin(siteUrl())}/dossiers/${dossier.id}`;
       for (const consultant of consultants) {
         await appMailer.send(

@@ -4,6 +4,7 @@ import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { invoicePaidEmail, invoiceSentEmail, proofReceivedEmail } from '@/features/invoices/lib/invoice-emails';
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { invoicePdf, type InvoiceForPdf } from '@/features/invoices/server/invoice-document';
+import { consultantInboxes } from '@/features/notifications/server/consultant-inbox';
 import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
 import { prisma } from '@/server/db/client';
@@ -68,10 +69,7 @@ export function notifyInvoicePaid(invoice: Invoice): void {
 /** To every consultant Account: a Client uploaded a Preuve de paiement. */
 export function notifyProofReceived(invoice: Invoice): void {
   later('a Preuve de paiement', async () => {
-    const consultants = await prisma.account.findMany({
-      where: { role: 'CONSULTANT' },
-      select: { email: true, locale: true },
-    });
+    const consultants = await consultantInboxes(prisma);
     for (const consultant of consultants) {
       await appMailer.send(
         proofReceivedEmail({

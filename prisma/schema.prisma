@@ -664,6 +664,8 @@ enum NotificationKind {
   STANZY_REQUESTED
   /// To the Client: Stanzy won't get that Document.
   STANZY_DECLINED
+  /// To the consultant: someone ordered a Service documentaire through its private link.
+  SERVICE_ORDERED
   /// To the Client: a Réunion planned, moved or cancelled (#94).
   MEETING_SCHEDULED
   MEETING_MOVED
