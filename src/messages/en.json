@@ -1577,6 +1577,7 @@
   },
   "Common": {
     "loading": "Loading…",
+    "pageLoading": "Loading the page",
     "QueryError": {
       "title": "This couldn’t be loaded.",
       "description": "Check your connection, then try again.",
@@ -2342,6 +2343,7 @@
       "INTEREST_REJECTED": "Your Accompagnement request wasn’t accepted.",
       "STANZY_REQUESTED": "{actor} asks Stanzy to get “{document}”.",
       "STANZY_DECLINED": "Stanzy won’t be able to get “{document}”.",
+      "SERVICE_ORDERED": "{client} ordered “{service}”.",
       "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
       "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature.",
       "REQUIREMENTS_SUBMITTED": "{actor} handed over all their pieces: to confirm.",
@@ -2375,6 +2377,7 @@
       "INTEREST_REJECTED": "An answer to your request.",
       "STANZY_REQUESTED": "A document to get.",
       "STANZY_DECLINED": "A document to get yourself.",
+      "SERVICE_ORDERED": "New service order.",
       "SIGNATURE_REMINDER": "A document is waiting for your signature.",
       "CONTRACT_REMINDER": "A contract is waiting for your signature.",
       "REQUIREMENTS_SUBMITTED": "Pieces to confirm.",

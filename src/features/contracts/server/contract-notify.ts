@@ -7,6 +7,7 @@ import {
 } from '@/features/contracts/lib/contract-emails';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import type { ServiceType } from '@/features/dossiers/data/workflows';
+import { consultantInboxes } from '@/features/notifications/server/consultant-inbox';
 import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
 import { prisma } from '@/server/db/client';
@@ -58,10 +59,7 @@ export function notifyContractSigned(client: Client, contract: Contract, pdf: Ui
         url: `${clientDossier(client, contract.dossierId)}#contrats`,
       }),
     );
-    const consultants = await prisma.account.findMany({
-      where: { role: 'CONSULTANT' },
-      select: { email: true, locale: true },
-    });
+    const consultants = await consultantInboxes(prisma);
     for (const consultant of consultants) {
       await appMailer.send(
         consultantContractSignedEmail({

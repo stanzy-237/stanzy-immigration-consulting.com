@@ -33,6 +33,7 @@ import { computeCrs } from '@/features/crs/lib/compute-crs';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
 import { dossierFor, isConsultant, writable } from '@/features/dossiers/server/dossier-access';
+import { consultantInboxes } from '@/features/notifications/server/consultant-inbox';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { rulesInForceOn } from '@/features/shared/lib/rules-version';
 import { toLocale } from '@/i18n/routing';
@@ -65,9 +66,6 @@ function mailLater(label: string, emails: () => Promise<EmailMessage[]>): void {
     }
   });
 }
-
-const consultants = (db: Db) =>
-  db.account.findMany({ where: { role: 'CONSULTANT' }, select: { email: true, locale: true } });
 
 /** The Client's open Accompagnement Dossier, if any: one at a time. */
 const openAccompagnement = (db: Db, accountId: string) =>
@@ -174,7 +172,7 @@ export const accompagnementRouter = createTRPCRouter({
     });
 
     mailLater('a new Demande', async () =>
-      (await consultants(ctx.prisma)).map((consultant) =>
+      (await consultantInboxes(ctx.prisma)).map((consultant) =>
         newInterestEmail({
           to: consultant.email,
           locale: consultant.locale,
@@ -471,7 +469,7 @@ export const accompagnementRouter = createTRPCRouter({
         };
         const client = dossier.account.name;
         mailLater('a Stanzy request', async () =>
-          (await consultants(ctx.prisma)).map((consultant) =>
+          (await consultantInboxes(ctx.prisma)).map((consultant) =>
             stanzyRequestedEmail({
               to: consultant.email,
               locale: consultant.locale,

@@ -8,7 +8,8 @@ import { createCaller } from '@/server/trpc/root';
 
 const mailer = vi.hoisted(() => ({ appMailer: { send: vi.fn() } }));
 vi.mock('@/server/email/app-mailer', () => mailer);
-vi.mock('@/features/notifications/server/notify', () => ({ notifyLater: vi.fn() }));
+const notifications = vi.hoisted(() => ({ notifyLater: vi.fn() }));
+vi.mock('@/features/notifications/server/notify', () => notifications);
 vi.mock('next/server', () => ({ after: (fn: () => unknown) => fn() }));
 const accept = vi.hoisted(() => ({
   acceptStanzyRequest: vi.fn(async () => ({ contract: { id: 'ctr_1', number: 'C-1' }, invoiceId: 'inv_1' })),
@@ -147,6 +148,10 @@ describe('ordering a service on its own', () => {
     await callerFor(db, client).order(order);
     expect(orders).toEqual([expect.objectContaining({ accountId: 'acc_1', serviceId: 'svc_pof', note: '7 000 000 FCFA', status: 'SUBMITTED' })]);
     expect(mailer.appMailer.send).toHaveBeenCalledWith(expect.objectContaining({ to: 'stanzy@example.com' }));
+    expect(notifications.notifyLater).toHaveBeenCalledWith(
+      db,
+      expect.objectContaining({ kind: 'SERVICE_ORDERED', actorId: 'acc_1', recipients: 'CONSULTANTS' }),
+    );
     await expect(callerFor(db, client).order(order)).rejects.toMatchObject({ message: 'ORDER_PENDING' });
     expect((await callerFor(db, client).offer({ token: TOKEN })).order).toMatchObject({ status: 'SUBMITTED' });
     await expect(callerFor(db, null).order(order)).rejects.toMatchObject({ code: 'UNAUTHORIZED' });

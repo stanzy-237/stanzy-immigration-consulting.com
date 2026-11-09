@@ -1594,6 +1594,7 @@
   },
   "Common": {
     "loading": "Chargement…",
+    "pageLoading": "Chargement de la page",
     "QueryError": {
       "title": "Impossible de charger ces informations.",
       "description": "Vérifiez votre connexion, puis réessayez.",
@@ -2359,6 +2360,7 @@
       "INTEREST_REJECTED": "Votre demande d’accompagnement n’a pas été retenue.",
       "STANZY_REQUESTED": "{actor} demande à Stanzy d’obtenir « {document} ».",
       "STANZY_DECLINED": "Stanzy ne pourra pas obtenir « {document} ».",
+      "SERVICE_ORDERED": "{client} a commandé « {service} ».",
       "SIGNATURE_REMINDER": "Rappel : « {document} » attend votre signature.",
       "CONTRACT_REMINDER": "Rappel : {number} attend votre signature.",
       "REQUIREMENTS_SUBMITTED": "{actor} a remis toutes ses pièces : à confirmer.",
@@ -2392,6 +2394,7 @@
       "INTEREST_REJECTED": "Réponse à votre demande.",
       "STANZY_REQUESTED": "Un document à obtenir.",
       "STANZY_DECLINED": "Un document à obtenir vous-même.",
+      "SERVICE_ORDERED": "Nouvelle commande de service.",
       "SIGNATURE_REMINDER": "Un document attend votre signature.",
       "CONTRACT_REMINDER": "Un contrat attend votre signature.",
       "REQUIREMENTS_SUBMITTED": "Des pièces à confirmer.",
