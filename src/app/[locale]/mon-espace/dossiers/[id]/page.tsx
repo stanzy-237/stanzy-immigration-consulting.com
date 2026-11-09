@@ -4,6 +4,7 @@ import { DossierOverviewView } from '@/features/accompagnement/views/dossier-ove
 import { ServiceProgressView } from '@/features/document-services/views/service-progress-view';
 import { requireSession } from '@/features/auth/server/guards';
 import { MyDossierDocumentsView, MyDossierView } from '@/features/dossiers/views/my-dossier-view';
+import { PendingPiecesNoticeView } from '@/features/document-services/views/pending-pieces-notice-view';
 import { ServiceStepsView } from '@/features/document-services/views/service-steps-view';
 import { DossierContractsView } from '@/features/contracts/views/dossier-contracts-view';
 import { DossierInvoicesView } from '@/features/invoices/views/dossier-invoices-view';
@@ -28,6 +29,7 @@ export default async function Page({ params }: { params: Params }) {
   prefetch(trpc.invoices.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.contracts.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.meetings.forDossier.queryOptions({ dossierId: id }));
+  prefetch(trpc.documentServices.requirements.mine.queryOptions());
   prefetch(trpc.accompagnement.overview.queryOptions({ dossierId: id }));
   // Awaited: the Dossier's service picks the tab it opens on, and a Service documentaire's
   // open pieces load with the page (step ①, ServiceStepsView). A failure shows in the View.
@@ -45,6 +47,7 @@ export default async function Page({ params }: { params: Params }) {
     <HydrateClient>
       <MyDossierView
         id={id}
+        notice={<PendingPiecesNoticeView />}
         documents={
           <ServiceStepsView dossierId={id}>
             <MyDossierDocumentsView id={id} />

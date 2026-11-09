@@ -4042,6 +4042,21 @@
       "review": "Revoir mes pièces",
       "loading": "Chargement des étapes du service",
       "done": "Remises"
+    },
+    "pending": {
+      "label": "Pièces à remettre",
+      "text": "Vous n’avez pas encore envoyé les pièces nécessaires pour {services}.",
+      "link": "Voir mes services"
+    },
+    "underWay": {
+      "title": "Mes services en cours",
+      "for": "Pour « {document} »",
+      "left": "{count, plural, one {# pièce à remettre} other {# pièces à remettre}}",
+      "submitted": "Pièces envoyées",
+      "confirmed": "Pièces confirmées",
+      "underWay": "En cours",
+      "open": "Voir le service",
+      "openLabel": "Voir le service {service}"
     }
   },
   "ClientForms": {

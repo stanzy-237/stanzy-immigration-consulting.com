@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { requireSession } from '@/features/auth/server/guards';
+import { PendingPiecesNoticeView } from '@/features/document-services/views/pending-pieces-notice-view';
 import { MySpaceView } from '@/features/dossiers/views/my-space-view';
 import type { LocaleParams } from '@/i18n/routing';
 import { HydrateClient, prefetch, trpc } from '@/trpc/server';
@@ -17,9 +18,10 @@ export default async function Page({ params }: { params: LocaleParams }) {
   setRequestLocale(locale);
   await requireSession({ locale, next: '/mon-espace' });
   prefetch(trpc.dossiers.mine.queryOptions());
+  prefetch(trpc.documentServices.requirements.mine.queryOptions());
   return (
     <HydrateClient>
-      <MySpaceView />
+      <MySpaceView notice={<PendingPiecesNoticeView />} />
     </HydrateClient>
   );
 }

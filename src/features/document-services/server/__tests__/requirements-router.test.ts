@@ -235,3 +235,20 @@ describe('« Suivant », then the consultant’s confirmation', () => {
     ]);
   });
 });
+
+describe('the Client’s services under way', () => {
+  it('lists each, with what is left to hand over and where it stands', async () => {
+    const { db } = fakeDatabase();
+    expect(await callerFor(db, client).mine()).toEqual([
+      expect.objectContaining({
+        id: 'stz_1',
+        dossierId: 'dos_1',
+        service: { name: pof.name },
+        document: 'Lettre de la banque',
+        hasRequirements: true,
+        complete: false,
+        handOver: 'OPEN',
+      }),
+    ]);
+  });
+});

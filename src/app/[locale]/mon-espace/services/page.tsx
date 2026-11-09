@@ -20,6 +20,7 @@ export default async function Page({ params, searchParams }: { params: Params; s
   setRequestLocale(locale);
   await requireSession({ locale, next: '/mon-espace/services' });
   prefetch(trpc.documentServices.list.queryOptions());
+  prefetch(trpc.documentServices.requirements.mine.queryOptions());
   return (
     <HydrateClient>
       <MyServicesView documentId={document ?? null} />

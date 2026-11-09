@@ -27,6 +27,7 @@ import { dossierFor, isConsultant } from '@/features/dossiers/server/dossier-acc
 import { notifyLater } from '@/features/notifications/server/notify';
 import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
+import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 
 type Db = TRPCContext['prisma'];
@@ -71,6 +72,31 @@ async function askable(db: Db, accountId: string, documentId: string) {
   if (!document || dossier?.accountId !== accountId || dossier.state !== 'OPEN') return null;
   if (document.finalVersionId || document.stanzyRequests.length > 0) return null;
   return { id: document.id, title: document.title, kind: document.kind, dossierId: dossier.id };
+}
+
+/** Where one request under way stands: what is left to hand over, the day it is due, its hand-over. */
+async function progressOf(db: Db, session: CurrentSession, requestId: string) {
+  const found = await requestFor(db, session, requestId);
+  const { request, dossier } = found;
+  const { items, questionsLeft, complete } = await requirementsOf(db, found);
+  const hasRequirements = items.length > 0 || request.service?.questionnaire !== null;
+  return {
+    id: request.id,
+    dossierId: dossier.id,
+    status: request.status,
+    service: request.service ? { name: request.service.name } : null,
+    document: request.document.title,
+    startedOn: request.startedOn,
+    turnaroundDays: request.service?.turnaroundDays ?? null,
+    dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
+    left: items.filter((item) => item.state === 'missing').length + questionsLeft.length,
+    hasRequirements,
+    complete,
+    handOver: handOverOf(request),
+    // A Service documentaire's own Dossier opens on its pieces (ServiceStepsView); an
+    // Accompagnement's « Stanzy s'en charge » keeps its Documents tab as it is.
+    handOverFirst: dossier.service === 'SERVICE_DOCUMENTAIRE' && hasRequirements,
+  };
 }
 
 /**
@@ -216,30 +242,24 @@ export const documentServicesRouter = createTRPCRouter({
         orderBy: { createdAt: 'asc' },
         select: { id: true },
       });
-      return Promise.all(
-        requests.map(async ({ id }) => {
-          const found = await requestFor(ctx.prisma, ctx.session, id);
-          const { request } = found;
-          const { items, questionsLeft, complete } = await requirementsOf(ctx.prisma, found);
-          return {
-            id: request.id,
-            status: request.status,
-            service: request.service ? { name: request.service.name } : null,
-            document: request.document.title,
-            startedOn: request.startedOn,
-            turnaroundDays: request.service?.turnaroundDays ?? null,
-            dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
-            left: items.filter((item) => item.state === 'missing').length + questionsLeft.length,
-            hasRequirements: items.length > 0 || request.service?.questionnaire !== null,
-            // A Service documentaire's own Dossier opens on its pieces (ServiceStepsView); an
-            // Accompagnement's « Stanzy s'en charge » keeps its Documents tab as it is.
-            handOverFirst:
-              dossier.service === 'SERVICE_DOCUMENTAIRE' && (items.length > 0 || request.service?.questionnaire !== null),
-            complete,
-            handOver: handOverOf(request),
-          };
-        }),
-      );
+      return Promise.all(requests.map(({ id }) => progressOf(ctx.prisma, ctx.session, id)));
+    }),
+
+    /**
+     * The viewer's own services under way, in all their open Dossiers: for the
+     * notice of pieces still to hand over and « Mes services en cours ».
+     */
+    mine: protectedProcedure.query(async ({ ctx }) => {
+      const requests = await ctx.prisma.stanzyRequest.findMany({
+        where: {
+          status: { in: [...OPEN_STANZY] },
+          serviceId: { not: null },
+          document: { section: { dossier: { accountId: ctx.session.account.id, state: 'OPEN' } } },
+        },
+        orderBy: { createdAt: 'asc' },
+        select: { id: true },
+      });
+      return Promise.all(requests.map(({ id }) => progressOf(ctx.prisma, ctx.session, id)));
     }),
 
     /** « Suivant »: the Client has handed everything over; the documents to receive show from now on. */

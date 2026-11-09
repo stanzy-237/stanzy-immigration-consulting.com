@@ -4025,6 +4025,21 @@
       "review": "Review my pieces",
       "loading": "Loading the service steps",
       "done": "Handed over"
+    },
+    "pending": {
+      "label": "Pieces to hand over",
+      "text": "You haven’t sent the pieces needed for {services} yet.",
+      "link": "See my services"
+    },
+    "underWay": {
+      "title": "My services under way",
+      "for": "For “{document}”",
+      "left": "{count, plural, one {# piece to hand over} other {# pieces to hand over}}",
+      "submitted": "Pieces sent",
+      "confirmed": "Pieces confirmed",
+      "underWay": "Under way",
+      "open": "View the service",
+      "openLabel": "View the service {service}"
     }
   },
   "ClientForms": {

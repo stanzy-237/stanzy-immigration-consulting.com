@@ -26,6 +26,7 @@ import { useTRPC } from '@/trpc/client';
  */
 export function MyDossierView({
   id,
+  notice,
   documents,
   overview,
   invoices,
@@ -33,6 +34,8 @@ export function MyDossierView({
   meetings,
 }: {
   id: string;
+  /** Above the Dossier: the pieces still to hand over for its services, passed in by the route. */
+  notice?: ReactNode;
   /** The Documents tab; by default the Dossier's Documents (`MyDossierDocumentsView`). */
   documents?: ReactNode;
   /** The top of the Aperçu (#81: CRS score, ITA countdown), passed in by the route. */
@@ -64,6 +67,7 @@ export function MyDossierView({
             <QueryBoundary fallback={<HeaderSkeleton />}>
               <MyDossierHeader id={id} />
             </QueryBoundary>
+            {notice ? <div className="mt-6">{notice}</div> : null}
           </div>
           <DossierTabs
             counts={counts}
