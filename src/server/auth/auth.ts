@@ -2,6 +2,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { after } from 'next/server';
 
 import { parseConsultantEmails } from '@/features/auth/lib/consultant-emails';
+import { toCookieDomain } from '@/features/auth/lib/cookie-domain';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { env } from '@/lib/env';
 import { prisma } from '@/server/db/client';
@@ -51,7 +52,7 @@ export const auth = createAuth({
       ? { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET }
       : undefined,
   consultantEmails: parseConsultantEmails(env.CONSULTANT_EMAILS).emails,
-  cookieDomain: env.AUTH_COOKIE_DOMAIN,
+  cookieDomain: toCookieDomain(env.AUTH_COOKIE_DOMAIN),
   trustedOrigins: [
     // Locally (no BETTER_AUTH_URL, not on Vercel) that is localhost and admin.localhost.
     ...(env.BETTER_AUTH_URL
