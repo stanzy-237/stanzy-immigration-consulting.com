@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Plus_Jakarta_Sans, Syne, Work_Sans } from 'next/font/google';
 
+import { NavigationProgress } from '@/components/navigation-progress';
 import { ServiceWorkerRegister } from '@/components/service-worker-register';
 import { SiteAnalytics } from '@/components/site-analytics';
 import { Toaster } from '@/components/ui/toast';
@@ -86,6 +87,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <TRPCReactProvider>
             <Toaster>
+              <NavigationProgress />
               {children}
               {modal}
               <DrawAlertsAuto />

@@ -18,6 +18,7 @@ import {
 } from '@/features/document-services/lib/order-schema';
 import { prerequisitesOf, textIn, type Texts } from '@/features/document-services/lib/service-schema';
 import { dossierFor } from '@/features/dossiers/server/dossier-access';
+import { consultantInboxes } from '@/features/notifications/server/consultant-inbox';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
@@ -107,17 +108,23 @@ export const ordersRouter = createTRPCRouter({
     });
     const name = service.name as unknown as Texts;
     mailLater('an order', async () =>
-      (await ctx.prisma.account.findMany({ where: { role: 'CONSULTANT' }, select: { email: true, locale: true } })).map(
-        (consultant) =>
-          stanzyRequestedEmail({
-            to: consultant.email,
-            locale: consultant.locale,
-            client: account.name,
-            document: textIn(name, consultant.locale ?? 'fr'),
-            url: `${dashboardOrigin(siteUrl())}/services#commandes`,
-          }),
+      (await consultantInboxes(ctx.prisma)).map((consultant) =>
+        stanzyRequestedEmail({
+          to: consultant.email,
+          locale: consultant.locale,
+          client: account.name,
+          document: textIn(name, consultant.locale ?? 'fr'),
+          url: `${dashboardOrigin(siteUrl())}/services#commandes`,
+        }),
       ),
     );
+    notifyLater(ctx.prisma, {
+      kind: 'SERVICE_ORDERED',
+      actorId: account.id,
+      recipients: 'CONSULTANTS',
+      target: {},
+      params: { orderId: order.id, client: account.name, service: textIn(name, 'fr') },
+    });
     trackLater(ctx.headers, 'service.ordered', { service: service.slug });
     return order;
   }),

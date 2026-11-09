@@ -12,10 +12,14 @@ import type { Rotation, Source } from '@/features/pdf-tools/lib/pages';
 type PdfJs = typeof import('pdfjs-dist');
 let pdfjs: Promise<PdfJs> | null = null;
 
-/** pdf.js, loaded once on first use, with its worker. */
+/**
+ * pdf.js, loaded once on first use, with its worker. The legacy build carries
+ * polyfills: the modern one calls `Promise.withResolvers` (Safari 17.4+), so
+ * Clients on an older iPhone could not open a contract to sign it.
+ */
 export function loadPdfJs(): Promise<PdfJs> {
-  pdfjs ??= import('pdfjs-dist').then((lib) => {
-    lib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+  pdfjs ??= import('pdfjs-dist/legacy/build/pdf.mjs').then((lib) => {
+    lib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/legacy/build/pdf.worker.min.mjs', import.meta.url).toString();
     return lib;
   });
   return pdfjs;

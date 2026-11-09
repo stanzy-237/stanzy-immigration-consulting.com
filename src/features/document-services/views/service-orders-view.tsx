@@ -113,10 +113,10 @@ function OrderList({ filter }: { filter: Filter }): ReactNode {
                   {order.account.email} ·{' '}
                   {format.dateTime(order.createdAt, { day: 'numeric', month: 'short', year: 'numeric' })}
                 </p>
-                <p className="mt-1 flex flex-wrap items-baseline gap-x-2 text-sm text-navy-deep">
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-2 text-sm text-navy-deep">
                   <span className="font-semibold">{textIn(order.service.name, locale)}</span>
                   <ServicePrice service={order.service} className="text-sm" />
-                </p>
+                </div>
               </div>
               {order.status === 'SUBMITTED' ? (
                 <div className="flex flex-wrap items-center gap-1">
