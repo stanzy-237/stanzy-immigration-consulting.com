@@ -64,6 +64,8 @@ model Account {
   signaturesSigned  SignatureRequest[]   @relation("SignatureSigner")
   contractsSent     Contract[]           @relation("ContractSender")
   contractsSigned   Contract[]           @relation("ContractSigner")
+  paymentsRecorded  Payment[]            @relation("PaymentRecorder")
+  receiptsSigned    Payment[]            @relation("ReceiptSigner")
   interestRequests  InterestRequest[]
   serviceOrders     ServiceOrder[]
   interestsDecided  InterestRequest[]    @relation("InterestDecider")
@@ -552,8 +554,20 @@ enum InvoiceStatus {
   DRAFT
   SENT
   PROOF_RECEIVED
+  /// Some of it received (#145), the rest still due.
+  PARTIALLY_PAID
   PAID
   CANCELLED
+}
+
+/// How a Paiement was made, as its Reconnaissance de réception de fonds lists it (#145).
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  BANK_DEPOSIT
+  MOBILE_MONEY
+  CHEQUE
+  OTHER
 }
 
 /// A Facture, for one Dossier. Amounts are in the currency's minor unit (XAF has none, CAD and EUR cents).
@@ -570,6 +584,7 @@ model Invoice {
   notes             String?
   lines             InvoiceLine[]
   proofs            PaymentProof[]
+  payments          Payment[]
   notifications     Notification[]
   sentAt            DateTime?
   paidAt            DateTime?
@@ -621,10 +636,67 @@ model PaymentProof {
   iv           String
   uploadedById String
   uploadedBy   Account  @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+  /// The Paiement it justifies, when the consultant attached it while recording one (cash, #145).
+  paymentId    String?
+  payment      Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
   createdAt    DateTime @default(now())
 
   @@index([invoiceId, createdAt])
   @@map("payment_proof")
+}
+
+/// One payment received on a Facture (#145). Amounts in the Facture's currency's minor unit. Each one recorded
+/// since #145 issues a Reconnaissance de réception de fonds: numbered, on the letterhead, signed and stamped by
+/// the consultant, then signed by the Client in the app. Payments from before (« Marquer payée ») have none.
+model Payment {
+  id               String         @id @default(cuid())
+  invoiceId        String
+  invoice          Invoice        @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  amount           Int
+  /// The day it was received (`YYYY-MM-DD`, Douala): a Recette on that day.
+  receivedOn       String
+  /// Null for a payment recorded before #145.
+  method           PaymentMethod?
+  /// What « Autre » was.
+  methodNote       String?
+  recordedById     String?
+  recordedBy       Account?       @relation("PaymentRecorder", fields: [recordedById], references: [id], onDelete: Restrict)
+  /// Justificatifs the consultant attached (a cash receipt).
+  proofs           PaymentProof[]
+  /// The Reconnaissance: REC-2026-0001, in the Client's language, with the Client's fields on it.
+  receiptNumber    String?        @unique
+  locale           String?
+  objectKey        String?
+  wrappedKey       String?
+  iv               String?
+  size             Int?
+  /// SHA-256 (hex) of the Reconnaissance as sent, checked again before signing.
+  fingerprint      String?
+  fields           Json?
+  /// The Reconnaissance signed by the Client, with its Certificat de signature.
+  signedObjectKey  String?
+  signedWrappedKey String?
+  signedIv         String?
+  signedSize       Int?
+  signedById       String?
+  signedBy         Account?       @relation("ReceiptSigner", fields: [signedById], references: [id], onDelete: Restrict)
+  signedName       String?
+  signedAt         DateTime?
+  signedIp         String?
+  signedDevice     String?
+  createdAt        DateTime       @default(now())
+
+  @@index([invoiceId, createdAt])
+  @@index([receivedOn])
+  @@map("payment")
+}
+
+/// The last Reconnaissance number given in a year.
+model ReceiptCounter {
+  year Int @id
+  last Int
+
+  @@map("receipt_counter")
 }
 
 /// What a Notification tells (#92). Its text is rendered in the reader's language, never stored.
@@ -684,6 +756,10 @@ enum NotificationKind {
   REQUIREMENTS_SUBMITTED
   /// To the Client: the consultant confirmed what was handed over.
   REQUIREMENTS_CONFIRMED
+  /// To the Client: a payment recorded, its Reconnaissance de réception de fonds to sign (#145).
+  RECEIPT_SENT
+  /// To the consultant: the Client signed a Reconnaissance.
+  RECEIPT_SIGNED
 }
 
 /// One line in an Account's notification center. Repeats by the same actor on the same target, while unread and within 30 minutes, raise `count` instead of adding lines.

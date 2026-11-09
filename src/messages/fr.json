@@ -2155,6 +2155,7 @@
       "SENT": "Envoyée",
       "OVERDUE": "En retard",
       "PROOF_RECEIVED": "Preuve reçue",
+      "PARTIALLY_PAID": "Partiellement payée",
       "PAID": "Payée",
       "CANCELLED": "Annulée"
     },
@@ -2313,6 +2314,26 @@
       "DOCUMENT_FILE_TOO_LARGE": "Ce fichier dépasse 25 Mo.",
       "DOCUMENT_FILE_INVALID": "Le fichier n’a pas été reçu correctement. Réessayez.",
       "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez."
+    },
+    "receipt": {
+      "title": "Reconnaissance de réception de fonds",
+      "number": "Reconnaissance n° {number}",
+      "body": "Je soussigné, représentant de STANZY IMMIGRATION CONSULTING, reconnais avoir reçu de Monsieur/Madame {client}, la somme de {amount}, soit {words} {currencyWords}, au titre du règlement de la prestation de services fournie par notre agence.\n\nLa prestation concernée est la suivante : {service}.\n\nLe montant total convenu pour cette prestation est de {total}. La somme de {amount} a été reçue le {receivedOn}. Le solde restant dû est de {balance}.\n\nLe paiement a été effectué par le moyen suivant :\n\n{methods}\n\nLa présente reconnaissance est établie afin d’attester de la réception effective des fonds par STANZY IMMIGRATION CONSULTING au titre de la prestation de services susmentionnée et pour servir et valoir ce que de droit.\n\nFait à Douala, le {issuedOn}.",
+      "currencyWords": {
+        "XAF": "francs CFA",
+        "CAD": "dollars canadiens",
+        "EUR": "euros"
+      },
+      "methods": {
+        "CASH": "Espèces",
+        "BANK_TRANSFER": "Virement bancaire",
+        "BANK_DEPOSIT": "Dépôt bancaire",
+        "MOBILE_MONEY": "Mobile Money",
+        "CHEQUE": "Chèque",
+        "OTHER": "Autre"
+      },
+      "client": "Le Concerné",
+      "company": "STANZY IMMIGRATION CONSULTING"
     }
   },
   "Notifications": {
@@ -2370,7 +2391,9 @@
       "MEETING_CANCELLED": "Réunion « {subject} » annulée.",
       "MEETING_REMINDER": "{soon, select, true {La réunion « {subject} » commence bientôt.} other {Rappel : réunion « {subject} » le {date}.}}",
       "DOSSIER_MESSAGE": "{actor} a écrit {count, plural, one {un message} other {# messages}} dans le dossier {service}.",
-      "MEETING_JOIN_REQUEST": "{client} demande à entrer dans « {subject} »."
+      "MEETING_JOIN_REQUEST": "{client} demande à entrer dans « {subject} ».",
+      "RECEIPT_SENT": "Stanzy a reçu votre paiement : signez la reconnaissance {number}.",
+      "RECEIPT_SIGNED": "{actor} a signé la reconnaissance {number}."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2404,7 +2427,9 @@
       "MEETING_CANCELLED": "Une réunion est annulée.",
       "MEETING_REMINDER": "Rappel de réunion.",
       "DOSSIER_MESSAGE": "Nouveau message dans un dossier.",
-      "MEETING_JOIN_REQUEST": "Quelqu’un demande à entrer."
+      "MEETING_JOIN_REQUEST": "Quelqu’un demande à entrer.",
+      "RECEIPT_SENT": "Une reconnaissance à signer.",
+      "RECEIPT_SIGNED": "Une reconnaissance a été signée."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",

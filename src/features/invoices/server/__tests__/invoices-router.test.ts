@@ -26,6 +26,37 @@ vi.mock('@/server/storage/r2', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/server/storage/r2')>()),
   ...storage,
 }));
+// The Reconnaissance's PDF, its storage and the consultant's signature and stamp: stubbed, the rules run for real.
+const receipts = vi.hoisted(() => ({
+  receiptPdf: vi.fn(async () => ({
+    bytes: new Uint8Array([1, 2, 3]),
+    fields: [{ kind: 'SIGNATURE', page: 1, x: 0.1, y: 0.2, width: 0.3, height: 0.05 }],
+  })),
+}));
+vi.mock('@/features/invoices/server/receipt-document', () => receipts);
+const stored = vi.hoisted(() => ({
+  storeEncryptedPdf: vi.fn(async (prefix: string) => ({ objectKey: `${prefix}r.bin`, wrappedKey: 'w', iv: 'i', size: 3 })),
+}));
+vi.mock('@/features/contracts/server/contract-files', () => stored);
+vi.mock('@/features/signatures/server/signing-assets', () => ({
+  openSigningAssets: vi.fn(async () => ({
+    signature: { type: 'image/png', bytes: new Uint8Array() },
+    stamp: { type: 'image/png', bytes: new Uint8Array() },
+  })),
+}));
+const signing = vi.hoisted(() => ({
+  fingerprintOf: vi.fn(async () => 'f1ng3r'),
+  signPdf: vi.fn(async () => new Uint8Array([4, 5])),
+}));
+vi.mock('@/features/signatures/lib/sign-pdf', () => signing);
+vi.mock('@/features/signatures/server/certificate', () => ({
+  certificateFor: vi.fn(async () => ({ page: {}, date: '31 octobre 2026' })),
+}));
+vi.mock('@/features/dossiers/server/dossier-files', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/features/dossiers/server/dossier-files')>()),
+  openEncryptedFile: vi.fn(async () => new Uint8Array([1, 2, 3]).buffer),
+}));
+
 // A real master key: the routers wrap each file's key with it.
 vi.stubEnv('DOSSIER_FILES_KEY', 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=');
 
@@ -45,7 +76,9 @@ function fakeDatabase() {
   const invoices: Row[] = [];
   const lines: Row[] = [];
   const proofs: Row[] = [];
+  const payments: Row[] = [];
   const counters: { year: number; last: number }[] = [];
+  const receiptCounters: { year: number; last: number }[] = [];
   let seq = 0;
   let clock = Date.parse('2026-10-31T09:00:00Z');
 
@@ -67,6 +100,7 @@ function fakeDatabase() {
       .filter((l) => l.invoiceId === invoice.id)
       .sort((a, b) => (a.position as number) - (b.position as number)),
     proofs: proofs.filter((p) => p.invoiceId === invoice.id),
+    payments: payments.filter((p) => p.invoiceId === invoice.id).map((p) => ({ ...p, proofs: proofs.filter((f) => f.paymentId === p.id) })),
     dossier: withAccount(dossiers.find((d) => d.id === invoice.dossierId)!),
   });
   const now = () => new Date((clock += 1000));
@@ -142,6 +176,36 @@ function fakeDatabase() {
         return counters.find((c) => c.year === where.year)!;
       },
     },
+    payment: {
+      async findMany({ where }: { where: { invoiceId: string } }) {
+        return payments.filter((p) => p.invoiceId === where.invoiceId);
+      },
+      async findUnique({ where }: { where: { id: string } }) {
+        const row = payments.find((p) => p.id === where.id);
+        return row ? { ...row, invoice: full(invoices.find((i) => i.id === row.invoiceId)!) } : null;
+      },
+      async create({ data }: { data: Record<string, unknown> }) {
+        const row: Row = { signedAt: null, signedObjectKey: null, ...data, id: `pay_${++seq}`, createdAt: now() };
+        payments.push(row);
+        return { id: row.id };
+      },
+      async updateMany({ where, data }: { where: Record<string, unknown>; data: Record<string, unknown> }) {
+        const hit = payments.filter((p) => matches(p, where));
+        for (const p of hit) Object.assign(p, data);
+        return { count: hit.length };
+      },
+      async update({ where, data }: { where: { id: string }; data: Record<string, unknown> }) {
+        return Object.assign(payments.find((p) => p.id === where.id)!, data);
+      },
+    },
+    receiptCounter: {
+      async upsert({ where }: { where: { year: number } }) {
+        const counter = receiptCounters.find((c) => c.year === where.year);
+        if (counter) counter.last += 1;
+        else receiptCounters.push({ year: where.year, last: 1 });
+        return receiptCounters.find((c) => c.year === where.year)!;
+      },
+    },
     paymentProof: {
       async create({ data }: { data: Record<string, unknown> }) {
         const row = { ...data, id: `proof_${++seq}`, createdAt: now() };
@@ -151,7 +215,7 @@ function fakeDatabase() {
     },
   } as Record<string, unknown>;
   prisma.$transaction = (fn: (tx: unknown) => Promise<unknown>) => fn(prisma);
-  return { prisma: prisma as unknown as TRPCContext['prisma'], invoices, lines, proofs };
+  return { prisma: prisma as unknown as TRPCContext['prisma'], invoices, lines, proofs, payments };
 }
 
 const asConsultant = sessionFor({ id: 'acc_stanzy', name: 'Stanzy', role: 'CONSULTANT' });
@@ -172,6 +236,14 @@ const draft = {
   ],
 };
 
+const payment = (invoiceId: string, amount: number, extra: Record<string, unknown> = {}) => ({
+  invoiceId,
+  amount,
+  receivedOn: '2026-10-31',
+  method: 'CASH' as const,
+  methodNote: null,
+  ...extra,
+});
 const proof = (invoiceId: string, extra: Record<string, unknown> = {}) => ({
   invoiceId,
   objectKey: `invoices/${invoiceId}/9a2b.bin`,
@@ -296,12 +368,13 @@ describe('the Client’s Factures', () => {
 });
 
 describe('closing a Facture', () => {
-  it('marks it Payée and thanks the Client; after that it takes no proof', async () => {
+  it('is Payée once its total is received, and thanks the Client; after that it takes no proof', async () => {
     const id = await sent();
     await as(asAminata).addProof(proof(id));
-    await as(asConsultant).dashboard.markPaid({ id });
-    expect(db.invoices[0]).toMatchObject({ status: 'PAID' });
+    await as(asConsultant).payments.record(payment(id, 105000));
+    expect(db.invoices[0]).toMatchObject({ status: 'PAID', paidAt: expect.any(Date) });
     expect(notify.notifyInvoicePaid).toHaveBeenCalledOnce();
+    expect(notifications.notifyLater).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ kind: 'INVOICE_PAID' }));
     await expect(as(asAminata).addProof(proof(id))).rejects.toMatchObject({ message: 'INVOICE_NOT_PAYABLE' });
   });
 
@@ -312,6 +385,55 @@ describe('closing a Facture', () => {
     await expect(as(asConsultant).dashboard.cancel({ id, reason: 'Encore' })).rejects.toMatchObject({
       message: 'INVOICE_NOT_PAYABLE',
     });
+  });
+});
+
+describe('Paiements and their Reconnaissance de réception de fonds (#145)', () => {
+  it('records a part payment: « Partiellement payée », a numbered Reconnaissance, signed and stamped, for the Client to sign', async () => {
+    const id = await sent();
+    await as(asConsultant).payments.record(payment(id, 50000));
+    expect(db.invoices[0]).toMatchObject({ status: 'PARTIALLY_PAID', paidAt: null });
+    expect(db.payments).toEqual([
+      expect.objectContaining({ invoiceId: id, amount: 50000, method: 'CASH', receiptNumber: 'REC-2026-0001', fingerprint: 'f1ng3r' }),
+    ]);
+    expect(receipts.receiptPdf).toHaveBeenCalledWith(
+      expect.objectContaining({ number: 'REC-2026-0001', amount: 50000, total: 105000, balance: 55000, consultant: expect.anything() }),
+    );
+    expect(notifications.notifyLater).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ kind: 'RECEIPT_SENT', recipients: ['acc_1'], target: { dossierId: 'dos_1', invoiceId: id } }),
+    );
+    expect(notify.notifyInvoicePaid).not.toHaveBeenCalled();
+    // The next one is numbered after it and can't go past the balance.
+    await expect(as(asConsultant).payments.record(payment(id, 60000))).rejects.toMatchObject({ message: 'PAYMENT_TOO_HIGH' });
+    await as(asConsultant).payments.record(payment(id, 55000, { method: 'OTHER', methodNote: 'Western Union' }));
+    expect(db.payments[1]).toMatchObject({ receiptNumber: 'REC-2026-0002', methodNote: 'Western Union' });
+    expect(db.invoices[0]).toMatchObject({ status: 'PAID' });
+  });
+
+  it('is recorded by the consultant only, a justificatif attached to it', async () => {
+    const id = await sent();
+    await expect(as(asAminata).payments.record(payment(id, 1000))).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await as(asConsultant).payments.record(payment(id, 1000, { proof: proof(id, { fileName: 'recu-especes.jpg' }) }));
+    expect(db.proofs).toEqual([expect.objectContaining({ paymentId: db.payments[0]!.id, fileName: 'recu-especes.jpg', uploadedById: 'acc_stanzy' })]);
+    // A justificatif doesn't make it « Preuve reçue »: it stays as the payment left it.
+    expect(db.invoices[0]).toMatchObject({ status: 'PARTIALLY_PAID' });
+  });
+
+  it('is signed by its Client only, once, and the consultant is told', async () => {
+    const id = await sent();
+    await as(asConsultant).payments.record(payment(id, 1000));
+    const paymentId = db.payments[0]!.id;
+    const signature = { id: paymentId, name: 'Aminata Diallo', signature: 'data:image/png;base64,iVBORw0KGgo=', accepted: true as const };
+    await expect(as(asBob).payments.sign(signature)).rejects.toMatchObject({ code: 'NOT_FOUND' });
+    await expect(as(asConsultant).payments.sign(signature)).rejects.toMatchObject({ message: 'RECEIPT_NOT_YOURS' });
+    await as(asAminata).payments.sign(signature);
+    expect(db.payments[0]).toMatchObject({ signedName: 'Aminata Diallo', signedById: 'acc_1', signedObjectKey: expect.any(String) });
+    expect(notifications.notifyLater).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ kind: 'RECEIPT_SIGNED', recipients: 'CONSULTANTS' }),
+    );
+    await expect(as(asAminata).payments.sign(signature)).rejects.toMatchObject({ message: 'RECEIPT_NOT_PENDING' });
   });
 });
 

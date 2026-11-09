@@ -2138,6 +2138,7 @@
       "SENT": "Sent",
       "OVERDUE": "Overdue",
       "PROOF_RECEIVED": "Proof received",
+      "PARTIALLY_PAID": "Partly paid",
       "PAID": "Paid",
       "CANCELLED": "Cancelled"
     },
@@ -2296,6 +2297,26 @@
       "DOCUMENT_FILE_TOO_LARGE": "This file is over 25 MB.",
       "DOCUMENT_FILE_INVALID": "The file didn’t arrive properly. Try again.",
       "UNKNOWN": "The change couldn’t be saved. Try again."
+    },
+    "receipt": {
+      "title": "Acknowledgement of receipt of funds",
+      "number": "Receipt no. {number}",
+      "body": "I, the undersigned, representing STANZY IMMIGRATION CONSULTING, acknowledge having received from Mr/Mrs {client} the sum of {amount}, that is {words} {currencyWords}, in payment for the services provided by our agency.\n\nThe service concerned is the following: {service}.\n\nThe total amount agreed for this service is {total}. The sum of {amount} was received on {receivedOn}. The balance still due is {balance}.\n\nThe payment was made by the following means:\n\n{methods}\n\nThis acknowledgement is issued to certify that STANZY IMMIGRATION CONSULTING has effectively received the funds for the above-mentioned service, for all legal purposes.\n\nDone in Douala, on {issuedOn}.",
+      "currencyWords": {
+        "XAF": "CFA francs",
+        "CAD": "Canadian dollars",
+        "EUR": "euros"
+      },
+      "methods": {
+        "CASH": "Cash",
+        "BANK_TRANSFER": "Bank transfer",
+        "BANK_DEPOSIT": "Bank deposit",
+        "MOBILE_MONEY": "Mobile Money",
+        "CHEQUE": "Cheque",
+        "OTHER": "Other"
+      },
+      "client": "The Client",
+      "company": "STANZY IMMIGRATION CONSULTING"
     }
   },
   "Notifications": {
@@ -2353,7 +2374,9 @@
       "MEETING_CANCELLED": "Meeting “{subject}” cancelled.",
       "MEETING_REMINDER": "{soon, select, true {The meeting “{subject}” starts soon.} other {Reminder: meeting “{subject}” on {date}.}}",
       "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file.",
-      "MEETING_JOIN_REQUEST": "{client} asks to join “{subject}”."
+      "MEETING_JOIN_REQUEST": "{client} asks to join “{subject}”.",
+      "RECEIPT_SENT": "Stanzy received your payment: sign receipt {number}.",
+      "RECEIPT_SIGNED": "{actor} signed receipt {number}."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2387,7 +2410,9 @@
       "MEETING_CANCELLED": "A meeting was cancelled.",
       "MEETING_REMINDER": "Meeting reminder.",
       "DOSSIER_MESSAGE": "New message in a file.",
-      "MEETING_JOIN_REQUEST": "Someone asks to join."
+      "MEETING_JOIN_REQUEST": "Someone asks to join.",
+      "RECEIPT_SENT": "A receipt to sign.",
+      "RECEIPT_SIGNED": "A receipt was signed."
     },
     "pushSwitch": {
       "label": "Get them on this phone",

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { encryptedFileInput } from '@/features/dossiers/lib/document-schema';
 import { CURRENCIES } from '@/features/invoices/lib/money';
 
 export const LINE_DESCRIPTION_MAX = 200;
@@ -37,3 +38,28 @@ export const cancelInvoiceInput = z.object({ id, reason: z.string().trim().min(3
 
 /** Where a Facture's encrypted Preuves de paiement live in the private R2 bucket (#87). */
 export const invoiceFilePrefix = (invoiceId: string): string => `invoices/${invoiceId}/`;
+
+/** How a Paiement was made, in the order a Reconnaissance lists them (#145). */
+export const PAYMENT_METHODS = ['CASH', 'BANK_TRANSFER', 'BANK_DEPOSIT', 'MOBILE_MONEY', 'CHEQUE', 'OTHER'] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
+export const PAYMENT_NOTE_MAX = 120;
+
+/**
+ * A Paiement the consultant records (#145): how much (minor units), the day,
+ * how (« Autre » says what), and optionally a justificatif the browser
+ * already encrypted and sent (a cash receipt).
+ */
+export const recordPaymentInput = z
+  .object({
+    invoiceId: id,
+    amount: z.number().int().positive(),
+    receivedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    method: z.enum(PAYMENT_METHODS),
+    methodNote: z.string().trim().max(PAYMENT_NOTE_MAX).nullable(),
+    proof: encryptedFileInput.extend({ invoiceId: id }).optional(),
+  })
+  .refine((input) => input.method !== 'OTHER' || Boolean(input.methodNote), { path: ['methodNote'], message: 'PAYMENT_NOTE_REQUIRED' });
+
+/** REC-2026-0001 */
+export const receiptNumber = (year: number, sequence: number): string => `REC-${year}-${String(sequence).padStart(4, '0')}`;

@@ -16,6 +16,7 @@ import {
 import { invoiceNumber, isAwaitingPayment } from '@/features/invoices/lib/invoice-status';
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { invoiceFields, invoiceFor } from '@/features/invoices/server/invoice-access';
+import { paymentsRouter } from '@/features/invoices/server/payments-router';
 import { notifyInvoicePaid, notifyInvoiceSent, notifyProofReceived } from '@/features/invoices/server/invoice-notify';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { trackLater } from '@/server/analytics';
@@ -33,7 +34,7 @@ function whereFor(filter: InvoiceFilter, now: Date): Prisma.InvoiceWhereInput {
     case 'ALL':
       return {};
     case 'AWAITING':
-      return { status: { in: ['SENT', 'PROOF_RECEIVED'] } };
+      return { status: { in: ['SENT', 'PROOF_RECEIVED', 'PARTIALLY_PAID'] } };
     case 'OVERDUE':
       return { status: 'SENT', dueDate: { lte: new Date(now.getTime() - DAY) } };
     default:
@@ -69,6 +70,9 @@ const proofFields = { select: { id: true, fileName: true, createdAt: true }, ord
  * ones on their Dossier and uploads a Preuve de paiement.
  */
 export const invoicesRouter = createTRPCRouter({
+  /** Paiements and their Reconnaissance de réception de fonds (#145). */
+  payments: paymentsRouter,
+
   /** A Dossier's Factures, newest first: all for the consultant, the sent ones for its Client. */
   forDossier: protectedProcedure.input(dossierRefInput).query(async ({ ctx, input }) => {
     const dossier = await dossierFor(ctx.prisma, ctx.session, input.dossierId);
@@ -237,24 +241,6 @@ export const invoicesRouter = createTRPCRouter({
         target: { dossierId: draft.dossier.id, invoiceId: draft.id },
       });
       return { number };
-    }),
-
-    markPaid: consultantProcedure.input(byId).mutation(async ({ ctx, input }) => {
-      const invoice = await invoiceFor(ctx.prisma, ctx.session, input.id);
-      const paidAt = new Date();
-      const { count } = await ctx.prisma.invoice.updateMany({
-        where: { id: invoice.id, status: { in: ['SENT', 'PROOF_RECEIVED'] } },
-        data: { status: 'PAID', paidAt },
-      });
-      if (count === 0) throw refuse('INVOICE_NOT_PAYABLE');
-      notifyInvoicePaid({ ...printable(invoice), status: 'PAID' });
-      trackLater(ctx.headers, 'invoice.paid', { service: invoice.dossier.service });
-      notifyLater(ctx.prisma, {
-        kind: 'INVOICE_PAID',
-        actorId: ctx.session.account.id,
-        recipients: [invoice.dossier.accountId],
-        target: { dossierId: invoice.dossier.id, invoiceId: invoice.id },
-      });
     }),
 
     /** Annulée with a reason, from Envoyée or Preuve reçue; a Brouillon is deleted instead. */

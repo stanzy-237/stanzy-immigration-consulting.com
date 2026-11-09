@@ -1,4 +1,4 @@
-export type InvoiceStatus = 'DRAFT' | 'SENT' | 'PROOF_RECEIVED' | 'PAID' | 'CANCELLED';
+export type InvoiceStatus = 'DRAFT' | 'SENT' | 'PROOF_RECEIVED' | 'PARTIALLY_PAID' | 'PAID' | 'CANCELLED';
 
 /**
  * What the consultant and the Client read. En retard is never stored: it is
@@ -19,5 +19,9 @@ export function displayStatus(invoice: { status: InvoiceStatus; dueDate: Date | 
 export const invoiceNumber = (year: number, sequence: number): string =>
   `STZ-${year}-${String(sequence).padStart(4, '0')}`;
 
-/** Statuses the Client can still pay: a Preuve de paiement can be added, the consultant can mark it Payée or cancel it. */
-export const isAwaitingPayment = (status: InvoiceStatus): boolean => status === 'SENT' || status === 'PROOF_RECEIVED';
+/**
+ * Statuses with something still to pay: a Preuve de paiement can be added and the consultant can record a
+ * Paiement (#145). Only one with nothing received yet can be cancelled.
+ */
+export const isAwaitingPayment = (status: InvoiceStatus): boolean =>
+  status === 'SENT' || status === 'PROOF_RECEIVED' || status === 'PARTIALLY_PAID';
