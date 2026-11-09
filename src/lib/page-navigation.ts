@@ -21,6 +21,8 @@ export function isPageNavigation(click: LinkClick, link: LinkTarget, current: UR
   // Another site (the Tableau de bord's link to the site included) loads in full.
   const next = new URL(link.href);
   if (next.origin !== current.origin) return false;
+  // A file (a PDF, an export) from a route handler: no page to wait for.
+  if (next.pathname.startsWith('/api/')) return false;
   // Only the #fragment differs: the browser scrolls, nothing loads.
   return next.pathname !== current.pathname || next.search !== current.search;
 }

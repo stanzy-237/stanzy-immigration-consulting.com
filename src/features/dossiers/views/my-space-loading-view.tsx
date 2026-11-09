@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
 
-import { PageSkeleton } from '@/components/page-skeleton';
+import { PageSkeleton, type PageSkeletonVariant } from '@/components/page-skeleton';
 import { SiteNav } from '@/features/landing/components/site-nav';
 
 /**
  * A « Mon espace » page while it loads. Its pages draw the site's menu
  * themselves, so the menu stays here too and doesn't blink on a click.
  */
-export function MySpaceLoadingView({ variant }: { variant?: 'list' | 'detail' }): ReactNode {
+export function MySpaceLoadingView({ variant }: { variant?: PageSkeletonVariant }): ReactNode {
   return (
     <>
       <SiteNav />

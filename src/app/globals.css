@@ -286,6 +286,15 @@
       transform: rotateX(0deg);
     }
   }
+
+  /* A loading page's skeleton fades in only past 150 ms: a fast page never flashes it. */
+  --animate-skeleton-in: skeleton-in 200ms ease-out 150ms both;
+
+  @keyframes skeleton-in {
+    from {
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {

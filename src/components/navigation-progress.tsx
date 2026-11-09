@@ -9,7 +9,7 @@ import { isPageNavigation } from '@/lib/page-navigation';
 
 /** A page that arrives sooner than this never shows the bar: no flash on fast changes. */
 const SHOW_AFTER_MS = 150;
-/** How long the bar fills the width once the page is in place, then how long it fades. */
+/** How long the bar fills the width once the page is in place, then how long it fades: both `duration-200` below. */
 const FILL_MS = 200;
 const FADE_MS = 200;
 /** A change that never lands (cancelled, failed) stops showing after this. */
@@ -22,6 +22,8 @@ type Phase = 'idle' | 'loading' | 'done' | 'fading';
  * started by a click on a link to another page of the app. It rushes ahead
  * then crawls (it can't know how long the page takes), fills the width once
  * the new URL is in place, and fades. With reduced motion it only fades.
+ * A change made from code (`router.push` after a form) doesn't start it;
+ * the page's `loading.tsx` skeleton still shows.
  */
 export function NavigationProgress(): ReactNode {
   // useSearchParams needs a Suspense boundary, or it would hold back static pages.
@@ -105,7 +107,7 @@ function Bar(): ReactNode {
           : 'scale-x-100 transition duration-200 ease-out',
         phase === 'fading' && 'opacity-0',
         // Reduced motion: no sweep, the full bar fades in and out.
-        'motion-reduce:scale-x-100 motion-reduce:transition-opacity motion-reduce:starting:opacity-0',
+        'motion-reduce:scale-x-100 motion-reduce:transition-opacity motion-reduce:duration-200 motion-reduce:starting:opacity-0',
       )}
     />
   );

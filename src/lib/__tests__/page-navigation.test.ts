@@ -36,6 +36,10 @@ describe('isPageNavigation', () => {
     expect(isPageNavigation(click, link('mailto:info@example.com'), here)).toBe(false);
   });
 
+  it('leaves files served by the API to the browser, download attribute or not', () => {
+    expect(isPageNavigation(click, link('/api/dossiers/files/v1'), here)).toBe(false);
+  });
+
   it('stays put for the same page or a jump within it', () => {
     expect(isPageNavigation(click, link('/fr/mon-espace?onglet=documents'), here)).toBe(false);
     expect(isPageNavigation(click, link('/fr/mon-espace?onglet=documents#factures'), here)).toBe(false);
