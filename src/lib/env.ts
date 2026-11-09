@@ -56,6 +56,9 @@ const schema = z.object({
     )
     .optional(),
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+  // Where the consultant's emails go. Optional: without it, to every
+  // consultant Account's own email.
+  CONSULTANT_INBOX: z.string().email().optional(),
   // Comma-separated emails whose Account gets the consultant role at creation
   // (normally one). Optional: without it nobody is consultant.
   CONSULTANT_EMAILS: z

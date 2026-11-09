@@ -30,6 +30,8 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
   // A Demande d'intérêt (#81): the consultant's decision page, the User's own status.
   if (item.kind === 'INTEREST_SUBMITTED') return item.params?.interestId ? `/demandes/${item.params.interestId}` : '/demandes';
   if (item.kind === 'INTEREST_REJECTED') return `${base}/accompagnement`;
+  // An order through a private link (#80): the consultant's « Commandes ».
+  if (item.kind === 'SERVICE_ORDERED') return '/services#commandes';
   // A Réunion, with a Dossier or not, opens on its room; cancelled, on the Dossier's Réunions if any.
   if (item.kind.startsWith('MEETING_') && item.params?.meetingId) {
     if (item.kind === 'MEETING_CANCELLED' && item.dossier) return `${base}/dossiers/${item.dossier.id}?onglet=reunions`;

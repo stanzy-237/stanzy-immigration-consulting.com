@@ -14,7 +14,8 @@ export function useNotificationText() {
   const format = useFormatter();
 
   return (item: NotificationItem): { title: string; detail: string | null } => {
-    const service = item.dossier ? dossiers(`services.${item.dossier.service}`) : '';
+    // A Dossier's service, or the Service documentaire an order names.
+    const service = item.dossier ? dossiers(`services.${item.dossier.service}`) : (item.params.service ?? '');
     const values = {
       actor: actorName(item, t('someone')),
       // The sign-ups summary carries its own count; grouped Notifications, how many they gathered.
