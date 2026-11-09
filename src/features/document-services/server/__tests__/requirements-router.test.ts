@@ -231,12 +231,30 @@ describe('the Client’s services under way', () => {
       expect.objectContaining({
         id: 'stz_1',
         dossierId: 'dos_1',
-        service: { name: pof.name },
+        service: { slug: pof.slug, name: pof.name },
         document: 'Lettre de la banque',
         hasRequirements: true,
         complete: false,
         handOver: 'OPEN',
       }),
     ]);
+  });
+});
+
+describe('the services under way, for the consultant', () => {
+  it('lists every one with its Client and its service, for the consultant only', async () => {
+    const { db } = fakeDatabase();
+    const services = createCaller({ prisma: db, session: consultant, headers: new Headers() } as unknown as TRPCContext)
+      .documentServices.dashboard;
+    expect(await services.underWay()).toEqual([
+      expect.objectContaining({
+        id: 'stz_1',
+        client: 'Aminata Diallo',
+        service: { slug: pof.slug, name: pof.name },
+        handOver: 'OPEN',
+      }),
+    ]);
+    const asClient = createCaller({ prisma: db, session: client, headers: new Headers() } as unknown as TRPCContext);
+    await expect(asClient.documentServices.dashboard.underWay()).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 });

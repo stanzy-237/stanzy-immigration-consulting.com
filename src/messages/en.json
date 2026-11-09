@@ -1427,7 +1427,8 @@
       "demandes": "Expressions of interest",
       "finances": "Finances",
       "reunions": "Meetings",
-      "services": "Document services"
+      "services": "Document services",
+      "services-en-cours": "Services"
     },
     "viewSite": "View the site",
     "overview": {
@@ -4029,6 +4030,18 @@
       "underWay": "Under way",
       "open": "View the service",
       "openLabel": "View the service {service}"
+    },
+    "inProgress": {
+      "title": "Services under way",
+      "intro": "The documents Stanzy gets for its clients. The catalogue and prices are managed in <catalogue>Document services</catalogue>.",
+      "tabs": "Services",
+      "all": "All",
+      "proofOfFunds": "Proof of funds",
+      "empty": "No service under way.",
+      "due": "Due on {date}",
+      "open": "Open",
+      "openLabel": "Open {client}’s service",
+      "loading": "Loading the services under way"
     }
   },
   "ClientForms": {

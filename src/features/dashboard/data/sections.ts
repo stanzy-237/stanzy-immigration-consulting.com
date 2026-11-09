@@ -1,4 +1,4 @@
-import { FileCheck2, FileSignature, FileStack, FolderKanban, Inbox, ScrollText, LayoutDashboard, Newspaper, ReceiptText, Users, Video, Wallet, type LucideIcon } from 'lucide-react';
+import { ClipboardList, FileCheck2, FileSignature, FileStack, FolderKanban, Inbox, ScrollText, LayoutDashboard, Newspaper, ReceiptText, Users, Video, Wallet, type LucideIcon } from 'lucide-react';
 
 /**
  * The Tableau de bord's sections, in sidebar order. A new section (Leads,
@@ -7,7 +7,7 @@ import { FileCheck2, FileSignature, FileStack, FolderKanban, Inbox, ScrollText, 
  */
 export type DashboardSection = {
   /** Its label is `Dashboard.nav.<key>`. */
-  key: 'overview' | 'demandes' | 'dossiers' | 'reunions' | 'comptes' | 'factures' | 'finances' | 'outils-pdf' | 'signatures' | 'contrats' | 'services' | 'blog';
+  key: 'overview' | 'demandes' | 'dossiers' | 'services-en-cours' | 'reunions' | 'comptes' | 'factures' | 'finances' | 'outils-pdf' | 'signatures' | 'contrats' | 'services' | 'blog';
   /** Its address on the dashboard's subdomain. */
   href: string;
   /** The first route segment below the dashboard it owns; null for the Aperçu. */
@@ -25,6 +25,8 @@ export const DASHBOARD_SECTIONS: readonly DashboardSection[] = [
   { key: 'overview', href: '/', segment: null, icon: LayoutDashboard, group: 'general' },
   { key: 'demandes', href: '/demandes', segment: 'demandes', icon: Inbox, group: 'clients' },
   { key: 'dossiers', href: '/dossiers', segment: 'dossiers', icon: FolderKanban, group: 'clients' },
+  // The Services documentaires under way for Clients; the catalogue stays under Facturation.
+  { key: 'services-en-cours', href: '/services-en-cours', segment: 'services-en-cours', icon: ClipboardList, group: 'clients' },
   { key: 'reunions', href: '/reunions', segment: 'reunions', icon: Video, group: 'clients' },
   { key: 'comptes', href: '/comptes', segment: 'comptes', icon: Users, group: 'clients' },
   { key: 'contrats', href: '/contrats', segment: 'contrats', icon: ScrollText, group: 'clients' },

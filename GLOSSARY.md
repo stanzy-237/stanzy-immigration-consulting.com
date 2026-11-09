@@ -235,6 +235,9 @@ A password-protected, expiring link the consultant sends so that someone can rea
 **Dossier service documentaire**:
 A small Dossier holding only the Documents someone ordered from the Services documentaires, without Accompagnement.
 
+**Services en cours** (Services under way):
+The Tableau de bord's list, under Clients, of the Services documentaires Stanzy is getting for Clients (« Stanzy s'en charge » requests not yet delivered or declined), one tab per service, both Preuve de fonds together. Distinct from « Services documentaires », where the catalogue and its prices are managed.
+
 **Pièces à remettre** (Pieces to hand over):
 What a Client gives Stanzy for a Service documentaire: the service's questionnaire and its prerequisite files (any photo or PDF, a signature drawn on screen). They belong to the « Stanzy s'en charge » request, never become Documents of the Dossier, and are shared with the consultant and the Partner in charge. Avoid: prérequis, documents requis (a Document is what the Client receives).
 

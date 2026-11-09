@@ -83,8 +83,10 @@ async function progressOf(db: Db, session: CurrentSession, requestId: string) {
   return {
     id: request.id,
     dossierId: dossier.id,
+    client: dossier.account.name,
+    createdAt: request.createdAt,
     status: request.status,
-    service: request.service ? { name: request.service.name } : null,
+    service: request.service ? { slug: request.service.slug, name: request.service.name } : null,
     document: request.document.title,
     startedOn: request.startedOn,
     turnaroundDays: request.service?.turnaroundDays ?? null,
@@ -104,6 +106,23 @@ async function progressOf(db: Db, session: CurrentSession, requestId: string) {
  */
 export const documentServicesRouter = createTRPCRouter({
   dashboard: createTRPCRouter({
+    /**
+     * « Services » under Clients: every « Stanzy s'en charge » request under way
+     * for a service, in every open Dossier, oldest first, and where it stands.
+     */
+    underWay: consultantProcedure.query(async ({ ctx }) => {
+      const requests = await ctx.prisma.stanzyRequest.findMany({
+        where: {
+          status: { in: [...OPEN_STANZY] },
+          serviceId: { not: null },
+          document: { section: { dossier: { state: 'OPEN' } } },
+        },
+        orderBy: { createdAt: 'asc' },
+        select: { id: true },
+      });
+      return Promise.all(requests.map(({ id }) => progressOf(ctx.prisma, ctx.session, id)));
+    }),
+
     /** Every service, in catalogue order, with how many requests each has had. */
     list: consultantProcedure.query(async ({ ctx }) =>
       (
