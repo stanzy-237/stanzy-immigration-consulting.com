@@ -261,6 +261,8 @@
   --duration-slow: 320ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  /* Steep start, long settle: the page-loading bar rushes ahead, then crawls. */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 
   /* Flip-clock tiles (Compte à rebours ITA, #8): the old top half folds
      down, then the new bottom half falls into place, like a page turning. */

@@ -1576,6 +1576,7 @@
   },
   "Common": {
     "loading": "Loading…",
+    "pageLoading": "Loading the page",
     "QueryError": {
       "title": "This couldn’t be loaded.",
       "description": "Check your connection, then try again.",

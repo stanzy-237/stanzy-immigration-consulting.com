@@ -1593,6 +1593,7 @@
   },
   "Common": {
     "loading": "Chargement…",
+    "pageLoading": "Chargement de la page",
     "QueryError": {
       "title": "Impossible de charger ces informations.",
       "description": "Vérifiez votre connexion, puis réessayez.",
