@@ -1,6 +1,6 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -21,16 +21,20 @@ import { useTRPC } from '@/trpc/client';
 /**
  * One of the Client's Dossiers in « Mon espace »: a header always in view,
  * then tabs (Aperçu, Documents, Messages, Réunions, Facturation). The top
- * of the Aperçu, the Contrat, Factures and Réunions are passed in by the route.
+ * of the Aperçu, the Contrat, Factures and Réunions are passed in by the
+ * route.
  */
 export function MyDossierView({
   id,
+  notice,
   overview,
   invoices,
   contracts,
   meetings,
 }: {
   id: string;
+  /** Above the Dossier: the pieces still to hand over for its services, passed in by the route. */
+  notice?: ReactNode;
   /** The top of the Aperçu (#81: CRS score, ITA countdown), passed in by the route. */
   overview?: ReactNode;
   invoices?: ReactNode;
@@ -40,10 +44,10 @@ export function MyDossierView({
   meetings?: ReactNode;
 }): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
-  // A Notification's link (#92): the Document to unfold, the message to highlight.
-  const params = useSearchParams();
-  const focus = { documentId: params.get('document'), messageId: params.get('message') };
   const counts = useDossierCounts(id);
+  // Prefetched by the route: known on the first render, so the right tab opens at once.
+  const trpc = useTRPC();
+  const { data: dossier } = useQuery(trpc.dossiers.myDossier.queryOptions({ id }));
   return (
     <>
       <SiteNav />
@@ -60,9 +64,12 @@ export function MyDossierView({
             <QueryBoundary fallback={<HeaderSkeleton />}>
               <MyDossierHeader id={id} />
             </QueryBoundary>
+            {notice ? <div className="mt-6">{notice}</div> : null}
           </div>
           <DossierTabs
             counts={counts}
+            // A Dossier service documentaire is about its documents: it opens on them.
+            fallback={dossier?.service === 'SERVICE_DOCUMENTAIRE' ? 'documents' : 'apercu'}
             panels={{
               apercu: (
                 <>
@@ -72,11 +79,7 @@ export function MyDossierView({
                   </QueryBoundary>
                 </>
               ),
-              documents: (
-                <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
-                  <DossierDocuments dossierId={id} viewer="client" focus={focus} />
-                </QueryBoundary>
-              ),
+              documents: <MyDossierDocuments id={id} />,
               messages: (
                 <QueryBoundary fallback={<DossierMessagesSkeleton />}>
                   <DossierMessages dossierId={id} viewer="client" />
@@ -149,5 +152,16 @@ function HeaderSkeleton(): ReactNode {
       <span className="sr-only">{t('loadingDossier')}</span>
       <Skeleton aria-hidden={true} className="h-96 rounded-2xl" />
     </div>
+  );
+}
+
+/** The Dossier's Documents for its Client, one unfolded when a Notification points to it (#92). */
+function MyDossierDocuments({ id }: { id: string }): ReactNode {
+  const params = useSearchParams();
+  const focus = { documentId: params.get('document'), messageId: params.get('message') };
+  return (
+    <QueryBoundary fallback={<DossierDocumentsSkeleton />}>
+      <DossierDocuments dossierId={id} viewer="client" focus={focus} />
+    </QueryBoundary>
   );
 }

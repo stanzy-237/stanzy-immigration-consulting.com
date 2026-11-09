@@ -2,6 +2,8 @@
 
 import {
   AlarmClock,
+  BadgeCheck,
+  ClipboardCheck,
   HandHelping,
   Inbox,
   UserX,
@@ -70,6 +72,8 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   DOSSIER_MESSAGE: MessageSquare,
   SIGNATURE_REMINDER: PenLine,
   CONTRACT_REMINDER: ScrollText,
+  REQUIREMENTS_SUBMITTED: ClipboardCheck,
+  REQUIREMENTS_CONFIRMED: BadgeCheck,
 };
 
 /**

@@ -34,13 +34,13 @@ const isTab = (value: string | null): value is DossierTab => (DOSSIER_TABS as re
 
 /**
  * The tab a Dossier opens on: `?onglet=`, else a Document a link points to
- * (`?document=`), else the anchor (`#messages`), else « Aperçu ».
+ * (`?document=`), else the anchor (`#messages`), else `fallback` (« Aperçu »).
  */
-export function tabFrom(search: URLSearchParams, hash: string): DossierTab {
+export function tabFrom(search: URLSearchParams, hash: string, fallback: DossierTab = 'apercu'): DossierTab {
   const asked = search.get('onglet');
   if (isTab(asked)) return asked;
   if (search.has('document')) return 'documents';
-  return ANCHOR_TAB[hash.replace(/^#/, '')] ?? 'apercu';
+  return ANCHOR_TAB[hash.replace(/^#/, '')] ?? fallback;
 }
 
 /**
@@ -49,31 +49,34 @@ export function tabFrom(search: URLSearchParams, hash: string): DossierTab {
  * address (`?onglet=`), and the anchors older links use still land on the
  * right tab and section. `counts` adds what is waiting next to a tab's name.
  * The five tabs always fit the width (icon over the name on a phone), so
- * the active one's underline is never scrolled out of sight.
+ * the active one's underline is never scrolled out of sight. `fallback`: the
+ * tab when the address asks for none.
  */
 export function DossierTabs({
   panels,
   counts = {},
+  fallback = 'apercu',
 }: {
   panels: Record<DossierTab, ReactNode>;
   counts?: Partial<Record<DossierTab, { value: number; label: string }>>;
+  fallback?: DossierTab;
 }): ReactNode {
   const t = useTranslations('Dossiers.tabs');
   const search = useSearchParams();
-  const [tab, setTab] = useState<DossierTab>(() => tabFrom(search, ''));
+  const [tab, setTab] = useState<DossierTab>(() => tabFrom(search, '', fallback));
 
   // The anchor is only known in the browser: follow it once loaded, and on each change.
   useEffect(() => {
     const follow = () => {
       const anchor = window.location.hash.replace(/^#/, '');
       if (!anchor) return;
-      setTab(tabFrom(new URLSearchParams(window.location.search), window.location.hash));
+      setTab(tabFrom(new URLSearchParams(window.location.search), window.location.hash, fallback));
       requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView({ block: 'start' }));
     };
     follow();
     window.addEventListener('hashchange', follow);
     return () => window.removeEventListener('hashchange', follow);
-  }, []);
+  }, [fallback]);
 
   const choose = (next: DossierTab) => {
     setTab(next);

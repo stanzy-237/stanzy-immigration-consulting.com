@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
+import { ServicesUnderWayView } from '@/features/document-services/views/services-under-way-view';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ServicePrice } from '@/features/document-services/components/service-parts';
 import { textIn } from '@/features/document-services/lib/service-schema';
@@ -51,6 +52,7 @@ export function MyServicesView({ documentId }: { documentId: string | null }): R
               {t('choose')}
             </p>
           ) : null}
+          <ServicesUnderWayView />
           <QueryBoundary fallback={<ServicesSkeleton />}>
             <Services documentId={documentId} />
           </QueryBoundary>

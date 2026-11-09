@@ -30,6 +30,9 @@ describe('the tab a Dossier opens on', () => {
     expect(tabFrom(new URLSearchParams(), '#contrats')).toBe('facturation');
     expect(tabFrom(new URLSearchParams(), '#stanzy')).toBe('documents');
     expect(tabFrom(new URLSearchParams('onglet=nope'), '#nope')).toBe('apercu');
+    // A Service documentaire's Dossier opens on its Documents (its pieces first).
+    expect(tabFrom(new URLSearchParams(), '', 'documents')).toBe('documents');
+    expect(tabFrom(new URLSearchParams('onglet=messages'), '', 'documents')).toBe('messages');
   });
 });
 

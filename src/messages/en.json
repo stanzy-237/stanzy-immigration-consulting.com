@@ -2345,6 +2345,8 @@
       "SERVICE_ORDERED": "{client} ordered “{service}”.",
       "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
       "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature.",
+      "REQUIREMENTS_SUBMITTED": "{actor} handed over all their pieces: to confirm.",
+      "REQUIREMENTS_CONFIRMED": "Stanzy confirmed the pieces you handed over.",
       "MEETING_SCHEDULED": "Meeting “{subject}” planned on {date}.",
       "MEETING_MOVED": "Meeting “{subject}” moved to {date}.",
       "MEETING_CANCELLED": "Meeting “{subject}” cancelled.",
@@ -2377,6 +2379,8 @@
       "SERVICE_ORDERED": "New service order.",
       "SIGNATURE_REMINDER": "A document is waiting for your signature.",
       "CONTRACT_REMINDER": "A contract is waiting for your signature.",
+      "REQUIREMENTS_SUBMITTED": "Pieces to confirm.",
+      "REQUIREMENTS_CONFIRMED": "Your pieces are confirmed.",
       "MEETING_SCHEDULED": "New meeting.",
       "MEETING_MOVED": "A meeting changed.",
       "MEETING_CANCELLED": "A meeting was cancelled.",
@@ -3214,8 +3218,9 @@
       "acceptConfirm": "Send the contract",
       "accepted": "Contract {number} sent; line added to the draft invoice",
       "openInvoice": "See the invoice",
-      "handOver": "Items to hand over for this service",
-      "requirements": "Items handed over ({count})"
+      "requirements": "Items handed over ({count})",
+      "viewService": "View the service",
+      "viewServiceLabel": "View the service for “{document}”"
     },
     "toast": {
       "sent": "Request sent",
@@ -3921,9 +3926,25 @@
       "signSave": "Hand over the signature",
       "errors": {
         "REQUIREMENTS_CLOSED": "This request is no longer under way.",
-        "UNKNOWN": "Something went wrong. Try again."
+        "UNKNOWN": "Something went wrong. Try again.",
+        "REQUIREMENTS_INCOMPLETE": "Hand over every piece first."
       },
-      "due": "Due on {date}"
+      "due": "Due on {date}",
+      "handOver": {
+        "next": "Next",
+        "nextHint": "Answer every question and add every piece to continue.",
+        "nextText": "All handed over? Click “Next”: Stanzy checks your pieces and starts the work.",
+        "sending": "Sending…",
+        "sent": "Pieces sent to Stanzy",
+        "submitted": "Pieces sent: you can still change them until Stanzy confirms them.",
+        "confirmed": "Pieces confirmed by Stanzy.",
+        "waiting": "The client hasn’t clicked “Next” yet.",
+        "toConfirm": "The client handed everything over: check the pieces, then confirm them.",
+        "confirm": "Confirm the pieces",
+        "confirming": "Confirming…",
+        "confirmedToast": "Pieces confirmed",
+        "confirmedNote": "Pieces confirmed: the client can no longer change them."
+      }
     },
     "offer": {
       "metaTitle": "Document service",
@@ -3996,6 +4017,21 @@
       "saveStart": "Save",
       "startSaved": "Start date saved",
       "error": "Something went wrong. Try again."
+    },
+    "pending": {
+      "label": "Pieces to hand over",
+      "text": "You haven’t sent the pieces needed for {services} yet.",
+      "link": "See my services"
+    },
+    "underWay": {
+      "title": "My services under way",
+      "for": "For “{document}”",
+      "left": "{count, plural, one {# piece to hand over} other {# pieces to hand over}}",
+      "submitted": "Pieces sent",
+      "confirmed": "Pieces confirmed",
+      "underWay": "Under way",
+      "open": "View the service",
+      "openLabel": "View the service {service}"
     }
   },
   "ClientForms": {

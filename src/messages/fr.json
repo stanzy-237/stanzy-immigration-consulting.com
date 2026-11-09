@@ -2362,6 +2362,8 @@
       "SERVICE_ORDERED": "{client} a commandé « {service} ».",
       "SIGNATURE_REMINDER": "Rappel : « {document} » attend votre signature.",
       "CONTRACT_REMINDER": "Rappel : {number} attend votre signature.",
+      "REQUIREMENTS_SUBMITTED": "{actor} a remis toutes ses pièces : à confirmer.",
+      "REQUIREMENTS_CONFIRMED": "Stanzy a confirmé les pièces que vous avez remises.",
       "MEETING_SCHEDULED": "Réunion « {subject} » planifiée le {date}.",
       "MEETING_MOVED": "Réunion « {subject} » déplacée au {date}.",
       "MEETING_CANCELLED": "Réunion « {subject} » annulée.",
@@ -2394,6 +2396,8 @@
       "SERVICE_ORDERED": "Nouvelle commande de service.",
       "SIGNATURE_REMINDER": "Un document attend votre signature.",
       "CONTRACT_REMINDER": "Un contrat attend votre signature.",
+      "REQUIREMENTS_SUBMITTED": "Des pièces à confirmer.",
+      "REQUIREMENTS_CONFIRMED": "Vos pièces sont confirmées.",
       "MEETING_SCHEDULED": "Nouvelle réunion.",
       "MEETING_MOVED": "Une réunion a changé.",
       "MEETING_CANCELLED": "Une réunion est annulée.",
@@ -3231,8 +3235,9 @@
       "acceptConfirm": "Envoyer le contrat",
       "accepted": "Contrat {number} envoyé ; ligne ajoutée à la facture brouillon",
       "openInvoice": "Voir la facture",
-      "handOver": "Pièces à remettre pour ce service",
-      "requirements": "Pièces remises ({count})"
+      "requirements": "Pièces remises ({count})",
+      "viewService": "Voir le service",
+      "viewServiceLabel": "Voir le service pour « {document} »"
     },
     "toast": {
       "sent": "Demande envoyée",
@@ -3938,9 +3943,25 @@
       "signSave": "Remettre la signature",
       "errors": {
         "REQUIREMENTS_CLOSED": "Cette demande n’est plus en cours.",
-        "UNKNOWN": "Une erreur est survenue. Réessayez."
+        "UNKNOWN": "Une erreur est survenue. Réessayez.",
+        "REQUIREMENTS_INCOMPLETE": "Remettez d’abord toutes les pièces."
       },
-      "due": "Livraison prévue le {date}"
+      "due": "Livraison prévue le {date}",
+      "handOver": {
+        "next": "Suivant",
+        "nextHint": "Répondez à toutes les questions et ajoutez toutes les pièces pour continuer.",
+        "nextText": "Tout est remis ? Cliquez sur « Suivant » : Stanzy vérifie vos pièces et lance le travail.",
+        "sending": "Envoi…",
+        "sent": "Pièces envoyées à Stanzy",
+        "submitted": "Pièces envoyées : vous pouvez encore les modifier jusqu’à ce que Stanzy les confirme.",
+        "confirmed": "Pièces confirmées par Stanzy.",
+        "waiting": "Le client n’a pas encore cliqué sur « Suivant ».",
+        "toConfirm": "Le client a tout remis : vérifiez les pièces, puis confirmez-les.",
+        "confirm": "Confirmer les pièces",
+        "confirming": "Confirmation…",
+        "confirmedToast": "Pièces confirmées",
+        "confirmedNote": "Pièces confirmées : le client ne peut plus les modifier."
+      }
     },
     "offer": {
       "metaTitle": "Service documentaire",
@@ -4013,6 +4034,21 @@
       "saveStart": "Enregistrer",
       "startSaved": "Date de début enregistrée",
       "error": "Une erreur est survenue. Réessayez."
+    },
+    "pending": {
+      "label": "Pièces à remettre",
+      "text": "Vous n’avez pas encore envoyé les pièces nécessaires pour {services}.",
+      "link": "Voir mes services"
+    },
+    "underWay": {
+      "title": "Mes services en cours",
+      "for": "Pour « {document} »",
+      "left": "{count, plural, one {# pièce à remettre} other {# pièces à remettre}}",
+      "submitted": "Pièces envoyées",
+      "confirmed": "Pièces confirmées",
+      "underWay": "En cours",
+      "open": "Voir le service",
+      "openLabel": "Voir le service {service}"
     }
   },
   "ClientForms": {

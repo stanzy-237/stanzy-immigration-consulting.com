@@ -17,9 +17,10 @@ import { useTRPC } from '@/trpc/client';
 /**
  * « Mon espace »: the signed-in Account's Dossiers, each with its stages and
  * a link to its documents and invoices; for a Client in Cameroon, the
- * Services documentaires too (#80).
+ * Services documentaires too (#80). `notice`: the pieces still to hand over
+ * for them, passed in by the route.
  */
-export function MySpaceView(): ReactNode {
+export function MySpaceView({ notice }: { notice?: ReactNode }): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
   return (
     <>
@@ -28,6 +29,7 @@ export function MySpaceView(): ReactNode {
         <div className="mx-auto max-w-3xl">
           <h1 className="font-heading text-3xl font-bold text-navy-deep md:text-4xl">{t('title')}</h1>
           <p className="mt-2 text-slate">{t('subtitle')}</p>
+          {notice ? <div className="mt-6">{notice}</div> : null}
           <ServicesLink />
           <div className="mt-8">
             <QueryBoundary fallback={<MyDossiersSkeleton />}>

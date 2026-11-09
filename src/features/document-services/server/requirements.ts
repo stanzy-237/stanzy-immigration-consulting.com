@@ -9,7 +9,7 @@ import { TRPCError } from '@trpc/server';
 
 import { answersOf, askedPrerequisites, questionsLeft } from '@/features/document-services/lib/requirements';
 import { prerequisitesOf, type Questionnaire } from '@/features/document-services/lib/service-schema';
-import { dossierFor, type DossierRow } from '@/features/dossiers/server/dossier-access';
+import { dossierFor, isConsultant, type DossierRow } from '@/features/dossiers/server/dossier-access';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 
@@ -25,7 +25,8 @@ export type RequirementState = 'given' | 'inDossier' | 'missing';
  * The request and its Dossier, for whoever may see what is handed over for
  * it: the Dossier's Client and the consultant (the Partner in charge of the
  * service joins here with #42). Anyone else gets NOT_FOUND. `editable` while
- * the request is under way in an open Dossier.
+ * the request is under way in an open Dossier, and for the Client only until
+ * the consultant confirmed what was handed over.
  */
 export async function requestFor(db: Db, session: CurrentSession, requestId: string) {
   const request = await db.stanzyRequest.findUnique({
@@ -36,13 +37,16 @@ export async function requestFor(db: Db, session: CurrentSession, requestId: str
       answers: true,
       startedOn: true,
       createdAt: true,
+      submittedAt: true,
+      confirmedAt: true,
       document: { select: { id: true, title: true, section: { select: { dossierId: true } } } },
       service: { select: { slug: true, name: true, prerequisites: true, questionnaire: true, turnaroundDays: true } },
     },
   });
   if (!request) throw new TRPCError({ code: 'NOT_FOUND' });
   const dossier: DossierRow = await dossierFor(db, session, request.document.section.dossierId);
-  const editable = dossier.state === 'OPEN' && (OPEN_STANZY as readonly string[]).includes(request.status);
+  const underWay = dossier.state === 'OPEN' && (OPEN_STANZY as readonly string[]).includes(request.status);
+  const editable = underWay && (isConsultant(session) || !request.confirmedAt);
   return { request, dossier, editable };
 }
 
@@ -88,4 +92,15 @@ export async function requirementsOf(db: Db, found: Awaited<ReturnType<typeof re
     questionsLeft: left,
     complete: left.length === 0 && items.every((item) => item.state !== 'missing'),
   };
+}
+
+/**
+ * After the Client changed what was handed over: if something is missing
+ * again since « Suivant », back to step ① (the documents to receive hide).
+ */
+export async function reopenIfIncomplete(db: Db, session: CurrentSession, requestId: string): Promise<void> {
+  const found = await requestFor(db, session, requestId);
+  if (!found.request.submittedAt || found.request.confirmedAt) return;
+  if ((await requirementsOf(db, found)).complete) return;
+  await db.stanzyRequest.update({ where: { id: requestId }, data: { submittedAt: null } });
 }

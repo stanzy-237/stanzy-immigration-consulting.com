@@ -55,6 +55,11 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
   }
   if (contract || item.kind === 'CONTRACT_SIGNED') return `${dossier}#contrats`;
   if (item.kind === 'DOSSIER_MESSAGE') return `${dossier}#messages`;
+  // A service's hand-over (#80): the consultant's request page, the Client's Documents tab.
+  if (item.kind === 'REQUIREMENTS_SUBMITTED' && audience === 'consultant' && item.params?.requestId) {
+    return `${dossier}/services/${item.params.requestId}`;
+  }
+  if (item.kind === 'REQUIREMENTS_CONFIRMED') return `${dossier}?onglet=documents`;
   if (item.invoice) return audience === 'client' ? `${dossier}#factures` : `/factures/${item.invoice.id}`;
   if (item.document) {
     const message = item.comment ? `&message=${item.comment.id}` : '';
