@@ -66,3 +66,24 @@ export function DoneNote({ children }: { children: ReactNode }): ReactNode {
     </p>
   );
 }
+
+/**
+ * Where a service's Pièces à remettre stand, as a pill: confirmed, sent,
+ * how many are left, or `fallback` when there is nothing to hand over.
+ */
+export function HandOverPill({
+  request,
+  fallback = null,
+}: {
+  request: { handOver: 'OPEN' | 'SUBMITTED' | 'CONFIRMED'; hasRequirements: boolean; left: number };
+  fallback?: string | null;
+}): ReactNode {
+  const t = useTranslations('DocumentServices.underWay');
+  const pill = 'rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap';
+  if (request.handOver === 'CONFIRMED') return <span className={`${pill} bg-leaf-tint text-leaf`}>{t('confirmed')}</span>;
+  if (request.handOver === 'SUBMITTED') return <span className={`${pill} bg-leaf-tint text-leaf`}>{t('submitted')}</span>;
+  if (request.hasRequirements && request.left > 0) {
+    return <span className={`${pill} bg-honey-tint text-honey`}>{t('left', { count: request.left })}</span>;
+  }
+  return fallback ? <span className={`${pill} bg-ice-blue text-navy-deep`}>{fallback}</span> : null;
+}

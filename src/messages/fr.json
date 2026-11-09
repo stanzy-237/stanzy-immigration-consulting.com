@@ -1444,7 +1444,8 @@
       "demandes": "Demandes d’intérêt",
       "finances": "Finances",
       "reunions": "Réunions",
-      "services": "Services documentaires"
+      "services": "Services documentaires",
+      "services-en-cours": "Services en cours"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -4049,6 +4050,20 @@
       "underWay": "En cours",
       "open": "Voir le service",
       "openLabel": "Voir le service {service}"
+    },
+    "inProgress": {
+      "title": "Services en cours",
+      "intro": "Les documents que Stanzy obtient pour ses clients. Le catalogue et les prix se gèrent dans <catalogue>Services documentaires</catalogue>.",
+      "tabs": "Services",
+      "all": "Tous",
+      "proofOfFunds": "Preuve de fonds",
+      "empty": "Aucun service en cours.",
+      "due": "Livraison prévue le {date}",
+      "open": "Ouvrir",
+      "openLabel": "Ouvrir le service de {client}",
+      "loading": "Chargement des services en cours",
+      "count": "{count, plural, one {# service} other {# services}}",
+      "for": "Pour « {document} »"
     }
   },
   "ClientForms": {

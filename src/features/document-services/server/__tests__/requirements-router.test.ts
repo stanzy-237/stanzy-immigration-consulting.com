@@ -42,13 +42,16 @@ function fakeDatabase(status = 'REQUESTED', service = 'ACCOMPAGNEMENT') {
     account: { id: 'acc_1', name: 'Aminata Diallo', email: 'aminata@example.com', locale: 'fr' },
   };
   // The Dossier's photo has a Version: it covers the « Photo » prerequisite.
-  const documents = [{ id: 'doc_photo', kind: 'photo', title: 'Photo' }];
+  const documents = [{ id: 'doc_photo', kind: 'photo', title: 'Photo', section: { dossierId: 'dos_1' } }];
   const files: Row[] = [];
   let seq = 0;
   const db = {
     stanzyRequest: {
       findUnique: async ({ where }: { where: { id: string } }) => (where.id === request.id ? request : null),
-      findMany: async () => [{ id: request.id }],
+      // Whole rows, as the consultant's list reads them; the other lists only read the id.
+      findMany: async () => [
+        { ...request, files, document: { ...(request.document as Row), section: { dossierId: 'dos_1', dossier } } },
+      ],
       update: async ({ data }: { data: Row }) => Object.assign(request, data),
     },
     dossier: { findUnique: async ({ where }: { where: { id: string } }) => (where.id === dossier.id ? dossier : null) },
@@ -231,12 +234,30 @@ describe('the Client’s services under way', () => {
       expect.objectContaining({
         id: 'stz_1',
         dossierId: 'dos_1',
-        service: { name: pof.name },
+        service: { slug: pof.slug, name: pof.name },
         document: 'Lettre de la banque',
         hasRequirements: true,
         complete: false,
         handOver: 'OPEN',
       }),
     ]);
+  });
+});
+
+describe('the services under way, for the consultant', () => {
+  it('lists every one with its Client and its service, for the consultant only', async () => {
+    const { db } = fakeDatabase();
+    const services = createCaller({ prisma: db, session: consultant, headers: new Headers() } as unknown as TRPCContext)
+      .documentServices.dashboard;
+    expect(await services.underWay()).toEqual([
+      expect.objectContaining({
+        id: 'stz_1',
+        client: 'Aminata Diallo',
+        service: { slug: pof.slug, name: pof.name },
+        handOver: 'OPEN',
+      }),
+    ]);
+    const asClient = createCaller({ prisma: db, session: client, headers: new Headers() } as unknown as TRPCContext);
+    await expect(asClient.documentServices.dashboard.underWay()).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 });
