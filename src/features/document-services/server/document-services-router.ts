@@ -8,6 +8,7 @@ import {
   addRequirementFileInput,
   requestRef,
   dueOn,
+  handOverOf,
   requirementFilePrefix,
   saveAnswersInput,
   setStartInput,
@@ -17,6 +18,7 @@ import { ordersRouter } from '@/features/document-services/server/orders-router'
 import { editableRequest, OPEN_STANZY, requestFor, requirementsOf } from '@/features/document-services/server/requirements';
 import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
 import { dossierFor } from '@/features/dossiers/server/dossier-access';
+import { notifyLater } from '@/features/notifications/server/notify';
 import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -190,6 +192,7 @@ export const documentServicesRouter = createTRPCRouter({
         },
         dossier: { id: dossier.id, client: dossier.account.name, stage: dossier.stage, service: dossier.service },
         editable,
+        handOver: handOverOf({ submittedAt: request.submittedAt ?? null, confirmedAt: request.confirmedAt ?? null }),
         startedOn: request.startedOn,
         dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
         ...(await requirementsOf(ctx.prisma, found)),
@@ -223,9 +226,43 @@ export const documentServicesRouter = createTRPCRouter({
             left: items.filter((item) => item.state === 'missing').length + questionsLeft.length,
             hasRequirements: items.length > 0 || request.service?.questionnaire !== null,
             complete,
+            handOver: handOverOf({ submittedAt: request.submittedAt ?? null, confirmedAt: request.confirmedAt ?? null }),
           };
         }),
       );
+    }),
+
+    /** « Suivant »: the Client has handed everything over; the documents to receive show from now on. */
+    submit: protectedProcedure.input(requestRef).mutation(async ({ ctx, input }) => {
+      const found = await editableRequest(ctx.prisma, ctx.session, input.requestId);
+      if (!(await requirementsOf(ctx.prisma, found)).complete) throw refuse('REQUIREMENTS_INCOMPLETE');
+      if (found.request.submittedAt) return;
+      await ctx.prisma.stanzyRequest.update({ where: { id: found.request.id }, data: { submittedAt: new Date() } });
+      notifyLater(ctx.prisma, {
+        kind: 'REQUIREMENTS_SUBMITTED',
+        actorId: ctx.session.account.id,
+        recipients: 'CONSULTANTS',
+        target: { dossierId: found.dossier.id },
+        params: { requestId: found.request.id },
+      });
+    }),
+
+    /** The consultant confirms what was handed over: the Client can no longer change it. */
+    confirm: consultantProcedure.input(requestRef).mutation(async ({ ctx, input }) => {
+      const { request, dossier } = await editableRequest(ctx.prisma, ctx.session, input.requestId);
+      if (request.confirmedAt) return;
+      const now = new Date();
+      await ctx.prisma.stanzyRequest.update({
+        where: { id: request.id },
+        data: { confirmedAt: now, submittedAt: request.submittedAt ?? now },
+      });
+      notifyLater(ctx.prisma, {
+        kind: 'REQUIREMENTS_CONFIRMED',
+        actorId: ctx.session.account.id,
+        recipients: [dossier.accountId],
+        target: { dossierId: dossier.id },
+        params: { requestId: request.id },
+      });
     }),
 
     /** The consultant sets the day the work starts: the countdown runs from it. */

@@ -90,3 +90,14 @@ export function dueOn(startedOn: string | null, turnaroundDays: number | null): 
 
 /** Whole days from `today` to `day`, both UTC calendar days; negative once past. */
 export const daysUntil = (day: string, today: string): number => Math.round((utcDay(day) - utcDay(today)) / DAY_IN_MS);
+
+/**
+ * Where the hand-over stands: `OPEN` while the Client gathers the pieces,
+ * `SUBMITTED` once they clicked « Suivant » (the documents to receive show,
+ * the pieces can still change), `CONFIRMED` once the consultant confirmed
+ * them (locked for the Client).
+ */
+export type HandOver = 'OPEN' | 'SUBMITTED' | 'CONFIRMED';
+
+export const handOverOf = (request: { submittedAt: Date | null; confirmedAt: Date | null }): HandOver =>
+  request.confirmedAt ? 'CONFIRMED' : request.submittedAt ? 'SUBMITTED' : 'OPEN';

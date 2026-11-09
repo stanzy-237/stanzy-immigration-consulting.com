@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowLeft, CheckCircle2, Circle, FileText, PenLine, Plus, Save, Trash2, TriangleAlert, Upload } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, FileText, PenLine, Plus, Save, Trash2, TriangleAlert, Upload } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import NextLink from 'next/link';
@@ -49,17 +49,27 @@ const STATE_STYLES = {
  * a signature drawn on screen. Shared with the consultant (and the Partner in
  * charge, #42); none of it becomes a Document of the Dossier. The Client
  * reaches it in « Mon espace », the consultant from the Dossier's « Documents
- * à obtenir par Stanzy ».
+ * à obtenir par Stanzy ». `step`: the same inside the Dossier's Documents tab
+ * (no page around it). Ends with « Suivant » for the Client, « Confirmer les
+ * pièces » for the consultant.
  */
-export function RequirementsView({ requestId, viewer }: { requestId: string; viewer: 'client' | 'consultant' }): ReactNode {
+export function RequirementsView({
+  requestId,
+  viewer,
+  layout = 'page',
+}: {
+  requestId: string;
+  viewer: 'client' | 'consultant';
+  layout?: 'page' | 'step';
+}): ReactNode {
   const body = (
-    <div className="mx-auto grid grid-cols-1 max-w-3xl gap-6">
+    <div className={layout === 'step' ? 'grid grid-cols-1 gap-6' : 'mx-auto grid grid-cols-1 max-w-3xl gap-6'}>
       <QueryBoundary fallback={<RequirementsSkeleton />}>
-        <Requirements requestId={requestId} viewer={viewer} />
+        <Requirements requestId={requestId} viewer={viewer} layout={layout} />
       </QueryBoundary>
     </div>
   );
-  if (viewer === 'consultant') return body;
+  if (viewer === 'consultant' || layout === 'step') return body;
   return (
     <>
       <SiteNav />
@@ -69,7 +79,15 @@ export function RequirementsView({ requestId, viewer }: { requestId: string; vie
   );
 }
 
-function Requirements({ requestId, viewer }: { requestId: string; viewer: 'client' | 'consultant' }): ReactNode {
+function Requirements({
+  requestId,
+  viewer,
+  layout,
+}: {
+  requestId: string;
+  viewer: 'client' | 'consultant';
+  layout: 'page' | 'step';
+}): ReactNode {
   const t = useTranslations('DocumentServices.requirements');
   const locale = useLocale();
   const trpc = useTRPC();
@@ -77,6 +95,8 @@ function Requirements({ requestId, viewer }: { requestId: string; viewer: 'clien
   const format = useFormatter();
   const { data } = useSuspenseQuery(trpc.documentServices.requirements.get.queryOptions({ requestId }));
   const left = data.items.filter((item) => item.state === 'missing').length + data.questionsLeft.length;
+  // Inside the Documents tab the step's own heading comes first.
+  const Title = layout === 'step' ? 'h3' : 'h1';
   const backClass = 'inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-slate hover:text-navy-deep';
   const backContent = (
     <>
@@ -86,7 +106,7 @@ function Requirements({ requestId, viewer }: { requestId: string; viewer: 'clien
   );
   return (
     <>
-      {viewer === 'consultant' ? (
+      {layout === 'step' ? null : viewer === 'consultant' ? (
         <NextLink href={`/dossiers/${data.dossier.id}#stanzy`} className={backClass}>
           {backContent}
         </NextLink>
@@ -99,9 +119,9 @@ function Requirements({ requestId, viewer }: { requestId: string; viewer: 'clien
         </Link>
       )}
       <div>
-        <h1 className="font-heading text-2xl font-bold text-navy-deep md:text-3xl">
+        <Title className={layout === 'step' ? 'font-heading text-lg font-bold text-navy-deep' : 'font-heading text-2xl font-bold text-navy-deep md:text-3xl'}>
           {data.request.service ? textIn(data.request.service.name, locale) : t('title')}
-        </h1>
+        </Title>
         <p className="mt-1 text-sm text-slate">
           {t('for', { document: data.request.document.title, client: data.dossier.client })}
         </p>
@@ -136,7 +156,91 @@ function Requirements({ requestId, viewer }: { requestId: string; viewer: 'clien
           </ul>
         </section>
       ) : null}
+      <HandOver data={data} viewer={viewer} />
     </>
+  );
+}
+
+/**
+ * Where the hand-over stands, at the end of the page: « Suivant » for the
+ * Client once everything is handed over; « Confirmer les pièces » for the
+ * consultant, which locks them for the Client.
+ */
+function HandOver({ data, viewer }: { data: Data; viewer: 'client' | 'consultant' }): ReactNode {
+  const t = useTranslations('DocumentServices.requirements');
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: trpc.documentServices.requirements.get.queryKey() });
+    void queryClient.invalidateQueries({ queryKey: trpc.documentServices.requirements.forDossier.queryKey() });
+  };
+  const failed = (error: { message: string }) => {
+    const known = t.has(`errors.${error.message}`);
+    toast.add({ title: t(known ? `errors.${error.message}` : 'errors.UNKNOWN'), type: known ? 'warning' : 'error' });
+  };
+  const submit = useMutation(
+    trpc.documentServices.requirements.submit.mutationOptions({
+      onSuccess: () => {
+        refresh();
+        toast.add({ title: t('handOver.sent'), type: 'success' });
+      },
+      onError: failed,
+    }),
+  );
+  const confirm = useMutation(
+    trpc.documentServices.requirements.confirm.mutationOptions({
+      onSuccess: () => {
+        refresh();
+        toast.add({ title: t('handOver.confirmedToast'), type: 'success' });
+      },
+      onError: failed,
+    }),
+  );
+  const note = (text: string) => (
+    <p className="flex items-center gap-2 rounded-2xl bg-leaf-tint px-5 py-4 text-sm font-semibold text-leaf">
+      <CheckCircle2 aria-hidden={true} className="size-4 shrink-0" />
+      {text}
+    </p>
+  );
+
+  if (data.handOver === 'CONFIRMED') return note(t(viewer === 'client' ? 'handOver.confirmed' : 'handOver.confirmedNote'));
+  if (viewer === 'consultant') {
+    return (
+      <div className={card}>
+        <p className="text-sm text-navy-deep">{t(data.handOver === 'SUBMITTED' ? 'handOver.toConfirm' : 'handOver.waiting')}</p>
+        {data.editable ? (
+          <button
+            type="button"
+            disabled={confirm.isPending}
+            onClick={() => confirm.mutate({ requestId: data.request.id })}
+            className="inline-flex h-11 w-fit items-center gap-2 rounded-full bg-navy-deep px-5 text-sm font-semibold text-white hover:bg-navy-80 disabled:opacity-50"
+          >
+            <CheckCircle2 aria-hidden={true} className="size-4" />
+            {confirm.isPending ? t('handOver.confirming') : t('handOver.confirm')}
+          </button>
+        ) : null}
+      </div>
+    );
+  }
+  if (data.handOver === 'SUBMITTED') return note(t('handOver.submitted'));
+  if (!data.editable) return null;
+  const hintId = `${data.request.id}-next-hint`;
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border-2 border-navy-deep bg-white p-5 shadow-md md:p-6">
+      <p id={hintId} className="max-w-md text-sm text-navy-deep">
+        {data.complete ? t('handOver.nextText') : t('handOver.nextHint')}
+      </p>
+      <button
+        type="button"
+        disabled={!data.complete || submit.isPending}
+        aria-describedby={hintId}
+        onClick={() => submit.mutate({ requestId: data.request.id })}
+        className="inline-flex h-12 items-center gap-2 rounded-full bg-rouge px-6 font-heading text-body font-bold text-white hover:bg-crimson disabled:opacity-50"
+      >
+        {submit.isPending ? t('handOver.sending') : t('handOver.next')}
+        <ArrowRight aria-hidden={true} className="size-5" />
+      </button>
+    </div>
   );
 }
 

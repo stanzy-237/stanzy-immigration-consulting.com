@@ -3,7 +3,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { DossierOverviewView } from '@/features/accompagnement/views/dossier-overview-view';
 import { ServiceProgressView } from '@/features/document-services/views/service-progress-view';
 import { requireSession } from '@/features/auth/server/guards';
-import { MyDossierView } from '@/features/dossiers/views/my-dossier-view';
+import { MyDossierDocumentsView, MyDossierView } from '@/features/dossiers/views/my-dossier-view';
+import { ServiceStepsView } from '@/features/document-services/views/service-steps-view';
 import { DossierContractsView } from '@/features/contracts/views/dossier-contracts-view';
 import { DossierInvoicesView } from '@/features/invoices/views/dossier-invoices-view';
 import { DossierMeetingsView } from '@/features/meetings/views/dossier-meetings-view';
@@ -34,6 +35,11 @@ export default async function Page({ params }: { params: Params }) {
     <HydrateClient>
       <MyDossierView
         id={id}
+        documents={
+          <ServiceStepsView dossierId={id}>
+            <MyDossierDocumentsView id={id} />
+          </ServiceStepsView>
+        }
         overview={
           <>
             <DossierOverviewView dossierId={id} viewer="client" />

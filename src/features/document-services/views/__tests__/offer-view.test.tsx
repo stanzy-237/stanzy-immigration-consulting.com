@@ -88,7 +88,7 @@ describe('a Dossier’s service progress', () => {
     queryClient.setQueryData(trpc.documentServices.requirements.forDossier.queryKey({ dossierId: 'dos_1' }), data as never);
     render(withIntl(wrap(<ServiceProgressView dossierId="dos_1" viewer="client" />)));
     expect(screen.getByText(/12 jours restants/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /3 éléments à remettre/ })).toHaveAttribute('href', '/fr/mon-espace/services/demandes/stz_1');
+    expect(screen.getByRole('link', { name: /3 éléments à remettre/ })).toHaveAttribute('href', '/fr/mon-espace/dossiers/dos_1?onglet=documents');
     vi.useRealTimers();
   });
 });

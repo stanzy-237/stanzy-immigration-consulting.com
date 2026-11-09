@@ -678,6 +678,10 @@ enum NotificationKind {
   SIGNATURE_REMINDER
   /// To the Client, 3 then 7 days after a Contrat or an Avenant, if unsigned.
   CONTRACT_REMINDER
+  /// To the consultant: the Client handed over everything for a service and clicked « Suivant » (#80).
+  REQUIREMENTS_SUBMITTED
+  /// To the Client: the consultant confirmed what was handed over.
+  REQUIREMENTS_CONFIRMED
 }
 
 /// One line in an Account's notification center. Repeats by the same actor on the same target, while unread and within 30 minutes, raise `count` instead of adding lines.
@@ -980,6 +984,10 @@ model StanzyRequest {
   answers       Json?
   /// What the Client handed over for the service: shared with whoever does it, never a Dossier Document.
   files         RequirementFile[]
+  /// When the Client, everything handed over, clicked « Suivant »: the documents to receive show from then.
+  submittedAt   DateTime?
+  /// When the consultant confirmed what was handed over: from then the Client can no longer change it.
+  confirmedAt   DateTime?
   createdAt     DateTime            @default(now())
 
   @@index([documentId, status])

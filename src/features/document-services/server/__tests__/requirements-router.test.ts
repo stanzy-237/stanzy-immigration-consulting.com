@@ -11,6 +11,8 @@ vi.mock('@/server/storage/r2', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/server/storage/r2')>()),
   ...storage,
 }));
+const notifications = vi.hoisted(() => ({ notifyLater: vi.fn() }));
+vi.mock('@/features/notifications/server/notify', () => notifications);
 vi.stubEnv('DOSSIER_FILES_KEY', 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=');
 
 type Row = Record<string, unknown> & { id: string };
@@ -153,5 +155,50 @@ describe('what the Client hands over for a service', () => {
     await expect(
       callerFor(db, client).addFile({ ...upload('signature'), objectKey: 'requirements/stz_other/9a2b.bin' }),
     ).rejects.toMatchObject({ message: 'DOCUMENT_FILE_INVALID' });
+  });
+});
+
+/** Answers every question and hands over every missing file. */
+async function handOverEverything(db: TRPCContext['prisma']) {
+  storage.objectSize.mockResolvedValue(1016);
+  const answers = { niu: 'M012345678901A', contacts: [{ name: 'Paul Mbarga', phone: '690000000' }], donation: false, donor: null, ubaAccount: true };
+  await callerFor(db, client).saveAnswers({ requestId: 'stz_1', answers });
+  for (const key of ['signature', 'plan-de-localisation', 'bulletin-de-paie']) await callerFor(db, client).addFile(upload(key));
+}
+
+describe('« Suivant », then the consultant’s confirmation', () => {
+  it('refuses « Suivant » while something is left to hand over', async () => {
+    const { db, request } = fakeDatabase();
+    await expect(callerFor(db, client).submit({ requestId: 'stz_1' })).rejects.toMatchObject({ message: 'REQUIREMENTS_INCOMPLETE' });
+    expect(request.submittedAt ?? null).toBeNull();
+  });
+
+  it('takes « Suivant » once everything is handed over, and tells the consultant', async () => {
+    const { db, request } = fakeDatabase();
+    await handOverEverything(db);
+    await callerFor(db, client).submit({ requestId: 'stz_1' });
+    expect(request.submittedAt).toBeInstanceOf(Date);
+    expect((await callerFor(db, client).get({ requestId: 'stz_1' })).handOver).toBe('SUBMITTED');
+    expect(notifications.notifyLater).toHaveBeenCalledWith(
+      db,
+      expect.objectContaining({ kind: 'REQUIREMENTS_SUBMITTED', actorId: 'acc_1', recipients: 'CONSULTANTS', target: { dossierId: 'dos_1' } }),
+    );
+  });
+
+  it('is confirmed by the consultant only, which tells the Client and locks the pieces for them', async () => {
+    const { db, request } = fakeDatabase();
+    await handOverEverything(db);
+    await expect(callerFor(db, client).confirm({ requestId: 'stz_1' })).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await callerFor(db, consultant).confirm({ requestId: 'stz_1' });
+    expect(request.confirmedAt).toBeInstanceOf(Date);
+    expect(notifications.notifyLater).toHaveBeenCalledWith(
+      db,
+      expect.objectContaining({ kind: 'REQUIREMENTS_CONFIRMED', actorId: 'acc_stanzy', recipients: ['acc_1'], target: { dossierId: 'dos_1' } }),
+    );
+    const page = await callerFor(db, client).get({ requestId: 'stz_1' });
+    expect(page).toMatchObject({ handOver: 'CONFIRMED', editable: false });
+    await expect(callerFor(db, client).addFile(upload('signature'))).rejects.toMatchObject({ message: 'REQUIREMENTS_CLOSED' });
+    // The consultant can still fix what was handed over.
+    expect((await callerFor(db, consultant).get({ requestId: 'stz_1' })).editable).toBe(true);
   });
 });

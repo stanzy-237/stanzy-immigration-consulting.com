@@ -2343,6 +2343,8 @@
       "STANZY_DECLINED": "Stanzy won’t be able to get “{document}”.",
       "SIGNATURE_REMINDER": "Reminder: “{document}” is waiting for your signature.",
       "CONTRACT_REMINDER": "Reminder: {number} is waiting for your signature.",
+      "REQUIREMENTS_SUBMITTED": "{actor} handed over all their pieces: to confirm.",
+      "REQUIREMENTS_CONFIRMED": "Stanzy confirmed the pieces you handed over.",
       "MEETING_SCHEDULED": "Meeting “{subject}” planned on {date}.",
       "MEETING_MOVED": "Meeting “{subject}” moved to {date}.",
       "MEETING_CANCELLED": "Meeting “{subject}” cancelled.",
@@ -2374,6 +2376,8 @@
       "STANZY_DECLINED": "A document to get yourself.",
       "SIGNATURE_REMINDER": "A document is waiting for your signature.",
       "CONTRACT_REMINDER": "A contract is waiting for your signature.",
+      "REQUIREMENTS_SUBMITTED": "Pieces to confirm.",
+      "REQUIREMENTS_CONFIRMED": "Your pieces are confirmed.",
       "MEETING_SCHEDULED": "New meeting.",
       "MEETING_MOVED": "A meeting changed.",
       "MEETING_CANCELLED": "A meeting was cancelled.",
@@ -3918,9 +3922,25 @@
       "signSave": "Hand over the signature",
       "errors": {
         "REQUIREMENTS_CLOSED": "This request is no longer under way.",
-        "UNKNOWN": "Something went wrong. Try again."
+        "UNKNOWN": "Something went wrong. Try again.",
+        "REQUIREMENTS_INCOMPLETE": "Hand over every piece first."
       },
-      "due": "Due on {date}"
+      "due": "Due on {date}",
+      "handOver": {
+        "next": "Next",
+        "nextHint": "Answer every question and add every piece to continue.",
+        "nextText": "All handed over? Click “Next”: Stanzy starts the work and you see the documents you will receive.",
+        "sending": "Sending…",
+        "sent": "Pieces sent to Stanzy",
+        "submitted": "Pieces sent: you can still change them until Stanzy confirms them.",
+        "confirmed": "Pieces confirmed by Stanzy.",
+        "waiting": "The client hasn’t clicked “Next” yet.",
+        "toConfirm": "The client handed everything over: check the pieces, then confirm them.",
+        "confirm": "Confirm the pieces",
+        "confirming": "Confirming…",
+        "confirmedToast": "Pieces confirmed",
+        "confirmedNote": "Pieces confirmed: the client can no longer change them."
+      }
     },
     "offer": {
       "metaTitle": "Document service",
@@ -3993,6 +4013,16 @@
       "saveStart": "Save",
       "startSaved": "Start date saved",
       "error": "Something went wrong. Try again."
+    },
+    "steps": {
+      "label": "Service steps",
+      "pieces": "Pieces to hand over",
+      "documents": "Documents to receive",
+      "current": "In progress",
+      "locked": "After “Next”",
+      "lockedText": "The documents Stanzy will get for you show here once you have handed over your pieces and clicked “Next”.",
+      "review": "Review my pieces",
+      "loading": "Loading the service steps"
     }
   },
   "ClientForms": {
