@@ -1,5 +1,6 @@
 import { PDFDocument } from 'pdf-lib';
 
+import { installPdfPolyfills } from '@/features/pdf-tools/lib/pdf-polyfills';
 import type { RasterizePdf } from '@/features/pdf-tools/lib/build-pdf';
 import type { Rotation, Source } from '@/features/pdf-tools/lib/pages';
 
@@ -13,13 +14,15 @@ type PdfJs = typeof import('pdfjs-dist');
 let pdfjs: Promise<PdfJs> | null = null;
 
 /**
- * pdf.js, loaded once on first use, with its worker. The legacy build carries
- * polyfills: the modern one calls `Promise.withResolvers` (Safari 17.4+), so
- * Clients on an older iPhone could not open a contract to sign it.
+ * pdf.js, loaded once on first use, with its worker. The legacy build, plus
+ * the Safari 17.4 features it calls without polyfilling (pdf-polyfills.ts),
+ * installed here and in the worker (pdf-worker.ts): an iPhone on iOS 17.1
+ * could not open a Contrat to sign without them.
  */
 export function loadPdfJs(): Promise<PdfJs> {
+  installPdfPolyfills();
   pdfjs ??= import('pdfjs-dist/legacy/build/pdf.mjs').then((lib) => {
-    lib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/legacy/build/pdf.worker.min.mjs', import.meta.url).toString();
+    lib.GlobalWorkerOptions.workerPort = new Worker(new URL('./pdf-worker.ts', import.meta.url), { type: 'module' });
     return lib;
   });
   return pdfjs;
