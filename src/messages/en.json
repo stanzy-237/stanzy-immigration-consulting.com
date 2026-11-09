@@ -3930,7 +3930,7 @@
       "handOver": {
         "next": "Next",
         "nextHint": "Answer every question and add every piece to continue.",
-        "nextText": "All handed over? Click “Next”: Stanzy starts the work and you see the documents you will receive.",
+        "nextText": "All handed over? Click “Next”: Stanzy checks your pieces and starts the work.",
         "sending": "Sending…",
         "sent": "Pieces sent to Stanzy",
         "submitted": "Pieces sent: you can still change them until Stanzy confirms them.",
@@ -4014,17 +4014,6 @@
       "saveStart": "Save",
       "startSaved": "Start date saved",
       "error": "Something went wrong. Try again."
-    },
-    "steps": {
-      "label": "Service steps",
-      "pieces": "Pieces to hand over",
-      "documents": "Documents to receive",
-      "current": "In progress",
-      "locked": "After “Next”",
-      "lockedText": "The documents Stanzy will get for you show here once you have handed over your pieces and clicked “Next”.",
-      "review": "Review my pieces",
-      "loading": "Loading the service steps",
-      "done": "Handed over"
     },
     "pending": {
       "label": "Pieces to hand over",

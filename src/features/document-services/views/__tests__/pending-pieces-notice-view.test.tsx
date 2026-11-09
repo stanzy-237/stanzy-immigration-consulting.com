@@ -33,7 +33,6 @@ const underWay = (id: string, slug: string, handOver: HandOver, hasRequirements 
   hasRequirements,
   complete: handOver !== 'OPEN',
   handOver,
-  handOverFirst: false,
 });
 
 function notice(services: ReturnType<typeof underWay>[]) {

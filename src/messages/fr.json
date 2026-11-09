@@ -3947,7 +3947,7 @@
       "handOver": {
         "next": "Suivant",
         "nextHint": "Répondez à toutes les questions et ajoutez toutes les pièces pour continuer.",
-        "nextText": "Tout est remis ? Cliquez sur « Suivant » : Stanzy lance le travail et vous voyez les documents que vous allez recevoir.",
+        "nextText": "Tout est remis ? Cliquez sur « Suivant » : Stanzy vérifie vos pièces et lance le travail.",
         "sending": "Envoi…",
         "sent": "Pièces envoyées à Stanzy",
         "submitted": "Pièces envoyées : vous pouvez encore les modifier jusqu’à ce que Stanzy les confirme.",
@@ -4031,17 +4031,6 @@
       "saveStart": "Enregistrer",
       "startSaved": "Date de début enregistrée",
       "error": "Une erreur est survenue. Réessayez."
-    },
-    "steps": {
-      "label": "Étapes du service",
-      "pieces": "Pièces à remettre",
-      "documents": "Documents à recevoir",
-      "current": "En cours",
-      "locked": "Après « Suivant »",
-      "lockedText": "Les documents que Stanzy va obtenir pour vous apparaîtront ici dès que vous aurez remis vos pièces et cliqué sur « Suivant ».",
-      "review": "Revoir mes pièces",
-      "loading": "Chargement des étapes du service",
-      "done": "Remises"
     },
     "pending": {
       "label": "Pièces à remettre",

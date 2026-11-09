@@ -222,18 +222,6 @@ describe('« Suivant », then the consultant’s confirmation', () => {
     await callerFor(db, client).removeFile({ id: files[0]!.id });
     expect((await callerFor(db, client).get({ requestId: 'stz_1' })).handOver).toBe('OPEN');
   });
-
-  it('puts the pieces first in a Service documentaire Dossier only', async () => {
-    const order = fakeDatabase('REQUESTED', 'SERVICE_DOCUMENTAIRE');
-    expect(await callerFor(order.db, client).forDossier({ dossierId: 'dos_1' })).toEqual([
-      expect.objectContaining({ id: 'stz_1', handOver: 'OPEN', handOverFirst: true }),
-    ]);
-    // An Accompagnement's « Stanzy s'en charge »: its Documents tab stays as it is.
-    const accompagnement = fakeDatabase();
-    expect(await callerFor(accompagnement.db, client).forDossier({ dossierId: 'dos_1' })).toEqual([
-      expect.objectContaining({ handOverFirst: false }),
-    ]);
-  });
 });
 
 describe('the Client’s services under way', () => {

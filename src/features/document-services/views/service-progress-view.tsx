@@ -57,9 +57,7 @@ function ServiceCard({ dossierId, request, viewer }: { dossierId: string; reques
   const name = request.service ? textIn(request.service.name, locale) : request.document;
   const headingId = `${request.id}-progress`;
   const left = request.dueOn ? daysUntil(request.dueOn, utcToday(new Date())) : null;
-  // The Client hands over from the Dossier's Documents tab, step ① (ServiceStepsView).
-  const href =
-    viewer === 'consultant' ? `/dossiers/${dossierId}/services/${request.id}` : `/mon-espace/dossiers/${dossierId}?onglet=documents`;
+  const href = viewer === 'consultant' ? `/dossiers/${dossierId}/services/${request.id}` : `/mon-espace/services/demandes/${request.id}`;
   const linkClass = 'inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-rouge hover:text-crimson';
   const linkBody = (
     <>

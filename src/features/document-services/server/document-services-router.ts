@@ -93,9 +93,6 @@ async function progressOf(db: Db, session: CurrentSession, requestId: string) {
     hasRequirements,
     complete,
     handOver: handOverOf(request),
-    // A Service documentaire's own Dossier opens on its pieces (ServiceStepsView); an
-    // Accompagnement's « Stanzy s'en charge » keeps its Documents tab as it is.
-    handOverFirst: dossier.service === 'SERVICE_DOCUMENTAIRE' && hasRequirements,
   };
 }
 

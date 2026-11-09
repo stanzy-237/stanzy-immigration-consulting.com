@@ -21,13 +21,12 @@ import { useTRPC } from '@/trpc/client';
 /**
  * One of the Client's Dossiers in « Mon espace »: a header always in view,
  * then tabs (Aperçu, Documents, Messages, Réunions, Facturation). The top
- * of the Aperçu, the Documents tab, the Contrat, Factures and Réunions are
- * passed in by the route.
+ * of the Aperçu, the Contrat, Factures and Réunions are passed in by the
+ * route.
  */
 export function MyDossierView({
   id,
   notice,
-  documents,
   overview,
   invoices,
   contracts,
@@ -36,8 +35,6 @@ export function MyDossierView({
   id: string;
   /** Above the Dossier: the pieces still to hand over for its services, passed in by the route. */
   notice?: ReactNode;
-  /** The Documents tab; by default the Dossier's Documents (`MyDossierDocumentsView`). */
-  documents?: ReactNode;
   /** The top of the Aperçu (#81: CRS score, ITA countdown), passed in by the route. */
   overview?: ReactNode;
   invoices?: ReactNode;
@@ -71,7 +68,7 @@ export function MyDossierView({
           </div>
           <DossierTabs
             counts={counts}
-            // A Service documentaire's Dossier is about its documents: its pieces first (ServiceStepsView).
+            // A Dossier service documentaire is about its documents: it opens on them.
             fallback={dossier?.service === 'SERVICE_DOCUMENTAIRE' ? 'documents' : 'apercu'}
             panels={{
               apercu: (
@@ -82,7 +79,7 @@ export function MyDossierView({
                   </QueryBoundary>
                 </>
               ),
-              documents: documents ?? <MyDossierDocumentsView id={id} />,
+              documents: <MyDossierDocuments id={id} />,
               messages: (
                 <QueryBoundary fallback={<DossierMessagesSkeleton />}>
                   <DossierMessages dossierId={id} viewer="client" />
@@ -159,7 +156,7 @@ function HeaderSkeleton(): ReactNode {
 }
 
 /** The Dossier's Documents for its Client, one unfolded when a Notification points to it (#92). */
-export function MyDossierDocumentsView({ id }: { id: string }): ReactNode {
+function MyDossierDocuments({ id }: { id: string }): ReactNode {
   const params = useSearchParams();
   const focus = { documentId: params.get('document'), messageId: params.get('message') };
   return (
