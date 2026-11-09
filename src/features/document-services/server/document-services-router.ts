@@ -15,9 +15,15 @@ import {
 } from '@/features/document-services/lib/requirements';
 import { prerequisitesOf, saveServiceInput, slugInput } from '@/features/document-services/lib/service-schema';
 import { ordersRouter } from '@/features/document-services/server/orders-router';
-import { editableRequest, OPEN_STANZY, requestFor, requirementsOf } from '@/features/document-services/server/requirements';
+import {
+  editableRequest,
+  OPEN_STANZY,
+  reopenIfIncomplete,
+  requestFor,
+  requirementsOf,
+} from '@/features/document-services/server/requirements';
 import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
-import { dossierFor } from '@/features/dossiers/server/dossier-access';
+import { dossierFor, isConsultant } from '@/features/dossiers/server/dossier-access';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
@@ -192,7 +198,7 @@ export const documentServicesRouter = createTRPCRouter({
         },
         dossier: { id: dossier.id, client: dossier.account.name, stage: dossier.stage, service: dossier.service },
         editable,
-        handOver: handOverOf({ submittedAt: request.submittedAt ?? null, confirmedAt: request.confirmedAt ?? null }),
+        handOver: handOverOf(request),
         startedOn: request.startedOn,
         dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
         ...(await requirementsOf(ctx.prisma, found)),
@@ -225,8 +231,12 @@ export const documentServicesRouter = createTRPCRouter({
             dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
             left: items.filter((item) => item.state === 'missing').length + questionsLeft.length,
             hasRequirements: items.length > 0 || request.service?.questionnaire !== null,
+            // A Service documentaire's own Dossier opens on its pieces (ServiceStepsView); an
+            // Accompagnement's « Stanzy s'en charge » keeps its Documents tab as it is.
+            handOverFirst:
+              dossier.service === 'SERVICE_DOCUMENTAIRE' && (items.length > 0 || request.service?.questionnaire !== null),
             complete,
-            handOver: handOverOf({ submittedAt: request.submittedAt ?? null, confirmedAt: request.confirmedAt ?? null }),
+            handOver: handOverOf(request),
           };
         }),
       );
@@ -234,6 +244,7 @@ export const documentServicesRouter = createTRPCRouter({
 
     /** « Suivant »: the Client has handed everything over; the documents to receive show from now on. */
     submit: protectedProcedure.input(requestRef).mutation(async ({ ctx, input }) => {
+      if (isConsultant(ctx.session)) throw new TRPCError({ code: 'FORBIDDEN' });
       const found = await editableRequest(ctx.prisma, ctx.session, input.requestId);
       if (!(await requirementsOf(ctx.prisma, found)).complete) throw refuse('REQUIREMENTS_INCOMPLETE');
       if (found.request.submittedAt) return;
@@ -249,8 +260,10 @@ export const documentServicesRouter = createTRPCRouter({
 
     /** The consultant confirms what was handed over: the Client can no longer change it. */
     confirm: consultantProcedure.input(requestRef).mutation(async ({ ctx, input }) => {
-      const { request, dossier } = await editableRequest(ctx.prisma, ctx.session, input.requestId);
+      const found = await editableRequest(ctx.prisma, ctx.session, input.requestId);
+      const { request, dossier } = found;
       if (request.confirmedAt) return;
+      if (!(await requirementsOf(ctx.prisma, found)).complete) throw refuse('REQUIREMENTS_INCOMPLETE');
       const now = new Date();
       await ctx.prisma.stanzyRequest.update({
         where: { id: request.id },
@@ -287,6 +300,7 @@ export const documentServicesRouter = createTRPCRouter({
           },
         },
       });
+      await reopenIfIncomplete(ctx.prisma, ctx.session, request.id);
     }),
 
     /** Records a file the browser encrypted and stored for one of the prerequisites (any photo or PDF). */
@@ -324,6 +338,7 @@ export const documentServicesRouter = createTRPCRouter({
         await editableRequest(ctx.prisma, ctx.session, file.requestId);
         await ctx.prisma.requirementFile.delete({ where: { id: file.id } });
         await deleteFiles([file.objectKey]).catch(() => undefined);
+        await reopenIfIncomplete(ctx.prisma, ctx.session, file.requestId);
       }),
   }),
 });

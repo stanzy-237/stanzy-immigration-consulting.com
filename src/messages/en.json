@@ -4022,7 +4022,8 @@
       "locked": "After “Next”",
       "lockedText": "The documents Stanzy will get for you show here once you have handed over your pieces and clicked “Next”.",
       "review": "Review my pieces",
-      "loading": "Loading the service steps"
+      "loading": "Loading the service steps",
+      "done": "Handed over"
     }
   },
   "ClientForms": {

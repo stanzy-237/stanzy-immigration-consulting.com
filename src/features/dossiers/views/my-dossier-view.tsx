@@ -1,6 +1,6 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -45,6 +45,9 @@ export function MyDossierView({
 }): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
   const counts = useDossierCounts(id);
+  // Prefetched by the route: known on the first render, so the right tab opens at once.
+  const trpc = useTRPC();
+  const { data: dossier } = useQuery(trpc.dossiers.myDossier.queryOptions({ id }));
   return (
     <>
       <SiteNav />
@@ -64,6 +67,8 @@ export function MyDossierView({
           </div>
           <DossierTabs
             counts={counts}
+            // A Service documentaire's Dossier is about its documents: its pieces first (ServiceStepsView).
+            fallback={dossier?.service === 'SERVICE_DOCUMENTAIRE' ? 'documents' : 'apercu'}
             panels={{
               apercu: (
                 <>

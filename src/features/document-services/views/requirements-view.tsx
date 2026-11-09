@@ -17,6 +17,7 @@ import {
   type Answers,
   type Question,
 } from '@/features/document-services/lib/requirements';
+import { DoneNote } from '@/features/document-services/components/service-parts';
 import { textIn } from '@/features/document-services/lib/service-schema';
 import { signaturePage } from '@/features/document-services/lib/signature-page';
 import { uploadEncryptedFile } from '@/features/dossiers/lib/upload-version';
@@ -197,10 +198,9 @@ function HandOver({ data, viewer }: { data: Data; viewer: 'client' | 'consultant
     }),
   );
   const note = (text: string) => (
-    <p className="flex items-center gap-2 rounded-2xl bg-leaf-tint px-5 py-4 text-sm font-semibold text-leaf">
-      <CheckCircle2 aria-hidden={true} className="size-4 shrink-0" />
-      {text}
-    </p>
+    <DoneNote>
+      <span>{text}</span>
+    </DoneNote>
   );
 
   if (data.handOver === 'CONFIRMED') return note(t(viewer === 'client' ? 'handOver.confirmed' : 'handOver.confirmedNote'));
@@ -208,7 +208,7 @@ function HandOver({ data, viewer }: { data: Data; viewer: 'client' | 'consultant
     return (
       <div className={card}>
         <p className="text-sm text-navy-deep">{t(data.handOver === 'SUBMITTED' ? 'handOver.toConfirm' : 'handOver.waiting')}</p>
-        {data.editable ? (
+        {data.editable && data.complete ? (
           <button
             type="button"
             disabled={confirm.isPending}

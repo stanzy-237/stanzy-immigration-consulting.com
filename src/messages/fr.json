@@ -4039,7 +4039,8 @@
       "locked": "Après « Suivant »",
       "lockedText": "Les documents que Stanzy va obtenir pour vous apparaîtront ici dès que vous aurez remis vos pièces et cliqué sur « Suivant ».",
       "review": "Revoir mes pièces",
-      "loading": "Chargement des étapes du service"
+      "loading": "Chargement des étapes du service",
+      "done": "Remises"
     }
   },
   "ClientForms": {

@@ -1,5 +1,6 @@
 'use client';
 
+import { CheckCircle2 } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -53,5 +54,15 @@ export function ContractText({ body }: { body: string }): ReactNode {
         ),
       )}
     </div>
+  );
+}
+
+/** A green line: the pieces of a service were sent or confirmed. */
+export function DoneNote({ children }: { children: ReactNode }): ReactNode {
+  return (
+    <p className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-leaf-tint px-5 py-3 text-sm font-semibold text-leaf">
+      <CheckCircle2 aria-hidden={true} className="size-4 shrink-0" />
+      <span className="flex flex-1 flex-wrap items-center justify-between gap-2">{children}</span>
+    </p>
   );
 }

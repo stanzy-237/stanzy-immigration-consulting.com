@@ -93,3 +93,14 @@ export async function requirementsOf(db: Db, found: Awaited<ReturnType<typeof re
     complete: left.length === 0 && items.every((item) => item.state !== 'missing'),
   };
 }
+
+/**
+ * After the Client changed what was handed over: if something is missing
+ * again since « Suivant », back to step ① (the documents to receive hide).
+ */
+export async function reopenIfIncomplete(db: Db, session: CurrentSession, requestId: string): Promise<void> {
+  const found = await requestFor(db, session, requestId);
+  if (!found.request.submittedAt || found.request.confirmedAt) return;
+  if ((await requirementsOf(db, found)).complete) return;
+  await db.stanzyRequest.update({ where: { id: requestId }, data: { submittedAt: null } });
+}

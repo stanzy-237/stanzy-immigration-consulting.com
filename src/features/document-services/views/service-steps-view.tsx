@@ -7,6 +7,7 @@ import { useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DoneNote } from '@/features/document-services/components/service-parts';
 import { textIn } from '@/features/document-services/lib/service-schema';
 import { RequirementsView } from '@/features/document-services/views/requirements-view';
 import { Link } from '@/i18n/navigation';
@@ -29,60 +30,48 @@ export function ServiceStepsView({ dossierId, children }: { dossierId: string; c
 
 function Steps({ dossierId, children }: { dossierId: string; children: ReactNode }): ReactNode {
   const t = useTranslations('DocumentServices.steps');
-  const handOver = useTranslations('DocumentServices.requirements.handOver');
+  const tHandOver = useTranslations('DocumentServices.requirements.handOver');
   const locale = useLocale();
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.documentServices.requirements.forDossier.queryOptions({ dossierId }));
-  const services = data.filter((request) => request.hasRequirements);
+  const services = data.filter((request) => request.handOverFirst);
   const open = services.filter((request) => request.handOver === 'OPEN');
-  // « Suivant » just opened step ②: its documents slide in, once.
-  const [wasOpen, setWasOpen] = useState(open.length > 0);
-  if (open.length > 0 && !wasOpen) setWasOpen(true);
-  const justOpened = wasOpen && open.length === 0;
+  // Set while step ① shows; when the last « Suivant » opens step ②, its documents slide in, once.
+  const [hadOpenStep, setHadOpenStep] = useState(open.length > 0);
+  if (open.length > 0 && !hadOpenStep) setHadOpenStep(true);
 
+  if (services.length === 0) return children;
   if (open.length === 0) {
     return (
-      <div
-        className={
-          justOpened
-            ? 'grid grid-cols-1 gap-4 transition duration-300 ease-out starting:translate-y-2 starting:opacity-0 motion-reduce:starting:translate-y-0'
-            : 'grid grid-cols-1 gap-4'
-        }
-      >
-        {services.map((request) => (
-          <p
-            key={request.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-leaf-tint px-5 py-3 text-sm font-semibold text-leaf"
-          >
-            <span className="flex items-center gap-2">
-              <CheckCircle2 aria-hidden={true} className="size-4 shrink-0" />
-              {request.service ? `${textIn(request.service.name, locale)} · ` : null}
-              {handOver(request.handOver === 'CONFIRMED' ? 'confirmed' : 'submitted')}
-            </span>
-            <Link href={`/mon-espace/services/demandes/${request.id}`} className="underline underline-offset-2">
-              {t('review')}
-            </Link>
-          </p>
-        ))}
-        {children}
+      <div className="grid grid-cols-1 gap-4">
+        <Stepper step="documents" />
+        <div
+          className={
+            hadOpenStep
+              ? 'grid grid-cols-1 gap-4 transition duration-300 ease-out starting:translate-y-2 starting:opacity-0 motion-reduce:starting:translate-y-0'
+              : 'grid grid-cols-1 gap-4'
+          }
+        >
+          {services.map((request) => (
+            <DoneNote key={request.id}>
+              <span>
+                {request.service ? `${textIn(request.service.name, locale)} · ` : null}
+                {tHandOver(request.handOver === 'CONFIRMED' ? 'confirmed' : 'submitted')}
+              </span>
+              <Link href={`/mon-espace/services/demandes/${request.id}`} className="underline underline-offset-2">
+                {t('review')}
+              </Link>
+            </DoneNote>
+          ))}
+          {children}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="grid grid-cols-1 gap-6">
-      <ol aria-label={t('label')} className="grid grid-cols-2 gap-2">
-        <li aria-current="step" className="rounded-2xl border-2 border-navy-deep bg-white px-4 py-3">
-          <span className="block text-xs font-semibold text-rouge">1 · {t('current')}</span>
-          <span className="font-heading text-sm font-bold text-navy-deep">{t('pieces')}</span>
-        </li>
-        <li className="rounded-2xl border border-fog-light bg-off-white px-4 py-3 text-slate">
-          <span className="flex items-center gap-1 text-xs font-semibold">
-            <Lock aria-hidden={true} className="size-3" />2 · {t('locked')}
-          </span>
-          <span className="font-heading text-sm font-bold">{t('documents')}</span>
-        </li>
-      </ol>
+      <Stepper step="pieces" />
       <section aria-labelledby={`${dossierId}-pieces`} className="grid grid-cols-1 gap-6">
         <h2 id={`${dossierId}-pieces`} className="font-heading text-xl font-bold text-navy-deep">
           {t('pieces')}
@@ -104,6 +93,42 @@ function Steps({ dossierId, children }: { dossierId: string; children: ReactNode
         </div>
       </section>
     </div>
+  );
+}
+
+/** ① Pièces à remettre, ② Documents à recevoir: where the Client is. */
+function Stepper({ step }: { step: 'pieces' | 'documents' }): ReactNode {
+  const t = useTranslations('DocumentServices.steps');
+  const current = 'rounded-2xl border-2 border-navy-deep bg-white px-4 py-3';
+  const done = 'rounded-2xl border border-leaf-tint bg-leaf-tint px-4 py-3 text-leaf';
+  const later = 'rounded-2xl border border-fog-light bg-off-white px-4 py-3 text-slate';
+  return (
+    <ol aria-label={t('label')} className="grid grid-cols-2 gap-2">
+      <li aria-current={step === 'pieces' ? 'step' : undefined} className={step === 'pieces' ? current : done}>
+        <span className={step === 'pieces' ? 'block text-xs font-semibold text-rouge' : 'flex items-center gap-1 text-xs font-semibold'}>
+          {step === 'pieces' ? `1 · ${t('current')}` : (
+            <>
+              <CheckCircle2 aria-hidden={true} className="size-3" />1 · {t('done')}
+            </>
+          )}
+        </span>
+        <span className="font-heading text-sm font-bold text-navy-deep">{t('pieces')}</span>
+      </li>
+      <li aria-current={step === 'documents' ? 'step' : undefined} className={step === 'documents' ? current : later}>
+        <span className={step === 'documents' ? 'block text-xs font-semibold text-rouge' : 'flex items-center gap-1 text-xs font-semibold'}>
+          {step === 'documents' ? (
+            `2 · ${t('current')}`
+          ) : (
+            <>
+              <Lock aria-hidden={true} className="size-3" />2 · {t('locked')}
+            </>
+          )}
+        </span>
+        <span className={step === 'documents' ? 'font-heading text-sm font-bold text-navy-deep' : 'font-heading text-sm font-bold'}>
+          {t('documents')}
+        </span>
+      </li>
+    </ol>
   );
 }
 

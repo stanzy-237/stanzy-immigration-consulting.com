@@ -233,7 +233,16 @@ A Cameroonian tax compliance certificate, one of the Services documentaires.
 A password-protected, expiring link the consultant sends so that someone can read chosen Services documentaires and order them without being a Client, anonymously until they order. Revocable; an order placed through it stays valid after it expires.
 
 **Dossier service documentaire**:
-A small Dossier holding only the Documents someone ordered from the Services documentaires, without Accompagnement.
+A small Dossier holding only the Documents someone ordered from the Services documentaires, without Accompagnement. Its Documents tab opens on the Pièces à remettre first, then the documents to receive.
+
+**Pièces à remettre** (Pieces to hand over):
+What a Client gives Stanzy for a Service documentaire: the service's questionnaire and its prerequisite files (any photo or PDF, a signature drawn on screen). They belong to the « Stanzy s'en charge » request, never become Documents of the Dossier, and are shared with the consultant and the Partner in charge. Avoid: prérequis, documents requis (a Document is what the Client receives).
+
+**Suivant** (Next):
+The Client's step once every Pièce à remettre is handed over: the documents to receive show, and the consultant is told. The Client can still change the pieces until « Confirmer les pièces »; removing one reopens the step.
+
+**Confirmer les pièces** (Confirm the pieces):
+The consultant's check of the Pièces à remettre: from then the Client can no longer change them, only the consultant can.
 
 **Demande de devis** (Quote request):
 The EDE's public form, filled without an Account: the evaluation body (WES by default, or IQAS), any existing WES/IQAS account, and up to two diplômes (a second only as a BTS / DSEP / HND / HPD next to a Licence), each showing the documents to provide. Nothing is uploaded in it.

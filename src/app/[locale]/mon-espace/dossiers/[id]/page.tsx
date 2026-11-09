@@ -8,7 +8,7 @@ import { ServiceStepsView } from '@/features/document-services/views/service-ste
 import { DossierContractsView } from '@/features/contracts/views/dossier-contracts-view';
 import { DossierInvoicesView } from '@/features/invoices/views/dossier-invoices-view';
 import { DossierMeetingsView } from '@/features/meetings/views/dossier-meetings-view';
-import { HydrateClient, prefetch, trpc } from '@/trpc/server';
+import { getQueryClient, HydrateClient, prefetch, trpc } from '@/trpc/server';
 
 type Params = Promise<{ locale: string; id: string }>;
 
@@ -23,14 +23,24 @@ export default async function Page({ params }: { params: Params }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
   await requireSession({ locale, next: `/mon-espace/dossiers/${id}` });
-  prefetch(trpc.dossiers.myDossier.queryOptions({ id }));
   prefetch(trpc.dossiers.documents.sections.queryOptions({ dossierId: id }));
   prefetch(trpc.dossiers.messages.list.queryOptions({ dossierId: id }));
   prefetch(trpc.invoices.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.contracts.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.meetings.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.accompagnement.overview.queryOptions({ dossierId: id }));
-  prefetch(trpc.documentServices.requirements.forDossier.queryOptions({ dossierId: id }));
+  // Awaited: the Dossier's service picks the tab it opens on, and a Service documentaire's
+  // open pieces load with the page (step ①, ServiceStepsView). A failure shows in the View.
+  const queryClient = getQueryClient();
+  const [, steps] = await Promise.all([
+    queryClient.fetchQuery(trpc.dossiers.myDossier.queryOptions({ id })).catch(() => null),
+    queryClient.fetchQuery(trpc.documentServices.requirements.forDossier.queryOptions({ dossierId: id })).catch(() => []),
+  ]);
+  for (const step of steps) {
+    if (step.handOverFirst && step.handOver === 'OPEN') {
+      prefetch(trpc.documentServices.requirements.get.queryOptions({ requestId: step.id }));
+    }
+  }
   return (
     <HydrateClient>
       <MyDossierView

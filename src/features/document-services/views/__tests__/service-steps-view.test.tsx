@@ -23,7 +23,7 @@ vi.mock('@/i18n/navigation', () => ({
 
 const pof = STARTER_SERVICES.find((service) => service.slug === 'preuve-de-fonds-sans-fonds')!;
 
-const progress = (handOver: HandOver, complete = handOver !== 'OPEN') => ({
+const progress = (handOver: HandOver, complete = handOver !== 'OPEN', handOverFirst = true) => ({
   id: 'stz_1',
   status: 'ACCEPTED',
   service: { name: pof.name },
@@ -33,6 +33,7 @@ const progress = (handOver: HandOver, complete = handOver !== 'OPEN') => ({
   dueOn: null,
   left: complete ? 0 : 2,
   hasRequirements: true,
+  handOverFirst,
   complete,
   handOver,
 });
@@ -100,6 +101,15 @@ describe('a service’s steps in the Documents tab', () => {
     tab([progress('CONFIRMED')]);
     expect(screen.getByText('Mes documents à recevoir')).toBeInTheDocument();
     expect(screen.getByText(/Pièces confirmées par Stanzy/)).toBeInTheDocument();
+    // The steps stay in view: ① done, ② where the Client is now.
+    expect(screen.getByRole('list', { name: 'Étapes du service' })).toHaveTextContent('Documents à recevoir');
+    expect(screen.getByText('Documents à recevoir').closest('li')).toHaveAttribute('aria-current', 'step');
+  });
+
+  it('leaves an Accompagnement’s Documents tab as it is', () => {
+    tab([progress('OPEN', false, false)]);
+    expect(screen.getByText('Mes documents à recevoir')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Pièces à remettre' })).toBeNull();
   });
 
   it('changes nothing for a Dossier with no service to hand over for', () => {

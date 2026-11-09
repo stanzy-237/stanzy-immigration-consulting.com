@@ -24,7 +24,7 @@ const pof = STARTER_SERVICES.find((service) => service.slug === 'preuve-de-fonds
  * an in-memory stand-in for one Stanzy request, its Dossier and Documents,
  * and the files handed over; R2 stubbed.
  */
-function fakeDatabase(status = 'REQUESTED') {
+function fakeDatabase(status = 'REQUESTED', service = 'ACCOMPAGNEMENT') {
   const request: Row = {
     id: 'stz_1',
     status,
@@ -35,7 +35,7 @@ function fakeDatabase(status = 'REQUESTED') {
   };
   const dossier = {
     id: 'dos_1',
-    service: 'ACCOMPAGNEMENT',
+    service,
     stage: 'DOCUMENTS',
     state: 'OPEN',
     accountId: 'acc_1',
@@ -48,6 +48,7 @@ function fakeDatabase(status = 'REQUESTED') {
   const db = {
     stanzyRequest: {
       findUnique: async ({ where }: { where: { id: string } }) => (where.id === request.id ? request : null),
+      findMany: async () => [{ id: request.id }],
       update: async ({ data }: { data: Row }) => Object.assign(request, data),
     },
     dossier: { findUnique: async ({ where }: { where: { id: string } }) => (where.id === dossier.id ? dossier : null) },
@@ -200,5 +201,37 @@ describe('« Suivant », then the consultant’s confirmation', () => {
     await expect(callerFor(db, client).addFile(upload('signature'))).rejects.toMatchObject({ message: 'REQUIREMENTS_CLOSED' });
     // The consultant can still fix what was handed over.
     expect((await callerFor(db, consultant).get({ requestId: 'stz_1' })).editable).toBe(true);
+  });
+
+  it('takes « Suivant » from the Client only', async () => {
+    const { db } = fakeDatabase();
+    await handOverEverything(db);
+    await expect(callerFor(db, consultant).submit({ requestId: 'stz_1' })).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
+  it('confirms only what is complete', async () => {
+    const { db, request } = fakeDatabase();
+    await expect(callerFor(db, consultant).confirm({ requestId: 'stz_1' })).rejects.toMatchObject({ message: 'REQUIREMENTS_INCOMPLETE' });
+    expect(request.confirmedAt ?? null).toBeNull();
+  });
+
+  it('goes back to the pieces when the Client removes one after « Suivant »', async () => {
+    const { db, files } = fakeDatabase();
+    await handOverEverything(db);
+    await callerFor(db, client).submit({ requestId: 'stz_1' });
+    await callerFor(db, client).removeFile({ id: files[0]!.id });
+    expect((await callerFor(db, client).get({ requestId: 'stz_1' })).handOver).toBe('OPEN');
+  });
+
+  it('puts the pieces first in a Service documentaire Dossier only', async () => {
+    const order = fakeDatabase('REQUESTED', 'SERVICE_DOCUMENTAIRE');
+    expect(await callerFor(order.db, client).forDossier({ dossierId: 'dos_1' })).toEqual([
+      expect.objectContaining({ id: 'stz_1', handOver: 'OPEN', handOverFirst: true }),
+    ]);
+    // An Accompagnement's « Stanzy s'en charge »: its Documents tab stays as it is.
+    const accompagnement = fakeDatabase();
+    expect(await callerFor(accompagnement.db, client).forDossier({ dossierId: 'dos_1' })).toEqual([
+      expect.objectContaining({ handOverFirst: false }),
+    ]);
   });
 });
