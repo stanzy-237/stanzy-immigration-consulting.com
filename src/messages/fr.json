@@ -3232,8 +3232,9 @@
       "acceptConfirm": "Envoyer le contrat",
       "accepted": "Contrat {number} envoyé ; ligne ajoutée à la facture brouillon",
       "openInvoice": "Voir la facture",
-      "handOver": "Pièces à remettre pour ce service",
-      "requirements": "Pièces remises ({count})"
+      "requirements": "Pièces remises ({count})",
+      "viewService": "Voir le service",
+      "viewServiceLabel": "Voir le service pour « {document} »"
     },
     "toast": {
       "sent": "Demande envoyée",

@@ -3215,8 +3215,9 @@
       "acceptConfirm": "Send the contract",
       "accepted": "Contract {number} sent; line added to the draft invoice",
       "openInvoice": "See the invoice",
-      "handOver": "Items to hand over for this service",
-      "requirements": "Items handed over ({count})"
+      "requirements": "Items handed over ({count})",
+      "viewService": "View the service",
+      "viewServiceLabel": "View the service for “{document}”"
     },
     "toast": {
       "sent": "Request sent",

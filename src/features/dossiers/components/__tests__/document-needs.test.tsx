@@ -42,7 +42,7 @@ const catalogue = {
   services: [{ id: 'svc_1', slug: 'preuve-de-fonds', documentKinds: ['bankLetter', 'bankStatements'] }],
 };
 
-function open(viewer: Viewer, stanzy: boolean) {
+function open(viewer: Viewer, stanzy: boolean, requests: Record<string, unknown[]> = {}) {
   const data = {
     viewer: viewer === 'client' ? { id: 'acc_1', name: 'Aminata Diallo', role: 'MEMBER' } : { id: 'acc_stanzy', name: 'Stanzy', role: 'CONSULTANT' },
     open: true,
@@ -53,8 +53,13 @@ function open(viewer: Viewer, stanzy: boolean) {
         id: 'sec_1',
         title: 'Preuve de ressources financières suffisantes – Requérant principal',
         documents: [
-          document('doc_1', 'Lettre de la banque', { kind: 'bankLetter', missing: true, clientNote: 'Relevé de 4 mois' }),
-          document('doc_2', 'Résultats du test de langue', { kind: 'languageResults', missing: true }),
+          document('doc_1', 'Lettre de la banque', {
+            kind: 'bankLetter',
+            missing: true,
+            clientNote: 'Relevé de 4 mois',
+            stanzyRequests: requests.doc_1 ?? [],
+          }),
+          document('doc_2', 'Résultats du test de langue', { kind: 'languageResults', missing: true, stanzyRequests: requests.doc_2 ?? [] }),
           document('doc_3', 'Relevés bancaires', { kind: 'bankStatements', need: 'recommended' }),
         ],
       },
@@ -108,5 +113,21 @@ describe('Documents made from the Demande d’intérêt', () => {
     open('consultant', false);
     fireEvent.click(screen.getByRole('button', { name: /^Lettre de la banque/ }));
     expect(screen.getByText('Note du client : Relevé de 4 mois')).toBeInTheDocument();
+  });
+
+  it('keeps a document Stanzy gets in its place, with « Voir le service »', () => {
+    const service = { questionnaire: null, prerequisites: [] };
+    open('client', true, {
+      doc_1: [{ id: 'stz_1', status: 'ACCEPTED', declineNote: null, service }],
+      doc_2: [{ id: 'stz_2', status: 'DECLINED', declineNote: null, service }],
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^Lettre de la banque/ }));
+    expect(screen.getByRole('link', { name: 'Voir le service pour « Lettre de la banque »' })).toHaveAttribute(
+      'href',
+      '/fr/mon-espace/services/demandes/stz_1',
+    );
+    // Declined: the Client gets it themselves, no service to see.
+    fireEvent.click(screen.getByRole('button', { name: /^Résultats du test de langue/ }));
+    expect(screen.queryByRole('link', { name: /Voir le service pour « Résultats/ })).toBeNull();
   });
 });

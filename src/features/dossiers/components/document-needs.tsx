@@ -7,7 +7,6 @@ import type { ReactNode } from 'react';
 
 import { helpFor } from '@/features/accompagnement/lib/interest-schema';
 import { isFormKind } from '@/features/client-forms/lib/form-schema';
-import { prerequisitesOf } from '@/features/document-services/lib/service-schema';
 import { smallButton, type DocumentData, type Viewer } from '@/features/dossiers/components/document-styles';
 import { TCF_ACADEMY_URL } from '@/features/shared/data/links';
 import { Link } from '@/i18n/navigation';
@@ -98,14 +97,11 @@ export function DocumentNeeds({
     ? catalogue?.services.find((candidate) => candidate.documentKinds.includes(document.kind ?? ''))
     : undefined;
   const askHref = `/mon-espace/services${service ? `/${service.slug}` : ''}?document=${document.id}`;
-  // A request under way whose service asks for something: the Client hands it over on the request's own page.
-  const handOver =
-    client &&
-    request &&
-    request.status !== 'DECLINED' &&
-    Boolean(request.service?.questionnaire || prerequisitesOf(request.service?.prerequisites).length > 0);
+  // A request under way for a service: the Document stays here; the service (its pieces to hand
+  // over, where it stands) opens on the request's own page.
+  const followed = client && request && request.status !== 'DECLINED' && Boolean(request.service);
 
-  if (!document.clientNote && !help && !canAsk && !handOver && request?.status !== 'DECLINED') return null;
+  if (!document.clientNote && !help && !canAsk && !followed && request?.status !== 'DECLINED') return null;
   return (
     <div className="grid grid-cols-1 gap-2 rounded-lg bg-off-white px-3 py-2.5 text-sm">
       {document.clientNote ? (
@@ -119,13 +115,14 @@ export function DocumentNeeds({
           {request.declineNote ? ` · ${request.declineNote}` : ''}
         </p>
       ) : null}
-      {handOver && request ? (
+      {followed && request ? (
         <Link
           href={`/mon-espace/services/demandes/${request.id}`}
+          aria-label={t('stanzy.viewServiceLabel', { document: document.title })}
           className={`${smallButton} h-9 w-fit border border-navy-deep text-navy-deep hover:bg-navy-deep hover:text-white`}
         >
           <FileStack aria-hidden={true} className="size-4" />
-          {t('stanzy.handOver')}
+          {t('stanzy.viewService')}
         </Link>
       ) : null}
       {help || canAsk ? (
