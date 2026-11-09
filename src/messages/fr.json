@@ -1445,7 +1445,7 @@
       "finances": "Finances",
       "reunions": "Réunions",
       "services": "Services documentaires",
-      "services-en-cours": "Services"
+      "services-en-cours": "Services en cours"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -4058,7 +4058,9 @@
       "due": "Livraison prévue le {date}",
       "open": "Ouvrir",
       "openLabel": "Ouvrir le service de {client}",
-      "loading": "Chargement des services en cours"
+      "loading": "Chargement des services en cours",
+      "count": "{count, plural, one {# service} other {# services}}",
+      "for": "Pour « {document} »"
     }
   },
   "ClientForms": {

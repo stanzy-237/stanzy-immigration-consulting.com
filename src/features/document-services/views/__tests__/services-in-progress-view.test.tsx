@@ -13,12 +13,11 @@ const service = (slug: string) => {
   const found = STARTER_SERVICES.find((candidate) => candidate.slug === slug)!;
   return { slug: found.slug, name: found.name };
 };
-const underWay = (id: string, slug: string, client: string, handOver: HandOver = 'OPEN') => ({
+const underWay = (id: string, slug: string, client: string, handOver: HandOver = 'OPEN', status = 'ACCEPTED') => ({
   id,
   dossierId: `dos_${id}`,
   client,
-  createdAt: new Date('2026-11-07T10:00:00Z'),
-  status: 'ACCEPTED',
+  status,
   service: service(slug),
   document: 'Lettre de la banque',
   startedOn: null,
@@ -34,19 +33,38 @@ function page() {
   const data = [
     underWay('stz_1', 'preuve-de-fonds', 'Aminata Diallo'),
     underWay('stz_2', 'preuve-de-fonds-sans-fonds', 'Paul Mbarga', 'SUBMITTED'),
-    underWay('stz_3', 'attestation-cnps', 'Marie Ngo'),
+    underWay('stz_3', 'attestation-cnps', 'Marie Ngo', 'OPEN', 'REQUESTED'),
   ];
-  const { trpc, queryClient, wrap } = createTestTRPC({ 'documentServices.dashboard.underWay': () => data });
+  // The catalogue, in its order; only the active services make tabs.
+  const catalogue = STARTER_SERVICES.map((entry, index) => ({ id: `svc_${index}`, slug: entry.slug, name: entry.name, active: true }));
+  const { trpc, queryClient, wrap } = createTestTRPC({
+    'documentServices.dashboard.underWay': () => data,
+    'documentServices.dashboard.list': () => catalogue,
+  });
   queryClient.setQueryData(trpc.documentServices.dashboard.underWay.queryKey(), data as never);
+  queryClient.setQueryData(trpc.documentServices.dashboard.list.queryKey(), catalogue as never);
   return render(withIntl(wrap(<ServicesInProgressView />)));
 }
 
 describe('« Services » under Clients', () => {
-  it('has one tab per service, both proof of funds together, each with its count', () => {
+  it('has a tab per catalogue service, in its order and by short name, both proof of funds together, each with its count', () => {
     page();
     const tabs = screen.getByRole('tablist', { name: 'Services' });
-    expect(within(tabs).getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Tous3', 'Preuve de fonds2', 'Attestation CNPS1']);
+    expect(within(tabs).getAllByRole('tab').map((tab) => tab.getAttribute('aria-label'))).toEqual([
+      'Tous, 3 services',
+      'Preuve de fonds, 2 services',
+      'Certificat de police, 0 service',
+      'Attestation CNPS, 1 service',
+      'Compte salaire, 0 service',
+      'ACF, 0 service',
+      'Pack expérience pro, 0 service',
+    ]);
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
+  });
+
+  it('leads a request not yet accepted to where Stanzy accepts it', () => {
+    page();
+    expect(screen.getByRole('link', { name: 'Ouvrir le service de Marie Ngo' })).toHaveAttribute('href', '/dossiers/dos_stz_3#stanzy');
   });
 
   it('shows only the tab’s services, and leads to each', () => {

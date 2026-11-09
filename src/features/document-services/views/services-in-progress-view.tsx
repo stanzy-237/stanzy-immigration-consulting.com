@@ -1,6 +1,6 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQueries } from '@tanstack/react-query';
 import { FileCheck2 } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
@@ -10,7 +10,8 @@ import { useState, type ReactNode } from 'react';
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { isProofOfFunds, serviceFamily } from '@/features/document-services/lib/service-families';
+import { HandOverPill } from '@/features/document-services/components/service-parts';
+import { isProofOfFunds, serviceFamily, shortName } from '@/features/document-services/lib/service-families';
 import { textIn } from '@/features/document-services/lib/service-schema';
 import { utcDate } from '@/features/ita-countdown/lib/ita-deadline';
 import { useTRPC } from '@/trpc/client';
@@ -19,16 +20,22 @@ import type { RouterOutputs } from '@/trpc/types';
 type UnderWay = RouterOutputs['documentServices']['dashboard']['underWay'][number];
 
 const ALL = 'tous';
-const pill = 'rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap';
 
 /**
  * « Services » under Clients in the Tableau de bord: the Services
  * documentaires under way for Clients, one tab per service (both proof of
  * funds together), each with where its Pièces à remettre stand. The
- * catalogue itself is managed in « Services documentaires ». `service`: the
+ * catalogue itself is managed in « Services documentaires ». `orders`: the
+ * orders to approve (« Commandes »), passed in by the route; `service`: the
  * tab asked for in the address (`?service=`).
  */
-export function ServicesInProgressView({ service = null }: { service?: string | null }): ReactNode {
+export function ServicesInProgressView({
+  orders,
+  service = null,
+}: {
+  orders?: ReactNode;
+  service?: string | null;
+}): ReactNode {
   const t = useTranslations('DocumentServices.inProgress');
   return (
     <div className="mx-auto grid grid-cols-1 max-w-5xl gap-6">
@@ -44,8 +51,10 @@ export function ServicesInProgressView({ service = null }: { service?: string | 
           })}
         </p>
       </div>
+      {orders}
       <QueryBoundary fallback={<InProgressSkeleton />}>
-        <InProgress asked={service} />
+        {/* A link to another tab of this page starts it afresh on that tab. */}
+        <InProgress key={service ?? ALL} asked={service} />
       </QueryBoundary>
     </div>
   );
@@ -55,21 +64,25 @@ function InProgress({ asked }: { asked: string | null }): ReactNode {
   const t = useTranslations('DocumentServices.inProgress');
   const locale = useLocale();
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(trpc.documentServices.dashboard.underWay.queryOptions());
+  const [{ data }, { data: catalogue }] = useSuspenseQueries({
+    queries: [trpc.documentServices.dashboard.underWay.queryOptions(), trpc.documentServices.dashboard.list.queryOptions()],
+  });
 
-  // One tab per family, in the order the services first appear (oldest request first).
+  // A tab per family, in catalogue order: the active services, and any other with a request under way.
   const families = new Map<string, { label: string; rows: UnderWay[] }>();
-  for (const request of data) {
-    if (!request.service) continue;
-    const family = serviceFamily(request.service.slug);
-    const entry = families.get(family) ?? {
-      label: isProofOfFunds(family) ? t('proofOfFunds') : textIn(request.service.name, locale),
+  for (const entry of catalogue) {
+    const family = serviceFamily(entry.slug);
+    const underWayHere = data.some((request) => request.service?.slug === entry.slug);
+    if ((!entry.active && !underWayHere) || families.has(family)) continue;
+    families.set(family, {
+      label: isProofOfFunds(family) ? t('proofOfFunds') : shortName(textIn(entry.name, locale)),
       rows: [],
-    };
-    entry.rows.push(request);
-    families.set(family, entry);
+    });
   }
-  const tabs = [{ key: ALL, label: t('all'), rows: data.filter((request) => request.service) }, ...[...families].map(([key, entry]) => ({ key, ...entry }))];
+  for (const request of data) {
+    if (request.service) families.get(serviceFamily(request.service.slug))?.rows.push(request);
+  }
+  const tabs = [{ key: ALL, label: t('all'), rows: data }, ...[...families].map(([key, entry]) => ({ key, ...entry }))];
   const [tab, setTab] = useState(() => (tabs.some((entry) => entry.key === asked) ? asked! : ALL));
   const current = tabs.find((entry) => entry.key === tab) ?? tabs[0]!;
 
@@ -93,10 +106,14 @@ function InProgress({ asked }: { asked: string | null }): ReactNode {
           <TabsTrigger
             key={entry.key}
             value={entry.key}
+            aria-label={`${entry.label}, ${t('count', { count: entry.rows.length })}`}
             className="h-11 flex-none gap-2 rounded-none px-4 text-sm font-semibold whitespace-nowrap text-slate hover:text-navy-deep data-active:text-navy-deep group-data-horizontal/tabs:after:bottom-0 after:bg-rouge"
           >
             {entry.label}
-            <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-off-white px-1.5 text-xs font-bold text-navy-deep">
+            <span
+              aria-hidden={true}
+              className="inline-flex min-w-5 items-center justify-center rounded-full bg-off-white px-1.5 text-xs font-bold text-navy-deep"
+            >
               {entry.rows.length}
             </span>
           </TabsTrigger>
@@ -120,27 +137,23 @@ function InProgress({ asked }: { asked: string | null }): ReactNode {
 function Row({ request }: { request: UnderWay }): ReactNode {
   const t = useTranslations('DocumentServices.inProgress');
   const status = useTranslations('Accompagnement.stanzy.status');
-  const underWay = useTranslations('DocumentServices.underWay');
   const locale = useLocale();
   const format = useFormatter();
-  const pieces =
-    request.handOver === 'CONFIRMED'
-      ? { text: underWay('confirmed'), style: 'bg-leaf-tint text-leaf' }
-      : request.handOver === 'SUBMITTED'
-        ? { text: underWay('submitted'), style: 'bg-leaf-tint text-leaf' }
-        : request.hasRequirements && request.left > 0
-          ? { text: underWay('left', { count: request.left }), style: 'bg-honey-tint text-honey' }
-          : null;
+  // Not accepted yet: Stanzy accepts it (contract and invoice line) from the Dossier.
+  const href =
+    request.status === 'REQUESTED' ? `/dossiers/${request.dossierId}#stanzy` : `/dossiers/${request.dossierId}/services/${request.id}`;
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-fog-light bg-white p-4 shadow-sm">
       <div className="min-w-0">
         <p className="flex flex-wrap items-center gap-2">
           <span className="font-semibold text-navy-deep">{request.client}</span>
-          <span className={`${pill} bg-ice-blue text-navy-deep`}>{status(request.status)}</span>
-          {pieces ? <span className={`${pill} ${pieces.style}`}>{pieces.text}</span> : null}
+          <span className="rounded-full bg-ice-blue px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-navy-deep">
+            {status(request.status)}
+          </span>
+          <HandOverPill request={request} />
         </p>
         <p className="mt-1 truncate text-sm text-slate">
-          {request.service ? textIn(request.service.name, locale) : null} · {underWay('for', { document: request.document })}
+          {request.service ? textIn(request.service.name, locale) : null} · {t('for', { document: request.document })}
         </p>
         {request.dueOn ? (
           <p className="mt-0.5 text-xs text-slate">
@@ -149,7 +162,7 @@ function Row({ request }: { request: UnderWay }): ReactNode {
         ) : null}
       </div>
       <NextLink
-        href={`/dossiers/${request.dossierId}/services/${request.id}`}
+        href={href}
         aria-label={t('openLabel', { client: request.client })}
         className="inline-flex h-10 items-center gap-1.5 rounded-full border border-navy-deep px-4 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white"
       >

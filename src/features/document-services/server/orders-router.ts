@@ -114,7 +114,7 @@ export const ordersRouter = createTRPCRouter({
             locale: consultant.locale,
             client: account.name,
             document: textIn(name, consultant.locale ?? 'fr'),
-            url: `${dashboardOrigin(siteUrl())}/services#commandes`,
+            url: `${dashboardOrigin(siteUrl())}/services-en-cours#commandes`,
           }),
       ),
     );

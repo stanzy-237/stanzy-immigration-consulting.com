@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
+import { HandOverPill } from '@/features/document-services/components/service-parts';
 import { textIn } from '@/features/document-services/lib/service-schema';
 import { Link } from '@/i18n/navigation';
 import { useTRPC } from '@/trpc/client';
@@ -13,7 +14,6 @@ import type { RouterOutputs } from '@/trpc/types';
 
 type UnderWay = RouterOutputs['documentServices']['requirements']['mine'][number];
 
-const pill = 'rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap';
 
 /**
  * « Mes services en cours » (`#en-cours`), above the catalogue in « Mon
@@ -53,21 +53,13 @@ function Row({ request }: { request: UnderWay }): ReactNode {
   const t = useTranslations('DocumentServices.underWay');
   const locale = useLocale();
   const name = textIn(request.service!.name, locale);
-  const state =
-    request.handOver === 'CONFIRMED'
-      ? { text: t('confirmed'), style: 'bg-leaf-tint text-leaf' }
-      : request.handOver === 'SUBMITTED'
-        ? { text: t('submitted'), style: 'bg-leaf-tint text-leaf' }
-        : request.hasRequirements && request.left > 0
-          ? { text: t('left', { count: request.left }), style: 'bg-honey-tint text-honey' }
-          : { text: t('underWay'), style: 'bg-ice-blue text-navy-deep' };
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-off-white px-4 py-3">
       <div className="min-w-0">
         <p className="font-semibold text-navy-deep">{name}</p>
         <p className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-slate">
           {t('for', { document: request.document })}
-          <span className={`${pill} ${state.style}`}>{state.text}</span>
+          <HandOverPill request={request} fallback={t('underWay')} />
         </p>
       </div>
       <Link

@@ -1428,7 +1428,7 @@
       "finances": "Finances",
       "reunions": "Meetings",
       "services": "Document services",
-      "services-en-cours": "Services"
+      "services-en-cours": "Services under way"
     },
     "viewSite": "View the site",
     "overview": {
@@ -4041,7 +4041,9 @@
       "due": "Due on {date}",
       "open": "Open",
       "openLabel": "Open {client}’s service",
-      "loading": "Loading the services under way"
+      "loading": "Loading the services under way",
+      "count": "{count, plural, one {# service} other {# services}}",
+      "for": "For “{document}”"
     }
   },
   "ClientForms": {

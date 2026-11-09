@@ -42,13 +42,16 @@ function fakeDatabase(status = 'REQUESTED', service = 'ACCOMPAGNEMENT') {
     account: { id: 'acc_1', name: 'Aminata Diallo', email: 'aminata@example.com', locale: 'fr' },
   };
   // The Dossier's photo has a Version: it covers the « Photo » prerequisite.
-  const documents = [{ id: 'doc_photo', kind: 'photo', title: 'Photo' }];
+  const documents = [{ id: 'doc_photo', kind: 'photo', title: 'Photo', section: { dossierId: 'dos_1' } }];
   const files: Row[] = [];
   let seq = 0;
   const db = {
     stanzyRequest: {
       findUnique: async ({ where }: { where: { id: string } }) => (where.id === request.id ? request : null),
-      findMany: async () => [{ id: request.id }],
+      // Whole rows, as the consultant's list reads them; the other lists only read the id.
+      findMany: async () => [
+        { ...request, files, document: { ...(request.document as Row), section: { dossierId: 'dos_1', dossier } } },
+      ],
       update: async ({ data }: { data: Row }) => Object.assign(request, data),
     },
     dossier: { findUnique: async ({ where }: { where: { id: string } }) => (where.id === dossier.id ? dossier : null) },

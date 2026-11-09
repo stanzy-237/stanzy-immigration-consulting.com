@@ -21,6 +21,19 @@ export const OPEN_STANZY = ['REQUESTED', 'ACCEPTED', 'ASSIGNED'] as const;
 /** `given`: handed over for the request; `inDossier`: covered by the Dossier's Checklist document; `missing`. */
 export type RequirementState = 'given' | 'inDossier' | 'missing';
 
+/** What a request carries for its hand-over, read alone or in a list. */
+export const REQUEST_FIELDS = {
+  id: true,
+  status: true,
+  answers: true,
+  startedOn: true,
+  createdAt: true,
+  submittedAt: true,
+  confirmedAt: true,
+  document: { select: { id: true, title: true, section: { select: { dossierId: true } } } },
+  service: { select: { slug: true, name: true, prerequisites: true, questionnaire: true, turnaroundDays: true } },
+} as const;
+
 /**
  * The request and its Dossier, for whoever may see what is handed over for
  * it: the Dossier's Client and the consultant (the Partner in charge of the
@@ -29,20 +42,7 @@ export type RequirementState = 'given' | 'inDossier' | 'missing';
  * the consultant confirmed what was handed over.
  */
 export async function requestFor(db: Db, session: CurrentSession, requestId: string) {
-  const request = await db.stanzyRequest.findUnique({
-    where: { id: requestId },
-    select: {
-      id: true,
-      status: true,
-      answers: true,
-      startedOn: true,
-      createdAt: true,
-      submittedAt: true,
-      confirmedAt: true,
-      document: { select: { id: true, title: true, section: { select: { dossierId: true } } } },
-      service: { select: { slug: true, name: true, prerequisites: true, questionnaire: true, turnaroundDays: true } },
-    },
-  });
+  const request = await db.stanzyRequest.findUnique({ where: { id: requestId }, select: REQUEST_FIELDS });
   if (!request) throw new TRPCError({ code: 'NOT_FOUND' });
   const dossier: DossierRow = await dossierFor(db, session, request.document.section.dossierId);
   const underWay = dossier.state === 'OPEN' && (OPEN_STANZY as readonly string[]).includes(request.status);
@@ -57,28 +57,26 @@ export async function editableRequest(db: Db, session: CurrentSession, requestId
   return found;
 }
 
-/** Everything handed over for a request, and what is still missing. */
-export async function requirementsOf(db: Db, found: Awaited<ReturnType<typeof requestFor>>) {
-  const { request, dossier } = found;
+type RequestRow = Pick<Awaited<ReturnType<typeof requestFor>>['request'], 'id' | 'answers' | 'service'>;
+type FileRow = { id: string; key: string; fileName: string; contentType: string; size: number; createdAt: Date };
+type CoveringDocument = { id: string; kind: string | null; title: string };
+
+/** The Checklist kinds a request's asked prerequisites could be covered by. */
+export function coverableKinds(request: RequestRow): string[] {
+  const asked = askedPrerequisites(prerequisitesOf(request.service?.prerequisites), answersOf(request.answers));
+  return asked.flatMap((item) => (item.kind ? [item.kind] : []));
+}
+
+/**
+ * Everything handed over for a request and what is still missing, from its
+ * files and its Dossier's Documents with a Version (`covered`): pure, so a
+ * list of requests reads its rows once.
+ */
+export function summarize(request: RequestRow, files: FileRow[], covered: CoveringDocument[]) {
   const prerequisites = prerequisitesOf(request.service?.prerequisites);
   const questionnaire = (request.service?.questionnaire ?? null) as Questionnaire | null;
   const answers = answersOf(request.answers);
-  const asked = askedPrerequisites(prerequisites, answers);
-  const kinds = asked.flatMap((item) => (item.kind ? [item.kind] : []));
-  const [files, covered] = await Promise.all([
-    db.requirementFile.findMany({
-      where: { requestId: request.id },
-      orderBy: { createdAt: 'asc' },
-      select: { id: true, key: true, fileName: true, contentType: true, size: true, createdAt: true },
-    }),
-    kinds.length > 0
-      ? db.dossierDocument.findMany({
-          where: { section: { dossierId: dossier.id }, kind: { in: kinds }, versions: { some: {} } },
-          select: { id: true, kind: true, title: true },
-        })
-      : Promise.resolve([]),
-  ]);
-  const items = asked.map((item) => {
+  const items = askedPrerequisites(prerequisites, answers).map((item) => {
     const own = files.filter((file) => file.key === item.key);
     const document = item.kind ? (covered.find((candidate) => candidate.kind === item.kind) ?? null) : null;
     const state: RequirementState = own.length > 0 ? 'given' : document ? 'inDossier' : 'missing';
@@ -92,6 +90,24 @@ export async function requirementsOf(db: Db, found: Awaited<ReturnType<typeof re
     questionsLeft: left,
     complete: left.length === 0 && items.every((item) => item.state !== 'missing'),
   };
+}
+
+export const FILE_FIELDS = { id: true, key: true, fileName: true, contentType: true, size: true, createdAt: true } as const;
+
+/** Everything handed over for a request, and what is still missing. */
+export async function requirementsOf(db: Db, found: Awaited<ReturnType<typeof requestFor>>) {
+  const { request, dossier } = found;
+  const kinds = coverableKinds(request);
+  const [files, covered] = await Promise.all([
+    db.requirementFile.findMany({ where: { requestId: request.id }, orderBy: { createdAt: 'asc' }, select: FILE_FIELDS }),
+    kinds.length > 0
+      ? db.dossierDocument.findMany({
+          where: { section: { dossierId: dossier.id }, kind: { in: kinds }, versions: { some: {} } },
+          select: { id: true, kind: true, title: true },
+        })
+      : Promise.resolve([]),
+  ]);
+  return summarize(request, files, covered);
 }
 
 /**

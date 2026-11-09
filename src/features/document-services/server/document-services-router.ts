@@ -16,11 +16,15 @@ import {
 import { prerequisitesOf, saveServiceInput, slugInput } from '@/features/document-services/lib/service-schema';
 import { ordersRouter } from '@/features/document-services/server/orders-router';
 import {
+  coverableKinds,
   editableRequest,
+  FILE_FIELDS,
   OPEN_STANZY,
   reopenIfIncomplete,
+  REQUEST_FIELDS,
   requestFor,
   requirementsOf,
+  summarize,
 } from '@/features/document-services/server/requirements';
 import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
 import { dossierFor, isConsultant } from '@/features/dossiers/server/dossier-access';
@@ -74,17 +78,18 @@ async function askable(db: Db, accountId: string, documentId: string) {
   return { id: document.id, title: document.title, kind: document.kind, dossierId: dossier.id };
 }
 
+type Summary = ReturnType<typeof summarize>;
+
 /** Where one request under way stands: what is left to hand over, the day it is due, its hand-over. */
-async function progressOf(db: Db, session: CurrentSession, requestId: string) {
-  const found = await requestFor(db, session, requestId);
-  const { request, dossier } = found;
-  const { items, questionsLeft, complete } = await requirementsOf(db, found);
-  const hasRequirements = items.length > 0 || request.service?.questionnaire !== null;
+function progressFrom(
+  request: Pick<Awaited<ReturnType<typeof requestFor>>['request'], 'id' | 'status' | 'service' | 'document' | 'startedOn' | 'submittedAt' | 'confirmedAt'>,
+  dossier: { id: string; client: string },
+  { items, questionsLeft, complete }: Summary,
+) {
   return {
     id: request.id,
     dossierId: dossier.id,
-    client: dossier.account.name,
-    createdAt: request.createdAt,
+    client: dossier.client,
     status: request.status,
     service: request.service ? { slug: request.service.slug, name: request.service.name } : null,
     document: request.document.title,
@@ -92,10 +97,15 @@ async function progressOf(db: Db, session: CurrentSession, requestId: string) {
     turnaroundDays: request.service?.turnaroundDays ?? null,
     dueOn: dueOn(request.startedOn, request.service?.turnaroundDays ?? null),
     left: items.filter((item) => item.state === 'missing').length + questionsLeft.length,
-    hasRequirements,
+    hasRequirements: items.length > 0 || request.service?.questionnaire !== null,
     complete,
     handOver: handOverOf(request),
   };
+}
+
+async function progressOf(db: Db, session: CurrentSession, requestId: string) {
+  const found = await requestFor(db, session, requestId);
+  return progressFrom(found.request, { id: found.dossier.id, client: found.dossier.account.name }, await requirementsOf(db, found));
 }
 
 /**
@@ -111,6 +121,8 @@ export const documentServicesRouter = createTRPCRouter({
      * for a service, in every open Dossier, oldest first, and where it stands.
      */
     underWay: consultantProcedure.query(async ({ ctx }) => {
+      // Three reads whatever the count: the requests with their files, then the Dossiers'
+      // Documents that cover a prerequisite.
       const requests = await ctx.prisma.stanzyRequest.findMany({
         where: {
           status: { in: [...OPEN_STANZY] },
@@ -118,9 +130,39 @@ export const documentServicesRouter = createTRPCRouter({
           document: { section: { dossier: { state: 'OPEN' } } },
         },
         orderBy: { createdAt: 'asc' },
-        select: { id: true },
+        select: {
+          ...REQUEST_FIELDS,
+          document: {
+            select: {
+              id: true,
+              title: true,
+              section: { select: { dossierId: true, dossier: { select: { account: { select: { name: true } } } } } },
+            },
+          },
+          files: { orderBy: { createdAt: 'asc' }, select: FILE_FIELDS },
+        },
       });
-      return Promise.all(requests.map(({ id }) => progressOf(ctx.prisma, ctx.session, id)));
+      const kinds = [...new Set(requests.flatMap(coverableKinds))];
+      const covering =
+        kinds.length > 0
+          ? await ctx.prisma.dossierDocument.findMany({
+              where: {
+                section: { dossierId: { in: [...new Set(requests.map((request) => request.document.section.dossierId))] } },
+                kind: { in: kinds },
+                versions: { some: {} },
+              },
+              select: { id: true, kind: true, title: true, section: { select: { dossierId: true } } },
+            })
+          : [];
+      return requests.map((request) => {
+        const { dossierId } = request.document.section;
+        const covered = covering.filter((document) => document.section.dossierId === dossierId);
+        return progressFrom(
+          request,
+          { id: dossierId, client: request.document.section.dossier.account.name },
+          summarize(request, request.files, covered),
+        );
+      });
     }),
 
     /** Every service, in catalogue order, with how many requests each has had. */

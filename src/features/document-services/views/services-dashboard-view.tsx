@@ -13,7 +13,6 @@ import { toast } from '@/components/ui/toast';
 import { ServicePrice } from '@/features/document-services/components/service-parts';
 import { STARTER_SERVICES } from '@/features/document-services/data/starter-services';
 import { textIn } from '@/features/document-services/lib/service-schema';
-import { ServiceOrdersView } from '@/features/document-services/views/service-orders-view';
 import { useTRPC } from '@/trpc/client';
 
 /**
@@ -22,7 +21,7 @@ import { useTRPC } from '@/trpc/client';
  * with its price. The starting services can be added in one click, inactive
  * and unpriced, for the consultant to price before turning them on. Each
  * active one has a private link to send on WhatsApp to someone who wants it
- * alone; their orders wait above the catalogue.
+ * alone; their orders wait in « Services en cours » (Clients).
  */
 export function ServicesDashboardView(): ReactNode {
   const t = useTranslations('DocumentServices.dashboard');
@@ -41,7 +40,6 @@ export function ServicesDashboardView(): ReactNode {
           {t('new')}
         </Link>
       </div>
-      <ServiceOrdersView />
       <QueryBoundary fallback={<CatalogueSkeleton />}>
         <Catalogue />
       </QueryBoundary>
