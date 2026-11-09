@@ -142,25 +142,25 @@ About 3 weeks after the Client is drawn from the Express Entry pool. The procedu
 - Any further service not mentioned in this contract is quoted separately.`,
 });
 
-const PROOF_OF_FUNDS_TURNAROUND = { fr: 'Environ 3 semaines après l’extraction du bassin', en: 'About 3 weeks after the draw from the pool' };
+const PROOF_OF_FUNDS_TURNAROUND = { fr: 'Environ 3 semaines après le démarrage de la procédure', en: 'About 3 weeks once the procedure starts' };
 
 export const STARTER_SERVICES: StarterService[] = [
   {
     slug: 'preuve-de-fonds',
     name: { fr: 'Preuve de fonds (vous avez les fonds)', en: 'Proof of funds (you have the funds)' },
     summary: {
-      fr: 'Vous avez déjà la totalité des fonds : Stanzy constitue une preuve de fonds conforme aux exigences d’IRCC, sur un compte en microfinance puis un compte dans la banque de votre choix.',
-      en: 'You already have all the funds: Stanzy builds a proof of funds meeting IRCC’s requirements, on a microfinance account then an account at the bank of your choice.',
+      fr: 'Vous disposez déjà des fonds requis pour votre demande de résidence permanente au Canada ? Stanzy structure votre preuve de fonds : un dépôt initial en microfinance, suivi d’un transfert vers le compte bancaire de votre choix. Dites adieu aux risques de refus liés à la transférabilité des fonds !\n\nNous constituons avec vous un dossier complet de preuve de fonds :\n• les justificatifs bancaires nécessaires ;\n• la traçabilité et la justification de la source des fonds ;\n• la cohérence des mouvements financiers ;\n• une documentation structurée, conforme aux exigences d’IRCC.\n\nAvec Stanzy, votre preuve de fonds ne se limite pas à un solde bancaire : elle repose sur un dossier documenté et cohérent.',
+      en: 'You already have the funds required for your Canadian permanent residence application? Stanzy structures your proof of funds: an initial deposit in microfinance, followed by a transfer to the bank account of your choice. Say goodbye to refusals over the transferability of funds!\n\nWe build a complete proof of funds file with you:\n• the bank documents required;\n• the traceability and justification of the source of funds;\n• consistent financial movements;\n• structured documentation that meets IRCC’s requirements.\n\nWith Stanzy, your proof of funds is more than a bank balance: it rests on a documented, consistent file.',
     },
     provides: {
-      fr: 'Le nom de votre banque, vos relevés des 6 derniers mois et la taille de votre famille.',
-      en: 'Your bank’s name, your statements for the last 6 months and your family size.',
+      fr: 'Votre pièce d’identité, la taille de votre famille, la date prévue de votre profil ou de votre ITA, et la banque vers laquelle transférer les fonds.',
+      en: 'Your ID, your family size, the expected date of your profile or ITA, and the bank to transfer the funds to.',
     },
     turnaround: PROOF_OF_FUNDS_TURNAROUND,
     turnaroundDays: 21,
     conditions: {
-      fr: 'La procédure débute uniquement après votre extraction du bassin. Les fonds doivent être à votre nom et disponibles ; le montant à justifier suit le barème d’IRCC pour la taille de votre famille. Les honoraires sont un pourcentage de ce montant.',
-      en: 'The procedure only starts once you are drawn from the pool. The funds must be in your name and available; the amount to justify follows IRCC’s table for your family size. The fee is a percentage of that amount.',
+      fr: 'La procédure débute uniquement après le versement des honoraires. Ces honoraires, un pourcentage du montant à justifier, couvrent tout le processus de constitution et de sécurisation de la preuve de fonds. Les fonds doivent être à votre nom et disponibles.',
+      en: 'The procedure only starts once the fee is paid. The fee, a percentage of the amount to justify, covers the whole process of building and securing the proof of funds. The funds must be in your name and available.',
     },
     contractTitle: { fr: 'Contrat de service : preuve de fonds', en: 'Service contract: proof of funds' },
     contractBody: (({ fr, en }) => contract(fr, en))(
@@ -179,8 +179,8 @@ export const STARTER_SERVICES: StarterService[] = [
     slug: 'preuve-de-fonds-sans-fonds',
     name: { fr: 'Preuve de fonds (vous n’avez pas les fonds)', en: 'Proof of funds (you don’t have the funds)' },
     summary: {
-      fr: 'Vous n’avez pas les fonds requis : Stanzy les met à disposition et constitue une preuve de fonds conforme aux exigences d’IRCC, sur un compte en microfinance puis un compte UBA.',
-      en: 'You don’t have the required funds: Stanzy provides them and builds a proof of funds meeting IRCC’s requirements, on a microfinance account then a UBA account.',
+      fr: 'Vous ne disposez pas des fonds requis pour votre demande de résidence permanente au Canada ? Stanzy les met à votre disposition, avec une preuve de fonds structurée : un dépôt initial en microfinance, suivi d’un transfert bancaire vers un compte UBA. Dites adieu aux risques de refus liés à la transférabilité des fonds !\n\nNous constituons avec vous un dossier complet de preuve de fonds :\n• les justificatifs bancaires nécessaires ;\n• la traçabilité et la justification de la source des fonds ;\n• la cohérence des mouvements financiers ;\n• une documentation structurée, conforme aux exigences d’IRCC.\n\nAvec Stanzy, votre preuve de fonds ne se limite pas à un solde bancaire : elle repose sur un dossier documenté et cohérent.',
+      en: 'You don’t have the funds required for your Canadian permanent residence application? Stanzy provides them, with a structured proof of funds: an initial deposit in microfinance, followed by a bank transfer to a UBA account. Say goodbye to refusals over the transferability of funds!\n\nWe build a complete proof of funds file with you:\n• the bank documents required;\n• the traceability and justification of the source of funds;\n• consistent financial movements;\n• structured documentation that meets IRCC’s requirements.\n\nWith Stanzy, your proof of funds is more than a bank balance: it rests on a documented, consistent file.',
     },
     provides: {
       fr: 'Votre pièce d’identité, la taille de votre famille et la date prévue de votre profil ou de votre ITA.',
@@ -189,8 +189,8 @@ export const STARTER_SERVICES: StarterService[] = [
     turnaround: PROOF_OF_FUNDS_TURNAROUND,
     turnaroundDays: 21,
     conditions: {
-      fr: 'La procédure débute uniquement après votre extraction du bassin. Les honoraires, un pourcentage du montant à justifier, comprennent la mise à disposition des fonds et tout le processus de constitution et de sécurisation de la preuve. Si vous avez déjà un compte UBA, il doit être fermé : un nouveau est ouvert.',
-      en: 'The procedure only starts once you are drawn from the pool. The fee, a percentage of the amount to justify, covers providing the funds and the whole process of building and securing the proof. If you already have a UBA account, it must be closed: a new one is opened.',
+      fr: 'La procédure débute uniquement après le versement des honoraires. Ces honoraires, un pourcentage du montant à justifier, comprennent la mise à disposition des fonds ainsi que tout le processus de constitution et de sécurisation de la preuve de fonds. Si vous avez déjà un compte UBA, il doit être fermé : un nouveau compte est ouvert à votre nom.',
+      en: 'The procedure only starts once the fee is paid. The fee, a percentage of the amount to justify, covers providing the funds and the whole process of building and securing the proof of funds. If you already have a UBA account, it must be closed: a new account is opened in your name.',
     },
     contractTitle: { fr: 'Contrat de service : preuve de fonds (montage)', en: 'Service contract: proof of funds (arranged)' },
     contractBody: (({ fr, en }) => contract(fr, en))(
