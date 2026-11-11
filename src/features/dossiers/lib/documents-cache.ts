@@ -21,7 +21,10 @@ const mapDocument = (data: SectionsData, documentId: string, change: (document: 
 
 export const withSection = (data: SectionsData, input: { title: string }): SectionsData => ({
   ...data,
-  sections: [...data.sections, { id: optimisticId(), title: input.title.trim(), titles: null, documents: [] }],
+  sections: [
+    ...data.sections,
+    { id: optimisticId(), title: input.title.trim(), titles: null, concerns: null, concernsUpdatedAt: null, documents: [] },
+  ],
 });
 
 export const renamedSection = (data: SectionsData, input: { id: string; title: string }): SectionsData => ({
@@ -30,6 +33,17 @@ export const renamedSection = (data: SectionsData, input: { id: string; title: s
     section.id === input.id ? { ...section, title: input.title.trim(), titles: null } : section,
   ),
 });
+
+/** The Client's concerns about a Section (#149), as they saved them. */
+export const withConcerns = (data: SectionsData, input: { id: string; concerns: string }): SectionsData => {
+  const concerns = input.concerns.trim() || null;
+  return {
+    ...data,
+    sections: data.sections.map((section) =>
+      section.id === input.id ? { ...section, concerns, concernsUpdatedAt: concerns ? new Date() : null } : section,
+    ),
+  };
+};
 
 export const withoutSection = (data: SectionsData, input: { id: string }): SectionsData => ({
   ...data,

@@ -2036,7 +2036,9 @@
         "DOCUMENT_FILE_TOO_LARGE": "This file is over 25 MB.",
         "DOCUMENT_FILE_INVALID": "The file didn’t arrive properly. Try again.",
         "UNKNOWN": "The change couldn’t be saved. Try again.",
-        "COMMENT_NOT_YOURS": "You can only change your own messages."
+        "COMMENT_NOT_YOURS": "You can only change your own messages.",
+        "CONCERNS_CLIENT_ONLY": "Only the Client writes their concerns.",
+        "CONCERNS_NOT_OFFERED": "This file doesn't take concerns per section."
       },
       "conversation": {
         "title": "Conversation",
@@ -2066,6 +2068,21 @@
           "edited": "Message edited",
           "deleted": "Message deleted"
         }
+      },
+      "concerns": {
+        "title": "Your concerns about this section",
+        "titleConsultant": "Client's concerns",
+        "hint": "A possible error, a document that is a problem, a situation to explain… Note it here: Stanzy will use it to clarify your file, for instance in a letter of explanation.",
+        "add": "Add a concern",
+        "addLabel": "Add a concern about the section {section}",
+        "edit": "Edit",
+        "editLabel": "Edit your concerns about the section {section}",
+        "label": "Your concerns about the section {section}",
+        "save": "Save",
+        "cancel": "Cancel",
+        "updatedOn": "Updated on {date}",
+        "saved": "Concerns saved",
+        "cleared": "Concerns cleared"
       }
     },
     "messages": {

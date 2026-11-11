@@ -32,15 +32,26 @@ const message = (id: string, parentId: string | null, author: typeof CLIENT | ty
   author,
 });
 
-const sections = (extra: { locked?: boolean; open?: boolean; viewer?: typeof CLIENT | typeof STANZY } = {}) => ({
+const sections = (
+  extra: {
+    locked?: boolean;
+    open?: boolean;
+    viewer?: typeof CLIENT | typeof STANZY;
+    concerns?: boolean;
+    sectionConcerns?: string | null;
+  } = {},
+) => ({
   viewer: CLIENT,
   open: true,
   locked: false,
+  concerns: false,
   ...extra,
   sections: [
     {
       id: 'sec_1',
       title: 'Diplômes – Requérant principal',
+      concerns: extra.sectionConcerns ?? null,
+      concernsUpdatedAt: extra.sectionConcerns ? new Date('2026-11-10T10:00:00Z') : null,
       documents: [
         {
           id: 'doc_1',
@@ -94,6 +105,7 @@ const api = vi.hoisted(() => ({
   comment: vi.fn(),
   editComment: vi.fn(),
   deleteComment: vi.fn(),
+  setSectionConcerns: vi.fn(),
 }));
 beforeEach(() => vi.resetAllMocks());
 
@@ -114,6 +126,7 @@ function documents(
     'dossiers.documents.comment': (input) => api.comment(input) ?? { id: 'com_9' },
     'dossiers.documents.editComment': (input) => api.editComment(input),
     'dossiers.documents.deleteComment': (input) => api.deleteComment(input),
+    'dossiers.documents.setSectionConcerns': (input) => api.setSectionConcerns(input),
   });
   queryClient.setQueryData(trpc.dossiers.documents.sections.queryKey({ dossierId: 'dos_1' }), data as never);
   return render(withIntl(wrap(<DossierDocuments dossierId="dos_1" viewer={viewer} focus={focus} />)));
@@ -367,5 +380,36 @@ describe('Demandes de signature on the documents', () => {
   it('offers no signing in a closed Dossier', () => {
     documents('client', { ...waitingData(CLIENT), open: false });
     expect(screen.queryByRole('link', { name: 'Signer' })).not.toBeInTheDocument();
+  });
+});
+
+describe('the Client’s concerns about a Section (#149)', () => {
+  it('lets the Client note them, shown at once', async () => {
+    api.setSectionConcerns.mockImplementation(silent);
+    const { container } = documents('client', sections({ concerns: true }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter une préoccupation sur la section Diplômes – Requérant principal' }));
+    fireEvent.change(screen.getByLabelText('Vos préoccupations sur la section Diplômes – Requérant principal'), {
+      target: { value: 'Mon relevé porte mon nom de jeune fille.' },
+    });
+    expect(await axe(container)).toHaveNoViolations();
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
+
+    await waitFor(() =>
+      expect(api.setSectionConcerns).toHaveBeenCalledWith({ id: 'sec_1', concerns: 'Mon relevé porte mon nom de jeune fille.' }),
+    );
+    expect(screen.getByText('Mon relevé porte mon nom de jeune fille.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Modifier vos préoccupations sur la section Diplômes – Requérant principal' })).toBeInTheDocument();
+  }, 30_000);
+
+  it('shows the consultant the Client’s concerns, without editing them', () => {
+    documents('consultant', sections({ viewer: STANZY, concerns: true, sectionConcerns: 'Date de diplôme incertaine.' }));
+    expect(screen.getByText('Préoccupations du Client')).toBeInTheDocument();
+    expect(screen.getByText('Date de diplôme incertaine.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /préoccupation/i })).not.toBeInTheDocument();
+  });
+
+  it('asks nothing outside an Accompagnement Dossier', () => {
+    documents('client', sections({ concerns: false }));
+    expect(screen.queryByRole('button', { name: /préoccupation/ })).not.toBeInTheDocument();
   });
 });

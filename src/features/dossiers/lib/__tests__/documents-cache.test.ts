@@ -31,11 +31,14 @@ const data = (comments: ReturnType<typeof comment>[] = []): SectionsData => ({
   open: true,
   locked: false,
   stanzy: false,
+  concerns: true,
   sections: [
     {
       id: 'sec_1',
       title: 'Diplômes',
       titles: null,
+      concerns: null,
+      concernsUpdatedAt: null,
       documents: [
         {
           id: 'doc_1',

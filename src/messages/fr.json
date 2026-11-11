@@ -2053,7 +2053,9 @@
         "DOCUMENT_FILE_TOO_LARGE": "Ce fichier dépasse 25 Mo.",
         "DOCUMENT_FILE_INVALID": "Le fichier n’a pas été reçu correctement. Réessayez.",
         "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez.",
-        "COMMENT_NOT_YOURS": "Vous ne pouvez modifier que vos propres messages."
+        "COMMENT_NOT_YOURS": "Vous ne pouvez modifier que vos propres messages.",
+        "CONCERNS_CLIENT_ONLY": "Seul le Client écrit ses préoccupations.",
+        "CONCERNS_NOT_OFFERED": "Ce dossier ne prend pas de préoccupations par section."
       },
       "conversation": {
         "title": "Échanges",
@@ -2083,6 +2085,21 @@
           "edited": "Message modifié",
           "deleted": "Message supprimé"
         }
+      },
+      "concerns": {
+        "title": "Vos préoccupations sur cette section",
+        "titleConsultant": "Préoccupations du Client",
+        "hint": "Une erreur possible, un document qui pose problème, une situation à expliquer… Notez-le ici : Stanzy s’en servira pour clarifier votre dossier, par exemple dans une lettre d’explication.",
+        "add": "Ajouter une préoccupation",
+        "addLabel": "Ajouter une préoccupation sur la section {section}",
+        "edit": "Modifier",
+        "editLabel": "Modifier vos préoccupations sur la section {section}",
+        "label": "Vos préoccupations sur la section {section}",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "updatedOn": "Mis à jour le {date}",
+        "saved": "Préoccupations enregistrées",
+        "cleared": "Préoccupations effacées"
       }
     },
     "messages": {

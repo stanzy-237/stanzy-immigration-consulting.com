@@ -117,6 +117,9 @@ The case file for a Client's engagement — what the consultant tracks and works
 **Section IRCC** (IRCC upload slot):
 One upload box of the IRCC portal within a Dossier (« Diplômes – Requérant principal », « Preuve de fonds »…). It holds several Documents and produces exactly one Fichier de soumission.
 
+**Préoccupations** (on a Section IRCC):
+In an Accompagnement Dossier, the Client's note on one Section IRCC: what they think may be an error or a problem for them there. Only the Client writes it; the consultant reads it. It is kept as input for a later letter of explanation (#149).
+
 **Document** (in a Dossier):
 One piece inside a Section IRCC (a diplôme, a relevé de notes, a rapport WES…), generated from the Checklist logic or added by the Client or the consultant. Has Versions and one conversation (« Échanges »): messages between the Client and the consultant, each with its replies, one level deep. **Manquant** when the Client doesn't have it yet.
 _Avoid_: "file" (a Document has several Versions).
