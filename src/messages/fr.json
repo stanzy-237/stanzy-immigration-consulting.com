@@ -2055,7 +2055,8 @@
         "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez.",
         "COMMENT_NOT_YOURS": "Vous ne pouvez modifier que vos propres messages.",
         "CONCERNS_CLIENT_ONLY": "Seul le Client écrit ses préoccupations.",
-        "CONCERNS_NOT_OFFERED": "Ce dossier ne prend pas de préoccupations par section."
+        "CONCERNS_NOT_OFFERED": "Ce dossier ne prend pas de préoccupations par section.",
+        "DOCUMENT_IS_FORM": "Ce document se remplit dans son formulaire : aucun fichier n’est attendu."
       },
       "conversation": {
         "title": "Échanges",
@@ -3997,7 +3998,7 @@
         "donation": "Les fonds sont-ils un don ?",
         "donor": "Le donateur",
         "ubaAccount": "Avez-vous déjà un compte UBA ?",
-        "salaryAccount": "Votre salaire est-il versé sur un compte bancaire ?",
+        "salaryAccount": "Aurez-vous besoin d’un compte salaire ?",
         "salaryAccounts": "Vos comptes de salaire"
       },
       "niuHint": "Il figure sur votre attestation d’immatriculation fiscale.",

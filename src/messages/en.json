@@ -2038,7 +2038,8 @@
         "UNKNOWN": "The change couldn’t be saved. Try again.",
         "COMMENT_NOT_YOURS": "You can only change your own messages.",
         "CONCERNS_CLIENT_ONLY": "Only the Client writes their concerns.",
-        "CONCERNS_NOT_OFFERED": "This file doesn't take concerns per section."
+        "CONCERNS_NOT_OFFERED": "This file doesn't take concerns per section.",
+        "DOCUMENT_IS_FORM": "This document is filled in on its form: no file is expected."
       },
       "conversation": {
         "title": "Conversation",
@@ -3980,7 +3981,7 @@
         "donation": "Are the funds a gift?",
         "donor": "The donor",
         "ubaAccount": "Do you already have a UBA account?",
-        "salaryAccount": "Is your salary paid into a bank account?",
+        "salaryAccount": "Will you need a salary account?",
         "salaryAccounts": "Your salary accounts"
       },
       "niuHint": "It is on your tax registration certificate.",

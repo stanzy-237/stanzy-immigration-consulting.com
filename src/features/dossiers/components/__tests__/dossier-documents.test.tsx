@@ -152,6 +152,24 @@ describe('DossierDocuments for the Client', () => {
     expect(await axe(container)).toHaveNoViolations();
   }, 30_000);
 
+  it('asks no file for a form Document: it is filled in on its form', () => {
+    const data = sections();
+    const form = {
+      ...data.sections[0]!.documents[0]!,
+      id: 'doc_form',
+      title: 'Historique personnel et adresses (10 ans)',
+      kind: 'personalHistory',
+      finalVersionId: null,
+      versions: [],
+      comments: [],
+      clientForm: null,
+    };
+    documents('client', { ...data, sections: [{ ...data.sections[0]!, documents: [form] }] });
+    fireEvent.click(screen.getByRole('button', { name: /^Historique personnel/ }));
+    expect(screen.queryByLabelText(/Téléverser une version/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Versions')).not.toBeInTheDocument();
+  });
+
   it('leaves adding Documents to Stanzy', () => {
     documents('client');
     expect(screen.queryByLabelText('Ajouter un document')).not.toBeInTheDocument();

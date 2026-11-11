@@ -104,7 +104,7 @@ describe('what the Client hands over for a service', () => {
     const form = screen.getByRole('heading', { name: 'Vos informations' }).closest('form')!;
     expect(within(form).queryByLabelText('Entreprise (compte 1)')).not.toBeInTheDocument();
     fireEvent.click(
-      within(screen.getByRole('radiogroup', { name: 'Votre salaire est-il versé sur un compte bancaire ?' })).getByLabelText('Oui'),
+      within(screen.getByRole('radiogroup', { name: 'Aurez-vous besoin d’un compte salaire ?' })).getByLabelText('Oui'),
     );
     fireEvent.change(within(form).getByLabelText('Entreprise (compte 1)'), { target: { value: 'Brasseries du Cameroun' } });
     fireEvent.change(within(form).getByLabelText('Début (compte 1)'), { target: { value: '2020-01-01' } });
