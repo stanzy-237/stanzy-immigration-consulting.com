@@ -2055,7 +2055,8 @@
         "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez.",
         "COMMENT_NOT_YOURS": "Vous ne pouvez modifier que vos propres messages.",
         "CONCERNS_CLIENT_ONLY": "Seul le Client écrit ses préoccupations.",
-        "CONCERNS_NOT_OFFERED": "Ce dossier ne prend pas de préoccupations par section."
+        "CONCERNS_NOT_OFFERED": "Ce dossier ne prend pas de préoccupations par section.",
+        "DOCUMENT_IS_FORM": "Ce document se remplit dans son formulaire : aucun fichier n’est attendu."
       },
       "conversation": {
         "title": "Échanges",
@@ -3144,10 +3145,11 @@
       "steps": {
         "situation": "Votre situation",
         "progress": "Où vous en êtes",
+        "work": "Contact et expériences",
         "crs": "Votre score CRS",
         "documents": "Vos documents"
       },
-      "stepOf": "Étape {step} sur 4 : {name}",
+      "stepOf": "Étape {step} sur 5 : {name}",
       "next": "Continuer",
       "back": "Retour",
       "submit": "Envoyer ma demande",
@@ -3195,7 +3197,20 @@
       "note": "Note sur « {area} » (facultatif)",
       "notePlaceholder": "Ce qui vous inquiète, ce qui manque…",
       "crsIntro": "Les questions du Calculateur CRS, déjà remplies si vous avez enregistré une simulation. Votre score se met à jour à chaque réponse.",
-      "crsLive": "Votre score CRS"
+      "crsLive": "Votre score CRS",
+      "work": {
+        "intro": "Votre numéro de téléphone, puis chaque emploi déclaré à l’étape 1 : l’entreprise, le code CNP et les dates. IRCC les demande tels quels.",
+        "phone": "Numéro de téléphone (WhatsApp de préférence)",
+        "company": "Nom de l’entreprise",
+        "cnp": "Code CNP (5 chiffres)",
+        "cnpHint": "Trouvez le code de votre poste sur le site officiel de la CNP.",
+        "cnpLink": "Chercher un code CNP (site du gouvernement du Canada)",
+        "startOn": "Début",
+        "endOn": "Fin",
+        "current": "J’y travaille encore",
+        "noJobs": "Aucun emploi déclaré à l’étape 1.",
+        "invalid": "Vérifiez les champs signalés : un téléphone, et pour chaque emploi l’entreprise, un code CNP à 5 chiffres et des dates (la fin après le début)."
+      }
     },
     "status": {
       "title": "Accompagnement Entrée Express",
@@ -3269,7 +3284,25 @@
       "invoice": "Créer la facture",
       "next": "D’abord le contrat d’accompagnement : le Client le signe en ligne. Ensuite, la facture (le montant est votre devis).",
       "decision": "Votre décision",
-      "crs": "Score CRS"
+      "crs": "Score CRS",
+      "work": "Contact et expériences",
+      "current": "en cours",
+      "period": "{start} → {end}",
+      "cnp": "CNP {code}",
+      "edit": {
+        "editLabel": "Modifier : {field}",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "saved": "Réponse corrigée",
+        "editedOn": "Réponses corrigées par {name} le {date}",
+        "client": "Déclaré par le Client : {value}",
+        "notFilled": "Non renseigné",
+        "invalid": "Vérifiez la valeur saisie.",
+        "add": "Ajouter",
+        "remove": "Retirer {item}",
+        "item": "{field} {n}",
+        "approvedHint": "Le dossier est déjà ouvert : corriger ces réponses ne change pas ses sections et documents."
+      }
     },
     "document": {
       "mandatory": "★ Obligatoire",
@@ -3348,7 +3381,8 @@
       "STANZY_DOCUMENT_FINAL": "Ce document a déjà sa version finale.",
       "SERVICE_UNAVAILABLE": "Ce service n’est plus proposé.",
       "STANZY_NO_SERVICE": "Choisissez d’abord le service documentaire.",
-      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et votre cachet (Signatures)."
+      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et votre cachet (Signatures).",
+      "INTEREST_NOT_EDITABLE": "Une demande refusée ne se modifie plus."
     },
     "overview": {
       "crs": "Score CRS de la demande",
@@ -3978,7 +4012,9 @@
         "contacts": "Personnes à contacter en cas d’urgence",
         "donation": "Les fonds sont-ils un don ?",
         "donor": "Le donateur",
-        "ubaAccount": "Avez-vous déjà un compte UBA ?"
+        "ubaAccount": "Avez-vous déjà un compte UBA ?",
+        "salaryAccount": "Aurez-vous besoin d’un compte salaire ?",
+        "salaryAccounts": "Vos comptes de salaire"
       },
       "niuHint": "Il figure sur votre attestation d’immatriculation fiscale.",
       "name": "Nom complet",
@@ -4045,6 +4081,16 @@
         "confirming": "Confirmation…",
         "confirmedToast": "Pièces confirmées",
         "confirmedNote": "Pièces confirmées : le client ne peut plus les modifier."
+      },
+      "salary": {
+        "hint": "Pour chaque employeur qui vous verse un salaire sur un compte : son nom et la période.",
+        "company": "Entreprise (compte {n})",
+        "startOn": "Début (compte {n})",
+        "endOn": "Fin (compte {n})",
+        "add": "Ajouter un compte de salaire",
+        "remove": "Retirer le compte de salaire {n}",
+        "currentShort": "Toujours en cours",
+        "account": "compte {n}"
       }
     },
     "offer": {

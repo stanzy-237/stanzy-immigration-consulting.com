@@ -178,6 +178,10 @@ const areas = Object.fromEntries(AREAS.map((area) => [area, { answer: 'have', no
 const answers = (extra: Partial<InterestInput> = {}): InterestInput => ({
   checklist: { ...DEFAULT_CHECKLIST_FORM, jobs: [{ title: 'Comptable', inCanada: false, selfEmployed: false }], countries: ['Cameroun'] },
   progress: { ...DEFAULT_PROGRESS, citizenship: 'Camerounaise', languageTest: 'tcf', ede: true },
+  work: {
+    phone: '+237 692 24 53 94',
+    experiences: [{ title: 'Comptable', company: 'Brasseries du Cameroun', cnp: '11100', startOn: '2019-03-01', endOn: null }],
+  },
   areas,
   crs: toProfile(DEFAULT_FORM),
   ...extra,
@@ -267,6 +271,74 @@ describe('the Demande d’intérêt', () => {
       expect.objectContaining({ to: 'aminata@example.com', text: expect.stringContaining('Motif : Profil trop jeune') }),
     );
     await expect(callerFor(db, user()).accompagnement.submit(answers())).resolves.toMatchObject({ id: expect.any(String) });
+  });
+
+  it('lets the consultant correct the declarations before deciding, keeping the Client’s own (#154)', async () => {
+    const { db, interests, documents } = fakeDatabase();
+    const { id } = await callerFor(db, user()).accompagnement.submit(answers());
+    const submitted = interests[0]!.answers as InterestAnswers;
+    expect(interests[0]).toMatchObject({ level: 'B' });
+
+    // The Client is in fact in the pool, married with their spouse coming, and lives in Canada.
+    const corrected = answers({
+      checklist: { ...answers().checklist, maritalStatus: 'married', spouseAccompanying: true },
+      progress: { ...answers().progress, residence: 'CA', eeProfile: true },
+    });
+    await callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: corrected });
+    expect(interests[0]).toMatchObject({
+      level: 'C',
+      residence: 'CA',
+      originalAnswers: submitted,
+      answersEditedById: 'acc_stanzy',
+      answersEditedAt: expect.any(Date),
+    });
+    expect((interests[0]!.answers as InterestAnswers).crs).toMatchObject({ total: expect.any(Number) });
+
+    // A second correction keeps the Client's first answers.
+    await callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: corrected });
+    expect(interests[0]!.originalAnswers).toEqual(submitted);
+
+    // Approval builds the Dossier from the corrected answers: the spouse has their own Sections.
+    await callerFor(db, consultant).accompagnement.dashboard.approve({ id, level: 'C' });
+    expect(documents.filter((d) => d.kind === 'personalHistory')).toHaveLength(2);
+
+    // Still correctable once accepted: the answers and the residence, not the Niveau decided nor the Dossier's Sections.
+    const later = answers({ progress: { ...answers().progress, residence: 'CM', citizenship: 'Ivoirienne' } });
+    await callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: later });
+    expect(interests[0]).toMatchObject({ status: 'APPROVED', level: 'C', levelOverride: null, residence: 'CM', originalAnswers: submitted });
+    expect((interests[0]!.answers as InterestAnswers).progress.citizenship).toBe('Ivoirienne');
+    expect(documents.filter((d) => d.kind === 'personalHistory')).toHaveLength(2);
+  });
+
+  it('corrects a Demande sent before the CRS and work steps, filling in one job without a phone', async () => {
+    const { db, interests } = fakeDatabase();
+    const { id } = await callerFor(db, user()).accompagnement.submit(answers());
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- left out, as such a Demande has neither
+    const { crs, work, ...older } = answers();
+    interests[0]!.answers = older;
+    const job = { title: 'Comptable', company: 'Brasseries du Cameroun', cnp: '11100', startOn: '2019-03-01', endOn: null };
+    await callerFor(db, consultant).accompagnement.dashboard.updateAnswers({
+      id,
+      answers: { ...older, work: { phone: '', experiences: [job] } },
+    });
+    expect(interests[0]!.answers).toEqual({ ...older, work: { phone: '', experiences: [job] } });
+  });
+
+  it('leaves a refused Demande as it was', async () => {
+    const { db } = fakeDatabase();
+    const { id } = await callerFor(db, user()).accompagnement.submit(answers());
+    await callerFor(db, consultant).accompagnement.dashboard.reject({ id, reason: 'Profil trop jeune' });
+    await expect(
+      callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: answers() }),
+    ).rejects.toMatchObject({ message: 'INTEREST_NOT_EDITABLE' });
+  });
+
+  it('leaves the declarations to the consultant to correct', async () => {
+    const { db } = fakeDatabase();
+    const { id } = await callerFor(db, user()).accompagnement.submit(answers());
+    await expect(
+      callerFor(db, user()).accompagnement.dashboard.updateAnswers({ id, answers: answers() }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 
   it('is decided by the consultant only', async () => {

@@ -19,7 +19,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
-import { AREAS, LEVELS, REASON_MAX, startStageOf, type Level } from '@/features/accompagnement/lib/interest-schema';
+import { InterestAnswers } from '@/features/accompagnement/components/interest-answers';
+import { LEVELS, REASON_MAX, startStageOf, type Level } from '@/features/accompagnement/lib/interest-schema';
 import { STATUS_STYLES } from '@/features/accompagnement/views/interests-dashboard-view';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
@@ -52,6 +53,9 @@ function Detail({ id }: { id: string }): ReactNode {
   const { data: interest } = useSuspenseQuery(trpc.accompagnement.dashboard.get.queryOptions({ id }));
   const date = (value: Date) => format.dateTime(value, { day: 'numeric', month: 'long', year: 'numeric' });
   const level = interest.levelOverride ?? interest.level;
+  const pending = interest.status === 'SUBMITTED';
+  // Correctable before the decision and once accepted (#154); a refused Demande stays as it was.
+  const editable = interest.status !== 'REJECTED';
 
   return (
     <>
@@ -78,10 +82,22 @@ function Detail({ id }: { id: string }): ReactNode {
         ) : null}
       </div>
 
-      {interest.status === 'SUBMITTED' ? <Decision interest={interest} /> : null}
+      {/* Keyed by the Niveau: a correction that changes it starts the choice again from it. */}
+      {pending ? <Decision key={interest.level} interest={interest} /> : null}
       {interest.status === 'APPROVED' && interest.dossierId ? <Approved dossierId={interest.dossierId} /> : null}
 
-      <Answers interest={interest} />
+      {interest.answersEditedAt ? (
+        <p className="text-sm text-slate">
+          {t('dashboard.edit.editedOn', {
+            date: date(interest.answersEditedAt),
+            name: interest.answersEditedBy?.name ?? 'Stanzy',
+          })}
+        </p>
+      ) : null}
+      {editable && !pending ? (
+        <p className="rounded-xl bg-honey-tint px-4 py-3 text-sm text-navy-deep">{t('dashboard.edit.approvedHint')}</p>
+      ) : null}
+      <InterestAnswers interest={interest} editable={editable} />
 
       {interest.history.length > 0 ? (
         <section aria-labelledby="interest-history" className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
@@ -246,89 +262,6 @@ function Approved({ dossierId }: { dossierId: string }): ReactNode {
         </Link>
       </div>
     </div>
-  );
-}
-
-/** What they answered: situation, where they stand, and each document area with its note. */
-function Answers({ interest }: { interest: Interest }): ReactNode {
-  const t = useTranslations('Accompagnement');
-  const family = useTranslations('Calculators.family');
-  const { checklist, progress, areas } = interest.answers;
-  const yes = (value: boolean) => (value ? t('dashboard.yes') : t('dashboard.no'));
-  const residence =
-    progress.residence === 'OTHER' ? progress.residenceOther : t(`form.residences.${progress.residence}`);
-  const rows = (entries: [string, string][]) => (
-    <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-      {entries.map(([term, value]) => (
-        <div key={term}>
-          <dt className="text-xs font-semibold text-slate">{term}</dt>
-          <dd className="text-navy-deep">{value}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-  const section = (key: string, title: string, body: ReactNode) => (
-    <section aria-labelledby={`interest-${key}`} className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
-      <h2 id={`interest-${key}`} className="mb-3 font-heading text-lg font-bold text-navy-deep">
-        {title}
-      </h2>
-      {body}
-    </section>
-  );
-
-  return (
-    <>
-      {section(
-        'progress',
-        t('dashboard.progress'),
-        rows([
-          [t('form.age'), String(progress.age)],
-          [t('form.citizenship'), progress.citizenship],
-          [t('form.residence'), residence],
-          [t('form.languageTest'), t(`form.languageTests.${progress.languageTest}`)],
-          [t('form.ede'), yes(progress.ede)],
-          [t('form.eeProfile'), yes(progress.eeProfile)],
-          [t('form.ita'), progress.ita ? `${yes(true)}${progress.itaDate ? ` · ${progress.itaDate}` : ''}` : yes(false)],
-          ...(interest.answers.crs ? [[t('dashboard.crs'), String(interest.answers.crs.total)] as [string, string]] : []),
-        ]),
-      )}
-      {section(
-        'situation',
-        t('dashboard.situation'),
-        rows([
-          [t('dashboard.maritalStatus'), family(`maritalOptions.${checklist.maritalStatus}`)],
-          [t('dashboard.spouseAccompanying'), yes(checklist.spouseAccompanying)],
-          [t('dashboard.children'), String(checklist.children)],
-          [t('dashboard.foreignEducation'), yes(checklist.foreignEducation)],
-          [t('dashboard.canadianEducation'), yes(checklist.canadianEducation)],
-          [t('dashboard.jobs'), checklist.jobs.map((job) => job.title).join(', ')],
-          [t('dashboard.countries'), checklist.countries.join(', ')],
-        ]),
-      )}
-      {section(
-        'documents',
-        t('dashboard.documents'),
-        <ul className="grid grid-cols-1 gap-3">
-          {AREAS.map((area) => (
-            <li key={area} className="text-sm">
-              <p className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-navy-deep">{t(`form.areas.${area}`)}</span>
-                <span
-                  className={
-                    areas[area].answer === 'have'
-                      ? 'rounded-full bg-leaf-tint px-2 py-0.5 text-xs font-semibold text-leaf'
-                      : 'rounded-full bg-honey-tint px-2 py-0.5 text-xs font-semibold text-honey'
-                  }
-                >
-                  {t(`form.answers.${areas[area].answer}`)}
-                </span>
-              </p>
-              {areas[area].note ? <p className="mt-0.5 text-slate">{areas[area].note}</p> : null}
-            </li>
-          ))}
-        </ul>,
-      )}
-    </>
   );
 }
 
