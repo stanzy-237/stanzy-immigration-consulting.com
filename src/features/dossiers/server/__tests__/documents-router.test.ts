@@ -42,10 +42,12 @@ function fakeDatabase() {
     dossier: [
       { id: 'dos_1', accountId: 'acc_1', service: 'ACCOMPAGNEMENT', stage: 'ita', state: 'OPEN' },
       { id: 'dos_closed', accountId: 'acc_1', service: 'EDE', stage: 'compte', state: 'CLOSED' },
+      { id: 'dos_ede', accountId: 'acc_1', service: 'EDE', stage: 'compte', state: 'OPEN' },
     ],
     dossierSection: [
       { id: 'sec_1', dossierId: 'dos_1', title: 'Diplômes – Requérant principal', position: 1 },
       { id: 'sec_closed', dossierId: 'dos_closed', title: 'Diplômes', position: 1 },
+      { id: 'sec_ede', dossierId: 'dos_ede', title: 'Diplômes', position: 1 },
     ],
     dossierDocument: [
       { id: 'doc_closed', sectionId: 'sec_closed', title: 'Licence', addedById: 'acc_1', finalVersionId: null },
@@ -240,6 +242,37 @@ describe('the Client’s documents', () => {
     await expect(as(asAminata).comment({ documentId: 'doc_closed', body: 'Bonjour' })).rejects.toMatchObject({
       message: 'DOSSIER_CLOSED',
     });
+  });
+});
+
+describe('the Client’s concerns about a Section (#149)', () => {
+  it('lets the Client write them, and the consultant read them', async () => {
+    await as(asAminata).setSectionConcerns({ id: 'sec_1', concerns: '  Mon diplôme porte mon nom de jeune fille.  ' });
+    const seen = await as(asConsultant).sections({ dossierId: 'dos_1' });
+    expect(seen.concerns).toBe(true);
+    expect(seen.sections[0]).toMatchObject({
+      concerns: 'Mon diplôme porte mon nom de jeune fille.',
+      concernsUpdatedAt: expect.any(Date),
+    });
+
+    await as(asAminata).setSectionConcerns({ id: 'sec_1', concerns: '   ' });
+    expect((await as(asAminata).sections({ dossierId: 'dos_1' })).sections[0]).toMatchObject({ concerns: null });
+  });
+
+  it('keeps them the Client’s own, on an open Accompagnement Dossier', async () => {
+    await expect(as(asConsultant).setSectionConcerns({ id: 'sec_1', concerns: 'x' })).rejects.toMatchObject({
+      message: 'CONCERNS_CLIENT_ONLY',
+    });
+    await expect(as(asBob).setSectionConcerns({ id: 'sec_1', concerns: 'x' })).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
+    await expect(as(asAminata).setSectionConcerns({ id: 'sec_closed', concerns: 'x' })).rejects.toMatchObject({
+      message: 'DOSSIER_CLOSED',
+    });
+    await expect(as(asAminata).setSectionConcerns({ id: 'sec_ede', concerns: 'x' })).rejects.toMatchObject({
+      message: 'CONCERNS_NOT_OFFERED',
+    });
+    expect((await as(asAminata).sections({ dossierId: 'dos_ede' })).concerns).toBe(false);
   });
 });
 

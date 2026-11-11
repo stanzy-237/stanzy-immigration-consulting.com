@@ -447,15 +447,19 @@ model DossierEvent {
 
 /// A Section IRCC: one of the portal's upload boxes (« Diplômes – Requérant principal »), grouping Documents.
 model DossierSection {
-  id        String            @id @default(cuid())
-  dossierId String
-  dossier   Dossier           @relation(fields: [dossierId], references: [id], onDelete: Cascade)
-  title     String
+  id                String            @id @default(cuid())
+  dossierId         String
+  dossier           Dossier           @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  title             String
   /// `{ fr, en }`, when made from the Checklist (#81): shown in the viewer's language. A rename clears it.
-  titles    Json?
-  position  Int
-  documents DossierDocument[]
-  createdAt DateTime          @default(now())
+  titles            Json?
+  position          Int
+  documents         DossierDocument[]
+  /// The Client's concerns about this Section (#149): what may be wrong or a problem for them there.
+  /// For a later letter of explanation; Accompagnement Dossiers only.
+  concerns          String?
+  concernsUpdatedAt DateTime?
+  createdAt         DateTime          @default(now())
 
   @@index([dossierId, position])
   @@map("dossier_section")

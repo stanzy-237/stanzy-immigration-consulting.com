@@ -16,6 +16,7 @@ import {
   dossierFilePrefix,
   dossierRefInput,
   renameSectionInput,
+  sectionConcernsInput,
   setFinalInput,
 } from '@/features/dossiers/lib/document-schema';
 import { excerptOf } from '@/features/dossiers/lib/dossier-emails';
@@ -31,6 +32,9 @@ import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
 
 const byId = z.object({ id: z.string().min(1) });
+
+/** Sections take the Client's concerns in an Accompagnement Dossier (#149). */
+const concernsOffered = (service: string): boolean => service === 'ACCOMPAGNEMENT';
 const refuse = (message: string): TRPCError => new TRPCError({ code: 'BAD_REQUEST', message });
 const notFound = (): TRPCError => new TRPCError({ code: 'NOT_FOUND' });
 
@@ -66,6 +70,8 @@ export const documentsRouter = createTRPCRouter({
         id: true,
         title: true,
         titles: true,
+        concerns: true,
+        concernsUpdatedAt: true,
         documents: {
           orderBy: { createdAt: 'asc' },
           select: {
@@ -127,6 +133,8 @@ export const documentsRouter = createTRPCRouter({
       locked: finalesLocked(dossier.service, dossier.stage),
       /** The Client may ask « Stanzy s'en charge » on a missing Document: in Cameroon only. */
       stanzy: !isConsultant(ctx.session) && (await livesInCameroon(ctx.prisma, dossier.accountId)),
+      /** Whether each Section takes the Client's concerns (#149): Accompagnement Dossiers. */
+      concerns: concernsOffered(dossier.service),
       // A deleted comment keeps its place in the conversation, not its words.
       // Made from the Checklist, a Section and its Documents are named in each language (`titles`).
       sections: sections.map((section) => ({
@@ -160,6 +168,23 @@ export const documentsRouter = createTRPCRouter({
     const section = await sectionFor(ctx.prisma, ctx.session, input.id);
     writable(section.dossier);
     await ctx.prisma.dossierSection.update({ where: { id: section.id }, data: { title: input.title, titles: Prisma.DbNull } });
+  }),
+
+  /**
+   * The Client's concerns about a Section (#149): what they think may be an
+   * error or a problem for them there, for a later letter of explanation.
+   * Theirs alone to write; the consultant reads them. Empty clears them.
+   */
+  setSectionConcerns: protectedProcedure.input(sectionConcernsInput).mutation(async ({ ctx, input }) => {
+    const section = await sectionFor(ctx.prisma, ctx.session, input.id);
+    if (isConsultant(ctx.session)) throw refuse('CONCERNS_CLIENT_ONLY');
+    writable(section.dossier);
+    if (!concernsOffered(section.dossier.service)) throw refuse('CONCERNS_NOT_OFFERED');
+    const concerns = input.concerns || null;
+    await ctx.prisma.dossierSection.update({
+      where: { id: section.id },
+      data: { concerns, concernsUpdatedAt: concerns ? new Date() : null },
+    });
   }),
 
   /** Only an empty Section: DOSSIER_SECTION_NOT_EMPTY otherwise, so no file goes with it by accident. */

@@ -28,6 +28,10 @@ export const addSectionInput = z.object({ dossierId: id, title });
 export const renameSectionInput = z.object({ id, title });
 export const addDocumentInput = z.object({ sectionId: id, title });
 
+export const CONCERNS_MAX = 2000;
+/** The Client's concerns about a Section (#149); empty clears them. */
+export const sectionConcernsInput = z.object({ id, concerns: z.string().trim().max(CONCERNS_MAX) });
+
 /**
  * A file already encrypted and sent to R2, with its key for the server to
  * wrap (ADR 0007). Also what a Preuve de paiement records.

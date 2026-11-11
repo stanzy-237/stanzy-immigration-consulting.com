@@ -8,6 +8,7 @@ import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DocumentCard } from '@/features/dossiers/components/document-card';
 import { DocumentFocusContext, type DocumentFocus } from '@/features/dossiers/components/document-focus';
+import { SectionConcerns } from '@/features/dossiers/components/section-concerns';
 import { NewSignatureLink, SignatureAlert } from '@/features/dossiers/components/document-signature';
 import {
   fieldClass,
@@ -90,6 +91,7 @@ export function DossierDocuments({
                   me={data.viewer}
                   open={data.open}
                   locked={data.locked}
+                  concerns={data.concerns}
                 />
               </li>
             ))}
@@ -105,6 +107,8 @@ export function DossierDocuments({
 type SectionData = {
   id: string;
   title: string;
+  concerns: string | null;
+  concernsUpdatedAt: Date | null;
   documents: DocumentData[];
 };
 
@@ -115,6 +119,7 @@ function SectionCard({
   me,
   open,
   locked,
+  concerns,
 }: {
   dossierId: string;
   section: SectionData;
@@ -122,6 +127,8 @@ function SectionCard({
   me: SectionsData['viewer'];
   open: boolean;
   locked: boolean;
+  /** Whether the Section takes the Client's concerns (#149). */
+  concerns: boolean;
 }): ReactNode {
   const t = useTranslations('Dossiers.documents');
   const trpc = useTRPC();
@@ -178,6 +185,8 @@ function SectionCard({
           </>
         )}
       </header>
+
+      {concerns && !pending ? <SectionConcerns dossierId={dossierId} section={section} viewer={viewer} open={open} /> : null}
 
       {section.documents.length === 0 ? (
         <p className="mt-3 text-sm text-slate">{t('noDocuments')}</p>
