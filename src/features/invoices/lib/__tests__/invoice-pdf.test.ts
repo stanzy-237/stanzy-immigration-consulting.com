@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
 
-import { PDFDocument, StandardFonts } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFRawStream, StandardFonts } from 'pdf-lib';
 import { describe, expect, it } from 'vitest';
 
+import { jpegOf } from '@/features/pdf-tools/lib/__tests__/fixtures';
 import { renderInvoicePdf, wrap, type InvoicePdfData } from '@/features/invoices/lib/invoice-pdf';
 
 const letterhead = readFileSync('src/features/invoices/assets/letterhead.pdf');
@@ -18,6 +19,7 @@ const data = (lines: InvoicePdfData['lines']): InvoicePdfData => ({
   lines,
   notes: 'Paiement par Orange Money ✅\nMerci.',
   stamp: 'PAID',
+  consultant: null,
   labels: {
     title: 'Facture',
     number: 'N°',
@@ -34,12 +36,33 @@ const data = (lines: InvoicePdfData['lines']): InvoicePdfData => ({
     page: (page, pages) => `Page ${page}/${pages}`,
     paid: 'Payée',
     cancelled: 'Annulée',
+    company: 'Stanzy Immigration Consulting',
   },
 });
 
 const line = { description: 'Traduction certifiée', quantity: 2, unitAmount: 12500 };
 
+/** How many images a PDF holds. */
+async function imagesIn(bytes: Uint8Array): Promise<number> {
+  const pdf = await PDFDocument.load(bytes);
+  return pdf.context
+    .enumerateIndirectObjects()
+    .filter(([, object]) => object instanceof PDFRawStream && object.dict.get(PDFName.of('Subtype')) === PDFName.of('Image'))
+    .length;
+}
+
 describe('the Facture PDF', () => {
+  it('carries the consultant’s signature and the stamp once Payée, not before', async () => {
+    const consultant = {
+      signature: { bytes: jpegOf(60, 20), type: 'image/jpeg' as const },
+      stamp: { bytes: jpegOf(40, 40), type: 'image/jpeg' as const },
+    };
+    const bare = await imagesIn(await renderInvoicePdf(letterhead, data([line])));
+    expect(await imagesIn(await renderInvoicePdf(letterhead, { ...data([line]), consultant }))).toBe(bare + 2);
+    const sent = { ...data([line]), stamp: null, consultant };
+    expect(await imagesIn(await renderInvoicePdf(letterhead, sent))).toBe(bare);
+  });
+
   it('is drawn on the A4 letterhead, its title set, characters the font lacks dropped', async () => {
     const pdf = await PDFDocument.load(await renderInvoicePdf(letterhead, data([line])));
     expect(pdf.getPageCount()).toBe(1);

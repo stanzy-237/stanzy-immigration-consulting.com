@@ -14,21 +14,26 @@ import { createTestTRPC } from '@/trpc/__tests__/test-utils';
  * calls; the browser-side encryption and Blob upload are stubbed.
  */
 const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }));
-vi.mock('next/navigation', () => ({ useRouter: () => router }));
+vi.mock('next/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/navigation')>()),
+  useRouter: () => router,
+}));
 
 const urls = vi.hoisted(() => ({
   invoicePdfUrl: (id: string) => `/api/invoices/${id}/pdf`,
   proofFileUrl: (id: string) => `/api/invoices/proofs/${id}`,
+  receiptFileUrl: (id: string) => `/api/invoices/receipts/${id}`,
   uploadProofFile: vi.fn(),
 }));
 vi.mock('@/features/invoices/lib/invoice-urls', () => urls);
 
-const api = vi.hoisted(() => ({ save: vi.fn(), send: vi.fn(), addProof: vi.fn() }));
+const api = vi.hoisted(() => ({ save: vi.fn(), send: vi.fn(), addProof: vi.fn(), record: vi.fn() }));
 beforeEach(() => {
   vi.clearAllMocks();
   api.save.mockImplementation((input: { id?: string }) => ({ id: input.id ?? 'inv_9' }));
   api.send.mockReturnValue({ number: 'STZ-2026-0001' });
   api.addProof.mockReturnValue({ id: 'proof_1' });
+  api.record.mockReturnValue({ id: 'pay_2', number: 'REC-2026-0002', status: 'PAID' });
 });
 
 const dossier = {
@@ -128,6 +133,21 @@ const invoice = (extra: Record<string, unknown> = {}) => ({
   total: 90000,
   dossier,
   proofs: [],
+  payments: [] as unknown[],
+  received: 0,
+  ...extra,
+});
+
+const payment = (extra: Record<string, unknown> = {}) => ({
+  id: 'pay_1',
+  amount: 40000,
+  receivedOn: '2026-11-02',
+  method: 'CASH' as const,
+  methodNote: null,
+  receiptNumber: 'REC-2026-0001',
+  signedAt: null,
+  signedName: null,
+  proofs: [{ id: 'proof_9', fileName: 'especes.jpg' }],
   ...extra,
 });
 
@@ -135,6 +155,7 @@ function dossierInvoices(viewer: 'consultant' | 'client', invoices = [invoice()]
   const { trpc, queryClient, wrap } = createTestTRPC({
     'invoices.forDossier': () => invoices,
     'invoices.addProof': (input) => api.addProof(input),
+    'invoices.payments.record': (input) => api.record(input),
   });
   queryClient.setQueryData(trpc.invoices.forDossier.queryKey({ dossierId: 'dos_1' }), invoices as never);
   return render(withIntl(wrap(<DossierInvoices dossierId="dos_1" viewer={viewer} />)));
@@ -182,4 +203,59 @@ describe('DossierInvoices', () => {
     expect(screen.getByRole('link', { name: 'Brouillon' })).toHaveAttribute('href', '/factures/inv_1');
     expect(screen.queryByText('Téléverser une preuve de paiement')).not.toBeInTheDocument();
   });
+
+  it('shows the Client a part payment, its justificatif, and the Reconnaissance to sign', async () => {
+    const { container } = dossierInvoices('client', [
+      invoice({ status: 'PARTIALLY_PAID', payments: [payment()], received: 40000 }),
+    ]);
+    expect(screen.getByText('Partiellement payée')).toBeInTheDocument();
+    expect(screen.getByText('Reçu 40 000 FCFA sur 90 000 FCFA · reste 50 000 FCFA')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Signer la reconnaissance REC-2026-0001' })).toHaveAttribute(
+      'href',
+      '/fr/mon-espace/dossiers/dos_1/recus/pay_1',
+    );
+    expect(screen.getByRole('link', { name: /Justificatif · especes.jpg/ })).toHaveAttribute(
+      'href',
+      '/api/invoices/proofs/proof_9',
+    );
+    expect(screen.getByText('Téléverser une preuve de paiement')).toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
+  }, 30_000);
+
+  it('shows a signed Reconnaissance without asking again', () => {
+    const signed = payment({ signedAt: new Date('2026-11-03T10:00:00Z'), signedName: 'Aminata Diallo' });
+    dossierInvoices('client', [invoice({ status: 'PAID', payments: [signed], received: 90000 })]);
+    expect(screen.getByText('Signée par Aminata Diallo le 3 novembre 2026')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Signer la reconnaissance/ })).not.toBeInTheDocument();
+  });
+
+  it('lets the consultant record the rest, asking what « Autre » means', async () => {
+    dossierInvoices('consultant', [invoice({ status: 'PARTIALLY_PAID', payments: [payment()], received: 40000 })]);
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer un paiement' }));
+    const dialog = await screen.findByRole('alertdialog');
+    expect(within(dialog).getByLabelText('Montant reçu')).toHaveValue('50000');
+
+    fireEvent.change(within(dialog).getByLabelText('Montant reçu'), { target: { value: '60000' } });
+    fireEvent.change(within(dialog).getByLabelText('Moyen de paiement'), { target: { value: 'OTHER' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }));
+    expect(await within(dialog).findByText('Indiquez un montant entre 1 et 50 000 FCFA.')).toBeInTheDocument();
+    expect(within(dialog).getByText('Précisez le moyen de paiement.')).toBeInTheDocument();
+    expect(api.record).not.toHaveBeenCalled();
+
+    fireEvent.change(within(dialog).getByLabelText('Montant reçu'), { target: { value: '50 000' } });
+    fireEvent.change(within(dialog).getByLabelText('Précisez le moyen'), { target: { value: 'Western Union' } });
+    fireEvent.change(within(dialog).getByLabelText('Reçu le'), { target: { value: '2026-11-04' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }));
+    await waitFor(() =>
+      expect(api.record).toHaveBeenCalledWith({
+        invoiceId: 'inv_1',
+        amount: 50000,
+        receivedOn: '2026-11-04',
+        method: 'OTHER',
+        methodNote: 'Western Union',
+        proof: undefined,
+      }),
+    );
+    expect(await screen.findByText('Paiement enregistré : reconnaissance REC-2026-0002 envoyée')).toBeInTheDocument();
+  }, 30_000);
 });

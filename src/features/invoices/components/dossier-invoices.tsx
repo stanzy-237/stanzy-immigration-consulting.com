@@ -10,6 +10,7 @@ import { useId, useState, type ChangeEvent, type ReactNode } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { DOCUMENT_FILE_TYPES } from '@/features/dossiers/lib/document-schema';
+import { InvoicePayments } from '@/features/invoices/components/invoice-payments';
 import { InvoiceStatusPill } from '@/features/invoices/components/invoice-status-pill';
 import { useInvoiceMutation } from '@/features/invoices/hooks/use-invoice-mutation';
 import { invoicePdfUrl, uploadProofFile } from '@/features/invoices/lib/invoice-urls';
@@ -113,6 +114,11 @@ function InvoiceRow({ invoice, consultant }: { invoice: Invoice; consultant: boo
           ) : null}
         </div>
       </div>
+      {invoice.payments.length > 0 ? (
+        <div className="mt-3 border-t border-off-white pt-3">
+          <InvoicePayments invoice={invoice} viewer={consultant ? 'consultant' : 'client'} />
+        </div>
+      ) : null}
       {!consultant && invoice.number && isAwaitingPayment(invoice.status) ? (
         <UploadProof invoiceId={invoice.id} number={invoice.number} />
       ) : null}

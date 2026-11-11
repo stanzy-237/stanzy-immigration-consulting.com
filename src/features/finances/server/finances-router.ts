@@ -20,9 +20,14 @@ import {
   type ChargeInput,
   type IncomeInput,
 } from '@/features/finances/lib/finance-schema';
-import { dateOf, dayOf, loadEntries, loadRates } from '@/features/finances/server/finance-entries';
-import { doualaDay } from '@/features/notifications/lib/douala-days';
-import { invoiceTotal } from '@/features/invoices/lib/money';
+import {
+  countedPayments,
+  dateOf,
+  dayOf,
+  loadEntries,
+  loadRates,
+  yearBounds,
+} from '@/features/finances/server/finance-entries';
 import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter } from '@/server/trpc/trpc';
 
@@ -134,10 +139,10 @@ export const financesRouter = createTRPCRouter({
   }),
 
   incomes: createTRPCRouter({
-    /** The year's Recettes: by hand (editable) and paid Factures (read only), newest first. */
+    /** The year's Recettes: by hand (editable) and Paiements on Factures (read only), newest first. */
     list: consultantProcedure.input(yearInput).query(async ({ ctx, input }) => {
-      const days = { gte: dateOf(`${input.year}-01-01`), lt: dateOf(`${input.year + 1}-01-01`) };
-      const [incomes, invoices] = await Promise.all([
+      const { days, received } = yearBounds(input.year);
+      const [incomes, payments] = await Promise.all([
         ctx.prisma.income.findMany({
           where: { date: days },
           orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
@@ -152,32 +157,24 @@ export const financesRouter = createTRPCRouter({
             dossier: dossierShown,
           },
         }),
-        ctx.prisma.invoice.findMany({
-          where: {
-            status: 'PAID',
-            paidAt: {
-              gte: new Date(`${input.year}-01-01T00:00:00+01:00`),
-              lt: new Date(`${input.year + 1}-01-01T00:00:00+01:00`),
-            },
-          },
-          orderBy: { paidAt: 'desc' },
+        ctx.prisma.payment.findMany({
+          where: { invoice: countedPayments(), receivedOn: received },
+          orderBy: { receivedOn: 'desc' },
           select: {
             id: true,
-            number: true,
-            currency: true,
-            paidAt: true,
-            lines: { select: { quantity: true, unitAmount: true } },
-            dossier: dossierShown,
+            amount: true,
+            receivedOn: true,
+            invoice: { select: { id: true, number: true, currency: true, dossier: dossierShown } },
           },
         }),
       ]);
       return [
         ...incomes.map((income) => ({ ...income, day: dayOf(income.date), invoice: null })),
-        ...invoices.map((invoice) => ({
-          id: invoice.id,
-          amount: invoiceTotal(invoice.lines),
+        ...payments.map(({ invoice, ...payment }) => ({
+          id: payment.id,
+          amount: payment.amount,
           currency: invoice.currency,
-          day: doualaDay(invoice.paidAt!),
+          day: payment.receivedOn,
           service: invoice.dossier.service,
           source: null,
           note: null,

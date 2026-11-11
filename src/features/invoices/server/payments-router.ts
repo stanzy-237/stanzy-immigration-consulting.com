@@ -160,6 +160,7 @@ export const paymentsRouter = createTRPCRouter({
       receivedOn: payment.receivedOn,
       invoice: { id: invoice.id, number: invoice.number },
       dossierId: invoice.dossier.id,
+      signerName: invoice.dossier.account.name,
       fields: (payment.fields ?? []) as SignatureField[],
       signedAt: payment.signedAt,
       signedName: payment.signedName,

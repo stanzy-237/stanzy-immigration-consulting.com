@@ -1,7 +1,7 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Ban, CheckCircle2, Download, ExternalLink } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { Ban, Download, ExternalLink } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
@@ -17,49 +17,27 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from '@/components/ui/toast';
+import { InvoicePayments } from '@/features/invoices/components/invoice-payments';
 import { InvoiceStatusPill } from '@/features/invoices/components/invoice-status-pill';
 import { useInvoiceMutation } from '@/features/invoices/hooks/use-invoice-mutation';
 import { CANCEL_REASON_MAX, cancelInvoiceInput } from '@/features/invoices/lib/invoice-schema';
 import { isAwaitingPayment } from '@/features/invoices/lib/invoice-status';
 import { formatMoney, lineTotal } from '@/features/invoices/lib/money';
 import { invoicePdfUrl, proofFileUrl } from '@/features/invoices/lib/invoice-urls';
-import { optimisticUpdate } from '@/lib/optimistic-list';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
 
 type Invoice = RouterOutputs['invoices']['dashboard']['get'];
 
-/** A sent Facture in the Tableau de bord: what was billed, its proofs, and Payée / Annuler. */
+/** A sent Facture in the Tableau de bord: what was billed, its Paiements and proofs, and Annuler. */
 export function InvoiceDetail({ invoice }: { invoice: Invoice }): ReactNode {
   const t = useTranslations();
   const locale = useLocale();
   const format = useFormatter();
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-  const { refresh, failed } = useInvoiceMutation();
   const [cancelling, setCancelling] = useState(false);
   const money = (minor: number) => formatMoney(minor, invoice.currency, locale);
   const date = (value: Date) => format.dateTime(value, { day: 'numeric', month: 'long', year: 'numeric' });
 
-  // « Payée » shows on the click; a refusal puts the invoice back.
-  const paid = optimisticUpdate<Invoice, { id: string }>(
-    queryClient,
-    trpc.invoices.dashboard.get.queryKey({ id: invoice.id }),
-    (current) => ({ ...current, status: 'PAID', paidAt: new Date() }),
-  );
-  const markPaid = useMutation(
-    trpc.invoices.dashboard.markPaid.mutationOptions({
-      onMutate: paid.onMutate,
-      onSuccess: () => {
-        void refresh();
-        toast.add({ title: t('Invoices.toast.paid'), type: 'success' });
-      },
-      onError: (error, input, context) => {
-        paid.onError(error, input, context);
-        failed(error);
-      },
-    }),
-  );
   const awaiting = isAwaitingPayment(invoice.status);
 
   return (
@@ -106,6 +84,10 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }): ReactNode {
         </p>
       </section>
 
+      <div className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
+        <InvoicePayments invoice={invoice} viewer="consultant" />
+      </div>
+
       <section className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
         <h2 className="font-heading text-lg font-bold text-navy-deep">{t('Invoices.detail.proofs')}</h2>
         {invoice.proofs.length === 0 ? (
@@ -146,26 +128,15 @@ export function InvoiceDetail({ invoice }: { invoice: Invoice }): ReactNode {
           <Download aria-hidden={true} className="size-4" />
           {t('Invoices.detail.downloadPdf')}
         </a>
-        {awaiting ? (
-          <>
-            <button
-              type="button"
-              disabled={markPaid.isPending}
-              onClick={() => markPaid.mutate({ id: invoice.id })}
-              className="inline-flex h-11 items-center gap-1.5 rounded-full bg-leaf px-5 text-sm font-semibold text-white hover:bg-navy-deep disabled:opacity-50"
-            >
-              <CheckCircle2 aria-hidden={true} className="size-4" />
-              {t('Invoices.detail.markPaid')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setCancelling(true)}
-              className="ml-auto inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-slate hover:text-rouge"
-            >
-              <Ban aria-hidden={true} className="size-4" />
-              {t('Invoices.detail.cancelInvoice')}
-            </button>
-          </>
+        {awaiting && invoice.payments.length === 0 ? (
+          <button
+            type="button"
+            onClick={() => setCancelling(true)}
+            className="ml-auto inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-slate hover:text-rouge"
+          >
+            <Ban aria-hidden={true} className="size-4" />
+            {t('Invoices.detail.cancelInvoice')}
+          </button>
         ) : null}
       </div>
 

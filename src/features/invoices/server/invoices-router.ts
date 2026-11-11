@@ -17,7 +17,7 @@ import { invoiceNumber, isAwaitingPayment } from '@/features/invoices/lib/invoic
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { invoiceFields, invoiceFor } from '@/features/invoices/server/invoice-access';
 import { paymentsRouter } from '@/features/invoices/server/payments-router';
-import { notifyInvoicePaid, notifyInvoiceSent, notifyProofReceived } from '@/features/invoices/server/invoice-notify';
+import { notifyInvoiceSent, notifyProofReceived } from '@/features/invoices/server/invoice-notify';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { trackLater } from '@/server/analytics';
 import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
@@ -61,7 +61,41 @@ function printable(invoice: Row) {
   return { ...invoice, number: invoice.number, sentAt: invoice.sentAt };
 }
 
-const proofFields = { select: { id: true, fileName: true, createdAt: true }, orderBy: { createdAt: 'asc' } } as const;
+/** The Client's Preuves de paiement; a justificatif the consultant attached shows under its Paiement. */
+const proofFields = {
+  where: { paymentId: null },
+  select: { id: true, fileName: true, createdAt: true },
+  orderBy: { createdAt: 'asc' },
+} as const;
+
+/** Each Paiement, its justificatifs and where its Reconnaissance stands. */
+const paymentFields = {
+  select: {
+    id: true,
+    amount: true,
+    receivedOn: true,
+    method: true,
+    methodNote: true,
+    receiptNumber: true,
+    signedAt: true,
+    signedName: true,
+    proofs: { select: { id: true, fileName: true } },
+  },
+  orderBy: { createdAt: 'asc' },
+} as const;
+
+type WithPayments = Row & {
+  proofs: Prisma.PaymentProofGetPayload<typeof proofFields>[];
+  payments: Prisma.PaymentGetPayload<typeof paymentFields>[];
+};
+
+/** A Facture with its proofs, Paiements, and what was received on it. */
+const withPayments = ({ proofs, payments, ...row }: WithPayments) => ({
+  ...withTotal(row),
+  proofs,
+  payments,
+  received: payments.reduce((sum, payment) => sum + payment.amount, 0),
+});
 
 /**
  * Factures (GLOSSARY: Facture). The consultant writes a Brouillon for a
@@ -79,9 +113,9 @@ export const invoicesRouter = createTRPCRouter({
     const rows = await ctx.prisma.invoice.findMany({
       where: { dossierId: dossier.id, ...(isConsultant(ctx.session) ? {} : { status: { not: 'DRAFT' } }) },
       orderBy: { createdAt: 'desc' },
-      select: { ...invoiceFields, proofs: proofFields },
+      select: { ...invoiceFields, proofs: proofFields, payments: paymentFields },
     });
-    return rows.map(({ proofs, ...row }) => ({ ...withTotal(row), proofs }));
+    return rows.map(withPayments);
   }),
 
   /**
@@ -141,11 +175,10 @@ export const invoicesRouter = createTRPCRouter({
     get: consultantProcedure.input(byId).query(async ({ ctx, input }) => {
       const row = await ctx.prisma.invoice.findUnique({
         where: { id: input.id },
-        select: { ...invoiceFields, proofs: proofFields },
+        select: { ...invoiceFields, proofs: proofFields, payments: paymentFields },
       });
       if (!row) throw notFound();
-      const { proofs, ...invoice } = row;
-      return { ...withTotal(invoice), proofs };
+      return withPayments(row);
     }),
 
     /** Open Dossiers by their Client's name or email, to bill. */

@@ -1,8 +1,6 @@
 import type { Prisma } from '@prisma/client';
 
-import { doualaDay } from '@/features/notifications/lib/douala-days';
 import type { CadRates, Entry } from '@/features/finances/lib/finance-report';
-import { invoiceTotal } from '@/features/invoices/lib/money';
 import type { TRPCContext } from '@/server/trpc/context';
 
 type Db = TRPCContext['prisma'];
@@ -12,15 +10,21 @@ export const dayOf = (date: Date): string => date.toISOString().slice(0, 10);
 /** `YYYY-MM-DD` as a `@db.Date` value. */
 export const dateOf = (day: string): Date => new Date(`${day}T00:00:00Z`);
 
-/** The year's bounds: Douala time for a payment's moment, plain days for dates. */
-const yearBounds = (year: number) => ({
-  moments: { gte: new Date(`${year}-01-01T00:00:00+01:00`), lt: new Date(`${year + 1}-01-01T00:00:00+01:00`) },
+/** The year's bounds: `YYYY-MM-DD` text for a Paiement's day, `@db.Date` values for dates. */
+export const yearBounds = (year: number) => ({
+  received: { gte: `${year}-01-01`, lt: `${year + 1}-01-01` },
   days: { gte: dateOf(`${year}-01-01`), lt: dateOf(`${year + 1}-01-01`) },
 });
 
+/** The Paiements counted as Recettes: those on a Facture still standing (not Annulée). */
+export const countedPayments = (dossierId?: string): Prisma.PaymentWhereInput['invoice'] => ({
+  status: { not: 'CANCELLED' },
+  ...(dossierId ? { dossierId } : {}),
+});
+
 /**
- * Every Recette and Charge as the reports read them: paid Factures (a
- * Recette by themselves, on the day they were marked Payée, in Douala),
+ * Every Recette and Charge as the reports read them: each Paiement on a
+ * Facture (a Recette by itself, on the day it was received, #145),
  * Recettes by hand and Charges. `year` narrows to one year; `dossiers`
  * keeps only those linked to a Dossier (for margins, all time).
  */
@@ -29,19 +33,16 @@ export async function loadEntries(db: Db, scope: { year: number } | { dossiers: 
   const linked: Prisma.IncomeWhereInput & Prisma.ChargeWhereInput =
     'dossierId' in scope ? { dossierId: scope.dossierId } : 'dossiers' in scope ? { dossierId: { not: null } } : {};
 
-  const [invoices, incomes, charges] = await Promise.all([
-    db.invoice.findMany({
+  const [payments, incomes, charges] = await Promise.all([
+    db.payment.findMany({
       where: {
-        status: 'PAID',
-        ...(bounds ? { paidAt: bounds.moments } : {}),
-        ...('dossierId' in scope ? { dossierId: scope.dossierId } : {}),
+        invoice: countedPayments('dossierId' in scope ? scope.dossierId : undefined),
+        ...(bounds ? { receivedOn: bounds.received } : {}),
       },
       select: {
-        currency: true,
-        paidAt: true,
-        dossierId: true,
-        dossier: { select: { service: true } },
-        lines: { select: { quantity: true, unitAmount: true } },
+        amount: true,
+        receivedOn: true,
+        invoice: { select: { currency: true, dossierId: true, dossier: { select: { service: true } } } },
       },
     }),
     db.income.findMany({
@@ -55,11 +56,11 @@ export async function loadEntries(db: Db, scope: { year: number } | { dossiers: 
   ]);
 
   return [
-    ...invoices.map(
-      (invoice): Entry => ({
+    ...payments.map(
+      ({ invoice, ...payment }): Entry => ({
         kind: 'income',
-        day: doualaDay(invoice.paidAt!),
-        amount: invoiceTotal(invoice.lines),
+        day: payment.receivedOn,
+        amount: payment.amount,
         currency: invoice.currency,
         service: invoice.dossier.service,
         dossierId: invoice.dossierId,

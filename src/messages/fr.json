@@ -2267,7 +2267,6 @@
       "cancelledOn": "Annulée le {date}",
       "cancelReason": "Motif : {reason}",
       "downloadPdf": "Télécharger le PDF",
-      "markPaid": "Marquer payée",
       "cancelInvoice": "Annuler la facture",
       "cancelTitle": "Annuler cette facture ?",
       "cancelBody": "Elle reste dans l’historique, marquée « Annulée ». Le Client n’est pas prévenu par email.",
@@ -2300,10 +2299,10 @@
       "saved": "Brouillon enregistré",
       "sent": "Facture {number} envoyée",
       "deleted": "Brouillon supprimé",
-      "paid": "Facture marquée payée",
       "cancelled": "Facture annulée",
       "proofAdded": "Preuve de paiement envoyée",
-      "changed": "Cette facture a changé entre-temps : la page est à jour."
+      "changed": "Cette facture a changé entre-temps : la page est à jour.",
+      "recorded": "Paiement enregistré : reconnaissance {number} envoyée"
     },
     "errors": {
       "INVOICE_EMPTY": "Ajoutez au moins une ligne avec un montant.",
@@ -2313,7 +2312,14 @@
       "DOCUMENT_FILE_TYPE": "Ce type de fichier n’est pas accepté : PDF, JPG, PNG, WebP ou HEIC.",
       "DOCUMENT_FILE_TOO_LARGE": "Ce fichier dépasse 25 Mo.",
       "DOCUMENT_FILE_INVALID": "Le fichier n’a pas été reçu correctement. Réessayez.",
-      "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez."
+      "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez.",
+      "PAYMENT_TOO_HIGH": "Ce montant dépasse ce qui reste à payer.",
+      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et le cachet dans « Signatures ».",
+      "PAYMENT_NOTE_REQUIRED": "Précisez le moyen de paiement.",
+      "RECEIPT_NOT_PENDING": "Cette reconnaissance est déjà signée.",
+      "RECEIPT_NOT_YOURS": "Seul le Client du dossier peut signer cette reconnaissance.",
+      "SIGNATURE_DOCUMENT_CHANGED": "Le document a changé. Rechargez la page.",
+      "SIGNATURE_IMAGE_INVALID": "La signature n’a pas pu être lue. Signez à nouveau."
     },
     "receipt": {
       "title": "Reconnaissance de réception de fonds",
@@ -2334,6 +2340,41 @@
       },
       "client": "Le Concerné",
       "company": "STANZY IMMIGRATION CONSULTING"
+    },
+    "payments": {
+      "title": "Paiements",
+      "empty": "Aucun paiement enregistré.",
+      "summary": "Reçu {received} sur {total} · reste {balance}",
+      "record": "Enregistrer un paiement",
+      "recordTitle": "Enregistrer un paiement",
+      "recordBody": "Une Reconnaissance de réception de fonds, signée et cachetée, est envoyée au Client qui la signe dans l’application.",
+      "amount": "Montant reçu",
+      "amountError": "Indiquez un montant entre 1 et {balance}.",
+      "receivedOn": "Reçu le",
+      "method": "Moyen de paiement",
+      "methodNote": "Précisez le moyen",
+      "methodNoteError": "Précisez le moyen de paiement.",
+      "proof": "Justificatif (facultatif)",
+      "proofHint": "Photo ou PDF du reçu, par exemple pour un paiement en espèces. 25 Mo au plus.",
+      "confirm": "Enregistrer",
+      "cancel": "Annuler",
+      "sending": "Enregistrement…",
+      "receipt": "Reconnaissance {number}",
+      "openReceipt": "Ouvrir la reconnaissance",
+      "toSign": "À signer par le Client",
+      "signed": "Signée par {name} le {date}",
+      "sign": "Signer la reconnaissance",
+      "signLabel": "Signer la reconnaissance {number}",
+      "justificatif": "Justificatif"
+    },
+    "receiptSign": {
+      "metaTitle": "Signer la reconnaissance",
+      "back": "Retour au dossier",
+      "title": "Reconnaissance de réception de fonds {number}",
+      "intro": "Elle atteste le paiement de {amount} reçu par Stanzy le {date}. Notre signature et notre cachet y sont déjà : lisez-la, puis signez-la.",
+      "alreadySigned": "Vous avez signé cette reconnaissance le {date}.",
+      "openSigned": "Ouvrir la reconnaissance signée",
+      "signed": "Reconnaissance signée"
     }
   },
   "Notifications": {
