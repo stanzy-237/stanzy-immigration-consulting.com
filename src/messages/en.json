@@ -3979,7 +3979,9 @@
         "contacts": "People to contact in an emergency",
         "donation": "Are the funds a gift?",
         "donor": "The donor",
-        "ubaAccount": "Do you already have a UBA account?"
+        "ubaAccount": "Do you already have a UBA account?",
+        "salaryAccount": "Is your salary paid into a bank account?",
+        "salaryAccounts": "Your salary accounts"
       },
       "niuHint": "It is on your tax registration certificate.",
       "name": "Full name",
@@ -4046,6 +4048,16 @@
         "confirming": "Confirming…",
         "confirmedToast": "Pieces confirmed",
         "confirmedNote": "Pieces confirmed: the client can no longer change them."
+      },
+      "salary": {
+        "hint": "For each employer paying your salary into an account: its name and the period.",
+        "company": "Company (account {n})",
+        "startOn": "Start (account {n})",
+        "endOn": "End (account {n})",
+        "add": "Add a salary account",
+        "remove": "Remove salary account {n}",
+        "currentShort": "Still ongoing",
+        "account": "account {n}"
       }
     },
     "offer": {

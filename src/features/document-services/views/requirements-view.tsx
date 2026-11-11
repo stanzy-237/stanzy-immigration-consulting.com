@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import {
   CONTACTS_MAX,
+  SALARY_ACCOUNTS_MAX,
   requirementFileUrl,
   type Answers,
   type Question,
@@ -410,6 +411,101 @@ function Questions({ data }: { data: Data }): ReactNode {
             </p>
           ) : null}
         </div>
+      ) : null}
+
+      <div className="grid grid-cols-1 gap-2">
+        {label('salaryAccount', t('questions.salaryAccount'))}
+        {yesNo('salaryAccount', answers.salaryAccount, (salaryAccount) =>
+          update({
+            salaryAccount,
+            salaryAccounts:
+              salaryAccount && answers.salaryAccounts.length === 0 ? [{ company: '', startOn: '', endOn: null }] : answers.salaryAccounts,
+          }),
+        )}
+      </div>
+      {answers.salaryAccount ? (
+        <fieldset className="grid grid-cols-1 gap-2">
+          <legend className="mb-1.5">{label('salaryAccounts', t('questions.salaryAccounts'))}</legend>
+          <p className="text-xs text-slate">{t('salary.hint')}</p>
+          {answers.salaryAccounts.map((account, index) => {
+            const n = index + 1;
+            const setAccount = (patch: Partial<typeof account>) =>
+              update({
+                salaryAccounts: answers.salaryAccounts.map((other, at) => (at === index ? { ...other, ...patch } : other)),
+              });
+            return (
+              <div key={index} className="grid grid-cols-1 gap-2 rounded-xl bg-off-white p-3 sm:grid-cols-3">
+                <input
+                  aria-label={t('salary.company', { n })}
+                  placeholder={t('salary.company', { n })}
+                  value={account.company}
+                  maxLength={120}
+                  disabled={disabled}
+                  onChange={(event) => setAccount({ company: event.target.value })}
+                  className={`${field} sm:col-span-3`}
+                />
+                <label className="grid grid-cols-1 gap-1 text-xs font-semibold text-slate">
+                  {t('salary.startOn', { n })}
+                  <input
+                    type="date"
+                    value={account.startOn}
+                    disabled={disabled}
+                    onChange={(event) => setAccount({ startOn: event.target.value })}
+                    className={field}
+                  />
+                </label>
+                {account.endOn !== null ? (
+                  <label className="grid grid-cols-1 gap-1 text-xs font-semibold text-slate">
+                    {t('salary.endOn', { n })}
+                    <input
+                      type="date"
+                      value={account.endOn}
+                      min={account.startOn || undefined}
+                      disabled={disabled}
+                      onChange={(event) => setAccount({ endOn: event.target.value })}
+                      className={field}
+                    />
+                  </label>
+                ) : null}
+                <div className="flex items-end justify-between gap-2">
+                  <label className="flex min-h-11 items-center gap-2 text-sm text-navy-deep">
+                    <input
+                      type="checkbox"
+                      checked={account.endOn === null}
+                      disabled={disabled}
+                      onChange={(event) => setAccount({ endOn: event.target.checked ? null : '' })}
+                      className="size-5 accent-rouge"
+                    />
+                    <span>
+                      {t('salary.currentShort')}
+                      <span className="sr-only"> ({t('salary.account', { n })})</span>
+                    </span>
+                  </label>
+                  {answers.salaryAccounts.length > 1 && !disabled ? (
+                    <button
+                      type="button"
+                      onClick={() => update({ salaryAccounts: answers.salaryAccounts.filter((_, at) => at !== index) })}
+                      aria-label={t('salary.remove', { n })}
+                      className="inline-flex size-11 shrink-0 items-center justify-center rounded-full text-slate hover:bg-white hover:text-rouge"
+                    >
+                      <Trash2 aria-hidden={true} className="size-4" />
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+          {answers.salaryAccounts.length < SALARY_ACCOUNTS_MAX && !disabled ? (
+            <button
+              type="button"
+              onClick={() => update({ salaryAccounts: [...answers.salaryAccounts, { company: '', startOn: '', endOn: null }] })}
+              className="inline-flex h-10 w-fit items-center gap-1.5 rounded-full border-2 border-navy-deep px-4 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white"
+            >
+              <Plus aria-hidden={true} className="size-4" />
+              {t('salary.add')}
+            </button>
+          ) : null}
+        </fieldset>
       ) : null}
 
       {data.editable ? (

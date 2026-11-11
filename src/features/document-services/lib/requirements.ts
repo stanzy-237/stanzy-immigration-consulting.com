@@ -9,10 +9,24 @@ export const CONTACTS_MAX = 3;
 const text = (max: number) => z.string().trim().max(max);
 const person = z.object({ name: text(120), phone: text(30) });
 
+/** Up to five salary accounts, one per employer. */
+export const SALARY_ACCOUNTS_MAX = 5;
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+/** An account their salary is paid into: the employer and the period (`endOn` null: still paid there). */
+const salaryAccount = z.object({
+  company: text(120),
+  startOn: z.string().max(10),
+  endOn: z.string().max(10).nullable(),
+});
+export type SalaryAccount = z.infer<typeof salaryAccount>;
+
 /**
  * The proof of funds questionnaire, as the Client fills it in (saved at any
  * point: `questionsLeft` says what is still to answer). `ubaAccount` is asked
  * of the « sans fonds » service only: a new account is opened for the Client.
+ * `salaryAccount` (#147): whether a salary is paid into an account, then each
+ * one's employer and period; answers saved before it read as unanswered.
  */
 export const answersSchema = z.object({
   niu: text(30),
@@ -20,10 +34,20 @@ export const answersSchema = z.object({
   donation: z.boolean().nullable(),
   donor: person.extend({ email: text(200) }).nullable(),
   ubaAccount: z.boolean().nullable(),
+  salaryAccount: z.boolean().nullable().default(null),
+  salaryAccounts: z.array(salaryAccount).max(SALARY_ACCOUNTS_MAX).default([]),
 });
-export type Answers = z.infer<typeof answersSchema>;
+export type Answers = z.output<typeof answersSchema>;
 
-export const EMPTY_ANSWERS: Answers = { niu: '', contacts: [], donation: null, donor: null, ubaAccount: null };
+export const EMPTY_ANSWERS: Answers = {
+  niu: '',
+  contacts: [],
+  donation: null,
+  donor: null,
+  ubaAccount: null,
+  salaryAccount: null,
+  salaryAccounts: [],
+};
 
 /** Stored answers, whatever was saved before. */
 export function answersOf(value: unknown): Answers {
@@ -31,10 +55,16 @@ export function answersOf(value: unknown): Answers {
   return parsed.success ? parsed.data : EMPTY_ANSWERS;
 }
 
-export type Question = 'niu' | 'contacts' | 'donation' | 'donor' | 'ubaAccount';
+export type Question = 'niu' | 'contacts' | 'donation' | 'donor' | 'ubaAccount' | 'salaryAccount' | 'salaryAccounts';
 
 const filled = (value: string, min = 2) => value.trim().length >= min;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** A salary account with its employer named and its period in order. */
+const datedAccount = (account: SalaryAccount): boolean =>
+  filled(account.company) &&
+  DAY.test(account.startOn) &&
+  (account.endOn === null || (DAY.test(account.endOn) && account.endOn >= account.startOn));
 
 /** The questions of `questionnaire` still unanswered, in the order the form asks them; none without one. */
 export function questionsLeft(questionnaire: Questionnaire | null, answers: Answers): Question[] {
@@ -52,6 +82,10 @@ export function questionsLeft(questionnaire: Questionnaire | null, answers: Answ
     left.push('donor');
   }
   if (questionnaire === 'proofOfFundsNoFunds' && answers.ubaAccount === null) left.push('ubaAccount');
+  if (answers.salaryAccount === null) left.push('salaryAccount');
+  if (answers.salaryAccount && (answers.salaryAccounts.length === 0 || !answers.salaryAccounts.every(datedAccount))) {
+    left.push('salaryAccounts');
+  }
   return left;
 }
 
@@ -73,7 +107,6 @@ export const addRequirementFileInput = encryptedFileInput.extend({ requestId: id
 export const requirementFileUrl = (fileId: string): string => `/api/requirements/files/${fileId}`;
 
 const DAY_IN_MS = 86_400_000;
-const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const utcDay = (day: string): number => {
   const [year = 0, month = 1, date = 1] = day.split('-').map(Number);
   return Date.UTC(year, month - 1, date);

@@ -3996,7 +3996,9 @@
         "contacts": "Personnes à contacter en cas d’urgence",
         "donation": "Les fonds sont-ils un don ?",
         "donor": "Le donateur",
-        "ubaAccount": "Avez-vous déjà un compte UBA ?"
+        "ubaAccount": "Avez-vous déjà un compte UBA ?",
+        "salaryAccount": "Votre salaire est-il versé sur un compte bancaire ?",
+        "salaryAccounts": "Vos comptes de salaire"
       },
       "niuHint": "Il figure sur votre attestation d’immatriculation fiscale.",
       "name": "Nom complet",
@@ -4063,6 +4065,16 @@
         "confirming": "Confirmation…",
         "confirmedToast": "Pièces confirmées",
         "confirmedNote": "Pièces confirmées : le client ne peut plus les modifier."
+      },
+      "salary": {
+        "hint": "Pour chaque employeur qui vous verse un salaire sur un compte : son nom et la période.",
+        "company": "Entreprise (compte {n})",
+        "startOn": "Début (compte {n})",
+        "endOn": "Fin (compte {n})",
+        "add": "Ajouter un compte de salaire",
+        "remove": "Retirer le compte de salaire {n}",
+        "currentShort": "Toujours en cours",
+        "account": "compte {n}"
       }
     },
     "offer": {
