@@ -3273,15 +3273,18 @@
       "period": "{start} → {end}",
       "cnp": "NOC {code}",
       "edit": {
-        "open": "Edit the declarations",
-        "title": "Correct the Client's declarations",
-        "hint": "The same steps as the Client, with their answers. The level and the CRS score are worked out again; their original answers stay visible.",
-        "save": "Save the corrections",
+        "editLabel": "Edit: {field}",
+        "save": "Save",
         "cancel": "Cancel",
-        "saved": "Declarations corrected",
-        "editedOn": "Declarations corrected by {name} on {date}",
-        "original": "The Client's original answers",
-        "approvedHint": "The file is already open: its sections and documents stay as they are. The corrected answers replace the Client's on this page."
+        "saved": "Answer corrected",
+        "editedOn": "Answers corrected by {name} on {date}",
+        "client": "Declared by the Client: {value}",
+        "notFilled": "Not filled in",
+        "invalid": "Check the value entered.",
+        "add": "Add",
+        "remove": "Remove {item}",
+        "item": "{field} {n}",
+        "approvedHint": "The file is already open: correcting these answers doesn't change its sections and documents."
       }
     },
     "document": {

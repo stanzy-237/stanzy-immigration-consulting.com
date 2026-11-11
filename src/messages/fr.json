@@ -3290,15 +3290,18 @@
       "period": "{start} → {end}",
       "cnp": "CNP {code}",
       "edit": {
-        "open": "Modifier les déclarations",
-        "title": "Corriger les déclarations du Client",
-        "hint": "Les mêmes étapes que le Client, avec ses réponses. Le niveau et le score CRS sont recalculés ; ses réponses d’origine restent visibles.",
-        "save": "Enregistrer les corrections",
+        "editLabel": "Modifier : {field}",
+        "save": "Enregistrer",
         "cancel": "Annuler",
-        "saved": "Déclarations corrigées",
-        "editedOn": "Déclarations corrigées par {name} le {date}",
-        "original": "Réponses d’origine du Client",
-        "approvedHint": "Le dossier est déjà ouvert : ses sections et documents restent tels quels. Les réponses corrigées remplacent celles du Client sur cette page."
+        "saved": "Réponse corrigée",
+        "editedOn": "Réponses corrigées par {name} le {date}",
+        "client": "Déclaré par le Client : {value}",
+        "notFilled": "Non renseigné",
+        "invalid": "Vérifiez la valeur saisie.",
+        "add": "Ajouter",
+        "remove": "Retirer {item}",
+        "item": "{field} {n}",
+        "approvedHint": "Le dossier est déjà ouvert : corriger ces réponses ne change pas ses sections et documents."
       }
     },
     "document": {

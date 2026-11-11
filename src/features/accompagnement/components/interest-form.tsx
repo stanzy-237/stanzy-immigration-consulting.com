@@ -24,11 +24,10 @@ import {
   workSchema,
   type Areas,
   type Experience,
-  type InterestInput,
   type Progress,
   type Work,
 } from '@/features/accompagnement/lib/interest-schema';
-import { choosePrefill, type ChecklistForm, type PrefillSource } from '@/features/checklist/lib/checklist-form';
+import { choosePrefill, type ChecklistForm } from '@/features/checklist/lib/checklist-form';
 import { computeCrs } from '@/features/crs/lib/compute-crs';
 import { DEFAULT_FORM, fromProfile, toProfile, type CrsForm } from '@/features/crs/lib/crs-form';
 import { ChecklistFields } from '@/features/shared/components/checklist-fields';
@@ -79,22 +78,36 @@ export function InterestForm({ onSent }: { onSent: () => void }): ReactNode {
     draft: null,
   });
   return (
-    <ClientSteps
-      initial={{
-        situation: prefill.answers,
-        source: prefill.source,
-        progress: { ...DEFAULT_PROGRESS, ...(crs ? progressFromCrs(crs) : {}) },
-        crs,
-      }}
+    <Steps
+      prefill={prefill}
+      progress={{ ...DEFAULT_PROGRESS, ...(crs ? progressFromCrs(crs) : {}) }}
+      crs={crs}
       onSent={onSent}
     />
   );
 }
 
-/** The Client's Demande: tracked as it starts, sent, then the page moves on. */
-function ClientSteps({ initial, onSent }: { initial: StepsStart; onSent: () => void }): ReactNode {
+function Steps({
+  prefill,
+  progress: initialProgress,
+  crs: savedCrs,
+  onSent,
+}: {
+  prefill: ReturnType<typeof choosePrefill>;
+  progress: Progress;
+  /** Their latest CRS Simulation's answers, if any. */
+  crs: CrsForm | null;
+  onSent: () => void;
+}): ReactNode {
+  const t = useTranslations('Accompagnement.form');
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const [step, setStep] = useState<Step>('situation');
+  const [situation, setSituation] = useState<ChecklistForm>(prefill.answers);
+  const [progress, setProgress] = useState<Progress>(initialProgress);
+  const [work, setWork] = useState<Work>(() => workFor(prefill.answers.jobs));
+  const [areas, setAreas] = useState<Areas>(DEFAULT_AREAS);
+  const [crsForm, setCrsForm] = useState<CrsForm | null>(savedCrs);
   // `interest.viewed`, then `interest.started` once past the first step; the send is counted on the server.
   const markStarted = useCalculatorTracking('interest');
   const errors = useTranslations('Accompagnement.errors');
@@ -112,46 +125,6 @@ function ClientSteps({ initial, onSent }: { initial: StepsStart; onSent: () => v
       },
     }),
   );
-  return (
-    <InterestSteps initial={initial} onStarted={markStarted} pending={submit.isPending} onSubmit={submit.mutate} />
-  );
-}
-
-/** Where the steps start: the Checklist answers (and where they came from), then whatever is already known. */
-export type StepsStart = {
-  situation: ChecklistForm;
-  source: PrefillSource;
-  progress: Progress;
-  work?: Work;
-  areas?: Areas;
-  /** Their CRS answers, if known (a Simulation, or the Demande being corrected). */
-  crs: CrsForm | null;
-};
-
-/**
- * The Demande's five steps, for the Client sending it and for the consultant
- * correcting it (#154): `submitLabel` names the last button.
- */
-export function InterestSteps({
-  initial,
-  pending,
-  onSubmit,
-  onStarted,
-  submitLabel,
-}: {
-  initial: StepsStart;
-  pending: boolean;
-  onSubmit: (answers: InterestInput) => void;
-  onStarted?: () => void;
-  submitLabel?: string;
-}): ReactNode {
-  const t = useTranslations('Accompagnement.form');
-  const [step, setStep] = useState<Step>('situation');
-  const [situation, setSituation] = useState<ChecklistForm>(initial.situation);
-  const [progress, setProgress] = useState<Progress>(initial.progress);
-  const [work, setWork] = useState<Work>(() => initial.work ?? workFor(initial.situation.jobs));
-  const [areas, setAreas] = useState<Areas>(initial.areas ?? DEFAULT_AREAS);
-  const [crsForm, setCrsForm] = useState<CrsForm | null>(initial.crs);
   const index = STEPS.indexOf(step);
 
   return (
@@ -160,10 +133,10 @@ export function InterestSteps({
       {step === 'situation' ? (
         <ChecklistFields
           answers={situation}
-          source={initial.source}
+          source={prefill.source}
           submitLabel={t('next')}
           onContinue={(answers) => {
-            onStarted?.();
+            markStarted();
             setSituation(answers);
             setStep('progress');
           }}
@@ -212,11 +185,12 @@ export function InterestSteps({
         <DocumentsStep
           value={areas}
           cameroon={progress.residence === 'CM'}
-          pending={pending}
-          submitLabel={submitLabel}
+          pending={submit.isPending}
           onChange={setAreas}
           onBack={() => setStep('crs')}
-          onSubmit={() => onSubmit({ checklist: situation, progress, work, areas, crs: toProfile(crsForm ?? DEFAULT_FORM) })}
+          onSubmit={() =>
+            submit.mutate({ checklist: situation, progress, work, areas, crs: toProfile(crsForm ?? DEFAULT_FORM) })
+          }
         />
       )}
     </div>
@@ -581,7 +555,6 @@ function DocumentsStep({
   value,
   cameroon,
   pending,
-  submitLabel,
   onChange,
   onBack,
   onSubmit,
@@ -589,7 +562,6 @@ function DocumentsStep({
   value: Areas;
   cameroon: boolean;
   pending: boolean;
-  submitLabel?: string;
   onChange: (areas: Areas) => void;
   onBack: () => void;
   onSubmit: () => void;
@@ -661,7 +633,7 @@ function DocumentsStep({
         </button>
         <button type="submit" disabled={pending} className={primary}>
           <Send aria-hidden={true} className="size-4" />
-          {pending ? t('submitting') : (submitLabel ?? t('submit'))}
+          {pending ? t('submitting') : t('submit')}
         </button>
       </div>
     </form>

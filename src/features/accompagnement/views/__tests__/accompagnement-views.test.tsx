@@ -201,8 +201,7 @@ describe('a Demande d’intérêt, for the consultant', () => {
     expect(screen.getByText('Relevé de 4 mois')).toBeInTheDocument();
     // Their phone and each job (#147).
     expect(screen.getByText('+237 692 24 53 94')).toBeInTheDocument();
-    expect(screen.getByText('Comptable · Brasseries du Cameroun')).toBeInTheDocument();
-    expect(screen.getByText('CNP 11100 · 2019-03-01 → en cours')).toBeInTheDocument();
+    expect(screen.getByText('Brasseries du Cameroun · CNP 11100 · 2019-03-01 → en cours')).toBeInTheDocument();
     expect(screen.getByText('Le dossier s’ouvrira à l’étape « Création du profil Entrée Express ».')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
 
@@ -212,7 +211,7 @@ describe('a Demande d’intérêt, for the consultant', () => {
     await waitFor(() => expect(approve).toHaveBeenCalledWith({ id: 'int_1', level: 'C' }));
   });
 
-  it('lets the consultant correct the declarations, then shows who did and the Client’s own (#154)', async () => {
+  it('corrects one answer from its pencil, only that field opening (#154)', async () => {
     const update = vi.fn();
     const { trpc, queryClient, wrap } = createTestTRPC({
       'accompagnement.dashboard.get': () => interest,
@@ -221,32 +220,57 @@ describe('a Demande d’intérêt, for the consultant', () => {
     queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), interest as never);
     const { container } = render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Modifier les déclarations' }));
-    expect(screen.getByRole('heading', { name: 'Corriger les déclarations du Client' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier : Nationalité' }));
+    const field = screen.getByRole('textbox', { name: 'Nationalité' });
+    expect(field).toHaveValue('Camerounaise');
+    expect(screen.getAllByRole('button', { name: 'Enregistrer' })).toHaveLength(1);
     expect(await axe(container)).toHaveNoViolations();
-    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
-    expect(await screen.findByLabelText('Nationalité')).toHaveValue('Camerounaise');
-    fireEvent.change(screen.getByLabelText('Nationalité'), { target: { value: 'Ivoirienne' } });
-    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
-    // Their phone and job come back as they wrote them.
-    expect(await screen.findByLabelText('Numéro de téléphone (WhatsApp de préférence)')).toHaveValue('+237 692 24 53 94');
-    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
-    fireEvent.click(await screen.findByRole('button', { name: /Continuer/ }));
-    fireEvent.click(await screen.findByRole('button', { name: 'Enregistrer les corrections' }));
 
+    fireEvent.change(field, { target: { value: 'Ivoirienne' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
     await waitFor(() =>
       expect(update).toHaveBeenCalledWith({
         id: 'int_1',
-        answers: expect.objectContaining({
-          progress: expect.objectContaining({ citizenship: 'Ivoirienne' }),
+        answers: {
+          checklist: interest.answers.checklist,
+          progress: { ...interest.answers.progress, citizenship: 'Ivoirienne' },
           work: interest.answers.work,
-        }),
+          areas: interest.answers.areas,
+        },
       }),
     );
-    expect(await screen.findByText('Déclarations corrigées')).toBeInTheDocument();
+    expect(await screen.findByText('Réponse corrigée')).toBeInTheDocument();
   }, 30_000);
 
-  it('says who corrected the declarations, and keeps the Client’s own to compare', () => {
+  it('fills in a job’s company and CNP, and refuses a code that isn’t 5 digits', async () => {
+    const update = vi.fn();
+    const { trpc, queryClient, wrap } = createTestTRPC({
+      'accompagnement.dashboard.get': () => interest,
+      'accompagnement.dashboard.updateAnswers': (input) => update(input),
+    });
+    queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), interest as never);
+    render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier : Comptable' }));
+    fireEvent.change(screen.getByRole('textbox', { name: 'Code CNP (5 chiffres)' }), { target: { value: '111' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Vérifiez la valeur saisie.');
+    expect(update).not.toHaveBeenCalled();
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Code CNP (5 chiffres)' }), { target: { value: '12100' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
+    await waitFor(() =>
+      expect(update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          answers: expect.objectContaining({
+            work: { phone: '+237 692 24 53 94', experiences: [{ ...interest.answers.work.experiences[0], cnp: '12100' }] },
+          }),
+        }),
+      ),
+    );
+  }, 30_000);
+
+  it('shows who corrected the answers, and the Client’s own under each one changed', () => {
     const edited = {
       ...interest,
       answersEditedAt: new Date('2026-11-11T10:00:00Z'),
@@ -259,9 +283,9 @@ describe('a Demande d’intérêt, for the consultant', () => {
     const { trpc, queryClient, wrap } = createTestTRPC({ 'accompagnement.dashboard.get': () => edited });
     queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), edited as never);
     render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
-    expect(screen.getByText('Déclarations corrigées par Stanzy le 11 novembre 2026')).toBeInTheDocument();
-    expect(screen.getByText('Réponses d’origine du Client')).toBeInTheDocument();
-    expect(screen.getByText('Gabonaise')).toBeInTheDocument();
+    expect(screen.getByText('Réponses corrigées par Stanzy le 11 novembre 2026')).toBeInTheDocument();
+    expect(screen.getByText('Déclaré par le Client : Gabonaise')).toBeInTheDocument();
+    expect(screen.getAllByText(/Déclaré par le Client/)).toHaveLength(1);
   });
 
   it('still corrects an accepted Demande, saying the Dossier stays as it is; not a refused one', () => {
@@ -269,15 +293,15 @@ describe('a Demande d’intérêt, for the consultant', () => {
     const { trpc, queryClient, wrap } = createTestTRPC({ 'accompagnement.dashboard.get': () => accepted });
     queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), accepted as never);
     const { unmount } = render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
-    fireEvent.click(screen.getByRole('button', { name: 'Modifier les déclarations' }));
     expect(screen.getByText(/Le dossier est déjà ouvert/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Modifier : Nationalité' })).toBeInTheDocument();
     unmount();
 
     const refused = { ...interest, status: 'REJECTED', decidedAt: new Date('2026-11-05') };
     const other = createTestTRPC({ 'accompagnement.dashboard.get': () => refused });
     other.queryClient.setQueryData(other.trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), refused as never);
     render(withIntl(other.wrap(<InterestDashboardView id="int_1" />)));
-    expect(screen.queryByRole('button', { name: 'Modifier les déclarations' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Modifier :/ })).not.toBeInTheDocument();
   });
 
   it('once approved, sends the Contrat d’accompagnement first, then the invoice', () => {

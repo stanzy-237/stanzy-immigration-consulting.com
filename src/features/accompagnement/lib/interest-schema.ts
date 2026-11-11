@@ -75,22 +75,27 @@ export const areasSchema = z.object(Object.fromEntries(AREAS.map((area) => [area
 export type Areas = z.infer<typeof areasSchema>;
 
 /** The Demande d'intérêt as sent: with their CRS answers, scored on the server. « Stanzy s'en charge » only from Cameroon. */
+const answersShape = {
+  checklist: checklistFormSchema,
+  progress: progressSchema,
+  work: workSchema,
+  areas: areasSchema,
+  crs: crsProfileSchema,
+};
+
+type Consistent = { progress: Progress; areas: Areas };
+/** What holds whatever the answers: « Stanzy s'en charge » from Cameroon only… */
+const stanzyFromCameroon = (answers: Consistent): boolean =>
+  answers.progress.residence === 'CM' || AREAS.every((area) => answers.areas[area].answer !== 'stanzy');
+const STANZY_RULE = { message: 'INTEREST_STANZY_CAMEROON_ONLY', path: ['areas'] };
+/** …and an ITA only with a profile. */
+const itaWithProfile = (answers: Consistent): boolean => !answers.progress.ita || answers.progress.eeProfile;
+const ITA_RULE = { message: 'INTEREST_ITA_WITHOUT_PROFILE', path: ['progress', 'ita'] };
+
 export const interestAnswersSchema = z
-  .object({
-    checklist: checklistFormSchema,
-    progress: progressSchema,
-    work: workSchema,
-    areas: areasSchema,
-    crs: crsProfileSchema,
-  })
-  .refine(
-    (answers) => answers.progress.residence === 'CM' || AREAS.every((area) => answers.areas[area].answer !== 'stanzy'),
-    { message: 'INTEREST_STANZY_CAMEROON_ONLY', path: ['areas'] },
-  )
-  .refine((answers) => !answers.progress.ita || answers.progress.eeProfile, {
-    message: 'INTEREST_ITA_WITHOUT_PROFILE',
-    path: ['progress', 'ita'],
-  });
+  .object(answersShape)
+  .refine(stanzyFromCameroon, STANZY_RULE)
+  .refine(itaWithProfile, ITA_RULE);
 /** The Demande as the form sends it. */
 export type InterestInput = z.infer<typeof interestAnswersSchema>;
 
@@ -102,8 +107,22 @@ export type InterestAnswers = { checklist: ChecklistForm; progress: Progress; wo
 /** The consultant sets or clears the ITA date of an Accompagnement Dossier. */
 export const itaDateInput = z.object({ dossierId: z.string().min(1), itaDate: z.string().regex(DAY).nullable() });
 
-/** The consultant's correction of a Demande's answers (#154). */
-export const updateAnswersInput = z.object({ id: z.string().min(1), answers: interestAnswersSchema });
+/**
+ * The consultant's correction of a Demande's answers, one answer at a time
+ * (#154). A Demande sent before the CRS step or the work step (#147) has
+ * none to correct; only the jobs filled in are sent.
+ */
+export const correctedAnswersSchema = z
+  .object({
+    ...answersShape,
+    // A Demande sent before #147 has no phone: its jobs can be filled in without one.
+    work: workSchema.extend({ phone: workSchema.shape.phone.or(z.literal('')) }).optional(),
+    crs: crsProfileSchema.optional(),
+  })
+  .refine(stanzyFromCameroon, STANZY_RULE)
+  .refine(itaWithProfile, ITA_RULE);
+export type CorrectedAnswers = z.infer<typeof correctedAnswersSchema>;
+export const updateAnswersInput = z.object({ id: z.string().min(1), answers: correctedAnswersSchema });
 
 export const decideInput = z.object({ id: z.string().min(1), level: z.enum(LEVELS) });
 export const rejectInput = z.object({ id: z.string().min(1), reason: z.string().trim().max(REASON_MAX) });

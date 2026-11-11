@@ -310,6 +310,20 @@ describe('the Demande d’intérêt', () => {
     expect(documents.filter((d) => d.kind === 'personalHistory')).toHaveLength(2);
   });
 
+  it('corrects a Demande sent before the CRS and work steps, filling in one job without a phone', async () => {
+    const { db, interests } = fakeDatabase();
+    const { id } = await callerFor(db, user()).accompagnement.submit(answers());
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- left out, as such a Demande has neither
+    const { crs, work, ...older } = answers();
+    interests[0]!.answers = older;
+    const job = { title: 'Comptable', company: 'Brasseries du Cameroun', cnp: '11100', startOn: '2019-03-01', endOn: null };
+    await callerFor(db, consultant).accompagnement.dashboard.updateAnswers({
+      id,
+      answers: { ...older, work: { phone: '', experiences: [job] } },
+    });
+    expect(interests[0]!.answers).toEqual({ ...older, work: { phone: '', experiences: [job] } });
+  });
+
   it('leaves a refused Demande as it was', async () => {
     const { db } = fakeDatabase();
     const { id } = await callerFor(db, user()).accompagnement.submit(answers());

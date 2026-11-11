@@ -23,7 +23,6 @@ import {
   startStageOf,
   updateAnswersInput,
   type InterestAnswers,
-  type InterestInput,
   type SavedCrs,
 } from '@/features/accompagnement/lib/interest-schema';
 import { livesInCameroon } from '@/features/accompagnement/server/residence';
@@ -31,7 +30,7 @@ import { acceptStanzyRequest } from '@/features/accompagnement/server/stanzy-acc
 import { transitionAccountStatus } from '@/features/auth/server/account-status';
 import { SCHEDULE_MAX } from '@/features/contracts/lib/contract-schema';
 import { prerequisitesOf } from '@/features/document-services/lib/service-schema';
-import { computeCrs } from '@/features/crs/lib/compute-crs';
+import { computeCrs, type CrsProfile } from '@/features/crs/lib/compute-crs';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
 import { dossierFor, isConsultant, writable } from '@/features/dossiers/server/dossier-access';
@@ -98,12 +97,12 @@ const listed = {
  * made from the Checklist) or rejects. « Stanzy s'en charge » requests on a
  * missing Document are recorded here; prices and Missions come with #80 and #42.
  */
-/** The answers as saved: with their CRS score worked out here under the rules in force, never what the form sent. */
-function scoredAnswers(input: InterestInput): InterestAnswers & { crs: SavedCrs } {
+/** Their CRS score, worked out here under the rules in force: what the form showed, never what it sent. */
+function scoreOf(profile: CrsProfile): SavedCrs {
   const rules = rulesInForceOn(new Date());
-  const scored = computeCrs(input.crs, { rules });
+  const scored = computeCrs(profile, { rules });
   if (!scored.ok) throw refuse('INTEREST_CRS_INVALID');
-  return { ...input, crs: { profile: input.crs, rules, total: scored.breakdown.total } };
+  return { profile, rules, total: scored.breakdown.total };
 }
 
 export const accompagnementRouter = createTRPCRouter({
@@ -160,7 +159,7 @@ export const accompagnementRouter = createTRPCRouter({
     if (pending) throw refuse('INTEREST_PENDING');
 
     const level = levelOf(input);
-    const answers = scoredAnswers(input);
+    const answers = { ...input, crs: scoreOf(input.crs) };
     const interest = await ctx.prisma.$transaction(async (tx) => {
       const created = await tx.interestRequest.create({
         data: {
@@ -258,7 +257,8 @@ export const accompagnementRouter = createTRPCRouter({
       });
       if (!interest) throw notFound();
       if (interest.status === 'REJECTED') throw refuse('INTEREST_NOT_EDITABLE');
-      const answers = scoredAnswers(input.answers);
+      const { crs, ...rest } = input.answers;
+      const answers: InterestAnswers = { ...rest, ...(crs ? { crs: scoreOf(crs) } : {}) };
       // Against the status read: a decision in between makes it refused, and the page reloads.
       const { count } = await ctx.prisma.interestRequest.updateMany({
         where: { id: interest.id, status: interest.status },

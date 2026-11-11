@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowLeft, Check, Pencil, X } from 'lucide-react';
+import { ArrowLeft, Check, X } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
@@ -19,15 +19,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
-import { InterestEdit } from '@/features/accompagnement/components/interest-edit';
-import {
-  AREAS,
-  LEVELS,
-  REASON_MAX,
-  startStageOf,
-  type InterestAnswers,
-  type Level,
-} from '@/features/accompagnement/lib/interest-schema';
+import { InterestAnswers } from '@/features/accompagnement/components/interest-answers';
+import { LEVELS, REASON_MAX, startStageOf, type Level } from '@/features/accompagnement/lib/interest-schema';
 import { STATUS_STYLES } from '@/features/accompagnement/views/interests-dashboard-view';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
@@ -60,7 +53,6 @@ function Detail({ id }: { id: string }): ReactNode {
   const { data: interest } = useSuspenseQuery(trpc.accompagnement.dashboard.get.queryOptions({ id }));
   const date = (value: Date) => format.dateTime(value, { day: 'numeric', month: 'long', year: 'numeric' });
   const level = interest.levelOverride ?? interest.level;
-  const [editing, setEditing] = useState(false);
   const pending = interest.status === 'SUBMITTED';
   // Correctable before the decision and once accepted (#154); a refused Demande stays as it was.
   const editable = interest.status !== 'REJECTED';
@@ -90,51 +82,22 @@ function Detail({ id }: { id: string }): ReactNode {
         ) : null}
       </div>
 
-      {editing && editable ? (
-        <InterestEdit interest={interest} approved={!pending} onDone={() => setEditing(false)} />
-      ) : (
-        <>
-          {/* Keyed by the Niveau: a correction that changes it starts the choice again from it. */}
-          {pending ? <Decision key={interest.level} interest={interest} /> : null}
-          {interest.status === 'APPROVED' && interest.dossierId ? <Approved dossierId={interest.dossierId} /> : null}
+      {/* Keyed by the Niveau: a correction that changes it starts the choice again from it. */}
+      {pending ? <Decision key={interest.level} interest={interest} /> : null}
+      {interest.status === 'APPROVED' && interest.dossierId ? <Approved dossierId={interest.dossierId} /> : null}
 
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {interest.answersEditedAt ? (
-              <p className="text-sm text-slate">
-                {t('dashboard.edit.editedOn', {
-                  date: date(interest.answersEditedAt),
-                  name: interest.answersEditedBy?.name ?? 'Stanzy',
-                })}
-              </p>
-            ) : (
-              <span />
-            )}
-            {editable ? (
-              <button
-                type="button"
-                onClick={() => setEditing(true)}
-                className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-navy-deep px-4 text-sm font-semibold text-navy-deep hover:bg-navy-deep hover:text-white"
-              >
-                <Pencil aria-hidden={true} className="size-4" />
-                {t('dashboard.edit.open')}
-              </button>
-            ) : null}
-          </div>
-
-          <Answers answers={interest.answers} />
-
-          {interest.originalAnswers ? (
-            <details className="group rounded-2xl border border-dashed border-fog-light bg-off-white p-4">
-              <summary className="cursor-pointer text-sm font-semibold text-navy-deep">
-                {t('dashboard.edit.original')}
-              </summary>
-              <div className="mt-4 grid grid-cols-1 gap-4">
-                <Answers answers={interest.originalAnswers} prefix="original" />
-              </div>
-            </details>
-          ) : null}
-        </>
-      )}
+      {interest.answersEditedAt ? (
+        <p className="text-sm text-slate">
+          {t('dashboard.edit.editedOn', {
+            date: date(interest.answersEditedAt),
+            name: interest.answersEditedBy?.name ?? 'Stanzy',
+          })}
+        </p>
+      ) : null}
+      {editable && !pending ? (
+        <p className="rounded-xl bg-honey-tint px-4 py-3 text-sm text-navy-deep">{t('dashboard.edit.approvedHint')}</p>
+      ) : null}
+      <InterestAnswers interest={interest} editable={editable} />
 
       {interest.history.length > 0 ? (
         <section aria-labelledby="interest-history" className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
@@ -299,111 +262,6 @@ function Approved({ dossierId }: { dossierId: string }): ReactNode {
         </Link>
       </div>
     </div>
-  );
-}
-
-/** What they answered: where they stand, their contact and jobs (#147), situation, and each document area with its note. */
-function Answers({ answers, prefix = 'interest' }: { answers: InterestAnswers; prefix?: string }): ReactNode {
-  const t = useTranslations('Accompagnement');
-  const family = useTranslations('Calculators.family');
-  const { checklist, progress, work, areas } = answers;
-  const yes = (value: boolean) => (value ? t('dashboard.yes') : t('dashboard.no'));
-  const residence =
-    progress.residence === 'OTHER' ? progress.residenceOther : t(`form.residences.${progress.residence}`);
-  const rows = (entries: [string, string][]) => (
-    <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-      {entries.map(([term, value]) => (
-        <div key={term}>
-          <dt className="text-xs font-semibold text-slate">{term}</dt>
-          <dd className="text-navy-deep">{value}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-  const section = (key: string, title: string, body: ReactNode) => (
-    <section aria-labelledby={`${prefix}-${key}`} className="rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
-      <h2 id={`${prefix}-${key}`} className="mb-3 font-heading text-lg font-bold text-navy-deep">
-        {title}
-      </h2>
-      {body}
-    </section>
-  );
-
-  return (
-    <>
-      {section(
-        'progress',
-        t('dashboard.progress'),
-        rows([
-          [t('form.age'), String(progress.age)],
-          [t('form.citizenship'), progress.citizenship],
-          [t('form.residence'), residence],
-          [t('form.languageTest'), t(`form.languageTests.${progress.languageTest}`)],
-          [t('form.ede'), yes(progress.ede)],
-          [t('form.eeProfile'), yes(progress.eeProfile)],
-          [t('form.ita'), progress.ita ? `${yes(true)}${progress.itaDate ? ` · ${progress.itaDate}` : ''}` : yes(false)],
-          ...(answers.crs ? [[t('dashboard.crs'), String(answers.crs.total)] as [string, string]] : []),
-        ]),
-      )}
-      {work
-        ? section(
-            'work',
-            t('dashboard.work'),
-            <div className="grid grid-cols-1 gap-4">
-              {rows([[t('form.work.phone'), work.phone]])}
-              <ul className="grid grid-cols-1 gap-3">
-                {work.experiences.map((job, index) => (
-                  <li key={index} className="rounded-xl bg-off-white px-3 py-2.5 text-sm">
-                    <p className="font-semibold text-navy-deep">
-                      {job.title} · {job.company}
-                    </p>
-                    <p className="text-slate">
-                      {t('dashboard.cnp', { code: job.cnp })} ·{' '}
-                      {t('dashboard.period', { start: job.startOn, end: job.endOn ?? t('dashboard.current') })}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>,
-          )
-        : null}
-      {section(
-        'situation',
-        t('dashboard.situation'),
-        rows([
-          [t('dashboard.maritalStatus'), family(`maritalOptions.${checklist.maritalStatus}`)],
-          [t('dashboard.spouseAccompanying'), yes(checklist.spouseAccompanying)],
-          [t('dashboard.children'), String(checklist.children)],
-          [t('dashboard.foreignEducation'), yes(checklist.foreignEducation)],
-          [t('dashboard.canadianEducation'), yes(checklist.canadianEducation)],
-          [t('dashboard.jobs'), checklist.jobs.map((job) => job.title).join(', ')],
-          [t('dashboard.countries'), checklist.countries.join(', ')],
-        ]),
-      )}
-      {section(
-        'documents',
-        t('dashboard.documents'),
-        <ul className="grid grid-cols-1 gap-3">
-          {AREAS.map((area) => (
-            <li key={area} className="text-sm">
-              <p className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-navy-deep">{t(`form.areas.${area}`)}</span>
-                <span
-                  className={
-                    areas[area].answer === 'have'
-                      ? 'rounded-full bg-leaf-tint px-2 py-0.5 text-xs font-semibold text-leaf'
-                      : 'rounded-full bg-honey-tint px-2 py-0.5 text-xs font-semibold text-honey'
-                  }
-                >
-                  {t(`form.answers.${areas[area].answer}`)}
-                </span>
-              </p>
-              {areas[area].note ? <p className="mt-0.5 text-slate">{areas[area].note}</p> : null}
-            </li>
-          ))}
-        </ul>,
-      )}
-    </>
   );
 }
 
