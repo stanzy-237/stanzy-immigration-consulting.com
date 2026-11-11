@@ -17,8 +17,11 @@ export type LinkTarget = Pick<NotificationItem, 'kind'> & {
   document?: { id: string } | null;
   comment?: { id: string } | null;
   invoice?: { id: string } | null;
-  /** A Demande de signature's id (SIGNATURE_*), a Contrat's (CONTRACT_*), a Réunion's (MEETING_*), a Demande d'intérêt's (INTEREST_*). */
-  params?: { requestId?: string; contractId?: string; meetingId?: string; interestId?: string };
+  /**
+   * A Demande de signature's id (SIGNATURE_*), a Contrat's (CONTRACT_*), a Réunion's (MEETING_*),
+   * a Demande d'intérêt's (INTEREST_*), a Paiement's (RECEIPT_*).
+   */
+  params?: { requestId?: string; contractId?: string; meetingId?: string; interestId?: string; paymentId?: string };
 };
 
 export function notificationHref(item: LinkTarget, audience: Audience, locale: string): string {
@@ -54,6 +57,10 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
     return `${dossier}/contrats/${item.params.contractId}`;
   }
   if (contract || item.kind === 'CONTRACT_SIGNED') return `${dossier}#contrats`;
+  // A Reconnaissance de réception de fonds to sign (#145) opens on its fields.
+  if (item.kind === 'RECEIPT_SENT' && audience === 'client' && item.params?.paymentId) {
+    return `${dossier}/recus/${item.params.paymentId}`;
+  }
   if (item.kind === 'DOSSIER_MESSAGE') return `${dossier}#messages`;
   // A service's hand-over (#80): the consultant's request page, the Client's Documents tab.
   if (item.kind === 'REQUIREMENTS_SUBMITTED' && audience === 'consultant' && item.params?.requestId) {

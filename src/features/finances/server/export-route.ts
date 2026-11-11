@@ -5,10 +5,8 @@ import { isConsultant } from '@/features/dossiers/server/dossier-access';
 import { toCsv } from '@/features/finances/lib/csv';
 import { monthOf, toXaf } from '@/features/finances/lib/finance-report';
 import { yearInput } from '@/features/finances/lib/finance-schema';
-import { dateOf, dayOf, loadRates } from '@/features/finances/server/finance-entries';
+import { countedPayments, dayOf, loadRates, yearBounds } from '@/features/finances/server/finance-entries';
 import { minorDigits, type Currency } from '@/features/invoices/lib/money';
-import { doualaDay } from '@/features/notifications/lib/douala-days';
-import { invoiceTotal } from '@/features/invoices/lib/money';
 import { toLocale } from '@/i18n/routing';
 import en from '@/messages/en.json';
 import fr from '@/messages/fr.json';
@@ -36,21 +34,23 @@ export async function GET(request: Request): Promise<Response> {
   const locale = toLocale(url.searchParams.get('locale'));
   const t = createTranslator({ locale, messages: MESSAGES[locale] });
 
-  const days = { gte: dateOf(`${year}-01-01`), lt: dateOf(`${year + 1}-01-01`) };
+  const { days } = yearBounds(year);
   const client = { select: { account: { select: { name: true } } } } as const;
-  const [rates, invoices, incomes, charges] = await Promise.all([
+  const [rates, payments, incomes, charges] = await Promise.all([
     loadRates(prisma),
-    prisma.invoice.findMany({
-      where: {
-        status: 'PAID',
-        paidAt: { gte: new Date(`${year}-01-01T00:00:00+01:00`), lt: new Date(`${year + 1}-01-01T00:00:00+01:00`) },
-      },
+    prisma.payment.findMany({
+      where: { invoice: countedPayments(), receivedOn: yearBounds(year).received },
       select: {
-        number: true,
-        currency: true,
-        paidAt: true,
-        lines: { select: { quantity: true, unitAmount: true } },
-        dossier: { select: { service: true, account: { select: { name: true } } } },
+        amount: true,
+        receivedOn: true,
+        receiptNumber: true,
+        invoice: {
+          select: {
+            number: true,
+            currency: true,
+            dossier: { select: { service: true, account: { select: { name: true } } } },
+          },
+        },
       },
     }),
     prisma.income.findMany({
@@ -82,15 +82,15 @@ export async function GET(request: Request): Promise<Response> {
   };
   const service = (value: string | null) => (value ? t(`Dossiers.services.${value as 'EDE'}`) : '');
   const lines: Line[] = [
-    ...invoices.map((invoice) => ({
-      day: doualaDay(invoice.paidAt!),
+    ...payments.map(({ invoice, ...payment }) => ({
+      day: payment.receivedOn,
       kind: 'income' as const,
-      amount: invoiceTotal(invoice.lines),
+      amount: payment.amount,
       currency: invoice.currency,
       label: service(invoice.dossier.service),
       client: invoice.dossier.account.name,
       invoice: invoice.number ?? '',
-      note: '',
+      note: payment.receiptNumber ?? '',
     })),
     ...incomes.map((income) => ({
       day: dayOf(income.date),

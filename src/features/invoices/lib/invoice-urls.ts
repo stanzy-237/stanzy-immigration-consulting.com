@@ -9,3 +9,6 @@ export const proofFileUrl = (proofId: string): string => `/api/invoices/proofs/$
 /** Encrypts a Preuve de paiement in the browser and sends it to R2; `invoices.addProof` records it. */
 export const uploadProofFile = (invoiceId: string, file: File) =>
   uploadEncryptedFile(file, { uploadRoute: '/api/invoices/upload', payload: { invoiceId } });
+
+/** A Reconnaissance de réception de fonds: the signed copy once signed. */
+export const receiptFileUrl = (paymentId: string): string => `/api/invoices/receipts/${paymentId}`;

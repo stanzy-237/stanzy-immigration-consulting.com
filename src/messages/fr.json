@@ -2155,6 +2155,7 @@
       "SENT": "Envoyée",
       "OVERDUE": "En retard",
       "PROOF_RECEIVED": "Preuve reçue",
+      "PARTIALLY_PAID": "Partiellement payée",
       "PAID": "Payée",
       "CANCELLED": "Annulée"
     },
@@ -2266,7 +2267,6 @@
       "cancelledOn": "Annulée le {date}",
       "cancelReason": "Motif : {reason}",
       "downloadPdf": "Télécharger le PDF",
-      "markPaid": "Marquer payée",
       "cancelInvoice": "Annuler la facture",
       "cancelTitle": "Annuler cette facture ?",
       "cancelBody": "Elle reste dans l’historique, marquée « Annulée ». Le Client n’est pas prévenu par email.",
@@ -2299,10 +2299,10 @@
       "saved": "Brouillon enregistré",
       "sent": "Facture {number} envoyée",
       "deleted": "Brouillon supprimé",
-      "paid": "Facture marquée payée",
       "cancelled": "Facture annulée",
       "proofAdded": "Preuve de paiement envoyée",
-      "changed": "Cette facture a changé entre-temps : la page est à jour."
+      "changed": "Cette facture a changé entre-temps : la page est à jour.",
+      "recorded": "Paiement enregistré : reconnaissance {number} envoyée"
     },
     "errors": {
       "INVOICE_EMPTY": "Ajoutez au moins une ligne avec un montant.",
@@ -2312,7 +2312,69 @@
       "DOCUMENT_FILE_TYPE": "Ce type de fichier n’est pas accepté : PDF, JPG, PNG, WebP ou HEIC.",
       "DOCUMENT_FILE_TOO_LARGE": "Ce fichier dépasse 25 Mo.",
       "DOCUMENT_FILE_INVALID": "Le fichier n’a pas été reçu correctement. Réessayez.",
-      "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez."
+      "UNKNOWN": "La modification n’a pas pu être enregistrée. Réessayez.",
+      "PAYMENT_TOO_HIGH": "Ce montant dépasse ce qui reste à payer.",
+      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et le cachet dans « Signatures ».",
+      "PAYMENT_NOTE_REQUIRED": "Précisez le moyen de paiement.",
+      "RECEIPT_NOT_PENDING": "Cette reconnaissance est déjà signée.",
+      "RECEIPT_NOT_YOURS": "Seul le Client du dossier peut signer cette reconnaissance.",
+      "SIGNATURE_DOCUMENT_CHANGED": "Le document a changé. Rechargez la page.",
+      "SIGNATURE_IMAGE_INVALID": "La signature n’a pas pu être lue. Signez à nouveau."
+    },
+    "receipt": {
+      "title": "Reconnaissance de réception de fonds",
+      "number": "Reconnaissance n° {number}",
+      "body": "Je soussigné, représentant de STANZY IMMIGRATION CONSULTING, reconnais avoir reçu de Monsieur/Madame {client}, la somme de {amount}, soit {words} {currencyWords}, au titre du règlement de la prestation de services fournie par notre agence.\n\nLa prestation concernée est la suivante : {service}.\n\nLe montant total convenu pour cette prestation est de {total}. La somme de {amount} a été reçue le {receivedOn}. Le solde restant dû est de {balance}.\n\nLe paiement a été effectué par le moyen suivant :\n\n{methods}\n\nLa présente reconnaissance est établie afin d’attester de la réception effective des fonds par STANZY IMMIGRATION CONSULTING au titre de la prestation de services susmentionnée et pour servir et valoir ce que de droit.\n\nFait à Douala, le {issuedOn}.",
+      "currencyWords": {
+        "XAF": "francs CFA",
+        "CAD": "dollars canadiens",
+        "EUR": "euros"
+      },
+      "methods": {
+        "CASH": "Espèces",
+        "BANK_TRANSFER": "Virement bancaire",
+        "BANK_DEPOSIT": "Dépôt bancaire",
+        "MOBILE_MONEY": "Mobile Money",
+        "CHEQUE": "Chèque",
+        "OTHER": "Autre"
+      },
+      "client": "Le Concerné",
+      "company": "STANZY IMMIGRATION CONSULTING"
+    },
+    "payments": {
+      "title": "Paiements",
+      "empty": "Aucun paiement enregistré.",
+      "summary": "Reçu {received} sur {total} · reste {balance}",
+      "record": "Enregistrer un paiement",
+      "recordTitle": "Enregistrer un paiement",
+      "recordBody": "Une Reconnaissance de réception de fonds, signée et cachetée, est envoyée au Client qui la signe dans l’application.",
+      "amount": "Montant reçu",
+      "amountError": "Indiquez un montant entre 1 et {balance}.",
+      "receivedOn": "Reçu le",
+      "method": "Moyen de paiement",
+      "methodNote": "Précisez le moyen",
+      "methodNoteError": "Précisez le moyen de paiement.",
+      "proof": "Justificatif (facultatif)",
+      "proofHint": "Photo ou PDF du reçu, par exemple pour un paiement en espèces. 25 Mo au plus.",
+      "confirm": "Enregistrer",
+      "cancel": "Annuler",
+      "sending": "Enregistrement…",
+      "receipt": "Reconnaissance {number}",
+      "openReceipt": "Ouvrir la reconnaissance",
+      "toSign": "À signer par le Client",
+      "signed": "Signée par {name} le {date}",
+      "sign": "Signer la reconnaissance",
+      "signLabel": "Signer la reconnaissance {number}",
+      "justificatif": "Justificatif"
+    },
+    "receiptSign": {
+      "metaTitle": "Signer la reconnaissance",
+      "back": "Retour au dossier",
+      "title": "Reconnaissance de réception de fonds {number}",
+      "intro": "Elle atteste le paiement de {amount} reçu par Stanzy le {date}. Notre signature et notre cachet y sont déjà : lisez-la, puis signez-la.",
+      "alreadySigned": "Vous avez signé cette reconnaissance le {date}.",
+      "openSigned": "Ouvrir la reconnaissance signée",
+      "signed": "Reconnaissance signée"
     }
   },
   "Notifications": {
@@ -2370,7 +2432,9 @@
       "MEETING_CANCELLED": "Réunion « {subject} » annulée.",
       "MEETING_REMINDER": "{soon, select, true {La réunion « {subject} » commence bientôt.} other {Rappel : réunion « {subject} » le {date}.}}",
       "DOSSIER_MESSAGE": "{actor} a écrit {count, plural, one {un message} other {# messages}} dans le dossier {service}.",
-      "MEETING_JOIN_REQUEST": "{client} demande à entrer dans « {subject} »."
+      "MEETING_JOIN_REQUEST": "{client} demande à entrer dans « {subject} ».",
+      "RECEIPT_SENT": "Stanzy a reçu votre paiement : signez la reconnaissance {number}.",
+      "RECEIPT_SIGNED": "{actor} a signé la reconnaissance {number}."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2404,7 +2468,9 @@
       "MEETING_CANCELLED": "Une réunion est annulée.",
       "MEETING_REMINDER": "Rappel de réunion.",
       "DOSSIER_MESSAGE": "Nouveau message dans un dossier.",
-      "MEETING_JOIN_REQUEST": "Quelqu’un demande à entrer."
+      "MEETING_JOIN_REQUEST": "Quelqu’un demande à entrer.",
+      "RECEIPT_SENT": "Une reconnaissance à signer.",
+      "RECEIPT_SIGNED": "Une reconnaissance a été signée."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",

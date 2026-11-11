@@ -19,6 +19,13 @@ const item = (extra: Partial<NotificationItem>): NotificationItem =>
   }) as NotificationItem;
 
 describe('where a Notification leads', () => {
+  it('opens a Reconnaissance to sign for the Client, and its Facture for the consultant', () => {
+    const sent = item({ kind: 'RECEIPT_SENT', invoice: { id: 'inv_1', number: 'F-2026-0001', currency: 'XAF', total: 100 }, params: { paymentId: 'pay_1' } });
+    expect(notificationHref(sent, 'client', 'fr')).toBe('/fr/mon-espace/dossiers/dos_1/recus/pay_1');
+    const signed = item({ kind: 'RECEIPT_SIGNED', invoice: { id: 'inv_1', number: 'F-2026-0001', currency: 'XAF', total: 100 }, params: { paymentId: 'pay_1' } });
+    expect(notificationHref(signed, 'consultant', 'fr')).toBe('/factures/inv_1');
+  });
+
   it('opens a Demande d’intérêt for the consultant, and its status for the User', () => {
     const sent = item({ kind: 'INTEREST_SUBMITTED', dossier: null, params: { interestId: 'int_1' } });
     expect(notificationHref(sent, 'consultant', 'fr')).toBe('/demandes/int_1');

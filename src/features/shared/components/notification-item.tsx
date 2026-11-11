@@ -74,6 +74,8 @@ const ICONS: Record<Item['kind'], LucideIcon> = {
   CONTRACT_REMINDER: ScrollText,
   REQUIREMENTS_SUBMITTED: ClipboardCheck,
   REQUIREMENTS_CONFIRMED: BadgeCheck,
+  RECEIPT_SENT: ReceiptText,
+  RECEIPT_SIGNED: FileSignature,
 };
 
 /**

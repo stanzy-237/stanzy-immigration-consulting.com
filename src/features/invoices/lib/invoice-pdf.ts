@@ -1,6 +1,7 @@
-import { degrees, PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from 'pdf-lib';
+import { degrees, PDFDocument, rgb, StandardFonts, type PDFFont, type PDFImage, type PDFPage } from 'pdf-lib';
 
 import { formatMoney, invoiceTotal, lineTotal, type Currency } from '@/features/invoices/lib/money';
+import type { ImageFile } from '@/features/signatures/lib/sign-pdf';
 
 /** Everything printed on a Facture, already translated. */
 export type InvoicePdfData = {
@@ -15,6 +16,8 @@ export type InvoicePdfData = {
   notes: string | null;
   /** Stamped across the page: PAID « Payée », CANCELLED « Annulée ». */
   stamp: 'PAID' | 'CANCELLED' | null;
+  /** The consultant's signature and the company stamp, signed under a Payée Facture (#145). */
+  consultant: { signature: ImageFile; stamp: ImageFile } | null;
   labels: {
     title: string;
     number: string;
@@ -31,6 +34,7 @@ export type InvoicePdfData = {
     page: (page: number, pages: number) => string;
     paid: string;
     cancelled: string;
+    company: string;
   };
 };
 
@@ -53,6 +57,10 @@ const DESCRIPTION_WIDTH = 250;
 const QUANTITY_RIGHT = 360;
 const UNIT_RIGHT = 450;
 const AMOUNT_RIGHT = RIGHT - 6;
+
+// A Payée Facture's signature and stamp: the right half, this tall.
+const SIGNED_LEFT = 300;
+const SIGNED_HEIGHT = 70;
 
 /**
  * Draws a Facture on the Stanzy letterhead (`letterhead`: its one-page PDF).
@@ -151,6 +159,27 @@ export async function renderInvoicePdf(letterhead: Uint8Array, data: InvoicePdfD
     }
     text(page, labels.notes.toUpperCase(), LEFT, y, bold, 9, ROUGE);
     noteRows.forEach((row, index) => text(page, row, LEFT, y - 15 - index * 13, regular, 10, SLATE));
+    y -= 15 + noteRows.length * 13 + 20;
+  }
+
+  // Payée: signed and stamped on the right, under everything else.
+  if (data.stamp === 'PAID' && data.consultant) {
+    if (y - SIGNED_HEIGHT - 20 < BOTTOM) {
+      page = await newPage();
+      y = TOP;
+    }
+    const embed = (file: ImageFile) => (file.type === 'image/png' ? doc.embedPng(file.bytes) : doc.embedJpg(file.bytes));
+    const [signature, stamp] = await Promise.all([embed(data.consultant.signature), embed(data.consultant.stamp)]);
+    text(page, labels.company.toUpperCase(), SIGNED_LEFT, y, bold, 9, ROUGE);
+    const contain = (image: PDFImage, x: number, width: number) => {
+      const scale = Math.min(width / image.width, SIGNED_HEIGHT / image.height);
+      const w = image.width * scale;
+      const h = image.height * scale;
+      page.drawImage(image, { x: x + (width - w) / 2, y: y - 8 - SIGNED_HEIGHT + (SIGNED_HEIGHT - h) / 2, width: w, height: h });
+    };
+    const half = (RIGHT - SIGNED_LEFT) / 2;
+    contain(signature, SIGNED_LEFT, half);
+    contain(stamp, SIGNED_LEFT + half, half);
   }
 
   if (data.stamp) {

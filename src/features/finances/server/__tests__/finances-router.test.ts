@@ -38,13 +38,29 @@ function fakeDatabase() {
     {
       id: 'inv_2',
       number: 'STZ-2026-0002',
-      status: 'SENT',
+      status: 'PARTIALLY_PAID',
       currency: 'XAF',
       paidAt: null,
       dossierId: 'dos_1',
       dossier: dossiers[0],
       lines: [{ quantity: 1, unitAmount: 999_999 }],
     },
+    {
+      id: 'inv_3',
+      number: 'STZ-2026-0003',
+      status: 'CANCELLED',
+      currency: 'XAF',
+      paidAt: null,
+      dossierId: 'dos_1',
+      dossier: dossiers[0],
+      lines: [{ quantity: 1, unitAmount: 50_000 }],
+    },
+  ];
+  // Each Paiement is a Recette on the day it was received (#145), part payments included.
+  const payments: Row[] = [
+    { id: 'pay_1', invoiceId: 'inv_1', amount: 400_000, receivedOn: '2026-02-03' },
+    { id: 'pay_2', invoiceId: 'inv_2', amount: 100_000, receivedOn: '2026-02-20' },
+    { id: 'pay_3', invoiceId: 'inv_3', amount: 50_000, receivedOn: '2026-02-21' },
   ];
   const categories: Row[] = [
     { id: 'cat_rent', name: 'Loyer', position: 1, archivedAt: null },
@@ -73,9 +89,11 @@ function fakeDatabase() {
       findMany: async ({ where }: { where: { id: { in: string[] } } }) =>
         dossiers.filter((d) => where.id.in.includes(d.id)),
     },
-    invoice: {
-      findMany: async ({ where }: { where: Record<string, unknown> }) =>
-        invoices.filter((i) => i.status === where.status && linked(where, i)),
+    payment: {
+      findMany: async ({ where }: { where: { invoice: { status: { not: string }; dossierId?: string } } }) =>
+        payments
+          .map((payment) => ({ ...payment, invoice: invoices.find((i) => i.id === payment.invoiceId)! }))
+          .filter(({ invoice }) => invoice.status !== where.invoice.status.not && linked(where.invoice, invoice)),
     },
     income: {
       findMany: async ({ where }: { where?: Record<string, unknown> } = {}) =>
@@ -192,21 +210,22 @@ describe('finances', () => {
     await caller.finances.charges.create(chargeOf({ dossierId: 'dos_1', amount: 150_000 }));
 
     const { report, margins } = await caller.finances.overview({ year: 2026 });
-    expect(report.total).toEqual({ income: 450_000, charges: 150_000, net: 300_000 });
-    expect(report.months[1]!.income).toBe(400_000);
+    expect(report.total).toEqual({ income: 550_000, charges: 150_000, net: 400_000 });
+    expect(report.months[1]!.income).toBe(500_000);
     expect(margins).toEqual([
-      expect.objectContaining({ dossierId: 'dos_1', income: 400_000, charges: 150_000, net: 250_000 }),
+      expect.objectContaining({ dossierId: 'dos_1', income: 500_000, charges: 150_000, net: 350_000 }),
     ]);
     expect(await caller.finances.dossier({ dossierId: 'dos_1' })).toEqual({
-      income: 400_000,
+      income: 500_000,
       charges: 150_000,
-      net: 250_000,
+      net: 350_000,
       unconverted: false,
     });
 
     const listed = await caller.finances.incomes.list({ year: 2026 });
     expect(listed.map((row) => [row.day, row.invoice?.number ?? null])).toEqual([
       ['2026-03-10', null],
+      ['2026-02-20', 'STZ-2026-0002'],
       ['2026-02-03', 'STZ-2026-0001'],
     ]);
   });
@@ -222,7 +241,7 @@ describe('finances', () => {
     await caller.finances.rates.set({ month: '2026-03', xafPerCad: 440 });
     const { report } = await caller.finances.overview({ year: 2026 });
     expect(report.missingRates).toEqual([]);
-    expect(report.total.income).toBe(400_000 + 440_000);
+    expect(report.total.income).toBe(500_000 + 440_000);
   });
 
   it('refuses a Charge in an archived category, or a Dossier that doesn’t exist', async () => {

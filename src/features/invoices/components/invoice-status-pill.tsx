@@ -10,6 +10,7 @@ const PILL: Record<DisplayStatus, string> = {
   SENT: 'bg-ice-blue text-navy-deep',
   OVERDUE: 'bg-blush text-crimson',
   PROOF_RECEIVED: 'bg-honey-tint text-navy-deep',
+  PARTIALLY_PAID: 'bg-leaf-tint text-navy-deep',
   PAID: 'bg-leaf-tint text-leaf',
   CANCELLED: 'bg-fog-light text-slate line-through',
 };

@@ -7,6 +7,7 @@ import type { ServiceType } from '@/features/dossiers/data/workflows';
 import { renderInvoicePdf } from '@/features/invoices/lib/invoice-pdf';
 import type { InvoiceStatus } from '@/features/invoices/lib/invoice-status';
 import type { Currency } from '@/features/invoices/lib/money';
+import type { ImageFile } from '@/features/signatures/lib/sign-pdf';
 import { toLocale } from '@/i18n/routing';
 import en from '@/messages/en.json';
 import fr from '@/messages/fr.json';
@@ -29,8 +30,15 @@ export type InvoiceForPdf = {
   dossier: { service: ServiceType; account: { name: string; email: string; locale: string } };
 };
 
-/** The Facture's PDF on the Stanzy letterhead, in the Client's language, stamped once Payée or Annulée. */
-export async function invoicePdf(invoice: InvoiceForPdf): Promise<Buffer> {
+/**
+ * The Facture's PDF on the Stanzy letterhead, in the Client's language,
+ * stamped once Payée or Annulée; a Payée one carries `consultant`'s
+ * signature and the company stamp (#145).
+ */
+export async function invoicePdf(
+  invoice: InvoiceForPdf,
+  consultant: { signature: ImageFile; stamp: ImageFile } | null = null,
+): Promise<Buffer> {
   letterhead ??= readFile(LETTERHEAD);
   const locale = toLocale(invoice.dossier.account.locale);
   const t = createTranslator({ locale, messages: MESSAGES[locale] });
@@ -45,6 +53,7 @@ export async function invoicePdf(invoice: InvoiceForPdf): Promise<Buffer> {
     lines: invoice.lines,
     notes: invoice.notes,
     stamp: invoice.status === 'PAID' ? 'PAID' : invoice.status === 'CANCELLED' ? 'CANCELLED' : null,
+    consultant,
     labels: {
       title: t('Invoices.pdf.title'),
       number: t('Invoices.pdf.number'),
@@ -61,6 +70,7 @@ export async function invoicePdf(invoice: InvoiceForPdf): Promise<Buffer> {
       page: (page, pages) => t('Invoices.pdf.page', { page, pages }),
       paid: t('Invoices.status.PAID'),
       cancelled: t('Invoices.status.CANCELLED'),
+      company: t('Invoices.receipt.company'),
     },
   });
   return Buffer.from(bytes);

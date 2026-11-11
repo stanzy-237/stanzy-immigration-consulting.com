@@ -2138,6 +2138,7 @@
       "SENT": "Sent",
       "OVERDUE": "Overdue",
       "PROOF_RECEIVED": "Proof received",
+      "PARTIALLY_PAID": "Partly paid",
       "PAID": "Paid",
       "CANCELLED": "Cancelled"
     },
@@ -2249,7 +2250,6 @@
       "cancelledOn": "Cancelled on {date}",
       "cancelReason": "Reason: {reason}",
       "downloadPdf": "Download the PDF",
-      "markPaid": "Mark paid",
       "cancelInvoice": "Cancel the invoice",
       "cancelTitle": "Cancel this invoice?",
       "cancelBody": "It stays in the history, marked “Cancelled”. The Client isn’t emailed.",
@@ -2282,10 +2282,10 @@
       "saved": "Draft saved",
       "sent": "Invoice {number} sent",
       "deleted": "Draft deleted",
-      "paid": "Invoice marked paid",
       "cancelled": "Invoice cancelled",
       "proofAdded": "Proof of payment sent",
-      "changed": "This invoice changed in the meantime: the page is up to date."
+      "changed": "This invoice changed in the meantime: the page is up to date.",
+      "recorded": "Payment recorded: acknowledgement {number} sent"
     },
     "errors": {
       "INVOICE_EMPTY": "Add at least one line with an amount.",
@@ -2295,7 +2295,69 @@
       "DOCUMENT_FILE_TYPE": "This file type isn’t accepted: PDF, JPG, PNG, WebP or HEIC.",
       "DOCUMENT_FILE_TOO_LARGE": "This file is over 25 MB.",
       "DOCUMENT_FILE_INVALID": "The file didn’t arrive properly. Try again.",
-      "UNKNOWN": "The change couldn’t be saved. Try again."
+      "UNKNOWN": "The change couldn’t be saved. Try again.",
+      "PAYMENT_TOO_HIGH": "This amount is more than what is left to pay.",
+      "SIGNATURE_ASSETS_MISSING": "Add your signature and the stamp in “Signatures” first.",
+      "PAYMENT_NOTE_REQUIRED": "Specify the payment method.",
+      "RECEIPT_NOT_PENDING": "This acknowledgement is already signed.",
+      "RECEIPT_NOT_YOURS": "Only the file's Client can sign this acknowledgement.",
+      "SIGNATURE_DOCUMENT_CHANGED": "The document changed. Reload the page.",
+      "SIGNATURE_IMAGE_INVALID": "The signature could not be read. Sign again."
+    },
+    "receipt": {
+      "title": "Acknowledgement of receipt of funds",
+      "number": "Receipt no. {number}",
+      "body": "I, the undersigned, representing STANZY IMMIGRATION CONSULTING, acknowledge having received from Mr/Mrs {client} the sum of {amount}, that is {words} {currencyWords}, in payment for the services provided by our agency.\n\nThe service concerned is the following: {service}.\n\nThe total amount agreed for this service is {total}. The sum of {amount} was received on {receivedOn}. The balance still due is {balance}.\n\nThe payment was made by the following means:\n\n{methods}\n\nThis acknowledgement is issued to certify that STANZY IMMIGRATION CONSULTING has effectively received the funds for the above-mentioned service, for all legal purposes.\n\nDone in Douala, on {issuedOn}.",
+      "currencyWords": {
+        "XAF": "CFA francs",
+        "CAD": "Canadian dollars",
+        "EUR": "euros"
+      },
+      "methods": {
+        "CASH": "Cash",
+        "BANK_TRANSFER": "Bank transfer",
+        "BANK_DEPOSIT": "Bank deposit",
+        "MOBILE_MONEY": "Mobile Money",
+        "CHEQUE": "Cheque",
+        "OTHER": "Other"
+      },
+      "client": "The Client",
+      "company": "STANZY IMMIGRATION CONSULTING"
+    },
+    "payments": {
+      "title": "Payments",
+      "empty": "No payment recorded.",
+      "summary": "Received {received} of {total} · {balance} left",
+      "record": "Record a payment",
+      "recordTitle": "Record a payment",
+      "recordBody": "An acknowledgement of receipt of funds, signed and stamped, goes to the Client, who signs it in the app.",
+      "amount": "Amount received",
+      "amountError": "Enter an amount between 1 and {balance}.",
+      "receivedOn": "Received on",
+      "method": "Payment method",
+      "methodNote": "Specify the method",
+      "methodNoteError": "Specify the payment method.",
+      "proof": "Supporting document (optional)",
+      "proofHint": "Photo or PDF of the receipt, e.g. for a cash payment. 25 MB at most.",
+      "confirm": "Record",
+      "cancel": "Cancel",
+      "sending": "Recording…",
+      "receipt": "Acknowledgement {number}",
+      "openReceipt": "Open the acknowledgement",
+      "toSign": "Awaiting the Client's signature",
+      "signed": "Signed by {name} on {date}",
+      "sign": "Sign the acknowledgement",
+      "signLabel": "Sign acknowledgement {number}",
+      "justificatif": "Supporting document"
+    },
+    "receiptSign": {
+      "metaTitle": "Sign the acknowledgement",
+      "back": "Back to the file",
+      "title": "Acknowledgement of receipt of funds {number}",
+      "intro": "It confirms the payment of {amount} received by Stanzy on {date}. Our signature and stamp are already on it: read it, then sign it.",
+      "alreadySigned": "You signed this acknowledgement on {date}.",
+      "openSigned": "Open the signed acknowledgement",
+      "signed": "Acknowledgement signed"
     }
   },
   "Notifications": {
@@ -2353,7 +2415,9 @@
       "MEETING_CANCELLED": "Meeting “{subject}” cancelled.",
       "MEETING_REMINDER": "{soon, select, true {The meeting “{subject}” starts soon.} other {Reminder: meeting “{subject}” on {date}.}}",
       "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file.",
-      "MEETING_JOIN_REQUEST": "{client} asks to join “{subject}”."
+      "MEETING_JOIN_REQUEST": "{client} asks to join “{subject}”.",
+      "RECEIPT_SENT": "Stanzy received your payment: sign receipt {number}.",
+      "RECEIPT_SIGNED": "{actor} signed receipt {number}."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2387,7 +2451,9 @@
       "MEETING_CANCELLED": "A meeting was cancelled.",
       "MEETING_REMINDER": "Meeting reminder.",
       "DOSSIER_MESSAGE": "New message in a file.",
-      "MEETING_JOIN_REQUEST": "Someone asks to join."
+      "MEETING_JOIN_REQUEST": "Someone asks to join.",
+      "RECEIPT_SENT": "A receipt to sign.",
+      "RECEIPT_SIGNED": "A receipt was signed."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
