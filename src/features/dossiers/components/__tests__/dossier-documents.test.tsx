@@ -164,7 +164,7 @@ describe('DossierDocuments for the Client', () => {
       comments: [],
       clientForm: null,
     };
-    documents('client', { ...data, sections: [{ ...data.sections[0]!, documents: [form] }] });
+    documents('client', { ...data, sections: [{ ...data.sections[0]!, documents: [form] }] } as unknown as typeof data);
     fireEvent.click(screen.getByRole('button', { name: /^Historique personnel/ }));
     expect(screen.queryByLabelText(/Téléverser une version/)).not.toBeInTheDocument();
     expect(screen.queryByText('Versions')).not.toBeInTheDocument();
