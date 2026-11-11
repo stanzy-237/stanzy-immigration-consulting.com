@@ -32,6 +32,19 @@ const saved = {
   countries: ['Cameroun'],
 };
 
+/** The contact and experience step (#147): their phone, then the one job's company, CNP code and start. */
+async function fillWork() {
+  expect(await screen.findByText('Étape 3 sur 5 : Contact et expériences')).toBeInTheDocument();
+  const job = screen.getByRole('group', { name: 'Comptable' });
+  fireEvent.change(screen.getByLabelText('Numéro de téléphone (WhatsApp de préférence)'), {
+    target: { value: '+237 692 24 53 94' },
+  });
+  fireEvent.change(within(job).getByLabelText('Nom de l’entreprise'), { target: { value: 'Brasseries du Cameroun' } });
+  fireEvent.change(within(job).getByLabelText('Code CNP (5 chiffres)'), { target: { value: '11100' } });
+  fireEvent.change(within(job).getByLabelText('Début'), { target: { value: '2019-03-01' } });
+  fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
+}
+
 function client(mine: unknown, handlers: Record<string, (input: never) => unknown> = {}) {
   const { trpc, queryClient, wrap } = createTestTRPC({
     'accompagnement.mine': () => mine,
@@ -46,20 +59,21 @@ function client(mine: unknown, handlers: Record<string, (input: never) => unknow
 }
 
 describe('the Demande d’intérêt, for the User', () => {
-  it('goes through the four steps, their CRS scored as they go, and sends the answers', async () => {
+  it('goes through the five steps, their CRS scored as they go, and sends the answers', async () => {
     const submit = vi.fn();
     const { container } = client({ latest: null, dossierId: null }, { 'accompagnement.submit': (input) => submit(input) ?? { id: 'int_1' } });
-    expect(screen.getByText('Étape 1 sur 4 : Votre situation')).toBeInTheDocument();
+    expect(screen.getByText('Étape 1 sur 5 : Votre situation')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
     fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
 
-    expect(await screen.findByText('Étape 2 sur 4 : Où vous en êtes')).toBeInTheDocument();
+    expect(await screen.findByText('Étape 2 sur 5 : Où vous en êtes')).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('Nationalité'), { target: { value: 'Camerounaise' } });
     fireEvent.change(screen.getByLabelText('Test de langue passé'), { target: { value: 'tcf' } });
     fireEvent.click(screen.getByLabelText('J’ai fait mon EDE (WES, IQAS…)'));
     fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
 
-    expect(await screen.findByText('Étape 3 sur 4 : Votre score CRS')).toBeInTheDocument();
+    await fillWork();
+    expect(await screen.findByText('Étape 4 sur 5 : Votre score CRS')).toBeInTheDocument();
     const live = screen.getByRole('status');
     expect(live).toHaveTextContent(/\d+/);
     const before = live.textContent;
@@ -67,7 +81,7 @@ describe('the Demande d’intérêt, for the User', () => {
     expect(screen.getByRole('status').textContent).not.toBe(before);
     fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
 
-    expect(await screen.findByText('Étape 4 sur 4 : Vos documents')).toBeInTheDocument();
+    expect(await screen.findByText('Étape 5 sur 5 : Vos documents')).toBeInTheDocument();
     const funds = screen.getByRole('group', { name: 'Preuve de fonds' });
     fireEvent.click(within(funds).getByLabelText('Stanzy s’en charge'));
     fireEvent.change(within(funds).getByLabelText(/Note sur/), { target: { value: 'Relevé de 4 mois' } });
@@ -77,6 +91,12 @@ describe('the Demande d’intérêt, for the User', () => {
       expect(submit).toHaveBeenCalledWith({
         checklist: saved,
         progress: { ...DEFAULT_PROGRESS, citizenship: 'Camerounaise', languageTest: 'tcf', ede: true },
+        work: {
+          phone: '+237 692 24 53 94',
+          experiences: [
+            { title: 'Comptable', company: 'Brasseries du Cameroun', cnp: '11100', startOn: '2019-03-01', endOn: null },
+          ],
+        },
         areas: expect.objectContaining({ funds: { answer: 'stanzy', note: 'Relevé de 4 mois' } }),
         crs: expect.objectContaining({ age: 30, provincialNomination: true }),
       }),
@@ -89,10 +109,34 @@ describe('the Demande d’intérêt, for the User', () => {
     fireEvent.change(await screen.findByLabelText('Nationalité'), { target: { value: 'Camerounaise' } });
     fireEvent.change(screen.getByLabelText('Pays de résidence'), { target: { value: 'CA' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
+    await fillWork();
     fireEvent.click(await screen.findByRole('button', { name: /Continuer/ }));
-    expect(await screen.findByText('Étape 4 sur 4 : Vos documents')).toBeInTheDocument();
+    expect(await screen.findByText('Étape 5 sur 5 : Vos documents')).toBeInTheDocument();
     expect(screen.queryByLabelText('Stanzy s’en charge')).not.toBeInTheDocument();
   });
+
+  it('asks for a phone, a 5-digit CNP code and an end after the start before going on', async () => {
+    const { container } = client({ latest: null, dossierId: null });
+    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
+    fireEvent.change(await screen.findByLabelText('Nationalité'), { target: { value: 'Camerounaise' } });
+    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
+    expect(await screen.findByText('Étape 3 sur 5 : Contact et expériences')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Chercher un code CNP/ })).toHaveAttribute('href', 'https://noc.esdc.gc.ca/');
+    expect(await axe(container)).toHaveNoViolations();
+
+    const job = screen.getByRole('group', { name: 'Comptable' });
+    fireEvent.change(within(job).getByLabelText('Code CNP (5 chiffres)'), { target: { value: '111' } });
+    fireEvent.change(within(job).getByLabelText('Début'), { target: { value: '2019-03-01' } });
+    fireEvent.click(within(job).getByLabelText('J’y travaille encore'));
+    fireEvent.change(within(job).getByLabelText('Fin'), { target: { value: '2018-01-01' } });
+    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/code CNP à 5 chiffres/);
+    expect(screen.getByLabelText('Numéro de téléphone (WhatsApp de préférence)')).toHaveAttribute('aria-invalid', 'true');
+    expect(within(job).getByLabelText('Code CNP (5 chiffres)')).toHaveAttribute('aria-invalid', 'true');
+    expect(within(job).getByLabelText('Fin')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByText('Étape 3 sur 5 : Contact et expériences')).toBeInTheDocument();
+  }, 30_000);
 
   it('says where a sent Demande stands', () => {
     const { unmount } = client({
@@ -132,6 +176,10 @@ describe('a Demande d’intérêt, for the consultant', () => {
     answers: {
       checklist: saved,
       progress: { ...DEFAULT_PROGRESS, citizenship: 'Camerounaise', languageTest: 'tcf', ede: true },
+      work: {
+        phone: '+237 692 24 53 94',
+        experiences: [{ title: 'Comptable', company: 'Brasseries du Cameroun', cnp: '11100', startOn: '2019-03-01', endOn: null }],
+      },
       areas: Object.fromEntries(AREAS.map((area) => [area, { answer: area === 'funds' ? 'missing' : 'have', note: area === 'funds' ? 'Relevé de 4 mois' : '' }])),
     },
     history: [],
@@ -148,6 +196,10 @@ describe('a Demande d’intérêt, for the consultant', () => {
 
     expect(screen.getByRole('heading', { name: 'Aminata Diallo' })).toBeInTheDocument();
     expect(screen.getByText('Relevé de 4 mois')).toBeInTheDocument();
+    // Their phone and each job (#147).
+    expect(screen.getByText('+237 692 24 53 94')).toBeInTheDocument();
+    expect(screen.getByText('Comptable · Brasseries du Cameroun')).toBeInTheDocument();
+    expect(screen.getByText('CNP 11100 · 2019-03-01 → en cours')).toBeInTheDocument();
     expect(screen.getByText('Le dossier s’ouvrira à l’étape « Création du profil Entrée Express ».')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
 

@@ -249,11 +249,11 @@ function Approved({ dossierId }: { dossierId: string }): ReactNode {
   );
 }
 
-/** What they answered: situation, where they stand, and each document area with its note. */
+/** What they answered: where they stand, their contact and jobs (#147), situation, and each document area with its note. */
 function Answers({ interest }: { interest: Interest }): ReactNode {
   const t = useTranslations('Accompagnement');
   const family = useTranslations('Calculators.family');
-  const { checklist, progress, areas } = interest.answers;
+  const { checklist, progress, work, areas } = interest.answers;
   const yes = (value: boolean) => (value ? t('dashboard.yes') : t('dashboard.no'));
   const residence =
     progress.residence === 'OTHER' ? progress.residenceOther : t(`form.residences.${progress.residence}`);
@@ -292,6 +292,28 @@ function Answers({ interest }: { interest: Interest }): ReactNode {
           ...(interest.answers.crs ? [[t('dashboard.crs'), String(interest.answers.crs.total)] as [string, string]] : []),
         ]),
       )}
+      {work
+        ? section(
+            'work',
+            t('dashboard.work'),
+            <div className="grid grid-cols-1 gap-4">
+              {rows([[t('form.work.phone'), work.phone]])}
+              <ul className="grid grid-cols-1 gap-3">
+                {work.experiences.map((job, index) => (
+                  <li key={index} className="rounded-xl bg-off-white px-3 py-2.5 text-sm">
+                    <p className="font-semibold text-navy-deep">
+                      {job.title} · {job.company}
+                    </p>
+                    <p className="text-slate">
+                      {t('dashboard.cnp', { code: job.cnp })} ·{' '}
+                      {t('dashboard.period', { start: job.startOn, end: job.endOn ?? t('dashboard.current') })}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>,
+          )
+        : null}
       {section(
         'situation',
         t('dashboard.situation'),

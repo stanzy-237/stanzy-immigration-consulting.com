@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { STARTER_SERVICES } from '@/features/document-services/data/starter-services';
-import { askedPrerequisites, EMPTY_ANSWERS, questionsLeft, type Answers } from '@/features/document-services/lib/requirements';
+import { answersOf, askedPrerequisites, EMPTY_ANSWERS, questionsLeft, type Answers } from '@/features/document-services/lib/requirements';
 import { prerequisiteKey, prerequisitesOf } from '@/features/document-services/lib/service-schema';
 
 const answered: Answers = {
@@ -10,11 +10,13 @@ const answered: Answers = {
   donation: false,
   donor: null,
   ubaAccount: null,
+  salaryAccount: false,
+  salaryAccounts: [],
 };
 
 describe('the proof of funds questionnaire', () => {
   it('asks the NIU, at least one emergency contact and whether the funds are a gift', () => {
-    expect(questionsLeft('proofOfFunds', EMPTY_ANSWERS)).toEqual(['niu', 'contacts', 'donation']);
+    expect(questionsLeft('proofOfFunds', EMPTY_ANSWERS)).toEqual(['niu', 'contacts', 'donation', 'salaryAccount']);
     expect(questionsLeft('proofOfFunds', answered)).toEqual([]);
     expect(questionsLeft(null, EMPTY_ANSWERS)).toEqual([]);
   });
@@ -23,6 +25,22 @@ describe('the proof of funds questionnaire', () => {
     const gift = { ...answered, donation: true, donor: { name: 'Marie Ngo', email: 'marie@', phone: '690000000' } };
     expect(questionsLeft('proofOfFunds', gift)).toEqual(['donor']);
     expect(questionsLeft('proofOfFunds', { ...gift, donor: { ...gift.donor, email: 'marie@example.cm' } })).toEqual([]);
+  });
+
+  it('asks whether there is a salary account and, if so, each company and its period (#147)', () => {
+    const salaried = { ...answered, salaryAccount: true };
+    expect(questionsLeft('proofOfFunds', salaried)).toEqual(['salaryAccounts']);
+    const account = { company: 'Brasseries du Cameroun', startOn: '2020-01-01', endOn: null as string | null };
+    expect(questionsLeft('proofOfFunds', { ...salaried, salaryAccounts: [account] })).toEqual([]);
+    expect(questionsLeft('proofOfFunds', { ...salaried, salaryAccounts: [{ ...account, company: '' }] })).toEqual(['salaryAccounts']);
+    expect(
+      questionsLeft('proofOfFunds', { ...salaried, salaryAccounts: [{ ...account, endOn: '2019-01-01' }] }),
+    ).toEqual(['salaryAccounts']);
+    // Saved before the question existed: still asked.
+    expect(answersOf({ niu: 'M012345678901A', contacts: [], donation: false, donor: null, ubaAccount: null })).toMatchObject({
+      salaryAccount: null,
+      salaryAccounts: [],
+    });
   });
 
   it('asks about a UBA account for the « sans fonds » service only', () => {

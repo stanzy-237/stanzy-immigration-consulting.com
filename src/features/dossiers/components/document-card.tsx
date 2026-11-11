@@ -67,6 +67,7 @@ export function DocumentCard({
   const [expanded, setExpanded] = useState(focus.documentId === document.id);
   const [deleting, setDeleting] = useState(false);
   const consultant = viewer === 'consultant';
+  const form = isFormKind(document.kind);
   // Just added: it has no server id until the refetch, so nothing can be done with it yet.
   const pending = isOptimistic(document);
   const final = document.versions.find((version) => version.id === document.finalVersionId);
@@ -124,72 +125,75 @@ export function DocumentCard({
 
       {expanded ? (
         <div id={`${ids}-panel`} className="grid grid-cols-1 gap-5 border-t border-fog-light p-4">
-          {isFormKind(document.kind) ? <FormLink dossierId={dossierId} document={document} viewer={viewer} /> : null}
+          {form ? <FormLink dossierId={dossierId} document={document} viewer={viewer} /> : null}
           <DocumentNeeds dossierId={dossierId} document={document} viewer={viewer} open={open} />
-          <div>
-            <h4 className="text-sm font-semibold text-navy-deep">{t('versions')}</h4>
-            {document.versions.length === 0 ? (
-              <p className="mt-2 text-sm text-slate">{t('noVersionHint')}</p>
-            ) : (
-              <ol className="mt-2 grid grid-cols-1 gap-2">
-                {[...document.versions].reverse().map((version) => (
-                  <li
-                    key={version.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-off-white px-3 py-2"
-                  >
-                    <span className="min-w-0 text-sm">
-                      <span className="font-semibold text-navy-deep">V{version.number}</span>{' '}
-                      <span className="text-navy-deep">{version.fileName}</span>
-                      <span className="block text-xs text-slate">
-                        {t('size', { size: format.number(version.size / 1024 / 1024, { maximumFractionDigits: 1 }) })}
-                        {' · '}
-                        {t('uploadedBy', {
-                          name: version.uploadedBy.name,
-                          date: format.dateTime(version.createdAt, { day: 'numeric', month: 'short', year: 'numeric' }),
-                        })}
+          {/* A form Document (Historique personnel, Renseignements sur la famille) is filled in, never uploaded. */}
+          {form && document.versions.length === 0 ? null : (
+            <div>
+              <h4 className="text-sm font-semibold text-navy-deep">{t('versions')}</h4>
+              {document.versions.length === 0 ? (
+                <p className="mt-2 text-sm text-slate">{t('noVersionHint')}</p>
+              ) : (
+                <ol className="mt-2 grid grid-cols-1 gap-2">
+                  {[...document.versions].reverse().map((version) => (
+                    <li
+                      key={version.id}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-off-white px-3 py-2"
+                    >
+                      <span className="min-w-0 text-sm">
+                        <span className="font-semibold text-navy-deep">V{version.number}</span>{' '}
+                        <span className="text-navy-deep">{version.fileName}</span>
+                        <span className="block text-xs text-slate">
+                          {t('size', { size: format.number(version.size / 1024 / 1024, { maximumFractionDigits: 1 }) })}
+                          {' · '}
+                          {t('uploadedBy', {
+                            name: version.uploadedBy.name,
+                            date: format.dateTime(version.createdAt, { day: 'numeric', month: 'short', year: 'numeric' }),
+                          })}
+                        </span>
                       </span>
-                    </span>
-                    <span className="flex flex-wrap items-center gap-1">
-                      {version.signedFor ? <SignedBadge /> : null}
-                      {consultant && open && !waiting && version.contentType === 'application/pdf' ? (
-                        <RequestSignatureLink dossierId={dossierId} versionId={version.id} number={version.number} />
-                      ) : null}
-                      {consultant ? (
-                        <FinaleToggle
-                          dossierId={dossierId}
-                          documentId={document.id}
-                          versionId={version.id}
-                          number={version.number}
-                          isFinal={version.id === document.finalVersionId}
-                          disabled={!open || locked}
-                        />
-                      ) : version.id === document.finalVersionId ? (
-                        <span className="text-xs font-semibold text-leaf">{t('final')}</span>
-                      ) : null}
-                      <a
-                        href={versionFileUrl(version.id)}
-                        target="_blank"
-                        rel="noopener"
-                        aria-label={t('openVersionLabel', { number: version.number })}
-                        className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-rouge hover:text-crimson"
-                      >
-                        {t('openVersion')}
-                        <ExternalLink aria-hidden={true} className="size-3.5" />
-                      </a>
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            )}
-            {consultant && open && waiting ? (
-              <div className="mt-3">
-                <CancelSignature dossierId={dossierId} requestId={waiting.id} />
-              </div>
-            ) : null}
-            {open && !pending ? (
-              <UploadVersion dossierId={dossierId} documentId={document.id} title={document.title} />
-            ) : null}
-          </div>
+                      <span className="flex flex-wrap items-center gap-1">
+                        {version.signedFor ? <SignedBadge /> : null}
+                        {consultant && open && !waiting && version.contentType === 'application/pdf' ? (
+                          <RequestSignatureLink dossierId={dossierId} versionId={version.id} number={version.number} />
+                        ) : null}
+                        {consultant ? (
+                          <FinaleToggle
+                            dossierId={dossierId}
+                            documentId={document.id}
+                            versionId={version.id}
+                            number={version.number}
+                            isFinal={version.id === document.finalVersionId}
+                            disabled={!open || locked}
+                          />
+                        ) : version.id === document.finalVersionId ? (
+                          <span className="text-xs font-semibold text-leaf">{t('final')}</span>
+                        ) : null}
+                        <a
+                          href={versionFileUrl(version.id)}
+                          target="_blank"
+                          rel="noopener"
+                          aria-label={t('openVersionLabel', { number: version.number })}
+                          className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-rouge hover:text-crimson"
+                        >
+                          {t('openVersion')}
+                          <ExternalLink aria-hidden={true} className="size-3.5" />
+                        </a>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+              {consultant && open && waiting ? (
+                <div className="mt-3">
+                  <CancelSignature dossierId={dossierId} requestId={waiting.id} />
+                </div>
+              ) : null}
+              {open && !pending && !form ? (
+                <UploadVersion dossierId={dossierId} documentId={document.id} title={document.title} />
+              ) : null}
+            </div>
+          )}
 
           <DocumentConversation dossierId={dossierId} document={document} viewer={me} open={open && !pending} />
         </div>

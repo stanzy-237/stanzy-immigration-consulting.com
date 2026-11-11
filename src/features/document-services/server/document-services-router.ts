@@ -369,11 +369,12 @@ export const documentServicesRouter = createTRPCRouter({
       const { answers } = input;
       await ctx.prisma.stanzyRequest.update({
         where: { id: request.id },
-        // No donor without a donation; the UBA question only for the « sans fonds » service.
+        // No donor without a donation, no salary accounts without one; the UBA question only for the « sans fonds » service.
         data: {
           answers: {
             ...answers,
             donor: answers.donation ? answers.donor : null,
+            salaryAccounts: answers.salaryAccount ? answers.salaryAccounts : [],
             ubaAccount: request.service.questionnaire === 'proofOfFundsNoFunds' ? answers.ubaAccount : null,
           },
         },
