@@ -3297,7 +3297,8 @@
         "cancel": "Annuler",
         "saved": "Déclarations corrigées",
         "editedOn": "Déclarations corrigées par {name} le {date}",
-        "original": "Réponses d’origine du Client"
+        "original": "Réponses d’origine du Client",
+        "approvedHint": "Le dossier est déjà ouvert : ses sections et documents restent tels quels. Les réponses corrigées remplacent celles du Client sur cette page."
       }
     },
     "document": {
@@ -3377,7 +3378,8 @@
       "STANZY_DOCUMENT_FINAL": "Ce document a déjà sa version finale.",
       "SERVICE_UNAVAILABLE": "Ce service n’est plus proposé.",
       "STANZY_NO_SERVICE": "Choisissez d’abord le service documentaire.",
-      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et votre cachet (Signatures)."
+      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et votre cachet (Signatures).",
+      "INTEREST_NOT_EDITABLE": "Une demande refusée ne se modifie plus."
     },
     "overview": {
       "crs": "Score CRS de la demande",

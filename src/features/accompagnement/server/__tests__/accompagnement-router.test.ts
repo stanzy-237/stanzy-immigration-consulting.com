@@ -301,9 +301,22 @@ describe('the Demande d’intérêt', () => {
     // Approval builds the Dossier from the corrected answers: the spouse has their own Sections.
     await callerFor(db, consultant).accompagnement.dashboard.approve({ id, level: 'C' });
     expect(documents.filter((d) => d.kind === 'personalHistory')).toHaveLength(2);
+
+    // Still correctable once accepted: the answers and the residence, not the Niveau decided nor the Dossier's Sections.
+    const later = answers({ progress: { ...answers().progress, residence: 'CM', citizenship: 'Ivoirienne' } });
+    await callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: later });
+    expect(interests[0]).toMatchObject({ status: 'APPROVED', level: 'C', levelOverride: null, residence: 'CM', originalAnswers: submitted });
+    expect((interests[0]!.answers as InterestAnswers).progress.citizenship).toBe('Ivoirienne');
+    expect(documents.filter((d) => d.kind === 'personalHistory')).toHaveLength(2);
+  });
+
+  it('leaves a refused Demande as it was', async () => {
+    const { db } = fakeDatabase();
+    const { id } = await callerFor(db, user()).accompagnement.submit(answers());
+    await callerFor(db, consultant).accompagnement.dashboard.reject({ id, reason: 'Profil trop jeune' });
     await expect(
-      callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: corrected }),
-    ).rejects.toMatchObject({ message: 'INTEREST_NOT_PENDING' });
+      callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: answers() }),
+    ).rejects.toMatchObject({ message: 'INTEREST_NOT_EDITABLE' });
   });
 
   it('leaves the declarations to the consultant to correct', async () => {

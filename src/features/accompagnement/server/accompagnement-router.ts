@@ -244,10 +244,12 @@ export const accompagnementRouter = createTRPCRouter({
     }),
 
     /**
-     * The consultant corrects the Client's declarations before deciding
-     * (#154): the Niveau, the CRS score and the residence follow, and
-     * approval builds the Dossier from them. The Client's own answers are
-     * kept the first time, to show what changed.
+     * The consultant corrects the Client's declarations (#154), before
+     * deciding or once accepted. Before, the Niveau follows and approval
+     * builds the Dossier from them; once accepted, the Niveau decided and
+     * the Dossier's Sections stay, the answers and residence change. The
+     * Client's own answers are kept the first time, to show what changed.
+     * A refused Demande stays as it was.
      */
     updateAnswers: consultantProcedure.input(updateAnswersInput).mutation(async ({ ctx, input }) => {
       const interest = await ctx.prisma.interestRequest.findUnique({
@@ -255,12 +257,14 @@ export const accompagnementRouter = createTRPCRouter({
         select: { id: true, status: true, answers: true, originalAnswers: true },
       });
       if (!interest) throw notFound();
+      if (interest.status === 'REJECTED') throw refuse('INTEREST_NOT_EDITABLE');
       const answers = scoredAnswers(input.answers);
+      // Against the status read: a decision in between makes it refused, and the page reloads.
       const { count } = await ctx.prisma.interestRequest.updateMany({
-        where: { id: interest.id, status: 'SUBMITTED' },
+        where: { id: interest.id, status: interest.status },
         data: {
           answers: answers as unknown as Prisma.InputJsonValue,
-          level: levelOf(input.answers),
+          ...(interest.status === 'SUBMITTED' ? { level: levelOf(input.answers) } : {}),
           residence: input.answers.progress.residence,
           originalAnswers: (interest.originalAnswers ?? interest.answers) as Prisma.InputJsonValue,
           answersEditedById: ctx.session.account.id,

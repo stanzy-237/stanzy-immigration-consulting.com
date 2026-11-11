@@ -264,11 +264,19 @@ describe('a Demande d’intérêt, for the consultant', () => {
     expect(screen.getByText('Gabonaise')).toBeInTheDocument();
   });
 
-  it('keeps a decided Demande as it was', () => {
-    const decided = { ...interest, status: 'REJECTED', decidedAt: new Date('2026-11-05') };
-    const { trpc, queryClient, wrap } = createTestTRPC({ 'accompagnement.dashboard.get': () => decided });
-    queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), decided as never);
-    render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
+  it('still corrects an accepted Demande, saying the Dossier stays as it is; not a refused one', () => {
+    const accepted = { ...interest, status: 'APPROVED', dossierId: 'dos_1', decidedAt: new Date('2026-11-05') };
+    const { trpc, queryClient, wrap } = createTestTRPC({ 'accompagnement.dashboard.get': () => accepted });
+    queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), accepted as never);
+    const { unmount } = render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier les déclarations' }));
+    expect(screen.getByText(/Le dossier est déjà ouvert/)).toBeInTheDocument();
+    unmount();
+
+    const refused = { ...interest, status: 'REJECTED', decidedAt: new Date('2026-11-05') };
+    const other = createTestTRPC({ 'accompagnement.dashboard.get': () => refused });
+    other.queryClient.setQueryData(other.trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), refused as never);
+    render(withIntl(other.wrap(<InterestDashboardView id="int_1" />)));
     expect(screen.queryByRole('button', { name: 'Modifier les déclarations' })).not.toBeInTheDocument();
   });
 

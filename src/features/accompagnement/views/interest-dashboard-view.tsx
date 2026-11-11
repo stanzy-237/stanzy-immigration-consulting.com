@@ -62,6 +62,8 @@ function Detail({ id }: { id: string }): ReactNode {
   const level = interest.levelOverride ?? interest.level;
   const [editing, setEditing] = useState(false);
   const pending = interest.status === 'SUBMITTED';
+  // Correctable before the decision and once accepted (#154); a refused Demande stays as it was.
+  const editable = interest.status !== 'REJECTED';
 
   return (
     <>
@@ -88,8 +90,8 @@ function Detail({ id }: { id: string }): ReactNode {
         ) : null}
       </div>
 
-      {editing && pending ? (
-        <InterestEdit interest={interest} onDone={() => setEditing(false)} />
+      {editing && editable ? (
+        <InterestEdit interest={interest} approved={!pending} onDone={() => setEditing(false)} />
       ) : (
         <>
           {/* Keyed by the Niveau: a correction that changes it starts the choice again from it. */}
@@ -107,7 +109,7 @@ function Detail({ id }: { id: string }): ReactNode {
             ) : (
               <span />
             )}
-            {pending ? (
+            {editable ? (
               <button
                 type="button"
                 onClick={() => setEditing(true)}

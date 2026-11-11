@@ -3280,7 +3280,8 @@
         "cancel": "Cancel",
         "saved": "Declarations corrected",
         "editedOn": "Declarations corrected by {name} on {date}",
-        "original": "The Client's original answers"
+        "original": "The Client's original answers",
+        "approvedHint": "The file is already open: its sections and documents stay as they are. The corrected answers replace the Client's on this page."
       }
     },
     "document": {
@@ -3360,7 +3361,8 @@
       "STANZY_DOCUMENT_FINAL": "This document already has its final version.",
       "SERVICE_UNAVAILABLE": "This service is no longer offered.",
       "STANZY_NO_SERVICE": "Choose the document service first.",
-      "SIGNATURE_ASSETS_MISSING": "First add your signature and stamp (Signatures)."
+      "SIGNATURE_ASSETS_MISSING": "First add your signature and stamp (Signatures).",
+      "INTEREST_NOT_EDITABLE": "A refused request can no longer be changed."
     },
     "overview": {
       "crs": "CRS score from the request",

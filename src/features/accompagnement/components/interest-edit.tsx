@@ -12,15 +12,19 @@ import { fromProfile } from '@/features/crs/lib/crs-form';
 import { useTRPC } from '@/trpc/client';
 
 /**
- * The consultant corrects a Demande's declarations before deciding (#154):
- * the Client's five steps, opened on their answers. Saving recomputes the
- * Niveau and the CRS score; the Client's own answers stay on the page.
+ * The consultant corrects a Demande's declarations (#154), before deciding
+ * or once accepted: the Client's five steps, opened on their answers.
+ * Saving recomputes the CRS score (and the Niveau, before the decision);
+ * the Client's own answers stay on the page.
  */
 export function InterestEdit({
   interest,
+  approved,
   onDone,
 }: {
   interest: { id: string; answers: InterestAnswers };
+  /** Already accepted: the Dossier is open and its Sections stay as they are. */
+  approved: boolean;
   onDone: () => void;
 }): ReactNode {
   const t = useTranslations('Accompagnement');
@@ -50,6 +54,9 @@ export function InterestEdit({
             {t('dashboard.edit.title')}
           </h2>
           <p className="mt-1 text-sm text-slate">{t('dashboard.edit.hint')}</p>
+          {approved ? (
+            <p className="mt-2 rounded-xl bg-honey-tint px-3 py-2 text-sm text-navy-deep">{t('dashboard.edit.approvedHint')}</p>
+          ) : null}
         </div>
         <button
           type="button"
