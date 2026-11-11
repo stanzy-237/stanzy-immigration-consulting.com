@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient, useSuspenseQueries } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, Gauge, Send } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink, Gauge, Send } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 
@@ -17,8 +17,15 @@ import {
   progressFromCrs,
   progressSchema,
   RESIDENCES,
+  COMPANY_MAX,
+  CNP_PATTERN,
+  PHONE_MAX,
+  workFor,
+  workSchema,
   type Areas,
+  type Experience,
   type Progress,
+  type Work,
 } from '@/features/accompagnement/lib/interest-schema';
 import { choosePrefill, type ChecklistForm } from '@/features/checklist/lib/checklist-form';
 import { computeCrs } from '@/features/crs/lib/compute-crs';
@@ -37,13 +44,17 @@ const primary =
 const secondary =
   'inline-flex h-12 items-center gap-2 rounded-full px-5 font-heading text-body font-bold text-navy-deep hover:bg-off-white';
 
-type Step = 'situation' | 'progress' | 'crs' | 'documents';
-const STEPS: Step[] = ['situation', 'progress', 'crs', 'documents'];
+type Step = 'situation' | 'progress' | 'work' | 'crs' | 'documents';
+const STEPS: Step[] = ['situation', 'progress', 'work', 'crs', 'documents'];
+
+/** The official CNP (NOC 2021) search, to find a job's code. */
+const CNP_SEARCH_URL = 'https://noc.esdc.gc.ca/';
 
 /**
- * The Demande d'intérêt (#81), in four steps: the Checklist's questions
+ * The Demande d'intérêt (#81), in five steps: the Checklist's questions
  * (prefilled from the Account's Checklist, else its latest CRS Simulation),
- * where they stand (test, EDE, profile, ITA), their CRS answers with the
+ * where they stand (test, EDE, profile, ITA), their phone and each job's
+ * company, CNP code and dates (#147), their CRS answers with the
  * score as they go (prefilled from that Simulation), then each document area
  * with a note. « Stanzy s'en charge » shows for Cameroon only. Once sent,
  * the page gives their CRS score.
@@ -94,6 +105,7 @@ function Steps({
   const [step, setStep] = useState<Step>('situation');
   const [situation, setSituation] = useState<ChecklistForm>(prefill.answers);
   const [progress, setProgress] = useState<Progress>(initialProgress);
+  const [work, setWork] = useState<Work>(() => workFor(prefill.answers.jobs));
   const [areas, setAreas] = useState<Areas>(DEFAULT_AREAS);
   const [crsForm, setCrsForm] = useState<CrsForm | null>(savedCrs);
   // `interest.viewed`, then `interest.started` once past the first step; the send is counted on the server.
@@ -148,6 +160,17 @@ function Steps({
             }
             // Without a Simulation, the CRS step starts from the age they just gave.
             setCrsForm((current) => current ?? { ...DEFAULT_FORM, age: String(next.age) });
+            // One row per job named at the first step, keeping what they already wrote.
+            setWork((current) => workFor(situation.jobs, current));
+            setStep('work');
+          }}
+        />
+      ) : step === 'work' ? (
+        <WorkStep
+          value={work}
+          onBack={() => setStep('progress')}
+          onNext={(next) => {
+            setWork(next);
             setStep('crs');
           }}
         />
@@ -155,7 +178,7 @@ function Steps({
         <CrsStep
           value={crsForm}
           onChange={setCrsForm}
-          onBack={() => setStep('progress')}
+          onBack={() => setStep('work')}
           onNext={() => setStep('documents')}
         />
       ) : (
@@ -165,7 +188,9 @@ function Steps({
           pending={submit.isPending}
           onChange={setAreas}
           onBack={() => setStep('crs')}
-          onSubmit={() => submit.mutate({ checklist: situation, progress, areas, crs: toProfile(crsForm ?? DEFAULT_FORM) })}
+          onSubmit={() =>
+            submit.mutate({ checklist: situation, progress, work, areas, crs: toProfile(crsForm ?? DEFAULT_FORM) })
+          }
         />
       )}
     </div>
@@ -304,6 +329,155 @@ function ProgressStep({
       {invalid ? (
         <p role="alert" className="text-sm font-medium text-rouge">
           {t('invalid')}
+        </p>
+      ) : null}
+      <div className="flex flex-wrap justify-between gap-2">
+        <button type="button" onClick={onBack} className={secondary}>
+          <ArrowLeft aria-hidden={true} className="size-4" />
+          {t('back')}
+        </button>
+        <button type="submit" className={primary}>
+          {t('next')}
+          <ArrowRight aria-hidden={true} className="size-4" />
+        </button>
+      </div>
+    </form>
+  );
+}
+
+/** Their phone, then each job named at the first step: company, CNP code, dates (#147). */
+function WorkStep({
+  value,
+  onBack,
+  onNext,
+}: {
+  value: Work;
+  onBack: () => void;
+  onNext: (work: Work) => void;
+}): ReactNode {
+  const t = useTranslations('Accompagnement.form');
+  const ids = useId();
+  const [form, setForm] = useState(value);
+  const [invalid, setInvalid] = useState(false);
+  const setJob = (index: number, patch: Partial<Experience>) =>
+    setForm((current) => ({
+      ...current,
+      experiences: current.experiences.map((job, at) => (at === index ? { ...job, ...patch } : job)),
+    }));
+
+  const next = (event: FormEvent) => {
+    event.preventDefault();
+    const parsed = workSchema.safeParse(form);
+    setInvalid(!parsed.success);
+    if (parsed.success) onNext(parsed.data);
+  };
+  // Flagged once they tried to go on.
+  const bad = (wrong: boolean) => invalid && wrong;
+  const badDate = (day: string | null) => !day || !/^\d{4}-\d{2}-\d{2}$/.test(day);
+
+  return (
+    <form onSubmit={next} noValidate className={`grid gap-4 ${card}`}>
+      <p className="text-body text-slate">{t('work.intro')}</p>
+      <label htmlFor={`${ids}-phone`} className="grid grid-cols-1 max-w-sm gap-1 text-sm font-semibold text-navy-deep">
+        {t('work.phone')}
+        <input
+          id={`${ids}-phone`}
+          type="tel"
+          autoComplete="tel"
+          maxLength={PHONE_MAX}
+          value={form.phone}
+          aria-invalid={bad(!workSchema.shape.phone.safeParse(form.phone).success)}
+          onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
+          className={field}
+        />
+      </label>
+      <p className="text-sm text-slate">
+        {t('work.cnpHint')}{' '}
+        <a
+          href={CNP_SEARCH_URL}
+          target="_blank"
+          rel="noopener"
+          className="inline-flex items-center gap-1 font-semibold text-rouge hover:text-crimson"
+        >
+          {t('work.cnpLink')}
+          <ExternalLink aria-hidden={true} className="size-3.5" />
+        </a>
+      </p>
+      {form.experiences.length === 0 ? <p className="text-sm text-slate">{t('work.noJobs')}</p> : null}
+      {form.experiences.map((job, index) => {
+        const id = `${ids}-job-${index}`;
+        return (
+          <fieldset key={job.title + index} className="grid grid-cols-1 gap-3 rounded-xl bg-off-white p-4 sm:grid-cols-2">
+            <legend className="mb-1 font-heading text-body font-bold text-navy-deep sm:col-span-2">
+              {job.title}
+            </legend>
+            <label htmlFor={`${id}-company`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep sm:col-span-2">
+              {t('work.company')}
+              <input
+                id={`${id}-company`}
+                maxLength={COMPANY_MAX}
+                value={job.company}
+                aria-invalid={bad(job.company.trim().length < 2)}
+                onChange={(event) => setJob(index, { company: event.target.value })}
+                className={field}
+              />
+            </label>
+            <label htmlFor={`${id}-cnp`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
+              {t('work.cnp')}
+              <input
+                id={`${id}-cnp`}
+                inputMode="numeric"
+                maxLength={5}
+                value={job.cnp}
+                aria-invalid={bad(!CNP_PATTERN.test(job.cnp.trim()))}
+                onChange={(event) => setJob(index, { cnp: event.target.value })}
+                className={field}
+              />
+            </label>
+            <span aria-hidden={true} className="hidden sm:block" />
+            <label htmlFor={`${id}-start`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
+              {t('work.startOn')}
+              <input
+                id={`${id}-start`}
+                type="date"
+                value={job.startOn}
+                aria-invalid={bad(badDate(job.startOn))}
+                onChange={(event) => setJob(index, { startOn: event.target.value })}
+                className={field}
+              />
+            </label>
+            <div className="grid grid-cols-1 gap-2">
+              {job.endOn !== null ? (
+                <label htmlFor={`${id}-end`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep">
+                  {t('work.endOn')}
+                  <input
+                    id={`${id}-end`}
+                    type="date"
+                    value={job.endOn}
+                    min={job.startOn || undefined}
+                    aria-invalid={bad(badDate(job.endOn) || job.endOn < job.startOn)}
+                    onChange={(event) => setJob(index, { endOn: event.target.value })}
+                    className={field}
+                  />
+                </label>
+              ) : null}
+              <label htmlFor={`${id}-current`} className="flex items-center gap-3 text-sm text-navy-deep">
+                <input
+                  id={`${id}-current`}
+                  type="checkbox"
+                  checked={job.endOn === null}
+                  onChange={(event) => setJob(index, { endOn: event.target.checked ? null : '' })}
+                  className="size-5 accent-rouge"
+                />
+                {t('work.current')}
+              </label>
+            </div>
+          </fieldset>
+        );
+      })}
+      {invalid ? (
+        <p role="alert" className="text-sm font-medium text-rouge">
+          {t('work.invalid')}
         </p>
       ) : null}
       <div className="flex flex-wrap justify-between gap-2">

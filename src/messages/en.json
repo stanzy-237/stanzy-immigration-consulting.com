@@ -3127,10 +3127,11 @@
       "steps": {
         "situation": "Your situation",
         "progress": "Where you stand",
+        "work": "Contact and experience",
         "crs": "Your CRS score",
         "documents": "Your documents"
       },
-      "stepOf": "Step {step} of 4: {name}",
+      "stepOf": "Step {step} of 5: {name}",
       "next": "Continue",
       "back": "Back",
       "submit": "Send my request",
@@ -3178,7 +3179,20 @@
       "note": "Note on “{area}” (optional)",
       "notePlaceholder": "What worries you, what’s missing…",
       "crsIntro": "The CRS Calculator’s questions, already filled in if you saved a simulation. Your score updates with each answer.",
-      "crsLive": "Your CRS score"
+      "crsLive": "Your CRS score",
+      "work": {
+        "intro": "Your phone number, then each job declared in step 1: the company, the NOC code and the dates. IRCC asks for them as they are.",
+        "phone": "Phone number (WhatsApp preferred)",
+        "company": "Company name",
+        "cnp": "NOC code (5 digits)",
+        "cnpHint": "Find your job's code on the official NOC site.",
+        "cnpLink": "Search a NOC code (Government of Canada site)",
+        "startOn": "Start",
+        "endOn": "End",
+        "current": "I still work there",
+        "noJobs": "No job declared in step 1.",
+        "invalid": "Check the flagged fields: a phone number, and for each job the company, a 5-digit NOC code and the dates (the end after the start)."
+      }
     },
     "status": {
       "title": "Express Entry Accompagnement",
@@ -3252,7 +3266,11 @@
       "invoice": "Create the invoice",
       "next": "First the support contract: the Client signs it online. Then the invoice (the amount is your quote).",
       "decision": "Your decision",
-      "crs": "CRS score"
+      "crs": "CRS score",
+      "work": "Contact and experience",
+      "current": "ongoing",
+      "period": "{start} → {end}",
+      "cnp": "NOC {code}"
     },
     "document": {
       "mandatory": "★ Mandatory",
