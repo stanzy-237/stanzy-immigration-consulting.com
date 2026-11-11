@@ -3288,7 +3288,17 @@
       "work": "Contact et expériences",
       "current": "en cours",
       "period": "{start} → {end}",
-      "cnp": "CNP {code}"
+      "cnp": "CNP {code}",
+      "edit": {
+        "open": "Modifier les déclarations",
+        "title": "Corriger les déclarations du Client",
+        "hint": "Les mêmes étapes que le Client, avec ses réponses. Le niveau et le score CRS sont recalculés ; ses réponses d’origine restent visibles.",
+        "save": "Enregistrer les corrections",
+        "cancel": "Annuler",
+        "saved": "Déclarations corrigées",
+        "editedOn": "Déclarations corrigées par {name} le {date}",
+        "original": "Réponses d’origine du Client"
+      }
     },
     "document": {
       "mandatory": "★ Obligatoire",

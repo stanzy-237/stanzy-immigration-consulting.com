@@ -172,6 +172,9 @@ describe('a Demande d’intérêt, for the consultant', () => {
     residence: 'CM',
     rejectReason: null,
     decidedBy: null,
+    originalAnswers: null,
+    answersEditedAt: null,
+    answersEditedBy: null,
     account: { id: 'acc_1', name: 'Aminata Diallo', email: 'aminata@example.com', locale: 'fr', status: 'LEAD' },
     answers: {
       checklist: saved,
@@ -207,6 +210,66 @@ describe('a Demande d’intérêt, for the consultant', () => {
     expect(screen.getByText('Le dossier s’ouvrira à l’étape « Dans le bassin ».')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Accepter et ouvrir le dossier' }));
     await waitFor(() => expect(approve).toHaveBeenCalledWith({ id: 'int_1', level: 'C' }));
+  });
+
+  it('lets the consultant correct the declarations, then shows who did and the Client’s own (#154)', async () => {
+    const update = vi.fn();
+    const { trpc, queryClient, wrap } = createTestTRPC({
+      'accompagnement.dashboard.get': () => interest,
+      'accompagnement.dashboard.updateAnswers': (input) => update(input),
+    });
+    queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), interest as never);
+    const { container } = render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier les déclarations' }));
+    expect(screen.getByRole('heading', { name: 'Corriger les déclarations du Client' })).toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
+    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
+    expect(await screen.findByLabelText('Nationalité')).toHaveValue('Camerounaise');
+    fireEvent.change(screen.getByLabelText('Nationalité'), { target: { value: 'Ivoirienne' } });
+    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
+    // Their phone and job come back as they wrote them.
+    expect(await screen.findByLabelText('Numéro de téléphone (WhatsApp de préférence)')).toHaveValue('+237 692 24 53 94');
+    fireEvent.click(screen.getByRole('button', { name: /Continuer/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Continuer/ }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Enregistrer les corrections' }));
+
+    await waitFor(() =>
+      expect(update).toHaveBeenCalledWith({
+        id: 'int_1',
+        answers: expect.objectContaining({
+          progress: expect.objectContaining({ citizenship: 'Ivoirienne' }),
+          work: interest.answers.work,
+        }),
+      }),
+    );
+    expect(await screen.findByText('Déclarations corrigées')).toBeInTheDocument();
+  }, 30_000);
+
+  it('says who corrected the declarations, and keeps the Client’s own to compare', () => {
+    const edited = {
+      ...interest,
+      answersEditedAt: new Date('2026-11-11T10:00:00Z'),
+      answersEditedBy: { name: 'Stanzy' },
+      originalAnswers: {
+        ...interest.answers,
+        progress: { ...interest.answers.progress, citizenship: 'Gabonaise' },
+      },
+    };
+    const { trpc, queryClient, wrap } = createTestTRPC({ 'accompagnement.dashboard.get': () => edited });
+    queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), edited as never);
+    render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
+    expect(screen.getByText('Déclarations corrigées par Stanzy le 11 novembre 2026')).toBeInTheDocument();
+    expect(screen.getByText('Réponses d’origine du Client')).toBeInTheDocument();
+    expect(screen.getByText('Gabonaise')).toBeInTheDocument();
+  });
+
+  it('keeps a decided Demande as it was', () => {
+    const decided = { ...interest, status: 'REJECTED', decidedAt: new Date('2026-11-05') };
+    const { trpc, queryClient, wrap } = createTestTRPC({ 'accompagnement.dashboard.get': () => decided });
+    queryClient.setQueryData(trpc.accompagnement.dashboard.get.queryKey({ id: 'int_1' }), decided as never);
+    render(withIntl(wrap(<InterestDashboardView id="int_1" />)));
+    expect(screen.queryByRole('button', { name: 'Modifier les déclarations' })).not.toBeInTheDocument();
   });
 
   it('once approved, sends the Contrat d’accompagnement first, then the invoice', () => {

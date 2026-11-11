@@ -102,6 +102,9 @@ export type InterestAnswers = { checklist: ChecklistForm; progress: Progress; wo
 /** The consultant sets or clears the ITA date of an Accompagnement Dossier. */
 export const itaDateInput = z.object({ dossierId: z.string().min(1), itaDate: z.string().regex(DAY).nullable() });
 
+/** The consultant's correction of a Demande's answers (#154). */
+export const updateAnswersInput = z.object({ id: z.string().min(1), answers: interestAnswersSchema });
+
 export const decideInput = z.object({ id: z.string().min(1), level: z.enum(LEVELS) });
 export const rejectInput = z.object({ id: z.string().min(1), reason: z.string().trim().max(REASON_MAX) });
 export const INTEREST_FILTERS = ['SUBMITTED', 'APPROVED', 'REJECTED', 'ALL'] as const;

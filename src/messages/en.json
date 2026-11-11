@@ -3271,7 +3271,17 @@
       "work": "Contact and experience",
       "current": "ongoing",
       "period": "{start} → {end}",
-      "cnp": "NOC {code}"
+      "cnp": "NOC {code}",
+      "edit": {
+        "open": "Edit the declarations",
+        "title": "Correct the Client's declarations",
+        "hint": "The same steps as the Client, with their answers. The level and the CRS score are worked out again; their original answers stay visible.",
+        "save": "Save the corrections",
+        "cancel": "Cancel",
+        "saved": "Declarations corrected",
+        "editedOn": "Declarations corrected by {name} on {date}",
+        "original": "The Client's original answers"
+      }
     },
     "document": {
       "mandatory": "★ Mandatory",

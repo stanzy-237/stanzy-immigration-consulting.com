@@ -273,6 +273,47 @@ describe('the Demande d’intérêt', () => {
     await expect(callerFor(db, user()).accompagnement.submit(answers())).resolves.toMatchObject({ id: expect.any(String) });
   });
 
+  it('lets the consultant correct the declarations before deciding, keeping the Client’s own (#154)', async () => {
+    const { db, interests, documents } = fakeDatabase();
+    const { id } = await callerFor(db, user()).accompagnement.submit(answers());
+    const submitted = interests[0]!.answers as InterestAnswers;
+    expect(interests[0]).toMatchObject({ level: 'B' });
+
+    // The Client is in fact in the pool, married with their spouse coming, and lives in Canada.
+    const corrected = answers({
+      checklist: { ...answers().checklist, maritalStatus: 'married', spouseAccompanying: true },
+      progress: { ...answers().progress, residence: 'CA', eeProfile: true },
+    });
+    await callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: corrected });
+    expect(interests[0]).toMatchObject({
+      level: 'C',
+      residence: 'CA',
+      originalAnswers: submitted,
+      answersEditedById: 'acc_stanzy',
+      answersEditedAt: expect.any(Date),
+    });
+    expect((interests[0]!.answers as InterestAnswers).crs).toMatchObject({ total: expect.any(Number) });
+
+    // A second correction keeps the Client's first answers.
+    await callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: corrected });
+    expect(interests[0]!.originalAnswers).toEqual(submitted);
+
+    // Approval builds the Dossier from the corrected answers: the spouse has their own Sections.
+    await callerFor(db, consultant).accompagnement.dashboard.approve({ id, level: 'C' });
+    expect(documents.filter((d) => d.kind === 'personalHistory')).toHaveLength(2);
+    await expect(
+      callerFor(db, consultant).accompagnement.dashboard.updateAnswers({ id, answers: corrected }),
+    ).rejects.toMatchObject({ message: 'INTEREST_NOT_PENDING' });
+  });
+
+  it('leaves the declarations to the consultant to correct', async () => {
+    const { db } = fakeDatabase();
+    const { id } = await callerFor(db, user()).accompagnement.submit(answers());
+    await expect(
+      callerFor(db, user()).accompagnement.dashboard.updateAnswers({ id, answers: answers() }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
   it('is decided by the consultant only', async () => {
     const { db } = fakeDatabase();
     const { id } = await callerFor(db, user()).accompagnement.submit(answers());

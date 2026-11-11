@@ -21,7 +21,9 @@ import {
   REASON_MAX,
   rejectInput,
   startStageOf,
+  updateAnswersInput,
   type InterestAnswers,
+  type InterestInput,
   type SavedCrs,
 } from '@/features/accompagnement/lib/interest-schema';
 import { livesInCameroon } from '@/features/accompagnement/server/residence';
@@ -96,6 +98,14 @@ const listed = {
  * made from the Checklist) or rejects. « Stanzy s'en charge » requests on a
  * missing Document are recorded here; prices and Missions come with #80 and #42.
  */
+/** The answers as saved: with their CRS score worked out here under the rules in force, never what the form sent. */
+function scoredAnswers(input: InterestInput): InterestAnswers & { crs: SavedCrs } {
+  const rules = rulesInForceOn(new Date());
+  const scored = computeCrs(input.crs, { rules });
+  if (!scored.ok) throw refuse('INTEREST_CRS_INVALID');
+  return { ...input, crs: { profile: input.crs, rules, total: scored.breakdown.total } };
+}
+
 export const accompagnementRouter = createTRPCRouter({
   /** The viewer's latest Demande with the CRS score it gave them, and their open Accompagnement Dossier if any. */
   mine: protectedProcedure.query(async ({ ctx }) => {
@@ -150,11 +160,7 @@ export const accompagnementRouter = createTRPCRouter({
     if (pending) throw refuse('INTEREST_PENDING');
 
     const level = levelOf(input);
-    // Their CRS score, worked out here under the rules in force: what the form showed, never what it sent.
-    const rules = rulesInForceOn(new Date());
-    const scored = computeCrs(input.crs, { rules });
-    if (!scored.ok) throw refuse('INTEREST_CRS_INVALID');
-    const answers: InterestAnswers = { ...input, crs: { profile: input.crs, rules, total: scored.breakdown.total } };
+    const answers = scoredAnswers(input);
     const interest = await ctx.prisma.$transaction(async (tx) => {
       const created = await tx.interestRequest.create({
         data: {
@@ -192,9 +198,9 @@ export const accompagnementRouter = createTRPCRouter({
     trackLater(ctx.headers, 'interest.submitted', {
       level,
       residence: input.progress.residence,
-      crs: crsRange(scored.breakdown.total),
+      crs: crsRange(answers.crs.total),
     });
-    return { ...interest, crsScore: scored.breakdown.total };
+    return { ...interest, crsScore: answers.crs.total };
   }),
 
   dashboard: createTRPCRouter({
@@ -217,6 +223,9 @@ export const accompagnementRouter = createTRPCRouter({
           residence: true,
           rejectReason: true,
           decidedBy: { select: { name: true } },
+          originalAnswers: true,
+          answersEditedAt: true,
+          answersEditedBy: { select: { name: true } },
           account: { select: { id: true, name: true, email: true, locale: true, status: true } },
         },
       });
@@ -226,7 +235,39 @@ export const accompagnementRouter = createTRPCRouter({
         orderBy: { createdAt: 'desc' },
         select: { id: true, status: true, createdAt: true },
       });
-      return { ...interest, answers: interest.answers as unknown as InterestAnswers, history };
+      return {
+        ...interest,
+        answers: interest.answers as unknown as InterestAnswers,
+        originalAnswers: interest.originalAnswers as unknown as InterestAnswers | null,
+        history,
+      };
+    }),
+
+    /**
+     * The consultant corrects the Client's declarations before deciding
+     * (#154): the Niveau, the CRS score and the residence follow, and
+     * approval builds the Dossier from them. The Client's own answers are
+     * kept the first time, to show what changed.
+     */
+    updateAnswers: consultantProcedure.input(updateAnswersInput).mutation(async ({ ctx, input }) => {
+      const interest = await ctx.prisma.interestRequest.findUnique({
+        where: { id: input.id },
+        select: { id: true, status: true, answers: true, originalAnswers: true },
+      });
+      if (!interest) throw notFound();
+      const answers = scoredAnswers(input.answers);
+      const { count } = await ctx.prisma.interestRequest.updateMany({
+        where: { id: interest.id, status: 'SUBMITTED' },
+        data: {
+          answers: answers as unknown as Prisma.InputJsonValue,
+          level: levelOf(input.answers),
+          residence: input.answers.progress.residence,
+          originalAnswers: (interest.originalAnswers ?? interest.answers) as Prisma.InputJsonValue,
+          answersEditedById: ctx.session.account.id,
+          answersEditedAt: new Date(),
+        },
+      });
+      if (count === 0) throw refuse('INTEREST_NOT_PENDING');
     }),
 
     /**
