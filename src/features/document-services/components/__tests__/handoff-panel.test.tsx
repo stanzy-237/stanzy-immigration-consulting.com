@@ -99,7 +99,7 @@ describe('« Transmission au partenaire » (#148)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Exporter vers l’Outil PDF' }));
 
     await waitFor(() => expect(api.saveNote).toHaveBeenCalledWith(expect.objectContaining({ requestId: 'stz_1' })));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await screen.findByRole('dialog', { name: 'Transmission – Preuve de fonds' });
     expect(fetched).toEqual(['/api/requirements/stz_1/handoff-note', '/api/requirements/files/file_plan']);
     expect(pdfTool.sources.map((source) => source.name)).toEqual(['note.pdf', 'plan.jpg']);
 
@@ -127,7 +127,7 @@ describe('« Transmission au partenaire » (#148)', () => {
     panel({ ...handoff, partner: { name: null, phone: null, email: null } } as never);
     expect(screen.getByRole('link', { name: 'Réglages du service' })).toHaveAttribute('href', '/services/svc_pof');
     fireEvent.click(screen.getByRole('button', { name: 'Exporter vers l’Outil PDF' }));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await screen.findByRole('dialog', { name: 'Transmission – Preuve de fonds' });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Préparer l’envoi' }));
     expect(await within(dialog).findByRole('link', { name: 'Ouvrir WhatsApp' })).toHaveAttribute(
       'href',
