@@ -14,6 +14,7 @@ import {
   setStartInput,
 } from '@/features/document-services/lib/requirements';
 import { prerequisitesOf, saveServiceInput, slugInput } from '@/features/document-services/lib/service-schema';
+import { handoffRouter } from '@/features/document-services/server/handoff-router';
 import { ordersRouter } from '@/features/document-services/server/orders-router';
 import {
   coverableKinds,
@@ -267,6 +268,9 @@ export const documentServicesRouter = createTRPCRouter({
    * consultant (and the Partner in charge, #42), never Dossier Documents.
    */
   orders: ordersRouter,
+
+  /** The hand-off to a service's partner (#148). */
+  handoff: handoffRouter,
 
   requirements: createTRPCRouter({
     get: protectedProcedure.input(requestRef).query(async ({ ctx, input }) => {

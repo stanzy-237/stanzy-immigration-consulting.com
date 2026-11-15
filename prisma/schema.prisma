@@ -1076,6 +1076,12 @@ model StanzyRequest {
   submittedAt   DateTime?
   /// When the consultant confirmed what was handed over: from then the Client can no longer change it.
   confirmedAt   DateTime?
+  /// The note for the partner (#148), a Tiptap document started from the service's template, its
+  /// placeholders filled in. Null until the consultant saves one.
+  handoffNote   Json?
+  /// When it was last emailed to the partner, and to which address.
+  handoffSentAt DateTime?
+  handoffSentTo String?
   createdAt     DateTime            @default(now())
 
   @@index([documentId, status])
@@ -1352,43 +1358,49 @@ enum PriceKind {
 /// GLOSSARY: Services documentaires. A document Stanzy obtains for Clients in Cameroon, at a price set
 /// in the Tableau de bord. Prices live here only, never in code. Texts are `{ fr, en }`.
 model DocumentService {
-  id             String          @id @default(cuid())
+  id              String          @id @default(cuid())
   /// Its address in « Mon espace » (`/mon-espace/services/<slug>`).
-  slug           String          @unique
-  active         Boolean         @default(false)
-  position       Int
-  name           Json
-  summary        Json
+  slug            String          @unique
+  active          Boolean         @default(false)
+  position        Int
+  name            Json
+  summary         Json
   /// What the Client must provide, the turnaround and the conditions, shown before they accept.
-  provides       Json
-  turnaround     Json
+  provides        Json
+  turnaround      Json
   /// The turnaround in days, from the request's start date: the countdown the Client sees. Null: none shown.
-  turnaroundDays Int?
+  turnaroundDays  Int?
   /// The private link's secret (`/services/offre/<token>`), sent on WhatsApp to someone who wants this
   /// service only: they read its conditions and price and order it. Null until the consultant makes one.
-  shareToken     String?         @unique
-  conditions     Json
+  shareToken      String?         @unique
+  conditions      Json
   /// The service's own contract, with the same blanks as a Modèle de contrat ({client}, {prix}…).
-  contractTitle  Json
-  contractBody   Json
-  priceKind      PriceKind
+  contractTitle   Json
+  contractBody    Json
+  priceKind       PriceKind
   /// XAF for FIXED; hundredths of a percent for PERCENT (250 = 2.5 %).
-  price          Int
+  price           Int
   /// « par dossier », « par pays et par personne »…
-  unit           Json
+  unit            Json
   /// The Checklist documents it gets (`passport`, `policeCertificate`…): « Stanzy s'en charge » on one leads here.
-  documentKinds  String[]
+  documentKinds   String[]
   /// What the Client hands over for Stanzy to do it (police certificate: CNI, passport…):
   /// `{ key, fr, en, type, kind, when }[]` (src/features/document-services/lib/service-schema.ts).
   /// `kind`: a Checklist document whose copy in the Dossier also counts (one way only: what is
   /// handed over for a service never becomes a Dossier Document). `when`: only with a donation.
-  prerequisites  Json            @default("[]")
+  prerequisites   Json            @default("[]")
   /// A questionnaire the Client answers with the request: `proofOfFunds` or `proofOfFundsNoFunds`.
-  questionnaire  String?
-  requests       StanzyRequest[]
-  orders         ServiceOrder[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  questionnaire   String?
+  /// The partner the hand-off goes to (#148): its name, WhatsApp number and email.
+  partnerName     String?
+  partnerPhone    String?
+  partnerEmail    String?
+  /// The note's template, a Tiptap document with placeholders ({client}, {entreprise}…).
+  handoffTemplate Json?
+  requests        StanzyRequest[]
+  orders          ServiceOrder[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   @@index([active, position])
   @@map("document_service")
