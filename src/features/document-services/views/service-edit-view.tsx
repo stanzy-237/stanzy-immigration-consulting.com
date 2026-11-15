@@ -32,6 +32,7 @@ import {
   type Texts,
 } from "@/features/document-services/lib/service-schema";
 import { toLocale } from "@/i18n/routing";
+import { PartnerSettings } from "@/features/document-services/components/partner-settings";
 import { useTRPC } from "@/trpc/client";
 
 const field =
@@ -118,7 +119,14 @@ function Existing({ id }: { id: string }): ReactNode {
     trpc.documentServices.dashboard.get.queryOptions({ id }),
   );
   // Its texts are JSON in the database; the form's own parse keeps only its fields.
-  return <ServiceForm id={id} initial={data as unknown as ServiceInput} />;
+  return (
+    <>
+      <ServiceForm id={id} initial={data as unknown as ServiceInput} />
+      <QueryBoundary fallback={<Skeleton aria-hidden={true} className="h-80 rounded-2xl" />}>
+        <PartnerSettings serviceId={id} />
+      </QueryBoundary>
+    </>
+  );
 }
 
 function ServiceForm({

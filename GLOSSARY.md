@@ -244,6 +244,9 @@ The Tableau de bord's list, under Clients, of the Services documentaires Stanzy 
 **Pièces à remettre** (Pieces to hand over):
 What a Client gives Stanzy for a Service documentaire: the service's questionnaire and its prerequisite files (any photo or PDF, a signature drawn on screen). They belong to the « Stanzy s'en charge » request, never become Documents of the Dossier, and are shared with the consultant and the Partner in charge. Avoid: prérequis, documents requis (a Document is what the Client receives).
 
+**Transmission au partenaire** (Partner hand-off):
+On a « Stanzy s'en charge » request, the consultant's pack for the service's partner (a bank for Preuve de fonds…): a note written from the service's template, its fields ({client}, {entreprise}, {date_premier_emploi}…) filled in from the Client's details, then the Pièces à remettre. Put together in the Outils PDF and sent on WhatsApp or by email. The partner and the template are set per service.
+
 **Suivant** (Next):
 The Client's step once every Pièce à remettre is handed over: the consultant is told, and checks them. The Client can still change the pieces until « Confirmer les pièces »; removing one reopens the step.
 

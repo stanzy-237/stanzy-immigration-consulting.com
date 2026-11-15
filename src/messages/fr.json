@@ -4193,6 +4193,86 @@
       "loading": "Chargement des services en cours",
       "count": "{count, plural, one {# service} other {# services}}",
       "for": "Pour « {document} »"
+    },
+    "handoff": {
+      "toolbar": "Mise en forme",
+      "tools": {
+        "h2": "Titre",
+        "h3": "Sous-titre",
+        "bold": "Gras",
+        "italic": "Italique",
+        "bulletList": "Liste à puces",
+        "orderedList": "Liste numérotée"
+      },
+      "insertField": "Insérer un champ",
+      "fields": {
+        "client": "Nom du client",
+        "email": "E-mail du client",
+        "telephone": "Téléphone du client",
+        "nationalite": "Nationalité",
+        "service": "Service",
+        "date": "Date du jour",
+        "niu": "NIU",
+        "entreprise": "Entreprise actuelle",
+        "poste": "Poste actuel",
+        "cnp": "Code CNP",
+        "date_premier_emploi": "Date du premier emploi",
+        "comptes_salaire": "Comptes salaire"
+      },
+      "settings": {
+        "title": "Partenaire et note de transmission",
+        "intro": "Le partenaire à qui ce service est transmis, et le modèle de la note qui accompagne les pièces. Les champs ({client}, {entreprise}…) sont remplis avec les informations du client.",
+        "name": "Nom du partenaire",
+        "phone": "WhatsApp du partenaire",
+        "email": "E-mail du partenaire",
+        "template": "Modèle de la note",
+        "unknown": "Champs inconnus : {fields}. Ils resteront tels quels.",
+        "save": "Enregistrer le partenaire",
+        "saving": "Enregistrement…",
+        "saved": "Partenaire et modèle enregistrés"
+      },
+      "panel": {
+        "title": "Transmission au partenaire",
+        "to": "À : {partner}",
+        "noPartner": "Aucun partenaire pour ce service : ajoutez-le dans les réglages du service.",
+        "settingsLink": "Réglages du service",
+        "note": "Note pour le partenaire",
+        "noteHint": "Préparée à partir du modèle du service, ses champs remplis. Modifiez-la librement : elle sera la première page du PDF.",
+        "noTemplate": "Ce service n’a pas encore de modèle de note : écrivez-la ici, ou ajoutez un modèle dans les réglages du service.",
+        "saveNote": "Enregistrer la note",
+        "noteSaved": "Note enregistrée",
+        "reset": "Repartir du modèle",
+        "pieces": "Pièces à joindre",
+        "piecesHint": "Toutes les pièces remises sont jointes ; décochez celles à laisser de côté.",
+        "noPieces": "Aucune pièce remise pour l’instant.",
+        "export": "Exporter vers l’Outil PDF",
+        "exporting": "Préparation…",
+        "sentOn": "Envoyé par e-mail à {to} le {date}"
+      },
+      "export": {
+        "title": "Transmission – {service}",
+        "intro": "La note puis les pièces : réorganisez, faites pivoter, compressez, puis préparez l’envoi.",
+        "finish": "Préparer l’envoi",
+        "ready": "Le PDF est prêt ({size}).",
+        "share": "Partager (WhatsApp, e-mail…)",
+        "download": "Télécharger",
+        "whatsapp": "Ouvrir WhatsApp",
+        "whatsappHint": "Sur ordinateur, joignez le PDF téléchargé dans la conversation.",
+        "whatsappText": "Bonjour, voici le dossier de {client} pour le service « {service} ».",
+        "email": "Envoyer par e-mail à {to}",
+        "emailing": "Envoi…",
+        "emailed": "Envoyé à {to}",
+        "noEmail": "Ajoutez l’e-mail du partenaire dans les réglages du service pour l’envoyer d’ici.",
+        "close": "Fermer",
+        "loadFailed": "Une pièce n’a pas pu être chargée : {name}."
+      },
+      "errors": {
+        "HANDOFF_NO_PARTNER_EMAIL": "Ce service n’a pas d’e-mail de partenaire.",
+        "HANDOFF_TOO_LARGE": "Ce PDF dépasse 20 Mo : compressez-le avant de l’envoyer par e-mail.",
+        "HANDOFF_EMAIL_INVALID": "Cet e-mail n’est pas valide.",
+        "HANDOFF_NOTE_INVALID": "La note n’a pas pu être lue.",
+        "UNKNOWN": "L’action n’a pas abouti. Réessayez."
+      }
     }
   },
   "ClientForms": {

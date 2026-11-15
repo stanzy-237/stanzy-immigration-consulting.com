@@ -4176,6 +4176,86 @@
       "loading": "Loading the services under way",
       "count": "{count, plural, one {# service} other {# services}}",
       "for": "For “{document}”"
+    },
+    "handoff": {
+      "toolbar": "Formatting",
+      "tools": {
+        "h2": "Title",
+        "h3": "Subtitle",
+        "bold": "Bold",
+        "italic": "Italic",
+        "bulletList": "Bulleted list",
+        "orderedList": "Numbered list"
+      },
+      "insertField": "Insert a field",
+      "fields": {
+        "client": "Client's name",
+        "email": "Client's email",
+        "telephone": "Client's phone",
+        "nationalite": "Nationality",
+        "service": "Service",
+        "date": "Today's date",
+        "niu": "NIU",
+        "entreprise": "Current company",
+        "poste": "Current job",
+        "cnp": "NOC code",
+        "date_premier_emploi": "First job's date",
+        "comptes_salaire": "Salary accounts"
+      },
+      "settings": {
+        "title": "Partner and hand-off note",
+        "intro": "The partner this service is handed to, and the template of the note that goes with the pieces. The fields ({client}, {entreprise}…) are filled in with the client's details.",
+        "name": "Partner's name",
+        "phone": "Partner's WhatsApp",
+        "email": "Partner's email",
+        "template": "Note template",
+        "unknown": "Unknown fields: {fields}. They will stay as written.",
+        "save": "Save the partner",
+        "saving": "Saving…",
+        "saved": "Partner and template saved"
+      },
+      "panel": {
+        "title": "Hand-off to the partner",
+        "to": "To: {partner}",
+        "noPartner": "No partner for this service: add one in the service's settings.",
+        "settingsLink": "Service settings",
+        "note": "Note for the partner",
+        "noteHint": "Started from the service's template, its fields filled in. Edit it freely: it will be the PDF's first page.",
+        "noTemplate": "This service has no note template yet: write the note here, or add a template in the service's settings.",
+        "saveNote": "Save the note",
+        "noteSaved": "Note saved",
+        "reset": "Start again from the template",
+        "pieces": "Pieces to attach",
+        "piecesHint": "Every piece handed over is attached; untick those to leave out.",
+        "noPieces": "No piece handed over yet.",
+        "export": "Export to the PDF tool",
+        "exporting": "Preparing…",
+        "sentOn": "Emailed to {to} on {date}"
+      },
+      "export": {
+        "title": "Hand-off – {service}",
+        "intro": "The note, then the pieces: reorder, rotate, compress, then get it ready to send.",
+        "finish": "Get it ready to send",
+        "ready": "The PDF is ready ({size}).",
+        "share": "Share (WhatsApp, email…)",
+        "download": "Download",
+        "whatsapp": "Open WhatsApp",
+        "whatsappHint": "On a computer, attach the downloaded PDF in the chat.",
+        "whatsappText": "Hello, here is {client}'s file for the « {service} » service.",
+        "email": "Email it to {to}",
+        "emailing": "Sending…",
+        "emailed": "Sent to {to}",
+        "noEmail": "Add the partner's email in the service's settings to send it from here.",
+        "close": "Close",
+        "loadFailed": "A piece could not be loaded: {name}."
+      },
+      "errors": {
+        "HANDOFF_NO_PARTNER_EMAIL": "This service has no partner email.",
+        "HANDOFF_TOO_LARGE": "This PDF is over 20 MB: compress it before emailing it.",
+        "HANDOFF_EMAIL_INVALID": "This email isn't valid.",
+        "HANDOFF_NOTE_INVALID": "The note could not be read.",
+        "UNKNOWN": "That didn't work. Try again."
+      }
     }
   },
   "ClientForms": {

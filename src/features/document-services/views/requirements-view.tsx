@@ -18,6 +18,7 @@ import {
   type Answers,
   type Question,
 } from '@/features/document-services/lib/requirements';
+import { HandoffPanel } from '@/features/document-services/components/handoff-panel';
 import { DoneNote } from '@/features/document-services/components/service-parts';
 import { textIn } from '@/features/document-services/lib/service-schema';
 import { signaturePage } from '@/features/document-services/lib/signature-page';
@@ -159,6 +160,11 @@ function Requirements({
         </section>
       ) : null}
       <HandOver data={data} viewer={viewer} />
+      {viewer === 'consultant' && data.request.service ? (
+        <QueryBoundary fallback={<Skeleton aria-hidden={true} className="h-64 rounded-2xl" />}>
+          <HandoffPanel requestId={requestId} />
+        </QueryBoundary>
+      ) : null}
     </>
   );
 }
