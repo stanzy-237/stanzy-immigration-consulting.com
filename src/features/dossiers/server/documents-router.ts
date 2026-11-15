@@ -22,6 +22,7 @@ import {
 import { excerptOf } from '@/features/dossiers/lib/dossier-emails';
 import { finalesLocked } from '@/features/dossiers/lib/workflow';
 import { acceptEncryptedUpload, deleteFiles } from '@/features/dossiers/server/dossier-files';
+import { isFormKind } from '@/features/client-forms/lib/form-schema';
 import { documentFor, dossierFor, isConsultant, sectionFor, writable } from '@/features/dossiers/server/dossier-access';
 import { notifyClient, notifyConsultants } from '@/features/dossiers/server/dossier-notify';
 import { livesInCameroon } from '@/features/accompagnement/server/residence';
@@ -228,6 +229,8 @@ export const documentsRouter = createTRPCRouter({
     const document = await documentFor(ctx.prisma, ctx.session, input.documentId);
     const { dossier } = document;
     writable(dossier);
+    // Historique personnel, Renseignements sur la famille: filled in on their form, never a file.
+    if (isFormKind(document.kind)) throw refuse('DOCUMENT_IS_FORM');
     const wrappedKey = await acceptEncryptedUpload(input, dossierFilePrefix(dossier.id));
 
     const version = await nextVersion(ctx.prisma, document.id, {

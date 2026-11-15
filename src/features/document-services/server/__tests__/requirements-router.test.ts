@@ -94,7 +94,7 @@ describe('what the Client hands over for a service', () => {
     const { db } = fakeDatabase();
     const page = await callerFor(db, client).get({ requestId: 'stz_1' });
     expect(page.editable).toBe(true);
-    expect(page.questionsLeft).toEqual(['niu', 'contacts', 'donation', 'ubaAccount']);
+    expect(page.questionsLeft).toEqual(['niu', 'contacts', 'donation', 'ubaAccount', 'salaryAccount']);
     expect(page.items.map((item) => [item.key, item.state])).toEqual([
       ['photo', 'inDossier'],
       ['signature', 'missing'],
@@ -118,9 +118,16 @@ describe('what the Client hands over for a service', () => {
       donation: false,
       donor: { name: 'Marie Ngo', email: 'marie@example.cm', phone: '690000001' },
       ubaAccount: true,
+      salaryAccount: true,
+      salaryAccounts: [{ company: 'Brasseries du Cameroun', startOn: '2020-01-01', endOn: null }],
     };
     await callerFor(db, client).saveAnswers({ requestId: 'stz_1', answers });
-    expect(request.answers).toMatchObject({ donation: false, donor: null, ubaAccount: true });
+    expect(request.answers).toMatchObject({
+      donation: false,
+      donor: null,
+      ubaAccount: true,
+      salaryAccounts: [{ company: 'Brasseries du Cameroun', startOn: '2020-01-01', endOn: null }],
+    });
     await callerFor(db, client).saveAnswers({ requestId: 'stz_1', answers: { ...answers, donation: true } });
     const page = await callerFor(db, client).get({ requestId: 'stz_1' });
     expect(page.questionsLeft).toEqual([]);
@@ -165,7 +172,7 @@ describe('what the Client hands over for a service', () => {
 /** Answers every question and hands over every missing file. */
 async function handOverEverything(db: TRPCContext['prisma']) {
   storage.objectSize.mockResolvedValue(1016);
-  const answers = { niu: 'M012345678901A', contacts: [{ name: 'Paul Mbarga', phone: '690000000' }], donation: false, donor: null, ubaAccount: true };
+  const answers = { niu: 'M012345678901A', contacts: [{ name: 'Paul Mbarga', phone: '690000000' }], donation: false, donor: null, ubaAccount: true, salaryAccount: false };
   await callerFor(db, client).saveAnswers({ requestId: 'stz_1', answers });
   for (const key of ['signature', 'plan-de-localisation', 'bulletin-de-paie']) await callerFor(db, client).addFile(upload(key));
 }

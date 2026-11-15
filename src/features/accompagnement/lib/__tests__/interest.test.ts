@@ -29,9 +29,18 @@ const checklist = {
   jobs: [{ title: 'Comptable', inCanada: false, selfEmployed: false }],
   countries: ['Cameroun'],
 };
+const experience = {
+  title: 'Comptable',
+  company: 'Brasseries du Cameroun',
+  cnp: '11100',
+  startOn: '2019-03-01',
+  endOn: null as string | null,
+};
+const work = { phone: '+237 6 92 24 53 94', experiences: [experience] };
 const answers = (extra: Partial<InterestInput> = {}): InterestInput => ({
   checklist,
   progress,
+  work,
   areas,
   crs: toProfile(DEFAULT_FORM),
   ...extra,
@@ -66,6 +75,25 @@ describe('the Demande', () => {
       interestAnswersSchema.safeParse(answers({ areas: stanzy, progress: { ...progress, residence: 'CA' } })).success,
     ).toBe(false);
     expect(interestAnswersSchema.safeParse(answers({ progress: { ...progress, ita: true } })).success).toBe(false);
+  });
+});
+
+describe('their contact and work experience (#147)', () => {
+  const parse = (patch: Partial<typeof work>) => interestAnswersSchema.safeParse(answers({ work: { ...work, ...patch } }));
+
+  it('takes a phone number, and each job’s company, CNP code and dates, the current one open', () => {
+    expect(parse({}).success).toBe(true);
+    const ended = { ...experience, endOn: '2023-06-30' };
+    expect(parse({ experiences: [ended, { ...experience, title: 'Caissier', startOn: '2016-01-01', endOn: '2018-12-31' }] }).success).toBe(true);
+  });
+
+  it('refuses a missing phone, a CNP code that isn’t 5 digits, and an end before the start', () => {
+    expect(parse({ phone: '' }).success).toBe(false);
+    expect(parse({ phone: 'appelez-moi' }).success).toBe(false);
+    expect(parse({ experiences: [{ ...experience, cnp: '1110' }] }).success).toBe(false);
+    expect(parse({ experiences: [{ ...experience, cnp: 'ABCDE' }] }).success).toBe(false);
+    expect(parse({ experiences: [{ ...experience, company: '' }] }).success).toBe(false);
+    expect(parse({ experiences: [{ ...experience, endOn: '2018-01-01' }] }).success).toBe(false);
   });
 });
 

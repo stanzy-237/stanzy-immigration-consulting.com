@@ -51,6 +51,7 @@ function fakeDatabase() {
     ],
     dossierDocument: [
       { id: 'doc_closed', sectionId: 'sec_closed', title: 'Licence', addedById: 'acc_1', finalVersionId: null },
+      { id: 'doc_history', sectionId: 'sec_1', title: 'Historique personnel', kind: 'personalHistory', addedById: 'acc_stanzy', finalVersionId: null },
     ],
     documentVersion: [],
     documentComment: [],
@@ -235,6 +236,11 @@ describe('the Client’s documents', () => {
     storage.objectSize.mockResolvedValue(null);
     await expect(as(asAminata).addVersion(version(id))).rejects.toMatchObject({ message: 'DOCUMENT_FILE_INVALID' });
     expect(db.tables.documentVersion).toHaveLength(0);
+  });
+
+  it('takes no file on a form Document: the Client fills it in instead', async () => {
+    await expect(as(asAminata).addVersion(version('doc_history'))).rejects.toMatchObject({ message: 'DOCUMENT_IS_FORM' });
+    expect(db.tables.documentVersion).toEqual([]);
   });
 
   it('keeps a closed Dossier readable but unchanged', async () => {

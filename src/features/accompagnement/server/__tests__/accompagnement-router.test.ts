@@ -178,6 +178,10 @@ const areas = Object.fromEntries(AREAS.map((area) => [area, { answer: 'have', no
 const answers = (extra: Partial<InterestInput> = {}): InterestInput => ({
   checklist: { ...DEFAULT_CHECKLIST_FORM, jobs: [{ title: 'Comptable', inCanada: false, selfEmployed: false }], countries: ['Cameroun'] },
   progress: { ...DEFAULT_PROGRESS, citizenship: 'Camerounaise', languageTest: 'tcf', ede: true },
+  work: {
+    phone: '+237 692 24 53 94',
+    experiences: [{ title: 'Comptable', company: 'Brasseries du Cameroun', cnp: '11100', startOn: '2019-03-01', endOn: null }],
+  },
   areas,
   crs: toProfile(DEFAULT_FORM),
   ...extra,

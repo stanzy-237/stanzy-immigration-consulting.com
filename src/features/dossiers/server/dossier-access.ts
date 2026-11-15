@@ -53,8 +53,13 @@ export async function sectionFor(prisma: Db, session: CurrentSession, id: string
 export async function documentFor(prisma: Db, session: CurrentSession, id: string) {
   const document = await prisma.dossierDocument.findUnique({
     where: { id },
-    select: { id: true, title: true, section: { select: { dossier: { select: dossierFields } } } },
+    select: { id: true, title: true, kind: true, section: { select: { dossier: { select: dossierFields } } } },
   });
   if (!document) throw notFound();
-  return { id: document.id, title: document.title, dossier: reachable(session, document.section.dossier) };
+  return {
+    id: document.id,
+    title: document.title,
+    kind: document.kind,
+    dossier: reachable(session, document.section.dossier),
+  };
 }

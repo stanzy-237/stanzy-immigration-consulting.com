@@ -97,4 +97,34 @@ describe('what the Client hands over for a service', () => {
       ),
     );
   });
+
+  it('asks for each salary account’s company and period once there is one (#147)', async () => {
+    const save = vi.fn();
+    const { container } = page(save);
+    const form = screen.getByRole('heading', { name: 'Vos informations' }).closest('form')!;
+    expect(within(form).queryByLabelText('Entreprise (compte 1)')).not.toBeInTheDocument();
+    fireEvent.click(
+      within(screen.getByRole('radiogroup', { name: 'Aurez-vous besoin d’un compte salaire ?' })).getByLabelText('Oui'),
+    );
+    fireEvent.change(within(form).getByLabelText('Entreprise (compte 1)'), { target: { value: 'Brasseries du Cameroun' } });
+    fireEvent.change(within(form).getByLabelText('Début (compte 1)'), { target: { value: '2020-01-01' } });
+    fireEvent.click(within(form).getByLabelText('Toujours en cours (compte 1)'));
+    fireEvent.change(within(form).getByLabelText('Fin (compte 1)'), { target: { value: '2024-06-30' } });
+    fireEvent.click(within(form).getByRole('button', { name: 'Ajouter un compte de salaire' }));
+    expect(within(form).getByLabelText('Entreprise (compte 2)')).toBeInTheDocument();
+    fireEvent.click(within(form).getByRole('button', { name: 'Retirer le compte de salaire 2' }));
+    expect(await axe(container)).toHaveNoViolations();
+
+    fireEvent.click(within(form).getByRole('button', { name: 'Enregistrer' }));
+    await waitFor(() =>
+      expect(save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          answers: expect.objectContaining({
+            salaryAccount: true,
+            salaryAccounts: [{ company: 'Brasseries du Cameroun', startOn: '2020-01-01', endOn: '2024-06-30' }],
+          }),
+        }),
+      ),
+    );
+  }, 30_000);
 });

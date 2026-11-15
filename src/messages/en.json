@@ -2038,7 +2038,8 @@
         "UNKNOWN": "The change couldn’t be saved. Try again.",
         "COMMENT_NOT_YOURS": "You can only change your own messages.",
         "CONCERNS_CLIENT_ONLY": "Only the Client writes their concerns.",
-        "CONCERNS_NOT_OFFERED": "This file doesn't take concerns per section."
+        "CONCERNS_NOT_OFFERED": "This file doesn't take concerns per section.",
+        "DOCUMENT_IS_FORM": "This document is filled in on its form: no file is expected."
       },
       "conversation": {
         "title": "Conversation",
@@ -3127,10 +3128,11 @@
       "steps": {
         "situation": "Your situation",
         "progress": "Where you stand",
+        "work": "Contact and experience",
         "crs": "Your CRS score",
         "documents": "Your documents"
       },
-      "stepOf": "Step {step} of 4: {name}",
+      "stepOf": "Step {step} of 5: {name}",
       "next": "Continue",
       "back": "Back",
       "submit": "Send my request",
@@ -3178,7 +3180,20 @@
       "note": "Note on “{area}” (optional)",
       "notePlaceholder": "What worries you, what’s missing…",
       "crsIntro": "The CRS Calculator’s questions, already filled in if you saved a simulation. Your score updates with each answer.",
-      "crsLive": "Your CRS score"
+      "crsLive": "Your CRS score",
+      "work": {
+        "intro": "Your phone number, then each job declared in step 1: the company, the NOC code and the dates. IRCC asks for them as they are.",
+        "phone": "Phone number (WhatsApp preferred)",
+        "company": "Company name",
+        "cnp": "NOC code (5 digits)",
+        "cnpHint": "Find your job's code on the official NOC site.",
+        "cnpLink": "Search a NOC code (Government of Canada site)",
+        "startOn": "Start",
+        "endOn": "End",
+        "current": "I still work there",
+        "noJobs": "No job declared in step 1.",
+        "invalid": "Check the flagged fields: a phone number, and for each job the company, a 5-digit NOC code and the dates (the end after the start)."
+      }
     },
     "status": {
       "title": "Express Entry Accompagnement",
@@ -3252,7 +3267,11 @@
       "invoice": "Create the invoice",
       "next": "First the support contract: the Client signs it online. Then the invoice (the amount is your quote).",
       "decision": "Your decision",
-      "crs": "CRS score"
+      "crs": "CRS score",
+      "work": "Contact and experience",
+      "current": "ongoing",
+      "period": "{start} → {end}",
+      "cnp": "NOC {code}"
     },
     "document": {
       "mandatory": "★ Mandatory",
@@ -3961,7 +3980,9 @@
         "contacts": "People to contact in an emergency",
         "donation": "Are the funds a gift?",
         "donor": "The donor",
-        "ubaAccount": "Do you already have a UBA account?"
+        "ubaAccount": "Do you already have a UBA account?",
+        "salaryAccount": "Will you need a salary account?",
+        "salaryAccounts": "Your salary accounts"
       },
       "niuHint": "It is on your tax registration certificate.",
       "name": "Full name",
@@ -4028,6 +4049,16 @@
         "confirming": "Confirming…",
         "confirmedToast": "Pieces confirmed",
         "confirmedNote": "Pieces confirmed: the client can no longer change them."
+      },
+      "salary": {
+        "hint": "For each employer paying your salary into an account: its name and the period.",
+        "company": "Company (account {n})",
+        "startOn": "Start (account {n})",
+        "endOn": "End (account {n})",
+        "add": "Add a salary account",
+        "remove": "Remove salary account {n}",
+        "currentShort": "Still ongoing",
+        "account": "account {n}"
       }
     },
     "offer": {
