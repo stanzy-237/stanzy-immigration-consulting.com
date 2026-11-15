@@ -69,6 +69,7 @@ model Account {
   interestRequests  InterestRequest[]
   serviceOrders     ServiceOrder[]
   interestsDecided  InterestRequest[]    @relation("InterestDecider")
+  interestsEdited   InterestRequest[]    @relation("InterestEditor")
   stanzyRequests    StanzyRequest[]
   meetingsPlanned   Meeting[]
   meetingConsents   MeetingConsent[]
@@ -1007,26 +1008,31 @@ enum InterestLevel {
 
 /// GLOSSARY: Demande d'intérêt (#81). Kept after the decision, as history.
 model InterestRequest {
-  id            String         @id @default(cuid())
-  accountId     String
-  account       Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  status        InterestStatus @default(SUBMITTED)
+  id                String         @id @default(cuid())
+  accountId         String
+  account           Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  status            InterestStatus @default(SUBMITTED)
   /// The answers: the Checklist's, where they stand, and each document area (src/features/accompagnement/lib/interest-schema.ts).
-  answers       Json
+  answers           Json
   /// Worked out from the answers; the consultant's choice, if any, wins.
-  level         InterestLevel
-  levelOverride InterestLevel?
+  level             InterestLevel
+  levelOverride     InterestLevel?
   /// Where they live: « Stanzy s'en charge » is for Cameroon only.
-  residence     String
-  rejectReason  String?
-  decidedById   String?
-  decidedBy     Account?       @relation("InterestDecider", fields: [decidedById], references: [id], onDelete: SetNull)
-  decidedAt     DateTime?
+  residence         String
+  rejectReason      String?
+  decidedById       String?
+  decidedBy         Account?       @relation("InterestDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt         DateTime?
+  /// The Client's own answers, kept when the consultant first corrects them (#154); null while untouched.
+  originalAnswers   Json?
+  answersEditedAt   DateTime?
+  answersEditedById String?
+  answersEditedBy   Account?       @relation("InterestEditor", fields: [answersEditedById], references: [id], onDelete: SetNull)
   /// The Accompagnement Dossier its approval opened.
-  dossierId     String?        @unique
-  dossier       Dossier?       @relation(fields: [dossierId], references: [id], onDelete: SetNull)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  dossierId         String?        @unique
+  dossier           Dossier?       @relation(fields: [dossierId], references: [id], onDelete: SetNull)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
   @@index([status, createdAt])
   @@index([accountId, createdAt])

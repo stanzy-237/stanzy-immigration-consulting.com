@@ -21,6 +21,7 @@ import {
   REASON_MAX,
   rejectInput,
   startStageOf,
+  updateAnswersInput,
   type InterestAnswers,
   type SavedCrs,
 } from '@/features/accompagnement/lib/interest-schema';
@@ -29,7 +30,7 @@ import { acceptStanzyRequest } from '@/features/accompagnement/server/stanzy-acc
 import { transitionAccountStatus } from '@/features/auth/server/account-status';
 import { SCHEDULE_MAX } from '@/features/contracts/lib/contract-schema';
 import { prerequisitesOf } from '@/features/document-services/lib/service-schema';
-import { computeCrs } from '@/features/crs/lib/compute-crs';
+import { computeCrs, type CrsProfile } from '@/features/crs/lib/compute-crs';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { dossierRefInput } from '@/features/dossiers/lib/document-schema';
 import { dossierFor, isConsultant, writable } from '@/features/dossiers/server/dossier-access';
@@ -96,6 +97,14 @@ const listed = {
  * made from the Checklist) or rejects. « Stanzy s'en charge » requests on a
  * missing Document are recorded here; prices and Missions come with #80 and #42.
  */
+/** Their CRS score, worked out here under the rules in force: what the form showed, never what it sent. */
+function scoreOf(profile: CrsProfile): SavedCrs {
+  const rules = rulesInForceOn(new Date());
+  const scored = computeCrs(profile, { rules });
+  if (!scored.ok) throw refuse('INTEREST_CRS_INVALID');
+  return { profile, rules, total: scored.breakdown.total };
+}
+
 export const accompagnementRouter = createTRPCRouter({
   /** The viewer's latest Demande with the CRS score it gave them, and their open Accompagnement Dossier if any. */
   mine: protectedProcedure.query(async ({ ctx }) => {
@@ -150,11 +159,7 @@ export const accompagnementRouter = createTRPCRouter({
     if (pending) throw refuse('INTEREST_PENDING');
 
     const level = levelOf(input);
-    // Their CRS score, worked out here under the rules in force: what the form showed, never what it sent.
-    const rules = rulesInForceOn(new Date());
-    const scored = computeCrs(input.crs, { rules });
-    if (!scored.ok) throw refuse('INTEREST_CRS_INVALID');
-    const answers: InterestAnswers = { ...input, crs: { profile: input.crs, rules, total: scored.breakdown.total } };
+    const answers = { ...input, crs: scoreOf(input.crs) };
     const interest = await ctx.prisma.$transaction(async (tx) => {
       const created = await tx.interestRequest.create({
         data: {
@@ -192,9 +197,9 @@ export const accompagnementRouter = createTRPCRouter({
     trackLater(ctx.headers, 'interest.submitted', {
       level,
       residence: input.progress.residence,
-      crs: crsRange(scored.breakdown.total),
+      crs: crsRange(answers.crs.total),
     });
-    return { ...interest, crsScore: scored.breakdown.total };
+    return { ...interest, crsScore: answers.crs.total };
   }),
 
   dashboard: createTRPCRouter({
@@ -217,6 +222,9 @@ export const accompagnementRouter = createTRPCRouter({
           residence: true,
           rejectReason: true,
           decidedBy: { select: { name: true } },
+          originalAnswers: true,
+          answersEditedAt: true,
+          answersEditedBy: { select: { name: true } },
           account: { select: { id: true, name: true, email: true, locale: true, status: true } },
         },
       });
@@ -226,7 +234,44 @@ export const accompagnementRouter = createTRPCRouter({
         orderBy: { createdAt: 'desc' },
         select: { id: true, status: true, createdAt: true },
       });
-      return { ...interest, answers: interest.answers as unknown as InterestAnswers, history };
+      return {
+        ...interest,
+        answers: interest.answers as unknown as InterestAnswers,
+        originalAnswers: interest.originalAnswers as unknown as InterestAnswers | null,
+        history,
+      };
+    }),
+
+    /**
+     * The consultant corrects the Client's declarations (#154), before
+     * deciding or once accepted. Before, the Niveau follows and approval
+     * builds the Dossier from them; once accepted, the Niveau decided and
+     * the Dossier's Sections stay, the answers and residence change. The
+     * Client's own answers are kept the first time, to show what changed.
+     * A refused Demande stays as it was.
+     */
+    updateAnswers: consultantProcedure.input(updateAnswersInput).mutation(async ({ ctx, input }) => {
+      const interest = await ctx.prisma.interestRequest.findUnique({
+        where: { id: input.id },
+        select: { id: true, status: true, answers: true, originalAnswers: true },
+      });
+      if (!interest) throw notFound();
+      if (interest.status === 'REJECTED') throw refuse('INTEREST_NOT_EDITABLE');
+      const { crs, ...rest } = input.answers;
+      const answers: InterestAnswers = { ...rest, ...(crs ? { crs: scoreOf(crs) } : {}) };
+      // Against the status read: a decision in between makes it refused, and the page reloads.
+      const { count } = await ctx.prisma.interestRequest.updateMany({
+        where: { id: interest.id, status: interest.status },
+        data: {
+          answers: answers as unknown as Prisma.InputJsonValue,
+          ...(interest.status === 'SUBMITTED' ? { level: levelOf(input.answers) } : {}),
+          residence: input.answers.progress.residence,
+          originalAnswers: (interest.originalAnswers ?? interest.answers) as Prisma.InputJsonValue,
+          answersEditedById: ctx.session.account.id,
+          answersEditedAt: new Date(),
+        },
+      });
+      if (count === 0) throw refuse('INTEREST_NOT_PENDING');
     }),
 
     /**

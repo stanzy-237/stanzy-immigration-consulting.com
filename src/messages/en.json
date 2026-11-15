@@ -3271,7 +3271,21 @@
       "work": "Contact and experience",
       "current": "ongoing",
       "period": "{start} → {end}",
-      "cnp": "NOC {code}"
+      "cnp": "NOC {code}",
+      "edit": {
+        "editLabel": "Edit: {field}",
+        "save": "Save",
+        "cancel": "Cancel",
+        "saved": "Answer corrected",
+        "editedOn": "Answers corrected by {name} on {date}",
+        "client": "Declared by the Client: {value}",
+        "notFilled": "Not filled in",
+        "invalid": "Check the value entered.",
+        "add": "Add",
+        "remove": "Remove {item}",
+        "item": "{field} {n}",
+        "approvedHint": "The file is already open: correcting these answers doesn't change its sections and documents."
+      }
     },
     "document": {
       "mandatory": "★ Mandatory",
@@ -3350,7 +3364,8 @@
       "STANZY_DOCUMENT_FINAL": "This document already has its final version.",
       "SERVICE_UNAVAILABLE": "This service is no longer offered.",
       "STANZY_NO_SERVICE": "Choose the document service first.",
-      "SIGNATURE_ASSETS_MISSING": "First add your signature and stamp (Signatures)."
+      "SIGNATURE_ASSETS_MISSING": "First add your signature and stamp (Signatures).",
+      "INTEREST_NOT_EDITABLE": "A refused request can no longer be changed."
     },
     "overview": {
       "crs": "CRS score from the request",

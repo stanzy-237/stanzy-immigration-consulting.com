@@ -3288,7 +3288,21 @@
       "work": "Contact et expériences",
       "current": "en cours",
       "period": "{start} → {end}",
-      "cnp": "CNP {code}"
+      "cnp": "CNP {code}",
+      "edit": {
+        "editLabel": "Modifier : {field}",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "saved": "Réponse corrigée",
+        "editedOn": "Réponses corrigées par {name} le {date}",
+        "client": "Déclaré par le Client : {value}",
+        "notFilled": "Non renseigné",
+        "invalid": "Vérifiez la valeur saisie.",
+        "add": "Ajouter",
+        "remove": "Retirer {item}",
+        "item": "{field} {n}",
+        "approvedHint": "Le dossier est déjà ouvert : corriger ces réponses ne change pas ses sections et documents."
+      }
     },
     "document": {
       "mandatory": "★ Obligatoire",
@@ -3367,7 +3381,8 @@
       "STANZY_DOCUMENT_FINAL": "Ce document a déjà sa version finale.",
       "SERVICE_UNAVAILABLE": "Ce service n’est plus proposé.",
       "STANZY_NO_SERVICE": "Choisissez d’abord le service documentaire.",
-      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et votre cachet (Signatures)."
+      "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et votre cachet (Signatures).",
+      "INTEREST_NOT_EDITABLE": "Une demande refusée ne se modifie plus."
     },
     "overview": {
       "crs": "Score CRS de la demande",
