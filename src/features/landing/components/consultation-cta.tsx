@@ -6,10 +6,8 @@ import Image from 'next/image';
 import type { ReactNode } from 'react';
 
 import { Link } from '@/i18n/navigation';
+import consultationImage from '@/features/landing/data/images/consultation.jpg';
 import { track } from '@/lib/analytics';
-
-const CONSULT_IMAGE_SRC =
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=85';
 
 export function ConsultationCta(): ReactNode {
   const t = useTranslations('Home.ConsultationCta');
@@ -72,12 +70,12 @@ export function ConsultationCta(): ReactNode {
           {/* Right — 420px image column with soft gradient bg behind + badge */}
           <div className="relative min-h-[260px] overflow-hidden bg-[linear-gradient(135deg,#E8EDF5_0%,#FCEDEF_100%)] lg:min-h-full">
             <Image
-              src={CONSULT_IMAGE_SRC}
+              src={consultationImage}
               alt={t('imageAlt')}
               fill
               sizes="(min-width: 1024px) 460px, 100vw"
               className="object-cover object-top"
-              unoptimized
+              placeholder="blur"
             />
             <div
               aria-hidden={true}

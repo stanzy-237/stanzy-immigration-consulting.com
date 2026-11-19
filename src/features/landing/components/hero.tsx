@@ -10,14 +10,12 @@ import { track } from '@/lib/analytics';
 
 import { FloatingScoreCard } from '@/features/landing/components/floating-score-card';
 import { StatTile } from '@/features/landing/components/stat-tile';
+import heroImage from '@/features/landing/data/images/hero.jpg';
 import { HERO_STATS, type HeroStat } from '@/features/landing/data/hero-stats';
 import { WHATSAPP_CHANNEL_URL } from '@/features/shared/data/links';
 
 const WHATSAPP_HREF: string = WHATSAPP_CHANNEL_URL;
 const CONSULTATION_HREF: string = '/services/consultation';
-// Pixel-perfect hero image taken from the MagicPath design.
-const HERO_IMAGE_SRC: string =
-  'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1200&q=85';
 
 function WhatsAppGlyph(): ReactNode {
   return (
@@ -133,13 +131,15 @@ export function Hero(): ReactNode {
         {/* RIGHT */}
         <div className="relative hidden h-[520px] flex-1 overflow-hidden rounded-3xl lg:block">
           <Image
-            src={HERO_IMAGE_SRC}
+            src={heroImage}
             alt={t('imageAlt')}
             fill
             sizes="(min-width: 1024px) 45vw, 100vw"
             className="object-cover"
-            unoptimized
-            priority
+            placeholder="blur"
+            // The page's largest paint (#165): fetched first, from our own host, sized and compressed.
+            preload
+            fetchPriority="high"
           />
           <div
             aria-hidden={true}
