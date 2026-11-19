@@ -90,13 +90,16 @@ describe('a Dossier’s finances (#158)', () => {
     expect(api.setDossierPricing).not.toHaveBeenCalled();
   }, 30_000);
 
-  it('edits the Dossier’s own service apart from its requests', async () => {
+  it('edits the Dossier’s own service apart from its requests, with no partner price', async () => {
     view();
+    const own = screen.getByText('Accompagnement Entrée Express').closest('li')!;
+    expect(within(own).queryByText('Prix du partenaire')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Modifier les prix : Accompagnement Entrée Express' }));
     const form = screen.getByRole('form', { name: 'Modifier les prix : Accompagnement Entrée Express' });
+    expect(within(form).queryByLabelText('Prix du partenaire')).not.toBeInTheDocument();
     fireEvent.change(within(form).getByLabelText('Prix convenu'), { target: { value: '90000' } });
     fireEvent.click(within(form).getByRole('button', { name: 'Enregistrer' }));
-    await waitFor(() => expect(api.setDossierPricing).toHaveBeenCalledWith({ dossierId: 'dos_1', price: 90_000, partnerPrice: null }));
+    await waitFor(() => expect(api.setDossierPricing).toHaveBeenCalledWith({ dossierId: 'dos_1', price: 90_000 }));
   }, 30_000);
 
   it('says how to follow the balance when nothing is priced', () => {

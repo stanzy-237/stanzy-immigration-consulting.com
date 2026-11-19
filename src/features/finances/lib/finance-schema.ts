@@ -74,8 +74,8 @@ export const RECEIPT_PREFIX = 'finances/receipts/';
 
 const price = z.number().int().min(0).max(100_000_000_000).nullable();
 
-/** The price of a Dossier's own service and what a partner takes on it (#158), whole FCFA; null: back to the prefill. */
-export const dossierPricingInput = z.object({ dossierId: id, price, partnerPrice: price });
+/** The price of a Dossier's own service (#158), whole FCFA; null: back to the signed Contrat's. No partner works on it. */
+export const dossierPricingInput = z.object({ dossierId: id, price });
 
 /** A « Stanzy s'en charge » request's negotiated price and its partner's (#158), whole FCFA; null: back to the prefill. */
 export const requestPricingInput = z.object({ requestId: id, price, partnerPrice: price });

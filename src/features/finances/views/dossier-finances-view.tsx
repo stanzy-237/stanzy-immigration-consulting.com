@@ -82,7 +82,9 @@ function DossierFinances({ dossierId }: { dossierId: string }): ReactNode {
                   <p className="min-w-40 flex-1 font-semibold text-navy-deep">{nameOf(line)}</p>
                   <dl className="grid flex-2 grid-cols-2 gap-3">
                     <Priced label={t('agreedPrice')} amount={line.price} source={line.priceSource} />
-                    <Priced label={t('partnerPrice')} amount={line.partnerPrice} source={line.partnerSource} />
+                    {line.kind === 'REQUEST' ? (
+                      <Priced label={t('partnerPrice')} amount={line.partnerPrice} source={line.partnerSource} />
+                    ) : null}
                   </dl>
                   <button
                     type="button"
@@ -187,7 +189,7 @@ function PricingForm({ dossierId, line, name, onDone }: { dossierId: string; lin
       return;
     }
     setInvalid(false);
-    if (line.kind === 'DOSSIER') forDossier.mutate({ dossierId, price, partnerPrice });
+    if (line.kind === 'DOSSIER') forDossier.mutate({ dossierId, price });
     else forRequest.mutate({ requestId: line.id, price, partnerPrice });
   };
 
@@ -208,19 +210,22 @@ function PricingForm({ dossierId, line, name, onDone }: { dossierId: string; lin
           className={field}
         />
       </label>
-      <label htmlFor={`${ids}-partner`} className="grid gap-1 text-xs font-semibold text-slate">
-        {t('partnerPrice')}
-        <input
-          id={`${ids}-partner`}
-          inputMode="numeric"
-          value={partnerText}
-          placeholder={line.partnerPrice === null ? '' : String(line.partnerPrice)}
-          onChange={(event) => setPartnerText(event.target.value)}
-          aria-invalid={invalid}
-          aria-describedby={`${ids}-hint`}
-          className={field}
-        />
-      </label>
+      {/* Partners only work on Services documentaires: the Dossier's own service has no partner price. */}
+      {line.kind === 'REQUEST' ? (
+        <label htmlFor={`${ids}-partner`} className="grid gap-1 text-xs font-semibold text-slate">
+          {t('partnerPrice')}
+          <input
+            id={`${ids}-partner`}
+            inputMode="numeric"
+            value={partnerText}
+            placeholder={line.partnerPrice === null ? '' : String(line.partnerPrice)}
+            onChange={(event) => setPartnerText(event.target.value)}
+            aria-invalid={invalid}
+            aria-describedby={`${ids}-hint`}
+            className={field}
+          />
+        </label>
+      ) : null}
       <p id={`${ids}-hint`} className="text-xs text-slate sm:col-span-2">
         {t('emptyHint')}
       </p>

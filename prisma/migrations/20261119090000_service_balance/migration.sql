@@ -1,6 +1,5 @@
 -- AlterTable
-ALTER TABLE "dossier" ADD COLUMN     "partnerPrice" INTEGER,
-ADD COLUMN     "servicePrice" INTEGER;
+ALTER TABLE "dossier" ADD COLUMN     "servicePrice" INTEGER;
 
 -- AlterTable
 ALTER TABLE "document_service" ADD COLUMN     "partnerPrice" INTEGER;

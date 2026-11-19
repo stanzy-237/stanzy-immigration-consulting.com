@@ -405,8 +405,6 @@ model Dossier {
   /// « Prix du service » of the Dossier's own service (#158), in XAF: typed, else its signed Contrat's
   /// amount. Each « Stanzy s'en charge » request adds its own price on top. Null: not set.
   servicePrice  Int?
-  /// What a partner takes on the Dossier's own service (#158), in XAF; null: none.
-  partnerPrice  Int?
   events        DossierEvent[]
   sections      DossierSection[]
   invoices      Invoice[]

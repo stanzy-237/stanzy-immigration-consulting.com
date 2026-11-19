@@ -21,6 +21,7 @@ export type ServiceLine = {
   name: { fr?: string; en?: string } | null;
   price: number | null;
   priceSource: PriceSource;
+  /** What the partner is paid; always null on the Dossier's own service: partners only do requests. */
   partnerPrice: number | null;
   partnerSource: 'TYPED' | 'CATALOGUE' | null;
 };
@@ -57,7 +58,6 @@ export async function dossierPricing(db: Db, dossierId: string): Promise<Dossier
       id: true,
       service: true,
       servicePrice: true,
-      partnerPrice: true,
       contracts: {
         where: { status: 'SIGNED', amount: { not: null }, currency: 'XAF', stanzyRequestId: null },
         orderBy: { signedAt: 'desc' },
@@ -89,15 +89,16 @@ export async function dossierPricing(db: Db, dossierId: string): Promise<Dossier
 
   const lines: ServiceLine[] = [];
   const [ownPrice, ownSource] = typedOr<PriceSource>(dossier.servicePrice, [[dossier.contracts[0]?.amount, 'CONTRACT']], 'TYPED');
-  if (dossier.service !== 'SERVICE_DOCUMENTAIRE' || ownPrice !== null || dossier.partnerPrice !== null) {
+  if (dossier.service !== 'SERVICE_DOCUMENTAIRE' || ownPrice !== null) {
     lines.push({
       kind: 'DOSSIER',
       id: dossier.id,
       name: null,
       price: ownPrice,
       priceSource: ownSource,
-      partnerPrice: dossier.partnerPrice,
-      partnerSource: dossier.partnerPrice === null ? null : 'TYPED',
+      // Partners only work on Services documentaires, never on the Dossier's own service.
+      partnerPrice: null,
+      partnerSource: null,
     });
   }
   for (const request of requests) {

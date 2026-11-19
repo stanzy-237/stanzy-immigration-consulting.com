@@ -113,7 +113,6 @@ function fakeDatabase() {
         // #158: no signed Contrat here; a test sets `servicePrice` on the row.
         return {
           servicePrice: null,
-          partnerPrice: null,
           contracts: [],
           ...withAccount(row),
           invoices: invoices.filter((i) => i.dossierId === row.id).map(full),

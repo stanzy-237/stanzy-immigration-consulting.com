@@ -29,8 +29,7 @@ function fakeDatabase() {
       service: 'ACCOMPAGNEMENT',
       account: client,
       servicePrice: null,
-      partnerPrice: null,
-      // #158: the Dossier's signed Contrat prices its own service.
+      // #158: the Dossier's signed Contrat prices its own service; no partner works on it.
       contracts: [{ amount: 1_500_000 }],
     },
   ];
@@ -330,17 +329,17 @@ describe('finances', () => {
     ).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 
-  it('sets the Dossier’s own service price and what a partner takes on it (#158)', async () => {
+  it('sets the Dossier’s own service price, with no partner on it (#158)', async () => {
     const { db, dossiers } = fakeDatabase();
     const caller = callerFor(db, consultant);
-    await caller.finances.setDossierPricing({ dossierId: 'dos_1', price: 1_200_000, partnerPrice: 100_000 });
-    expect(dossiers[0]).toMatchObject({ servicePrice: 1_200_000, partnerPrice: 100_000 });
+    await caller.finances.setDossierPricing({ dossierId: 'dos_1', price: 1_200_000 });
+    expect(dossiers[0]).toMatchObject({ servicePrice: 1_200_000 });
     expect((await caller.finances.dossier({ dossierId: 'dos_1' })).lines[0]).toMatchObject({
       price: 1_200_000,
       priceSource: 'TYPED',
-      partnerPrice: 100_000,
+      partnerPrice: null,
     });
-    await expect(caller.finances.setDossierPricing({ dossierId: 'nope', price: 1, partnerPrice: null })).rejects.toMatchObject({
+    await expect(caller.finances.setDossierPricing({ dossierId: 'nope', price: 1 })).rejects.toMatchObject({
       message: 'FINANCE_DOSSIER_UNKNOWN',
     });
   });

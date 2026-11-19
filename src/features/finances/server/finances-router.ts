@@ -159,14 +159,14 @@ export const financesRouter = createTRPCRouter({
   }),
 
   /**
-   * The price of the Dossier's own service and what a partner takes on it (#158), in FCFA.
-   * Null on the price goes back to the signed Contrat's.
+   * The price of the Dossier's own service (#158), in FCFA; null goes back to the signed Contrat's.
+   * No partner price: partners only work on « Stanzy s'en charge » requests.
    */
   setDossierPricing: consultantProcedure.input(dossierPricingInput).mutation(async ({ ctx, input }) => {
     await linkable(ctx.prisma, input.dossierId);
     await ctx.prisma.dossier.update({
       where: { id: input.dossierId },
-      data: { servicePrice: input.price, partnerPrice: input.partnerPrice },
+      data: { servicePrice: input.price },
     });
     return { ok: true as const };
   }),
