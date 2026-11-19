@@ -72,9 +72,10 @@ export const rateInput = z.object({ month: monthInput, xafPerCad: z.number().pos
 /** Where Charges' encrypted receipts live in the private R2 bucket. */
 export const RECEIPT_PREFIX = 'finances/receipts/';
 
-/** A Dossier's « Prix du service » and « Part du partenaire » (#158), whole FCFA; null: back to the prefill. */
-export const dossierPricingInput = z.object({
-  dossierId: id,
-  servicePrice: z.number().int().min(0).max(100_000_000_000).nullable(),
-  partnerShare: z.number().int().min(0).max(100_000_000_000).nullable(),
-});
+const price = z.number().int().min(0).max(100_000_000_000).nullable();
+
+/** The price of a Dossier's own service and what a partner takes on it (#158), whole FCFA; null: back to the prefill. */
+export const dossierPricingInput = z.object({ dossierId: id, price, partnerPrice: price });
+
+/** A « Stanzy s'en charge » request's negotiated price and its partner's (#158), whole FCFA; null: back to the prefill. */
+export const requestPricingInput = z.object({ requestId: id, price, partnerPrice: price });

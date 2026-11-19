@@ -60,8 +60,23 @@ export function invoiceBalance(
   return { price, earlier, thisInvoice, remaining: Math.max(0, price - earlier - thisInvoice) };
 }
 
-/** Bénéfice (#158) = Prix du service − Part du partenaire − the Dossier's other Charges. */
-export function serviceProfit(price: number | null, partnerShare: number | null, charges: number): number | null {
+/** One service sold on a Dossier (#158): its own service, or a « Stanzy s'en charge » request. */
+export type PricedLine = { price: number | null; partnerPrice: number | null };
+
+/**
+ * A Dossier's totals over its services (#158): the price is the sum of the
+ * prices set (null when none is), and so is what partners take.
+ */
+export function pricingTotals(lines: PricedLine[]): { price: number | null; partnerPrice: number } {
+  const priced = lines.filter((line) => line.price !== null);
+  return {
+    price: priced.length === 0 ? null : priced.reduce((sum, line) => sum + line.price!, 0),
+    partnerPrice: lines.reduce((sum, line) => sum + (line.partnerPrice ?? 0), 0),
+  };
+}
+
+/** Bénéfice (#158) = what the Client pays − what the partners take − the Dossier's other Charges. */
+export function serviceProfit(price: number | null, partnerPrice: number | null, charges: number): number | null {
   if (price === null) return null;
-  return price - (partnerShare ?? 0) - charges;
+  return price - (partnerPrice ?? 0) - charges;
 }

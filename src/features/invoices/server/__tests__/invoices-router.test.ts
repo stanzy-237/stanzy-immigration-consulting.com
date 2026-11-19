@@ -110,17 +110,18 @@ function fakeDatabase() {
       async findUnique({ where }: { where: { id: string } }) {
         const row = dossiers.find((d) => d.id === where.id);
         if (!row) return null;
-        // #158: no signed Contrat nor catalogue service here; a test sets `servicePrice` on the row.
+        // #158: no signed Contrat here; a test sets `servicePrice` on the row.
         return {
           servicePrice: null,
-          partnerShare: null,
+          partnerPrice: null,
           contracts: [],
-          serviceOrder: null,
           ...withAccount(row),
           invoices: invoices.filter((i) => i.dossierId === row.id).map(full),
         };
       },
     },
+    // #158: no « Stanzy s'en charge » request on these Dossiers.
+    stanzyRequest: { findMany: async () => [] },
     invoice: {
       async findUnique({ where }: { where: { id: string } }) {
         const row = invoices.find((i) => i.id === where.id);

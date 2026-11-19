@@ -3844,16 +3844,27 @@
       "margin": "Margin",
       "unconverted": "Some CAD amounts are waiting for their month’s rate.",
       "open": "See finances",
-      "servicePrice": "Service price",
-      "partnerShare": "Partner’s share",
       "profit": "Profit",
-      "profitHint": "Service price − partner’s share − the file’s expenses.",
+      "profitHint": "Agreed prices − partners’ prices − the file’s expenses.",
       "noPrice": "Not set",
       "edit": "Edit",
       "save": "Save",
       "cancel": "Cancel",
-      "saved": "Price and partner’s share saved",
-      "amountError": "Enter a whole, positive amount in FCFA."
+      "saved": "Prices saved",
+      "amountError": "Enter a whole, positive amount in FCFA.",
+      "services": "Services sold",
+      "service": "Service",
+      "agreedPrice": "Agreed price",
+      "partnerPrice": "Partner’s price",
+      "total": "Total",
+      "noServices": "No service sold on this file yet.",
+      "editFor": "Edit prices: {service}",
+      "emptyHint": "Leave empty to go back to the contract’s or the catalogue’s price.",
+      "source": {
+        "TYPED": "negotiated",
+        "CONTRACT": "from the contract",
+        "CATALOGUE": "from the catalogue"
+      }
     }
   },
   "DocumentServices": {
@@ -4235,9 +4246,9 @@
         "save": "Save the partner",
         "saving": "Saving…",
         "saved": "Partner and template saved",
-        "partnerShare": "Partner’s default share (FCFA)",
-        "partnerShareHint": "Copied to each file of this service; editable in the file’s finances.",
-        "partnerShareInvalid": "Enter a whole amount in FCFA."
+        "partnerPrice": "Partner’s usual price (FCFA)",
+        "partnerPriceHint": "The starting point for each request; you then negotiate it request by request in the file’s finances.",
+        "partnerPriceInvalid": "Enter a whole amount in FCFA."
       },
       "panel": {
         "title": "Hand-off to the partner",

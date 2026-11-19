@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { invoiceBalance, serviceBalance, serviceProfit, type BalanceInvoice } from '@/features/invoices/lib/service-balance';
+import {
+  invoiceBalance,
+  pricingTotals,
+  serviceBalance,
+  serviceProfit,
+  type BalanceInvoice,
+} from '@/features/invoices/lib/service-balance';
 
 const invoice = (id: string, status: BalanceInvoice['status'], total: number, paid: number[] = []): BalanceInvoice => ({
   id,
@@ -48,8 +54,19 @@ describe('invoiceBalance (#158)', () => {
   });
 });
 
+describe('pricingTotals (#158)', () => {
+  it('adds up each service negotiated on the Dossier, and what each partner takes', () => {
+    expect(pricingTotals([{ price: 100, partnerPrice: null }, { price: 25, partnerPrice: 15 }])).toEqual({ price: 125, partnerPrice: 15 });
+  });
+
+  it('has no price until one service has one', () => {
+    expect(pricingTotals([{ price: null, partnerPrice: 10 }])).toEqual({ price: null, partnerPrice: 10 });
+    expect(pricingTotals([])).toEqual({ price: null, partnerPrice: 0 });
+  });
+});
+
 describe('serviceProfit (#158)', () => {
-  it('is the price less the partner’s share and the Charges', () => {
+  it('is the price less what the partners take and the Charges', () => {
     expect(serviceProfit(100, 30, 10)).toBe(60);
     expect(serviceProfit(100, null, 0)).toBe(100);
     expect(serviceProfit(null, 30, 0)).toBeNull();

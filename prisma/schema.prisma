@@ -402,12 +402,11 @@ model Dossier {
   state         DossierState     @default(OPEN)
   closedAt      DateTime?
   closedReason  String?
-  /// « Prix du service » (#158), in XAF: prefilled from the signed Contrat or the catalogue's fixed
-  /// price, editable. Factures and Reconnaissances show what is left to pay against it. Null: not set.
+  /// « Prix du service » of the Dossier's own service (#158), in XAF: typed, else its signed Contrat's
+  /// amount. Each « Stanzy s'en charge » request adds its own price on top. Null: not set.
   servicePrice  Int?
-  /// « Part du partenaire » (#158), in XAF: copied from the service's default, editable.
-  /// Bénéfice = servicePrice − partnerShare − the Dossier's Charges.
-  partnerShare  Int?
+  /// What a partner takes on the Dossier's own service (#158), in XAF; null: none.
+  partnerPrice  Int?
   events        DossierEvent[]
   sections      DossierSection[]
   invoices      Invoice[]
@@ -1088,6 +1087,11 @@ model StanzyRequest {
   /// When it was last emailed to the partner, and to which address.
   handoffSentAt DateTime?
   handoffSentTo String?
+  /// The price negotiated with the Client for this request (#158), in XAF: typed, else its Contrat's
+  /// amount, else the catalogue's fixed price.
+  agreedPrice   Int?
+  /// What the partner is paid for this request (#158), in XAF: typed, else the service's usual price.
+  partnerPrice  Int?
   createdAt     DateTime            @default(now())
 
   @@index([documentId, status])
@@ -1401,8 +1405,9 @@ model DocumentService {
   partnerName     String?
   partnerPhone    String?
   partnerEmail    String?
-  /// The partner's default share (#158), in XAF, copied to each Dossier of this service.
-  partnerShare    Int?
+  /// What the partner is usually paid for this service (#158), in XAF: the starting point of each
+  /// request's « Prix du partenaire », which the consultant negotiates per request.
+  partnerPrice    Int?
   /// The note's template, a Tiptap document with placeholders ({client}, {entreprise}…).
   handoffTemplate Json?
   requests        StanzyRequest[]

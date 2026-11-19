@@ -10,6 +10,7 @@ import {
   categoryInput,
   chargeInput,
   dossierPricingInput,
+  requestPricingInput,
   incomeInput,
   RECEIPT_PREFIX,
   rateInput,
@@ -139,32 +140,47 @@ export const financesRouter = createTRPCRouter({
     const [margin] = dossierMargins(entries, rates);
     const unconverted = entries.some((entry) => toXaf(entry.amount, entry.currency, monthOf(entry.day), rates) === null);
     const charges = margin?.charges ?? 0;
-    // #158: the service's price and the partner's share, what is left to pay, and the Bénéfice.
+    // #158: each service sold on the Dossier, what its partner takes, what is left to pay, and the Bénéfice.
     const pricing = await dossierPricing(ctx.prisma, input.dossierId);
+    const price = pricing?.price ?? null;
+    const partnerPrice = pricing?.partnerPrice ?? 0;
     return {
       income: margin?.income ?? 0,
       charges,
       net: margin?.net ?? 0,
       unconverted,
-      price: pricing.price,
-      priceSource: pricing.priceSource,
-      partnerShare: pricing.partnerShare,
-      partnerSource: pricing.partnerSource,
-      balance: serviceBalance(pricing.price, pricing.invoices),
-      profit: serviceProfit(pricing.price, pricing.partnerShare, charges),
+      service: pricing?.service ?? null,
+      lines: pricing?.lines ?? [],
+      price,
+      partnerPrice,
+      balance: pricing ? serviceBalance(price, pricing.invoices) : null,
+      profit: serviceProfit(price, partnerPrice, charges),
     };
   }),
 
   /**
-   * Sets the Dossier's « Prix du service » and « Part du partenaire » (#158), in FCFA.
-   * Null on either goes back to its prefill (the Contrat, the catalogue).
+   * The price of the Dossier's own service and what a partner takes on it (#158), in FCFA.
+   * Null on the price goes back to the signed Contrat's.
    */
-  setPricing: consultantProcedure.input(dossierPricingInput).mutation(async ({ ctx, input }) => {
+  setDossierPricing: consultantProcedure.input(dossierPricingInput).mutation(async ({ ctx, input }) => {
     await linkable(ctx.prisma, input.dossierId);
     await ctx.prisma.dossier.update({
       where: { id: input.dossierId },
-      data: { servicePrice: input.servicePrice, partnerShare: input.partnerShare },
+      data: { servicePrice: input.price, partnerPrice: input.partnerPrice },
     });
+    return { ok: true as const };
+  }),
+
+  /**
+   * The price negotiated with the Client for a « Stanzy s'en charge » request, and what its partner
+   * is paid (#158), in FCFA, whatever the catalogue says. Null goes back to the Contrat / catalogue.
+   */
+  setRequestPricing: consultantProcedure.input(requestPricingInput).mutation(async ({ ctx, input }) => {
+    const { count } = await ctx.prisma.stanzyRequest.updateMany({
+      where: { id: input.requestId },
+      data: { agreedPrice: input.price, partnerPrice: input.partnerPrice },
+    });
+    if (count === 0) throw notFound();
     return { ok: true as const };
   }),
 

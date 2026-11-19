@@ -3861,16 +3861,27 @@
       "margin": "Marge",
       "unconverted": "Des montants en CAD attendent leur taux du mois.",
       "open": "Voir les finances",
-      "servicePrice": "Prix du service",
-      "partnerShare": "Part du partenaire",
       "profit": "Bénéfice",
-      "profitHint": "Prix du service − part du partenaire − charges du dossier.",
+      "profitHint": "Prix convenus − prix des partenaires − charges du dossier.",
       "noPrice": "Non renseigné",
       "edit": "Modifier",
       "save": "Enregistrer",
       "cancel": "Annuler",
-      "saved": "Prix et part du partenaire enregistrés",
-      "amountError": "Saisissez un montant entier positif en FCFA."
+      "saved": "Prix enregistrés",
+      "amountError": "Saisissez un montant entier positif en FCFA.",
+      "services": "Services vendus",
+      "service": "Service",
+      "agreedPrice": "Prix convenu",
+      "partnerPrice": "Prix du partenaire",
+      "total": "Total",
+      "noServices": "Aucun service vendu sur ce dossier pour l’instant.",
+      "editFor": "Modifier les prix : {service}",
+      "emptyHint": "Laissez vide pour revenir au prix du contrat ou du catalogue.",
+      "source": {
+        "TYPED": "négocié",
+        "CONTRACT": "du contrat",
+        "CATALOGUE": "du catalogue"
+      }
     }
   },
   "DocumentServices": {
@@ -4252,9 +4263,9 @@
         "save": "Enregistrer le partenaire",
         "saving": "Enregistrement…",
         "saved": "Partenaire et modèle enregistrés",
-        "partnerShare": "Part du partenaire par défaut (FCFA)",
-        "partnerShareHint": "Copiée dans chaque dossier de ce service ; modifiable dans les finances du dossier.",
-        "partnerShareInvalid": "Saisissez un montant entier en FCFA."
+        "partnerPrice": "Prix habituel du partenaire (FCFA)",
+        "partnerPriceHint": "Point de départ de chaque demande ; vous le négociez ensuite demande par demande dans les finances du dossier.",
+        "partnerPriceInvalid": "Saisissez un montant entier en FCFA."
       },
       "panel": {
         "title": "Transmission au partenaire",

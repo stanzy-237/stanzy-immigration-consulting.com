@@ -29,9 +29,9 @@ export function PartnerSettings({ serviceId }: { serviceId: string }): ReactNode
   const [name, setName] = useState(data.partnerName ?? '');
   const [phone, setPhone] = useState(data.partnerPhone ?? '');
   const [email, setEmail] = useState(data.partnerEmail ?? '');
-  const [share, setShare] = useState(data.partnerShare === null ? '' : String(data.partnerShare));
-  const shareAmount = share.trim() === '' ? null : toMinor(share, 'XAF');
-  const shareInvalid = share.trim() !== '' && shareAmount === null;
+  const [partnerPriceText, setPartnerPrice] = useState(data.partnerPrice === null ? '' : String(data.partnerPrice));
+  const priceAmount = partnerPriceText.trim() === '' ? null : toMinor(partnerPriceText, 'XAF');
+  const priceInvalid = partnerPriceText.trim() !== '' && priceAmount === null;
   const [template, setTemplate] = useState<NoteDoc>(data.handoffTemplate ?? EMPTY);
   const unknown = unknownPlaceholders(template);
   const save = useMutation(
@@ -81,18 +81,18 @@ export function PartnerSettings({ serviceId }: { serviceId: string }): ReactNode
         ))}
       </div>
       <label htmlFor={`${ids}-share`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep sm:w-1/3">
-        {t('settings.partnerShare')}
+        {t('settings.partnerPrice')}
         <input
           id={`${ids}-share`}
           inputMode="numeric"
-          value={share}
-          aria-invalid={shareInvalid}
+          value={partnerPriceText}
+          aria-invalid={priceInvalid}
           aria-describedby={`${ids}-share-hint`}
-          onChange={(event) => setShare(event.target.value)}
+          onChange={(event) => setPartnerPrice(event.target.value)}
           className={`${field} tabular-nums`}
         />
-        <span id={`${ids}-share-hint`} className={`text-xs font-normal ${shareInvalid ? 'text-crimson' : 'text-slate'}`}>
-          {shareInvalid ? t('settings.partnerShareInvalid') : t('settings.partnerShareHint')}
+        <span id={`${ids}-share-hint`} className={`text-xs font-normal ${priceInvalid ? 'text-crimson' : 'text-slate'}`}>
+          {priceInvalid ? t('settings.partnerPriceInvalid') : t('settings.partnerPriceHint')}
         </span>
       </label>
       <div className="grid grid-cols-1 gap-1">
@@ -104,14 +104,14 @@ export function PartnerSettings({ serviceId }: { serviceId: string }): ReactNode
       </div>
       <button
         type="button"
-        disabled={save.isPending || shareInvalid}
+        disabled={save.isPending || priceInvalid}
         onClick={() =>
           save.mutate({
             serviceId,
             partnerName: name,
             partnerPhone: phone,
             partnerEmail: email,
-            partnerShare: shareAmount,
+            partnerPrice: priceAmount,
             template: empty ? null : template,
           })
         }
