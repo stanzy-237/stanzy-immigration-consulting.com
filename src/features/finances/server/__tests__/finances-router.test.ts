@@ -23,7 +23,18 @@ type Row = Record<string, unknown> & { id: string };
  */
 function fakeDatabase() {
   const client = { name: 'Aminata Diallo', email: 'aminata@example.com' };
-  const dossiers: Row[] = [{ id: 'dos_1', service: 'ACCOMPAGNEMENT', account: client }];
+  const dossiers: Row[] = [
+    {
+      id: 'dos_1',
+      service: 'ACCOMPAGNEMENT',
+      account: client,
+      servicePrice: null,
+      partnerShare: null,
+      // #158: the latest signed Contrat in FCFA prefills the price; the catalogue's default the share.
+      contracts: [{ amount: 1_500_000 }],
+      serviceOrder: { service: { priceKind: 'FIXED', price: 900_000, partnerShare: 300_000 } },
+    },
+  ];
   const invoices: Row[] = [
     {
       id: 'inv_1',
@@ -85,9 +96,19 @@ function fakeDatabase() {
 
   const db = {
     dossier: {
-      findUnique: async ({ where }: { where: { id: string } }) => dossiers.find((d) => d.id === where.id) ?? null,
+      findUnique: async ({ where }: { where: { id: string } }) => {
+        const dossier = dossiers.find((d) => d.id === where.id);
+        if (!dossier) return null;
+        const own = invoices
+          .filter((invoice) => invoice.dossierId === dossier.id)
+          .map((invoice) => ({ ...invoice, payments: payments.filter((payment) => payment.invoiceId === invoice.id) }));
+        return { ...dossier, invoices: own };
+      },
       findMany: async ({ where }: { where: { id: { in: string[] } } }) =>
         dossiers.filter((d) => where.id.in.includes(d.id)),
+      update: async ({ where, data }: { where: { id: string }; data: Row }) => {
+        Object.assign(dossiers.find((d) => d.id === where.id)!, data);
+      },
     },
     payment: {
       findMany: async ({ where }: { where: { invoice: { status: { not: string }; dossierId?: string } } }) =>
@@ -168,7 +189,7 @@ function fakeDatabase() {
       },
     },
   };
-  return { db: db as unknown as TRPCContext['prisma'], incomes, charges, categories };
+  return { db: db as unknown as TRPCContext['prisma'], incomes, charges, categories, dossiers };
 }
 
 const consultant = sessionFor({ id: 'acc_stanzy', role: 'CONSULTANT' });
@@ -215,7 +236,7 @@ describe('finances', () => {
     expect(margins).toEqual([
       expect.objectContaining({ dossierId: 'dos_1', income: 500_000, charges: 150_000, net: 350_000 }),
     ]);
-    expect(await caller.finances.dossier({ dossierId: 'dos_1' })).toEqual({
+    expect(await caller.finances.dossier({ dossierId: 'dos_1' })).toMatchObject({
       income: 500_000,
       charges: 150_000,
       net: 350_000,
@@ -228,6 +249,46 @@ describe('finances', () => {
       ['2026-02-20', 'STZ-2026-0002'],
       ['2026-02-03', 'STZ-2026-0001'],
     ]);
+  });
+
+  it('prefills the Prix du service from the signed Contrat and the partner’s share from the catalogue (#158)', async () => {
+    const { db } = fakeDatabase();
+    const caller = callerFor(db, consultant);
+    await caller.finances.charges.create(chargeOf({ dossierId: 'dos_1', amount: 150_000 }));
+
+    // Factures 1 and 2 are sent (400 000 + 999 999), the Annulée doesn't count; 500 000 paid on them.
+    expect(await caller.finances.dossier({ dossierId: 'dos_1' })).toMatchObject({
+      price: 1_500_000,
+      priceSource: 'CONTRACT',
+      partnerShare: 300_000,
+      partnerSource: 'CATALOGUE',
+      balance: { price: 1_500_000, invoiced: 1_399_999, paid: 500_000, remaining: 1_000_000, toInvoice: 100_001 },
+      profit: 1_500_000 - 300_000 - 150_000,
+    });
+  });
+
+  it('keeps the price and share the consultant types, and goes back to the prefill when cleared (#158)', async () => {
+    const { db, dossiers } = fakeDatabase();
+    const caller = callerFor(db, consultant);
+    await caller.finances.setPricing({ dossierId: 'dos_1', servicePrice: 1_000_000, partnerShare: 250_000 });
+    expect(dossiers[0]).toMatchObject({ servicePrice: 1_000_000, partnerShare: 250_000 });
+    expect(await caller.finances.dossier({ dossierId: 'dos_1' })).toMatchObject({
+      price: 1_000_000,
+      priceSource: 'DOSSIER',
+      partnerShare: 250_000,
+      partnerSource: 'DOSSIER',
+      profit: 750_000,
+    });
+
+    await caller.finances.setPricing({ dossierId: 'dos_1', servicePrice: null, partnerShare: null });
+    expect(await caller.finances.dossier({ dossierId: 'dos_1' })).toMatchObject({ priceSource: 'CONTRACT', partnerSource: 'CATALOGUE' });
+
+    await expect(caller.finances.setPricing({ dossierId: 'nope', servicePrice: 1, partnerShare: null })).rejects.toMatchObject({
+      message: 'FINANCE_DOSSIER_UNKNOWN',
+    });
+    await expect(
+      callerFor(db, member).finances.setPricing({ dossierId: 'dos_1', servicePrice: 1, partnerShare: null }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 
   it('counts CAD once the month has its rate', async () => {

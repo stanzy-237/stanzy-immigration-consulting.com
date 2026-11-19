@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { invoiceFor } from '@/features/invoices/server/invoice-access';
 import { invoicePdf } from '@/features/invoices/server/invoice-document';
+import { printedBalance } from '@/features/invoices/server/service-balance';
 import { openSigningAssets } from '@/features/signatures/server/signing-assets';
 import { getCurrentSession } from '@/server/auth/session';
 import { prisma } from '@/server/db/client';
@@ -25,7 +26,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   // Payée: signed and stamped by the consultant (#145).
   const consultant = invoice.status === 'PAID' ? await openSigningAssets(prisma) : null;
-  const pdf = await invoicePdf({ ...invoice, number: invoice.number, sentAt: invoice.sentAt }, consultant);
+  const balance = await printedBalance(prisma, invoice);
+  const pdf = await invoicePdf({ ...invoice, number: invoice.number, sentAt: invoice.sentAt, balance }, consultant);
   const download = new URL(request.url).searchParams.has('download');
   return new Response(new Uint8Array(pdf), {
     headers: {

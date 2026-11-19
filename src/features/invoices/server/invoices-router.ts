@@ -17,6 +17,7 @@ import { invoiceNumber, isAwaitingPayment } from '@/features/invoices/lib/invoic
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { invoiceFields, invoiceFor } from '@/features/invoices/server/invoice-access';
 import { paymentsRouter } from '@/features/invoices/server/payments-router';
+import { dossierBalance } from '@/features/invoices/server/service-balance';
 import { notifyInvoiceSent, notifyProofReceived } from '@/features/invoices/server/invoice-notify';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { trackLater } from '@/server/analytics';
@@ -116,6 +117,15 @@ export const invoicesRouter = createTRPCRouter({
       select: { ...invoiceFields, proofs: proofFields, payments: paymentFields },
     });
     return rows.map(withPayments);
+  }),
+
+  /**
+   * Where the Dossier's service stands against its « Prix du service » (#158), for its Client and the
+   * consultant: null without a price. Only sent Factures count, so a Client never learns of a Brouillon.
+   */
+  serviceBalance: protectedProcedure.input(dossierRefInput).query(async ({ ctx, input }) => {
+    const dossier = await dossierFor(ctx.prisma, ctx.session, input.dossierId);
+    return dossierBalance(ctx.prisma, dossier.id);
   }),
 
   /**

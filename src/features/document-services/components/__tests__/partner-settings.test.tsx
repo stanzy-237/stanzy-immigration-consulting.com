@@ -9,7 +9,7 @@ import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /** Seam: a service's partner and note template, as the consultant sets them (#148). The editor is only read. */
 function settings(save = vi.fn(), template: unknown = null) {
-  const partner = { partnerName: 'Banque Atlantique', partnerPhone: null, partnerEmail: null, handoffTemplate: template };
+  const partner = { partnerName: 'Banque Atlantique', partnerPhone: null, partnerEmail: null, partnerShare: null, handoffTemplate: template };
   const { trpc, queryClient, wrap } = createTestTRPC({
     'documentServices.handoff.partner': () => partner,
     'documentServices.handoff.savePartner': (input) => save(input),
@@ -35,6 +35,7 @@ describe('a service’s partner (#148)', () => {
         partnerName: 'Banque Atlantique',
         partnerPhone: '+237 690 00 00 00',
         partnerEmail: 'dossiers@banque.cm',
+        partnerShare: null,
         template: null,
       }),
     );

@@ -28,6 +28,8 @@ export type InvoiceForPdf = {
   notes: string | null;
   lines: { description: string; quantity: number; unitAmount: number }[];
   dossier: { service: ServiceType; account: { name: string; email: string; locale: string } };
+  /** Where the service stands after it (#158), from `printedBalance`; none without a « Prix du service ». */
+  balance?: { price: number; earlier: number; remaining: number } | null;
 };
 
 /**
@@ -52,6 +54,7 @@ export async function invoicePdf(
     service: t(`Dossiers.services.${invoice.dossier.service}`),
     lines: invoice.lines,
     notes: invoice.notes,
+    balance: invoice.balance ?? null,
     stamp: invoice.status === 'PAID' ? 'PAID' : invoice.status === 'CANCELLED' ? 'CANCELLED' : null,
     consultant,
     labels: {
@@ -67,6 +70,9 @@ export async function invoicePdf(
       amount: t('Invoices.pdf.amount'),
       total: t('Invoices.pdf.total'),
       notes: t('Invoices.pdf.notes'),
+      servicePrice: t('Invoices.pdf.servicePrice'),
+      earlier: t('Invoices.pdf.earlier'),
+      remaining: t('Invoices.pdf.remaining'),
       page: (page, pages) => t('Invoices.pdf.page', { page, pages }),
       paid: t('Invoices.status.PAID'),
       cancelled: t('Invoices.status.CANCELLED'),

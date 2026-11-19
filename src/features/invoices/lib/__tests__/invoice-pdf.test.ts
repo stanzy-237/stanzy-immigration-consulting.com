@@ -18,6 +18,7 @@ const data = (lines: InvoicePdfData['lines']): InvoicePdfData => ({
   service: 'Accompagnement Entrée Express',
   lines,
   notes: 'Paiement par Orange Money ✅\nMerci.',
+  balance: null,
   stamp: 'PAID',
   consultant: null,
   labels: {
@@ -33,6 +34,9 @@ const data = (lines: InvoicePdfData['lines']): InvoicePdfData => ({
     amount: 'Montant',
     total: 'Total',
     notes: 'Notes',
+    servicePrice: 'Prix du service',
+    earlier: 'Déjà facturé',
+    remaining: 'Reste à payer',
     page: (page, pages) => `Page ${page}/${pages}`,
     paid: 'Payée',
     cancelled: 'Annulée',
@@ -68,6 +72,14 @@ describe('the Facture PDF', () => {
     expect(pdf.getPageCount()).toBe(1);
     expect(pdf.getPage(0).getSize()).toEqual({ width: 595, height: 842 });
     expect(pdf.getTitle()).toBe('Facture STZ-2026-0001');
+  });
+
+  it('prints the service’s price and what is left to pay after the Facture (#158), on the same page', async () => {
+    const withBalance = { ...data([line]), balance: { price: 100_000, earlier: 0, remaining: 75_000 } };
+    const bare = await renderInvoicePdf(letterhead, data([line]));
+    const printed = await renderInvoicePdf(letterhead, withBalance);
+    expect((await PDFDocument.load(printed)).getPageCount()).toBe(1);
+    expect(printed.length).toBeGreaterThan(bare.length);
   });
 
   it('continues on another letterhead page when the lines don’t fit', async () => {

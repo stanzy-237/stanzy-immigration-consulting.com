@@ -402,6 +402,12 @@ model Dossier {
   state         DossierState     @default(OPEN)
   closedAt      DateTime?
   closedReason  String?
+  /// « Prix du service » (#158), in XAF: prefilled from the signed Contrat or the catalogue's fixed
+  /// price, editable. Factures and Reconnaissances show what is left to pay against it. Null: not set.
+  servicePrice  Int?
+  /// « Part du partenaire » (#158), in XAF: copied from the service's default, editable.
+  /// Bénéfice = servicePrice − partnerShare − the Dossier's Charges.
+  partnerShare  Int?
   events        DossierEvent[]
   sections      DossierSection[]
   invoices      Invoice[]
@@ -1395,6 +1401,8 @@ model DocumentService {
   partnerName     String?
   partnerPhone    String?
   partnerEmail    String?
+  /// The partner's default share (#158), in XAF, copied to each Dossier of this service.
+  partnerShare    Int?
   /// The note's template, a Tiptap document with placeholders ({client}, {entreprise}…).
   handoffTemplate Json?
   requests        StanzyRequest[]

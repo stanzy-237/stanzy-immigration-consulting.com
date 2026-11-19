@@ -109,7 +109,16 @@ function fakeDatabase() {
     dossier: {
       async findUnique({ where }: { where: { id: string } }) {
         const row = dossiers.find((d) => d.id === where.id);
-        return row ? withAccount(row) : null;
+        if (!row) return null;
+        // #158: no signed Contrat nor catalogue service here; a test sets `servicePrice` on the row.
+        return {
+          servicePrice: null,
+          partnerShare: null,
+          contracts: [],
+          serviceOrder: null,
+          ...withAccount(row),
+          invoices: invoices.filter((i) => i.dossierId === row.id).map(full),
+        };
       },
     },
     invoice: {
@@ -215,7 +224,7 @@ function fakeDatabase() {
     },
   } as Record<string, unknown>;
   prisma.$transaction = (fn: (tx: unknown) => Promise<unknown>) => fn(prisma);
-  return { prisma: prisma as unknown as TRPCContext['prisma'], invoices, lines, proofs, payments };
+  return { prisma: prisma as unknown as TRPCContext['prisma'], invoices, lines, proofs, payments, dossiers };
 }
 
 const asConsultant = sessionFor({ id: 'acc_stanzy', name: 'Stanzy', role: 'CONSULTANT' });
@@ -389,6 +398,26 @@ describe('closing a Facture', () => {
 });
 
 describe('Paiements and their Reconnaissance de réception de fonds (#145)', () => {
+  it('speaks of the whole service once the Dossier has a Prix du service (#158)', async () => {
+    db.dossiers[0]!.servicePrice = 150000;
+    const id = await sent();
+    await as(asConsultant).payments.record(payment(id, 50000));
+    // The Facture is 105 000; the service 150 000, of which 50 000 is now paid.
+    expect(receipts.receiptPdf).toHaveBeenCalledWith(expect.objectContaining({ amount: 50000, total: 150000, balance: 100000 }));
+    expect(await as(asConsultant).serviceBalance({ dossierId: 'dos_1' })).toEqual({
+      price: 150000,
+      invoiced: 105000,
+      paid: 50000,
+      remaining: 100000,
+      toInvoice: 45000,
+    });
+  });
+
+  it('shows no service balance without a price (#158)', async () => {
+    await sent();
+    expect(await as(asConsultant).serviceBalance({ dossierId: 'dos_1' })).toBeNull();
+  });
+
   it('records a part payment: « Partiellement payée », a numbered Reconnaissance, signed and stamped, for the Client to sign', async () => {
     const id = await sent();
     await as(asConsultant).payments.record(payment(id, 50000));

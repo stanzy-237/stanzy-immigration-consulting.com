@@ -4,6 +4,7 @@ import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { invoicePaidEmail, invoiceSentEmail, proofReceivedEmail } from '@/features/invoices/lib/invoice-emails';
 import { invoiceTotal } from '@/features/invoices/lib/money';
 import { invoicePdf, type InvoiceForPdf } from '@/features/invoices/server/invoice-document';
+import { printedBalance } from '@/features/invoices/server/service-balance';
 import { consultantInboxes } from '@/features/notifications/server/consultant-inbox';
 import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
@@ -44,7 +45,7 @@ export function notifyInvoiceSent(invoice: Invoice): void {
         name: account.name,
         locale: account.locale,
         invoice: facts(invoice),
-        pdf: await invoicePdf(invoice),
+        pdf: await invoicePdf({ ...invoice, balance: await printedBalance(prisma, invoice) }),
         url: clientUrl(invoice),
       }),
     );
