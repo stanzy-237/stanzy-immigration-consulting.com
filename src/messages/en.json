@@ -2178,7 +2178,10 @@
       "amount": "Amount",
       "total": "Total",
       "notes": "Notes",
-      "page": "Page {page}/{pages}"
+      "page": "Page {page}/{pages}",
+      "servicePrice": "Service price",
+      "earlier": "Already invoiced",
+      "remaining": "Left to pay after this invoice"
     },
     "emails": {
       "sent": {
@@ -2376,6 +2379,15 @@
       "alreadySigned": "You signed this acknowledgement on {date}.",
       "openSigned": "Open the signed acknowledgement",
       "signed": "Acknowledgement signed"
+    },
+    "balance": {
+      "title": "Service balance",
+      "price": "Service price",
+      "invoiced": "Invoiced",
+      "paid": "Paid",
+      "remaining": "Left to pay",
+      "toInvoice": "Left to invoice",
+      "none": "No service price: set it in the file’s finances to follow the balance."
     }
   },
   "Notifications": {
@@ -3831,7 +3843,28 @@
       "charges": "Expenses",
       "margin": "Margin",
       "unconverted": "Some CAD amounts are waiting for their month’s rate.",
-      "open": "See finances"
+      "open": "See finances",
+      "profit": "Profit",
+      "profitHint": "Agreed prices − partners’ prices − the file’s expenses.",
+      "noPrice": "Not set",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saved": "Prices saved",
+      "amountError": "Enter a whole, positive amount in FCFA.",
+      "services": "Services sold",
+      "service": "Service",
+      "agreedPrice": "Agreed price",
+      "partnerPrice": "Partner’s price",
+      "total": "Total",
+      "noServices": "No service sold on this file yet.",
+      "editFor": "Edit prices: {service}",
+      "emptyHint": "Leave empty to go back to the contract’s or the catalogue’s price.",
+      "source": {
+        "TYPED": "negotiated",
+        "CONTRACT": "from the contract",
+        "CATALOGUE": "from the catalogue"
+      }
     }
   },
   "DocumentServices": {
@@ -4212,7 +4245,10 @@
         "unknown": "Unknown fields: {fields}. They will stay as written.",
         "save": "Save the partner",
         "saving": "Saving…",
-        "saved": "Partner and template saved"
+        "saved": "Partner and template saved",
+        "partnerPrice": "Partner’s usual price (FCFA)",
+        "partnerPriceHint": "The starting point for each request; you then negotiate it request by request in the file’s finances.",
+        "partnerPriceInvalid": "Enter a whole amount in FCFA."
       },
       "panel": {
         "title": "Hand-off to the partner",

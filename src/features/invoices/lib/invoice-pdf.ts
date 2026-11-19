@@ -14,6 +14,8 @@ export type InvoicePdfData = {
   service: string;
   lines: { description: string; quantity: number; unitAmount: number }[];
   notes: string | null;
+  /** Where the service stands after this Facture (#158); null when the Dossier has no « Prix du service ». */
+  balance: { price: number; earlier: number; remaining: number } | null;
   /** Stamped across the page: PAID « Payée », CANCELLED « Annulée ». */
   stamp: 'PAID' | 'CANCELLED' | null;
   /** The consultant's signature and the company stamp, signed under a Payée Facture (#145). */
@@ -31,6 +33,9 @@ export type InvoicePdfData = {
     amount: string;
     total: string;
     notes: string;
+    servicePrice: string;
+    earlier: string;
+    remaining: string;
     page: (page: number, pages: number) => string;
     paid: string;
     cancelled: string;
@@ -151,6 +156,26 @@ export async function renderInvoicePdf(letterhead: Uint8Array, data: InvoicePdfD
   text(page, labels.total, UNIT_RIGHT - 100, y - 25, bold, 12);
   textRight(page, money(invoiceTotal(data.lines)), AMOUNT_RIGHT, y - 25, bold, 12);
   y -= 58;
+
+  // The service's price, what earlier Factures asked for, and what is left after this one (#158).
+  if (data.balance) {
+    const rows: [string, string, boolean][] = [
+      [labels.servicePrice, money(data.balance.price), false],
+      ...(data.balance.earlier > 0 ? [[labels.earlier, money(data.balance.earlier), false] as [string, string, boolean]] : []),
+      [labels.remaining, money(data.balance.remaining), true],
+    ];
+    if (y - rows.length * 16 - 10 < BOTTOM) {
+      page = await newPage();
+      y = TOP;
+    }
+    rows.forEach(([label, value, strong], index) => {
+      const font = strong ? bold : regular;
+      const color = strong ? ROUGE : SLATE;
+      text(page, label, UNIT_RIGHT - 160, y - index * 16, font, 10, color);
+      textRight(page, value, AMOUNT_RIGHT, y - index * 16, font, 10, color);
+    });
+    y -= rows.length * 16 + 20;
+  }
 
   if (noteRows.length > 0) {
     if (y - 18 - noteRows.length * 13 < BOTTOM) {

@@ -13,6 +13,7 @@ import { invoiceTotal } from '@/features/invoices/lib/money';
 import { invoiceFor } from '@/features/invoices/server/invoice-access';
 import { notifyInvoicePaid } from '@/features/invoices/server/invoice-notify';
 import { receiptPdf } from '@/features/invoices/server/receipt-document';
+import { dossierBalance } from '@/features/invoices/server/service-balance';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { fingerprintOf, signPdf } from '@/features/signatures/lib/sign-pdf';
 import { SIGNATURE_IMAGE_PREFIX, signInput, type SignatureField } from '@/features/signatures/lib/signature-schema';
@@ -75,14 +76,16 @@ export const paymentsRouter = createTRPCRouter({
     const { account } = invoice.dossier;
     const number = await nextReceiptNumber(ctx.prisma, issuedAt.getUTCFullYear());
     const balance = total - received - input.amount;
+    // With a « Prix du service » (#158) the Reconnaissance speaks of the whole service, not this Facture only.
+    const service = await dossierBalance(ctx.prisma, invoice.dossier.id);
     const { bytes, fields } = await receiptPdf({
       locale: account.locale,
       number,
       client: account.name,
       service: invoice.lines.map((line) => line.description).join(', '),
       amount: input.amount,
-      total,
-      balance,
+      total: service ? service.price : total,
+      balance: service ? Math.max(0, service.price - service.paid - input.amount) : balance,
       currency: invoice.currency,
       receivedOn: input.receivedOn,
       method: input.method,

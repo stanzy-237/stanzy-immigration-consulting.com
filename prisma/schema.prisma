@@ -402,6 +402,9 @@ model Dossier {
   state         DossierState     @default(OPEN)
   closedAt      DateTime?
   closedReason  String?
+  /// « Prix du service » of the Dossier's own service (#158), in XAF: typed, else its signed Contrat's
+  /// amount. Each « Stanzy s'en charge » request adds its own price on top. Null: not set.
+  servicePrice  Int?
   events        DossierEvent[]
   sections      DossierSection[]
   invoices      Invoice[]
@@ -1082,6 +1085,11 @@ model StanzyRequest {
   /// When it was last emailed to the partner, and to which address.
   handoffSentAt DateTime?
   handoffSentTo String?
+  /// The price negotiated with the Client for this request (#158), in XAF: typed, else its Contrat's
+  /// amount, else the catalogue's fixed price.
+  agreedPrice   Int?
+  /// What the partner is paid for this request (#158), in XAF: typed, else the service's usual price.
+  partnerPrice  Int?
   createdAt     DateTime            @default(now())
 
   @@index([documentId, status])
@@ -1395,6 +1403,9 @@ model DocumentService {
   partnerName     String?
   partnerPhone    String?
   partnerEmail    String?
+  /// What the partner is usually paid for this service (#158), in XAF: the starting point of each
+  /// request's « Prix du partenaire », which the consultant negotiates per request.
+  partnerPrice    Int?
   /// The note's template, a Tiptap document with placeholders ({client}, {entreprise}…).
   handoffTemplate Json?
   requests        StanzyRequest[]

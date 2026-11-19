@@ -8,6 +8,7 @@ import { useId, useState, type ReactNode } from 'react';
 import { toast } from '@/components/ui/toast';
 import { NoteEditor } from '@/features/document-services/components/note-editor';
 import { unknownPlaceholders, type NoteDoc } from '@/features/document-services/lib/handoff';
+import { toMinor } from '@/features/invoices/lib/money';
 import { useTRPC } from '@/trpc/client';
 
 const field =
@@ -28,6 +29,9 @@ export function PartnerSettings({ serviceId }: { serviceId: string }): ReactNode
   const [name, setName] = useState(data.partnerName ?? '');
   const [phone, setPhone] = useState(data.partnerPhone ?? '');
   const [email, setEmail] = useState(data.partnerEmail ?? '');
+  const [partnerPriceText, setPartnerPrice] = useState(data.partnerPrice === null ? '' : String(data.partnerPrice));
+  const priceAmount = partnerPriceText.trim() === '' ? null : toMinor(partnerPriceText, 'XAF');
+  const priceInvalid = partnerPriceText.trim() !== '' && priceAmount === null;
   const [template, setTemplate] = useState<NoteDoc>(data.handoffTemplate ?? EMPTY);
   const unknown = unknownPlaceholders(template);
   const save = useMutation(
@@ -76,6 +80,21 @@ export function PartnerSettings({ serviceId }: { serviceId: string }): ReactNode
           </label>
         ))}
       </div>
+      <label htmlFor={`${ids}-share`} className="grid grid-cols-1 gap-1 text-sm font-semibold text-navy-deep sm:w-1/3">
+        {t('settings.partnerPrice')}
+        <input
+          id={`${ids}-share`}
+          inputMode="numeric"
+          value={partnerPriceText}
+          aria-invalid={priceInvalid}
+          aria-describedby={`${ids}-share-hint`}
+          onChange={(event) => setPartnerPrice(event.target.value)}
+          className={`${field} tabular-nums`}
+        />
+        <span id={`${ids}-share-hint`} className={`text-xs font-normal ${priceInvalid ? 'text-crimson' : 'text-slate'}`}>
+          {priceInvalid ? t('settings.partnerPriceInvalid') : t('settings.partnerPriceHint')}
+        </span>
+      </label>
       <div className="grid grid-cols-1 gap-1">
         <p className="text-sm font-semibold text-navy-deep">{t('settings.template')}</p>
         <NoteEditor initial={template} label={t('settings.template')} onChange={setTemplate} />
@@ -85,13 +104,14 @@ export function PartnerSettings({ serviceId }: { serviceId: string }): ReactNode
       </div>
       <button
         type="button"
-        disabled={save.isPending}
+        disabled={save.isPending || priceInvalid}
         onClick={() =>
           save.mutate({
             serviceId,
             partnerName: name,
             partnerPhone: phone,
             partnerEmail: email,
+            partnerPrice: priceAmount,
             template: empty ? null : template,
           })
         }

@@ -30,6 +30,8 @@ export const partnerInput = z.object({
   partnerPhone: text(30),
   partnerEmail: text(200).refine((value) => value === '' || EMAIL.test(value), { message: 'HANDOFF_EMAIL_INVALID' }),
   template: noteDocSchema.nullable(),
+  /** What the partner is usually paid (#158), whole FCFA, the start of each request's; null clears it, absent leaves it. */
+  partnerPrice: z.number().int().min(0).max(100_000_000_000).nullable().optional(),
 });
 
 /** The largest PDF the email takes: what mail servers accept as an attachment, with room to spare. */
@@ -70,7 +72,7 @@ export const handoffRouter = createTRPCRouter({
   partner: consultantProcedure.input(z.object({ serviceId: id })).query(async ({ ctx, input }) => {
     const service = await ctx.prisma.documentService.findUnique({
       where: { id: input.serviceId },
-      select: { partnerName: true, partnerPhone: true, partnerEmail: true, handoffTemplate: true },
+      select: { partnerName: true, partnerPhone: true, partnerEmail: true, partnerPrice: true, handoffTemplate: true },
     });
     if (!service) throw new TRPCError({ code: 'NOT_FOUND' });
     return { ...service, handoffTemplate: service.handoffTemplate as NoteDoc | null };
@@ -83,6 +85,7 @@ export const handoffRouter = createTRPCRouter({
         partnerName: input.partnerName || null,
         partnerPhone: input.partnerPhone || null,
         partnerEmail: input.partnerEmail || null,
+        ...(input.partnerPrice === undefined ? {} : { partnerPrice: input.partnerPrice }),
         handoffTemplate: input.template === null ? Prisma.DbNull : (input.template as Prisma.InputJsonObject),
       },
     });

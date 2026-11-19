@@ -9,6 +9,8 @@ import {
   archiveCategoryInput,
   categoryInput,
   chargeInput,
+  dossierPricingInput,
+  requestPricingInput,
   incomeInput,
   RECEIPT_PREFIX,
   rateInput,
@@ -28,6 +30,8 @@ import {
   loadRates,
   yearBounds,
 } from '@/features/finances/server/finance-entries';
+import { serviceBalance, serviceProfit } from '@/features/invoices/lib/service-balance';
+import { dossierPricing } from '@/features/invoices/server/service-balance';
 import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter } from '@/server/trpc/trpc';
 
@@ -135,7 +139,49 @@ export const financesRouter = createTRPCRouter({
     ]);
     const [margin] = dossierMargins(entries, rates);
     const unconverted = entries.some((entry) => toXaf(entry.amount, entry.currency, monthOf(entry.day), rates) === null);
-    return { income: margin?.income ?? 0, charges: margin?.charges ?? 0, net: margin?.net ?? 0, unconverted };
+    const charges = margin?.charges ?? 0;
+    // #158: each service sold on the Dossier, what its partner takes, what is left to pay, and the Bénéfice.
+    const pricing = await dossierPricing(ctx.prisma, input.dossierId);
+    const price = pricing?.price ?? null;
+    const partnerPrice = pricing?.partnerPrice ?? 0;
+    return {
+      income: margin?.income ?? 0,
+      charges,
+      net: margin?.net ?? 0,
+      unconverted,
+      service: pricing?.service ?? null,
+      lines: pricing?.lines ?? [],
+      price,
+      partnerPrice,
+      balance: pricing ? serviceBalance(price, pricing.invoices) : null,
+      profit: serviceProfit(price, partnerPrice, charges),
+    };
+  }),
+
+  /**
+   * The price of the Dossier's own service (#158), in FCFA; null goes back to the signed Contrat's.
+   * No partner price: partners only work on « Stanzy s'en charge » requests.
+   */
+  setDossierPricing: consultantProcedure.input(dossierPricingInput).mutation(async ({ ctx, input }) => {
+    await linkable(ctx.prisma, input.dossierId);
+    await ctx.prisma.dossier.update({
+      where: { id: input.dossierId },
+      data: { servicePrice: input.price },
+    });
+    return { ok: true as const };
+  }),
+
+  /**
+   * The price negotiated with the Client for a « Stanzy s'en charge » request, and what its partner
+   * is paid (#158), in FCFA, whatever the catalogue says. Null goes back to the Contrat / catalogue.
+   */
+  setRequestPricing: consultantProcedure.input(requestPricingInput).mutation(async ({ ctx, input }) => {
+    const { count } = await ctx.prisma.stanzyRequest.updateMany({
+      where: { id: input.requestId },
+      data: { agreedPrice: input.price, partnerPrice: input.partnerPrice },
+    });
+    if (count === 0) throw notFound();
+    return { ok: true as const };
   }),
 
   incomes: createTRPCRouter({

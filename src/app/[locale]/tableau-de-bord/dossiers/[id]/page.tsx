@@ -14,6 +14,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   prefetch(trpc.dossiers.documents.sections.queryOptions({ dossierId: id }));
   prefetch(trpc.dossiers.messages.list.queryOptions({ dossierId: id }));
   prefetch(trpc.invoices.forDossier.queryOptions({ dossierId: id }));
+  prefetch(trpc.invoices.serviceBalance.queryOptions({ dossierId: id }));
   prefetch(trpc.finances.dossier.queryOptions({ dossierId: id }));
   prefetch(trpc.contracts.forDossier.queryOptions({ dossierId: id }));
   prefetch(trpc.accompagnement.stanzy.forDossier.queryOptions({ dossierId: id }));
