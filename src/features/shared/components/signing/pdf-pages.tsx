@@ -55,7 +55,7 @@ export function PdfPages({
                 className="relative w-full overflow-hidden rounded-lg bg-white shadow-md ring-1 ring-fog-light"
                 style={{ aspectRatio: `${page.width} / ${page.height}` }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element -- a page drawn in the browser, as a data URL */}
+                {/* eslint-disable-next-line @next/next/no-img-element -- a page drawn in the browser, as a blob URL */}
                 <img src={page.src} alt="" className="pointer-events-none absolute inset-0 size-full select-none" />
                 <div
                   className={

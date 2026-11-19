@@ -7,8 +7,26 @@ import { loadPdfJs } from '@/features/pdf-tools/lib/browser-pdf';
 /** One page drawn for reading: an image, and its shape as shown (rotation applied). */
 export type ShownPage = { src: string; width: number; height: number };
 
-/** How wide pages are drawn, in pixels: sharp enough to read a letter on a large screen. */
-const DRAW_WIDTH = 1100;
+/** The widest pages are drawn, in pixels: sharp enough to read a letter on a large screen. */
+const MAX_DRAW_WIDTH = 1100;
+
+/**
+ * How wide to draw pages on this screen (#165): its width at up to twice its
+ * pixel density, at most MAX_DRAW_WIDTH. A phone draws about half the pixels
+ * a desktop does, and reads just as sharp.
+ */
+export function drawWidth(screenWidth: number, pixelRatio: number): number {
+  return Math.min(MAX_DRAW_WIDTH, Math.round(screenWidth * Math.min(Math.max(pixelRatio, 1), 2)));
+}
+
+/** A drawn page as a JPEG, encoded off the main thread where the browser can. */
+const toJpeg = (canvas: HTMLCanvasElement): Promise<Blob> =>
+  new Promise((resolve, reject) =>
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('PDF page not drawn'))), 'image/jpeg', 0.85),
+  );
+
+/** Lets the browser paint and answer taps between two pages. */
+const breathe = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
 
 type State = { url: string | null; pages: ShownPage[]; total: number | null; failed: boolean };
 
@@ -23,13 +41,15 @@ export function usePdfPages(url: string | null): { pages: ShownPage[]; total: nu
   useEffect(() => {
     if (!url) return;
     let alive = true;
+    const urls: string[] = [];
     const update = (change: (current: State) => State) =>
       alive && setState((current) => change(current.url === url ? current : { url, pages: [], total: null, failed: false }));
+    const width = drawWidth(window.innerWidth, window.devicePixelRatio || 1);
 
     (async () => {
-      const response = await fetch(url);
+      // The file and pdf.js arrive together, not one after the other.
+      const [response, lib] = await Promise.all([fetch(url), loadPdfJs()]);
       if (!response.ok) throw new Error(`PDF ${response.status}`);
-      const lib = await loadPdfJs();
       const task = lib.getDocument({ data: new Uint8Array(await response.arrayBuffer()) });
       try {
         const doc = await task.promise;
@@ -37,7 +57,7 @@ export function usePdfPages(url: string | null): { pages: ShownPage[]; total: nu
         for (let number = 1; number <= doc.numPages && alive; number++) {
           const page = await doc.getPage(number);
           const shown = page.getViewport({ scale: 1 });
-          const viewport = page.getViewport({ scale: DRAW_WIDTH / shown.width });
+          const viewport = page.getViewport({ scale: width / shown.width });
           const canvas = document.createElement('canvas');
           canvas.width = Math.ceil(viewport.width);
           canvas.height = Math.ceil(viewport.height);
@@ -45,9 +65,11 @@ export function usePdfPages(url: string | null): { pages: ShownPage[]; total: nu
           context.fillStyle = '#ffffff';
           context.fillRect(0, 0, canvas.width, canvas.height);
           await page.render({ canvas, canvasContext: context, viewport }).promise;
-          const drawn = { src: canvas.toDataURL('image/jpeg', 0.85), width: shown.width, height: shown.height };
-          update((current) => ({ ...current, pages: [...current.pages, drawn] }));
           page.cleanup();
+          const src = URL.createObjectURL(await toJpeg(canvas));
+          urls.push(src);
+          update((current) => ({ ...current, pages: [...current.pages, { src, width: shown.width, height: shown.height }] }));
+          await breathe();
         }
       } finally {
         await task.destroy();
@@ -56,6 +78,7 @@ export function usePdfPages(url: string | null): { pages: ShownPage[]; total: nu
 
     return () => {
       alive = false;
+      urls.forEach((src) => URL.revokeObjectURL(src));
     };
   }, [url]);
 
