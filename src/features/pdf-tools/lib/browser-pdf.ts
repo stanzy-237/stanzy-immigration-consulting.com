@@ -1,6 +1,6 @@
 import { PDFDocument } from 'pdf-lib';
 
-import { installPdfPolyfills } from '@/features/pdf-tools/lib/pdf-polyfills';
+import { loadPdfJs } from '@/features/pdf-tools/lib/pdf-js';
 import type { RasterizePdf } from '@/features/pdf-tools/lib/build-pdf';
 import type { Rotation, Source } from '@/features/pdf-tools/lib/pages';
 
@@ -9,24 +9,6 @@ import type { Rotation, Source } from '@/features/pdf-tools/lib/pages';
  * added, drawing page thumbnails and redrawing pages as JPEG, with pdf.js
  * (loaded on first use, its worker beside it). Nothing leaves the browser.
  */
-
-type PdfJs = typeof import('pdfjs-dist');
-let pdfjs: Promise<PdfJs> | null = null;
-
-/**
- * pdf.js, loaded once on first use, with its worker. The legacy build, plus
- * the Safari 17.4 features it calls without polyfilling (pdf-polyfills.ts),
- * installed here and in the worker (pdf-worker.ts): an iPhone on iOS 17.1
- * could not open a Contrat to sign without them.
- */
-export function loadPdfJs(): Promise<PdfJs> {
-  installPdfPolyfills();
-  pdfjs ??= import('pdfjs-dist/legacy/build/pdf.mjs').then((lib) => {
-    lib.GlobalWorkerOptions.workerPort = new Worker(new URL('./pdf-worker.ts', import.meta.url), { type: 'module' });
-    return lib;
-  });
-  return pdfjs;
-}
 
 /** What can be added: PDFs and photos (HEIC is converted, WebP redrawn). */
 export const ACCEPTED = 'application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif';
