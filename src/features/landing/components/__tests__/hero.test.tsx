@@ -20,6 +20,14 @@ describe('Hero', () => {
     expect(within(heading).getByText('Confiance.')).toHaveClass('text-rouge');
   });
 
+  it('serves its photo, the page’s largest paint, from our own host, optimised and fetched first (#165)', () => {
+    render(withIntl(<Hero />));
+    const photo = screen.getByAltText("Candidat à l'immigration canadienne célébrant son succès");
+    expect(photo.getAttribute('src')).toMatch(/^\/_next\/image\?url=%2F_next%2Fstatic%2Fmedia%2Fhero/);
+    expect(photo).toHaveAttribute('fetchpriority', 'high');
+    expect(photo).not.toHaveAttribute('loading', 'lazy');
+  });
+
   it('exposes the two primary CTAs', () => {
     render(withIntl(<Hero />));
     const book = screen.getByRole('link', { name: /Réserver une consultation/i });

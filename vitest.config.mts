@@ -1,10 +1,25 @@
 import { fileURLToPath } from 'node:url';
 
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, type Plugin } from 'vitest/config';
+
+/**
+ * Static image imports as Next builds them (`StaticImageData`), so a
+ * `<Image src={photo} placeholder="blur" />` renders in tests as it does in
+ * the app (#165). Sizes are placeholders; the browser never sees them.
+ */
+const staticImages = (): Plugin => ({
+  name: 'static-images',
+  enforce: 'pre',
+  load(id) {
+    if (!/\.(jpe?g|png|webp|avif)$/.test(id)) return null;
+    const src = JSON.stringify(`/_next/static/media/${id.split('/').pop()}`);
+    return `export default { src: ${src}, width: 1600, height: 1067, blurDataURL: 'data:image/jpeg;base64,' };`;
+  },
+});
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), staticImages()],
   test: {
     include: [
       'src/**/__tests__/**/*.test.ts',

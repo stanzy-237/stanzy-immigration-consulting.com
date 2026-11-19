@@ -7,11 +7,11 @@ import Image from 'next/image';
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
 
 import { EASE_OUT } from '@/components/ui/reveal';
+import heroImage from '@/features/accompagnement/data/images/hero.jpg';
 import { WORKFLOWS } from '@/features/dossiers/data/workflows';
 import { Link } from '@/i18n/navigation';
 import { track } from '@/lib/analytics';
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1517090504586-fde19ea6066f?w=1200&q=85';
 const STATS = [
   { key: 'stages', value: '10' },
   { key: 'days', value: '60', highlight: true },
@@ -100,11 +100,13 @@ export function AccompagnementHero(): ReactNode {
           className="relative h-96 flex-1 overflow-hidden rounded-3xl sm:h-130"
         >
           <Image
-            src={HERO_IMAGE}
+            src={heroImage}
             alt={t('heroImageAlt')}
             fill
-            priority
-            unoptimized
+            placeholder="blur"
+            // The page's largest paint (#165): fetched first, from our own host, sized and compressed.
+            preload
+            fetchPriority="high"
             sizes="(min-width: 1024px) 45vw, 100vw"
             className="object-cover"
           />

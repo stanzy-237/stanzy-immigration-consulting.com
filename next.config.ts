@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
     '/api/**/*': ['./src/features/invoices/assets/letterhead.pdf'],
   },
   images: {
+    // AVIF first, WebP for browsers without it (#165).
+    formats: ['image/avif', 'image/webp'],
     // Blog covers, uploaded by the consultant to the public R2 bucket (#87).
     remotePatterns: R2_PUBLIC_HOST ? [{ protocol: 'https', hostname: R2_PUBLIC_HOST }] : [],
   },

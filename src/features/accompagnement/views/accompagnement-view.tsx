@@ -22,13 +22,12 @@ import { AccompagnementHero } from '@/features/accompagnement/components/accompa
 import { ApplyLink } from '@/features/accompagnement/components/apply-link';
 import { HowItWorks } from '@/features/accompagnement/components/how-it-works';
 import { StoryStages } from '@/features/accompagnement/components/story-stages';
+import ctaImage from '@/features/accompagnement/data/images/cta.jpg';
 import { LEVELS, startStageOf } from '@/features/accompagnement/lib/interest-schema';
 import { WORKFLOWS } from '@/features/dossiers/data/workflows';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { Link } from '@/i18n/navigation';
-
-const CTA_IMAGE = 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1600&q=80';
 
 const FEATURES: { key: string; icon: LucideIcon }[] = [
   { key: 'dossier', icon: FolderOpen },
@@ -169,7 +168,7 @@ export function AccompagnementView(): ReactNode {
         {/* The last chapter */}
         <section aria-labelledby="accompagnement-cta" className="px-5 pb-20 md:px-7">
           <Reveal className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl">
-            <Image src={CTA_IMAGE} alt="" fill unoptimized sizes="100vw" className="object-cover" />
+            <Image src={ctaImage} alt="" fill sizes="(min-width: 1280px) 1280px, 100vw" placeholder="blur" className="object-cover" />
             <div aria-hidden={true} className="absolute inset-0 bg-linear-to-r from-navy-deep via-navy-deep/90 to-navy-deep/40" />
             <div className="relative grid grid-cols-1 gap-6 px-6 py-16 text-white sm:px-12 md:max-w-2xl">
               <p className="text-xs font-semibold tracking-widest text-rose uppercase">{t('chapters.end')}</p>
