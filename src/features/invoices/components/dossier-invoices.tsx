@@ -56,6 +56,7 @@ export function DossierInvoices({
           </Link>
         ) : null}
       </div>
+      <ServiceBalanceBar dossierId={dossierId} />
       {invoices.length === 0 ? (
         <p className="rounded-2xl border-2 border-dashed border-fog-light bg-white px-6 py-8 text-center text-sm text-slate">
           {consultant ? t('empty') : t('emptyClient')}
@@ -70,6 +71,35 @@ export function DossierInvoices({
         </ul>
       )}
     </section>
+  );
+}
+
+/** Where the service stands (#158): its price, invoiced, paid, and what is left to pay. Nothing without a price. */
+function ServiceBalanceBar({ dossierId }: { dossierId: string }): ReactNode {
+  const t = useTranslations('Invoices.balance');
+  const locale = useLocale();
+  const trpc = useTRPC();
+  const { data: balance } = useSuspenseQuery(trpc.invoices.serviceBalance.queryOptions({ dossierId }));
+  if (!balance) return null;
+  const xaf = (amount: number) => formatMoney(amount, 'XAF', locale);
+  const figures: [string, number][] = [
+    [t('price'), balance.price],
+    [t('invoiced'), balance.invoiced],
+    [t('paid'), balance.paid],
+  ];
+  return (
+    <dl aria-label={t('title')} className="grid grid-cols-2 gap-3 rounded-2xl bg-ice-blue/40 p-4 sm:grid-cols-4">
+      {figures.map(([label, amount]) => (
+        <div key={label}>
+          <dt className="text-xs font-semibold text-slate">{label}</dt>
+          <dd className="font-semibold text-navy-deep tabular-nums">{xaf(amount)}</dd>
+        </div>
+      ))}
+      <div>
+        <dt className="text-xs font-semibold text-slate">{t('remaining')}</dt>
+        <dd className={`font-bold tabular-nums ${balance.remaining > 0 ? 'text-rouge' : 'text-leaf'}`}>{xaf(balance.remaining)}</dd>
+      </div>
+    </dl>
   );
 }
 

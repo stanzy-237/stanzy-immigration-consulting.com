@@ -2178,7 +2178,10 @@
       "amount": "Amount",
       "total": "Total",
       "notes": "Notes",
-      "page": "Page {page}/{pages}"
+      "page": "Page {page}/{pages}",
+      "servicePrice": "Service price",
+      "earlier": "Already invoiced",
+      "remaining": "Left to pay after this invoice"
     },
     "emails": {
       "sent": {
@@ -2376,6 +2379,15 @@
       "alreadySigned": "You signed this acknowledgement on {date}.",
       "openSigned": "Open the signed acknowledgement",
       "signed": "Acknowledgement signed"
+    },
+    "balance": {
+      "title": "Service balance",
+      "price": "Service price",
+      "invoiced": "Invoiced",
+      "paid": "Paid",
+      "remaining": "Left to pay",
+      "toInvoice": "Left to invoice",
+      "none": "No service price: set it in the file’s finances to follow the balance."
     }
   },
   "Notifications": {
@@ -3831,7 +3843,17 @@
       "charges": "Expenses",
       "margin": "Margin",
       "unconverted": "Some CAD amounts are waiting for their month’s rate.",
-      "open": "See finances"
+      "open": "See finances",
+      "servicePrice": "Service price",
+      "partnerShare": "Partner’s share",
+      "profit": "Profit",
+      "profitHint": "Service price − partner’s share − the file’s expenses.",
+      "noPrice": "Not set",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saved": "Price and partner’s share saved",
+      "amountError": "Enter a whole, positive amount in FCFA."
     }
   },
   "DocumentServices": {
@@ -4212,7 +4234,10 @@
         "unknown": "Unknown fields: {fields}. They will stay as written.",
         "save": "Save the partner",
         "saving": "Saving…",
-        "saved": "Partner and template saved"
+        "saved": "Partner and template saved",
+        "partnerShare": "Partner’s default share (FCFA)",
+        "partnerShareHint": "Copied to each file of this service; editable in the file’s finances.",
+        "partnerShareInvalid": "Enter a whole amount in FCFA."
       },
       "panel": {
         "title": "Hand-off to the partner",

@@ -151,17 +151,33 @@ const payment = (extra: Record<string, unknown> = {}) => ({
   ...extra,
 });
 
-function dossierInvoices(viewer: 'consultant' | 'client', invoices = [invoice()]) {
+type Balance = { price: number; invoiced: number; paid: number; remaining: number; toInvoice: number } | null;
+
+function dossierInvoices(viewer: 'consultant' | 'client', invoices = [invoice()], balance: Balance = null) {
   const { trpc, queryClient, wrap } = createTestTRPC({
     'invoices.forDossier': () => invoices,
+    'invoices.serviceBalance': () => balance,
     'invoices.addProof': (input) => api.addProof(input),
     'invoices.payments.record': (input) => api.record(input),
   });
   queryClient.setQueryData(trpc.invoices.forDossier.queryKey({ dossierId: 'dos_1' }), invoices as never);
+  queryClient.setQueryData(trpc.invoices.serviceBalance.queryKey({ dossierId: 'dos_1' }), balance as never);
   return render(withIntl(wrap(<DossierInvoices dossierId="dos_1" viewer={viewer} />)));
 }
 
 describe('DossierInvoices', () => {
+  it('shows what is left to pay on the service, against its price (#158)', async () => {
+    dossierInvoices('client', [invoice()], { price: 100_000, invoiced: 80_000, paid: 80_000, remaining: 20_000, toInvoice: 20_000 });
+    const list = await screen.findByLabelText('Solde du service');
+    expect(within(list).getByText('Prix du service')).toBeInTheDocument();
+    expect(within(list).getByText('Reste à payer').nextElementSibling).toHaveTextContent('20 000 FCFA');
+  });
+
+  it('shows no balance without a price (#158)', () => {
+    dossierInvoices('client');
+    expect(screen.queryByLabelText('Solde du service')).not.toBeInTheDocument();
+  });
+
   it('lets the Client open the PDF and send a Preuve de paiement', async () => {
     urls.uploadProofFile.mockResolvedValue({
       objectKey: 'dossiers/dos_1/x.bin',

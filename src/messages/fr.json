@@ -2195,7 +2195,10 @@
       "amount": "Montant",
       "total": "Total",
       "notes": "Notes",
-      "page": "Page {page}/{pages}"
+      "page": "Page {page}/{pages}",
+      "servicePrice": "Prix du service",
+      "earlier": "Déjà facturé",
+      "remaining": "Reste à payer après cette facture"
     },
     "emails": {
       "sent": {
@@ -2393,6 +2396,15 @@
       "alreadySigned": "Vous avez signé cette reconnaissance le {date}.",
       "openSigned": "Ouvrir la reconnaissance signée",
       "signed": "Reconnaissance signée"
+    },
+    "balance": {
+      "title": "Solde du service",
+      "price": "Prix du service",
+      "invoiced": "Facturé",
+      "paid": "Payé",
+      "remaining": "Reste à payer",
+      "toInvoice": "Reste à facturer",
+      "none": "Aucun prix du service : renseignez-le dans les finances du dossier pour suivre le solde."
     }
   },
   "Notifications": {
@@ -3848,7 +3860,17 @@
       "charges": "Charges",
       "margin": "Marge",
       "unconverted": "Des montants en CAD attendent leur taux du mois.",
-      "open": "Voir les finances"
+      "open": "Voir les finances",
+      "servicePrice": "Prix du service",
+      "partnerShare": "Part du partenaire",
+      "profit": "Bénéfice",
+      "profitHint": "Prix du service − part du partenaire − charges du dossier.",
+      "noPrice": "Non renseigné",
+      "edit": "Modifier",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "saved": "Prix et part du partenaire enregistrés",
+      "amountError": "Saisissez un montant entier positif en FCFA."
     }
   },
   "DocumentServices": {
@@ -4229,7 +4251,10 @@
         "unknown": "Champs inconnus : {fields}. Ils resteront tels quels.",
         "save": "Enregistrer le partenaire",
         "saving": "Enregistrement…",
-        "saved": "Partenaire et modèle enregistrés"
+        "saved": "Partenaire et modèle enregistrés",
+        "partnerShare": "Part du partenaire par défaut (FCFA)",
+        "partnerShareHint": "Copiée dans chaque dossier de ce service ; modifiable dans les finances du dossier.",
+        "partnerShareInvalid": "Saisissez un montant entier en FCFA."
       },
       "panel": {
         "title": "Transmission au partenaire",
