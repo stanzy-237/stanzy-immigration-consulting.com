@@ -6,7 +6,7 @@ import { drawWidth, usePdfPages } from '@/features/shared/hooks/use-pdf-pages';
 
 /** Seam: pdf.js (loadPdfJs) and the browser's canvas, as a two-page A4 Contrat (#165). */
 const pdf = vi.hoisted(() => ({ scales: [] as number[] }));
-vi.mock('@/features/pdf-tools/lib/browser-pdf', () => ({
+vi.mock('@/features/pdf-tools/lib/pdf-js', () => ({
   loadPdfJs: async () => ({
     getDocument: () => ({
       promise: Promise.resolve({

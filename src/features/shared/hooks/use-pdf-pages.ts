@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { loadPdfJs } from '@/features/pdf-tools/lib/browser-pdf';
+import { loadPdfJs } from '@/features/pdf-tools/lib/pdf-js';
 
 /** One page drawn for reading: an image, and its shape as shown (rotation applied). */
 export type ShownPage = { src: string; width: number; height: number };
