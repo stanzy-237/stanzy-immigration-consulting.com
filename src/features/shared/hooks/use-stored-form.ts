@@ -7,7 +7,7 @@ import type { z } from 'zod';
  * Checks what the browser kept: any input is accepted (it is unknown JSON),
  * so a schema may coerce or default old shapes, e.g. with `.catch()`.
  */
-type StoredSchema<T> = z.ZodType<T, z.ZodTypeDef, unknown>;
+type StoredSchema<T> = z.ZodType<T, unknown>;
 
 function readRaw(key: string): string | null {
   try {

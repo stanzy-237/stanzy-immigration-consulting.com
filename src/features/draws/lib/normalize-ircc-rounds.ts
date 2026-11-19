@@ -25,7 +25,7 @@ export type NormalizeResult = {
 
 const IRCC_ORIGIN = 'https://www.canada.ca';
 
-const feedSchema = z.object({ rounds: z.array(z.record(z.unknown())) });
+const feedSchema = z.object({ rounds: z.array(z.record(z.string(), z.unknown())) });
 
 /** "5,000" → 5000. Digits and thousands separators only. */
 const count = z
