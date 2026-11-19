@@ -58,9 +58,11 @@ const fetched: string[] = [];
 beforeEach(() => {
   vi.clearAllMocks();
   fetched.length = 0;
+  // A bare response, not `new Response(new Blob(...))`: Node 22's undici does
+  // not read jsdom's Blob, so every file failed to load on CI.
   vi.stubGlobal('fetch', async (url: string) => {
     fetched.push(url);
-    return new Response(new Blob(['%PDF']), { status: 200 });
+    return { ok: true, status: 200, blob: async () => new Blob(['%PDF'], { type: 'application/pdf' }) };
   });
   upload.uploadEncryptedFile.mockResolvedValue({
     objectKey: 'requirements/stz_1/handoff/x.bin',
@@ -102,7 +104,6 @@ describe('« Transmission au partenaire » (#148)', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Transmission – Preuve de fonds' });
     expect(fetched).toEqual(['/api/requirements/stz_1/handoff-note', '/api/requirements/files/file_plan']);
     expect(pdfTool.sources.map((source) => source.name)).toEqual(['note.pdf', 'plan.jpg']);
-
     fireEvent.click(within(dialog).getByRole('button', { name: 'Préparer l’envoi' }));
     const whatsapp = await within(dialog).findByRole('link', { name: 'Ouvrir WhatsApp' });
     expect(whatsapp).toHaveAttribute(
