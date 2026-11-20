@@ -8,7 +8,8 @@ cd "$(dirname "$0")/.."
 
 PROJECT=stanzy-immigration-consulting-com
 MONITORS=docs/ops/monitors.json
-existing="$(vercel monitors ls 2>/dev/null || true)"
+# The CLI prints its table on stderr.
+existing="$(vercel monitors ls 2>&1 || true)"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
