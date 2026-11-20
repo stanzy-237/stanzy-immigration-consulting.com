@@ -1,0 +1,345 @@
+[
+  {
+    "name": "Rate limit: sign-in, sign-up, password reset",
+    "description": "#163. POSTs to Better Auth's credential endpoints, 30/min per IP (Better Auth adds 3-5/min per IP behind it). Generous for shared mobile IPs.",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/auth/sign-in/"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/auth/sign-up/"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/auth/request-password-reset"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/auth/reset-password"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/auth/send-verification-email"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/auth/two-factor/"
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "rate_limit",
+        "rateLimit": {
+          "algo": "fixed_window",
+          "window": 60,
+          "limit": 30,
+          "keys": [
+            "ip"
+          ],
+          "action": "rate_limit"
+        }
+      }
+    }
+  },
+  {
+    "name": "Rate limit: encrypted uploads",
+    "description": "#163. POSTs asking for an upload address (dossiers, messages, requirements, hand-off, proofs, finances, PDF tool, blog, signature assets), 120/min per IP.",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/dossiers/upload"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/dossiers/messages/upload"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/requirements/upload"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/requirements/handoff-upload"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/invoices/upload"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/finances/upload"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/pdf-tools/upload"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/blog/upload"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "pre",
+            "value": "/api/signatures/assets"
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "rate_limit",
+        "rateLimit": {
+          "algo": "fixed_window",
+          "window": 60,
+          "limit": 120,
+          "keys": [
+            "ip"
+          ],
+          "action": "rate_limit"
+        }
+      }
+    }
+  },
+  {
+    "name": "Rate limit: public form writes",
+    "description": "#163. tRPC writes open to visitors (Demande d'interet, Alertes tirages, PDF tool count, Signaler, Offre order), 30/min per IP; matched inside batched paths.",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "sub",
+            "value": "accompagnement.submit"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "sub",
+            "value": "draws.subscribe"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "sub",
+            "value": "pdfTools.quota.use"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "sub",
+            "value": "reports.create"
+          }
+        ]
+      },
+      {
+        "conditions": [
+          {
+            "type": "method",
+            "op": "eq",
+            "value": "POST"
+          },
+          {
+            "type": "path",
+            "op": "sub",
+            "value": "documentServices.orders.order"
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "rate_limit",
+        "rateLimit": {
+          "algo": "fixed_window",
+          "window": 60,
+          "limit": 30,
+          "keys": [
+            "ip"
+          ],
+          "action": "rate_limit"
+        }
+      }
+    }
+  }
+]
