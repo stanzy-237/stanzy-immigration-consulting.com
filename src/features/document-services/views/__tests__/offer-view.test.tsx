@@ -21,6 +21,9 @@ vi.mock('@/i18n/navigation', () => ({
   ),
 }));
 
+const analytics = vi.hoisted(() => ({ track: vi.fn() }));
+vi.mock('@/lib/analytics', () => analytics);
+
 beforeEach(() => vi.clearAllMocks());
 
 const TOKEN = 'abcdefghijklmnopqrstuvwxyz012345';
@@ -56,6 +59,11 @@ describe('a service’s private link', () => {
     fireEvent.click(screen.getByLabelText(/je commande ce service/));
     fireEvent.click(button);
     await waitFor(() => expect(send).toHaveBeenCalledWith({ token: TOKEN, note: '7 000 000 FCFA', accepted: true }));
+    // Funnel (#161): the page seen, then the conditions ticked, by service only; the order is counted on the server.
+    expect(analytics.track.mock.calls).toEqual([
+      ['service.offer.viewed', { service: 'preuve-de-fonds' }],
+      ['service.conditions.accepted', { service: 'preuve-de-fonds' }],
+    ]);
   });
 
   it('shows an order waiting, or the Dossier once confirmed', () => {

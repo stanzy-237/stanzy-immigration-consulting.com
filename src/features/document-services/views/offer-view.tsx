@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { CheckCircle2, Clock, FileStack, HandHelping, Hourglass, ListChecks, LogIn, ScrollText, ShieldCheck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -49,6 +49,8 @@ function OfferPage({ token, signedIn }: { token: string; signedIn: boolean }): R
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.documentServices.orders.offer.queryOptions({ token }));
   const offer = data.service;
+  // Funnel (#161): the Offre's page seen, by service only.
+  useEffect(() => track('service.offer.viewed', { service: offer.slug }), [offer.slug]);
   const facts = [
     { key: 'provides', icon: ListChecks, text: textIn(offer.provides, locale) },
     { key: 'turnaround', icon: Clock, text: textIn(offer.turnaround, locale) },
@@ -121,7 +123,7 @@ function OfferPage({ token, signedIn }: { token: string; signedIn: boolean }): R
             <ServicePrice service={offer} />
             <p className="text-xs text-slate">{t('priceNote')}</p>
           </div>
-          <OrderBox token={token} signedIn={signedIn} order={data.order} />
+          <OrderBox token={token} slug={offer.slug} signedIn={signedIn} order={data.order} />
         </aside>
       </div>
     </>
@@ -129,7 +131,7 @@ function OfferPage({ token, signedIn }: { token: string; signedIn: boolean }): R
 }
 
 /** Ordering: sign in first; then the order's state, or the form to send one. */
-function OrderBox({ token, signedIn, order }: { token: string; signedIn: boolean; order: Offer['order'] }): ReactNode {
+function OrderBox({ token, slug, signedIn, order }: { token: string; slug: string; signedIn: boolean; order: Offer['order'] }): ReactNode {
   const t = useTranslations('DocumentServices.offer');
   const box = 'grid grid-cols-1 gap-3 rounded-2xl border-2 border-navy-deep bg-white p-6 shadow-md';
   if (!signedIn) {
@@ -181,12 +183,12 @@ function OrderBox({ token, signedIn, order }: { token: string; signedIn: boolean
           {order.rejectNote ? ` · ${order.rejectNote}` : ''}
         </p>
       ) : null}
-      <OrderForm token={token} />
+      <OrderForm token={token} slug={slug} />
     </>
   );
 }
 
-function OrderForm({ token }: { token: string }): ReactNode {
+function OrderForm({ token, slug }: { token: string; slug: string }): ReactNode {
   const t = useTranslations('DocumentServices.offer');
   const service = useTranslations('DocumentServices.service');
   const id = useId();
@@ -197,8 +199,8 @@ function OrderForm({ token }: { token: string }): ReactNode {
   const order = useMutation(
     trpc.documentServices.orders.order.mutationOptions({
       onSuccess: () => {
+        // Counted on the server (service.ordered), where an ad blocker can't hide it.
         void queryClient.invalidateQueries({ queryKey: trpc.documentServices.orders.offer.queryKey({ token }) });
-        track('service.ordered');
         toast.add({ title: t('ordered'), type: 'success' });
       },
       onError: (error) => {
@@ -232,7 +234,11 @@ function OrderForm({ token }: { token: string }): ReactNode {
           id={`${id}-accept`}
           type="checkbox"
           checked={accepted}
-          onChange={(event) => setAccepted(event.target.checked)}
+          onChange={(event) => {
+            setAccepted(event.target.checked);
+            // Funnel (#161): the conditions and contract ticked, before ordering.
+            if (event.target.checked) track('service.conditions.accepted', { service: slug });
+          }}
           className="mt-0.5 size-5 shrink-0 accent-rouge"
         />
         {t('accept')}

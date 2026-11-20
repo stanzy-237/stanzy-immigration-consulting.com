@@ -286,3 +286,31 @@ describe('verification email language', () => {
     expect(h.sent[0]?.subject).toBe('Confirmez votre adresse e-mail — Stanzy');
   });
 });
+
+describe('sign-up and sign-in funnels (#161)', () => {
+  it('counts an Account created and a sign-in, by method only', async () => {
+    const onAuthEvent = vi.fn();
+    const h = createHarness({ onAuthEvent });
+
+    await h.request('/sign-up/email', { body: AMINATA });
+    expect(onAuthEvent).toHaveBeenCalledWith({ name: 'auth.signed_up', method: 'email' }, expect.any(Headers));
+    // Refused until verified: not a sign-in.
+    await h.request('/sign-in/email', { body: { email: AMINATA.email, password: AMINATA.password } });
+    expect(onAuthEvent.mock.calls.filter(([event]) => event.name === 'auth.signed_in')).toHaveLength(0);
+
+    await h.request(h.lastLinkTo(AMINATA.email));
+    await h.request('/sign-out', { body: {} });
+    await h.request('/sign-in/email', { body: { email: AMINATA.email, password: AMINATA.password } });
+    expect(onAuthEvent).toHaveBeenLastCalledWith({ name: 'auth.signed_in', method: 'email' }, expect.any(Headers));
+    // Nothing about who: two keys, both labels.
+    for (const [event] of onAuthEvent.mock.calls) expect(Object.keys(event).sort()).toEqual(['method', 'name']);
+  });
+
+  it('doesn’t count a wrong password', async () => {
+    const onAuthEvent = vi.fn();
+    const h = await verifiedAccount({ onAuthEvent });
+    onAuthEvent.mockClear();
+    await h.request('/sign-in/email', { body: { email: AMINATA.email, password: 'wrong-password-123' } });
+    expect(onAuthEvent).not.toHaveBeenCalled();
+  });
+});
