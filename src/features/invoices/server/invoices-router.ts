@@ -161,6 +161,7 @@ export const invoicesRouter = createTRPCRouter({
         return created;
       });
       if (!isConsultant(ctx.session)) {
+        trackLater(ctx.headers, 'invoice.proof_uploaded', { service: invoice.dossier.service });
         notifyProofReceived({ ...printable(invoice), status: 'PROOF_RECEIVED' });
         notifyLater(ctx.prisma, {
           kind: 'PROOF_RECEIVED',

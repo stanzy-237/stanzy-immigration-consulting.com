@@ -35,7 +35,22 @@ export type AuthDeps = {
    * The only way to become consultant; normally a single address.
    */
   consultantEmails?: string[];
+  /**
+   * An Account created or a session started (#161), for the sign-up and
+   * sign-in funnels: the step and the method only, never who.
+   */
+  onAuthEvent?: (event: AuthEvent, headers: Headers) => void;
 };
+
+/** A funnel step of signing up or in (#161). */
+export type AuthEvent = { name: 'auth.signed_up' | 'auth.signed_in'; method: 'email' | 'google' };
+
+/** How a request signs in, from Better Auth's path: email, Google's callback, or neither. */
+function methodOf(path: string | undefined): AuthEvent['method'] | null {
+  if (path === '/sign-up/email' || path === '/sign-in/email') return 'email';
+  if (path?.startsWith('/callback/')) return 'google';
+  return null;
+}
 
 /**
  * Builds the Better Auth instance from its dependencies. Production wires the
@@ -140,6 +155,9 @@ export function createAuth(deps: AuthDeps) {
     },
     hooks: {
       after: createAuthMiddleware(async (ctx) => {
+        // A session started by signing in (email or Google), for the funnel (#161).
+        const method = methodOf(ctx.path);
+        if (method && ctx.context.newSession && ctx.request) deps.onAuthEvent?.({ name: 'auth.signed_in', method }, ctx.request.headers);
         if (ctx.path !== '/reset-password' || !ctx.request) return;
         const user = passwordResetFor.get(ctx.request);
         if (!user) return;
@@ -174,6 +192,12 @@ export function createAuth(deps: AuthDeps) {
                 ...(isConsultant && { role: 'CONSULTANT' }),
               },
             };
+          },
+          // Covers every way an Account is created, Google included (#161).
+          async after(_user, ctx) {
+            const method = methodOf(ctx?.path);
+            const headers = ctx?.request?.headers ?? ctx?.headers;
+            if (method && headers) deps.onAuthEvent?.({ name: 'auth.signed_up', method }, headers);
           },
         },
       },

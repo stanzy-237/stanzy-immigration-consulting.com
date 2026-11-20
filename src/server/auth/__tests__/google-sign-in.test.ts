@@ -188,6 +188,18 @@ describe('Continuer avec Google', () => {
     expect(h.sent).toEqual([]);
   });
 
+  it('counts a first Google sign-in as a sign-up and a sign-in, by Google (#161)', async () => {
+    const onAuthEvent = vi.fn();
+    const h = createHarness({ onAuthEvent });
+
+    await h.continueWithGoogle(AMINATA_ON_GOOGLE, { callbackURL: '/fr' });
+
+    expect(onAuthEvent.mock.calls.map(([event]) => event)).toEqual([
+      { name: 'auth.signed_up', method: 'google' },
+      { name: 'auth.signed_in', method: 'google' },
+    ]);
+  });
+
   it('makes a first Google sign-in with a CONSULTANT_EMAILS address the consultant', async () => {
     const h = createHarness({ consultantEmails: [AMINATA.email] });
 

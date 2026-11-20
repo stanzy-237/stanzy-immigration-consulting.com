@@ -15,6 +15,8 @@ vi.mock('@/features/invoices/server/invoice-notify', () => notify);
 vi.mock('@/features/dossiers/server/dossier-notify', () => ({ notifyClient: vi.fn(), notifyConsultants: vi.fn() }));
 const notifications = vi.hoisted(() => ({ notifyLater: vi.fn(), forgetComment: vi.fn(), notify: vi.fn() }));
 vi.mock('@/features/notifications/server/notify', () => notifications);
+const analytics = vi.hoisted(() => ({ trackLater: vi.fn() }));
+vi.mock('@/server/analytics', () => analytics);
 
 const storage = vi.hoisted(() => ({
   objectSize: vi.fn(),
@@ -360,6 +362,8 @@ describe('the Client’s Factures', () => {
     expect(db.invoices[0]).toMatchObject({ status: 'PROOF_RECEIVED' });
     expect(db.proofs[0]).toMatchObject({ objectKey: `invoices/${id}/9a2b.bin`, uploadedById: 'acc_1' });
     expect(notify.notifyProofReceived).toHaveBeenCalledOnce();
+    // Funnel (#161): the step and the service, nothing about the Client or the amount.
+    expect(analytics.trackLater).toHaveBeenCalledWith(expect.any(Headers), 'invoice.proof_uploaded', { service: expect.any(String) });
   });
 
   it('refuses a proof for a draft, outside the invoice’s folder, or of the wrong size', async () => {

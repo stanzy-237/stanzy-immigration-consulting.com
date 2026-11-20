@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 
+import { isConsultant } from '@/features/dossiers/server/dossier-access';
 import { invoiceFor } from '@/features/invoices/server/invoice-access';
 import { invoicePdf } from '@/features/invoices/server/invoice-document';
 import { printedBalance } from '@/features/invoices/server/service-balance';
 import { openSigningAssets } from '@/features/signatures/server/signing-assets';
+import { trackLater } from '@/server/analytics';
 import { getCurrentSession } from '@/server/auth/session';
 import { prisma } from '@/server/db/client';
 
@@ -29,6 +31,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const balance = await printedBalance(prisma, invoice);
   const pdf = await invoicePdf({ ...invoice, number: invoice.number, sentAt: invoice.sentAt, balance }, consultant);
   const download = new URL(request.url).searchParams.has('download');
+  // Funnel (#161): the Client opened their Facture; the consultant's own views don't count.
+  if (!isConsultant(session)) trackLater(request.headers, 'invoice.opened', { service: invoice.dossier.service });
   return new Response(new Uint8Array(pdf), {
     headers: {
       'Content-Type': 'application/pdf',

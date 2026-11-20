@@ -5,6 +5,7 @@ import { parseConsultantEmails } from '@/features/auth/lib/consultant-emails';
 import { toCookieDomain } from '@/features/auth/lib/cookie-domain';
 import { dashboardOrigin } from '@/features/dashboard/lib/dashboard-host';
 import { env } from '@/lib/env';
+import { trackLater } from '@/server/analytics';
 import { prisma } from '@/server/db/client';
 import { createAuth } from '@/server/auth/create-auth';
 import { accountMailer } from '@/server/email/app-mailer';
@@ -52,6 +53,8 @@ export const auth = createAuth({
       ? { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET }
       : undefined,
   consultantEmails: parseConsultantEmails(env.CONSULTANT_EMAILS).emails,
+  // Sign-up and sign-in funnels (#161): the step and the method, no one's identity.
+  onAuthEvent: (event, headers) => trackLater(headers, event.name, { method: event.method }),
   cookieDomain: toCookieDomain(env.AUTH_COOKIE_DOMAIN),
   trustedOrigins: [
     // Locally (no BETTER_AUTH_URL, not on Vercel) that is localhost and admin.localhost.
