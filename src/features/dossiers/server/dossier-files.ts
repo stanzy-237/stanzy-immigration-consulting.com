@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { DOCUMENT_FILE_MAX_BYTES } from '@/features/dossiers/lib/document-schema';
 import { decryptFile, unwrapKey, wrapKey } from '@/features/dossiers/lib/file-crypto';
 import { env } from '@/lib/env';
+import type { ServerTiming } from '@/lib/server-timing';
 import { deleteObjects, isKeyUnder, objectSize, presignUpload, readObject } from '@/server/storage/r2';
 
 /** AES-GCM adds a 16-byte tag to each file. */
@@ -67,18 +68,19 @@ export async function acceptEncryptedUpload(
 type StoredFile = { objectKey: string; wrappedKey: string; iv: string; fileName: string; contentType: string };
 
 /** Fetches an encrypted file (a Version, a Preuve de paiement) and decrypts it. */
-export async function openEncryptedFile(file: StoredFile): Promise<ArrayBuffer> {
-  const ciphertext = await readObject('private', file.objectKey);
-  return decryptFile(ciphertext, await unwrapKey(file.wrappedKey, masterKey()), file.iv);
+export async function openEncryptedFile(file: StoredFile, timing?: ServerTiming): Promise<ArrayBuffer> {
+  const time = <T,>(name: string, work: () => Promise<T>) => (timing ? timing.time(name, work) : work());
+  const ciphertext = await time('r2', () => readObject('private', file.objectKey));
+  return time('decrypt', async () => decryptFile(ciphertext, await unwrapKey(file.wrappedKey, masterKey()), file.iv));
 }
 
 /**
  * The decrypted file as a response: never cached, shown in the browser
  * (every accepted type, PDF or image, is safe inline) unless `?download`.
  */
-export async function serveEncryptedFile(request: Request, file: StoredFile): Promise<Response> {
+export async function serveEncryptedFile(request: Request, file: StoredFile, timing?: ServerTiming): Promise<Response> {
   try {
-    const body = await openEncryptedFile(file);
+    const body = await openEncryptedFile(file, timing);
     const download = new URL(request.url).searchParams.has('download');
     return new Response(body, {
       headers: {
@@ -86,6 +88,7 @@ export async function serveEncryptedFile(request: Request, file: StoredFile): Pr
         'Content-Disposition': `${download ? 'attachment' : 'inline'}; filename*=UTF-8''${encodeURIComponent(file.fileName)}`,
         'Cache-Control': 'private, no-store',
         'X-Content-Type-Options': 'nosniff',
+        ...(timing ? { 'Server-Timing': timing.header() } : {}),
       },
     });
   } catch (error) {

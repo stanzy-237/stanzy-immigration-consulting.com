@@ -65,6 +65,19 @@ describe('usePdfPages', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:page-2');
   });
 
+  it('downloads a PDF once when two pages ask for it together, as React does in development (#165)', async () => {
+    const first = renderHook(() => usePdfPages('/api/contracts/c_1/pdf'));
+    const second = renderHook(() => usePdfPages('/api/contracts/c_1/pdf'));
+    await waitFor(() => expect(first.result.current.pages).toHaveLength(2));
+    await waitFor(() => expect(second.result.current.pages).toHaveLength(2));
+    expect(fetch).toHaveBeenCalledTimes(1);
+
+    // Once settled it is forgotten: a later visit downloads the file as it is then.
+    const later = renderHook(() => usePdfPages('/api/contracts/c_1/pdf'));
+    await waitFor(() => expect(later.result.current.pages).toHaveLength(2));
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
   it('says so when the file can’t be fetched', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 404 })));
     const { result } = renderHook(() => usePdfPages('/api/contracts/c_1/pdf'));

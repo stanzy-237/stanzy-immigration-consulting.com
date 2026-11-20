@@ -1,7 +1,9 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { requireSession } from '@/features/auth/server/guards';
+import { contractPdfUrl } from '@/features/contracts/lib/contract-urls';
 import { ContractSignView } from '@/features/contracts/views/contract-sign-view';
+import { preloadPdf } from '@/features/shared/lib/preload-pdf';
 import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 
 type Params = Promise<{ locale: string; id: string; contractId: string }>;
@@ -18,6 +20,7 @@ export default async function Page({ params }: { params: Params }) {
   setRequestLocale(locale);
   await requireSession({ locale, next: `/mon-espace/dossiers/${id}/contrats/${contractId}` });
   prefetch(trpc.contracts.get.queryOptions({ id: contractId }));
+  preloadPdf(contractPdfUrl(contractId));
   return (
     <HydrateClient>
       <ContractSignView dossierId={id} contractId={contractId} />
