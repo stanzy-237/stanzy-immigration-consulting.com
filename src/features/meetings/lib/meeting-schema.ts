@@ -23,7 +23,8 @@ const id = z.string().min(1);
 
 const meetingFields = {
   subject: z.string().trim().min(2).max(SUBJECT_MAX),
-  startsAt: z.coerce.date(),
+  // A Date, carried by superjson; Zod 4 would type a coerced input as unknown.
+  startsAt: z.coerce.date<Date>(),
   durationMinutes: z
     .number()
     .int()
