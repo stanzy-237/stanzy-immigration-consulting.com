@@ -81,7 +81,18 @@ export const REPLAY_OPTIONS = {
   inlineStylesheet: true,
   // No mouse trail; scrolls and inputs thinned out; no scripts, comments or head meta.
   sampling: { mousemove: false, scroll: 250, media: 800, input: 'last' },
-  slimDOMOptions: 'all',
+  slimDOMOptions: {
+    script: true,
+    comment: true,
+    headFavicon: true,
+    headWhitespace: true,
+    headMetaDescKeywords: true,
+    headMetaSocial: true,
+    headMetaRobots: true,
+    headMetaHttpEquiv: true,
+    headMetaAuthorship: true,
+    headMetaVerification: true,
+  },
 } satisfies Rollbar.ReplayOptions & Record<string, unknown>;
 
 /** Path segments that are secrets: a private Offre link's token. */
