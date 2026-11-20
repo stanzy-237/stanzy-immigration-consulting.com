@@ -46,7 +46,7 @@ import { trackLater } from '@/server/analytics';
 import { appMailer } from '@/server/email/app-mailer';
 import type { EmailMessage } from '@/server/email/mailer';
 import type { TRPCContext } from '@/server/trpc/context';
-import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
+import { consultantProcedure, createTRPCRouter, humanOnly, protectedProcedure } from '@/server/trpc/trpc';
 
 type Db = TRPCContext['prisma'];
 
@@ -148,7 +148,7 @@ export const accompagnementRouter = createTRPCRouter({
   }),
 
   /** Sends a Demande d'intérêt: the User becomes a Lead, the consultant is told. One waits at a time. */
-  submit: protectedProcedure.input(interestAnswersSchema).mutation(async ({ ctx, input }) => {
+  submit: protectedProcedure.use(humanOnly).input(interestAnswersSchema).mutation(async ({ ctx, input }) => {
     const account = ctx.session.account;
     if (account.role !== 'MEMBER') throw refuse('INTEREST_NOT_ELIGIBLE');
     if (await openAccompagnement(ctx.prisma, account.id)) throw refuse('INTEREST_ALREADY_CLIENT');

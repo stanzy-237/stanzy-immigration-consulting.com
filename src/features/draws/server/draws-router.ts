@@ -5,7 +5,7 @@ import { irccInstant, roundOrder, type DrawSummary } from '@/features/draws/lib/
 import { SYNC_ID } from '@/features/draws/server/ingest-draws';
 import { routing } from '@/i18n/routing';
 import { pushEndpoint, pushSubscriptionInput } from '@/server/push/subscription-schema';
-import { createTRPCRouter, publicProcedure } from '@/server/trpc/trpc';
+import { createTRPCRouter, humanOnly, publicProcedure } from '@/server/trpc/trpc';
 
 export type { DrawSummary };
 
@@ -68,6 +68,7 @@ export const drawsRouter = createTRPCRouter({
 
   /** Opts this device in. Signed in, the subscription is linked to the Account. */
   subscribe: publicProcedure
+    .use(humanOnly)
     .input(z.object({ subscription: pushSubscription, locale: z.enum(routing.locales) }))
     .mutation(async ({ ctx, input }) => {
       const { endpoint, keys } = input.subscription;

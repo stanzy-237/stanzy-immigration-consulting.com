@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server';
 
 import { notifyLater } from '@/features/notifications/server/notify';
 import { createReportInput, listReportsInput, setReportStatusInput } from '@/features/reports/lib/report-schema';
-import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
+import { consultantProcedure, createTRPCRouter, humanOnly, protectedProcedure } from '@/server/trpc/trpc';
 
 /** A tab may send this many Signalements in a row; more is a loop or abuse. */
 const PER_HOUR = 5;
@@ -13,7 +13,7 @@ const HOUR = 60 * 60 * 1000;
  * in reports what went wrong; the consultant triages each report.
  */
 export const reportsRouter = createTRPCRouter({
-  create: protectedProcedure.input(createReportInput).mutation(async ({ ctx, input }) => {
+  create: protectedProcedure.use(humanOnly).input(createReportInput).mutation(async ({ ctx, input }) => {
     const { account } = ctx.session;
     const recent = await ctx.prisma.problemReport.count({
       where: { accountId: account.id, createdAt: { gte: new Date(Date.now() - HOUR) } },

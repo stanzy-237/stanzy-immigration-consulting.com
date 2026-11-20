@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/toast';
 import { recentRollbarItems } from '@/features/reports/lib/recent-errors';
 import { MESSAGE_MAX, MESSAGE_MIN, pathOf } from '@/features/reports/lib/report-schema';
 import { useTRPC } from '@/trpc/client';
+import { isBotRefusal } from '@/lib/bot-protection';
 
 /**
  * « Signaler un problème » (#160): the signed-in visitor says what went
@@ -36,6 +37,7 @@ export function ReportProblemDialog({ open, onOpenChange }: { open: boolean; onO
 
 function ReportForm({ onSending, onDone }: { onSending: (sending: boolean) => void; onDone: () => void }): ReactNode {
   const t = useTranslations('Reports.dialog');
+  const common = useTranslations('Common');
   const trpc = useTRPC();
   const id = useId();
   const [message, setMessage] = useState('');
@@ -55,7 +57,7 @@ function ReportForm({ onSending, onDone }: { onSending: (sending: boolean) => vo
       toast.add({ title: t('sent'), type: 'success' });
     } catch (error) {
       const limited = error instanceof TRPCClientError && error.message === 'REPORT_LIMIT';
-      toast.add({ title: limited ? t('limit') : t('failed'), type: 'error' });
+      toast.add({ title: limited ? t('limit') : isBotRefusal(error) ? common('botDetected') : t('failed'), type: 'error' });
     } finally {
       onSending(false);
     }

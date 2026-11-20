@@ -397,7 +397,8 @@
       "invalidCredentials": "E-mail ou mot de passe incorrect.",
       "invalidEmail": "Cette adresse e-mail n’est pas valide.",
       "passwordTooShort": "Le mot de passe doit contenir au moins 10 caractères.",
-      "emailNotVerified": "Confirmez d’abord votre adresse e-mail grâce au lien que nous vous avons envoyé."
+      "emailNotVerified": "Confirmez d’abord votre adresse e-mail grâce au lien que nous vous avons envoyé.",
+      "botDetected": "Nous n’avons pas pu vérifier que la demande vient de vous. Rechargez la page et réessayez."
     },
     "Inscription": {
       "metaTitle": "Créer un compte",
@@ -1604,7 +1605,8 @@
     },
     "Toast": {
       "genericError": "L’opération a échoué. Réessayez."
-    }
+    },
+    "botDetected": "Nous n’avons pas pu vérifier que la demande vient de vous. Rechargez la page et réessayez."
   },
   "Checklist": {
     "metaTitle": "Checklist Entrée Express : les documents à préparer",
@@ -3398,7 +3400,8 @@
       "SERVICE_UNAVAILABLE": "Ce service n’est plus proposé.",
       "STANZY_NO_SERVICE": "Choisissez d’abord le service documentaire.",
       "SIGNATURE_ASSETS_MISSING": "Ajoutez d’abord votre signature et votre cachet (Signatures).",
-      "INTEREST_NOT_EDITABLE": "Une demande refusée ne se modifie plus."
+      "INTEREST_NOT_EDITABLE": "Une demande refusée ne se modifie plus.",
+      "BOT_DETECTED": "Nous n’avons pas pu vérifier que la demande vient de vous. Rechargez la page et réessayez."
     },
     "overview": {
       "crs": "Score CRS de la demande",
@@ -4152,7 +4155,8 @@
       "errors": {
         "ORDER_PENDING": "Une commande de ce service attend déjà la confirmation de Stanzy.",
         "ORDER_NOT_ELIGIBLE": "Ce compte ne peut pas commander de service.",
-        "UNKNOWN": "Une erreur est survenue. Réessayez."
+        "UNKNOWN": "Une erreur est survenue. Réessayez.",
+        "BOT_DETECTED": "Nous n’avons pas pu vérifier que la demande vient de vous. Rechargez la page et réessayez."
       }
     },
     "orders": {

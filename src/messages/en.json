@@ -397,7 +397,8 @@
       "invalidCredentials": "Incorrect email or password.",
       "invalidEmail": "This email address isn’t valid.",
       "passwordTooShort": "Your password must be at least 10 characters.",
-      "emailNotVerified": "Please confirm your email address first, using the link we sent you."
+      "emailNotVerified": "Please confirm your email address first, using the link we sent you.",
+      "botDetected": "We couldn’t verify this request came from you. Reload the page and try again."
     },
     "Inscription": {
       "metaTitle": "Create an account",
@@ -1587,7 +1588,8 @@
     },
     "Toast": {
       "genericError": "Something went wrong. Try again."
-    }
+    },
+    "botDetected": "We couldn’t verify this request came from you. Reload the page and try again."
   },
   "Checklist": {
     "metaTitle": "Express Entry checklist: the documents to prepare",
@@ -3381,7 +3383,8 @@
       "SERVICE_UNAVAILABLE": "This service is no longer offered.",
       "STANZY_NO_SERVICE": "Choose the document service first.",
       "SIGNATURE_ASSETS_MISSING": "First add your signature and stamp (Signatures).",
-      "INTEREST_NOT_EDITABLE": "A refused request can no longer be changed."
+      "INTEREST_NOT_EDITABLE": "A refused request can no longer be changed.",
+      "BOT_DETECTED": "We couldn’t verify this request came from you. Reload the page and try again."
     },
     "overview": {
       "crs": "CRS score from the request",
@@ -4135,7 +4138,8 @@
       "errors": {
         "ORDER_PENDING": "An order for this service is already waiting for Stanzy’s confirmation.",
         "ORDER_NOT_ELIGIBLE": "This account can’t order a service.",
-        "UNKNOWN": "Something went wrong. Try again."
+        "UNKNOWN": "Something went wrong. Try again.",
+        "BOT_DETECTED": "We couldn’t verify this request came from you. Reload the page and try again."
       }
     },
     "orders": {
