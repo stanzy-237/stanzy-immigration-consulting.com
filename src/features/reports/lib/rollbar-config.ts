@@ -78,7 +78,9 @@ export const REPLAY_OPTIONS = {
   inlineImages: false,
   recordCanvas: false,
   collectFonts: false,
-  inlineStylesheet: true,
+  // The site's stylesheets are public: the replay loads them by address. Inlined,
+  // with their embedded fonts, they made each replay 2.4 MB (measured on the preview).
+  inlineStylesheet: false,
   // No mouse trail; scrolls and inputs thinned out; no scripts, comments or head meta.
   sampling: { mousemove: false, scroll: 250, media: 800, input: 'last' },
   slimDOMOptions: {
