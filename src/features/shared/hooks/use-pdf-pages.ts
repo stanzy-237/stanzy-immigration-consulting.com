@@ -25,6 +25,29 @@ const toJpeg = (canvas: HTMLCanvasElement): Promise<Blob> =>
     canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('PDF page not drawn'))), 'image/jpeg', 0.85),
   );
 
+/**
+ * The PDFs being downloaded, by URL (#165): a second ask for the same file
+ * while the first is on its way (React runs effects twice in development, a
+ * remount) shares its download, and with it the page's preload
+ * (src/features/shared/lib/preload-pdf.ts). Forgotten once settled, so a
+ * later visit gets the file as it is then (signed, say).
+ */
+const downloads = new Map<string, Promise<ArrayBuffer>>();
+
+function download(url: string): Promise<ArrayBuffer> {
+  let pending = downloads.get(url);
+  if (!pending) {
+    pending = fetch(url)
+      .then((response) => {
+        if (!response.ok) throw new Error(`PDF ${response.status}`);
+        return response.arrayBuffer();
+      })
+      .finally(() => downloads.delete(url));
+    downloads.set(url, pending);
+  }
+  return pending;
+}
+
 /** Lets the browser paint and answer taps between two pages. */
 const breathe = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -48,9 +71,9 @@ export function usePdfPages(url: string | null): { pages: ShownPage[]; total: nu
 
     (async () => {
       // The file and pdf.js arrive together, not one after the other.
-      const [response, lib] = await Promise.all([fetch(url), loadPdfJs()]);
-      if (!response.ok) throw new Error(`PDF ${response.status}`);
-      const task = lib.getDocument({ data: new Uint8Array(await response.arrayBuffer()) });
+      const [bytes, lib] = await Promise.all([download(url), loadPdfJs()]);
+      // pdf.js takes its input over: a copy, so a shared download stays whole.
+      const task = lib.getDocument({ data: new Uint8Array(bytes.slice(0)) });
       try {
         const doc = await task.promise;
         update((current) => ({ ...current, total: doc.numPages }));

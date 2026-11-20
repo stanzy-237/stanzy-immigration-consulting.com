@@ -1,7 +1,9 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { requireSession } from '@/features/auth/server/guards';
+import { receiptFileUrl } from '@/features/invoices/lib/invoice-urls';
 import { ReceiptSignView } from '@/features/invoices/views/receipt-sign-view';
+import { preloadPdf } from '@/features/shared/lib/preload-pdf';
 import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 
 type Params = Promise<{ locale: string; id: string; paymentId: string }>;
@@ -18,6 +20,7 @@ export default async function Page({ params }: { params: Params }) {
   setRequestLocale(locale);
   await requireSession({ locale, next: `/mon-espace/dossiers/${id}/recus/${paymentId}` });
   prefetch(trpc.invoices.payments.get.queryOptions({ id: paymentId }));
+  preloadPdf(receiptFileUrl(paymentId));
   return (
     <HydrateClient>
       <ReceiptSignView dossierId={id} paymentId={paymentId} />

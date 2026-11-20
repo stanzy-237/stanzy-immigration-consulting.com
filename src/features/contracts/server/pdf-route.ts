@@ -5,6 +5,7 @@ import { contractPdf } from '@/features/contracts/server/contract-document';
 import { dossierFor, isConsultant } from '@/features/dossiers/server/dossier-access';
 import { serveEncryptedFile } from '@/features/dossiers/server/dossier-files';
 import { openSigningAssets } from '@/features/signatures/server/signing-assets';
+import { serverTiming } from '@/lib/server-timing';
 import { getCurrentSession } from '@/server/auth/session';
 import { prisma } from '@/server/db/client';
 
@@ -15,15 +16,18 @@ import { prisma } from '@/server/db/client';
  */
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   const { id } = await params;
-  const session = await getCurrentSession(request.headers);
+  const timing = serverTiming();
+  // The session and the Contrat together: neither waits for the other (#165).
+  const [session, contract] = await Promise.all([
+    timing.time('session', () => getCurrentSession(request.headers)),
+    timing.time('contract', () => prisma.contract.findUnique({ where: { id } })),
+  ]);
   if (!session) return new NextResponse(null, { status: 401 });
-
-  const contract = await prisma.contract.findUnique({ where: { id } });
   if (!contract || (contract.status === 'CANCELLED' && !isConsultant(session))) {
     return new NextResponse(null, { status: 404 });
   }
   try {
-    await dossierFor(prisma, session, contract.dossierId);
+    await timing.time('access', () => dossierFor(prisma, session, contract.dossierId));
   } catch {
     return new NextResponse(null, { status: 404 });
   }
@@ -35,7 +39,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     ...(signed ?? { objectKey: contract.objectKey, wrappedKey: contract.wrappedKey, iv: contract.iv }),
     fileName: `${contract.number}.pdf`,
     contentType: 'application/pdf',
-  });
+  }, timing);
 }
 
 /**
