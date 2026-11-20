@@ -26,7 +26,7 @@ import { trackLater } from '@/server/analytics';
 import { appMailer } from '@/server/email/app-mailer';
 import type { EmailMessage } from '@/server/email/mailer';
 import type { TRPCContext } from '@/server/trpc/context';
-import { consultantProcedure, createTRPCRouter, protectedProcedure, publicProcedure } from '@/server/trpc/trpc';
+import { consultantProcedure, createTRPCRouter, humanOnly, protectedProcedure, publicProcedure } from '@/server/trpc/trpc';
 
 type Db = TRPCContext['prisma'];
 
@@ -93,7 +93,7 @@ export const ordersRouter = createTRPCRouter({
   }),
 
   /** Orders the service, its conditions and contract accepted. One waits at a time per service. */
-  order: protectedProcedure.input(orderInput).mutation(async ({ ctx, input }) => {
+  order: protectedProcedure.use(humanOnly).input(orderInput).mutation(async ({ ctx, input }) => {
     const { account } = ctx.session;
     if (account.role !== 'MEMBER') throw refuse('ORDER_NOT_ELIGIBLE');
     const service = await serviceFor(ctx.prisma, input.token);

@@ -16,6 +16,7 @@ import { SiteNav } from '@/features/landing/components/site-nav';
 import { Link, useRouter } from '@/i18n/navigation';
 import { track } from '@/lib/analytics';
 import { useTRPC } from '@/trpc/client';
+import { isBotRefusal } from '@/lib/bot-protection';
 
 const PAGE = '/outils/pdf';
 const PROMISES = [
@@ -33,6 +34,7 @@ const PROMISES = [
  */
 export function PublicPdfToolView({ engine = browserEngine }: { engine?: WorkbenchEngine }): ReactNode {
   const t = useTranslations('PdfTools.public');
+  const common = useTranslations('Common');
   const format = useFormatter();
   const trpc = useTRPC();
   const router = useRouter();
@@ -61,8 +63,9 @@ export function PublicPdfToolView({ engine = browserEngine }: { engine?: Workben
     try {
       await use.mutateAsync();
       track('pdf.compressed');
-    } catch {
+    } catch (error) {
       // Counted on the next try: the compression the visitor made stays theirs.
+      if (isBotRefusal(error)) toast.add({ title: common('botDetected'), type: 'error' });
     } finally {
       void queryClient.invalidateQueries({ queryKey: trpc.pdfTools.quota.get.queryKey() });
     }

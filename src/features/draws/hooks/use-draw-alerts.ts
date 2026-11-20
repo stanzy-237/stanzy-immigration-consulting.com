@@ -8,6 +8,7 @@ import { toast } from '@/components/ui/toast';
 import { toLocale } from '@/i18n/routing';
 import { canPush, isIos, isStandalone, registration, subscribeDevice } from '@/lib/web-push-client';
 import { useTRPC } from '@/trpc/client';
+import { isBotRefusal } from '@/lib/bot-protection';
 
 /**
  * Where this device stands with Alertes tirages:
@@ -51,6 +52,7 @@ export function useDrawAlerts() {
   const [status, setStatus] = useState<DrawAlertsStatus>(publicKey ? 'checking' : 'hidden');
   const [busy, setBusy] = useState(false);
   const t = useTranslations('Draws.alerts');
+  const common = useTranslations('Common');
   const trpc = useTRPC();
   const { mutateAsync: subscribe } = useMutation(trpc.draws.subscribe.mutationOptions());
   const { mutateAsync: unsubscribe } = useMutation(trpc.draws.unsubscribe.mutationOptions());
@@ -111,12 +113,12 @@ export function useDrawAlerts() {
       setOptedOut(false);
       setStatus('on');
       toast.add({ title: t('toastOn'), type: 'success' });
-    } catch {
-      toast.add({ title: t('failed'), type: 'error' });
+    } catch (error) {
+      toast.add({ title: isBotRefusal(error) ? common('botDetected') : t('failed'), type: 'error' });
     } finally {
       setBusy(false);
     }
-  }, [publicKey, sync, t]);
+  }, [common, publicKey, sync, t]);
 
   const disable = useCallback(async () => {
     setBusy(true);

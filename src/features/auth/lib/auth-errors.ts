@@ -12,13 +12,16 @@ export type AuthErrorKey =
   | 'invalidCredentials'
   | 'invalidEmail'
   | 'passwordTooShort'
-  | 'emailNotVerified';
+  | 'emailNotVerified'
+  | 'botDetected';
 
 const BY_CODE: Record<string, AuthErrorKey> = {
   INVALID_EMAIL_OR_PASSWORD: 'invalidCredentials',
   INVALID_EMAIL: 'invalidEmail',
   PASSWORD_TOO_SHORT: 'passwordTooShort',
   EMAIL_NOT_VERIFIED: 'emailNotVerified',
+  // Vercel BotID refused the request (#162): src/app/api/auth/[...all]/route.ts.
+  BOT_DETECTED: 'botDetected',
 };
 
 /**

@@ -7,7 +7,7 @@ import { addHistoryInput, historyFilePrefix } from '@/features/pdf-tools/lib/his
 import { FREE_COMPRESSIONS_PER_MONTH, monthWindow } from '@/features/pdf-tools/lib/quota';
 import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
-import { consultantProcedure, createTRPCRouter, protectedProcedure } from '@/server/trpc/trpc';
+import { consultantProcedure, createTRPCRouter, humanOnly, protectedProcedure } from '@/server/trpc/trpc';
 
 const fields = {
   id: true,
@@ -34,7 +34,7 @@ export const pdfToolsRouter = createTRPCRouter({
     get: protectedProcedure.query(({ ctx }) => quotaOf(ctx.prisma, ctx.session, new Date())),
 
     /** Counts one finished compression; PDF_QUOTA_REACHED once the month's allowance is used. */
-    use: protectedProcedure.mutation(async ({ ctx }) => {
+    use: protectedProcedure.use(humanOnly).mutation(async ({ ctx }) => {
       const now = new Date();
       const quota = await quotaOf(ctx.prisma, ctx.session, now);
       if (quota.limit !== null && quota.used >= quota.limit) {

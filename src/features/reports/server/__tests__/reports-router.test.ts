@@ -8,6 +8,8 @@ import { createCaller } from '@/server/trpc/root';
 const notifications = vi.hoisted(() => ({ notifyLater: vi.fn() }));
 vi.mock('@/features/notifications/server/notify', () => notifications);
 vi.mock('next/server', () => ({ after: (fn: () => unknown) => fn() }));
+const bots = vi.hoisted(() => ({ isBotRequest: vi.fn(async () => false) }));
+vi.mock('@/server/bot-check', () => bots);
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -81,6 +83,16 @@ describe('Signaler un problème (#160)', () => {
     await expect(callerFor(db, client).create({ message: 'Rien ne marche ici.', path: '/fr', rollbarIds: ['not-a-uuid'] })).rejects.toMatchObject({
       code: 'BAD_REQUEST',
     });
+  });
+
+  it('refuses a report BotID classifies as a bot (#162)', async () => {
+    const { db, reports } = fakeDatabase();
+    bots.isBotRequest.mockResolvedValueOnce(true);
+    await expect(callerFor(db, client).create({ message: 'Rien ne marche ici.', path: '/fr' })).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+      message: 'BOT_DETECTED',
+    });
+    expect(reports).toHaveLength(0);
   });
 
   it('takes five reports an hour from one Account, then says to wait', async () => {

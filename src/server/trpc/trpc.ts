@@ -3,6 +3,8 @@ import superjson from 'superjson';
 import { ZodError } from 'zod';
 
 import { hasStatusAtLeast, type AccountStatus } from '@/features/auth/lib/account-status';
+import { BOT_DETECTED } from '@/lib/bot-protection';
+import { isBotRequest } from '@/server/bot-check';
 
 import type { TRPCContext } from './context';
 
@@ -21,6 +23,16 @@ const t = initTRPC.context<TRPCContext>().create({
 });
 
 export const createTRPCRouter = t.router;
+
+/**
+ * Refuses a request Vercel BotID classifies as a bot (#162), as FORBIDDEN
+ * `BOT_DETECTED`. For the procedures listed in src/lib/bot-protection.ts,
+ * whose requests the browser marks.
+ */
+export const humanOnly = t.middleware(async ({ ctx, next }) => {
+  if (await isBotRequest(ctx.headers)) throw new TRPCError({ code: 'FORBIDDEN', message: BOT_DETECTED });
+  return next();
+});
 export const createCallerFactory = t.createCallerFactory;
 export const publicProcedure = t.procedure;
 
