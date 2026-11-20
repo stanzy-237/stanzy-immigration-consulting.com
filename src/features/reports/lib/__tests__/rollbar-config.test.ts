@@ -31,6 +31,7 @@ describe('what Rollbar may know (#160)', () => {
 
   it('records a replay with every text and value masked, and no image, PDF page or frame', () => {
     expect(REPLAY_OPTIONS).toMatchObject({ maskAllInputs: true, maskTextSelector: '*', inlineImages: false, recordCanvas: false });
+    expect(REPLAY_OPTIONS.sampling.mousemove).toBe(false);
     expect(REPLAY_OPTIONS.blockSelector).toEqual(expect.stringContaining('canvas'));
     expect(REPLAY_OPTIONS.blockSelector).toEqual(expect.stringContaining('img'));
     expect(REPLAY_OPTIONS.blockSelector).toEqual(expect.stringContaining('iframe'));
@@ -49,6 +50,7 @@ describe('what Rollbar may know (#160)', () => {
     };
     sanitizeItem(item);
     expect(item).toEqual({
+      code_version: 'local',
       request: { url: 'https://site.com/fr/services/offre/[token]' },
       context: '/fr/outils',
       body: { telemetry: [{ body: { from: '/fr', to: '/fr/services/offre/[token]' } }] },

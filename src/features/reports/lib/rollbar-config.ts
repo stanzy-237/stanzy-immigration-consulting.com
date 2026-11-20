@@ -68,7 +68,8 @@ export const REPLAY_OPTIONS = {
   enabled: true,
   autoStart: true,
   triggers: [{ type: 'occurrence', level: ['error', 'critical'] }],
-  triggerDefaults: { samplingRatio: 1, preDuration: 60, postDuration: 5 },
+  // The 20 seconds before an error: enough to see what was tapped, light on a phone's data.
+  triggerDefaults: { samplingRatio: 1, preDuration: 20, postDuration: 5 },
   maskAllInputs: true,
   maskTextSelector: '*',
   maskTextFn: (text: string) => text.replace(/\S/g, '•'),
@@ -78,6 +79,9 @@ export const REPLAY_OPTIONS = {
   recordCanvas: false,
   collectFonts: false,
   inlineStylesheet: true,
+  // No mouse trail; scrolls and inputs thinned out; no scripts, comments or head meta.
+  sampling: { mousemove: false, scroll: 250, media: 800, input: 'last' },
+  slimDOMOptions: 'all',
 } satisfies Rollbar.ReplayOptions & Record<string, unknown>;
 
 /** Path segments that are secrets: a private Offre link's token. */
@@ -95,6 +99,8 @@ type Telemetry = { body?: { from?: string; to?: string; url?: string } };
  * navigation addresses lose their query strings and tokens.
  */
 export function sanitizeItem(data: Record<string, unknown>): void {
+  // The release: Rollbar's browser SDK leaves `codeVersion` out of its items.
+  data.code_version = process.env.RELEASE ?? 'local';
   const request = data.request as { url?: string; query_string?: string } | undefined;
   if (request?.url) request.url = safeUrl(request.url);
   if (request) delete request.query_string;
