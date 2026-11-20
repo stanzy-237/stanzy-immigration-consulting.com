@@ -104,6 +104,12 @@ const schema = z.object({
   // Réunions can be planned but not joined. Set both or neither.
   STREAM_API_KEY: z.string().min(1).optional(),
   STREAM_API_SECRET: z.string().min(1).optional(),
+  // Rollbar (#160), added by its Vercel Marketplace integration under these
+  // names. The server token posts server errors; the client one, public by
+  // design, is read in the browser bundle (features/reports/lib/rollbar-config.ts).
+  // Optional: without them nothing is sent (local dev).
+  ROLLBAR_STANZY_IMMIGRATION_CONSULTING_CO_SERVER_TOKEN_1795122183: z.string().min(1).optional(),
+  NEXT_PUBLIC_ROLLBAR_STANZY_IMMIGRATION_CONSULTING_CO_CLIENT_TOKEN_1795122183: z.string().min(1).optional(),
 }).superRefine((value, ctx) => {
   if (process.env.VERCEL_ENV === 'production' && !value.BETTER_AUTH_URL) {
     ctx.addIssue({

@@ -1,4 +1,4 @@
-import { ClipboardList, FileCheck2, FileSignature, FileStack, FolderKanban, Inbox, ScrollText, LayoutDashboard, Newspaper, ReceiptText, Users, Video, Wallet, type LucideIcon } from 'lucide-react';
+import { ClipboardList, FileCheck2, FileSignature, FileStack, Flag, FolderKanban, Inbox, ScrollText, LayoutDashboard, Newspaper, ReceiptText, Users, Video, Wallet, type LucideIcon } from 'lucide-react';
 
 /**
  * The Tableau de bord's sections, in sidebar order. A new section (Leads,
@@ -7,7 +7,7 @@ import { ClipboardList, FileCheck2, FileSignature, FileStack, FolderKanban, Inbo
  */
 export type DashboardSection = {
   /** Its label is `Dashboard.nav.<key>`. */
-  key: 'overview' | 'demandes' | 'dossiers' | 'services-en-cours' | 'reunions' | 'comptes' | 'factures' | 'finances' | 'outils-pdf' | 'signatures' | 'contrats' | 'services' | 'blog';
+  key: 'overview' | 'demandes' | 'dossiers' | 'services-en-cours' | 'reunions' | 'comptes' | 'factures' | 'finances' | 'outils-pdf' | 'signatures' | 'contrats' | 'services' | 'blog' | 'signalements';
   /** Its address on the dashboard's subdomain. */
   href: string;
   /** The first route segment below the dashboard it owns; null for the Aperçu. */
@@ -23,6 +23,8 @@ export type DashboardGroup = (typeof DASHBOARD_GROUPS)[number];
 
 export const DASHBOARD_SECTIONS: readonly DashboardSection[] = [
   { key: 'overview', href: '/', segment: null, icon: LayoutDashboard, group: 'general' },
+  // « Signaler un problème » reports, to triage (#160).
+  { key: 'signalements', href: '/signalements', segment: 'signalements', icon: Flag, group: 'general' },
   { key: 'demandes', href: '/demandes', segment: 'demandes', icon: Inbox, group: 'clients' },
   { key: 'dossiers', href: '/dossiers', segment: 'dossiers', icon: FolderKanban, group: 'clients' },
   // The Services documentaires under way for Clients; the catalogue stays under Facturation.

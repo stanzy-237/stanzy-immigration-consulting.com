@@ -7,6 +7,7 @@ import { Plus_Jakarta_Sans, Syne, Work_Sans } from 'next/font/google';
 import { NavigationProgress } from '@/components/navigation-progress';
 import { ServiceWorkerRegister } from '@/components/service-worker-register';
 import { SiteAnalytics } from '@/components/site-analytics';
+import { ErrorTracking } from '@/features/reports/components/error-tracking';
 import { Toaster } from '@/components/ui/toast';
 import { DrawAlertsAuto } from '@/features/draws/components/draw-alerts-auto';
 import { routing, type LocaleParams } from '@/i18n/routing';
@@ -92,6 +93,7 @@ export default async function LocaleLayout({
               {modal}
               <DrawAlertsAuto />
               <SiteAnalytics />
+              <ErrorTracking />
             </Toaster>
           </TRPCReactProvider>
         </NextIntlClientProvider>

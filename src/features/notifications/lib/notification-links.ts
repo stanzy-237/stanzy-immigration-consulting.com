@@ -35,6 +35,8 @@ export function notificationHref(item: LinkTarget, audience: Audience, locale: s
   if (item.kind === 'INTEREST_REJECTED') return `${base}/accompagnement`;
   // An order through a private link (#80): « Commandes » in « Services en cours ».
   if (item.kind === 'SERVICE_ORDERED') return '/services-en-cours#commandes';
+  // « Signaler un problème » (#160): the Signalements list, on the dashboard.
+  if (item.kind === 'PROBLEM_REPORTED') return '/signalements';
   // A Réunion, with a Dossier or not, opens on its room; cancelled, on the Dossier's Réunions if any.
   if (item.kind.startsWith('MEETING_') && item.params?.meetingId) {
     if (item.kind === 'MEETING_CANCELLED' && item.dossier) return `${base}/dossiers/${item.dossier.id}?onglet=reunions`;

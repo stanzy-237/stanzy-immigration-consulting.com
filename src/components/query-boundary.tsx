@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Component, Suspense, type ErrorInfo, type ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { reportClientError } from '@/features/reports/lib/browser-rollbar';
 
 type ErrorBoundaryProps = {
   onReset: () => void;
@@ -21,6 +22,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, { error: Error | null 
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error(error, info.componentStack);
+    reportClientError(error);
   }
 
   retry = () => {

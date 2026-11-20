@@ -7,6 +7,7 @@ import { authClient } from '@/features/auth/lib/auth-client';
 import { SiteNav } from '@/features/landing/components/site-nav';
 
 import { withIntl } from './test-utils';
+import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 const router = { push: vi.fn(), replace: vi.fn(), refresh: vi.fn() };
 let currentPath = '/';
@@ -215,6 +216,17 @@ describe('SiteNav', () => {
       fireEvent.click(await screen.findByRole('menuitem', { name: 'Déconnexion' }));
 
       await waitFor(() => expect(authClient.signOut).toHaveBeenCalled());
+    });
+
+    it('offers « Signaler un problème » from the account menu (#160)', async () => {
+      signedInAs('Aminata Diallo');
+      const { wrap } = createTestTRPC();
+      render(withIntl(wrap(<SiteNav />)));
+
+      fireEvent.click(screen.getByRole('button', { name: 'Mon compte : Aminata Diallo' }));
+      fireEvent.click(await screen.findByRole('menuitem', { name: 'Signaler un problème' }));
+
+      expect(await screen.findByRole('dialog', { name: 'Signaler un problème' })).toBeInTheDocument();
     });
 
     it('stays on the current page after signing out, refreshing it', async () => {

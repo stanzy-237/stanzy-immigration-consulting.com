@@ -16,6 +16,7 @@ import { dossiersRouter } from '@/features/dossiers/server/dossiers-router';
 import { drawsRouter } from '@/features/draws/server/draws-router';
 import { financesRouter } from '@/features/finances/server/finances-router';
 import { parcoursRouter } from '@/features/parcours/server/parcours-router';
+import { reportsRouter } from '@/features/reports/server/reports-router';
 import { signaturesRouter } from '@/features/signatures/server/signatures-router';
 
 import { healthRouter } from './routers/health';
@@ -41,6 +42,7 @@ export const appRouter = createTRPCRouter({
   meetings: meetingsRouter,
   notifications: notificationsRouter,
   pdfTools: pdfToolsRouter,
+  reports: reportsRouter,
   draws: drawsRouter,
   health: healthRouter,
   parcours: parcoursRouter,
