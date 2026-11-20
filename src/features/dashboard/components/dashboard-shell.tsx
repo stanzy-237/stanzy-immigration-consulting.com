@@ -28,6 +28,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { DASHBOARD_GROUPS, DASHBOARD_SECTIONS, isSectionActive } from '@/features/dashboard/data/sections';
 import { NotificationBell } from '@/features/shared/components/notification-bell';
+import { ReportProblemButton } from '@/features/shared/components/report-problem';
 
 /**
  * The Tableau de bord's frame around every dashboard page: from tablets up,
@@ -61,7 +62,10 @@ export function DashboardShell({
               <SidebarTrigger aria-label={t('nav.toggle')} className="size-10 text-navy-deep" />
               <p className="truncate font-heading text-base font-bold text-navy-deep">{t('greeting', { name })}</p>
             </div>
-            <NotificationBell audience="consultant" />
+            <div className="flex shrink-0 items-center gap-1">
+              <ReportProblemButton />
+              <NotificationBell audience="consultant" />
+            </div>
           </header>
           {/* SidebarInset is the page's <main>. */}
           <div className="min-w-0 flex-1 px-4 py-6 sm:px-7 sm:py-8">{children}</div>

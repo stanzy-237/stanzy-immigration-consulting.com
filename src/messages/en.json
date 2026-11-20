@@ -67,7 +67,8 @@
       "signOut": "Log out",
       "dashboard": "Dashboard",
       "allTools": "See all tools",
-      "mySpace": "My space"
+      "mySpace": "My space",
+      "report": "Report a problem"
     },
     "TikTok": {
       "eyebrow": "Stanzy on TikTok",
@@ -1428,7 +1429,8 @@
       "finances": "Finances",
       "reunions": "Meetings",
       "services": "Document services",
-      "services-en-cours": "Services under way"
+      "services-en-cours": "Services under way",
+      "signalements": "Reports"
     },
     "viewSite": "View the site",
     "overview": {
@@ -2447,7 +2449,8 @@
       "DOSSIER_MESSAGE": "{actor} wrote {count, plural, one {a message} other {# messages}} in the {service} file.",
       "MEETING_JOIN_REQUEST": "{client} asks to join “{subject}”.",
       "RECEIPT_SENT": "Stanzy received your payment: sign receipt {number}.",
-      "RECEIPT_SIGNED": "{actor} signed receipt {number}."
+      "RECEIPT_SIGNED": "{actor} signed receipt {number}.",
+      "PROBLEM_REPORTED": "{client} reported a problem."
     },
     "push": {
       "DOSSIER_OPENED": "Your file is open.",
@@ -2483,7 +2486,8 @@
       "DOSSIER_MESSAGE": "New message in a file.",
       "MEETING_JOIN_REQUEST": "Someone asks to join.",
       "RECEIPT_SENT": "A receipt to sign.",
-      "RECEIPT_SIGNED": "A receipt was signed."
+      "RECEIPT_SIGNED": "A receipt was signed.",
+      "PROBLEM_REPORTED": "New problem report."
     },
     "pushSwitch": {
       "label": "Get them on this phone",
@@ -4403,6 +4407,43 @@
         "deathDate": "Date of death",
         "deathPlace": "Place of death"
       }
+    }
+  },
+  "Reports": {
+    "dialog": {
+      "title": "Report a problem",
+      "description": "Tell us what happened: what you were doing, what you expected and what you saw. The page you are on and recent errors are attached, never the content of your documents.",
+      "label": "What happened?",
+      "placeholder": "E.g. I clicked “Sign” and nothing happened.",
+      "hint": "At least 10 characters.",
+      "tooShort": "Describe the problem in at least {min} characters.",
+      "send": "Send",
+      "sending": "Sending…",
+      "cancel": "Cancel",
+      "sent": "Thank you, your report was sent.",
+      "limit": "Too many reports in a short time. Try again in an hour.",
+      "failed": "The report could not be sent. Try again."
+    },
+    "list": {
+      "metaTitle": "Reports",
+      "title": "Reports",
+      "intro": "What Clients and you reported with “Report a problem”. Linked Rollbar errors open in Rollbar.",
+      "filterLabel": "Filter by status",
+      "all": "All",
+      "statuses": {
+        "NEW": "New",
+        "IN_PROGRESS": "In progress",
+        "RESOLVED": "Resolved",
+        "IGNORED": "Ignored"
+      },
+      "statusLabel": "Status",
+      "errors": "Linked Rollbar errors",
+      "error": "Error {number}",
+      "noErrors": "No linked Rollbar error.",
+      "empty": "No reports yet.",
+      "updated": "Status updated.",
+      "failed": "The status could not be updated. Try again.",
+      "loading": "Loading reports"
     }
   }
 }

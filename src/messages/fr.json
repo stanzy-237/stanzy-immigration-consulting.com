@@ -67,7 +67,8 @@
       "signOut": "Déconnexion",
       "dashboard": "Tableau de bord",
       "allTools": "Voir tous les outils",
-      "mySpace": "Mon espace"
+      "mySpace": "Mon espace",
+      "report": "Signaler un problème"
     },
     "TikTok": {
       "eyebrow": "Stanzy sur TikTok",
@@ -1445,7 +1446,8 @@
       "finances": "Finances",
       "reunions": "Réunions",
       "services": "Services documentaires",
-      "services-en-cours": "Services en cours"
+      "services-en-cours": "Services en cours",
+      "signalements": "Signalements"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -2464,7 +2466,8 @@
       "DOSSIER_MESSAGE": "{actor} a écrit {count, plural, one {un message} other {# messages}} dans le dossier {service}.",
       "MEETING_JOIN_REQUEST": "{client} demande à entrer dans « {subject} ».",
       "RECEIPT_SENT": "Stanzy a reçu votre paiement : signez la reconnaissance {number}.",
-      "RECEIPT_SIGNED": "{actor} a signé la reconnaissance {number}."
+      "RECEIPT_SIGNED": "{actor} a signé la reconnaissance {number}.",
+      "PROBLEM_REPORTED": "{client} a signalé un problème."
     },
     "push": {
       "DOSSIER_OPENED": "Votre dossier est ouvert.",
@@ -2500,7 +2503,8 @@
       "DOSSIER_MESSAGE": "Nouveau message dans un dossier.",
       "MEETING_JOIN_REQUEST": "Quelqu’un demande à entrer.",
       "RECEIPT_SENT": "Une reconnaissance à signer.",
-      "RECEIPT_SIGNED": "Une reconnaissance a été signée."
+      "RECEIPT_SIGNED": "Une reconnaissance a été signée.",
+      "PROBLEM_REPORTED": "Nouveau signalement."
     },
     "pushSwitch": {
       "label": "Recevoir sur ce téléphone",
@@ -4420,6 +4424,43 @@
         "deathDate": "Date du décès",
         "deathPlace": "Lieu du décès"
       }
+    }
+  },
+  "Reports": {
+    "dialog": {
+      "title": "Signaler un problème",
+      "description": "Dites-nous ce qui s’est passé : ce que vous faisiez, ce que vous attendiez et ce que vous avez vu. La page où vous êtes et les erreurs récentes sont jointes, jamais le contenu de vos documents.",
+      "label": "Que s’est-il passé ?",
+      "placeholder": "Ex. : j’ai cliqué sur « Signer » et rien ne s’est passé.",
+      "hint": "Au moins 10 caractères.",
+      "tooShort": "Décrivez le problème en au moins {min} caractères.",
+      "send": "Envoyer",
+      "sending": "Envoi…",
+      "cancel": "Annuler",
+      "sent": "Merci, votre signalement est envoyé.",
+      "limit": "Trop de signalements en peu de temps. Réessayez dans une heure.",
+      "failed": "Le signalement n’a pas pu être envoyé. Réessayez."
+    },
+    "list": {
+      "metaTitle": "Signalements",
+      "title": "Signalements",
+      "intro": "Ce que les clients et vous avez signalé avec « Signaler un problème ». Les erreurs Rollbar liées s’ouvrent dans Rollbar.",
+      "filterLabel": "Filtrer par statut",
+      "all": "Tous",
+      "statuses": {
+        "NEW": "Nouveau",
+        "IN_PROGRESS": "En cours",
+        "RESOLVED": "Résolu",
+        "IGNORED": "Ignoré"
+      },
+      "statusLabel": "Statut",
+      "errors": "Erreurs Rollbar liées",
+      "error": "Erreur {number}",
+      "noErrors": "Aucune erreur Rollbar liée.",
+      "empty": "Aucun signalement pour l’instant.",
+      "updated": "Statut mis à jour.",
+      "failed": "Le statut n’a pas pu être mis à jour. Réessayez.",
+      "loading": "Chargement des signalements"
     }
   }
 }

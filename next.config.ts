@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
     GOOGLE_SIGN_IN_ENABLED: String(
       Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
     ),
+    // Derived for Rollbar (#160): which deployment an error comes from, the
+    // same in the browser and on the server.
+    RELEASE: process.env.VERCEL_GIT_COMMIT_SHA ?? 'local',
+    DEPLOY_ENV: process.env.VERCEL_ENV ?? 'development',
   },
 };
 

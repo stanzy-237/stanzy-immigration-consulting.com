@@ -78,6 +78,7 @@ model Account {
   dossierMessages   DossierMessage[]
   incomesEntered    Income[]             @relation("IncomeCreator")
   chargesEntered    Charge[]             @relation("ChargeCreator")
+  problemReports    ProblemReport[]
 
   @@map("account")
 }
@@ -758,6 +759,8 @@ enum NotificationKind {
   DOSSIER_MESSAGE
   /// To the Client, 3 then 7 days after a Demande de signature, if unsigned.
   SIGNATURE_REMINDER
+  /// To the consultant: someone used « Signaler un problème » (#160).
+  PROBLEM_REPORTED
   /// To the Client, 3 then 7 days after a Contrat or an Avenant, if unsigned.
   CONTRACT_REMINDER
   /// To the consultant: the Client handed over everything for a service and clicked « Suivant » (#80).
@@ -1486,4 +1489,33 @@ model ServiceOrder {
   @@index([status, createdAt])
   @@index([accountId, serviceId, status])
   @@map("service_order")
+}
+
+/// Where the consultant stands on a Signalement (#160).
+enum ProblemReportStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  IGNORED
+}
+
+/// « Signaler un problème » (#160): what someone signed in says went wrong,
+/// with the page and their latest Rollbar items, for the consultant to triage.
+model ProblemReport {
+  id         String              @id @default(cuid())
+  accountId  String
+  account    Account             @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  message    String
+  /// The page they were on: a path, no query string.
+  path       String
+  /// The browser, as it introduced itself.
+  userAgent  String?
+  /// Their latest Rollbar occurrences in this tab, newest first (UUIDs).
+  rollbarIds String[]            @default([])
+  status     ProblemReportStatus @default(NEW)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@index([status, createdAt])
+  @@map("problem_report")
 }

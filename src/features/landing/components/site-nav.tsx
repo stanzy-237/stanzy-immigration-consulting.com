@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, ChevronDown, FolderOpen, LayoutDashboard, LogOut, Menu } from 'lucide-react';
+import { ArrowRight, ChevronDown, Flag, FolderOpen, LayoutDashboard, LogOut, Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/sheet';
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { NotificationBell } from '@/features/shared/components/notification-bell';
+import { ReportProblemDialog } from '@/features/shared/components/report-problem';
 import { withNext } from '@/features/auth/lib/safe-next-path';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -120,6 +121,8 @@ export function SiteNav(): ReactNode {
 
   const closeDropdown = useCallback((): void => setOpenMenu(null), []);
   const closeMobile = useCallback((): void => setMobileOpen(false), []);
+  // « Signaler un problème » (#160), from the account menu.
+  const [reporting, setReporting] = useState<boolean>(false);
 
   return (
     <nav
@@ -211,6 +214,8 @@ export function SiteNav(): ReactNode {
               triggerLabel={t('account', { name: accountName })}
               dashboard={dashboardUrl ? { href: dashboardUrl, label: t('dashboard') } : null}
               mySpaceLabel={account?.isConsultant ? null : t('mySpace')}
+              reportLabel={t('report')}
+              onReport={(): void => setReporting(true)}
               signOutLabel={t('signOut')}
               onSignOut={signOut}
             />
@@ -319,6 +324,19 @@ export function SiteNav(): ReactNode {
                 {accountName ? (
                   <button
                     type="button"
+                    className="text-navy-deep inline-flex items-center justify-center gap-2 rounded-md border border-fog px-3 py-2 text-sm font-medium"
+                    onClick={(): void => {
+                      closeMobile();
+                      setReporting(true);
+                    }}
+                  >
+                    <Flag aria-hidden={true} className="size-4" />
+                    {t('report')}
+                  </button>
+                ) : null}
+                {accountName ? (
+                  <button
+                    type="button"
                     className="text-navy-deep rounded-md border border-fog px-3 py-2 text-center text-sm font-medium"
                     onClick={(): void => {
                       closeMobile();
@@ -350,6 +368,7 @@ export function SiteNav(): ReactNode {
           </SheetContent>
         </Sheet>
       </div>
+      {accountName ? <ReportProblemDialog open={reporting} onOpenChange={setReporting} /> : null}
     </nav>
   );
 }
@@ -361,6 +380,9 @@ type AccountMenuProps = {
   dashboard: { href: string; label: string } | null;
   /** « Mon espace », for everyone but the consultant. */
   mySpaceLabel: string | null;
+  /** « Signaler un problème » (#160). */
+  reportLabel: string;
+  onReport: () => void;
   signOutLabel: string;
   onSignOut: () => Promise<void>;
 };
@@ -370,6 +392,8 @@ function AccountMenu({
   triggerLabel,
   dashboard,
   mySpaceLabel,
+  reportLabel,
+  onReport,
   signOutLabel,
   onSignOut,
 }: AccountMenuProps): ReactNode {
@@ -401,6 +425,10 @@ function AccountMenu({
             {mySpaceLabel}
           </DropdownMenuItem>
         ) : null}
+        <DropdownMenuItem onClick={onReport}>
+          <Flag aria-hidden={true} />
+          {reportLabel}
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={(): void => void onSignOut()}>
           <LogOut aria-hidden={true} />
           {signOutLabel}
