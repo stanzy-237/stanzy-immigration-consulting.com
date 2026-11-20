@@ -1,0 +1,143 @@
+[
+  {
+    "type": "custom",
+    "name": "5xx spike",
+    "severity": "high",
+    "tags": [
+      "issue-164"
+    ],
+    "evaluation": {
+      "window": "5m",
+      "query": {
+        "filter": "environment = \"production\"",
+        "metrics": {
+          "errors": {
+            "metric": "vercel.request.count",
+            "aggregation": "count",
+            "filter": "httpStatus >= 500"
+          }
+        },
+        "outputs": [
+          "errors"
+        ]
+      }
+    },
+    "trigger": {
+      "type": "threshold",
+      "output": "errors",
+      "operator": "gt",
+      "threshold": 5
+    },
+    "notificationSettings": {
+      "enableTeamOwnerNotifications": true
+    }
+  },
+  {
+    "type": "custom",
+    "name": "Function error rate",
+    "severity": "high",
+    "tags": [
+      "issue-164"
+    ],
+    "evaluation": {
+      "window": "15m",
+      "query": {
+        "filter": "environment = \"production\"",
+        "metrics": {
+          "failed": {
+            "metric": "vercel.function_invocation.count",
+            "aggregation": "count",
+            "filter": "httpStatus >= 500"
+          },
+          "total": {
+            "metric": "vercel.function_invocation.count",
+            "aggregation": "count"
+          }
+        },
+        "formulas": {
+          "formula": "failed / total"
+        },
+        "outputs": [
+          "formula"
+        ]
+      }
+    },
+    "trigger": {
+      "type": "threshold",
+      "output": "formula",
+      "operator": "gt",
+      "threshold": 0.05,
+      "minimum": {
+        "output": "failed",
+        "threshold": 3
+      }
+    },
+    "notificationSettings": {
+      "enableTeamOwnerNotifications": true
+    }
+  },
+  {
+    "type": "custom",
+    "name": "Slow tRPC (p95)",
+    "severity": "medium",
+    "tags": [
+      "issue-164"
+    ],
+    "evaluation": {
+      "window": "15m",
+      "query": {
+        "filter": "environment = \"production\" AND route = \"/api/trpc/[trpc]\"",
+        "metrics": {
+          "p95": {
+            "metric": "vercel.function_invocation.function_duration_ms",
+            "aggregation": "p95"
+          }
+        },
+        "outputs": [
+          "p95"
+        ]
+      }
+    },
+    "trigger": {
+      "type": "threshold",
+      "output": "p95",
+      "operator": "gt",
+      "threshold": 4000
+    },
+    "notificationSettings": {
+      "enableTeamOwnerNotifications": true
+    }
+  },
+  {
+    "type": "custom",
+    "name": "Slow PDF routes (p95)",
+    "severity": "medium",
+    "tags": [
+      "issue-164"
+    ],
+    "evaluation": {
+      "window": "15m",
+      "query": {
+        "filter": "environment = \"production\" AND (route = \"/api/contracts/[id]/pdf\" OR route = \"/api/invoices/[id]/pdf\" OR route = \"/api/invoices/receipts/[paymentId]\" OR route = \"/api/dossiers/files/[versionId]\" OR route = \"/api/requirements/files/[id]\")",
+        "metrics": {
+          "p95": {
+            "metric": "vercel.function_invocation.function_duration_ms",
+            "aggregation": "p95"
+          }
+        },
+        "outputs": [
+          "p95"
+        ]
+      }
+    },
+    "trigger": {
+      "type": "threshold",
+      "output": "p95",
+      "operator": "gt",
+      "threshold": 6000
+    },
+    "notificationSettings": {
+      "enableTeamOwnerNotifications": true
+    }
+  }
+]
