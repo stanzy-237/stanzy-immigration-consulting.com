@@ -30,6 +30,7 @@ Product screens are designed in Paper before they are built. The file is **« St
   - The canvas is laid out as a grid. Each flow has its own band of rows. Desktop artboards (1440 wide) sit above their mobile artboards (390 wide). Columns are 1640 px apart: x = 0, 1640, 3280, 4920.
   - Name artboards `Section · N Étape · Device`, for example `Paiement · 2 Validez sur le téléphone · Desktop`.
   - Variations of an existing screen go in the same row, to its right, named `… · Variante A — <idée>`. Don't move or overwrite the original.
+  - A long page (e.g. `Consultation · Page`) keeps its mobile version **beside** the desktop one, in the next column, with variants after it. The row's height is set by the tallest artboard in it.
   - Set artboards to `height: fit-content`. Never let them overlap. If an artboard grows, move every section below it down by the same amount (headers `N.N — titre/nombre/ligne` included) so the gaps stay as they were.
 - **No invented facts.** Use `XX XXX FCFA` for prices (prices live only in the dashboard catalogue) and `XXX` for figures. Label sample reviews as examples.
 - **Desktop first, then mobile.** Once a desktop variant is chosen, draw its mobile version in the mobile row below.
