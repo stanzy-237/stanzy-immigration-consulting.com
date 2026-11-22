@@ -34,3 +34,7 @@ Product screens are designed in Paper before they are built. The file is **« St
   - Set artboards to `height: fit-content`. Never let them overlap. If an artboard grows, move every section below it down by the same amount (headers `N.N — titre/nombre/ligne` included) so the gaps stay as they were.
 - **No invented facts.** Use `XX XXX FCFA` for prices (prices live only in the dashboard catalogue) and `XXX` for figures. Label sample reviews as examples.
 - **Desktop first, then mobile — but mobile is its own design.** Never shrink the desktop layout. Search Mobbin with platform `ios` first, then use mobile patterns: one step per screen, bottom sheets for choices, the main action in a bottom bar, large tap targets, short copy.
+
+## Payments (SasPay)
+
+Consultations and services are paid in Mobile Money through SasPay. Before writing any payment code, load the `saspay-integration` skill (`.agents/skills/saspay-integration/SKILL.md`). The OpenAPI spec at `https://api.saspay.me/api/v1/api-reference/openapi.json` is the source of truth. Supported countries come from `GET /countries/`, and networks per country from `GET /pricing/my-rates/`. Never hard-code a country or payment-method list.
