@@ -33,4 +33,4 @@ Product screens are designed in Paper before they are built. The file is **« St
   - A long page (e.g. `Consultation · Page`) keeps its mobile version **beside** the desktop one, in the next column, with variants after it. The row's height is set by the tallest artboard in it.
   - Set artboards to `height: fit-content`. Never let them overlap. If an artboard grows, move every section below it down by the same amount (headers `N.N — titre/nombre/ligne` included) so the gaps stay as they were.
 - **No invented facts.** Use `XX XXX FCFA` for prices (prices live only in the dashboard catalogue) and `XXX` for figures. Label sample reviews as examples.
-- **Desktop first, then mobile.** Once a desktop variant is chosen, draw its mobile version in the mobile row below.
+- **Desktop first, then mobile — but mobile is its own design.** Never shrink the desktop layout. Search Mobbin with platform `ios` first, then use mobile patterns: one step per screen, bottom sheets for choices, the main action in a bottom bar, large tap targets, short copy.
