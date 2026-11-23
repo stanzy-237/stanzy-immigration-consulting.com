@@ -59,6 +59,7 @@ function fakeDatabase({ consultations = [] as Row[], emails = [] as string[] } =
       update: async ({ where, data }: { where: { id: string }; data: Record<string, unknown> }) =>
         Object.assign(rows.find((r) => r.id === where.id)!, data),
     },
+    consultationPayment: { findFirst: async () => null },
     $executeRaw: async () => 0,
     $transaction: async (fn: (tx: unknown) => unknown) => fn(db),
   };

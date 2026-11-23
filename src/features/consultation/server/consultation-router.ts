@@ -1,17 +1,16 @@
 import { TRPCError } from '@trpc/server';
 
-import { DEFAULT_AVAILABILITY, weeklyHoursSchema, type ConsultationAvailability } from '@/features/consultation/lib/availability';
 import { bookInputSchema, bookingRefSchema, contactSchema, HOLD_MINUTES, isHeld, prepareSchema } from '@/features/consultation/lib/booking';
 import { freeSlots, MINUTE, type Busy, type SlotDay } from '@/features/consultation/lib/slots';
+import { BOOKING_LOCK, busyTimes, loadAvailability, type Db } from '@/features/consultation/server/booking-calendar';
+import { PAYMENT_ERRORS, payInputSchema, paymentRefSchema } from '@/features/consultation/lib/payment';
 import { createBookingAccount } from '@/features/consultation/server/booking-account';
+import { paymentOptions, refreshPayment, startPayment } from '@/features/consultation/server/consultation-payments';
+import { saspay } from '@/features/consultation/server/saspay';
 import { hashHoldToken, newHoldToken } from '@/features/consultation/server/hold-token';
 import type { TRPCContext } from '@/server/trpc/context';
 import { createTRPCRouter, humanOnly, publicProcedure } from '@/server/trpc/trpc';
-
-const DAY = 24 * 60 * MINUTE;
-
-/** Every booking takes its turn behind this lock, so two people never hold the same slot. */
-const BOOKING_LOCK = 15_2026;
+import { z } from 'zod';
 
 /** The booking errors the page explains, each with its own message. */
 export const BOOKING_ERRORS = {
@@ -31,42 +30,6 @@ export type ConsultationSlots = {
   price: number | null;
   days: SlotDay[];
 };
-
-type Db = TRPCContext['prisma'];
-
-async function loadAvailability(prisma: Db): Promise<{ availability: ConsultationAvailability; price: number | null }> {
-  const settings = await prisma.consultationSettings.findUnique({ where: { id: 'default' } });
-  return {
-    availability: settings ? { ...settings, weeklyHours: weeklyHoursSchema.parse(settings.weeklyHours) } : DEFAULT_AVAILABILITY,
-    price: settings?.price ?? null,
-  };
-}
-
-/**
- * The time already taken from now to the horizon: every Réunion still planned
- * (whatever it is about; the Salle personnelle is always open), and every
- * Consultation held or paid but not yet in a Réunion. `holder` leaves out that
- * Compte's own holds, so a booker never collides with the slot they hold.
- */
-async function busyTimes(prisma: Db, now: Date, horizonDays: number, holder?: string): Promise<Busy[]> {
-  const window = { gt: new Date(now.getTime() - DAY), lt: new Date(now.getTime() + (horizonDays + 2) * DAY) };
-  const [meetings, bookings] = await Promise.all([
-    prisma.meeting.findMany({
-      where: { status: 'SCHEDULED', kind: { in: ['SCHEDULED', 'INSTANT'] }, endedAt: null, startsAt: window },
-      select: { startsAt: true, durationMinutes: true },
-    }),
-    prisma.consultation.findMany({
-      where: {
-        startsAt: window,
-        meetingId: null,
-        OR: [{ status: 'PAID' }, { status: 'HELD', heldUntil: { gt: now } }],
-        ...(holder ? { NOT: { accountId: holder, status: 'HELD' } } : {}),
-      },
-      select: { startsAt: true, durationMinutes: true },
-    }),
-  ]);
-  return [...meetings, ...bookings].map((b) => ({ startsAt: b.startsAt, endsAt: new Date(b.startsAt.getTime() + b.durationMinutes * MINUTE) }));
-}
 
 /** The booking `ref` names, if its signed-in Compte or the browser holding its secret asks; else NOT_FOUND. */
 async function ownedBooking(ctx: TRPCContext, ref: { id: string; token?: string }) {
@@ -192,7 +155,14 @@ export const consultationRouter = createTRPCRouter({
   booking: publicProcedure.input(bookingRefSchema).query(async ({ ctx, input }) => {
     const booking = await ownedBooking(ctx, input);
     const { price } = await loadAvailability(ctx.prisma);
+    const payment = await ctx.prisma.consultationPayment.findFirst({
+      where: { consultationId: booking.id },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, status: true, createdAt: true },
+    });
     return {
+      payment,
+      meetingId: booking.meetingId,
       id: booking.id,
       status: booking.status,
       held: isHeld(booking, new Date()),
@@ -236,4 +206,101 @@ export const consultationRouter = createTRPCRouter({
       await ctx.prisma.consultation.update({ where: { id: booking.id }, data: input.answers });
       return { id: booking.id };
     }),
+
+  /**
+   * Step 3's choices: the networks of `country` with their fee on the price,
+   * and the countries one can pay from. `open` is false when SasPay is not set
+   * up here (no key, or a live key outside production): the page says so.
+   */
+  paymentOptions: publicProcedure
+    .input(z.object({ country: z.string().length(2) }))
+    .query(async ({ ctx, input }) => {
+      const { price } = await loadAvailability(ctx.prisma);
+      const client = saspay();
+      if (!client || price === null) return { open: false as const, price, countries: [], networks: [] };
+      try {
+        return { open: true as const, price, ...(await paymentOptions(client, input.country.toUpperCase(), price)) };
+      } catch (error) {
+        console.error('[saspay] could not list networks', error instanceof Error ? error.message : error);
+        return { open: false as const, price, countries: [], networks: [] };
+      }
+    }),
+
+  /** « Payer »: one SasPay payment for the held booking; says whether to wait for the phone or open SasPay's page. */
+  pay: publicProcedure
+    .use(humanOnly)
+    .input(payInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      const booking = await ownedBooking(ctx, input);
+      if (booking.status === 'PAID') throw new TRPCError({ code: 'CONFLICT', message: PAYMENT_ERRORS.paid });
+      if (!isHeld(booking, new Date())) throw new TRPCError({ code: 'CONFLICT', message: BOOKING_ERRORS.holdExpired });
+      const client = saspay();
+      if (!client) throw new TRPCError({ code: 'PRECONDITION_FAILED', message: PAYMENT_ERRORS.closed });
+      const { price } = await loadAvailability(ctx.prisma);
+      if (price === null) throw new TRPCError({ code: 'PRECONDITION_FAILED', message: PAYMENT_ERRORS.noPrice });
+      return startPayment(ctx.prisma, client, booking, input, price);
+    }),
+
+  /**
+   * A payment as the page follows it. A PENDING one is checked with SasPay
+   * (at most every few seconds, or now with `force`: « Vérifier maintenant »),
+   * so the page moves on without waiting for the webhook.
+   */
+  payment: publicProcedure
+    .input(paymentRefSchema.extend({ force: z.boolean().optional() }))
+    .query(async ({ ctx, input }) => {
+      const booking = await ownedBooking(ctx, input);
+      const found = await ctx.prisma.consultationPayment.findFirst({ where: { id: input.paymentId, consultationId: booking.id } });
+      if (!found) throw new TRPCError({ code: 'NOT_FOUND' });
+      const client = saspay();
+      const payment = client ? await refreshPayment(ctx.prisma, client, found, input.force) : found;
+      return paymentView(ctx.prisma, payment);
+    }),
+
+  /**
+   * Where SasPay's page sends the payer back (`/reserver/paiement/<id>`),
+   * maybe in another tab: the payment's id, a random UUID, is the only key.
+   * Says how it went and, once paid, the slot and receipt lines; nothing else.
+   */
+  paymentReturn: publicProcedure.input(z.object({ paymentId: z.uuid() })).query(async ({ ctx, input }) => {
+    const found = await ctx.prisma.consultationPayment.findUnique({ where: { id: input.paymentId } });
+    if (!found) throw new TRPCError({ code: 'NOT_FOUND' });
+    const client = saspay();
+    const payment = client ? await refreshPayment(ctx.prisma, client, found) : found;
+    return paymentView(ctx.prisma, payment);
+  }),
 });
+
+/** What the payment screens show of one attempt and, once paid, its Consultation. */
+async function paymentView(prisma: Db, payment: ConsultationPaymentRow) {
+  const consultation = await prisma.consultation.findUniqueOrThrow({
+    where: { id: payment.consultationId },
+    select: { status: true, startsAt: true, durationMinutes: true, heldUntil: true, meetingId: true, paidById: true, account: { select: { name: true } } },
+  });
+  const paid = consultation.status === 'PAID' && consultation.paidById === payment.id;
+  return {
+    id: payment.id,
+    status: payment.status,
+    flow: payment.flow,
+    network: payment.network,
+    networkName: payment.networkName,
+    phone: payment.phone,
+    amount: payment.amount,
+    charged: payment.charged === null ? null : Number(payment.charged),
+    fee: payment.fee === null ? null : Number(payment.fee),
+    checkoutUrl: payment.checkoutUrl,
+    createdAt: payment.createdAt,
+    settledAt: payment.settledAt,
+    consultation: paid
+      ? {
+          firstName: consultation.account.name.trim().split(/\s+/)[0] ?? '',
+          startsAt: consultation.startsAt,
+          durationMinutes: consultation.durationMinutes,
+          meetingId: consultation.meetingId,
+        }
+      : null,
+    heldUntil: consultation.status === 'HELD' ? consultation.heldUntil : null,
+  };
+}
+
+type ConsultationPaymentRow = Awaited<ReturnType<Db['consultationPayment']['findUniqueOrThrow']>>;

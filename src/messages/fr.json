@@ -4842,6 +4842,28 @@
         "saved": "Réponses enregistrées",
         "error": "Ça n’a pas marché. Réessayez."
       }
+    },
+    "emails": {
+      "greeting": "Bonjour {name},",
+      "paid": {
+        "subject": "Votre Consultation est confirmée : {when}",
+        "body": "Votre paiement est bien reçu : votre Consultation vidéo avec Stanzy est réservée le {when}, pour {minutes} minutes.",
+        "moved": "Le créneau que vous aviez choisi a été pris pendant que votre paiement arrivait : votre Consultation a été placée sur le créneau libre suivant, ci-dessus. S’il ne vous convient pas, choisissez-en un autre avec « Déplacer » dans Mon espace.",
+        "receipt": "Payé : {amount} avec {network}.",
+        "receiptCard": "Payé : {amount} sur la page SasPay.",
+        "room": "La réunion se passe dans Mon espace : le bouton « Rejoindre » s’active 15 minutes avant. Elle est enregistrée, et l’enregistrement vous reste ensuite.",
+        "noRefund": "La Consultation n’est pas remboursable ; vous pouvez la déplacer depuis Mon espace.",
+        "cta": "Ouvrir Mon espace"
+      },
+      "failed": {
+        "subject": "Votre paiement n’est pas passé",
+        "body": "Votre paiement {network} pour la Consultation n’est pas passé : la demande a été refusée ou a expiré.",
+        "bodyCard": "Votre paiement sur la page SasPay pour la Consultation n’est pas passé.",
+        "nothing": "Rien n’a été débité.",
+        "held": "Votre créneau du {when} reste gardé jusqu’à {time} : vous pouvez réessayer d’ici là.",
+        "released": "Votre créneau a été libéré ; vous pouvez en choisir un autre.",
+        "cta": "Réessayer"
+      }
     }
   }
 }

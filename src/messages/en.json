@@ -4825,6 +4825,28 @@
         "saved": "Answers saved",
         "error": "That didn’t work. Try again."
       }
+    },
+    "emails": {
+      "greeting": "Hello {name},",
+      "paid": {
+        "subject": "Your Consultation is confirmed: {when}",
+        "body": "Your payment came through: your video Consultation with Stanzy is booked for {when}, for {minutes} minutes.",
+        "moved": "The slot you chose was taken while your payment was on its way, so your Consultation was placed on the next free slot, above. If it doesn’t suit you, pick another with “Move” in My space.",
+        "receipt": "Paid: {amount} with {network}.",
+        "receiptCard": "Paid: {amount} on the SasPay page.",
+        "room": "The meeting takes place in My space: the “Join” button opens 15 minutes before. It is recorded, and the recording stays available to you afterwards.",
+        "noRefund": "The Consultation can’t be refunded; you can move it from My space.",
+        "cta": "Open My space"
+      },
+      "failed": {
+        "subject": "Your payment didn’t go through",
+        "body": "Your {network} payment for the Consultation didn’t go through: the request was declined or expired.",
+        "bodyCard": "Your payment on the SasPay page for the Consultation didn’t go through.",
+        "nothing": "Nothing was charged.",
+        "held": "Your slot on {when} stays held until {time}: you can try again until then.",
+        "released": "Your slot has been released; you can choose another one.",
+        "cta": "Try again"
+      }
     }
   }
 }
