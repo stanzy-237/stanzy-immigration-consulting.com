@@ -4449,5 +4449,180 @@
       "failed": "The status could not be updated. Try again.",
       "loading": "Loading reports"
     }
+  },
+  "Consultation": {
+    "page": {
+      "metaDescription": "{minutes} minutes on video with Stanzy: your profile, your CRS score, the right program. Book and pay online.",
+      "hero": {
+        "section": "Services",
+        "pill": "Video consultation · {minutes} min",
+        "title": "Your questions, answered by Stanzy.",
+        "lead": "{minutes} minutes on video with Stanzy: your profile, your CRS score, the right program. You leave with a plan, and the recording.",
+        "duration": "{minutes} min",
+        "durationLabel": "on video, recorded",
+        "stats": []
+      },
+      "booking": {
+        "title": "Choose your time",
+        "subtitle": "{minutes} min on video · Douala time",
+        "subtitlePrice": "{minutes} min on video · Douala time · {price}",
+        "days": "Day",
+        "times": "Time",
+        "full": "{day} · fully booked",
+        "earlier": "Earlier days",
+        "later": "Later days",
+        "book": "Book {weekday} {day} at {time}",
+        "hold": "Time held 15 min while you pay · MTN or Orange Money",
+        "none": "No free time right now. New dates open every week: come back soon.",
+        "loading": "Looking for free times"
+      },
+      "steps": {
+        "title": "How the consultation works",
+        "before": {
+          "eyebrow": "Before",
+          "title": "You book and pay",
+          "body": "A time, MTN or Orange Money. You get the payment receipt and a reminder the day before."
+        },
+        "during": {
+          "eyebrow": "During",
+          "title": "{minutes} min with Stanzy",
+          "body": "“Join” from My space. Eligibility, CRS score, documents, what comes next."
+        },
+        "after": {
+          "eyebrow": "After",
+          "title": "You watch it all again",
+          "body": "Recording and transcript in My space, announced by email."
+        }
+      },
+      "topics": {
+        "title": "What we cover",
+        "lead": "Come with your questions. We start from your real profile, not a general case.",
+        "label": "Topics",
+        "example": "Sample profile · we check yours together",
+        "count": "{current} / {total}",
+        "eligibility": {
+          "tab": "Eligibility",
+          "title": "Your eligibility",
+          "body": "FSW, CEC or PNP: where you really stand.",
+          "preview": "Your eligibility",
+          "rows": {
+            "fsw": {
+              "name": "FSW · Skilled workers",
+              "value": "67 points"
+            },
+            "cec": {
+              "name": "CEC · Canadian experience",
+              "value": "1 year in Canada"
+            },
+            "pnp": {
+              "name": "PNP · Provincial program",
+              "value": "depends on the province"
+            }
+          }
+        },
+        "points": {
+          "tab": "Gaining points",
+          "title": "Gaining points",
+          "body": "Languages, studies, work: the levers on your CRS score.",
+          "preview": "Gaining points",
+          "rows": {
+            "english": {
+              "name": "English · CLB 9 and up",
+              "value": "the biggest lever"
+            },
+            "french": {
+              "name": "French · second language",
+              "value": "up to 50 points"
+            },
+            "studies": {
+              "name": "Studies in Canada",
+              "value": "up to 30 points"
+            }
+          }
+        },
+        "documents": {
+          "tab": "Documents",
+          "title": "Your documents",
+          "body": "What to prepare, and in what order.",
+          "preview": "Your documents",
+          "rows": {
+            "test": {
+              "name": "Language test",
+              "value": "valid 2 years"
+            },
+            "ede": {
+              "name": "ECA · WES or IQAS",
+              "value": "ask early"
+            },
+            "funds": {
+              "name": "Proof of funds",
+              "value": "6 months of statements"
+            }
+          }
+        },
+        "next": {
+          "tab": "What’s next",
+          "title": "What’s next",
+          "body": "On your own with our tools, or with us all the way to the ITA.",
+          "preview": "What’s next",
+          "rows": {
+            "tools": {
+              "name": "CRS calculator and Checklist",
+              "value": "free"
+            },
+            "accompagnement": {
+              "name": "Express Entry support",
+              "value": "with Stanzy"
+            },
+            "pool": {
+              "name": "Your profile in the pool",
+              "value": "up to the ITA"
+            }
+          }
+        }
+      },
+      "deliverables": {
+        "eyebrow": "What you leave with",
+        "plan": {
+          "title": "An action plan",
+          "body": "The program to aim for (FSW, CEC or PNP), the levers on your CRS score, and the order of the steps."
+        },
+        "recording": {
+          "title": "The recording",
+          "body": "The video and its transcript in My space. Watch any answer again whenever you need it."
+        },
+        "documents": {
+          "title": "Your documents, sorted",
+          "body": "What to prepare first, and what can wait."
+        }
+      },
+      "reviews": {
+        "title": "What they say",
+        "items": []
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "titleLead": "Your questions,",
+        "titleAccent": "our answers.",
+        "lead": "Can’t find the answer you’re looking for? Contact us directly.",
+        "cta": "Ask a question",
+        "app": {
+          "q": "Do I need to install an app?",
+          "a": "No. On the day, click “Join” in My space, from your phone or your computer."
+        },
+        "refused": {
+          "q": "What if the payment is declined?",
+          "a": "Nothing is charged. Your time stays held for 15 minutes: try again, with the same payment method or another. After that, it is released."
+        },
+        "move": {
+          "q": "Can I move my appointment?",
+          "a": "Yes, from My space, up to {hours} h before it starts. A paid Consultation is not refunded: you move it instead."
+        },
+        "recording": {
+          "q": "Who sees the recording?",
+          "a": "You and Stanzy, nobody else. Once Stanzy publishes them, the video and its transcript appear in My space: you can watch them, not download them."
+        }
+      }
+    }
   }
 }

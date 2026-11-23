@@ -4466,5 +4466,180 @@
       "failed": "Le statut n’a pas pu être mis à jour. Réessayez.",
       "loading": "Chargement des signalements"
     }
+  },
+  "Consultation": {
+    "page": {
+      "metaDescription": "{minutes} minutes en vidéo avec Stanzy : votre profil, votre score CRS, le bon programme. Réservez et payez en ligne.",
+      "hero": {
+        "section": "Services",
+        "pill": "Consultation en vidéo · {minutes} min",
+        "title": "Vos questions, les réponses de Stanzy.",
+        "lead": "{minutes} minutes en vidéo avec Stanzy : votre profil, votre score CRS, le bon programme. Vous repartez avec un plan, et l’enregistrement.",
+        "duration": "{minutes} min",
+        "durationLabel": "en vidéo, enregistrées",
+        "stats": []
+      },
+      "booking": {
+        "title": "Choisissez votre créneau",
+        "subtitle": "{minutes} min en vidéo · Heure de Douala",
+        "subtitlePrice": "{minutes} min en vidéo · Heure de Douala · {price}",
+        "days": "Jour",
+        "times": "Heure",
+        "full": "{day} · complet",
+        "earlier": "Jours précédents",
+        "later": "Jours suivants",
+        "book": "Réserver {weekday} {day} à {time}",
+        "hold": "Créneau gardé 15 min pendant le paiement · MTN ou Orange Money",
+        "none": "Aucun créneau libre pour le moment. De nouvelles dates s’ouvrent chaque semaine : revenez bientôt.",
+        "loading": "Recherche des créneaux libres"
+      },
+      "steps": {
+        "title": "Comment se passe la consultation",
+        "before": {
+          "eyebrow": "Avant",
+          "title": "Vous réservez et payez",
+          "body": "Un créneau, MTN ou Orange Money. Vous recevez la Reconnaissance et un rappel la veille."
+        },
+        "during": {
+          "eyebrow": "Pendant",
+          "title": "{minutes} min avec Stanzy",
+          "body": "« Rejoindre » depuis Mon espace. Admissibilité, score CRS, documents, la suite."
+        },
+        "after": {
+          "eyebrow": "Après",
+          "title": "Vous revoyez tout",
+          "body": "Enregistrement et transcription dans Mon espace, annoncés par e-mail."
+        }
+      },
+      "topics": {
+        "title": "Ce qu’on aborde",
+        "lead": "Arrivez avec vos questions. On part de votre profil réel, pas d’un cas général.",
+        "label": "Les sujets",
+        "example": "Profil d’exemple · on vérifie le vôtre ensemble",
+        "count": "{current} / {total}",
+        "eligibility": {
+          "tab": "Admissibilité",
+          "title": "Votre admissibilité",
+          "body": "FSW, CEC ou PNP : où vous en êtes vraiment.",
+          "preview": "Votre admissibilité",
+          "rows": {
+            "fsw": {
+              "name": "FSW · Travailleurs qualifiés",
+              "value": "67 points"
+            },
+            "cec": {
+              "name": "CEC · Expérience canadienne",
+              "value": "1 an au Canada"
+            },
+            "pnp": {
+              "name": "PNP · Programme provincial",
+              "value": "selon la province"
+            }
+          }
+        },
+        "points": {
+          "tab": "Gagner des points",
+          "title": "Gagner des points",
+          "body": "Langues, études, emploi : les leviers sur votre score CRS.",
+          "preview": "Gagner des points",
+          "rows": {
+            "english": {
+              "name": "Anglais · NCLC 9 et plus",
+              "value": "le plus gros levier"
+            },
+            "french": {
+              "name": "Français · 2e langue",
+              "value": "jusqu’à 50 points"
+            },
+            "studies": {
+              "name": "Études au Canada",
+              "value": "jusqu’à 30 points"
+            }
+          }
+        },
+        "documents": {
+          "tab": "Documents",
+          "title": "Vos documents",
+          "body": "Ce qu’il faut préparer, et dans quel ordre.",
+          "preview": "Vos documents",
+          "rows": {
+            "test": {
+              "name": "Test de langue",
+              "value": "valable 2 ans"
+            },
+            "ede": {
+              "name": "EDE · WES ou IQAS",
+              "value": "à demander tôt"
+            },
+            "funds": {
+              "name": "Preuve de fonds",
+              "value": "6 mois de relevés"
+            }
+          }
+        },
+        "next": {
+          "tab": "La suite",
+          "title": "La suite",
+          "body": "Seul avec nos outils, ou accompagné jusqu’à l’ITA.",
+          "preview": "La suite",
+          "rows": {
+            "tools": {
+              "name": "Calculateur CRS et Checklist",
+              "value": "gratuits"
+            },
+            "accompagnement": {
+              "name": "Accompagnement Entrée Express",
+              "value": "avec Stanzy"
+            },
+            "pool": {
+              "name": "Votre profil dans le bassin",
+              "value": "jusqu’à l’ITA"
+            }
+          }
+        }
+      },
+      "deliverables": {
+        "eyebrow": "Ce que vous repartez avec",
+        "plan": {
+          "title": "Un plan d’action",
+          "body": "Le programme à viser (FSW, CEC ou PNP), les leviers sur votre score CRS, et l’ordre des étapes."
+        },
+        "recording": {
+          "title": "L’enregistrement",
+          "body": "La vidéo et sa transcription dans Mon espace. Revoyez chaque réponse quand vous en avez besoin."
+        },
+        "documents": {
+          "title": "Vos documents, triés",
+          "body": "Ce qu’il faut préparer en premier, et ce qui peut attendre."
+        }
+      },
+      "reviews": {
+        "title": "Ils en parlent",
+        "items": []
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "titleLead": "Vos questions,",
+        "titleAccent": "nos réponses.",
+        "lead": "Vous ne trouvez pas la réponse que vous cherchez ? Contactez-nous directement.",
+        "cta": "Poser une question",
+        "app": {
+          "q": "Faut-il installer une application ?",
+          "a": "Non. Le jour J, cliquez « Rejoindre » dans Mon espace, depuis votre téléphone ou votre ordinateur."
+        },
+        "refused": {
+          "q": "Et si le paiement est refusé ?",
+          "a": "Rien n’est débité. Votre créneau reste gardé 15 minutes : réessayez, avec le même moyen de paiement ou un autre. Passé ce délai, il est libéré."
+        },
+        "move": {
+          "q": "Puis-je déplacer mon rendez-vous ?",
+          "a": "Oui, depuis Mon espace, jusqu’à {hours} h avant le début. Une Consultation payée n’est pas remboursée : vous la déplacez."
+        },
+        "recording": {
+          "q": "Qui voit l’enregistrement ?",
+          "a": "Vous et Stanzy, personne d’autre. Une fois publiés par Stanzy, la vidéo et sa transcription apparaissent dans Mon espace : vous les regardez, sans les télécharger."
+        }
+      }
+    }
   }
 }
