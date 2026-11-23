@@ -18,10 +18,7 @@ Before building any part, open its artboards (names below) with the Paper MCP an
 
 Use `GLOSSARY.md`. Terms this design relies on: Consultation, Réunion, Enregistrement, Transcription, Lead, Client, Compte, Reconnaissance de paiement, Demande d'intérêt, Dossier, Code promo.
 
-**Two glossary entries are out of date.** Update them (or record an ADR) in the same PR that first builds the affected part:
-
-1. **Consultation** — booked and paid in the app (SasPay), no longer « through an embedded external scheduler (Cal.com) ».
-2. **Enregistrement** and **Transcription** — the consultant may **publish** a Consultation's recording and transcription to its Client (see « Publier »). Today the glossary says « for the consultant only ». Retention rules for a published recording must be decided (open question 1).
+Recordings stay the consultant's, with one exception: a **Consultation's** Enregistrement and Transcription, once published, are shown to its Client to watch and read only. Never a download, and never for other Réunions (Dossier meetings stay consultant-only).
 
 ## Screens
 
@@ -58,7 +55,7 @@ PAYÉE ─► DÉPLACÉE (new slot, same Réunion) · ANNULÉE (with a reason)
 
 ## Booking
 
-- **Step 1 — Vos coordonnées:** name, country, e-mail, phone. Signed-in accounts see it filled and folded (« Modifier »).
+- **Step 1 — Vos coordonnées:** name, country, e-mail, phone. Signed-in accounts see it filled and folded (« Modifier »). For someone signed out, this step **creates their Compte** (or finds the one with that e-mail and asks them to sign in) before the slot is held. So every held slot, payment attempt and promo use belongs to a Compte: « Une seule fois par Compte » can be enforced, Mon espace works right after payment, and failed payments link to a Compte. The e-mail is confirmed with the existing Vérification e-mail.
 - **Step 2 — Préparer l'échange:** everything optional. Topics (multi-select: « Mon admissibilité », « Gagner des points CRS », « Mes documents », « La suite »), CRS score (link to the CRS calculator), « Avez-vous déjà été sélectionné ? » (Non / Oui, ITA reçue), situation (max 500 characters, counter). The consultant sees these answers on `Consultation · 1 Avant` as « Ce qu'[prénom] a préparé ».
 - **Step 3 — Paiement:** summary card (date, duration, what is included), promo field, total, pay button.
 
@@ -77,8 +74,9 @@ Managed in Tableau de bord → Facturation → **Codes promo** (new sidebar item
 
 - **1 Avant:** date, countdown, what to prepare, « Tester ma caméra », « Déplacer », the Reconnaissance.
 - **2 Salle d'attente:** « Rejoindre » opens **15 minutes before** the start (same rule as `meeting-schema.ts`). Recording consent is asked before joining.
-- **3 Après · Récap:** only after the consultant publishes: video, Notes de Stanzy with timestamps (a timestamp seeks the video), Transcription, « Vos prochaines étapes » checklist (the Client ticks them), documents cited, downloads (video, Reconnaissance), and the Accompagnement call to action (« Envoyer ma demande » → Demande d'intérêt).
-- **4 Déplacer le créneau:** pick another free slot; the Réunion moves (meeting e-mail « Déplacée »). The notice period is a setting (open question 2).
+- **3 Après · Récap:** only after the consultant publishes: video (streamed, **no download**), Notes de Stanzy with timestamps (a timestamp seeks the video), Transcription, « Vos prochaines étapes » checklist (the Client ticks them), documents cited, the Reconnaissance (downloadable PDF), and the Accompagnement call to action (« Envoyer ma demande » → Demande d'intérêt). The video stays visible as long as the Enregistrement is kept (2 years, glossary).
+- **4 Déplacer le créneau:** pick another free slot; the Réunion moves (meeting e-mail « Déplacée »). How long before the start moving closes is a Disponibilités setting.
+- **No refund.** A paid Consultation is never refunded, whoever cancels; the way out is « Déplacer ». Say so on the Reconnaissance and before paying.
 - **5 Mes consultations / 6 Aucune consultation:** list and empty state with its own illustration.
 
 ## Consultant dashboard
@@ -106,7 +104,7 @@ Tabs « À venir », « Passées », « Paiements échoués » (count = unresolv
 
 One route, two states:
 
-- **1 Avant:** header (name, « Payée · réseau », date, « Déplacer », « Rejoindre » greyed with « S'ouvre à HH:MM » until 15 min before), « Ce qu'[prénom] a préparé » (booking answers, the situation as a quote), **Vos notes** (private, autosaved, stored as the Réunion's `notes`), Paiement (price, promo line, paid amount + frais, network, time, Reconnaissance), Son Compte (Lead badge, contact, « Ouvrir un dossier »), reminders sent (day before; 15 min before), « Annuler la consultation ».
+- **1 Avant:** header (name, « Payée · réseau », date, « Déplacer », « Rejoindre » greyed with « S'ouvre à HH:MM » until 15 min before), « Ce qu'[prénom] a préparé » (booking answers, the situation as a quote), **Vos notes** (private, autosaved, stored as the Réunion's `notes`), Paiement (price, promo line, paid amount + frais, network, time, Reconnaissance), Son Compte (Lead badge, contact, « Ouvrir un dossier »), reminders sent (day before; 15 min before), « Annuler la consultation » (asks for a reason, warns there is no refund, suggests « Déplacer »).
 - **2 Après:** header « Terminée · N min », the recording with markers, tabs « Notes pour [prénom] » (timestamped notes written for the Client) / Transcription / « Vos notes privées », « Ses prochaines étapes » (checklist written for the Client), « Dans son espace » (what she will see), « Ouvrir un dossier ».
 - **Publier dans son espace:** nothing reaches the Client before it. Publishing makes the video, transcription, notes for the Client and next steps visible in her Mon espace and sends « Votre enregistrement est prêt ». Private notes are never shown. The consultant can edit after publishing.
 
@@ -128,8 +126,8 @@ WhatsApp twins of the Consultation messages are designed (`3.9`) and not built. 
 
 Loading → skeletons shaped like the content (ADR 0006); mutations end in a toast. Empty states use their own brand illustrations from `Design system · Illustrations & Stanzy` (never a generic icon). Every screen above has its mobile artboard.
 
-## Open questions
+## Decisions
 
-1. **Published recording retention.** How long a Client can see a published recording, and whether she can download it (the Après screen shows « Télécharger la vidéo »).
-2. **Moving and cancelling.** How long before the start a Client may move; whether a cancelled paid Consultation is refunded, and how.
-3. **Who sees « Paiements échoués »** rows for people with no Compte yet (booking without sign-in).
+- **Recording:** shared only for Consultations, once published; watch only, no download; visible while the Enregistrement is kept. (2026-11-23)
+- **Moving:** allowed, up to a Disponibilités setting before the start. **Refunds:** never. (2026-11-23)
+- **Accounts:** booking step 1 creates or finds the Compte before the slot is held, so failed payments always link to a Compte. (2026-11-23)
