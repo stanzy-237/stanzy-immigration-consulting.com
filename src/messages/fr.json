@@ -4683,6 +4683,12 @@
           "body": "Ce qu’il faut préparer en premier, et ce qui peut attendre."
         }
       },
+      "invite": {
+        "title": "On en parle de vive voix ?",
+        "next": "Prochain créneau libre : <b>{slot}</b> · heure de Douala",
+        "at": "à",
+        "cta": "Réserver ce créneau"
+      },
       "reviews": {
         "title": "Ils en parlent",
         "items": []
@@ -4709,6 +4715,12 @@
           "q": "Qui voit l’enregistrement ?",
           "a": "Vous et Stanzy, personne d’autre. Une fois publiés par Stanzy, la vidéo et sa transcription apparaissent dans Mon espace : vous les regardez, sans les télécharger."
         }
+      },
+      "sticky": {
+        "meta": "{minutes} min",
+        "metaPrice": "{minutes} min · {price}",
+        "change": "Changer",
+        "book": "Réserver"
       }
     }
   }

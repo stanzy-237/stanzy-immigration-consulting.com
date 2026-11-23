@@ -10,8 +10,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = resolve(process.argv[2] ?? resolve(root, '../stanzy_content_studio/video-engine/engine/mascot.js'));
 const { mascotSVG } = createRequire(import.meta.url)(source);
 
-// The poses the site uses: wave (hero, invitation band), pointr (Ce qu'on aborde), idle (FAQ avatar).
-const POSES = ['wave', 'pointr', 'idle'];
+// The poses the site uses: wave (hero, invitation band), pointr (Ce qu'on aborde), idle (recap video), think (FAQ avatar).
+const POSES = ['wave', 'pointr', 'idle', 'think'];
 
 const out = resolve(root, 'public/stanzy');
 mkdirSync(out, { recursive: true });

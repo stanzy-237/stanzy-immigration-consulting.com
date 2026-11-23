@@ -7,6 +7,7 @@ import { useId, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useChosenSlot } from '@/features/consultation/contexts/chosen-slot-context';
 import { bookingHref, dayLabels, fcfa, timeOf } from '@/features/consultation/lib/slot-format';
 import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -47,7 +48,9 @@ function BookingPanel(): ReactNode {
   const { days, durationMinutes, price } = data;
   const firstOpen = Math.max(0, days.findIndex((d) => d.starts.length > 0));
   const [dayIndex, setDayIndex] = useState(firstOpen);
-  const [start, setStart] = useState<string | undefined>(days[firstOpen]?.starts[0]);
+  // The picked start is shared with the page (the mobile sticky bar books it too).
+  const [chosen, setStart] = useChosenSlot();
+  const start = chosen ?? days[firstOpen]?.starts[0];
   // Until the visitor pages, show the page holding the chosen day (the page size settles after hydration).
   const [paged, setPaged] = useState<number | null>(null);
   const pageStart = paged ?? Math.floor(dayIndex / pageSize) * pageSize;
@@ -71,7 +74,8 @@ function BookingPanel(): ReactNode {
   const visible = days.slice(pageStart, pageStart + pageSize);
   const choose = (index: number) => {
     setDayIndex(index);
-    setStart(days[index]!.starts[0]);
+    const first = days[index]!.starts[0];
+    if (first) setStart(first);
   };
   const step = (direction: -1 | 1) => setPaged(Math.max(0, pageStart + direction * pageSize));
 

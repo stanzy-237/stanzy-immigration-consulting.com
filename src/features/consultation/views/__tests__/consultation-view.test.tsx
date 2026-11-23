@@ -141,6 +141,28 @@ describe('ConsultationView, « Ce qu’on aborde »', () => {
   });
 });
 
+describe('ConsultationView, « On en parle de vive voix ? »', () => {
+  it('offers the next free slot, live from the same slots as the panel', () => {
+    renderPage();
+    const band = within(screen.getByRole('region', { name: 'On en parle de vive voix ?' }));
+    expect(band.getByText('jeu. 26 nov. à 09:00')).toBeInTheDocument();
+    expect(band.getByRole('link', { name: /Réserver ce créneau/ })).toHaveAttribute(
+      'href',
+      `/fr/services/consultation/reserver?creneau=${encodeURIComponent(at('2026-11-26', '09:00'))}`,
+    );
+  });
+
+  it('is not shown when nothing is free', () => {
+    renderPage({ ...SLOTS, days: [{ day: '2026-11-25', starts: [] }] });
+    expect(screen.queryByRole('region', { name: 'On en parle de vive voix ?' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the booking bar out of the way while the panel has not been scrolled past', () => {
+    renderPage();
+    expect(screen.queryByRole('link', { name: /^Réserver$/ })).not.toBeInTheDocument();
+  });
+});
+
 describe('ConsultationView, « Un aperçu de votre récap »', () => {
   const demo = () => within(screen.getByRole('group', { name: 'Exemple de récap' }));
 

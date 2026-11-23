@@ -25,3 +25,14 @@ export const fcfa = (amount: number, locale: string): string => `${new Intl.Numb
 
 /** The booking step the panel leads to, with the chosen start. */
 export const bookingHref = (start: string): string => `/services/consultation/reserver?creneau=${encodeURIComponent(start)}`;
+
+/** The day of an ISO start, heure de Douala: « mar. 25 nov. », or « Mar. 25 » when `short`. */
+export function slotDay(iso: string, locale: string, { short = false }: { short?: boolean } = {}): string {
+  const text = new Intl.DateTimeFormat(locale, {
+    timeZone: DOUALA,
+    weekday: 'short',
+    day: 'numeric',
+    ...(short ? {} : { month: 'short' }),
+  }).format(new Date(iso));
+  return short ? capitalize(text) : text;
+}

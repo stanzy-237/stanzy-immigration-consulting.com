@@ -2,6 +2,7 @@
 
 import { ArrowRight, Plus } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
@@ -11,7 +12,6 @@ import { FOOTER_SOCIALS } from '@/features/landing/data/footer';
 import { cn } from '@/lib/utils';
 
 const QUESTIONS = ['app', 'refused', 'move', 'recording'] as const;
-
 
 const WHATSAPP = FOOTER_SOCIALS.find((social) => social.key === 'whatsapp')?.href;
 
@@ -27,7 +27,21 @@ export function ConsultationFaq({ moveCutoffHours }: { moveCutoffHours: number }
   return (
     <section aria-labelledby="consultation-faq" className="bg-navy-deep px-5 py-14 text-white md:px-7 lg:py-24">
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2">
-        <Reveal>
+        <Reveal className="relative">
+          {/* Stanzy, thinking about your question. Not animated. */}
+          <div
+            aria-hidden={true}
+            className="absolute top-0 right-0 flex size-19 justify-center overflow-hidden rounded-full border-3 border-white bg-ice-blue lg:top-7.5 lg:right-10 lg:size-30 lg:border-4"
+          >
+            <Image
+              unoptimized={true}
+              src="/stanzy/think.svg"
+              alt=""
+              width={144}
+              height={252}
+              className="h-40 w-23 max-w-none shrink-0 translate-y-1.5 lg:h-63 lg:w-36 lg:translate-y-2"
+            />
+          </div>
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3.5 py-1.5">
             <span aria-hidden={true} className="h-1 w-4 shrink-0 rounded-full bg-rouge" />
             <span className="text-caption font-semibold tracking-widest uppercase">{t('eyebrow')}</span>

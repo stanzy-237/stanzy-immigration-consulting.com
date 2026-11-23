@@ -4666,6 +4666,12 @@
           "body": "What to prepare first, and what can wait."
         }
       },
+      "invite": {
+        "title": "Shall we talk it through?",
+        "next": "Next free slot: <b>{slot}</b> · Douala time",
+        "at": "at",
+        "cta": "Book this slot"
+      },
       "reviews": {
         "title": "What they say",
         "items": []
@@ -4692,6 +4698,12 @@
           "q": "Who sees the recording?",
           "a": "You and Stanzy, nobody else. Once Stanzy publishes them, the video and its transcript appear in My space: you can watch them, not download them."
         }
+      },
+      "sticky": {
+        "meta": "{minutes} min",
+        "metaPrice": "{minutes} min · {price}",
+        "change": "Change",
+        "book": "Book"
       }
     }
   }

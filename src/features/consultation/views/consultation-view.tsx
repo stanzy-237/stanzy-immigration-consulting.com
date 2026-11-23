@@ -3,17 +3,21 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { MotionConfig } from 'motion/react';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Reveal } from '@/components/ui/reveal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BookingCard } from '@/features/consultation/components/booking-card';
+import { BookingInvite } from '@/features/consultation/components/booking-invite';
 import { CallPreview } from '@/features/consultation/components/call-preview';
 import { ConsultationJourney } from '@/features/consultation/components/consultation-journey';
+import { ConsultationDeliverables } from '@/features/consultation/components/consultation-deliverables';
 import { ConsultationFaq } from '@/features/consultation/components/consultation-faq';
 import { ConsultationTopics } from '@/features/consultation/components/consultation-topics';
 import { RecapPreview } from '@/features/consultation/components/recap-preview';
+import { StickyBookingBar } from '@/features/consultation/components/sticky-booking-bar';
+import { ChosenSlotProvider } from '@/features/consultation/contexts/chosen-slot-context';
 import { LABEL_CLASS, SECTION_TITLE_CLASS } from '@/features/consultation/lib/styles';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
@@ -23,7 +27,6 @@ import { useTRPC } from '@/trpc/client';
 /** A client's words: real ones only, written in `messages/*.json`. */
 type Review = { quote: string; author: string };
 
-const DELIVERABLES = ['plan', 'recording', 'documents'] as const;
 
 /**
  * The public Consultation page (#15): what it is, the free slots to book one,
@@ -36,7 +39,9 @@ export function ConsultationView(): ReactNode {
     <MotionConfig reducedMotion="user">
       <SiteNav />
       <QueryBoundary fallback={<ConsultationPageSkeleton />}>
-        <ConsultationPage />
+        <ChosenSlotProvider>
+          <ConsultationPage />
+        </ChosenSlotProvider>
       </QueryBoundary>
       <SiteFooter />
     </MotionConfig>
@@ -50,6 +55,7 @@ function ConsultationPage(): ReactNode {
   const { data } = useSuspenseQuery(trpc.consultation.slots.queryOptions());
   const { durationMinutes: minutes, moveCutoffHours } = data;
   const reviews = t.raw('reviews.items') as Review[];
+  const panelRef = useRef<HTMLDivElement>(null);
 
   return (
     <main className="overflow-hidden bg-white">
@@ -70,7 +76,7 @@ function ConsultationPage(): ReactNode {
             <p className="max-w-136 text-body leading-6 text-ice-blue lg:text-body-lg lg:leading-7">{t('hero.lead', { minutes })}</p>
             <CallPreview className="lg:w-140" />
           </div>
-          <div className="relative px-4 pb-12 lg:w-130 lg:shrink-0 lg:p-0">
+          <div ref={panelRef} className="relative px-4 pb-12 lg:w-130 lg:shrink-0 lg:p-0">
             <div aria-hidden={true} className="absolute inset-x-0 top-0 h-18 bg-navy-deep lg:hidden" />
             <BookingCard className="relative" />
           </div>
@@ -83,34 +89,9 @@ function ConsultationPage(): ReactNode {
 
       <RecapPreview />
 
-      {/* Ce que vous repartez avec */}
-      <section aria-labelledby="consultation-deliverables" className="bg-off-white px-5 py-14 md:px-7 lg:py-20">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:gap-10">
-          <h2 id="consultation-deliverables" className={cn(LABEL_CLASS, 'text-slate')}>
-            {t('deliverables.eyebrow')}
-          </h2>
-          <ol className="grid gap-8 lg:grid-cols-3 lg:gap-14">
-            {DELIVERABLES.map((item, index) => (
-              <li key={item}>
-                <Reveal delay={index * 0.06} className="flex gap-4 lg:flex-col">
-                  <span
-                    aria-hidden={true}
-                    className="w-8 shrink-0 font-heading text-h3 leading-8 font-extrabold text-rouge lg:w-auto lg:text-h1 lg:leading-14"
-                  >
-                    {index + 1}
-                  </span>
-                  <div className="flex flex-1 flex-col gap-1.5 lg:gap-4">
-                    <h3 className="font-heading text-h4 leading-6 font-bold tracking-tight text-ink lg:text-h3 lg:leading-8.5">
-                      {t(`deliverables.${item}.title`)}
-                    </h3>
-                    <p className="text-body-sm leading-5 text-slate lg:text-body lg:leading-6">{t(`deliverables.${item}.body`)}</p>
-                  </div>
-                </Reveal>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <ConsultationDeliverables />
+
+      <BookingInvite />
 
       {/* Ils en parlent: shown once real words are written in the messages. */}
       {reviews.length > 0 ? (
@@ -142,6 +123,7 @@ function ConsultationPage(): ReactNode {
       ) : null}
 
       <ConsultationFaq moveCutoffHours={moveCutoffHours} />
+      <StickyBookingBar panelRef={panelRef} />
     </main>
   );
 }
