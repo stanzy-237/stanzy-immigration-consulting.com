@@ -295,6 +295,18 @@
       opacity: 0;
     }
   }
+
+  /* « Ce qu'on aborde » (Consultation page): the line that fills while a topic is shown, then the next one comes. */
+  --animate-topic-progress: topic-progress 6s linear both;
+
+  @keyframes topic-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
 }
 
 @layer base {

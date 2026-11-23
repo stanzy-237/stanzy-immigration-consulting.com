@@ -148,6 +148,10 @@ Motion follows the project's animation skills (`.claude/skills/`, after Emil Kow
 | Where | Interaction | Motion | Reduced motion |
 |---|---|---|---|
 | Public page | Sections reaching the viewport | `Reveal` once (fade + 16 px lift, `EASE_OUT`, 500 ms), 60 ms stagger inside a section; the hero is static | appears |
+| Public page · Ce qu'on aborde | Active topic | The rouge underline (desktop) and the navy pill (mobile) slide to the chosen topic with `layoutId`, spring `{ duration: 0.25, bounce: 0 }`; the mobile dots follow with `layout` | instant |
+| Public page · Ce qu'on aborde | Topics advance on their own | Every 6 s, shown by a progress line under the active topic (`scaleX`, `linear`). Paused on hover, on focus and off screen; stops for good once the visitor picks a topic | off: no advance, no line |
+| Public page · Ce qu'on aborde | Preview changes | Crossfade with an 8 px shift in the direction of travel and `blur(2px)`, 200 ms ease-out; the bars then fill from the left (`scaleX`, 400 ms `--ease-out-expo`, 40 ms stagger) | crossfade, bars appear |
+| Public page · FAQ | Answer opens / closes | `height: "auto"` with the text fading, 250 ms `--ease-out-expo`; closing 150 ms. The « + » turns 45° and fills rouge, 200 ms `--ease-standard` | fade |
 | Booking · mobile | Next / back step | Forward: new step slides in from the right by 16 px with fade, 250 ms ease-out; back from the left. The progress segment fills with `scaleX`, 300 ms | crossfade |
 | Booking · desktop | A step folds and the next opens | Height via `height: "auto"`, 250 ms `--ease-out-expo`; content fades, with no slide inside | instant height, fade |
 | Booking | Topic chips | Press `scale(0.97)`; the check fades in from `scale(0.9)`, 150 ms | fade |

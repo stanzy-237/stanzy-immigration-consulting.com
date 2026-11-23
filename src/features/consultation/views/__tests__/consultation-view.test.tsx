@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -105,5 +105,50 @@ describe('ConsultationView, the Consultation as the consultant set it', () => {
     render(withIntl(wrap(<ConsultationView />)));
     expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
     expect(screen.queryByText(/Chargement/)).not.toBeInTheDocument();
+  });
+});
+
+describe('ConsultationView, « Ce qu’on aborde »', () => {
+  const tabs = () => within(screen.getByRole('tablist', { name: 'Les sujets' }));
+  const preview = () => screen.getByRole('tabpanel');
+  /**
+   * The line under the shown topic finishing its run (its CSS animation ending). jsdom has no
+   * AnimationEvent, so React listens for the prefixed `webkitAnimationEnd` there.
+   */
+  const progressEnds = () =>
+    fireEvent(screen.getAllByTestId('topic-progress')[0]!, new Event('webkitAnimationEnd', { bubbles: true }));
+
+  it('shows the preview of the topic the visitor picks', () => {
+    renderPage();
+    fireEvent.click(tabs().getByRole('tab', { name: /Vos documents/ }));
+    expect(tabs().getByRole('tab', { name: /Vos documents/ })).toHaveAttribute('aria-selected', 'true');
+    expect(within(preview()).getByText('Test de langue')).toBeInTheDocument();
+  });
+
+  it('moves on to the next topic by itself, until the visitor picks one', () => {
+    renderPage();
+    progressEnds();
+    expect(tabs().getByRole('tab', { name: /Gagner des points/ })).toHaveAttribute('aria-selected', 'true');
+
+    fireEvent.click(tabs().getByRole('tab', { name: /La suite/ }));
+    expect(screen.queryAllByTestId('topic-progress')).toHaveLength(0);
+  });
+
+  it('comes back to the first topic after the last', () => {
+    renderPage();
+    for (let i = 0; i < 4; i += 1) progressEnds();
+    expect(tabs().getByRole('tab', { name: /Votre admissibilité/ })).toHaveAttribute('aria-selected', 'true');
+  });
+});
+
+describe('ConsultationView, FAQ', () => {
+  it('opens one answer at a time', async () => {
+    renderPage();
+    const move = screen.getByRole('button', { name: /Puis-je déplacer/ });
+    fireEvent.click(move);
+    expect(move).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: /Faut-il installer/ })).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(move);
+    await waitFor(() => expect(screen.queryByText(/jusqu’à 24 h avant le début/)).not.toBeInTheDocument());
   });
 });

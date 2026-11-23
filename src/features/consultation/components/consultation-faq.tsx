@@ -1,22 +1,24 @@
 'use client';
 
 import { ArrowRight, Plus } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
 import { Reveal } from '@/components/ui/reveal';
-import { PRESS } from '@/features/consultation/lib/styles';
+import { EASE_OUT_EXPO, PRESS } from '@/features/consultation/lib/styles';
 import { FOOTER_SOCIALS } from '@/features/landing/data/footer';
 import { cn } from '@/lib/utils';
 
 const QUESTIONS = ['app', 'refused', 'move', 'recording'] as const;
 
+
 const WHATSAPP = FOOTER_SOCIALS.find((social) => social.key === 'whatsapp')?.href;
 
 /**
  * The Consultation's questions, in the home page's FAQ look. « Poser une
- * question » opens WhatsApp. Answers open and close at once: the motion spec
- * gives the FAQ no animation.
+ * question » opens WhatsApp. An answer opens to its height with its text
+ * fading in, and the « + » turns into a « × » (docs/design/consultation.md, row « FAQ »).
  */
 export function ConsultationFaq({ moveCutoffHours }: { moveCutoffHours: number }): ReactNode {
   const t = useTranslations('Consultation.page.faq');
@@ -61,7 +63,7 @@ export function ConsultationFaq({ moveCutoffHours }: { moveCutoffHours: number }
                   <button
                     type="button"
                     aria-expanded={expanded}
-                    aria-controls={`consultation-faq-${key}`}
+                    aria-controls={expanded ? `consultation-faq-${key}` : undefined}
                     onClick={() => setOpen(expanded ? null : key)}
                     className="flex w-full items-center justify-between gap-4 py-5 text-left font-heading text-body leading-snug font-semibold"
                   >
@@ -69,16 +71,27 @@ export function ConsultationFaq({ moveCutoffHours }: { moveCutoffHours: number }
                     <span
                       aria-hidden={true}
                       className={cn(
-                        'flex size-8 shrink-0 items-center justify-center rounded-full border',
-                        expanded ? 'rotate-45 border-rouge bg-rouge' : 'border-white/20',
+                        'flex size-8 shrink-0 items-center justify-center rounded-full border transition duration-200 ease-standard',
+                        expanded ? 'rotate-45 border-rouge bg-rouge' : 'border-white/20 hover:border-white/40',
                       )}
                     >
                       <Plus className="size-4" strokeWidth={2.5} />
                     </span>
                   </button>
-                  <div id={`consultation-faq-${key}`} hidden={!expanded}>
-                    <p className="pr-10 pb-5 text-body-sm leading-relaxed text-white/70">{t(`${key}.a`, { hours: moveCutoffHours })}</p>
-                  </div>
+                  <AnimatePresence initial={false}>
+                    {expanded ? (
+                      <motion.div
+                        id={`consultation-faq-${key}`}
+                        key="answer"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1, transition: { duration: 0.25, ease: EASE_OUT_EXPO } }}
+                        exit={{ height: 0, opacity: 0, transition: { duration: 0.15, ease: EASE_OUT_EXPO } }}
+                        className="overflow-hidden"
+                      >
+                        <p className="pr-10 pb-5 text-body-sm leading-relaxed text-white/70">{t(`${key}.a`, { hours: moveCutoffHours })}</p>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
                 </li>
               );
             })}
