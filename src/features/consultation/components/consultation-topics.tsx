@@ -26,7 +26,7 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
  * scroll on mobile) and the chosen one's preview from a sample profile. The
  * topics move on every 6 s, shown by a filling line, while the section is in
  * view and not hovered or focused; picking one stops that for good. Motion:
- * docs/design/consultation.md, rows « Ce qu'on aborde ».
+ * docs/design/consultation-motion.md, rows « Ce qu'on aborde ».
  */
 export function ConsultationTopics(): ReactNode {
   const t = useTranslations('Consultation.page.topics');

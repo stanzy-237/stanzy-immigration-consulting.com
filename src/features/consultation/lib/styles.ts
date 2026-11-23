@@ -1,4 +1,4 @@
-/** Press feedback on every tappable thing (docs/design/consultation.md, Motion): scale(0.97), 150 ms, none with reduced motion. */
+/** Press feedback on every tappable thing (docs/design/consultation-motion.md): scale(0.97), 150 ms, none with reduced motion. */
 export const PRESS = 'transition-transform duration-150 ease-standard active:scale-97 motion-reduce:active:scale-100';
 
 /** The small uppercase label above a block (« AVANT », « 01 · VOTRE ADMISSIBILITÉ »). */

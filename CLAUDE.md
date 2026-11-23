@@ -26,7 +26,7 @@ tRPC data is prefetched in the route and read with `useSuspenseQuery` under a sk
 
 ### Consultation (mandatory)
 
-The paid Consultation (booking, payment, promo codes, Mon espace, the dashboard's Consultations, Codes promo and Aperçu, its e-mails) is designed in Paper. Every agent MUST read `docs/design/consultation.md` before planning, specifying or building any part of it.
+The paid Consultation (booking, payment, promo codes, Mon espace, the dashboard's Consultations, Codes promo and Aperçu, its e-mails) is designed in Paper. Every agent MUST read `docs/design/consultation.md` before planning, specifying or building any part of it. Its motion (the public Consultation page included) is specified in `docs/design/consultation-motion.md`: every agent MUST read it before animating any Consultation screen, and adds a row there before building a new motion.
 
 ### Tailwind — no arbitrary values (mandatory)
 

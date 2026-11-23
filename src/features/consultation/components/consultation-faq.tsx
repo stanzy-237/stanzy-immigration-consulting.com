@@ -18,7 +18,7 @@ const WHATSAPP = FOOTER_SOCIALS.find((social) => social.key === 'whatsapp')?.hre
 /**
  * The Consultation's questions, in the home page's FAQ look. « Poser une
  * question » opens WhatsApp. An answer opens to its height with its text
- * fading in, and the « + » turns into a « × » (docs/design/consultation.md, row « FAQ »).
+ * fading in, and the « + » turns into a « × » (docs/design/consultation-motion.md, row « FAQ »).
  */
 export function ConsultationFaq({ moveCutoffHours }: { moveCutoffHours: number }): ReactNode {
   const t = useTranslations('Consultation.page.faq');
