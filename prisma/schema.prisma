@@ -80,6 +80,7 @@ model Account {
   chargesEntered    Charge[]             @relation("ChargeCreator")
   problemReports    ProblemReport[]
   consultations     Consultation[]
+  promoCodes        PromoCode[]
 
   @@map("account")
 }
@@ -1591,6 +1592,8 @@ model Consultation {
   meeting           Meeting?              @relation(fields: [meetingId], references: [id], onDelete: SetNull)
   createdAt         DateTime              @default(now())
   updatedAt         DateTime              @updatedAt
+  promoCode         PromoCode?            @relation(fields: [promoCodeId], references: [id])
+  promoCodeId       String?
 
   @@index([status, startsAt])
   @@index([accountId, createdAt])
@@ -1624,8 +1627,12 @@ model ConsultationPayment {
   networkName     String?
   /// The number charged (E.164), for a push.
   phone           String?
-  /// What was asked, in `currency` (FCFA, no decimals).
+  /// What was asked, in `currency` (FCFA, no decimals): the price less `discount`.
   amount          Int
+  /// The Code promo's reduction (FCFA) on this try, 0 without one. Its place counts once paid.
+  discount        Int                       @default(0)
+  promoCodeId     String?
+  promoCode       PromoCode?                @relation(fields: [promoCodeId], references: [id], onDelete: Restrict)
   currency        String
   /// From SasPay once paid: the fees on top, what left the payer, what reaches the practice…
   fee             Decimal?                  @db.Decimal(12, 2)
@@ -1644,5 +1651,42 @@ model ConsultationPayment {
 
   @@index([consultationId, createdAt])
   @@index([status, createdAt])
+  @@index([promoCodeId, status])
   @@map("consultation_payment")
+}
+
+enum PromoReduction {
+  PERCENT
+  AMOUNT
+}
+
+/// A Code promo (docs/design/consultation.md, Promo codes): made in Tableau de
+/// bord → Facturation → Codes promo, applied at checkout only. A place counts
+/// when the payment succeeds; deleting stops it at once (soft: payments
+/// already made keep their reduction). One live code per text: a partial
+/// unique index in the migration.
+model PromoCode {
+  id             String                @id @default(cuid())
+  /// Upper case, as typed at checkout (« BLACKFRIDAY »).
+  code           String
+  reductionType  PromoReduction
+  /// A percentage (1–99) or FCFA.
+  reductionValue Int
+  /// The services it applies to: `CONSULTATION` and the `ServiceType`s.
+  services       String[]
+  /// Null: no limit.
+  places         Int?
+  /// Null: no end date. Douala time in the form, stored UTC.
+  endsAt         DateTime?
+  oncePerAccount Boolean               @default(true)
+  deletedAt      DateTime?
+  createdById    String?
+  createdBy      Account?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  consultations  Consultation[]
+  payments       ConsultationPayment[]
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([code])
+  @@map("promo_code")
 }

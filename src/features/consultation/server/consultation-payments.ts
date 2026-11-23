@@ -8,8 +8,10 @@ import { after } from 'next/server';
 import { consultationFailedEmail, consultationPaidEmail } from '@/features/consultation/lib/consultation-emails';
 import { CARD_NETWORK, HOLD_LIMIT_MINUTES, PAYING_MINUTES, PAYMENT_ERRORS, type PayInput } from '@/features/consultation/lib/payment';
 import { feeFor } from '@/features/consultation/lib/payment-fees';
+import { discountFor, PROMO_ERRORS } from '@/features/consultation/lib/promo';
 import { freeSlots, MINUTE } from '@/features/consultation/lib/slots';
 import { BOOKING_LOCK, busyTimes, loadAvailability, overlapsBusy, type Db } from '@/features/consultation/server/booking-calendar';
+import { checkPromo } from '@/features/consultation/server/promo-codes';
 import { SasPayError, type SasPay, type SasPayNetwork, type SasPayVerdict } from '@/features/consultation/server/saspay';
 import { clientRoomPath, newInviteToken } from '@/features/meetings/lib/meeting-schema';
 import { toLocale } from '@/i18n/routing';
@@ -79,6 +81,7 @@ type Booking = {
   createdAt: Date;
   heldUntil: Date | null;
   phone: string;
+  promoCodeId: string | null;
   account: { name: string; email: string };
 };
 
@@ -112,25 +115,55 @@ export async function startPayment(prisma: Db, client: SasPay, booking: Booking,
   const id = randomUUID();
   const idempotencyKey = randomUUID();
 
-  await prisma.consultationPayment.create({
-    data: {
-      id,
-      consultationId: booking.id,
-      idempotencyKey,
-      country: network.country,
-      network: network.code,
-      networkName: network.name,
-      phone: method.kind === 'network' ? phone : null,
-      amount: price,
-      currency,
-    },
+  // The Code promo, checked again just before paying, behind the booking lock: places
+  // still on their way count, so the cap is never exceeded. If it can't be used any more
+  // it comes off the booking, and the page shows the full price before anything is sent.
+  const written = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(${BOOKING_LOCK})`;
+    const db = tx as unknown as Db;
+    let promo: { id: string; discount: number } | null = null;
+    if (booking.promoCodeId) {
+      const code = await db.promoCode.findUnique({ where: { id: booking.promoCodeId }, select: { code: true } });
+      const verdict = await checkPromo(db, {
+        code: code?.code ?? '',
+        accountId: booking.accountId,
+        consultationId: booking.id,
+        service: 'CONSULTATION',
+        now,
+        paying: true,
+      });
+      if (!verdict.ok) {
+        await db.consultation.update({ where: { id: booking.id }, data: { promoCodeId: null } });
+        // Deleted meanwhile: it simply ended.
+        return { error: verdict.error === PROMO_ERRORS.unknown ? PROMO_ERRORS.ended : verdict.error };
+      }
+      promo = { id: verdict.code.id, discount: discountFor(price, verdict.code) };
+    }
+    await db.consultationPayment.create({
+      data: {
+        id,
+        consultationId: booking.id,
+        idempotencyKey,
+        country: network.country,
+        network: network.code,
+        networkName: network.name,
+        phone: method.kind === 'network' ? phone : null,
+        amount: price - (promo?.discount ?? 0),
+        discount: promo?.discount ?? 0,
+        promoCodeId: promo?.id ?? null,
+        currency,
+      },
+    });
+    return { amount: price - (promo?.discount ?? 0) };
   });
+  if ('error' in written) throw new TRPCError({ code: 'CONFLICT', message: written.error });
+  const amount = written.amount;
 
   try {
     const push = () =>
       client.softpay(
         {
-          amount: price,
+          amount,
           currency,
           country: network.country,
           network: network.code,

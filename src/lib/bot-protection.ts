@@ -2,7 +2,7 @@
  * The requests Vercel BotID checks (#162): sign-up, sign-in (email and
  * Google), the password reset, the verification email, and the public forms
  * that write something (Demande d'intérêt, Alertes tirages, the PDF tool's
- * monthly count, « Signaler un problème », an Offre's order, a Consultation's booking). The browser
+ * monthly count, « Signaler un problème », an Offre's order, a Consultation's booking, its payment and its Code promo). The browser
  * marks these requests (src/instrumentation-client.ts); the server refuses
  * the ones that come from a bot (src/server/bot-check.ts).
  */
@@ -22,6 +22,8 @@ export const TRPC_PROTECTED_PROCEDURES = [
   'reports.create',
   'documentServices.orders.order',
   'consultation.book',
+  'consultation.pay',
+  'consultation.applyPromo',
 ] as const;
 
 export const BOT_PROTECTED_ROUTES = [

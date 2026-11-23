@@ -4,8 +4,10 @@ import { bookInputSchema, bookingRefSchema, contactSchema, HOLD_MINUTES, isHeld,
 import { freeSlots, MINUTE, type Busy, type SlotDay } from '@/features/consultation/lib/slots';
 import { BOOKING_LOCK, busyTimes, loadAvailability, type Db } from '@/features/consultation/server/booking-calendar';
 import { PAYMENT_ERRORS, payInputSchema, paymentRefSchema } from '@/features/consultation/lib/payment';
+import { applyPromoSchema, normalizeCode } from '@/features/consultation/lib/promo';
 import { createBookingAccount } from '@/features/consultation/server/booking-account';
 import { paymentOptions, refreshPayment, startPayment } from '@/features/consultation/server/consultation-payments';
+import { checkPromo, promoView, usedCounts } from '@/features/consultation/server/promo-codes';
 import { saspay } from '@/features/consultation/server/saspay';
 import { hashHoldToken, newHoldToken } from '@/features/consultation/server/hold-token';
 import type { TRPCContext } from '@/server/trpc/context';
@@ -160,8 +162,13 @@ export const consultationRouter = createTRPCRouter({
       orderBy: { createdAt: 'desc' },
       select: { id: true, status: true, createdAt: true },
     });
+    const promo = await appliedPromo(ctx.prisma, booking.promoCodeId, price);
     return {
       payment,
+      /** The Code promo applied, if any, with its reduction on the price. */
+      promo,
+      /** What is left to pay before SasPay's fees: the price less the code's reduction. */
+      amount: price === null ? null : price - (promo?.discount ?? 0),
       meetingId: booking.meetingId,
       id: booking.id,
       status: booking.status,
@@ -208,14 +215,51 @@ export const consultationRouter = createTRPCRouter({
     }),
 
   /**
+   * « Appliquer » a Code promo at checkout: it must exist, apply to the
+   * Consultation, not be over, have a place left (places paid so far) and, if
+   * « Une seule fois par Compte », not have been paid with by this Compte.
+   * Each refusal is its own message; an unknown code suggests the live code it
+   * most likely meant. Kept on the booking until paid; checked again then.
+   */
+  applyPromo: publicProcedure
+    .use(humanOnly)
+    .input(applyPromoSchema)
+    .mutation(async ({ ctx, input }) => {
+      const booking = await ownedBooking(ctx, input);
+      if (!isHeld(booking, new Date())) throw new TRPCError({ code: 'CONFLICT', message: BOOKING_ERRORS.holdExpired });
+      const verdict = await checkPromo(ctx.prisma, {
+        code: normalizeCode(input.code),
+        accountId: booking.accountId,
+        consultationId: booking.id,
+        service: 'CONSULTATION',
+        now: new Date(),
+      });
+      if (!verdict.ok) {
+        // An unknown code carries the one it most likely meant: « PROMO_UNKNOWN:BLACKFRIDAY ».
+        throw new TRPCError({ code: 'BAD_REQUEST', message: verdict.suggestion ? `${verdict.error}:${verdict.suggestion}` : verdict.error });
+      }
+      await ctx.prisma.consultation.update({ where: { id: booking.id }, data: { promoCodeId: verdict.code.id } });
+      return { code: verdict.code.code };
+    }),
+
+  /** « Retirer » the Code promo: back to the full price. */
+  removePromo: publicProcedure.input(bookingRefSchema).mutation(async ({ ctx, input }) => {
+    const booking = await ownedBooking(ctx, input);
+    await ctx.prisma.consultation.update({ where: { id: booking.id }, data: { promoCodeId: null } });
+    return { id: booking.id };
+  }),
+
+  /**
    * Step 3's choices: the networks of `country` with their fee on the price,
    * and the countries one can pay from. `open` is false when SasPay is not set
    * up here (no key, or a live key outside production): the page says so.
    */
   paymentOptions: publicProcedure
-    .input(z.object({ country: z.string().length(2) }))
+    .input(z.object({ country: z.string().length(2), amount: z.number().int().positive().optional() }))
     .query(async ({ ctx, input }) => {
-      const { price } = await loadAvailability(ctx.prisma);
+      const { price: fullPrice } = await loadAvailability(ctx.prisma);
+      // With a Code promo the fees are on what is left to pay (never more than the price).
+      const price = fullPrice === null ? null : Math.min(input.amount ?? fullPrice, fullPrice);
       const client = saspay();
       if (!client || price === null) return { open: false as const, price, networks: [], card: null };
       try {
@@ -306,3 +350,12 @@ async function paymentView(prisma: Db, payment: ConsultationPaymentRow) {
 }
 
 type ConsultationPaymentRow = Awaited<ReturnType<Db['consultationPayment']['findUniqueOrThrow']>>;
+
+/** The Code promo applied to a booking, as the checkout shows it; null once deleted or without one. */
+async function appliedPromo(prisma: Db, promoCodeId: string | null, price: number | null) {
+  if (!promoCodeId || price === null) return null;
+  const code = await prisma.promoCode.findFirst({ where: { id: promoCodeId, deletedAt: null } });
+  if (!code) return null;
+  const used = (await usedCounts(prisma, [code.id])).get(code.id) ?? 0;
+  return promoView(code, price, used);
+}

@@ -53,7 +53,7 @@ const START = new Date('2026-11-24T08:00:00Z'); // mardi 09:00 Douala
  * in-memory stand-in for the Consultations, their payments, Réunions and
  * Comptes. Holding, paying, verifying and delivering run for real.
  */
-function fakeDatabase({ meetings = [] as Row[], others = [] as Row[] } = {}) {
+function fakeDatabase({ meetings = [] as Row[], others = [] as Row[], codes = [] as Row[], paid = [] as Row[] } = {}) {
   const account = { id: 'acc_1', name: 'Aminata Diallo', email: 'aminata@example.com', locale: 'fr', status: 'USER', role: 'MEMBER' };
   const consultant = { id: 'acc_stanzy', role: 'CONSULTANT' };
   const consultations: Row[] = [
@@ -65,6 +65,7 @@ function fakeDatabase({ meetings = [] as Row[], others = [] as Row[] } = {}) {
       durationMinutes: 45,
       heldUntil: new Date('2026-11-23T07:15:00Z'),
       holdTokenHash: null,
+      promoCodeId: null,
       meetingId: null,
       paidById: null,
       phone: '+237677123450',
@@ -72,7 +73,9 @@ function fakeDatabase({ meetings = [] as Row[], others = [] as Row[] } = {}) {
     },
     ...others,
   ];
-  const payments: Row[] = [];
+  // `paid`: payments made earlier by others (or this Compte, `accountId`), with a code.
+  const payments: Row[] = paid.map((p) => ({ status: 'SUCCESS', createdAt: new Date(), ...p }));
+  const promoCodes: Row[] = codes.map((c) => ({ deletedAt: null, endsAt: null, places: null, oncePerAccount: true, services: ['CONSULTATION'], ...c }));
   const createdMeetings: Row[] = [...meetings];
   const withAccount = (row: Row | undefined) => (row ? { ...row, account } : null);
   const find = (rows: Row[], where: Record<string, unknown>) => rows.find((r) => Object.entries(where).every(([k, v]) => r[k] === v));
@@ -108,7 +111,32 @@ function fakeDatabase({ meetings = [] as Row[], others = [] as Row[] } = {}) {
         return { count: 1 };
       },
     },
+    promoCode: {
+      findFirst: async ({ where }: { where: Row }) => find(promoCodes, where) ?? null,
+      findUnique: async ({ where }: { where: { id: string } }) => find(promoCodes, where) ?? null,
+      findMany: async () => promoCodes.filter((c) => c.deletedAt === null),
+    },
     consultationPayment: {
+      count: async ({ where }: { where: Record<string, unknown> }) =>
+        payments.filter((p) => {
+          const ownerOf = (row: Row) => (row.accountId as string | undefined) ?? find(consultations, { id: row.consultationId })?.accountId;
+          if (where.promoCodeId !== undefined && p.promoCodeId !== where.promoCodeId) return false;
+          if (where.status !== undefined && p.status !== where.status) return false;
+          const notCon = (where.consultationId as { not?: string } | undefined)?.not;
+          if (notCon !== undefined && p.consultationId === notCon) return false;
+          const after = (where.createdAt as { gt?: Date } | undefined)?.gt;
+          if (after && !((p.createdAt as Date) > after)) return false;
+          const owner = (where.consultation as { accountId?: string } | undefined)?.accountId;
+          if (owner !== undefined && ownerOf(p) !== owner) return false;
+          return true;
+        }).length,
+      groupBy: async ({ where }: { where: { promoCodeId: { in: string[] }; status: string } }) => {
+        const counts = new Map<string, number>();
+        for (const p of payments) {
+          if (p.status === where.status && where.promoCodeId.in.includes(p.promoCodeId as string)) counts.set(p.promoCodeId as string, (counts.get(p.promoCodeId as string) ?? 0) + 1);
+        }
+        return [...counts].map(([promoCodeId, n]) => ({ promoCodeId, _count: { _all: n } }));
+      },
       create: async ({ data }: { data: Row }) => {
         const row = { status: 'PENDING', transactionId: null, checkoutId: null, checkoutUrl: null, checkedAt: null, settledAt: null, fee: null, charged: null, netAmount: null, createdAt: new Date(), ...data };
         payments.push(row);
@@ -135,6 +163,11 @@ function fakeDatabase({ meetings = [] as Row[], others = [] as Row[] } = {}) {
 }
 
 const defaults = DEFAULT_AVAILABILITY;
+
+const BLACKFRIDAY = { id: 'promo_bf', code: 'BLACKFRIDAY', reductionType: 'PERCENT', reductionValue: 70, places: 20 };
+/** Payments that succeeded with a code, by other bookings. */
+const paidWith = (codeId: string, n: number) =>
+  Array.from({ length: n }, (_, i) => ({ id: `old_${i}`, consultationId: `con_old_${i}`, accountId: `acc_old_${i}`, promoCodeId: codeId }));
 
 /** Signed in as the booker, so the booking is theirs without a browser secret. */
 const callerFor = (db: TRPCContext['prisma']) =>
@@ -307,5 +340,65 @@ describe('consultation.payment, after paying', () => {
     const { paymentId } = await callerFor(db).pay({ id: 'con_1', locale: 'fr', method: mtn });
     expect(await callerFor(db).payment({ id: 'con_1', paymentId })).toMatchObject({ status: 'PENDING' });
     expect(client.verify).not.toHaveBeenCalled();
+  });
+});
+
+describe('Codes promo at checkout', () => {
+  it('applies a live code to the booking, and the booking shows its reduction and the places left', async () => {
+    const { db, consultations } = fakeDatabase({ codes: [BLACKFRIDAY], paid: paidWith('promo_bf', 13) });
+    expect(await callerFor(db).applyPromo({ id: 'con_1', code: ' blackfriday ' })).toEqual({ code: 'BLACKFRIDAY' });
+    expect(consultations[0]!.promoCodeId).toBe('promo_bf');
+
+    const booking = await callerFor(db).booking({ id: 'con_1' });
+    expect(booking.promo).toMatchObject({ code: 'BLACKFRIDAY', discount: 10_500, places: 20, placesLeft: 7 });
+    expect(booking.amount).toBe(4_500);
+  });
+
+  it('suggests the code a typo meant', async () => {
+    const { db } = fakeDatabase({ codes: [BLACKFRIDAY] });
+    await expect(callerFor(db).applyPromo({ id: 'con_1', code: 'BLACKFRYDAY' })).rejects.toThrow('PROMO_UNKNOWN:BLACKFRIDAY');
+  });
+
+  it('refuses a code whose places are all paid, one that ended, and one this Compte already used', async () => {
+    const soldOut = fakeDatabase({ codes: [{ ...BLACKFRIDAY, places: 13 }], paid: paidWith('promo_bf', 13) });
+    await expect(callerFor(soldOut.db).applyPromo({ id: 'con_1', code: 'BLACKFRIDAY' })).rejects.toThrow('PROMO_SOLD_OUT');
+
+    const ended = fakeDatabase({ codes: [{ ...BLACKFRIDAY, endsAt: new Date('2026-11-23T07:00:00Z') }] });
+    await expect(callerFor(ended.db).applyPromo({ id: 'con_1', code: 'BLACKFRIDAY' })).rejects.toThrow('PROMO_ENDED');
+
+    const used = fakeDatabase({ codes: [BLACKFRIDAY], paid: [{ id: 'mine', consultationId: 'con_before', accountId: 'acc_1', promoCodeId: 'promo_bf' }] });
+    await expect(callerFor(used.db).applyPromo({ id: 'con_1', code: 'BLACKFRIDAY' })).rejects.toThrow('PROMO_USED');
+  });
+
+  it('charges the price less the reduction, and keeps it on the payment', async () => {
+    const { db, payments } = fakeDatabase({ codes: [BLACKFRIDAY] });
+    await callerFor(db).applyPromo({ id: 'con_1', code: 'BLACKFRIDAY' });
+    await callerFor(db).pay({ id: 'con_1', locale: 'fr', method: mtn });
+
+    expect(client.softpay).toHaveBeenCalledWith(expect.objectContaining({ amount: 4_500 }), expect.any(String));
+    expect(payments.at(-1)).toMatchObject({ amount: 4_500, discount: 10_500, promoCodeId: 'promo_bf' });
+  });
+
+  it('just before paying, counts places still on their way: the last one gone, nothing is sent and the full price is back', async () => {
+    const { db, consultations } = fakeDatabase({ codes: [{ ...BLACKFRIDAY, places: 14 }], paid: paidWith('promo_bf', 13) });
+    await callerFor(db).applyPromo({ id: 'con_1', code: 'BLACKFRIDAY' });
+    // Someone else is paying with the 14th place right now.
+    const someoneElse = { id: 'other_pending', consultationId: 'con_other', accountId: 'acc_other', promoCodeId: 'promo_bf', status: 'PENDING', createdAt: new Date() };
+    await (db as unknown as { consultationPayment: { create: (a: { data: Row }) => Promise<Row> } }).consultationPayment.create({ data: someoneElse });
+
+    await expect(callerFor(db).pay({ id: 'con_1', locale: 'fr', method: mtn })).rejects.toThrow('PROMO_LAST_PLACE');
+    expect(client.softpay).not.toHaveBeenCalled();
+    expect(consultations[0]!.promoCodeId).toBeNull();
+  });
+
+  it('a code deleted meanwhile simply ended: full price shown again before paying', async () => {
+    const { db, consultations } = fakeDatabase({ codes: [BLACKFRIDAY] });
+    await callerFor(db).applyPromo({ id: 'con_1', code: 'BLACKFRIDAY' });
+    const code = (await db.promoCode.findUnique({ where: { id: 'promo_bf' } })) as unknown as Row;
+    code.deletedAt = new Date();
+
+    expect((await callerFor(db).booking({ id: 'con_1' })).promo).toBeNull();
+    await expect(callerFor(db).pay({ id: 'con_1', locale: 'fr', method: mtn })).rejects.toThrow('PROMO_ENDED');
+    expect(consultations[0]!.promoCodeId).toBeNull();
   });
 });
