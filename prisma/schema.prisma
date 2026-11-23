@@ -1603,53 +1603,44 @@ enum ConsultationPaymentStatus {
   FAILED
 }
 
-/// How the payer pays: a push to their phone (`POST /payments/softpay/`, which
-/// may still answer with a SasPay page), or SasPay's hosted page where they
-/// choose (`POST /checkout-sessions/`, card and countries without Mobile Money).
-enum ConsultationPaymentFlow {
-  SOFTPAY
-  CHECKOUT
-}
-
 /// One try at paying a held Consultation through SasPay. Paid means SasPay
 /// `SUCCESS` only, read from verify or a signed webhook
 /// (docs/design/consultation.md). Failed tries are kept for « Paiements échoués ».
 model ConsultationPayment {
   /// A random UUID: also the secret of the page SasPay brings the payer back to.
-  id             String                    @id
-  consultationId String
-  consultation   Consultation              @relation(fields: [consultationId], references: [id], onDelete: Cascade)
-  paid           Consultation?             @relation("ConsultationPaidBy")
-  flow           ConsultationPaymentFlow
+  id              String                    @id
+  consultationId  String
+  consultation    Consultation              @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  paid            Consultation?             @relation("ConsultationPaidBy")
   /// Sent as `Idempotency-Key`, so a network retry never charges twice.
-  idempotencyKey String                    @unique
-  /// SasPay's transaction id; for a hosted page, known once it is paid.
-  transactionId  String?                   @unique
-  /// SasPay's hosted page session, for `CHECKOUT`.
-  checkoutId     String?                   @unique
-  /// The SasPay page to send the payer to, when there is one.
-  checkoutUrl    String?
+  idempotencyKey  String                    @unique
+  /// SasPay's transaction id.
+  transactionId   String?                   @unique
+  /// The SasPay page to send the payer to (card, Wave, Orange…), when there is one.
+  checkoutUrl     String?
   /// ISO country and network code (`mtn_cm`), and its name as SasPay gives it.
-  country        String
-  network        String?
-  networkName    String?
+  country         String
+  network         String?
+  networkName     String?
   /// The number charged (E.164), for a push.
-  phone          String?
+  phone           String?
   /// What was asked, in `currency` (FCFA, no decimals).
-  amount         Int
-  currency       String
-  /// From SasPay once paid: the fees on top, what left the payer, what reaches the practice.
-  fee            Decimal?                  @db.Decimal(12, 2)
-  charged        Decimal?                  @db.Decimal(12, 2)
-  netAmount      Decimal?                  @db.Decimal(12, 2)
-  status         ConsultationPaymentStatus @default(PENDING)
+  amount          Int
+  currency        String
+  /// From SasPay once paid: the fees on top, what left the payer, what reaches the practice…
+  fee             Decimal?                  @db.Decimal(12, 2)
+  charged         Decimal?                  @db.Decimal(12, 2)
+  netAmount       Decimal?                  @db.Decimal(12, 2)
+  /// …in this currency: SasPay converts (card is charged in USD), so it may not be `currency`.
+  settledCurrency String?
+  status          ConsultationPaymentStatus @default(PENDING)
   /// SasPay's error code when it refused at once (`no_route_available`, …).
-  failureCode    String?
+  failureCode     String?
   /// The last time SasPay was asked, so a page polling doesn't flood it.
-  checkedAt      DateTime?
-  settledAt      DateTime?
-  createdAt      DateTime                  @default(now())
-  updatedAt      DateTime                  @updatedAt
+  checkedAt       DateTime?
+  settledAt       DateTime?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
 
   @@index([consultationId, createdAt])
   @@index([status, createdAt])

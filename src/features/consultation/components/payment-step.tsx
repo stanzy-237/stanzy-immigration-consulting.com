@@ -21,7 +21,7 @@ import { useTRPC } from '@/trpc/client';
 /** How the payer chose to pay, kept to « Réessayer » or « Renvoyer la demande » the same way. */
 export type PayMethod =
   | { kind: 'network'; country: string; network: string; networkName: string; phone: string; otp?: string }
-  | { kind: 'checkout'; country: string };
+  | { kind: 'card'; country: string };
 
 /** The fee line beside the total: the network's name and its fee, or null when only SasPay's page knows it. */
 export type FeeLine = { label: string | null; amount: number | null };
@@ -140,7 +140,8 @@ function PaymentForm({
       if (network.otpRequired && !/^\d{4,8}$/.test(otp.trim())) return setError('otp');
       method = { kind: 'network', country, network: network.code, networkName: network.name, phone, ...(network.otpRequired ? { otp: otp.trim() } : {}) };
     } else {
-      method = { kind: 'checkout', country };
+      if (!data.card) return;
+      method = { kind: 'card', country };
       tab = window.open('', '_blank');
     }
     try {
@@ -188,10 +189,9 @@ function PaymentForm({
               onChange={(e) => onCountry(e.target.value)}
               className="h-12 rounded-lg border border-fog bg-white px-3 text-body text-ink"
             >
-              {!data.countries.some((c) => c.code === country) ? <option value={country}>{countryName}</option> : null}
-              {data.countries.map((c) => (
+              {all.map((c) => (
                 <option key={c.code} value={c.code}>
-                  {all.find((x) => x.code === c.code)?.name ?? c.name}
+                  {c.name}
                 </option>
               ))}
             </select>
@@ -208,19 +208,25 @@ function PaymentForm({
               <p>{t('noMobileMoneyLead')}</p>
             </div>
           </div>
-          <div className="flex flex-col gap-3 rounded-2xl border-2 border-navy-deep p-5">
-            <div className="flex items-center gap-3">
-              <span aria-hidden={true} className="size-4.5 shrink-0 rounded-full border-5 border-navy-deep bg-white" />
-              <div className="flex flex-col gap-0.5">
-                <p className="text-body leading-5.5 font-bold text-ink">{t('card')}</p>
-                <p className="text-caption leading-4 text-slate">{t('cardHint')}</p>
+          {data.card ? (
+            <div className="flex flex-col gap-3 rounded-2xl border-2 border-navy-deep p-5">
+              <div className="flex items-center gap-3">
+                <span aria-hidden={true} className="size-4.5 shrink-0 rounded-full border-5 border-navy-deep bg-white" />
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-body leading-5.5 font-bold text-ink">{t('card')}</p>
+                  <p className="text-caption leading-4 text-slate">{t('cardHint', { currency: data.card.currency })}</p>
+                </div>
               </div>
+              <p className="flex items-center gap-2.5 rounded-lg bg-off-white px-3.5 py-3 text-body-sm leading-5 text-slate">
+                <ExternalLink aria-hidden={true} className="size-4 shrink-0" strokeWidth={2.2} />
+                {t('cardSafe')}
+              </p>
             </div>
-            <p className="flex items-center gap-2.5 rounded-lg bg-off-white px-3.5 py-3 text-body-sm leading-5 text-slate">
-              <ExternalLink aria-hidden={true} className="size-4 shrink-0" strokeWidth={2.2} />
-              {t('cardSafe')}
+          ) : (
+            <p role="alert" className="rounded-xl bg-blush px-4 py-3.5 text-body-sm leading-5 text-rouge">
+              {t('noWay')}
             </p>
-          </div>
+          )}
         </>
       ) : (
         <>
@@ -336,7 +342,7 @@ function PaymentForm({
         </p>
         <button
           type="submit"
-          disabled={pay.isPending}
+          disabled={pay.isPending || (!network && !data.card)}
           className={cn(
             'flex h-14 flex-1 items-center justify-center gap-2.5 rounded-full bg-rouge px-6 font-heading text-body font-bold text-white hover:bg-crimson disabled:opacity-60 lg:flex-none',
             PRESS,
@@ -357,7 +363,7 @@ function PaymentForm({
 export function sentMethod(method: PayMethod) {
   return method.kind === 'network'
     ? { kind: 'network' as const, country: method.country, network: method.network, phone: method.phone, ...(method.otp ? { otp: method.otp } : {}) }
-    : method;
+    : { kind: 'card' as const, country: method.country };
 }
 
 /** Step 3's shape while SasPay's networks load. */

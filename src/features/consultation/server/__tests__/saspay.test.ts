@@ -40,6 +40,7 @@ describe('createSasPay', () => {
         network: 'mtn_cm',
         description: 'Consultation',
         customer: { email: 'a@example.com', firstName: 'Aminata', lastName: 'Diallo', phone: '+237677123450' },
+        returnUrl: 'https://example.com/fr/services/consultation/reserver/paiement/p_1',
         metadata: { consultationId: 'con_1' },
       },
       'key-1',
@@ -49,7 +50,12 @@ describe('createSasPay', () => {
     const [url, init] = fetcher.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe('https://sandbox-api.saspay.me/api/v1/payments/softpay/');
     expect(init.headers).toMatchObject({ Authorization: 'Bearer sk_test_key', 'Idempotency-Key': 'key-1' });
-    expect(JSON.parse(init.body as string)).toMatchObject({ amount: '15000.00', fee_charge_mode: 'ADD_ON', customer: { first_name: 'Aminata' } });
+    expect(JSON.parse(init.body as string)).toMatchObject({
+      amount: '15000.00',
+      fee_charge_mode: 'ADD_ON',
+      return_url: 'https://example.com/fr/services/consultation/reserver/paiement/p_1',
+      customer: { first_name: 'Aminata' },
+    });
   });
 
   it('turns a refusal into a SasPayError with its code', async () => {
@@ -66,7 +72,7 @@ describe('createSasPay', () => {
   it('reads verify’s amounts, and only pay-in networks from my-rates', async () => {
     const fetcher = vi.fn(async (url: string) =>
       url.endsWith('/verify/')
-        ? reply(200, { success: true, data: { status: 'SUCCESS', client_fee: '713.00', debited_amount: '15713.00', net_amount: '15000.00' } })
+        ? reply(200, { success: true, data: { status: 'SUCCESS', currency: 'XAF', client_fee: '713.00', debited_amount: '15713.00', net_amount: '15000.00' } })
         : reply(200, {
             success: true,
             data: [
@@ -83,7 +89,7 @@ describe('createSasPay', () => {
           }),
     );
     const client = createSasPay(config, fetcher as unknown as typeof fetch);
-    expect(await client.verify('tx_1')).toEqual({ status: 'SUCCESS', fee: '713.00', charged: '15713.00', netAmount: '15000.00' });
+    expect(await client.verify('tx_1')).toEqual({ status: 'SUCCESS', currency: 'XAF', fee: '713.00', charged: '15713.00', netAmount: '15000.00' });
     const networks = await client.networks();
     expect(networks).toHaveLength(1);
     expect(networks[0]).toMatchObject({ code: 'orange_ci', otpRequired: true, tiers: [{ percent: 3.9, maxAmount: null }] });

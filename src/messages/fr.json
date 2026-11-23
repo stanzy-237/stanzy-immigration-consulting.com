@@ -4819,7 +4819,7 @@
         "noMobileMoney": "Pas de Mobile Money pour ce pays : {country}",
         "noMobileMoneyLead": "Payez par carte bancaire sur la page sécurisée SasPay, ou avec un numéro Mobile Money d’un autre pays (« Payer depuis un autre pays »).",
         "card": "Carte bancaire",
-        "cardHint": "Visa, Mastercard · sur la page SasPay",
+        "cardHint": "Visa, Mastercard · débitée en {currency} au taux du jour, sur la page SasPay",
         "cardSafe": "Les données de carte sont saisies sur la page SasPay, jamais sur Stanzy.",
         "total": "Total à payer",
         "totalBeforeFees": "Total avant frais",
@@ -4833,7 +4833,8 @@
           "phone": "Ce numéro ne semble pas valide pour ce pays.",
           "otp": "Saisissez le code de paiement reçu sur votre téléphone.",
           "refused": "SasPay n’a pas pu lancer ce paiement : rien n’a été débité. Vérifiez le numéro, ou choisissez un autre moyen."
-        }
+        },
+        "noWay": "SasPay ne propose pas de moyen de paiement pour ce pays. Choisissez-en un autre avec « Payer depuis un autre pays »."
       },
       "summary": {
         "eyebrow": "Votre consultation",
@@ -4942,8 +4943,9 @@
         "fees": "Frais {network}",
         "feesCard": "Frais",
         "paid": "Payé",
-        "card": "Page de paiement SasPay",
-        "paidAt": "Payé le {date} à {time}"
+        "card": "Carte bancaire, sur la page SasPay",
+        "paidAt": "Payé le {date} à {time}",
+        "converted": "Débité en {currency} par SasPay, au taux du jour."
       },
       "returned": {
         "back": "Reprendre ma réservation"
@@ -4956,7 +4958,6 @@
         "body": "Votre paiement est bien reçu : votre Consultation vidéo avec Stanzy est réservée le {when}, pour {minutes} minutes.",
         "moved": "Le créneau que vous aviez choisi a été pris pendant que votre paiement arrivait : votre Consultation a été placée sur le créneau libre suivant, ci-dessus. S’il ne vous convient pas, choisissez-en un autre avec « Déplacer » dans Mon espace.",
         "receipt": "Payé : {amount} avec {network}.",
-        "receiptCard": "Payé : {amount} sur la page SasPay.",
         "room": "La réunion se passe dans Mon espace : le bouton « Rejoindre » s’active 15 minutes avant. Elle est enregistrée, et l’enregistrement vous reste ensuite.",
         "noRefund": "La Consultation n’est pas remboursable ; vous pouvez la déplacer depuis Mon espace.",
         "cta": "Ouvrir Mon espace"
@@ -4964,7 +4965,6 @@
       "failed": {
         "subject": "Votre paiement n’est pas passé",
         "body": "Votre paiement {network} pour la Consultation n’est pas passé : la demande a été refusée ou a expiré.",
-        "bodyCard": "Votre paiement sur la page SasPay pour la Consultation n’est pas passé.",
         "nothing": "Rien n’a été débité.",
         "held": "Votre créneau du {when} reste gardé jusqu’à {time} : vous pouvez réessayer d’ici là.",
         "released": "Votre créneau a été libéré ; vous pouvez en choisir un autre.",

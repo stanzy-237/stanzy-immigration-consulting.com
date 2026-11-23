@@ -2,10 +2,11 @@ import { randomUUID } from 'node:crypto';
 
 import type { ConsultationPayment } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
+import { isSupportedCountry } from 'libphonenumber-js/min';
 import { after } from 'next/server';
 
 import { consultationFailedEmail, consultationPaidEmail } from '@/features/consultation/lib/consultation-emails';
-import { HOLD_LIMIT_MINUTES, PAYING_MINUTES, PAYMENT_ERRORS, type PayInput } from '@/features/consultation/lib/payment';
+import { CARD_NETWORK, HOLD_LIMIT_MINUTES, PAYING_MINUTES, PAYMENT_ERRORS, type PayInput } from '@/features/consultation/lib/payment';
 import { feeFor } from '@/features/consultation/lib/payment-fees';
 import { freeSlots, MINUTE } from '@/features/consultation/lib/slots';
 import { BOOKING_LOCK, busyTimes, loadAvailability, overlapsBusy, type Db } from '@/features/consultation/server/booking-calendar';
@@ -42,23 +43,22 @@ export type PaymentOption = {
   name: string;
   otpRequired: boolean;
   otpInstructions: string;
-  /** SasPay's fee on the price, or null when it can only be known on SasPay's page. */
+  /** SasPay's fee on the price, or null when it can only be known on SasPay's side (another currency). */
   fee: number | null;
 };
 
 /**
- * Step 3's choices for `country`: its networks with their fee on the price,
- * and every country one can pay from (« Payer depuis un autre pays »). No
- * network: card on SasPay's page (`3b`). Never a hard-coded list.
+ * Step 3's choices for `country`: its Mobile Money networks with their fee
+ * on the price, and whether SasPay takes card (`3b`, offered where there is no
+ * Mobile Money). SasPay lists card and crypto in countries of their own
+ * (`XX`, `XY`): never shown as countries. Never a hard-coded list.
  */
 export async function paymentOptions(client: SasPay, country: string, price: number) {
   const networks = await allNetworks(client);
-  const countries = new Map<string, string>();
-  for (const n of networks) countries.set(n.country, n.countryName);
+  const card = networks.find((n) => n.code === CARD_NETWORK);
   return {
-    countries: [...countries].map(([code, name]) => ({ code, name })).sort((a, b) => a.name.localeCompare(b.name)),
     networks: networks
-      .filter((n) => n.country === country)
+      .filter((n) => n.country === country && n.code !== CARD_NETWORK && isSupportedCountry(n.country))
       .map(
         (n): PaymentOption => ({
           code: n.code,
@@ -68,6 +68,7 @@ export async function paymentOptions(client: SasPay, country: string, price: num
           fee: FCFA.has(n.currency) ? feeFor(price, n.tiers) : null,
         }),
       ),
+    card: card ? { name: card.name, currency: card.currency } : null,
   };
 }
 
@@ -91,79 +92,69 @@ const splitName = (name: string) => {
  * written first with its `Idempotency-Key`, so a network retry never charges
  * twice; a refusal SasPay gives at once is kept as FAILED. Paying keeps the
  * slot a little longer (never past HOLD_LIMIT_MINUTES after it was held).
- * The answer says where the payer goes: wait for their phone, or SasPay's page.
+ * The answer says where the payer goes: wait for their phone, or SasPay's
+ * page (card, Wave, Orange…), which brings them back to the payment's page.
  */
 export async function startPayment(prisma: Db, client: SasPay, booking: Booking, input: PayInput, price: number) {
   const now = new Date();
   const { method } = input;
-  let network: SasPayNetwork | undefined;
-  if (method.kind === 'network') {
-    network = (await allNetworks(client)).find((n) => n.country === method.country && n.code === method.network);
-    if (!network) throw new TRPCError({ code: 'BAD_REQUEST', message: PAYMENT_ERRORS.network });
-    if (network.otpRequired && !method.otp) throw new TRPCError({ code: 'BAD_REQUEST', message: PAYMENT_ERRORS.otp });
-  }
-  const currency = network && FCFA.has(network.currency) ? network.currency : 'XAF';
+  const networks = await allNetworks(client);
+  const network =
+    method.kind === 'card'
+      ? networks.find((n) => n.code === CARD_NETWORK)
+      : networks.find((n) => n.country === method.country && n.code === method.network);
+  if (!network) throw new TRPCError({ code: 'BAD_REQUEST', message: PAYMENT_ERRORS.network });
+  const otp = method.kind === 'network' ? method.otp : undefined;
+  if (network.otpRequired && !otp) throw new TRPCError({ code: 'BAD_REQUEST', message: PAYMENT_ERRORS.otp });
+  // The price is in FCFA; SasPay converts it for any other currency.
+  const currency = FCFA.has(network.currency) ? network.currency : 'XAF';
+  const phone = method.kind === 'network' ? method.phone : booking.phone;
   const id = randomUUID();
   const idempotencyKey = randomUUID();
-  const description = 'Consultation Stanzy Immigration';
-  const metadata = { consultationId: booking.id, paymentId: id };
 
   await prisma.consultationPayment.create({
     data: {
       id,
       consultationId: booking.id,
-      flow: method.kind === 'network' ? 'SOFTPAY' : 'CHECKOUT',
       idempotencyKey,
-      country: method.country,
-      network: network?.code ?? null,
-      networkName: network?.name ?? null,
-      phone: method.kind === 'network' ? method.phone : null,
+      country: network.country,
+      network: network.code,
+      networkName: network.name,
+      phone: method.kind === 'network' ? phone : null,
       amount: price,
       currency,
     },
   });
 
   try {
-    let started: { transactionId: string | null; checkoutId: string | null; checkoutUrl: string | null };
-    if (method.kind === 'network') {
-      const push = () =>
-        client.softpay(
-          {
-            amount: price,
-            currency,
-            country: method.country,
-            network: method.network,
-            description,
-            customer: { email: booking.account.email, ...splitName(booking.account.name), phone: method.phone },
-            otp: method.otp,
-            metadata,
-          },
-          idempotencyKey,
-        );
-      // A timeout proves nothing: ask again with the same key, SasPay answers the first call's result.
-      const result = await push().catch((error: unknown) => {
-        if (error instanceof SasPayError && error.status < 500) throw error;
-        return push();
-      });
-      started = { transactionId: result.id, checkoutId: null, checkoutUrl: result.checkoutUrl };
-    } else {
-      const session = await client.checkout({
-        amount: price,
-        currency,
-        country: method.country,
-        description,
-        customer: { email: booking.account.email, name: booking.account.name, phone: booking.phone },
-        returnUrl: `${siteUrl()}/${input.locale}/services/consultation/reserver/paiement/${id}`,
-        expiresAt: new Date(now.getTime() + HOLD_LIMIT_MINUTES * MINUTE),
-        metadata,
-      });
-      started = { transactionId: null, checkoutId: session.id, checkoutUrl: session.checkoutUrl };
-    }
+    const push = () =>
+      client.softpay(
+        {
+          amount: price,
+          currency,
+          country: network.country,
+          network: network.code,
+          description: 'Consultation Stanzy Immigration',
+          customer: { email: booking.account.email, ...splitName(booking.account.name), phone },
+          otp,
+          returnUrl: `${siteUrl()}/${input.locale}/services/consultation/reserver/paiement/${id}`,
+          metadata: { consultationId: booking.id, paymentId: id },
+        },
+        idempotencyKey,
+      );
+    // A timeout proves nothing: ask again with the same key, SasPay answers the first call's result.
+    const started = await push().catch((error: unknown) => {
+      if (error instanceof SasPayError && error.status < 500) throw error;
+      return push();
+    });
 
     const limit = new Date(booking.createdAt.getTime() + HOLD_LIMIT_MINUTES * MINUTE);
     const paying = new Date(Math.min(now.getTime() + PAYING_MINUTES * MINUTE, limit.getTime()));
     await prisma.$transaction([
-      prisma.consultationPayment.update({ where: { id }, data: { ...started, checkedAt: now } }),
+      prisma.consultationPayment.update({
+        where: { id },
+        data: { transactionId: started.id, checkoutUrl: started.checkoutUrl, checkedAt: now },
+      }),
       prisma.consultation.updateMany({
         where: { id: booking.id, status: 'HELD', heldUntil: { lt: paying } },
         data: { heldUntil: paying },
@@ -189,15 +180,9 @@ export async function refreshPayment(prisma: Db, client: SasPay, payment: Consul
   const now = new Date();
   if (!force && payment.checkedAt && now.getTime() - payment.checkedAt.getTime() < CHECK_EVERY_MS) return payment;
 
-  let transactionId = payment.transactionId;
+  const { transactionId } = payment;
+  if (!transactionId) return payment;
   try {
-    if (!transactionId && payment.checkoutId) {
-      transactionId = await client.checkoutTransaction(payment.checkoutId);
-      if (transactionId) await prisma.consultationPayment.update({ where: { id: payment.id }, data: { transactionId } });
-    }
-    if (!transactionId) {
-      return prisma.consultationPayment.update({ where: { id: payment.id }, data: { checkedAt: now } });
-    }
     const verdict = await client.verify(transactionId);
     await settlePayment(prisma, payment.id, verdict);
   } catch (error) {
@@ -267,6 +252,7 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
         fee: decimal(verdict.fee),
         charged: decimal(verdict.charged),
         netAmount: decimal(verdict.netAmount),
+        settledCurrency: verdict.currency,
         checkedAt: now,
         settledAt: now,
       },
@@ -322,7 +308,7 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
       locale: lang,
       startsAt: done.startsAt,
       durationMinutes: done.durationMinutes,
-      paid: verdict.charged ? Math.round(Number(verdict.charged)) : done.payment.amount,
+      paid: verdict.charged ? { amount: Number(verdict.charged), currency: verdict.currency ?? done.payment.currency } : { amount: done.payment.amount, currency: done.payment.currency },
       network: done.payment.networkName,
       moved: done.moved,
       url: `${siteUrl()}/${lang}${clientRoomPath(done.meetingId)}`,

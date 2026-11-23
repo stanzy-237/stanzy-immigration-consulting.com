@@ -4802,7 +4802,7 @@
         "noMobileMoney": "No Mobile Money for this country: {country}",
         "noMobileMoneyLead": "Pay by card on SasPay’s secure page, or with a Mobile Money number from another country (“Pay from another country”).",
         "card": "Bank card",
-        "cardHint": "Visa, Mastercard · on the SasPay page",
+        "cardHint": "Visa, Mastercard · charged in {currency} at the day’s rate, on the SasPay page",
         "cardSafe": "Card details are entered on SasPay’s page, never on Stanzy.",
         "total": "Total to pay",
         "totalBeforeFees": "Total before fees",
@@ -4816,7 +4816,8 @@
           "phone": "This number doesn’t look valid for this country.",
           "otp": "Enter the payment code you received on your phone.",
           "refused": "SasPay couldn’t start this payment: nothing was charged. Check the number, or choose another method."
-        }
+        },
+        "noWay": "SasPay offers no way to pay for this country. Pick another one with “Pay from another country”."
       },
       "summary": {
         "eyebrow": "Your consultation",
@@ -4925,8 +4926,9 @@
         "fees": "{network} fees",
         "feesCard": "Fees",
         "paid": "Paid",
-        "card": "SasPay payment page",
-        "paidAt": "Paid on {date} at {time}"
+        "card": "Bank card, on the SasPay page",
+        "paidAt": "Paid on {date} at {time}",
+        "converted": "Charged in {currency} by SasPay, at the day’s rate."
       },
       "returned": {
         "back": "Back to my booking"
@@ -4939,7 +4941,6 @@
         "body": "Your payment came through: your video Consultation with Stanzy is booked for {when}, for {minutes} minutes.",
         "moved": "The slot you chose was taken while your payment was on its way, so your Consultation was placed on the next free slot, above. If it doesn’t suit you, pick another with “Move” in My space.",
         "receipt": "Paid: {amount} with {network}.",
-        "receiptCard": "Paid: {amount} on the SasPay page.",
         "room": "The meeting takes place in My space: the “Join” button opens 15 minutes before. It is recorded, and the recording stays available to you afterwards.",
         "noRefund": "The Consultation can’t be refunded; you can move it from My space.",
         "cta": "Open My space"
@@ -4947,7 +4948,6 @@
       "failed": {
         "subject": "Your payment didn’t go through",
         "body": "Your {network} payment for the Consultation didn’t go through: the request was declined or expired.",
-        "bodyCard": "Your payment on the SasPay page for the Consultation didn’t go through.",
         "nothing": "Nothing was charged.",
         "held": "Your slot on {when} stays held until {time}: you can try again until then.",
         "released": "Your slot has been released; you can choose another one.",

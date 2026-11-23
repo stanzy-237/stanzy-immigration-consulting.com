@@ -7,6 +7,8 @@ import type { ReactNode } from 'react';
 
 import { NetworkMark } from '@/features/consultation/components/payment-step';
 import type { PaymentView } from '@/features/consultation/components/payment-progress';
+import { isFcfa, money } from '@/features/consultation/lib/money';
+import { CARD_NETWORK } from '@/features/consultation/lib/payment';
 import { fcfa, timeOf } from '@/features/consultation/lib/slot-format';
 import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
 import { clientRoomPath } from '@/features/meetings/lib/meeting-schema';
@@ -64,9 +66,11 @@ export function PaymentConfirmed({ payment }: { payment: PaymentView }): ReactNo
   const booked = payment.consultation!;
   const startsAt = new Date(booked.startsAt);
   const end = new Date(startsAt.getTime() + booked.durationMinutes * 60_000);
+  // What left the payer, in the currency SasPay charged it (card: USD at the day's rate).
+  const settled = payment.settledCurrency ?? payment.currency;
   const paid = payment.charged ?? payment.amount + (payment.fee ?? 0);
   const roomPath = booked.meetingId ? clientRoomPath(booked.meetingId) : '/mon-espace';
-  const settled = payment.settledAt ? new Date(payment.settledAt) : new Date();
+  const paidAt = payment.settledAt ? new Date(payment.settledAt) : new Date();
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-5 pt-10 pb-12 lg:flex-row lg:items-start lg:gap-10 lg:px-7 lg:pt-18 lg:pb-24">
@@ -170,21 +174,22 @@ export function PaymentConfirmed({ payment }: { payment: PaymentView }): ReactNo
           </div>
           {payment.fee ? (
             <div className="flex justify-between">
-              <dt className="text-slate">{payment.networkName ? t('fees', { network: payment.networkName }) : t('feesCard')}</dt>
-              <dd className="text-ink">+{fcfa(payment.fee, locale)}</dd>
+              <dt className="text-slate">{payment.network === CARD_NETWORK || !payment.networkName ? t('feesCard') : t('fees', { network: payment.networkName })}</dt>
+              <dd className="text-ink">+{money(payment.fee, settled, locale)}</dd>
             </div>
           ) : null}
           <div className="flex items-baseline justify-between border-t border-fog-light pt-4">
             <dt className="text-body font-bold text-ink">{t('paid')}</dt>
-            <dd className="font-heading text-h3 leading-8 font-extrabold text-ink">{fcfa(paid, locale)}</dd>
+            <dd className="font-heading text-h3 leading-8 font-extrabold text-ink">{money(paid, settled, locale)}</dd>
           </div>
+          {isFcfa(settled) ? null : <p className="text-caption leading-4 text-slate">{t('converted', { currency: settled })}</p>}
         </dl>
         <div className="flex items-center gap-3 rounded-xl bg-off-white p-3.5">
           <NetworkMark code={payment.network} name={payment.networkName} className="size-9" />
           <p className="flex flex-col gap-0.5 text-body-sm leading-5 text-ink">
-            <span>{payment.networkName ? [payment.networkName, payment.phone].filter(Boolean).join(' · ') : t('card')}</span>
+            <span>{payment.network === CARD_NETWORK ? t('card') : [payment.networkName, payment.phone].filter(Boolean).join(' · ')}</span>
             <span className="text-caption leading-4 text-slate">
-              {t('paidAt', { date: part(settled, locale, { day: 'numeric', month: 'short' }), time: timeOf(settled.toISOString(), locale) })}
+              {t('paidAt', { date: part(paidAt, locale, { day: 'numeric', month: 'short' }), time: timeOf(paidAt.toISOString(), locale) })}
             </span>
           </p>
         </div>

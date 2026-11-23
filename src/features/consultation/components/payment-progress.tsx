@@ -8,6 +8,8 @@ import type { ReactNode } from 'react';
 import { OnTheWayIllustration, RefusedIllustration, SecurePageIllustration, VerifyingIllustration } from '@/features/consultation/components/payment-illustrations';
 import { PhoneIllustration } from '@/features/consultation/components/step-illustrations';
 import { useHoldCountdown } from '@/features/consultation/hooks/use-hold-countdown';
+import { isFcfa } from '@/features/consultation/lib/money';
+import { CARD_NETWORK } from '@/features/consultation/lib/payment';
 import { fcfa, timeOf } from '@/features/consultation/lib/slot-format';
 import { PRESS } from '@/features/consultation/lib/styles';
 import { FOOTER_SOCIALS } from '@/features/landing/data/footer';
@@ -26,7 +28,9 @@ export function paymentScreen(payment: PaymentView, { returned = false, now = Da
   if (payment.status === 'FAILED') return 'failed';
   if (now - new Date(payment.createdAt).getTime() > SLOW_MS) return 'slow';
   if (returned) return 'verifying';
-  return payment.checkoutUrl ? 'page' : 'phone';
+  if (payment.checkoutUrl) return 'page';
+  // Card without a page to open (SasPay's sandbox settles it at once): nothing to do on a phone.
+  return payment.network === CARD_NETWORK ? 'verifying' : 'phone';
 }
 
 const WHATSAPP = FOOTER_SOCIALS.find((s) => s.key === 'whatsapp')?.href ?? null;
@@ -114,7 +118,8 @@ export function PaymentProgress({
   const locale = useLocale();
   const countdown = useHoldCountdown(heldUntil);
   const network = payment.networkName ?? 'SasPay';
-  const total = fcfa(payment.amount + (payment.fee ?? 0), locale);
+  // SasPay's fee is known once it answered, and only adds up when it is in FCFA too.
+  const total = fcfa(payment.amount + (payment.fee !== null && isFcfa(payment.settledCurrency) ? payment.fee : 0), locale);
   const startedAt = timeOf(new Date(payment.createdAt).toISOString(), locale);
   const held = heldUntil ? timeOf(heldUntil.toISOString(), locale) : null;
   const b = (chunks: ReactNode) => <b className="font-bold text-ink">{chunks}</b>;
@@ -134,7 +139,7 @@ export function PaymentProgress({
     page: {
       art: <SecurePageIllustration className="size-full" />,
       title: t('page.title'),
-      lead: t.rich(payment.networkName ? 'page.lead' : 'page.leadCard', { amount: total, network, b }),
+      lead: t.rich(payment.network === CARD_NETWORK ? 'page.leadCard' : 'page.lead', { amount: total, network, b }),
       rows: [
         { state: 'done', text: t('page.opened'), side: <span className="text-caption text-slate tabular-nums">{startedAt}</span> },
         { state: 'current', text: t('page.paying'), side: held ? pill('honey', t('page.held', { time: held })) : null },
@@ -157,7 +162,7 @@ export function PaymentProgress({
       art: <RefusedIllustration className="size-full" />,
       title: t('failed.title'),
       lead: held
-        ? t.rich(payment.networkName ? 'failed.lead' : 'failed.leadCard', { network, time: held, b })
+        ? t.rich(payment.network === CARD_NETWORK ? 'failed.leadCard' : 'failed.lead', { network, time: held, b })
         : t.rich('failed.leadReleased', { b }),
       rows: [
         { state: 'done', text: payment.checkoutUrl ? t('page.opened') : t('sent', { network }), side: <span className="text-caption text-slate tabular-nums">{startedAt}</span> },

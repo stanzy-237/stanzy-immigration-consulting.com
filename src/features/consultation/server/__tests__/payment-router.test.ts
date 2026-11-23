@@ -12,7 +12,7 @@ vi.mock('@/server/email/app-mailer', () => mail);
 
 /** Seam: SasPay itself, as the sandbox's magic numbers would answer. */
 const gateway = vi.hoisted(() => ({
-  verdict: { status: 'PENDING', fee: null, charged: null, netAmount: null } as SasPayVerdict,
+  verdict: { status: 'PENDING', currency: null, fee: null, charged: null, netAmount: null } as SasPayVerdict,
   client: null as unknown,
 }));
 vi.mock('@/features/consultation/server/saspay', async (original) => ({
@@ -33,11 +33,15 @@ const network = {
 
 function fakeSasPay() {
   return {
-    networks: vi.fn(async () => [network, { ...network, country: 'CI', currency: 'XOF', code: 'orange_ci', name: 'Orange Money', otpRequired: true }]),
-    softpay: vi.fn(async () => ({ id: 'tx_1', status: 'PENDING' as const, checkoutUrl: null })),
-    checkout: vi.fn(async () => ({ id: 'cs_1', checkoutUrl: 'https://sandbox-checkout.saspay.me/checkout/x' })),
+    networks: vi.fn(async () => [
+      network,
+      { ...network, country: 'CI', currency: 'XOF', code: 'orange_ci', name: 'Orange Money', otpRequired: true },
+      // SasPay lists card and crypto in countries of their own.
+      { ...network, country: 'XX', countryName: 'International', currency: 'USD', code: 'card', name: 'Carte bancaire' },
+      { ...network, country: 'XY', countryName: 'Crypto', currency: 'USD', code: 'crypto', name: 'Crypto / Stablecoin' },
+    ]),
+    softpay: vi.fn(async (): Promise<{ id: string; status: 'PENDING'; checkoutUrl: string | null }> => ({ id: 'tx_1', status: 'PENDING', checkoutUrl: null })),
     verify: vi.fn(async () => gateway.verdict),
-    checkoutTransaction: vi.fn(async () => null),
   };
 }
 
@@ -148,7 +152,7 @@ beforeEach(() => {
   forgetNetworks();
   client = fakeSasPay();
   gateway.client = client as unknown as SasPay;
-  gateway.verdict = { status: 'PENDING', fee: null, charged: null, netAmount: null };
+  gateway.verdict = { status: 'PENDING', currency: null, fee: null, charged: null, netAmount: null };
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(new Date('2026-11-23T07:05:00Z'));
   vi.spyOn(console, 'info').mockImplementation(() => {});
@@ -156,11 +160,21 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe('consultation.paymentOptions', () => {
-  it('lists the country’s networks with their fee on the price, and every country one can pay from', async () => {
+  it('lists the country’s Mobile Money networks with their fee on the price, and card apart', async () => {
     const { db } = fakeDatabase();
     const options = await callerFor(db).paymentOptions({ country: 'CM' });
-    expect(options).toMatchObject({ open: true, price: 15000, networks: [{ code: 'mtn_cm', fee: 713, otpRequired: false }] });
-    expect(options.countries.map((c) => c.code)).toEqual(['CM', 'CI']);
+    expect(options).toMatchObject({
+      open: true,
+      price: 15000,
+      networks: [{ code: 'mtn_cm', fee: 713, otpRequired: false }],
+      card: { name: 'Carte bancaire', currency: 'USD' },
+    });
+  });
+
+  it('never offers SasPay’s card or crypto « countries » as a country', async () => {
+    const { db } = fakeDatabase();
+    expect((await callerFor(db).paymentOptions({ country: 'XX' })).networks).toEqual([]);
+    expect((await callerFor(db).paymentOptions({ country: 'CA' })).networks).toEqual([]);
   });
 
   it('is closed when SasPay is not set up here', async () => {
@@ -202,13 +216,34 @@ describe('consultation.pay', () => {
     expect(payments[0]).toMatchObject({ status: 'FAILED', failureCode: 'no_route_available' });
   });
 
-  it('opens SasPay’s page for card, coming back to the payment’s own page', async () => {
-    const { db } = fakeDatabase();
-    const result = await callerFor(db).pay({ id: 'con_1', locale: 'en', method: { kind: 'checkout', country: 'CA' } });
-    expect(result.checkoutUrl).toBe('https://sandbox-checkout.saspay.me/checkout/x');
-    expect(client.checkout).toHaveBeenCalledWith(
-      expect.objectContaining({ returnUrl: expect.stringMatching(new RegExp(`/en/services/consultation/reserver/paiement/${result.paymentId}$`)) }),
+  it('pays by card on SasPay’s card network, coming back to the payment’s own page', async () => {
+    client.softpay.mockResolvedValueOnce({ id: 'tx_card', status: 'PENDING', checkoutUrl: 'https://sandbox-checkout.saspay.me/card/x' });
+    const { db, payments } = fakeDatabase();
+    const result = await callerFor(db).pay({ id: 'con_1', locale: 'en', method: { kind: 'card', country: 'CA' } });
+
+    expect(result.checkoutUrl).toBe('https://sandbox-checkout.saspay.me/card/x');
+    expect(client.softpay).toHaveBeenCalledWith(
+      expect.objectContaining({
+        country: 'XX',
+        network: 'card',
+        currency: 'XAF',
+        customer: expect.objectContaining({ phone: '+237677123450' }),
+        returnUrl: expect.stringMatching(new RegExp(`/en/services/consultation/reserver/paiement/${result.paymentId}$`)),
+      }),
+      expect.any(String),
     );
+    expect(payments[0]).toMatchObject({ network: 'card', phone: null, checkoutUrl: 'https://sandbox-checkout.saspay.me/card/x' });
+  });
+
+  it('keeps what a card really cost, in the currency SasPay charged it', async () => {
+    const { db, payments } = fakeDatabase();
+    const { paymentId } = await callerFor(db).pay({ id: 'con_1', locale: 'fr', method: { kind: 'card', country: 'CA' } });
+    gateway.verdict = { status: 'SUCCESS', currency: 'USD', fee: '0.35', charged: '2.02', netAmount: '1.67' };
+    const view = await callerFor(db).payment({ id: 'con_1', paymentId, force: true });
+
+    expect(view).toMatchObject({ status: 'SUCCESS', settledCurrency: 'USD', charged: 2.02, currency: 'XAF', amount: 15000 });
+    expect(payments[0]).toMatchObject({ settledCurrency: 'USD', charged: '2.02' });
+    expect(mail.appMailer.send).toHaveBeenCalledWith(expect.objectContaining({ text: expect.stringMatching(/2,02.*\$/) }));
   });
 
   it('refuses once the hold is over', async () => {
@@ -222,7 +257,7 @@ describe('consultation.payment, after paying', () => {
   async function paid(setup: Parameters<typeof fakeDatabase>[0] = {}) {
     const state = fakeDatabase(setup);
     const { paymentId } = await callerFor(state.db).pay({ id: 'con_1', locale: 'fr', method: mtn });
-    gateway.verdict = { status: 'SUCCESS', fee: '713.00', charged: '15713.00', netAmount: '15000.00' };
+    gateway.verdict = { status: 'SUCCESS', currency: 'XAF', fee: '713.00', charged: '15713.00', netAmount: '15000.00' };
     const view = await callerFor(state.db).payment({ id: 'con_1', paymentId, force: true });
     return { ...state, paymentId, view };
   }
@@ -259,7 +294,7 @@ describe('consultation.payment, after paying', () => {
   it('on FAILED tells them nothing was charged and the slot stays held, without delivering', async () => {
     const { db, consultations } = fakeDatabase();
     const { paymentId } = await callerFor(db).pay({ id: 'con_1', locale: 'fr', method: mtn });
-    gateway.verdict = { status: 'FAILED', fee: null, charged: null, netAmount: null };
+    gateway.verdict = { status: 'FAILED', currency: null, fee: null, charged: null, netAmount: null };
     const view = await callerFor(db).payment({ id: 'con_1', paymentId, force: true });
 
     expect(view).toMatchObject({ status: 'FAILED', consultation: null, heldUntil: consultations[0]!.heldUntil });

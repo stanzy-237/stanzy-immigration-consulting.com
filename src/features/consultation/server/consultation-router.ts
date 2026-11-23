@@ -217,12 +217,12 @@ export const consultationRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { price } = await loadAvailability(ctx.prisma);
       const client = saspay();
-      if (!client || price === null) return { open: false as const, price, countries: [], networks: [] };
+      if (!client || price === null) return { open: false as const, price, networks: [], card: null };
       try {
         return { open: true as const, price, ...(await paymentOptions(client, input.country.toUpperCase(), price)) };
       } catch (error) {
         console.error('[saspay] could not list networks', error instanceof Error ? error.message : error);
-        return { open: false as const, price, countries: [], networks: [] };
+        return { open: false as const, price, networks: [], card: null };
       }
     }),
 
@@ -281,13 +281,15 @@ async function paymentView(prisma: Db, payment: ConsultationPaymentRow) {
   return {
     id: payment.id,
     status: payment.status,
-    flow: payment.flow,
     network: payment.network,
     networkName: payment.networkName,
     phone: payment.phone,
     amount: payment.amount,
+    currency: payment.currency,
     charged: payment.charged === null ? null : Number(payment.charged),
     fee: payment.fee === null ? null : Number(payment.fee),
+    /** The currency of `fee` and `charged`, once paid (card: USD). */
+    settledCurrency: payment.settledCurrency,
     checkoutUrl: payment.checkoutUrl,
     createdAt: payment.createdAt,
     settledAt: payment.settledAt,

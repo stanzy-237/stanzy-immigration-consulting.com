@@ -34,6 +34,8 @@ export type SasPayNetwork = {
 /** What verify tells: the status and, once paid, the amounts to account with. */
 export type SasPayVerdict = {
   status: SasPayStatus;
+  /** The currency of the amounts below: SasPay converts (card is charged in USD). */
+  currency: string | null;
   fee: string | null;
   charged: string | null;
   netAmount: string | null;
@@ -145,6 +147,12 @@ export function createSasPay(config: SasPayConfig, fetchImpl: typeof fetch = fet
         description: string;
         customer: { email: string; firstName: string; lastName: string; phone: string };
         otp?: string;
+        /**
+         * Where SasPay's page sends the payer back. Not in the OpenAPI spec, but
+         * SasPay requires it for `card` (« Requis pour le réseau 'card' ») and
+         * accepts it on every network (checked on the sandbox, 2026-11-24).
+         */
+        returnUrl: string;
         metadata: Json;
       },
       idempotencyKey: string,
@@ -165,6 +173,7 @@ export function createSasPay(config: SasPayConfig, fetchImpl: typeof fetch = fet
             last_name: input.customer.lastName,
             phone: input.customer.phone,
           },
+          return_url: input.returnUrl,
           metadata: input.metadata,
           ...(input.otp ? { otp: input.otp } : {}),
         },
@@ -173,48 +182,16 @@ export function createSasPay(config: SasPayConfig, fetchImpl: typeof fetch = fet
       return { id: str(data.id), status: status(data.status), checkoutUrl: str(data.checkout_url) || null };
     },
 
-    /** SasPay's hosted page, where the payer chooses (card, another country). No idempotency there. */
-    async checkout(input: {
-      amount: number;
-      currency: string;
-      country: string;
-      description: string;
-      customer: { email: string; name: string; phone: string };
-      returnUrl: string;
-      expiresAt: Date;
-      metadata: Json;
-    }): Promise<{ id: string; checkoutUrl: string }> {
-      const data = (await call('POST', '/checkout-sessions/', {
-        amount: input.amount.toFixed(2),
-        currency: input.currency,
-        country: input.country,
-        description: input.description,
-        customer_email: input.customer.email,
-        customer_name: input.customer.name,
-        customer_phone: input.customer.phone,
-        return_url: input.returnUrl,
-        expires_at: input.expiresAt.toISOString(),
-        fee_charge_mode: 'ADD_ON',
-        metadata: input.metadata,
-      })) as Json;
-      return { id: str(data.id), checkoutUrl: str(data.checkout_url) };
-    },
-
     /** The real status, asked of the gateway each time (`GET /payments/{id}/verify/`). */
     async verify(transactionId: string): Promise<SasPayVerdict> {
       const data = (await call('GET', `/payments/${encodeURIComponent(transactionId)}/verify/`)) as Json;
       return {
         status: status(data.status),
+        currency: str(data.currency) || null,
         fee: str(data.client_fee) || null,
         charged: str(data.debited_amount) || null,
         netAmount: str(data.net_amount) || null,
       };
-    },
-
-    /** A hosted page's transaction, once the payer has paid on it. */
-    async checkoutTransaction(checkoutId: string): Promise<string | null> {
-      const data = (await call('GET', `/checkout-sessions/${encodeURIComponent(checkoutId)}/status/`)) as Json;
-      return str(data.transaction_id) || null;
     },
   };
 }

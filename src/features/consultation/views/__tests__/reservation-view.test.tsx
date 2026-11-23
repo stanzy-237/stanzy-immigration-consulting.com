@@ -135,7 +135,7 @@ describe('ReservationView, a held booking', () => {
     renderPage({
       'consultation.booking': () => held(),
       'consultation.prepare': prepare,
-      'consultation.paymentOptions': () => ({ open: false, price: 12_345, countries: [], networks: [] }),
+      'consultation.paymentOptions': () => ({ open: false, price: 12_345, networks: [], card: null }),
     });
 
     fireEvent.click(await screen.findByRole('button', { name: /Mon admissibilité/ }));
@@ -174,20 +174,21 @@ describe('ReservationView, no slot', () => {
 const OPTIONS = {
   open: true,
   price: 12_345,
-  countries: [{ code: 'CM', name: 'Cameroun' }],
   networks: [{ code: 'mtn_cm', name: 'MTN Mobile Money', otpRequired: false, otpInstructions: '', fee: 587 }],
+  card: { name: 'Carte bancaire', currency: 'USD' },
 };
 
 const paymentOf = (extra: Record<string, unknown> = {}) => ({
   id: '0b8f6a3e-4b5d-4c1e-9a2f-5d6e7f8a9b0c',
   status: 'PENDING',
-  flow: 'SOFTPAY',
   network: 'mtn_cm',
   networkName: 'MTN Mobile Money',
   phone: '+237677123456',
   amount: 12_345,
+  currency: 'XAF',
   charged: null,
   fee: null,
+  settledCurrency: null,
   checkoutUrl: null,
   createdAt: new Date(),
   settledAt: null,
@@ -240,6 +241,7 @@ describe('ReservationView, paying', () => {
           status: 'SUCCESS',
           fee: 587,
           charged: 12_932,
+          settledCurrency: 'XAF',
           settledAt: new Date(),
           consultation: { firstName: 'Aminata', startsAt: new Date(START), durationMinutes: 45, meetingId: 'meet_1' },
         }),
@@ -252,19 +254,66 @@ describe('ReservationView, paying', () => {
   it('where there is no Mobile Money, pays by card on SasPay’s page in a new tab', async () => {
     const tab = { opener: {}, location: { href: '' }, close: vi.fn() };
     const open = vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window);
-    const pay = vi.fn(() => ({ paymentId: paymentOf().id, checkoutUrl: 'https://sandbox-checkout.saspay.me/checkout/x' }));
+    const pay = vi.fn(() => ({ paymentId: paymentOf().id, checkoutUrl: 'https://sandbox-checkout.saspay.me/card/x' }));
     await toPayment({
       'consultation.paymentOptions': () => ({ ...OPTIONS, networks: [] }),
       'consultation.pay': pay,
-      'consultation.payment': () => paymentOf({ flow: 'CHECKOUT', network: null, networkName: null, phone: null, checkoutUrl: 'https://sandbox-checkout.saspay.me/checkout/x' }),
+      'consultation.payment': () => paymentOf({ network: 'card', networkName: 'Carte bancaire', phone: null, checkoutUrl: 'https://sandbox-checkout.saspay.me/card/x' }),
     });
 
     expect(await screen.findByText('Carte bancaire')).toBeInTheDocument();
+    expect(screen.getByText(/débitée en USD au taux du jour/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Payer par carte/ }));
-    await waitFor(() => expect(pay).toHaveBeenCalledWith(expect.objectContaining({ method: { kind: 'checkout', country: 'CM' } })));
+    await waitFor(() => expect(pay).toHaveBeenCalledWith(expect.objectContaining({ method: { kind: 'card', country: 'CM' } })));
     expect(open).toHaveBeenCalled();
-    await waitFor(() => expect(tab.location.href).toBe('https://sandbox-checkout.saspay.me/checkout/x'));
+    await waitFor(() => expect(tab.location.href).toBe('https://sandbox-checkout.saspay.me/card/x'));
     expect(await screen.findByRole('heading', { name: 'Finissez sur la page SasPay' })).toBeInTheDocument();
     open.mockRestore();
+  });
+
+  it('lets them pay from any country, and says so when SasPay has nothing there', async () => {
+    await toPayment({ 'consultation.paymentOptions': ({ country }: { country: string }) => (country === 'CM' ? OPTIONS : { ...OPTIONS, networks: [], card: null }) });
+    fireEvent.click(await screen.findByRole('button', { name: 'Payer depuis un autre pays' }));
+    // Every country, not only those with Mobile Money (and never SasPay's « XX »).
+    const select = screen.getByRole('combobox', { name: 'Pays du moyen de paiement' });
+    expect(within(select).getByRole('option', { name: 'Canada' })).toBeInTheDocument();
+    fireEvent.change(select, { target: { value: 'CA' } });
+    expect(await screen.findByText(/SasPay ne propose pas de moyen de paiement pour ce pays/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Payer par carte/ })).toBeDisabled();
+  });
+
+  it('asks Orange Money CI’s code, with SasPay’s own instructions, before paying', async () => {
+    const pay = vi.fn();
+    await toPayment({
+      'consultation.paymentOptions': () => ({
+        ...OPTIONS,
+        networks: [{ code: 'orange_ci', name: 'Orange Money', otpRequired: true, otpInstructions: 'Composez #144*82# puis l’option 2.', fee: 470 }],
+      }),
+      'consultation.pay': pay,
+    });
+    expect(await screen.findByText('Composez #144*82# puis l’option 2.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Payer 12.?815 FCFA/ }));
+    expect(await screen.findByText('Saisissez le code de paiement reçu sur votre téléphone.')).toBeInTheDocument();
+    expect(pay).not.toHaveBeenCalled();
+  });
+
+  it('shows a card’s receipt in the currency SasPay charged it', async () => {
+    renderPage({
+      'consultation.booking': () => held({ status: 'PAID', held: false, payment: { id: paymentOf().id, status: 'SUCCESS', createdAt: new Date() } }),
+      'consultation.payment': () =>
+        paymentOf({
+          status: 'SUCCESS',
+          network: 'card',
+          networkName: 'Carte bancaire',
+          phone: null,
+          fee: 0.35,
+          charged: 2.02,
+          settledCurrency: 'USD',
+          settledAt: new Date(),
+          consultation: { firstName: 'Aminata', startsAt: new Date(START), durationMinutes: 45, meetingId: 'meet_1' },
+        }),
+    });
+    expect(await screen.findByText(/2,02.*\$/)).toBeInTheDocument();
+    expect(screen.getByText('Débité en USD par SasPay, au taux du jour.')).toBeInTheDocument();
   });
 });

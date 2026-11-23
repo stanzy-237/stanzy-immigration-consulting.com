@@ -24,7 +24,7 @@ export const PAYMENT_ERRORS = {
   paid: 'ALREADY_PAID',
 } as const;
 
-/** The two ways to pay: a network SasPay pushes to (or opens a page for), or SasPay's own page (card, other countries). */
+/** The two ways to pay: a Mobile Money network SasPay pushes to (or opens a page for), or card on SasPay's card page. */
 const method = z.discriminatedUnion('kind', [
   z
     .object({
@@ -47,7 +47,8 @@ const method = z.discriminatedUnion('kind', [
       }
       return { ...value, phone };
     }),
-  z.object({ kind: z.literal('checkout'), country: z.string().refine(isSupportedCountry, 'country') }),
+  /** Card: SasPay's `card` network, charged in USD at the day's rate. `country`: where the payer is. */
+  z.object({ kind: z.literal('card'), country: z.string().refine(isSupportedCountry, 'country') }),
 ]);
 
 export const payInputSchema = bookingRefSchema.extend({
@@ -55,6 +56,9 @@ export const payInputSchema = bookingRefSchema.extend({
   method,
 });
 export type PayInput = z.output<typeof payInputSchema>;
+
+/** SasPay's card, listed by `GET /pricing/my-rates/` as network `card` in a country of its own (`XX`). */
+export const CARD_NETWORK = 'card';
 
 /** A payment as its page follows it: the booking it belongs to, and its own id. */
 export const paymentRefSchema = bookingRefSchema.extend({ paymentId: z.uuid() });

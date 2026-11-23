@@ -1,5 +1,6 @@
 import { createTranslator } from 'next-intl';
 
+import { money } from '@/features/consultation/lib/money';
 import { renderEmail } from '@/features/dossiers/lib/dossier-emails';
 import { meetingWhen } from '@/features/meetings/lib/meeting-emails';
 import { toLocale } from '@/i18n/routing';
@@ -8,9 +9,6 @@ import fr from '@/messages/fr.json';
 import type { EmailMessage } from '@/server/email/mailer';
 
 const MESSAGES = { fr, en } as const;
-
-const amount = (value: number, lang: 'fr' | 'en') =>
-  `${new Intl.NumberFormat(lang === 'fr' ? 'fr-FR' : 'en-CA', { maximumFractionDigits: 0 }).format(value)} FCFA`;
 
 /**
  * « Votre Consultation est confirmée » (board `3.2`): sent once SasPay said
@@ -24,7 +22,8 @@ export function consultationPaidEmail(opts: {
   locale: unknown;
   startsAt: Date;
   durationMinutes: number;
-  paid: number;
+  /** What left the payer, in the currency SasPay charged. */
+  paid: { amount: number; currency: string };
   network: string | null;
   moved: boolean;
   url: string;
@@ -36,7 +35,7 @@ export function consultationPaidEmail(opts: {
     t('greeting', { name: opts.name.split(' ')[0] ?? opts.name }),
     t('paid.body', { when, minutes: opts.durationMinutes }),
     ...(opts.moved ? [t('paid.moved')] : []),
-    opts.network ? t('paid.receipt', { amount: amount(opts.paid, lang), network: opts.network }) : t('paid.receiptCard', { amount: amount(opts.paid, lang) }),
+    t('paid.receipt', { amount: money(opts.paid.amount, opts.paid.currency, lang === 'fr' ? 'fr-FR' : 'en-CA'), network: opts.network ?? 'SasPay' }),
     t('paid.room'),
     t('paid.noRefund'),
   ];
@@ -65,7 +64,7 @@ export function consultationFailedEmail(opts: {
     : null;
   const lines = [
     t('greeting', { name: opts.name.split(' ')[0] ?? opts.name }),
-    opts.network ? t('failed.body', { network: opts.network }) : t('failed.bodyCard'),
+    t('failed.body', { network: opts.network ?? 'SasPay' }),
     t('failed.nothing'),
     until && opts.heldUntil! > new Date() ? t('failed.held', { time: until, when: meetingWhen(opts.startsAt, lang) }) : t('failed.released'),
   ];

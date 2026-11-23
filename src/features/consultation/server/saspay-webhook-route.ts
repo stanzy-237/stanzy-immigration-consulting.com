@@ -5,9 +5,6 @@ import { saspay, webhookIsValid } from '@/features/consultation/server/saspay';
 import { env } from '@/lib/env';
 import { prisma } from '@/server/db/client';
 
-/** Hosted pages only learn their transaction once paid: the ones still open are looked through. */
-const CHECKOUT_LOOKBACK_MS = 24 * 60 * 60 * 1000;
-
 /**
  * POST /api/consultation/saspay: SasPay's webhook (#15), signed with the
  * secret shown when it was created. Only `transaction.success` and
@@ -41,21 +38,8 @@ export async function POST(request: Request): Promise<Response> {
 
   after(async () => {
     try {
-      const known = await prisma.consultationPayment.findUnique({ where: { transactionId } });
-      const candidates = known
-        ? [known]
-        : await prisma.consultationPayment.findMany({
-            where: {
-              status: 'PENDING',
-              flow: 'CHECKOUT',
-              transactionId: null,
-              createdAt: { gt: new Date(Date.now() - CHECKOUT_LOOKBACK_MS) },
-            },
-          });
-      for (const payment of candidates) {
-        const checked = await refreshPayment(prisma, client, payment, true);
-        if (checked.transactionId === transactionId) break;
-      }
+      const payment = await prisma.consultationPayment.findUnique({ where: { transactionId } });
+      if (payment) await refreshPayment(prisma, client, payment, true);
     } catch (error) {
       console.error('[saspay] webhook could not be handled', transactionId, error);
     }
