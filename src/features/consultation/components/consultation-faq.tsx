@@ -5,12 +5,13 @@ import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
 import { Reveal } from '@/components/ui/reveal';
+import { PRESS } from '@/features/consultation/lib/styles';
 import { FOOTER_SOCIALS } from '@/features/landing/data/footer';
 import { cn } from '@/lib/utils';
 
 const QUESTIONS = ['app', 'refused', 'move', 'recording'] as const;
 
-const WHATSAPP = FOOTER_SOCIALS.find((social) => social.key === 'whatsapp')!.href;
+const WHATSAPP = FOOTER_SOCIALS.find((social) => social.key === 'whatsapp')?.href;
 
 /**
  * The Consultation's questions, in the home page's FAQ look. « Poser une
@@ -35,15 +36,20 @@ export function ConsultationFaq({ moveCutoffHours }: { moveCutoffHours: number }
             <span className="text-rouge">{t('titleAccent')}</span>
           </h2>
           <p className="mt-4 max-w-md text-body leading-relaxed text-white/70">{t('lead')}</p>
-          <a
-            href={WHATSAPP}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 font-heading text-body-sm font-semibold transition-transform duration-150 ease-out hover:bg-crimson active:scale-97 motion-reduce:active:scale-100"
-          >
-            {t('cta')}
-            <ArrowRight aria-hidden={true} className="size-4" strokeWidth={2.5} />
-          </a>
+          {WHATSAPP ? (
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noreferrer"
+              className={cn(
+                'mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 font-heading text-body-sm font-semibold hover:bg-crimson',
+                PRESS,
+              )}
+            >
+              {t('cta')}
+              <ArrowRight aria-hidden={true} className="size-4" strokeWidth={2.5} />
+            </a>
+          ) : null}
         </Reveal>
 
         <Reveal delay={0.06}>

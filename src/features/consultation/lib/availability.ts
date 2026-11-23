@@ -7,6 +7,9 @@ const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 /** `ConsultationSettings.weeklyHours`, read back from the database. */
 export const weeklyHoursSchema = z.array(z.object({ day: z.number().int().min(1).max(7), start: time, end: time }));
 
+/** The Disponibilités plus how late the Client may still move a Consultation. */
+export type ConsultationAvailability = Availability & { moveCutoffHours: number };
+
 const WEEKDAYS = [1, 2, 3, 4, 5];
 
 /**
@@ -14,7 +17,7 @@ const WEEKDAYS = [1, 2, 3, 4, 5];
  * weekdays 09:00–17:00 Douala, 45 minutes with a 15-minute pause, booked at
  * least a day ahead and up to 30 days out. No price: it is never in code.
  */
-export const DEFAULT_AVAILABILITY: Availability & { moveCutoffHours: number } = {
+export const DEFAULT_AVAILABILITY: ConsultationAvailability = {
   durationMinutes: 45,
   bufferMinutes: 15,
   minNoticeHours: 24,

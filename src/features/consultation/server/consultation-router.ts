@@ -1,8 +1,7 @@
-import { DEFAULT_AVAILABILITY, weeklyHoursSchema } from '@/features/consultation/lib/availability';
-import { freeSlots, type Availability, type SlotDay } from '@/features/consultation/lib/slots';
+import { DEFAULT_AVAILABILITY, weeklyHoursSchema, type ConsultationAvailability } from '@/features/consultation/lib/availability';
+import { freeSlots, MINUTE, type SlotDay } from '@/features/consultation/lib/slots';
 import { createTRPCRouter, publicProcedure } from '@/server/trpc/trpc';
 
-const MINUTE = 60 * 1000;
 const DAY = 24 * 60 * MINUTE;
 
 export type ConsultationSlots = {
@@ -20,7 +19,7 @@ export const consultationRouter = createTRPCRouter({
   slots: publicProcedure.query(async ({ ctx }): Promise<ConsultationSlots> => {
     const now = new Date();
     const settings = await ctx.prisma.consultationSettings.findUnique({ where: { id: 'default' } });
-    const availability: Availability & { moveCutoffHours: number } = settings
+    const availability: ConsultationAvailability = settings
       ? { ...settings, weeklyHours: weeklyHoursSchema.parse(settings.weeklyHours) }
       : DEFAULT_AVAILABILITY;
 

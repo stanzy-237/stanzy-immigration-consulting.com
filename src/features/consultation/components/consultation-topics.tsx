@@ -5,6 +5,7 @@ import { useState, type ReactNode } from 'react';
 
 import { Reveal } from '@/components/ui/reveal';
 import { TOPICS } from '@/features/consultation/data/topics';
+import { LABEL_CLASS, PRESS, SECTION_TITLE_CLASS } from '@/features/consultation/lib/styles';
 import { cn } from '@/lib/utils';
 
 /**
@@ -22,7 +23,7 @@ export function ConsultationTopics(): ReactNode {
     <section aria-labelledby="consultation-topics" className="bg-white px-5 py-14 md:px-7 lg:py-24">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-x-16 lg:gap-y-8">
         <Reveal className="flex flex-col gap-2.5 lg:col-start-1 lg:gap-4">
-          <h2 id="consultation-topics" className="font-heading text-h3 leading-8 font-extrabold tracking-tight text-ink lg:text-h2 lg:leading-11">
+          <h2 id="consultation-topics" className={SECTION_TITLE_CLASS}>
             {t('title')}
           </h2>
           <p className="text-body-sm leading-5 text-slate lg:text-body lg:leading-6">{t('lead')}</p>
@@ -44,7 +45,8 @@ export function ConsultationTopics(): ReactNode {
                   className={cn(
                     'relative flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2.5 text-left',
                     'lg:items-baseline lg:gap-6 lg:rounded-lg lg:px-5 lg:py-6.5',
-                    'transition-transform duration-150 ease-out active:scale-97 motion-reduce:active:scale-100 lg:active:scale-100',
+                    PRESS,
+                    'lg:active:scale-100',
                     selected
                       ? 'bg-navy-deep lg:bg-off-white'
                       : 'border border-fog-light lg:rounded-none lg:border-x-0 lg:border-t-0 lg:hover:bg-off-white',
@@ -89,7 +91,7 @@ export function ConsultationTopics(): ReactNode {
             className="flex h-66 flex-col justify-between overflow-hidden rounded-3xl bg-navy-deep p-6"
           >
             <div className="flex items-center justify-between">
-              <p className="font-label text-label leading-3.5 font-bold tracking-wide text-rose uppercase">
+              <p className={cn(LABEL_CLASS, 'text-rose')}>
                 {number(active)} · {t(`${topic.key}.preview`)}
               </p>
               <p className="font-label text-caption font-semibold text-fog">

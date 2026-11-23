@@ -4489,7 +4489,7 @@
         "earlier": "Jours précédents",
         "later": "Jours suivants",
         "book": "Réserver {weekday} {day} à {time}",
-        "hold": "Créneau gardé 15 min pendant le paiement · MTN ou Orange Money",
+        "hold": "Créneau gardé 15 min pendant le paiement · Mobile Money ou carte",
         "none": "Aucun créneau libre pour le moment. De nouvelles dates s’ouvrent chaque semaine : revenez bientôt.",
         "loading": "Recherche des créneaux libres"
       },
@@ -4498,7 +4498,7 @@
         "before": {
           "eyebrow": "Avant",
           "title": "Vous réservez et payez",
-          "body": "Un créneau, MTN ou Orange Money. Vous recevez la Reconnaissance et un rappel la veille."
+          "body": "Un créneau, Mobile Money ou carte. Vous recevez la Reconnaissance et un rappel la veille."
         },
         "during": {
           "eyebrow": "Pendant",

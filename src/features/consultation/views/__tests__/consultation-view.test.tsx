@@ -90,3 +90,20 @@ describe('ConsultationView, choosing a slot', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 });
+
+describe('ConsultationView, the Consultation as the consultant set it', () => {
+  it('writes the length and how late it can be moved from the Disponibilités, not the defaults', () => {
+    renderPage({ ...SLOTS, durationMinutes: 60, moveCutoffHours: 48 });
+    expect(screen.getByText(/^60 minutes en vidéo avec Stanzy/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '60 min avec Stanzy' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Puis-je déplacer mon rendez-vous/ }));
+    expect(screen.getByText(/jusqu’à 48 h avant le début/)).toBeInTheDocument();
+  });
+
+  it('shows the page’s shape while the slots load', () => {
+    const { wrap } = createTestTRPC({ 'consultation.slots': () => new Promise(() => {}) });
+    render(withIntl(wrap(<ConsultationView />)));
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Chargement/)).not.toBeInTheDocument();
+  });
+});

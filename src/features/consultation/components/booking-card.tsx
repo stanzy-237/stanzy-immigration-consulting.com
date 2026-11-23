@@ -8,12 +8,11 @@ import { useId, useState, type ReactNode } from 'react';
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { bookingHref, dayLabels, fcfa, timeOf } from '@/features/consultation/lib/slot-format';
+import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
-
-const press = 'transition-transform duration-150 ease-out active:scale-97 motion-reduce:active:scale-100';
 
 /**
  * « Choisissez votre créneau »: the free days and times (heure de Douala),
@@ -49,7 +48,9 @@ function BookingPanel(): ReactNode {
   const firstOpen = Math.max(0, days.findIndex((d) => d.starts.length > 0));
   const [dayIndex, setDayIndex] = useState(firstOpen);
   const [start, setStart] = useState<string | undefined>(days[firstOpen]?.starts[0]);
-  const [pageStart, setPageStart] = useState(Math.floor(firstOpen / pageSize) * pageSize);
+  // Until the visitor pages, show the page holding the chosen day (the page size settles after hydration).
+  const [paged, setPaged] = useState<number | null>(null);
+  const pageStart = paged ?? Math.floor(dayIndex / pageSize) * pageSize;
 
   const subtitle =
     price === null
@@ -72,7 +73,7 @@ function BookingPanel(): ReactNode {
     setDayIndex(index);
     setStart(days[index]!.starts[0]);
   };
-  const step = (direction: -1 | 1) => setPageStart((page) => Math.max(0, page + direction * pageSize));
+  const step = (direction: -1 | 1) => setPaged(Math.max(0, pageStart + direction * pageSize));
 
   return (
     <>
@@ -84,7 +85,7 @@ function BookingPanel(): ReactNode {
             type="button"
             aria-label={t('earlier')}
             onClick={() => step(-1)}
-            className={cn('flex w-9 shrink-0 items-center justify-center rounded-lg bg-ice-blue text-ink sm:w-11', press)}
+            className={cn('flex w-9 shrink-0 items-center justify-center rounded-lg bg-ice-blue text-ink sm:w-11', PRESS)}
           >
             <ChevronLeft aria-hidden={true} className="size-4 sm:size-4.5" strokeWidth={2.5} />
           </button>
@@ -110,7 +111,7 @@ function BookingPanel(): ReactNode {
                     ? 'bg-navy-deep'
                     : full
                       ? 'border border-dashed border-fog'
-                      : cn('border border-fog-light hover:border-fog', press),
+                      : cn('border border-fog-light hover:border-fog', PRESS),
                 )}
               >
                 <span
@@ -138,7 +139,7 @@ function BookingPanel(): ReactNode {
             type="button"
             aria-label={t('later')}
             onClick={() => step(1)}
-            className={cn('flex w-9 shrink-0 items-center justify-center rounded-lg bg-ice-blue text-ink sm:w-11', press)}
+            className={cn('flex w-9 shrink-0 items-center justify-center rounded-lg bg-ice-blue text-ink sm:w-11', PRESS)}
           >
             <ChevronRight aria-hidden={true} className="size-4 sm:size-4.5" strokeWidth={2.5} />
           </button>
@@ -146,7 +147,7 @@ function BookingPanel(): ReactNode {
       </div>
 
       <div className="flex flex-col gap-2 sm:gap-2.5">
-        <p className="font-label text-label leading-3.5 font-bold tracking-wide text-slate uppercase">{labels.long}</p>
+        <p className={cn(LABEL_CLASS, 'text-slate')}>{labels.long}</p>
         <div role="radiogroup" aria-label={t('times')} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {day.starts.map((iso) => {
             const selected = iso === start;
@@ -159,7 +160,7 @@ function BookingPanel(): ReactNode {
                 onClick={() => setStart(iso)}
                 className={cn(
                   'rounded-full border py-3 text-body-sm leading-5',
-                  press,
+                  PRESS,
                   selected
                     ? 'border-rouge bg-blush font-bold text-rouge ring-1 ring-rouge ring-inset'
                     : 'border-fog font-semibold text-ink hover:border-slate-mute',
@@ -178,7 +179,7 @@ function BookingPanel(): ReactNode {
             href={bookingHref(start)}
             className={cn(
               'flex h-13 items-center justify-center gap-2.5 rounded-full bg-rouge font-heading text-body font-bold text-white hover:bg-crimson',
-              press,
+              PRESS,
             )}
           >
             {t('book', { weekday: labels.weekday, day: labels.date, time: timeOf(start, locale) })}
@@ -195,7 +196,7 @@ function BookingPanel(): ReactNode {
 function BookingPanelSkeleton(): ReactNode {
   const t = useTranslations('Consultation.page.booking');
   return (
-    <div role="status" className="flex flex-col gap-4.5 sm:gap-5">
+    <div role="status" className="flex animate-skeleton-in flex-col gap-4.5 sm:gap-5">
       <span className="sr-only">{t('loading')}</span>
       <Skeleton aria-hidden={true} className="-mt-3 h-4 w-56" />
       <div aria-hidden={true} className="flex gap-1.5 sm:gap-2">

@@ -1,6 +1,6 @@
 import { addDays, doualaDay } from '@/features/notifications/lib/douala-days';
 
-const MINUTE = 60 * 1000;
+export const MINUTE = 60 * 1000;
 /** Douala is UTC+1 all year (no summer time). */
 const DOUALA_OFFSET_MS = 60 * MINUTE;
 

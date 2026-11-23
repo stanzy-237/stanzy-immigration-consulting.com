@@ -4472,7 +4472,7 @@
         "earlier": "Earlier days",
         "later": "Later days",
         "book": "Book {weekday} {day} at {time}",
-        "hold": "Time held 15 min while you pay · MTN or Orange Money",
+        "hold": "Time held 15 min while you pay · Mobile Money or card",
         "none": "No free time right now. New dates open every week: come back soon.",
         "loading": "Looking for free times"
       },
@@ -4481,7 +4481,7 @@
         "before": {
           "eyebrow": "Before",
           "title": "You book and pay",
-          "body": "A time, MTN or Orange Money. You get the payment receipt and a reminder the day before."
+          "body": "A time, Mobile Money or card. You get the payment receipt and a reminder the day before."
         },
         "during": {
           "eyebrow": "During",

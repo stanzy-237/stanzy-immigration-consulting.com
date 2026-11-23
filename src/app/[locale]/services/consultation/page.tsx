@@ -16,10 +16,10 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Home.ServicesGrid.Items' });
-  const page = await getTranslations({ locale, namespace: 'Consultation.page' });
+  const copy = await getTranslations({ locale, namespace: 'Consultation.page' });
   return {
     title: t('consultationName'),
-    description: page('metaDescription', { minutes: DEFAULT_AVAILABILITY.durationMinutes }),
+    description: copy('metaDescription', { minutes: DEFAULT_AVAILABILITY.durationMinutes }),
   };
 }
 
