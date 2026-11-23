@@ -24,7 +24,7 @@ Recordings stay the consultant's, with one exception: a **Consultation's** Enreg
 
 | Part | Artboards (Paper, page « Stanzy · Produit ») |
 |---|---|
-| Public page | `Consultation · Page · Desktop`, `· Mobile` |
+| Public page | `Consultation · Page v2 · Desktop`, `· Mobile`, its motion on `Consultation · Page v2 · Motion` (v1 `Consultation · Page` is superseded) |
 | Booking | `Réservation v2 · 1 Vos coordonnées`, `2 Préparer l'échange`, `3 Paiement`, `3b Hors Mobile Money (carte)`, `3c Code de paiement (Orange CI)`, `4 Créneau libéré` (Desktop) · Mobile: `1 Qui êtes-vous`, `2 Pour bien préparer`, `3 Vérifier et payer`, `3a Feuille code promo` (+ `Places épuisées`, `Offre terminée`, `Déjà utilisé`), `3b Feuille paiement (carte)`, `3c Feuille code Orange CI`, `3d Dernière place partie`, `4 Créneau libéré` |
 | Payment | `Paiement v2 · 1 Validez sur le téléphone`, `2 Page SasPay`, `3 Vérification`, `4 Refusé`, `5 Toujours en attente`, `6 Confirmée` (Desktop + Mobile) |
 | Client space | `Mon espace v2 · 1 Avant`, `2 Salle d'attente`, `3 Après · Récap`, `4 Déplacer le créneau`, `5 Mes consultations`, `6 Aucune consultation` (Desktop + Mobile) |
