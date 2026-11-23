@@ -4705,6 +4705,126 @@
         "change": "Change",
         "book": "Book"
       }
+    },
+    "reservation": {
+      "metaTitle": "Book a Consultation",
+      "back": "Consultation",
+      "title": "Complete your booking",
+      "stepOf": "Step {step} of 3",
+      "edit": "Edit",
+      "hold": {
+        "timer": "<b>{time}</b> · slot held for you while you pay",
+        "timerShort": "Held <b>{time}</b>",
+        "released": "<b>00:00</b> · the {time} slot was released"
+      },
+      "contact": {
+        "title": "Your details",
+        "mobileTitle": "Who are you?",
+        "mobileLead": "So we can send you the Meeting link and your reminders.",
+        "haveAccount": "Already have an account?",
+        "signIn": "Sign in",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "fullName": "Full name",
+        "country": "Country of residence",
+        "countryMobile": "Country you live in",
+        "countryHint": "Open to every country: Mobile Money in 22 African countries, bank card everywhere else. The dialling code and time adapt too.",
+        "email": "Email",
+        "emailHint": "Your confirmation and the Meeting link arrive here.",
+        "emailPlaceholder": "you@example.com",
+        "phone": "WhatsApp number",
+        "reminders": "Get reminders on WhatsApp (the day before and 15 min before)",
+        "remindersMobile": "WhatsApp reminders",
+        "remindersMobileHint": "The day before and 15 min before",
+        "accountNote": "An account is created for you: My space keeps the Meeting and the recording.",
+        "submit": "Continue",
+        "saving": "One moment…",
+        "summary": "{name} · {country} · {email} · {phone}",
+        "errors": {
+          "name": "Write your name.",
+          "email": "This email doesn’t look valid.",
+          "phone": "This number doesn’t look valid for this country.",
+          "accountExists": "An account already exists with this email. Sign in to book: your slot is waiting.",
+          "slotTaken": "This slot was just taken. Choose another one."
+        },
+        "chooseAnother": "Choose another slot"
+      },
+      "prepare": {
+        "title": "Prepare the call",
+        "mobileTitle": "Get ready",
+        "lead": "Stanzy reads your answers before the Meeting. Everything is optional.",
+        "topics": "What would you like to talk about?",
+        "topic": {
+          "eligibility": "My eligibility",
+          "points": "Gaining CRS points",
+          "documents": "My documents",
+          "next": "What comes next"
+        },
+        "crs": "Your CRS score",
+        "crsMobile": "CRS score",
+        "noScore": "No score yet?",
+        "calculator": "CRS calculator",
+        "calculatorMobile": "Work it out",
+        "selected": "Have you been selected already?",
+        "selectedMobile": "Selected already?",
+        "no": "No, not yet",
+        "noShort": "No",
+        "yes": "Yes, invitation received (ITA)",
+        "yesShort": "Yes, ITA",
+        "itaHint": "With an ITA, the consultation covers filing your application within 60 days.",
+        "situation": "Your situation in a few lines",
+        "addSituation": "Add a word about your situation",
+        "count": "{count} / {max}",
+        "submit": "Continue to payment",
+        "submitMobile": "Continue",
+        "skip": "Skip this step",
+        "summary": "{parts}",
+        "crsSummary": "CRS score {score}",
+        "itaSummaryNo": "not selected yet",
+        "itaSummaryYes": "ITA received",
+        "nothing": "Nothing specified"
+      },
+      "payment": {
+        "title": "Payment",
+        "soon": "Online payment (Mobile Money or card, through SasPay) is coming very soon. Your slot stays held until {time}."
+      },
+      "summary": {
+        "eyebrow": "Your consultation",
+        "title": "Video with Stanzy · {minutes} min",
+        "time": "{weekday} · {start} – {end}",
+        "zone": "Douala time",
+        "change": "Change",
+        "included": [
+          "Video Meeting in My space",
+          "Recording and transcript",
+          "Payment receipt by email"
+        ],
+        "price": "Consultation",
+        "total": "Total",
+        "fees": "+ fees depending on the payment method",
+        "noPrice": "Price shown before payment",
+        "secured": "Mobile Money or card depending on your country, secured by SasPay",
+        "chip": "{date} · {time} · Video with Stanzy"
+      },
+      "released": {
+        "title": "Your slot was released",
+        "lead": "Payment wasn’t made within 15 min. Nothing was charged, and your answers are kept.",
+        "next": "Next free slots",
+        "other": "Another date",
+        "keep": "Hold {day} at {time} and pay",
+        "none": "No other free slot for now."
+      },
+      "missing": {
+        "title": "Choose a slot first",
+        "lead": "The free slots are on the Consultation page.",
+        "cta": "See the slots"
+      },
+      "loading": "Getting your booking ready",
+      "toast": {
+        "held": "Slot held for 15 minutes",
+        "saved": "Answers saved",
+        "error": "That didn’t work. Try again."
+      }
     }
   }
 }

@@ -19,8 +19,8 @@ export function toE164(phone: string, country: string): string | null {
 /** Step 1, Vos coordonnées. Name and e-mail are the Compte's; a signed-in booker's come from it. */
 export const contactSchema = z
   .object({
-    firstName: z.string().trim().min(1).max(80),
-    lastName: z.string().trim().min(1).max(80),
+    /** Full name: desktop asks Prénom and Nom and joins them; mobile asks « Nom complet ». */
+    name: z.string().trim().min(2).max(160),
     email: z.string().trim().toLowerCase().email().max(254),
     country: z.string().refine(isSupportedCountry, 'country'),
     phone: z.string().trim().min(4).max(30),

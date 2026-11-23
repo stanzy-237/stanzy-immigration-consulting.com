@@ -4722,6 +4722,126 @@
         "change": "Changer",
         "book": "Réserver"
       }
+    },
+    "reservation": {
+      "metaTitle": "Réserver une Consultation",
+      "back": "Consultation",
+      "title": "Finalisez votre réservation",
+      "stepOf": "Étape {step} sur 3",
+      "edit": "Modifier",
+      "hold": {
+        "timer": "<b>{time}</b> · créneau gardé pour vous le temps de payer",
+        "timerShort": "Gardé <b>{time}</b>",
+        "released": "<b>00:00</b> · le créneau de {time} a été libéré"
+      },
+      "contact": {
+        "title": "Vos coordonnées",
+        "mobileTitle": "Qui êtes-vous ?",
+        "mobileLead": "Pour vous envoyer le lien de la Réunion et vos rappels.",
+        "haveAccount": "Déjà un compte ?",
+        "signIn": "Se connecter",
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "fullName": "Nom complet",
+        "country": "Pays de résidence",
+        "countryMobile": "Pays où vous vivez",
+        "countryHint": "Ouvert à tous les pays : Mobile Money dans 22 pays d’Afrique, carte bancaire partout ailleurs. L’indicatif et l’heure s’adaptent aussi.",
+        "email": "E-mail",
+        "emailHint": "La confirmation et le lien de la Réunion arrivent ici.",
+        "emailPlaceholder": "vous@exemple.com",
+        "phone": "Numéro WhatsApp",
+        "reminders": "Recevoir les rappels sur WhatsApp (la veille et 15 min avant)",
+        "remindersMobile": "Rappels sur WhatsApp",
+        "remindersMobileHint": "La veille et 15 min avant",
+        "accountNote": "Un Compte est créé pour vous : Mon espace garde la Réunion et l’enregistrement.",
+        "submit": "Continuer",
+        "saving": "Un instant…",
+        "summary": "{name} · {country} · {email} · {phone}",
+        "errors": {
+          "name": "Écrivez votre nom.",
+          "email": "Cet e-mail ne semble pas valide.",
+          "phone": "Ce numéro ne semble pas valide pour ce pays.",
+          "accountExists": "Un Compte existe déjà avec cet e-mail. Connectez-vous pour réserver : votre créneau vous attend.",
+          "slotTaken": "Ce créneau vient d’être pris. Choisissez-en un autre."
+        },
+        "chooseAnother": "Choisir un autre créneau"
+      },
+      "prepare": {
+        "title": "Préparer l’échange",
+        "mobileTitle": "Pour bien préparer",
+        "lead": "Stanzy lit vos réponses avant la Réunion. Tout est facultatif.",
+        "topics": "De quoi voulez-vous parler ?",
+        "topic": {
+          "eligibility": "Mon admissibilité",
+          "points": "Gagner des points CRS",
+          "documents": "Mes documents",
+          "next": "La suite"
+        },
+        "crs": "Votre score CRS",
+        "crsMobile": "Score CRS",
+        "noScore": "Pas de score ?",
+        "calculator": "Calculateur CRS",
+        "calculatorMobile": "Calculez-le",
+        "selected": "Avez-vous déjà été sélectionné ?",
+        "selectedMobile": "Déjà sélectionné ?",
+        "no": "Non, pas encore",
+        "noShort": "Non",
+        "yes": "Oui, invitation reçue (ITA)",
+        "yesShort": "Oui, ITA",
+        "itaHint": "Avec une ITA, la consultation porte sur le dépôt du dossier dans les 60 jours.",
+        "situation": "Votre situation en quelques lignes",
+        "addSituation": "Ajouter un mot sur votre situation",
+        "count": "{count} / {max}",
+        "submit": "Continuer vers le paiement",
+        "submitMobile": "Continuer",
+        "skip": "Passer cette étape",
+        "summary": "{parts}",
+        "crsSummary": "Score CRS {score}",
+        "itaSummaryNo": "pas encore sélectionné",
+        "itaSummaryYes": "ITA reçue",
+        "nothing": "Rien de précisé"
+      },
+      "payment": {
+        "title": "Paiement",
+        "soon": "Le paiement en ligne (Mobile Money ou carte, via SasPay) arrive très bientôt. Votre créneau reste gardé jusqu’à {time}."
+      },
+      "summary": {
+        "eyebrow": "Votre consultation",
+        "title": "Vidéo avec Stanzy · {minutes} min",
+        "time": "{weekday} · {start} – {end}",
+        "zone": "Heure de Douala",
+        "change": "Changer",
+        "included": [
+          "Réunion vidéo dans Mon espace",
+          "Enregistrement et transcription",
+          "Reconnaissance de paiement par e-mail"
+        ],
+        "price": "Consultation",
+        "total": "Total",
+        "fees": "+ frais selon le moyen de paiement",
+        "noPrice": "Prix communiqué avant le paiement",
+        "secured": "Mobile Money ou carte selon votre pays, sécurisé par SasPay",
+        "chip": "{date} · {time} · Vidéo avec Stanzy"
+      },
+      "released": {
+        "title": "Votre créneau a été libéré",
+        "lead": "Le paiement n’a pas été fait dans les 15 min. Rien n’a été débité, et vos réponses sont gardées.",
+        "next": "Prochains créneaux libres",
+        "other": "Autre date",
+        "keep": "Garder {day} à {time} et payer",
+        "none": "Aucun autre créneau libre pour le moment."
+      },
+      "missing": {
+        "title": "Choisissez d’abord un créneau",
+        "lead": "Les créneaux libres sont sur la page Consultation.",
+        "cta": "Voir les créneaux"
+      },
+      "loading": "Préparation de votre réservation",
+      "toast": {
+        "held": "Créneau gardé 15 minutes",
+        "saved": "Réponses enregistrées",
+        "error": "Ça n’a pas marché. Réessayez."
+      }
     }
   }
 }

@@ -72,8 +72,7 @@ const callerFor = (db: TRPCContext['prisma'], session: CurrentSession | null = n
 const at = (day: string, time: string) => new Date(`${day}T${time}:00+01:00`).toISOString();
 
 const contact = {
-  firstName: 'Aminata',
-  lastName: 'Diallo',
+  name: 'Aminata Diallo',
   email: 'Aminata@Example.com',
   country: 'CM',
   phone: '6 77 12 34 56',
@@ -190,15 +189,16 @@ describe('consultation.booking and prepare', () => {
 
   it('changes the country and number while held; the name and e-mail stay the Compte’s', async () => {
     const { db, rows, id, token } = await booked();
-    await callerFor(db).contact({ id, token, contact: { ...contact, country: 'CI', phone: '07 07 07 07 07', firstName: 'X', email: 'x@example.com' } });
+    await callerFor(db).contact({ id, token, contact: { ...contact, country: 'CI', phone: '07 07 07 07 07', name: 'Someone Else', email: 'x@example.com' } });
     expect(rows[0]).toMatchObject({ country: 'CI', phone: '+2250707070707' });
   });
 });
 
 describe('consultation.book, « Changer »', () => {
-  it('lets a signed-out browser move its hold to another slot, for the Compte it created', async () => {
+  it('lets a signed-out browser move its hold to another slot, for the Compte it created, answers and all', async () => {
     const fake = fakeDatabase();
     const first = await callerFor(fake.db).book({ start: at('2026-11-24', '09:00'), contact, locale: 'fr' });
+    await callerFor(fake.db).prepare({ id: first.id, token: first.token!, answers: { topics: ['documents'], crsScore: 470, itaReceived: true, situation: 'Infirmière' } });
     vi.clearAllMocks();
 
     const second = await callerFor(fake.db).book({
@@ -211,6 +211,7 @@ describe('consultation.book, « Changer »', () => {
     expect(accounts.createBookingAccount).not.toHaveBeenCalled();
     expect(fake.rows.find((r) => r.id === second.id)).toMatchObject({ accountId: 'acc_new', status: 'HELD' });
     expect(second.token).toEqual(expect.any(String));
+    expect(fake.rows.find((r) => r.id === second.id)).toMatchObject({ topics: ['documents'], crsScore: 470, itaReceived: true, situation: 'Infirmière' });
     // The first slot is free again.
     expect((await callerFor(fake.db).slots()).days[0]!.starts).toContain(at('2026-11-24', '09:00'));
   });

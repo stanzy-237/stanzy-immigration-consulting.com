@@ -131,7 +131,7 @@ export const consultationRouter = createTRPCRouter({
         if (existing) throw new TRPCError({ code: 'CONFLICT', message: BOOKING_ERRORS.accountExists });
         accountId = (
           await createBookingAccount({
-            name: `${contact.firstName} ${contact.lastName}`,
+            name: contact.name,
             email: contact.email,
             locale: input.locale,
             next: '/services/consultation/reserver',
@@ -162,6 +162,13 @@ export const consultationRouter = createTRPCRouter({
             country: contact.country,
             phone: contact.phone,
             whatsappReminders: contact.whatsappReminders,
+            // « Créneau libéré », kept again: what they prepared comes along.
+            ...(previous && {
+              topics: previous.topics,
+              crsScore: previous.crsScore,
+              itaReceived: previous.itaReceived,
+              situation: previous.situation,
+            }),
           },
           select: { id: true, heldUntil: true },
         });
