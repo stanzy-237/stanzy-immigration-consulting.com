@@ -43,7 +43,7 @@ créneau choisi ──► GARDÉ (15 min) ──► paiement SasPay
                        │                 ├─ FAILED  ─► « Paiement non abouti » (retry while still GARDÉ)
                        │                 └─ PENDING ─► « Toujours en attente » (verify again; never deliver)
                        └─ 15 min passed, not paid ─► LIBÉRÉ (« Créneau libéré »)
-PAYÉE ─► DÉPLACÉE (new slot, same Réunion) · ANNULÉE (with a reason)
+PAYÉE ─► DÉPLACÉE (new slot, same Réunion; by the Client, or automatically when the consultant cancels)
 ```
 
 - **Slot hold.** Choosing a slot holds it for that person for 15 minutes (`Réservation v2` timer « créneau gardé jusqu'à HH:MM »). Held slots disappear for everyone else. After 15 minutes unpaid it is released and the booker sees `4 Créneau libéré`.
@@ -76,7 +76,8 @@ Managed in Tableau de bord → Facturation → **Codes promo** (new sidebar item
 - **2 Salle d'attente:** « Rejoindre » opens **15 minutes before** the start (same rule as `meeting-schema.ts`). Recording consent is asked before joining.
 - **3 Après · Récap:** only after the consultant publishes: video (streamed, **no download**), Notes de Stanzy with timestamps (a timestamp seeks the video), Transcription, « Vos prochaines étapes » checklist (the Client ticks them), documents cited, the Reconnaissance (downloadable PDF), and the Accompagnement call to action (« Envoyer ma demande » → Demande d'intérêt). The video stays visible as long as the Enregistrement is kept (2 years, glossary).
 - **4 Déplacer le créneau:** pick another free slot; the Réunion moves (meeting e-mail « Déplacée »). How long before the start moving closes is a Disponibilités setting.
-- **No refund.** A paid Consultation is never refunded, whoever cancels; the way out is « Déplacer ». Say so on the Reconnaissance and before paying.
+- **No refund.** A paid Consultation is never refunded; the way out is « Déplacer ». Say so on the Reconnaissance and before paying.
+- **When the consultant cancels**, the Consultation is not lost: it moves at once to the **next free slot**, the Client is told (e-mail « Déplacée » with the consultant's reason, bell, WhatsApp when built) and can still change it with « Déplacer ».
 - **5 Mes consultations / 6 Aucune consultation:** list and empty state with its own illustration.
 
 ## Consultant dashboard
@@ -104,7 +105,7 @@ Tabs « À venir », « Passées », « Paiements échoués » (count = unresolv
 
 One route, two states:
 
-- **1 Avant:** header (name, « Payée · réseau », date, « Déplacer », « Rejoindre » greyed with « S'ouvre à HH:MM » until 15 min before), « Ce qu'[prénom] a préparé » (booking answers, the situation as a quote), **Vos notes** (private, autosaved, stored as the Réunion's `notes`), Paiement (price, promo line, paid amount + frais, network, time, Reconnaissance), Son Compte (Lead badge, contact, « Ouvrir un dossier »), reminders sent (day before; 15 min before), « Annuler la consultation » (asks for a reason, warns there is no refund, suggests « Déplacer »).
+- **1 Avant:** header (name, « Payée · réseau », date, « Déplacer », « Rejoindre » greyed with « S'ouvre à HH:MM » until 15 min before), « Ce qu'[prénom] a préparé » (booking answers, the situation as a quote), **Vos notes** (private, autosaved, stored as the Réunion's `notes`), Paiement (price, promo line, paid amount + frais, network, time, Reconnaissance), Son Compte (Lead badge, contact, « Ouvrir un dossier »), reminders sent (day before; 15 min before), « Annuler ce créneau » (asks for a reason, shows the next free slot the Client will be moved to, then moves and notifies; no refund, no lost Consultation).
 - **2 Après:** header « Terminée · N min », the recording with markers, tabs « Notes pour [prénom] » (timestamped notes written for the Client) / Transcription / « Vos notes privées », « Ses prochaines étapes » (checklist written for the Client), « Dans son espace » (what she will see), « Ouvrir un dossier ».
 - **Publier dans son espace:** nothing reaches the Client before it. Publishing makes the video, transcription, notes for the Client and next steps visible in her Mon espace and sends « Votre enregistrement est prêt ». Private notes are never shown. The consultant can edit after publishing.
 
@@ -118,7 +119,8 @@ Mobile: same content; « Rejoindre » or « Publier » in the bottom bar; « Dé
 | Payment failed | Paiement non abouti (`3.2`) | to build |
 | Published | Enregistrement prêt (`3.2`) | to build |
 | Published, with steps | Prochaines étapes (`3.2`) | to build |
-| Day before / 15 min before / moved / cancelled | Réunion e-mails (`3.3`) | exist (`meetings/lib/meeting-emails.ts`) |
+| Day before / 15 min before / moved | Réunion e-mails (`3.3`) | exist (`meetings/lib/meeting-emails.ts`) |
+| Consultant cancels → auto-moved | « Déplacée » with the reason and a « Choisir un autre créneau » button | extend `moved` |
 
 WhatsApp twins of the Consultation messages are designed (`3.9`) and not built. E-mails are sent from the notifications subdomain via Resend (`src/server/email/mailer.ts`).
 
@@ -130,4 +132,5 @@ Loading → skeletons shaped like the content (ADR 0006); mutations end in a toa
 
 - **Recording:** shared only for Consultations, once published; watch only, no download; visible while the Enregistrement is kept. (2026-11-23)
 - **Moving:** allowed, up to a Disponibilités setting before the start. **Refunds:** never. (2026-11-23)
+- **Consultant cancels:** the Client is moved to the next free slot, notified, and can change it. (2026-11-23)
 - **Accounts:** booking step 1 creates or finds the Compte before the slot is held, so failed payments always link to a Compte. (2026-11-23)
