@@ -37,7 +37,7 @@ Product screens are designed in Paper before they are built. The file is **« St
 
 ## Consultation (mandatory)
 
-Read `docs/design/consultation.md` before any work on the paid Consultation: booking, its payment, promo codes, the Client's Mon espace for it, the dashboard's Consultations, Codes promo or Aperçu, or its e-mails. It lists the Paper artboards to build from and the rules they imply (slot hold, paid only on SasPay `SUCCESS`, promo places, publishing to the Client).
+Read `docs/design/consultation.md` before any work on the paid Consultation: booking, its payment, promo codes, the Client's Mon espace for it, the dashboard's Consultations, Codes promo or Aperçu, or its e-mails. It lists the Paper artboards to build from and the rules they imply (slot hold, paid only on SasPay `SUCCESS`, promo places, publishing to the Client, motion per interaction).
 
 ## Payments (SasPay)
 
