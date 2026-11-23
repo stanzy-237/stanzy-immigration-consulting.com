@@ -115,8 +115,8 @@ Mobile: same content; « Rejoindre » or « Publier » in the bottom bar; « Dé
 
 | When | E-mail (board) | Status |
 |---|---|---|
-| Paid | Confirmation + Reconnaissance (`3.2`) | to build |
-| Payment failed | Paiement non abouti (`3.2`) | to build |
+| Paid | Confirmation + Reconnaissance (`3.2`) | confirmation built (`lib/consultation-emails.ts`); Reconnaissance to build |
+| Payment failed | Paiement non abouti (`3.2`) | built (`lib/consultation-emails.ts`) |
 | Published | Enregistrement prêt (`3.2`) | to build |
 | Published, with steps | Prochaines étapes (`3.2`) | to build |
 | Day before / 15 min before / moved | Réunion e-mails (`3.3`) | exist (`meetings/lib/meeting-emails.ts`) |
@@ -138,3 +138,5 @@ Every animation on these screens, and the rules behind them, is in `docs/design/
 - **Moving:** allowed, up to a Disponibilités setting before the start. **Refunds:** never. (2026-11-23)
 - **Consultant cancels:** the Client is moved to the next free slot, notified, and can change it. (2026-11-23)
 - **Accounts:** booking step 1 creates or finds the Compte before the slot is held, so failed payments always link to a Compte. (2026-11-23)
+- **Paying keeps the slot a little longer:** « Payer » extends the hold to 10 minutes from then, never past 45 minutes after the slot was first held, so someone validating on their phone doesn't lose it. If SasPay still says `SUCCESS` after the slot went to someone else, the Consultation is delivered on the next free slot and the confirmation e-mail says so: a paid Consultation is never lost. (2026-11-24)
+- **Sandbox outside production:** the app calls `sandbox-api.saspay.me` everywhere but Vercel production, and refuses an `sk_live_` key there (`server/saspay.ts`). (2026-11-24)

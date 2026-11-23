@@ -1,16 +1,20 @@
 'use client';
 
-import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowLeft, ChevronLeft, ShieldCheck } from 'lucide-react';
 import { MotionConfig } from 'motion/react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/components/ui/toast';
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { ContactStep, SignInAside, type Contact } from '@/features/consultation/components/contact-step';
+import { PaymentConfirmed } from '@/features/consultation/components/payment-confirmed';
+import { PaymentProgress, paymentScreen } from '@/features/consultation/components/payment-progress';
+import { PaymentStep, sentMethod, type FeeLine, type PayMethod } from '@/features/consultation/components/payment-step';
 import { PrepareStep, useAnswersSummary, type Answers } from '@/features/consultation/components/prepare-step';
 import { ReleasedPanel } from '@/features/consultation/components/released-panel';
 import { ReservationStep } from '@/features/consultation/components/reservation-step';
@@ -18,7 +22,6 @@ import { BookingSummary, HoldTimer } from '@/features/consultation/components/re
 import { useBookingRef, type BookingRef } from '@/features/consultation/hooks/use-booking-ref';
 import { useHoldCountdown } from '@/features/consultation/hooks/use-hold-countdown';
 import { countries } from '@/features/consultation/lib/countries';
-import { timeOf } from '@/features/consultation/lib/slot-format';
 import { LABEL_CLASS } from '@/features/consultation/lib/styles';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -108,34 +111,50 @@ function Reservation(): ReactNode {
 
 type Held = RouterOutputs['consultation']['booking'];
 
-/** A held booking: step 1 done, then 2 Préparer l'échange and 3 Paiement; « libéré » once the 15 minutes pass. */
+/** A payment this page follows: its id and, when this tab started it, how (to try again the same way). */
+type Following = { paymentId: string; method: PayMethod | null };
+
+/**
+ * A held booking: step 1 done, then 2 Préparer l'échange and 3 Paiement;
+ * « libéré » once the hold runs out unpaid. Once « Payer » is pressed the
+ * page follows that payment until SasPay answers; paid, it becomes
+ * `6 Confirmée`. A reload finds the latest payment again.
+ */
 function HeldBooking({ booking, bookingRef, onRef }: { booking: Held; bookingRef: BookingRef; onRef: (ref: BookingRef) => void }): ReactNode {
   const t = useTranslations('Consultation.reservation');
   const locale = useLocale();
   const router = useRouter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const [step, setStep] = useState<Step>(2);
+  const latest = booking.payment;
+  const [following, setFollowing] = useState<Following | null>(() =>
+    latest && (latest.status !== 'FAILED' || booking.status === 'PAID') ? { paymentId: latest.id, method: null } : null,
+  );
+  const [step, setStep] = useState<Step>(following ? 3 : 2);
   const [editing, setEditing] = useState(false);
+  const [fee, setFee] = useState<FeeLine | null>(null);
+  const onFee = useCallback((line: FeeLine | null) => setFee(line), []);
   const startsAt = new Date(booking.startsAt);
   const heldUntil = booking.heldUntil ? new Date(booking.heldUntil) : null;
   const { over } = useHoldCountdown(heldUntil);
-  const released = !booking.held || over;
+  const released = booking.status !== 'PAID' && (!booking.held || over) && !following;
   const countryName = countries(locale).find((c) => c.code === booking.contact.country)?.name ?? booking.contact.country;
   const answers: Answers = booking.answers;
   const prepared = useAnswersSummary(answers);
   const contact: Contact = booking.contact;
   const contactLine = t('contact.summary', { name: contact.name, country: countryName, email: contact.email, phone: contact.phone });
+  const refresh = () => void queryClient.invalidateQueries({ queryKey: trpc.consultation.booking.queryKey(bookingRef) });
 
-  return (
+  const frame = (children: ReactNode) => (
     <Layout
       step={editing ? 1 : step}
       startsAt={startsAt}
       durationMinutes={booking.durationMinutes}
       price={booking.price}
+      fee={fee}
       heldUntil={heldUntil}
       released={released}
-      onBack={step === 3 && !editing ? () => setStep(2) : editing ? () => setEditing(false) : undefined}
+      onBack={step === 3 && !editing && !following ? () => setStep(2) : editing ? () => setEditing(false) : undefined}
     >
       {editing && !released ? (
         <ReservationStep number={1} title={t('contact.title')} state="open">
@@ -146,59 +165,182 @@ function HeldBooking({ booking, bookingRef, onRef }: { booking: Held; bookingRef
             initial={contact}
             onHeld={onRef}
             onSaved={() => {
-              void queryClient.invalidateQueries({ queryKey: trpc.consultation.booking.queryKey(bookingRef) });
+              refresh();
               setEditing(false);
             }}
           />
         </ReservationStep>
       ) : (
-        <ReservationStep number={1} title={t('contact.title')} state="done" summary={contactLine} onEdit={released ? undefined : () => setEditing(true)} />
+        <ReservationStep
+          number={1}
+          title={t('contact.title')}
+          state="done"
+          summary={contactLine}
+          onEdit={released || following ? undefined : () => setEditing(true)}
+        />
       )}
+      {children}
+    </Layout>
+  );
 
-      {released ? (
-        <ReleasedPanel
-          previous={bookingRef}
-          contact={contact}
-          onHeld={(next, start) => {
-            onRef(next);
-            router.replace({ pathname: '/services/consultation/reserver', query: { creneau: start } });
+  if (following) {
+    return (
+      <QueryBoundary fallback={frame(<ReservationStep number={3} title={t('payment.title')} state="open"><PaymentLoading /></ReservationStep>)}>
+        <PaymentFollow
+          bookingRef={bookingRef}
+          following={following}
+          heldUntil={heldUntil}
+          frame={(panel, title) =>
+            frame(
+              <>
+                <ReservationStep number={2} title={t('prepare.title')} state="done" summary={prepared} />
+                <ReservationStep number={3} title={title} state="open">
+                  {panel}
+                </ReservationStep>
+              </>,
+            )
+          }
+          onFollow={setFollowing}
+          onChangeMethod={() => {
+            setFollowing(null);
+            refresh();
           }}
         />
-      ) : (
-        <>
-          {step === 2 && !editing ? (
-            <ReservationStep number={2} title={t('prepare.title')} state="open">
-              <PrepareStep
-                booking={bookingRef}
-                initial={answers}
-                onSaved={() => {
-                  void queryClient.invalidateQueries({ queryKey: trpc.consultation.booking.queryKey(bookingRef) });
-                  setStep(3);
-                }}
-                onExpired={() => void queryClient.invalidateQueries({ queryKey: trpc.consultation.booking.queryKey(bookingRef) })}
-              />
-            </ReservationStep>
-          ) : (
-            <ReservationStep
-              number={2}
-              title={t('prepare.title')}
-              state={step > 2 ? 'done' : 'closed'}
-              summary={prepared}
-              onEdit={step > 2 && !editing ? () => setStep(2) : undefined}
+      </QueryBoundary>
+    );
+  }
+
+  return frame(
+    released ? (
+      <ReleasedPanel
+        previous={bookingRef}
+        contact={contact}
+        onHeld={(next, start) => {
+          onRef(next);
+          router.replace({ pathname: '/services/consultation/reserver', query: { creneau: start } });
+        }}
+      />
+    ) : (
+      <>
+        {step === 2 && !editing ? (
+          <ReservationStep number={2} title={t('prepare.title')} state="open">
+            <PrepareStep
+              booking={bookingRef}
+              initial={answers}
+              onSaved={() => {
+                refresh();
+                setStep(3);
+              }}
+              onExpired={refresh}
             />
-          )}
-          {step === 3 && !editing ? (
-            <ReservationStep number={3} title={t('payment.title')} state="open">
-              <p className="rounded-xl bg-ice-blue px-4 py-3.5 text-body-sm leading-5 text-ink lg:-mt-2">
-                {t('payment.soon', { time: heldUntil ? timeOf(heldUntil.toISOString(), locale) : '' })}
-              </p>
-            </ReservationStep>
-          ) : (
-            <ReservationStep number={3} title={t('payment.title')} state="closed" />
-          )}
-        </>
-      )}
-    </Layout>
+          </ReservationStep>
+        ) : (
+          <ReservationStep
+            number={2}
+            title={t('prepare.title')}
+            state={step > 2 ? 'done' : 'closed'}
+            summary={prepared}
+            onEdit={step > 2 && !editing ? () => setStep(2) : undefined}
+          />
+        )}
+        {step === 3 && !editing ? (
+          <ReservationStep number={3} title={t('payment.title')} state="open">
+            <PaymentStep
+              bookingRef={bookingRef}
+              contact={contact}
+              heldUntil={heldUntil}
+              onFee={onFee}
+              onExpired={refresh}
+              onStarted={(paymentId, method) => {
+                setFollowing({ paymentId, method });
+                refresh();
+              }}
+            />
+          </ReservationStep>
+        ) : (
+          <ReservationStep number={3} title={t('payment.title')} state="closed" />
+        )}
+      </>
+    ),
+  );
+}
+
+/** While PENDING, the page asks again every few seconds; the server asks SasPay at most that often. */
+const POLL_MS = 3000;
+
+/**
+ * One payment followed: `Paiement v2` 1–5 inside step 3 until SasPay answers,
+ * then `6 Confirmée` in place of the whole page.
+ */
+function PaymentFollow({
+  bookingRef,
+  following,
+  heldUntil,
+  frame,
+  onFollow,
+  onChangeMethod,
+}: {
+  bookingRef: BookingRef;
+  following: Following;
+  heldUntil: Date | null;
+  frame: (panel: ReactNode, title: string) => ReactNode;
+  onFollow: (following: Following) => void;
+  onChangeMethod: () => void;
+}): ReactNode {
+  const t = useTranslations('Consultation.reservation');
+  const locale = useLocale();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const input = { ...bookingRef, paymentId: following.paymentId };
+  const { data: payment } = useSuspenseQuery({
+    ...trpc.consultation.payment.queryOptions(input),
+    refetchInterval: (query) => (query.state.data?.status === 'PENDING' ? POLL_MS : false),
+  });
+  const pay = useMutation(trpc.consultation.pay.mutationOptions());
+  const check = useMutation({
+    mutationFn: () => queryClient.fetchQuery(trpc.consultation.payment.queryOptions({ ...input, force: true })),
+    onSuccess: (fresh) => queryClient.setQueryData(trpc.consultation.payment.queryKey(input), fresh),
+  });
+
+  if (payment.status === 'SUCCESS' && payment.consultation) return <PaymentConfirmed payment={payment} />;
+
+  // The same way again, unless a one-time code must be typed again.
+  const method = following.method;
+  const retry =
+    method && !(method.kind === 'network' && method.otp)
+      ? async () => {
+          try {
+            const started = await pay.mutateAsync({ ...bookingRef, locale: locale === 'en' ? 'en' : 'fr', method: sentMethod(method) });
+            if (started.checkoutUrl) window.open(started.checkoutUrl, '_blank', 'noopener');
+            onFollow({ paymentId: started.paymentId, method });
+          } catch {
+            toast.add({ title: t('toast.error'), type: 'error' });
+          }
+        }
+      : undefined;
+
+  const held = payment.heldUntil ? new Date(payment.heldUntil) : heldUntil;
+  return frame(
+    <PaymentProgress
+      payment={payment}
+      screen={paymentScreen(payment)}
+      heldUntil={held}
+      onRetry={retry}
+      onChangeMethod={onChangeMethod}
+      onCheckNow={() => check.mutate()}
+      checking={check.isPending}
+    />,
+    payment.networkName ? t('payment.titleWith', { network: payment.networkName }) : t('payment.title'),
+  );
+}
+
+/** Step 3 while the payment is looked up. */
+function PaymentLoading(): ReactNode {
+  return (
+    <div aria-hidden={true} className="flex flex-col gap-6">
+      <Skeleton className="h-44 rounded-2xl" />
+      <Skeleton className="h-32 rounded-2xl" />
+    </div>
   );
 }
 
@@ -212,6 +354,7 @@ function Layout({
   startsAt,
   durationMinutes,
   price,
+  fee = null,
   heldUntil,
   released = false,
   onBack,
@@ -221,6 +364,7 @@ function Layout({
   startsAt: Date;
   durationMinutes: number;
   price: number | null;
+  fee?: FeeLine | null;
   heldUntil: Date | null;
   released?: boolean;
   /** Mobile back: the previous step; else back to the Consultation page. */
@@ -269,7 +413,7 @@ function Layout({
         <div className="flex flex-1 flex-col gap-4">{children}</div>
         <aside className="hidden w-105 shrink-0 flex-col gap-3 lg:flex">
           <HoldTimer heldUntil={heldUntil} startsAt={startsAt} />
-          <BookingSummary startsAt={startsAt} durationMinutes={durationMinutes} price={price} released={released} />
+          <BookingSummary startsAt={startsAt} durationMinutes={durationMinutes} price={price} fee={fee} released={released} />
           <p className="flex items-center justify-center gap-2 pt-1 text-caption leading-4 text-slate">
             <ShieldCheck aria-hidden={true} className="size-3.5" strokeWidth={2.2} />
             {tSummary('secured')}

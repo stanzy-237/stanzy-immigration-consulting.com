@@ -45,6 +45,8 @@ const held = (extra: Record<string, unknown> = {}) => ({
   price: 12_345,
   contact: { name: 'Aminata Diallo', email: 'aminata@example.com', country: 'CM', phone: '+237677123456', whatsappReminders: true },
   answers: { topics: [], crsScore: null, itaReceived: null, situation: null },
+  payment: null,
+  meetingId: null,
   ...extra,
 });
 
@@ -130,7 +132,11 @@ describe('ReservationView, a held booking', () => {
 
   it('saves what they prepared, then opens Paiement', async () => {
     const prepare = vi.fn(() => ({ id: 'con_1' }));
-    renderPage({ 'consultation.booking': () => held(), 'consultation.prepare': prepare });
+    renderPage({
+      'consultation.booking': () => held(),
+      'consultation.prepare': prepare,
+      'consultation.paymentOptions': () => ({ open: false, price: 12_345, countries: [], networks: [] }),
+    });
 
     fireEvent.click(await screen.findByRole('button', { name: /Mon admissibilité/ }));
     fill(/Score CRS/, '452');
@@ -162,5 +168,103 @@ describe('ReservationView, no slot', () => {
     search.params = new URLSearchParams();
     renderPage();
     expect(screen.getByRole('link', { name: 'Voir les créneaux' })).toHaveAttribute('href', '/fr/services/consultation');
+  });
+});
+
+const OPTIONS = {
+  open: true,
+  price: 12_345,
+  countries: [{ code: 'CM', name: 'Cameroun' }],
+  networks: [{ code: 'mtn_cm', name: 'MTN Mobile Money', otpRequired: false, otpInstructions: '', fee: 587 }],
+};
+
+const paymentOf = (extra: Record<string, unknown> = {}) => ({
+  id: '0b8f6a3e-4b5d-4c1e-9a2f-5d6e7f8a9b0c',
+  status: 'PENDING',
+  flow: 'SOFTPAY',
+  network: 'mtn_cm',
+  networkName: 'MTN Mobile Money',
+  phone: '+237677123456',
+  amount: 12_345,
+  charged: null,
+  fee: null,
+  checkoutUrl: null,
+  createdAt: new Date(),
+  settledAt: null,
+  consultation: null,
+  heldUntil: new Date(Date.now() + 14 * 60_000),
+  ...extra,
+});
+
+describe('ReservationView, paying', () => {
+  beforeEach(() => window.sessionStorage.setItem('stanzy.consultation.booking', JSON.stringify({ id: 'con_1', token: 'x'.repeat(43) })));
+
+  async function toPayment(handlers: Handlers) {
+    renderPage({ 'consultation.booking': () => held(), 'consultation.prepare': () => ({ id: 'con_1' }), 'consultation.paymentOptions': () => OPTIONS, ...handlers });
+    fireEvent.click(await screen.findByRole('button', { name: /Continuer vers le paiement/ }));
+  }
+
+  it('offers SasPay’s networks with their fee, then pushes the payment to their number and waits for their phone', async () => {
+    const pay = vi.fn(() => ({ paymentId: paymentOf().id, checkoutUrl: null }));
+    await toPayment({ 'consultation.pay': pay, 'consultation.payment': () => paymentOf() });
+
+    expect(await screen.findByText('MTN Mobile Money')).toBeInTheDocument();
+    expect(screen.getByText('+587 FCFA')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Payer 12.?932 FCFA/ }));
+
+    await waitFor(() =>
+      expect(pay).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'con_1', method: { kind: 'network', country: 'CM', network: 'mtn_cm', phone: expect.stringMatching(/6 ?77/) } }),
+      ),
+    );
+    expect(await screen.findByRole('heading', { name: 'Validez sur votre téléphone' })).toBeInTheDocument();
+    expect(screen.getByText('Demande envoyée à MTN Mobile Money')).toBeInTheDocument();
+  });
+
+  it('says the payment did not go through, nothing charged, and offers to try again', async () => {
+    window.sessionStorage.setItem('stanzy.consultation.booking', JSON.stringify({ id: 'con_1', token: 'x'.repeat(43) }));
+    renderPage({
+      'consultation.booking': () => held({ payment: { id: paymentOf().id, status: 'PENDING', createdAt: new Date() } }),
+      'consultation.payment': () => paymentOf({ status: 'FAILED' }),
+    });
+    expect(await screen.findByRole('heading', { name: 'Le paiement n’est pas passé' })).toBeInTheDocument();
+    expect(screen.getByText('0 FCFA débité')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Changer de moyen de paiement' })).toBeInTheDocument();
+  });
+
+  it('confirms only once SasPay said SUCCESS: « C’est réservé », the way to Mon espace and the receipt', async () => {
+    renderPage({
+      'consultation.booking': () => held({ status: 'PAID', held: false, payment: { id: paymentOf().id, status: 'SUCCESS', createdAt: new Date() } }),
+      'consultation.payment': () =>
+        paymentOf({
+          status: 'SUCCESS',
+          fee: 587,
+          charged: 12_932,
+          settledAt: new Date(),
+          consultation: { firstName: 'Aminata', startsAt: new Date(START), durationMinutes: 45, meetingId: 'meet_1' },
+        }),
+    });
+    expect(await screen.findByRole('heading', { name: 'C’est réservé, Aminata.' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Aller à Mon espace' })).toHaveAttribute('href', '/fr/mon-espace/reunions/meet_1');
+    expect(screen.getByText(/12.?932 FCFA/)).toBeInTheDocument();
+  });
+
+  it('where there is no Mobile Money, pays by card on SasPay’s page in a new tab', async () => {
+    const tab = { opener: {}, location: { href: '' }, close: vi.fn() };
+    const open = vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window);
+    const pay = vi.fn(() => ({ paymentId: paymentOf().id, checkoutUrl: 'https://sandbox-checkout.saspay.me/checkout/x' }));
+    await toPayment({
+      'consultation.paymentOptions': () => ({ ...OPTIONS, networks: [] }),
+      'consultation.pay': pay,
+      'consultation.payment': () => paymentOf({ flow: 'CHECKOUT', network: null, networkName: null, phone: null, checkoutUrl: 'https://sandbox-checkout.saspay.me/checkout/x' }),
+    });
+
+    expect(await screen.findByText('Carte bancaire')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Payer par carte/ }));
+    await waitFor(() => expect(pay).toHaveBeenCalledWith(expect.objectContaining({ method: { kind: 'checkout', country: 'CM' } })));
+    expect(open).toHaveBeenCalled();
+    await waitFor(() => expect(tab.location.href).toBe('https://sandbox-checkout.saspay.me/checkout/x'));
+    expect(await screen.findByRole('heading', { name: 'Finissez sur la page SasPay' })).toBeInTheDocument();
+    open.mockRestore();
   });
 });

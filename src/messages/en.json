@@ -4786,7 +4786,37 @@
       },
       "payment": {
         "title": "Payment",
-        "soon": "Online payment (Mobile Money or card, through SasPay) is coming very soon. Your slot stays held until {time}."
+        "titleWith": "Payment · {network}",
+        "soon": "Online payment (Mobile Money or card, through SasPay) is coming very soon. Your slot stays held until {time}.",
+        "country": "Paying from: <b>{country}</b>, through SasPay",
+        "otherCountry": "Pay from another country",
+        "countryLabel": "Country of the payment method",
+        "payWith": "Pay with",
+        "onPhone": "Confirm on your phone",
+        "withCode": "With a payment code",
+        "number": "{network} number",
+        "numberHint": "From your details. You’ll get a request to approve with your PIN.",
+        "numberHintOther": "The number that pays: yours or a relative’s.",
+        "otpFallback": "On your phone, get your payment code from your operator.",
+        "otpEnter": "Enter the code you received below.",
+        "noMobileMoney": "No Mobile Money for this country: {country}",
+        "noMobileMoneyLead": "Pay by card on SasPay’s secure page, or with a Mobile Money number from another country (“Pay from another country”).",
+        "card": "Bank card",
+        "cardHint": "Visa, Mastercard · on the SasPay page",
+        "cardSafe": "Card details are entered on SasPay’s page, never on Stanzy.",
+        "total": "Total to pay",
+        "totalBeforeFees": "Total before fees",
+        "pay": "Pay {amount}",
+        "payShort": "Pay",
+        "payCard": "Pay by card",
+        "fine": "Depending on the operator, you approve on your phone or on its payment page. Non-refundable: you can move the slot.",
+        "fineCard": "You’ll go to SasPay’s payment page, in a new tab. Non-refundable: you can move the slot.",
+        "error": "The payment couldn’t start. Try again.",
+        "errors": {
+          "phone": "This number doesn’t look valid for this country.",
+          "otp": "Enter the payment code you received on your phone.",
+          "refused": "SasPay couldn’t start this payment: nothing was charged. Check the number, or choose another method."
+        }
       },
       "summary": {
         "eyebrow": "Your consultation",
@@ -4804,7 +4834,12 @@
         "fees": "+ fees depending on the payment method",
         "noPrice": "Price shown before payment",
         "secured": "Mobile Money or card depending on your country, secured by SasPay",
-        "chip": "{date} · {time} · Video with Stanzy"
+        "chip": "{date} · {time} · Video with Stanzy",
+        "feesFor": "{network} fees",
+        "feesCard": "Payment fees",
+        "feesBySasPay": "set by SasPay",
+        "totalToPay": "Total to pay",
+        "totalBeforeFees": "Total before fees"
       },
       "released": {
         "title": "Your slot was released",
@@ -4824,6 +4859,77 @@
         "held": "Slot held for 15 minutes",
         "saved": "Answers saved",
         "error": "That didn’t work. Try again."
+      },
+      "progress": {
+        "sent": "Request sent to {network}",
+        "confirms": "Stanzy confirms your appointment",
+        "expires": "expires in {time}",
+        "change": "Change payment method",
+        "phone": {
+          "title": "Approve on your phone",
+          "lead": "A request for <b>{amount}</b> went to <b>{phone}</b>. Enter your {network} PIN to accept it.",
+          "validating": "You approve with your PIN",
+          "help": "Nothing showing? Open your Mobile Money menu to see pending requests, or send it again. Keep this page open: it updates by itself.",
+          "resend": "Send the request again"
+        },
+        "page": {
+          "title": "Finish on the SasPay page",
+          "lead": "A new tab opened on SasPay’s secure page to pay <b>{amount}</b> with {network}. Come back here once it’s done.",
+          "leadCard": "A new tab opened on SasPay’s secure page to pay <b>{amount}</b>. Come back here once it’s done.",
+          "opened": "SasPay payment page opened",
+          "paying": "You pay on SasPay",
+          "held": "slot held until {time}",
+          "help": "The tab didn’t open? Open the page again. If the payment fails on SasPay, just close the tab: this page will tell you what to do, and nothing will be charged.",
+          "reopen": "Open the SasPay page again"
+        },
+        "verifying": {
+          "title": "We’re checking your payment",
+          "lead": "SasPay sent you back here. We’re confirming the payment: it usually takes a few seconds. <b>Don’t pay a second time.</b>",
+          "done": "Paid on SasPay",
+          "checking": "Confirmation by {network}",
+          "seconds": "a few seconds",
+          "confirmed": "Your appointment is confirmed",
+          "help": "Keep this page open: it moves on to the confirmation by itself."
+        },
+        "failed": {
+          "title": "The payment didn’t go through",
+          "lead": "{network} declined the request, or it expired. <b>Nothing was charged</b>, and your slot stays held until {time}.",
+          "leadCard": "The payment on SasPay didn’t go through. <b>Nothing was charged</b>, and your slot stays held until {time}.",
+          "leadReleased": "The request was declined or expired. <b>Nothing was charged.</b>",
+          "step": "Request declined or expired",
+          "nothing": "0 FCFA charged",
+          "help": "Common causes: not enough balance, a wrong PIN, or the request approved too late.",
+          "retry": "Try again · {amount}"
+        },
+        "slow": {
+          "title": "It’s taking longer than expected",
+          "lead": "{network} hasn’t confirmed your <b>{amount}</b> payment yet. If you approved it, it’s on its way: we’ll e-mail you as soon as it arrives. <b>Don’t pay a second time.</b>",
+          "waiting": "Waiting for {network}’s answer",
+          "held": "slot still held",
+          "help": "You can safely close this page. If {network} finally declines the payment, nothing will be charged and you’ll be offered to try again.",
+          "check": "Check now",
+          "whatsapp": "Message Stanzy on WhatsApp"
+        }
+      },
+      "confirmed": {
+        "title": "You’re booked, {name}.",
+        "lead": "Payment received. The confirmation is on its way by e-mail.",
+        "when": "{weekday} · {start} – {end}",
+        "what": "Video with Stanzy · {minutes} min · Douala time",
+        "note": "The meeting takes place in My space. The “Join” button opens 15 minutes before, and the recording stays available to you afterwards.",
+        "space": "Go to My space",
+        "calendar": "Add to calendar",
+        "calendarTitle": "Video Consultation with Stanzy",
+        "receipt": "Receipt",
+        "price": "Consultation",
+        "fees": "{network} fees",
+        "feesCard": "Fees",
+        "paid": "Paid",
+        "card": "SasPay payment page",
+        "paidAt": "Paid on {date} at {time}"
+      },
+      "returned": {
+        "back": "Back to my booking"
       }
     },
     "emails": {

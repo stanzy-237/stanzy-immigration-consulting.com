@@ -4803,7 +4803,37 @@
       },
       "payment": {
         "title": "Paiement",
-        "soon": "Le paiement en ligne (Mobile Money ou carte, via SasPay) arrive très bientôt. Votre créneau reste gardé jusqu’à {time}."
+        "titleWith": "Paiement · {network}",
+        "soon": "Le paiement en ligne (Mobile Money ou carte, via SasPay) arrive très bientôt. Votre créneau reste gardé jusqu’à {time}.",
+        "country": "Payer depuis : <b>{country}</b>, via SasPay",
+        "otherCountry": "Payer depuis un autre pays",
+        "countryLabel": "Pays du moyen de paiement",
+        "payWith": "Payer avec",
+        "onPhone": "Confirmation sur votre téléphone",
+        "withCode": "Avec un code de paiement",
+        "number": "Numéro {network}",
+        "numberHint": "Repris de vos coordonnées. Vous recevez une demande à valider avec votre code secret.",
+        "numberHintOther": "Le numéro qui paie : le vôtre ou celui d’un proche.",
+        "otpFallback": "Sur votre téléphone, obtenez votre code de paiement auprès de votre opérateur.",
+        "otpEnter": "Saisissez le code reçu ci-dessous.",
+        "noMobileMoney": "Pas de Mobile Money pour ce pays : {country}",
+        "noMobileMoneyLead": "Payez par carte bancaire sur la page sécurisée SasPay, ou avec un numéro Mobile Money d’un autre pays (« Payer depuis un autre pays »).",
+        "card": "Carte bancaire",
+        "cardHint": "Visa, Mastercard · sur la page SasPay",
+        "cardSafe": "Les données de carte sont saisies sur la page SasPay, jamais sur Stanzy.",
+        "total": "Total à payer",
+        "totalBeforeFees": "Total avant frais",
+        "pay": "Payer {amount}",
+        "payShort": "Payer",
+        "payCard": "Payer par carte",
+        "fine": "Selon l’opérateur, vous validez sur votre téléphone ou sur sa page de paiement. Non remboursable : vous pourrez déplacer le créneau.",
+        "fineCard": "Vous êtes redirigé vers la page de paiement SasPay, dans un nouvel onglet. Non remboursable : vous pourrez déplacer le créneau.",
+        "error": "Le paiement n’a pas pu partir. Réessayez.",
+        "errors": {
+          "phone": "Ce numéro ne semble pas valide pour ce pays.",
+          "otp": "Saisissez le code de paiement reçu sur votre téléphone.",
+          "refused": "SasPay n’a pas pu lancer ce paiement : rien n’a été débité. Vérifiez le numéro, ou choisissez un autre moyen."
+        }
       },
       "summary": {
         "eyebrow": "Votre consultation",
@@ -4821,7 +4851,12 @@
         "fees": "+ frais selon le moyen de paiement",
         "noPrice": "Prix communiqué avant le paiement",
         "secured": "Mobile Money ou carte selon votre pays, sécurisé par SasPay",
-        "chip": "{date} · {time} · Vidéo avec Stanzy"
+        "chip": "{date} · {time} · Vidéo avec Stanzy",
+        "feesFor": "Frais {network}",
+        "feesCard": "Frais de paiement",
+        "feesBySasPay": "calculés par SasPay",
+        "totalToPay": "Total à payer",
+        "totalBeforeFees": "Total avant frais"
       },
       "released": {
         "title": "Votre créneau a été libéré",
@@ -4841,6 +4876,77 @@
         "held": "Créneau gardé 15 minutes",
         "saved": "Réponses enregistrées",
         "error": "Ça n’a pas marché. Réessayez."
+      },
+      "progress": {
+        "sent": "Demande envoyée à {network}",
+        "confirms": "Stanzy confirme votre rendez-vous",
+        "expires": "expire dans {time}",
+        "change": "Changer de moyen de paiement",
+        "phone": {
+          "title": "Validez sur votre téléphone",
+          "lead": "Une demande de <b>{amount}</b> est partie vers le <b>{phone}</b>. Tapez votre code secret {network} pour l’accepter.",
+          "validating": "Vous validez avec votre code secret",
+          "help": "Rien ne s’affiche ? Ouvrez votre menu Mobile Money pour voir les demandes en attente, ou renvoyez-la. Gardez cette page ouverte : elle se met à jour toute seule.",
+          "resend": "Renvoyer la demande"
+        },
+        "page": {
+          "title": "Finissez sur la page SasPay",
+          "lead": "Un nouvel onglet s’est ouvert sur la page sécurisée de SasPay pour payer <b>{amount}</b> avec {network}. Revenez ici quand c’est fait.",
+          "leadCard": "Un nouvel onglet s’est ouvert sur la page sécurisée de SasPay pour payer <b>{amount}</b>. Revenez ici quand c’est fait.",
+          "opened": "Page de paiement SasPay ouverte",
+          "paying": "Vous payez sur SasPay",
+          "held": "créneau gardé {time}",
+          "help": "L’onglet ne s’est pas ouvert ? Rouvrez la page. Si le paiement échoue sur SasPay, fermez simplement l’onglet : cette page vous dira quoi faire, et rien ne sera débité.",
+          "reopen": "Rouvrir la page SasPay"
+        },
+        "verifying": {
+          "title": "On vérifie votre paiement",
+          "lead": "SasPay vous a renvoyé ici. On confirme le paiement : quelques secondes suffisent en général. <b>Ne payez pas une deuxième fois.</b>",
+          "done": "Paiement fait sur SasPay",
+          "checking": "Confirmation par {network}",
+          "seconds": "quelques secondes",
+          "confirmed": "Votre rendez-vous est confirmé",
+          "help": "Gardez cette page ouverte : elle passe toute seule à la confirmation."
+        },
+        "failed": {
+          "title": "Le paiement n’est pas passé",
+          "lead": "{network} a refusé la demande, ou elle a expiré. <b>Rien n’a été débité</b>, et votre créneau reste gardé jusqu’à {time}.",
+          "leadCard": "Le paiement sur SasPay n’a pas abouti. <b>Rien n’a été débité</b>, et votre créneau reste gardé jusqu’à {time}.",
+          "leadReleased": "La demande a été refusée ou a expiré. <b>Rien n’a été débité.</b>",
+          "step": "Demande refusée ou expirée",
+          "nothing": "0 FCFA débité",
+          "help": "Causes fréquentes : solde insuffisant, code secret erroné, ou demande validée trop tard.",
+          "retry": "Réessayer · {amount}"
+        },
+        "slow": {
+          "title": "C’est plus long que prévu",
+          "lead": "{network} n’a pas encore confirmé votre paiement de <b>{amount}</b>. Si vous l’avez validé, il est en route : on vous prévient par e-mail dès qu’il arrive. <b>Ne payez pas une deuxième fois.</b>",
+          "waiting": "En attente de la réponse de {network}",
+          "held": "créneau toujours gardé",
+          "help": "Vous pouvez fermer cette page sans risque. Si {network} refuse finalement le paiement, rien ne sera débité et on vous proposera de réessayer.",
+          "check": "Vérifier maintenant",
+          "whatsapp": "Écrire à Stanzy sur WhatsApp"
+        }
+      },
+      "confirmed": {
+        "title": "C’est réservé, {name}.",
+        "lead": "Paiement reçu. La confirmation est partie par e-mail.",
+        "when": "{weekday} · {start} – {end}",
+        "what": "Vidéo avec Stanzy · {minutes} min · heure de Douala",
+        "note": "La réunion se passe dans Mon espace. Le bouton « Rejoindre » s’active 15 minutes avant, et l’enregistrement vous reste ensuite.",
+        "space": "Aller à Mon espace",
+        "calendar": "Ajouter au calendrier",
+        "calendarTitle": "Consultation vidéo avec Stanzy",
+        "receipt": "Reçu",
+        "price": "Consultation",
+        "fees": "Frais {network}",
+        "feesCard": "Frais",
+        "paid": "Payé",
+        "card": "Page de paiement SasPay",
+        "paidAt": "Payé le {date} à {time}"
+      },
+      "returned": {
+        "back": "Reprendre ma réservation"
       }
     },
     "emails": {

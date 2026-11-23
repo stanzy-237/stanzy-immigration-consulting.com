@@ -15,11 +15,11 @@ import { cn } from '@/lib/utils';
  */
 type Props = { className?: string; playing?: boolean };
 
-const LEAF =
+export const LEAF =
   'M11.27 16.02L0 12.67L1.48 11.9L0.37 8.16L4.06 8.84L4.62 6.97L8.03 10.03L6.83 3.4L9.6 4.68L12 0L14.4 4.68L17.17 3.4L15.97 10.03L19.38 6.97L19.94 8.84L23.63 8.16L22.52 11.9L24 12.67L12.73 16.02L12.73 19.67L11.27 19.67Z';
 
 /** A layer that breathes (2.5 s ease-in-out) while its illustration is in view. */
-const breathe = (playing: boolean) => cn('fill-box animate-breathe motion-reduce:animate-none', !playing && 'paused');
+export const breathe = (playing: boolean) => cn('fill-box animate-breathe motion-reduce:animate-none', !playing && 'paused');
 
 /** Avant: a phone with the maple leaf, paying, and a chat bubble. */
 export function PhoneIllustration({ className, playing = false }: Props): ReactNode {

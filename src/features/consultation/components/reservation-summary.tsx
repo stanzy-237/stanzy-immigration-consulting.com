@@ -4,6 +4,7 @@ import { Check, Timer } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import type { FeeLine } from '@/features/consultation/components/payment-step';
 import { useHoldCountdown } from '@/features/consultation/hooks/use-hold-countdown';
 import { fcfa, timeOf } from '@/features/consultation/lib/slot-format';
 import { LABEL_CLASS } from '@/features/consultation/lib/styles';
@@ -48,11 +49,14 @@ export function BookingSummary({
   startsAt,
   durationMinutes,
   price,
+  fee = null,
   released = false,
 }: {
   startsAt: Date;
   durationMinutes: number;
   price: number | null;
+  /** Step 3's chosen way to pay: its fee line, or « calculés par SasPay » when only its page knows. */
+  fee?: FeeLine | null;
   released?: boolean;
 }): ReactNode {
   const t = useTranslations('Consultation.reservation.summary');
@@ -99,12 +103,22 @@ export function BookingSummary({
               <span className="text-slate">{t('price')}</span>
               <span className="text-ink">{fcfa(price, locale)}</span>
             </p>
+            {fee ? (
+              <p className="flex justify-between gap-4 text-body-sm leading-5">
+                <span className="text-slate">{fee.label ? t('feesFor', { network: fee.label }) : t('feesCard')}</span>
+                <span className="text-ink">{fee.amount === null ? t('feesBySasPay') : `+${fcfa(fee.amount, locale)}`}</span>
+              </p>
+            ) : null}
             <div className="flex items-baseline justify-between gap-4 border-t border-fog-light pt-3">
               <p className="flex flex-col gap-0.5">
-                <span className="text-body leading-5.5 font-semibold text-ink">{t('total')}</span>
-                <span className="text-caption leading-4 text-slate">{t('fees')}</span>
+                <span className="text-body leading-5.5 font-semibold text-ink">
+                  {fee && fee.amount !== null ? t('totalToPay') : fee ? t('totalBeforeFees') : t('total')}
+                </span>
+                {fee ? null : <span className="text-caption leading-4 text-slate">{t('fees')}</span>}
               </p>
-              <p className="shrink-0 font-heading text-h4 leading-6.5 font-extrabold whitespace-nowrap text-ink">{fcfa(price, locale)}</p>
+              <p className="shrink-0 font-heading text-h4 leading-6.5 font-extrabold whitespace-nowrap text-ink">
+                {fcfa(price + (fee?.amount ?? 0), locale)}
+              </p>
             </div>
           </>
         )}
