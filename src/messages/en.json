@@ -4595,7 +4595,9 @@
               "value": "up to the ITA"
             }
           }
-        }
+        },
+        "tip": "“Write your questions down before the call: we go through them all, in the order that matters to you.”",
+        "tipBy": "Stanzy"
       },
       "deliverables": {
         "eyebrow": "What you leave with",

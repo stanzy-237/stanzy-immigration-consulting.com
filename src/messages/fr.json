@@ -4612,7 +4612,9 @@
               "value": "jusqu’à l’ITA"
             }
           }
-        }
+        },
+        "tip": "« Notez vos questions avant l’appel : on les passe toutes en revue, dans l’ordre qui compte pour vous. »",
+        "tipBy": "Stanzy"
       },
       "deliverables": {
         "eyebrow": "Ce que vous repartez avec",

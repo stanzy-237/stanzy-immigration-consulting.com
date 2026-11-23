@@ -178,9 +178,37 @@ export function ConsultationTopics(): ReactNode {
               );
             })}
           </div>
+          {/* Desktop: Stanzy's word on the topics, 150 ms after he steps in. */}
+          <motion.figure
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.2, ease: 'easeOut', delay: 0.15 }}
+            className="hidden origin-left items-center pt-7 pl-5 lg:flex"
+          >
+            <svg aria-hidden={true} viewBox="0 0 14 22" className="h-5.5 w-3.5 shrink-0">
+              <path d="M14 0 L0 11 L14 22 Z" className="fill-blush" />
+            </svg>
+            <div className="flex max-w-130 flex-col gap-1.5 rounded-xl bg-blush px-5 py-4">
+              <blockquote className="text-body leading-6 text-ink">{t('tip')}</blockquote>
+              <figcaption className="font-label text-caption leading-4 font-bold text-rouge">{t('tipBy')}</figcaption>
+            </div>
+          </motion.figure>
         </Reveal>
 
-        <Reveal delay={0.12} className="flex flex-col gap-6 lg:col-start-1 lg:mt-4">
+        <Reveal delay={0.12} className="relative flex flex-col gap-6 lg:col-start-1 lg:mt-4">
+          {/* Desktop: Stanzy beside the preview, pointing at the list; he slides 8 px toward it as he appears. */}
+          <motion.img
+            src="/stanzy/pointr.svg"
+            alt=""
+            width={96}
+            height={168}
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.3, ease: EASE_OUT_EXPO }}
+            className="absolute -right-19.5 -bottom-9 z-10 hidden h-42 w-24 lg:block"
+          />
           <div
             role="tabpanel"
             id="consultation-topic-panel"
