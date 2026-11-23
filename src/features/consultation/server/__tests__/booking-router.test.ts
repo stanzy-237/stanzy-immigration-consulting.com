@@ -22,6 +22,7 @@ function fakeDatabase({ consultations = [] as Row[], emails = [] as string[] } =
   const matches = (row: Row, where: Record<string, unknown>): boolean =>
     Object.entries(where).every(([key, condition]) => {
       if (key === 'OR') return (condition as Record<string, unknown>[]).some((w) => matches(row, w));
+      if (key === 'NOT') return !matches(row, condition as Record<string, unknown>);
       const value = row[key];
       if (condition === null) return value === null || value === undefined;
       if (typeof condition !== 'object' || condition instanceof Date) return value === condition;
@@ -40,6 +41,7 @@ function fakeDatabase({ consultations = [] as Row[], emails = [] as string[] } =
     },
     consultation: {
       findMany: async ({ where }: { where: Record<string, unknown> }) => rows.filter((r) => matches(r, where)),
+      findFirst: async ({ where }: { where: Record<string, unknown> }) => rows.filter((r) => matches(r, where)).at(-1) ?? null,
       findUnique: async ({ where }: { where: { id: string } }) => {
         const row = rows.find((r) => r.id === where.id);
         return row ? { ...row, account: { name: 'Aminata Diallo', email: 'aminata@example.com' } } : null;
@@ -184,5 +186,47 @@ describe('consultation.booking and prepare', () => {
     await expect(
       callerFor(db).prepare({ id, token, answers: { topics: [], crsScore: null, itaReceived: null, situation: null } }),
     ).rejects.toThrow('HOLD_EXPIRED');
+  });
+
+  it('changes the country and number while held; the name and e-mail stay the Compte’s', async () => {
+    const { db, rows, id, token } = await booked();
+    await callerFor(db).contact({ id, token, contact: { ...contact, country: 'CI', phone: '07 07 07 07 07', firstName: 'X', email: 'x@example.com' } });
+    expect(rows[0]).toMatchObject({ country: 'CI', phone: '+2250707070707' });
+  });
+});
+
+describe('consultation.book, « Changer »', () => {
+  it('lets a signed-out browser move its hold to another slot, for the Compte it created', async () => {
+    const fake = fakeDatabase();
+    const first = await callerFor(fake.db).book({ start: at('2026-11-24', '09:00'), contact, locale: 'fr' });
+    vi.clearAllMocks();
+
+    const second = await callerFor(fake.db).book({
+      start: at('2026-11-24', '11:00'),
+      contact,
+      locale: 'fr',
+      previous: { id: first.id, token: first.token! },
+    });
+
+    expect(accounts.createBookingAccount).not.toHaveBeenCalled();
+    expect(fake.rows.find((r) => r.id === second.id)).toMatchObject({ accountId: 'acc_new', status: 'HELD' });
+    expect(second.token).toEqual(expect.any(String));
+    // The first slot is free again.
+    expect((await callerFor(fake.db).slots()).days[0]!.starts).toContain(at('2026-11-24', '09:00'));
+  });
+
+  it('lets a signed-in booker book the very slot they hold again, after editing their details', async () => {
+    const { db } = fakeDatabase();
+    await callerFor(db, sessionFor()).book({ start: at('2026-11-24', '09:00'), contact, locale: 'fr' });
+    await expect(callerFor(db, sessionFor()).book({ start: at('2026-11-24', '09:00'), contact, locale: 'fr' })).resolves.toMatchObject({ token: null });
+  });
+});
+
+describe('consultation.current', () => {
+  it('finds the slot the signed-in Compte holds, back from the verification link', async () => {
+    const { db } = fakeDatabase();
+    const { id } = await callerFor(db, sessionFor()).book({ start: at('2026-11-24', '09:00'), contact, locale: 'fr' });
+    expect(await callerFor(db, sessionFor()).current()).toMatchObject({ id });
+    expect(await callerFor(db).current()).toBeNull();
   });
 });

@@ -35,11 +35,19 @@ export const contactSchema = z
     return { ...contact, phone };
   });
 
+/** Who may act on a booking: its signed-in Compte, or the browser holding its secret. */
+export const bookingRefSchema = z.object({
+  id: z.string().min(1),
+  token: z.string().min(20).max(100).optional(),
+});
+
 export const bookInputSchema = z.object({
   /** The chosen start, as the slots gave it (ISO). */
   start: z.iso.datetime(),
   contact: contactSchema,
   locale: z.enum(['fr', 'en']).default('fr'),
+  /** « Changer »: the booking this browser held before; its Compte books again and its slot is given back. */
+  previous: bookingRefSchema.optional(),
 });
 
 /** Step 2, Préparer l'échange: everything optional. */
@@ -53,12 +61,6 @@ export const prepareSchema = z.object({
     .max(SITUATION_MAX)
     .transform((text) => text || null)
     .nullable(),
-});
-
-/** Who may act on a booking: its signed-in Compte, or the browser holding its secret. */
-export const bookingRefSchema = z.object({
-  id: z.string().min(1),
-  token: z.string().min(20).max(100).optional(),
 });
 
 /** Whether a HELD booking still keeps its slot at `now`. */
