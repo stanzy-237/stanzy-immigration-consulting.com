@@ -37,6 +37,10 @@ Product screens are designed in Paper before they are built. The file is **« St
 - **No invented facts.** Use `XX XXX FCFA` for prices (prices live only in the dashboard catalogue) and `XXX` for figures. Label sample reviews as examples.
 - **Desktop first, then mobile — but mobile is its own design.** Never shrink the desktop layout. Search Mobbin with platform `ios` first, then use mobile patterns: one step per screen, bottom sheets for choices, the main action in a bottom bar, large tap targets, short copy.
 
+## Consultation (mandatory)
+
+Read `docs/design/consultation.md` before any work on the paid Consultation: booking, its payment, promo codes, the Client's Mon espace for it, the dashboard's Consultations, Codes promo or Aperçu, or its e-mails. It lists the Paper artboards to build from and the rules they imply (slot hold, paid only on SasPay `SUCCESS`, promo places, publishing to the Client, motion per interaction).
+
 ## Payments (SasPay)
 
 Consultations and services are paid in Mobile Money through SasPay. Before writing any payment code, load the `saspay-integration` skill (`.agents/skills/saspay-integration/SKILL.md`). The OpenAPI spec at `https://api.saspay.me/api/v1/api-reference/openapi.json` is the source of truth. Supported countries come from `GET /countries/`, and networks per country from `GET /pricing/my-rates/`. Never hard-code a country or payment-method list.

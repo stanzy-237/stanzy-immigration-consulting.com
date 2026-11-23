@@ -59,20 +59,23 @@ _Avoid_: "member".
 A User whom the consultant is onboarding — typically after they booked a consultation or began a service process — but who is not yet a Client. Onboarding is driven by the consultant, not a self-serve enquiry form.
 
 **Consultation**:
-A paid, booked appointment between a User and the consultant, and the primary funnel into becoming a Client. Booked through an embedded external scheduler (Cal.com) in v1.
+A paid, booked video appointment between a User and the consultant, and the primary funnel into becoming a Client. Booked and paid in the app: a slot is held 15 minutes while its Compte pays through SasPay, and the Consultation exists only once the payment succeeds; it then has its own Réunion. It can be moved to another free slot, never refunded; if the consultant cancels, it moves to the next free slot and its Client is told and may change it. After it, the consultant may publish its Enregistrement, Transcription, notes and next steps to its Client. Design: `docs/design/consultation.md`.
 
 **Réunion** (Meeting):
 A video meeting held in the app between the consultant and the people invited, each with an account (Clients, partners): planned ahead, started at once (« Réunion instantanée »), or in the Salle personnelle. About a Dossier (its Client invited) or on its own. Someone with the invitation link but not invited asks to enter and waits until the consultant lets them in. Recorded unless the consultant turns it off, after everyone accepted it; « Terminer pour tous » ends it for everyone.
-_Avoid_: "Consultation" (a paid appointment a prospect books on Cal.com).
+_Avoid_: "Consultation" (the paid appointment a User books and pays in the app; it has a Réunion, but not every Réunion is a Consultation).
+
+**Code promo** (Promo code):
+A code the consultant creates in the Tableau de bord to lower the price of chosen services at checkout: a percentage or an amount, a number of places, an optional end, optionally once per Compte. A place is used only when a payment with it succeeds. Prices and codes never appear on the site's pages or in the repo.
 
 **Salle personnelle** (Personal room):
 The consultant's Réunion that is always open, with its own invitation link, which the consultant can change.
 
 **Enregistrement** (Recording):
-The video of a Réunion, for the consultant only: kept until 2 years after its Dossier is closed, or 2 years after the recording for a Réunion outside any Dossier.
+The video of a Réunion, for the consultant only: kept until 2 years after its Dossier is closed, or 2 years after the recording for a Réunion outside any Dossier. One exception: the Enregistrement of a Consultation, once the consultant publishes it, is also shown to its Client in Mon espace, to watch only (never downloaded), for as long as it is kept.
 
 **Transcription**:
-The searchable text of a recorded Réunion, kept with its Enregistrement, for the consultant only.
+The searchable text of a recorded Réunion, kept with its Enregistrement, for the consultant only, except a Consultation's, shown to its Client with its published Enregistrement.
 
 **Messages du dossier** (Dossier messages):
 The general conversation of a Dossier between its Client and the consultant, apart from each Document's conversation: messages with replies (one level), files attached.

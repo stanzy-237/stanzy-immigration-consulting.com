@@ -24,6 +24,10 @@ Code is organised **by feature** under `src/features/<feature>/{views,components
 
 tRPC data is prefetched in the route and read with `useSuspenseQuery` under a skeleton; mutations end in a toast. Every agent MUST read `docs/agents/data-fetching.md` before writing code that calls tRPC (ADR 0006, summary in `AGENTS.md`).
 
+### Consultation (mandatory)
+
+The paid Consultation (booking, payment, promo codes, Mon espace, the dashboard's Consultations, Codes promo and Aperçu, its e-mails) is designed in Paper. Every agent MUST read `docs/design/consultation.md` before planning, specifying or building any part of it.
+
 ### Tailwind — no arbitrary values (mandatory)
 
 The editor's `tailwindcss(suggestCanonicalClasses)` warning is a hard rule, not a nag. **Do not ship `className` strings containing `[...]` arbitrary values** — not for colors, spacing, radius, font-size, line-height, letter-spacing, shadow, or anything else — when a canonical class or project token exists.
