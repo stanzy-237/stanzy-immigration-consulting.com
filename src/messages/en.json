@@ -1431,7 +1431,8 @@
       "reunions": "Meetings",
       "services": "Document services",
       "services-en-cours": "Services under way",
-      "signalements": "Reports"
+      "signalements": "Reports",
+      "codes-promo": "Promo codes"
     },
     "viewSite": "View the site",
     "overview": {
@@ -4987,6 +4988,75 @@
         "held": "Your slot on {when} stays held until {time}: you can try again until then.",
         "released": "Your slot has been released; you can choose another one.",
         "cta": "Try again"
+      }
+    },
+    "promoCodes": {
+      "eyebrow": "Billing",
+      "title": "Promo codes",
+      "lead": "Applied at payment, never shown on the pages. Create and delete them whenever you like.",
+      "listLabel": "Your promo codes",
+      "empty": "No promo codes yet. Create one: it shows nowhere, it’s typed at payment.",
+      "new": "New code",
+      "columns": {
+        "code": "Code",
+        "used": "Uses",
+        "end": "End"
+      },
+      "status": {
+        "ACTIVE": "Active",
+        "SOLD_OUT": "Sold out",
+        "ENDED": "Ended"
+      },
+      "services": {
+        "CONSULTATION": "Consultation",
+        "ACCOMPAGNEMENT": "Accompaniment",
+        "VERIFICATION": "Verification",
+        "EDE": "EDE"
+      },
+      "usedOnly": "{used, plural, =0 {Not used yet} one {# use} other {# uses}}",
+      "placesUsed": "Places used",
+      "noEnd": "No end date",
+      "douala": "Douala time",
+      "endIn": "{relative}",
+      "ended": "ended",
+      "limitReached": "Limit reached",
+      "delete": "Delete the code {code}",
+      "deleteShort": "Delete",
+      "deleted": "Code {code} deleted",
+      "created": "Code {code} created",
+      "error": "That didn’t work. Try again.",
+      "loading": "Loading promo codes",
+      "note": "A place counts when the payment succeeds. Deleting a code stops it at once; payments already made keep their reduction.",
+      "confirm": {
+        "title": "Delete {code}?",
+        "text": "The code stops at once: nobody can use it any more, and those who had applied it will pay the normal price. Payments already made keep their reduction.",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "form": {
+        "title": "New code",
+        "close": "Close",
+        "code": "Code",
+        "reduction": "Reduction",
+        "percent": "Percentage off",
+        "amount": "Amount off in FCFA",
+        "services": "Services",
+        "places": "Number of places",
+        "noLimit": "No limit",
+        "end": "End",
+        "endHint": "Douala time. Empty: no end date.",
+        "once": "Once per account",
+        "atCheckout": "At payment",
+        "plusFees": "+ fees",
+        "cancel": "Cancel",
+        "create": "Create the code",
+        "errors": {
+          "code": "At least 3 letters or digits.",
+          "value": "Enter the reduction.",
+          "percent": "99 % at most: the Consultation can’t be free.",
+          "services": "Choose at least one service.",
+          "taken": "An active code already has this name."
+        }
       }
     }
   }

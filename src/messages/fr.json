@@ -1448,7 +1448,8 @@
       "reunions": "Réunions",
       "services": "Services documentaires",
       "services-en-cours": "Services en cours",
-      "signalements": "Signalements"
+      "signalements": "Signalements",
+      "codes-promo": "Codes promo"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -5004,6 +5005,75 @@
         "held": "Votre créneau du {when} reste gardé jusqu’à {time} : vous pouvez réessayer d’ici là.",
         "released": "Votre créneau a été libéré ; vous pouvez en choisir un autre.",
         "cta": "Réessayer"
+      }
+    },
+    "promoCodes": {
+      "eyebrow": "Facturation",
+      "title": "Codes promo",
+      "lead": "Appliqués au paiement, jamais affichés sur les pages. Créez-les et supprimez-les quand vous voulez.",
+      "listLabel": "Vos codes promo",
+      "empty": "Aucun code promo pour l’instant. Créez-en un : il ne s’affiche nulle part, il se tape au paiement.",
+      "new": "Nouveau code",
+      "columns": {
+        "code": "Code",
+        "used": "Utilisations",
+        "end": "Fin"
+      },
+      "status": {
+        "ACTIVE": "Actif",
+        "SOLD_OUT": "Épuisé",
+        "ENDED": "Terminé"
+      },
+      "services": {
+        "CONSULTATION": "Consultation",
+        "ACCOMPAGNEMENT": "Accompagnement",
+        "VERIFICATION": "Vérification",
+        "EDE": "EDE"
+      },
+      "usedOnly": "{used, plural, =0 {Aucune utilisation} one {# utilisation} other {# utilisations}}",
+      "placesUsed": "Places utilisées",
+      "noEnd": "Sans date de fin",
+      "douala": "Heure de Douala",
+      "endIn": "{relative}",
+      "ended": "terminé",
+      "limitReached": "Limite atteinte",
+      "delete": "Supprimer le code {code}",
+      "deleteShort": "Supprimer",
+      "deleted": "Code {code} supprimé",
+      "created": "Code {code} créé",
+      "error": "Ça n’a pas marché. Réessayez.",
+      "loading": "Chargement des codes promo",
+      "note": "Une place est comptée quand le paiement réussit. Supprimer un code l’arrête tout de suite ; les paiements déjà faits gardent leur réduction.",
+      "confirm": {
+        "title": "Supprimer {code} ?",
+        "text": "Le code s’arrête tout de suite : plus personne ne peut l’utiliser, et ceux qui l’avaient appliqué paieront le prix normal. Les paiements déjà faits gardent leur réduction.",
+        "cancel": "Annuler",
+        "delete": "Supprimer"
+      },
+      "form": {
+        "title": "Nouveau code",
+        "close": "Fermer",
+        "code": "Code",
+        "reduction": "Réduction",
+        "percent": "Pourcentage de réduction",
+        "amount": "Réduction en FCFA",
+        "services": "Services",
+        "places": "Nombre de places",
+        "noLimit": "Sans limite",
+        "end": "Fin",
+        "endHint": "Heure de Douala. Vide : sans date de fin.",
+        "once": "Une seule fois par Compte",
+        "atCheckout": "Au paiement",
+        "plusFees": "+ frais",
+        "cancel": "Annuler",
+        "create": "Créer le code",
+        "errors": {
+          "code": "Au moins 3 lettres ou chiffres.",
+          "value": "Indiquez la réduction.",
+          "percent": "Au plus 99 % : la Consultation ne peut pas être gratuite.",
+          "services": "Choisissez au moins un service.",
+          "taken": "Un code actif porte déjà ce nom."
+        }
       }
     }
   }
