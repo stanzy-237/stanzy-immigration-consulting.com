@@ -7,7 +7,7 @@ type Row = Record<string, unknown> & { id: string };
 
 /** Seam: the Tableau de bord's Codes promo through a server-side caller, over in-memory codes and payments. */
 function fakeDatabase(codes: Row[] = [], payments: Row[] = []) {
-  const rows = codes.map((c) => ({ deletedAt: null, endsAt: null, places: null, oncePerAccount: true, services: ['CONSULTATION'], createdAt: new Date(), ...c }));
+  const rows: Row[] = codes.map((c) => ({ deletedAt: null, endsAt: null, places: null, oncePerAccount: true, services: ['CONSULTATION'], createdAt: new Date(), ...c }));
   const cleared: string[] = [];
   const db = {
     consultationSettings: { findUnique: async () => null },
@@ -15,8 +15,8 @@ function fakeDatabase(codes: Row[] = [], payments: Row[] = []) {
       findMany: async () => rows.filter((r) => r.deletedAt === null),
       findFirst: async ({ where }: { where: { code: string } }) => rows.find((r) => r.code === where.code && r.deletedAt === null) ?? null,
       create: async ({ data }: { data: Row }) => {
-        const row = { id: `promo_${rows.length + 1}`, deletedAt: null, ...data };
-        rows.push(row as (typeof rows)[number]);
+        const row: Row = { deletedAt: null, ...data, id: `promo_${rows.length + 1}` };
+        rows.push(row);
         return row;
       },
       updateMany: async ({ where, data }: { where: { id: string }; data: Row }) => {
