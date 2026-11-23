@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import type { FeeLine } from '@/features/consultation/components/payment-step';
+import type { AppliedPromo } from '@/features/consultation/components/promo-field';
 import { useHoldCountdown } from '@/features/consultation/hooks/use-hold-countdown';
 import { fcfa, timeOf } from '@/features/consultation/lib/slot-format';
 import { LABEL_CLASS } from '@/features/consultation/lib/styles';
@@ -50,6 +51,8 @@ export function BookingSummary({
   durationMinutes,
   price,
   fee = null,
+  promo = null,
+  promoSlot = null,
   released = false,
 }: {
   startsAt: Date;
@@ -57,6 +60,10 @@ export function BookingSummary({
   price: number | null;
   /** Step 3's chosen way to pay: its fee line, or « calculés par SasPay » when only its page knows. */
   fee?: FeeLine | null;
+  /** The Code promo applied: the price struck through, its reduction, the total with it. */
+  promo?: AppliedPromo | null;
+  /** Step 3: the code field (« Vous avez un code promo ? »), or the applied chip. */
+  promoSlot?: ReactNode;
   released?: boolean;
 }): ReactNode {
   const t = useTranslations('Consultation.reservation.summary');
@@ -101,8 +108,14 @@ export function BookingSummary({
           <>
             <p className="flex justify-between text-body-sm leading-5">
               <span className="text-slate">{t('price')}</span>
-              <span className="text-ink">{fcfa(price, locale)}</span>
+              <span className={cn('text-ink', promo && 'text-slate line-through')}>{fcfa(price, locale)}</span>
             </p>
+            {promoSlot ?? (promo ? (
+              <p className="flex justify-between text-body-sm leading-5">
+                <span className="text-leaf">{promo.code}</span>
+                <span className="font-bold text-leaf">−{fcfa(promo.discount, locale)}</span>
+              </p>
+            ) : null)}
             {fee ? (
               <p className="flex justify-between gap-4 text-body-sm leading-5">
                 <span className="text-slate">{fee.label ? t('feesFor', { network: fee.label }) : t('feesCard')}</span>
@@ -117,7 +130,7 @@ export function BookingSummary({
                 {fee ? null : <span className="text-caption leading-4 text-slate">{t('fees')}</span>}
               </p>
               <p className="shrink-0 font-heading text-h4 leading-6.5 font-extrabold whitespace-nowrap text-ink">
-                {fcfa(price + (fee?.amount ?? 0), locale)}
+                {fcfa(price - (promo?.discount ?? 0) + (fee?.amount ?? 0), locale)}
               </p>
             </div>
           </>

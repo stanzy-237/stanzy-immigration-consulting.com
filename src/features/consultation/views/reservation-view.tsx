@@ -15,6 +15,7 @@ import { ContactStep, SignInAside, type Contact } from '@/features/consultation/
 import { PaymentConfirmed } from '@/features/consultation/components/payment-confirmed';
 import { PaymentProgress, paymentScreen } from '@/features/consultation/components/payment-progress';
 import { PaymentStep, sentMethod, type FeeLine, type PayMethod } from '@/features/consultation/components/payment-step';
+import { SummaryPromo, type AppliedPromo } from '@/features/consultation/components/promo-field';
 import { PrepareStep, useAnswersSummary, type Answers } from '@/features/consultation/components/prepare-step';
 import { ReleasedPanel } from '@/features/consultation/components/released-panel';
 import { ReservationStep } from '@/features/consultation/components/reservation-step';
@@ -151,7 +152,9 @@ function HeldBooking({ booking, bookingRef, onRef }: { booking: Held; bookingRef
       startsAt={startsAt}
       durationMinutes={booking.durationMinutes}
       price={booking.price}
-      fee={fee}
+      fee={following ? null : fee}
+      promo={booking.promo}
+      promoSlot={step === 3 && !editing && !following && !released ? <SummaryPromo bookingRef={bookingRef} promo={booking.promo} price={booking.price} /> : null}
       heldUntil={heldUntil}
       released={released}
       onBack={step === 3 && !editing && !following ? () => setStep(2) : editing ? () => setEditing(false) : undefined}
@@ -249,6 +252,8 @@ function HeldBooking({ booking, bookingRef, onRef }: { booking: Held; bookingRef
               bookingRef={bookingRef}
               contact={contact}
               heldUntil={heldUntil}
+              promo={booking.promo}
+              amount={booking.amount}
               onFee={onFee}
               onExpired={refresh}
               onStarted={(paymentId, method) => {
@@ -355,6 +360,8 @@ function Layout({
   durationMinutes,
   price,
   fee = null,
+  promo = null,
+  promoSlot = null,
   heldUntil,
   released = false,
   onBack,
@@ -365,6 +372,9 @@ function Layout({
   durationMinutes: number;
   price: number | null;
   fee?: FeeLine | null;
+  promo?: AppliedPromo | null;
+  /** Step 3, desktop: the code field in the summary. */
+  promoSlot?: ReactNode;
   heldUntil: Date | null;
   released?: boolean;
   /** Mobile back: the previous step; else back to the Consultation page. */
@@ -413,7 +423,7 @@ function Layout({
         <div className="flex flex-1 flex-col gap-4">{children}</div>
         <aside className="hidden w-105 shrink-0 flex-col gap-3 lg:flex">
           <HoldTimer heldUntil={heldUntil} startsAt={startsAt} />
-          <BookingSummary startsAt={startsAt} durationMinutes={durationMinutes} price={price} fee={fee} released={released} />
+          <BookingSummary startsAt={startsAt} durationMinutes={durationMinutes} price={price} fee={fee} promo={promo} promoSlot={promoSlot} released={released} />
           <p className="flex items-center justify-center gap-2 pt-1 text-caption leading-4 text-slate">
             <ShieldCheck aria-hidden={true} className="size-3.5" strokeWidth={2.2} />
             {tSummary('secured')}

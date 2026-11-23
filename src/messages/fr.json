@@ -4834,7 +4834,12 @@
           "otp": "Saisissez le code de paiement reçu sur votre téléphone.",
           "refused": "SasPay n’a pas pu lancer ce paiement : rien n’a été débité. Vérifiez le numéro, ou choisissez un autre moyen."
         },
-        "noWay": "SasPay ne propose pas de moyen de paiement pour ce pays. Choisissez-en un autre avec « Payer depuis un autre pays »."
+        "noWay": "SasPay ne propose pas de moyen de paiement pour ce pays. Choisissez-en un autre avec « Payer depuis un autre pays ».",
+        "price": "Consultation",
+        "fees": "Frais de paiement",
+        "feesFor": "Frais {network}",
+        "feesBySasPay": "calculés par SasPay",
+        "promoEnded": "Le code {code} n’est plus valable : le prix normal s’applique. Rien n’a été débité ; vérifiez le total et payez à nouveau."
       },
       "summary": {
         "eyebrow": "Votre consultation",
@@ -4945,10 +4950,40 @@
         "paid": "Payé",
         "card": "Carte bancaire, sur la page SasPay",
         "paidAt": "Payé le {date} à {time}",
-        "converted": "Débité en {currency} par SasPay, au taux du jour."
+        "converted": "Débité en {currency} par SasPay, au taux du jour.",
+        "promo": "Code promo"
       },
       "returned": {
         "back": "Reprendre ma réservation"
+      },
+      "promo": {
+        "ask": "Vous avez un code promo ?",
+        "label": "Code promo",
+        "placeholder": "Votre code",
+        "apply": "Appliquer",
+        "clear": "Effacer",
+        "remove": "Retirer le code {code}",
+        "removeShort": "Retirer",
+        "sheetTitle": "Code promo",
+        "close": "Fermer",
+        "left": "Plus que {left, plural, one {# place} other {# places}} sur {places}",
+        "until": "valable jusqu’au {date}",
+        "errors": {
+          "unknown": "Ce code n’existe pas. Vérifiez l’orthographe.",
+          "unknownSuggest": "Ce code n’existe pas. Vérifiez l’orthographe :",
+          "ended": "Cette offre est terminée. La consultation reste à {price}.",
+          "soldOut": "Les places de ce code sont toutes parties. La consultation reste à {price}.",
+          "used": "Vous avez déjà utilisé ce code : il ne vaut qu’une fois par Compte.",
+          "service": "Ce code ne s’applique pas à la Consultation."
+        },
+        "lastPlace": {
+          "title": "Dernière place partie",
+          "lead": "Quelqu’un a validé son paiement juste avant vous : les places <b>{code}</b> sont prises. <b>Rien n’a été débité.</b>",
+          "with": "Avec {code}",
+          "now": "Consultation + frais",
+          "pay": "Payer {total}",
+          "close": "Fermer"
+        }
       }
     },
     "emails": {

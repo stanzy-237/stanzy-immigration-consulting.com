@@ -1,18 +1,20 @@
 'use client';
 
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { TRPCClientError } from '@trpc/client';
 import { CreditCard, ExternalLink, Info, Lock } from 'lucide-react';
 import { parsePhoneNumberFromString } from 'libphonenumber-js/min';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
+import { LastPlaceSheet, MobilePromo, type AppliedPromo } from '@/features/consultation/components/promo-field';
 import type { BookingRef } from '@/features/consultation/hooks/use-booking-ref';
 import { toE164 } from '@/features/consultation/lib/booking';
 import { countries } from '@/features/consultation/lib/countries';
+import { feeFor } from '@/features/consultation/lib/payment-fees';
 import { fcfa, timeOf } from '@/features/consultation/lib/slot-format';
 import { PRESS } from '@/features/consultation/lib/styles';
 import { cn } from '@/lib/utils';
@@ -72,6 +74,9 @@ export function PaymentStep(props: {
   bookingRef: BookingRef;
   contact: { country: string; phone: string };
   heldUntil: Date | null;
+  /** The Code promo applied, and what is left to pay with it (the price without one). */
+  promo: AppliedPromo | null;
+  amount: number | null;
   onStarted: (paymentId: string, method: PayMethod, checkoutUrl: string | null) => void;
   onFee: (fee: FeeLine | null) => void;
   onExpired: () => void;
@@ -92,6 +97,8 @@ function PaymentForm({
   onStarted,
   onFee,
   onExpired,
+  promo,
+  amount,
   country,
   onCountry,
 }: Parameters<typeof PaymentStep>[0] & { country: string; onCountry: (country: string) => void }): ReactNode {
@@ -112,7 +119,14 @@ function PaymentForm({
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<'phone' | 'otp' | 'refused' | null>(null);
 
-  const fee = network?.fee ?? null;
+  // The fee is on what is left to pay: with a Code promo, on the reduced amount.
+  const toPay = amount ?? data.price ?? 0;
+  const fee = network?.tiers ? feeFor(toPay, network.tiers) : (network?.fee ?? null);
+  const [lastPlace, setLastPlace] = useState<{ code: string; before: string | null } | null>(null);
+  const [promoEnded, setPromoEnded] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const formRef = useRef<HTMLFormElement>(null);
+  const refreshBooking = () => queryClient.invalidateQueries({ queryKey: trpc.consultation.booking.queryKey(bookingRef) });
   useEffect(() => {
     onFee(data.open ? { label: network?.name ?? null, amount: fee } : null);
   }, [data.open, network?.name, fee, onFee]);
@@ -127,7 +141,7 @@ function PaymentForm({
     );
   }
   const price = data.price;
-  const total = fee === null ? null : price + fee;
+  const total = fee === null ? null : toPay + fee;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -155,6 +169,15 @@ function PaymentForm({
       if (code === 'HOLD_EXPIRED') return onExpired();
       if (code === 'OTP_REQUIRED') return setError('otp');
       if (code === 'PAYMENT_REFUSED' || code === 'NETWORK_UNAVAILABLE') return setError('refused');
+      // The code was taken off the booking; the page shows the full price before anything is sent.
+      if (code === 'PROMO_LAST_PLACE') {
+        setLastPlace({ code: promo?.code ?? '', before: total === null ? fcfa(toPay, locale) : fcfa(total, locale) });
+        return void refreshBooking();
+      }
+      if (code === 'PROMO_ENDED' || code === 'PROMO_UNKNOWN') {
+        setPromoEnded(promo?.code ?? '');
+        return void refreshBooking();
+      }
       toast.add({ title: t('error'), type: 'error' });
     }
   }
@@ -167,7 +190,7 @@ function PaymentForm({
     ) : null;
 
   return (
-    <form onSubmit={submit} className="flex flex-1 flex-col gap-6 pb-28 lg:pb-0">
+    <form ref={formRef} onSubmit={submit} className="flex flex-1 flex-col gap-6 pb-28 lg:pb-0">
       {/* Where one pays from: the step 1 country, or another (« Payer depuis un autre pays »). */}
       <div className="flex flex-col gap-3 rounded-xl bg-off-white px-4 py-3">
         <div className="flex items-center justify-between gap-3">
@@ -328,6 +351,32 @@ function PaymentForm({
         </>
       )}
 
+      <MobilePromo bookingRef={bookingRef} promo={promo} price={price} />
+
+      {/* Mobile: the price lines above the bottom bar (desktop: in the summary). */}
+      <dl className="flex flex-col gap-2.5 text-body-sm leading-5 lg:hidden">
+        <div className="flex justify-between">
+          <dt className="text-slate">{t('price')}</dt>
+          <dd className={cn('text-ink', promo && 'text-slate line-through')}>{fcfa(price, locale)}</dd>
+        </div>
+        {promo ? (
+          <div className="flex justify-between">
+            <dt className="text-leaf">{promo.code}</dt>
+            <dd className="font-bold text-leaf">−{fcfa(promo.discount, locale)}</dd>
+          </div>
+        ) : null}
+        <div className="flex justify-between">
+          <dt className="text-slate">{network ? t('feesFor', { network: network.name }) : t('fees')}</dt>
+          <dd className="text-ink">{fee === null ? t('feesBySasPay') : `+${fcfa(fee, locale)}`}</dd>
+        </div>
+      </dl>
+
+      {promoEnded !== null ? (
+        <p role="alert" className="rounded-xl bg-honey-tint px-4 py-3.5 text-body-sm leading-5 text-honey">
+          {t('promoEnded', { code: promoEnded })}
+        </p>
+      ) : null}
+
       {error === 'refused' ? (
         <p role="alert" className="rounded-xl bg-blush px-4 py-3.5 text-body-sm leading-5 text-rouge">
           {t('errors.refused')}
@@ -338,7 +387,7 @@ function PaymentForm({
       <div className="fixed inset-x-0 bottom-0 z-20 flex items-center gap-4 border-t border-fog-light bg-white px-5 pt-4 pb-6 lg:static lg:flex-col lg:items-stretch lg:border-0 lg:p-0">
         <p className="flex flex-col lg:hidden">
           <span className="text-caption leading-4 text-slate">{total === null ? t('totalBeforeFees') : t('total')}</span>
-          <span className="font-heading text-h4 leading-6 font-extrabold whitespace-nowrap text-ink">{fcfa(total ?? price, locale)}</span>
+          <span className="font-heading text-h4 leading-6 font-extrabold whitespace-nowrap text-ink">{fcfa(total ?? toPay, locale)}</span>
         </p>
         <button
           type="submit"
@@ -350,11 +399,23 @@ function PaymentForm({
         >
           <Lock aria-hidden={true} className="size-4" strokeWidth={2.5} />
           <span className="lg:hidden">{t('payShort')}</span>
-          <span className="hidden lg:inline">{network ? (total === null ? t('pay', { amount: fcfa(price, locale) }) : t('pay', { amount: fcfa(total, locale) })) : t('payCard')}</span>
+          <span className="hidden lg:inline">{network ? t('pay', { amount: fcfa(total ?? toPay, locale) }) : t('payCard')}</span>
         </button>
         <p className="hidden text-center text-caption leading-4 text-slate lg:block">{network ? t('fine') : t('fineCard')}</p>
       </div>
       <p className="text-caption leading-4 text-slate lg:hidden">{network ? t('fine') : t('fineCard')}</p>
+
+      <LastPlaceSheet
+        open={lastPlace !== null}
+        code={lastPlace?.code ?? null}
+        before={lastPlace?.before ?? null}
+        total={fcfa((data.price ?? 0) + (network?.tiers ? (feeFor(data.price ?? 0, network.tiers) ?? 0) : 0), locale)}
+        onClose={() => setLastPlace(null)}
+        onPay={() => {
+          setLastPlace(null);
+          formRef.current?.requestSubmit();
+        }}
+      />
     </form>
   );
 }

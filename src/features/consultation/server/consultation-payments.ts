@@ -7,7 +7,7 @@ import { after } from 'next/server';
 
 import { consultationFailedEmail, consultationPaidEmail } from '@/features/consultation/lib/consultation-emails';
 import { CARD_NETWORK, HOLD_LIMIT_MINUTES, PAYING_MINUTES, PAYMENT_ERRORS, type PayInput } from '@/features/consultation/lib/payment';
-import { feeFor } from '@/features/consultation/lib/payment-fees';
+import { feeFor, type FeeTier } from '@/features/consultation/lib/payment-fees';
 import { discountFor, PROMO_ERRORS } from '@/features/consultation/lib/promo';
 import { freeSlots, MINUTE } from '@/features/consultation/lib/slots';
 import { BOOKING_LOCK, busyTimes, loadAvailability, overlapsBusy, type Db } from '@/features/consultation/server/booking-calendar';
@@ -47,6 +47,8 @@ export type PaymentOption = {
   otpInstructions: string;
   /** SasPay's fee on the price, or null when it can only be known on SasPay's side (another currency). */
   fee: number | null;
+  /** Its fee bands in FCFA, for the fee on another amount (a Code promo); null when not in FCFA. */
+  tiers: FeeTier[] | null;
 };
 
 /**
@@ -68,6 +70,7 @@ export async function paymentOptions(client: SasPay, country: string, price: num
           otpRequired: n.otpRequired,
           otpInstructions: n.otpInstructions,
           fee: FCFA.has(n.currency) ? feeFor(price, n.tiers) : null,
+          tiers: FCFA.has(n.currency) ? n.tiers : null,
         }),
       ),
     card: card ? { name: card.name, currency: card.currency } : null,

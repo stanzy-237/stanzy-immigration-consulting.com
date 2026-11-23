@@ -47,6 +47,8 @@ const held = (extra: Record<string, unknown> = {}) => ({
   answers: { topics: [], crsScore: null, itaReceived: null, situation: null },
   payment: null,
   meetingId: null,
+  promo: null,
+  amount: 12_345,
   ...extra,
 });
 
@@ -174,7 +176,7 @@ describe('ReservationView, no slot', () => {
 const OPTIONS = {
   open: true,
   price: 12_345,
-  networks: [{ code: 'mtn_cm', name: 'MTN Mobile Money', otpRequired: false, otpInstructions: '', fee: 587 }],
+  networks: [{ code: 'mtn_cm', name: 'MTN Mobile Money', otpRequired: false, otpInstructions: '', fee: 587, tiers: [{ minAmount: 0, maxAmount: null, percent: 4.75, fixed: 0, floor: null, cap: null }] }],
   card: { name: 'Carte bancaire', currency: 'USD' },
 };
 
@@ -186,6 +188,8 @@ const paymentOf = (extra: Record<string, unknown> = {}) => ({
   phone: '+237677123456',
   amount: 12_345,
   currency: 'XAF',
+  discount: 0,
+  promoCode: null,
   charged: null,
   fee: null,
   settledCurrency: null,
@@ -210,7 +214,8 @@ describe('ReservationView, paying', () => {
     await toPayment({ 'consultation.pay': pay, 'consultation.payment': () => paymentOf() });
 
     expect(await screen.findByText('MTN Mobile Money')).toBeInTheDocument();
-    expect(screen.getByText('+587 FCFA')).toBeInTheDocument();
+    // In the summary (desktop) and above the bottom bar (mobile).
+    expect(screen.getAllByText('+587 FCFA').length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole('button', { name: /Payer 12.?932 FCFA/ }));
 
     await waitFor(() =>
@@ -287,7 +292,7 @@ describe('ReservationView, paying', () => {
     await toPayment({
       'consultation.paymentOptions': () => ({
         ...OPTIONS,
-        networks: [{ code: 'orange_ci', name: 'Orange Money', otpRequired: true, otpInstructions: 'Composez #144*82# puis l’option 2.', fee: 470 }],
+        networks: [{ code: 'orange_ci', name: 'Orange Money', otpRequired: true, otpInstructions: 'Composez #144*82# puis l’option 2.', fee: 470, tiers: null }],
       }),
       'consultation.pay': pay,
     });
@@ -315,5 +320,70 @@ describe('ReservationView, paying', () => {
     });
     expect(await screen.findByText(/2,02.*\$/)).toBeInTheDocument();
     expect(screen.getByText('Débité en USD par SasPay, au taux du jour.')).toBeInTheDocument();
+  });
+});
+
+describe('ReservationView, a Code promo', () => {
+  beforeEach(() => window.sessionStorage.setItem('stanzy.consultation.booking', JSON.stringify({ id: 'con_1', token: 'x'.repeat(43) })));
+
+  const BF = { code: 'BLACKFRIDAY', reductionType: 'PERCENT', reductionValue: 70, discount: 8_642, places: 20, placesLeft: 7, endsAt: new Date('2026-11-27T22:59:00Z') };
+
+  async function toPayment(handlers: Handlers) {
+    renderPage({ 'consultation.prepare': () => ({ id: 'con_1' }), 'consultation.paymentOptions': () => OPTIONS, ...handlers });
+    fireEvent.click(await screen.findByRole('button', { name: /Continuer vers le paiement/ }));
+  }
+
+  it('applies a code: the reduction, the places left, and « Payer » for what is left plus the fee on it', async () => {
+    let promo: typeof BF | null = null;
+    const applyPromo = vi.fn(() => {
+      promo = BF;
+      return { code: 'BLACKFRIDAY' };
+    });
+    await toPayment({ 'consultation.booking': () => held({ promo, amount: promo ? 12_345 - 8_642 : 12_345 }), 'consultation.applyPromo': applyPromo });
+
+    fireEvent.click(await screen.findByRole('button', { name: /Vous avez un code promo/ }));
+    fill(/^Code promo$/, 'blackfriday');
+    fireEvent.click(screen.getByRole('button', { name: 'Appliquer' }));
+
+    await waitFor(() => expect(applyPromo).toHaveBeenCalledWith(expect.objectContaining({ id: 'con_1', code: 'BLACKFRIDAY' })));
+    expect((await screen.findAllByText(/Plus que 7 places sur 20/)).length).toBeGreaterThan(0);
+    // 3 703 FCFA left, MTN's 4,75 % on it: 176 FCFA.
+    expect(screen.getByRole('button', { name: /Payer 3.?879 FCFA/ })).toBeInTheDocument();
+  });
+
+  it('suggests the code a typo meant', async () => {
+    await toPayment({
+      'consultation.booking': () => held(),
+      'consultation.applyPromo': () => {
+        throw new Error('PROMO_UNKNOWN:BLACKFRIDAY');
+      },
+    });
+    fireEvent.click(await screen.findByRole('button', { name: /Vous avez un code promo/ }));
+    fill(/^Code promo$/, 'BLACKFRYDAY');
+    fireEvent.click(screen.getByRole('button', { name: 'Appliquer' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Ce code n’existe pas. Vérifiez l’orthographe : BLACKFRIDAY ?');
+  });
+
+  it('« Dernière place partie »: nothing charged, and paying the full price from there', async () => {
+    let promo: typeof BF | null = BF;
+    const pay = vi.fn(() => {
+      if (promo) {
+        promo = null;
+        throw new Error('PROMO_LAST_PLACE');
+      }
+      return { paymentId: paymentOf().id, checkoutUrl: null };
+    });
+    await toPayment({
+      'consultation.booking': () => held({ promo, amount: promo ? 12_345 - 8_642 : 12_345 }),
+      'consultation.pay': pay,
+      'consultation.payment': () => paymentOf(),
+    });
+    fireEvent.click(await screen.findByRole('button', { name: /Payer 3.?879 FCFA/ }));
+
+    expect(await screen.findByText('Dernière place partie')).toBeInTheDocument();
+    expect(screen.getByText(/Rien n’a été débité/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Payer 12.?932 FCFA/ }));
+    await waitFor(() => expect(pay).toHaveBeenCalledTimes(2));
+    expect(await screen.findByRole('heading', { name: 'Validez sur votre téléphone' })).toBeInTheDocument();
   });
 });

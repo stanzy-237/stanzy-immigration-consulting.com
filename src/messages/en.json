@@ -4817,7 +4817,12 @@
           "otp": "Enter the payment code you received on your phone.",
           "refused": "SasPay couldn’t start this payment: nothing was charged. Check the number, or choose another method."
         },
-        "noWay": "SasPay offers no way to pay for this country. Pick another one with “Pay from another country”."
+        "noWay": "SasPay offers no way to pay for this country. Pick another one with “Pay from another country”.",
+        "price": "Consultation",
+        "fees": "Payment fees",
+        "feesFor": "{network} fees",
+        "feesBySasPay": "set by SasPay",
+        "promoEnded": "The code {code} is no longer valid: the normal price applies. Nothing was charged; check the total and pay again."
       },
       "summary": {
         "eyebrow": "Your consultation",
@@ -4928,10 +4933,40 @@
         "paid": "Paid",
         "card": "Bank card, on the SasPay page",
         "paidAt": "Paid on {date} at {time}",
-        "converted": "Charged in {currency} by SasPay, at the day’s rate."
+        "converted": "Charged in {currency} by SasPay, at the day’s rate.",
+        "promo": "Promo code"
       },
       "returned": {
         "back": "Back to my booking"
+      },
+      "promo": {
+        "ask": "Have a promo code?",
+        "label": "Promo code",
+        "placeholder": "Your code",
+        "apply": "Apply",
+        "clear": "Clear",
+        "remove": "Remove the code {code}",
+        "removeShort": "Remove",
+        "sheetTitle": "Promo code",
+        "close": "Close",
+        "left": "Only {left, plural, one {# place} other {# places}} left of {places}",
+        "until": "valid until {date}",
+        "errors": {
+          "unknown": "This code doesn’t exist. Check the spelling.",
+          "unknownSuggest": "This code doesn’t exist. Check the spelling:",
+          "ended": "This offer has ended. The consultation stays at {price}.",
+          "soldOut": "All places for this code are gone. The consultation stays at {price}.",
+          "used": "You’ve already used this code: it’s once per account.",
+          "service": "This code doesn’t apply to the Consultation."
+        },
+        "lastPlace": {
+          "title": "Last place gone",
+          "lead": "Someone approved their payment just before you: the <b>{code}</b> places are taken. <b>Nothing was charged.</b>",
+          "with": "With {code}",
+          "now": "Consultation + fees",
+          "pay": "Pay {total}",
+          "close": "Close"
+        }
       }
     },
     "emails": {

@@ -255,11 +255,9 @@ export const consultationRouter = createTRPCRouter({
    * up here (no key, or a live key outside production): the page says so.
    */
   paymentOptions: publicProcedure
-    .input(z.object({ country: z.string().length(2), amount: z.number().int().positive().optional() }))
+    .input(z.object({ country: z.string().length(2) }))
     .query(async ({ ctx, input }) => {
-      const { price: fullPrice } = await loadAvailability(ctx.prisma);
-      // With a Code promo the fees are on what is left to pay (never more than the price).
-      const price = fullPrice === null ? null : Math.min(input.amount ?? fullPrice, fullPrice);
+      const { price } = await loadAvailability(ctx.prisma);
       const client = saspay();
       if (!client || price === null) return { open: false as const, price, networks: [], card: null };
       try {
@@ -330,6 +328,9 @@ async function paymentView(prisma: Db, payment: ConsultationPaymentRow) {
     phone: payment.phone,
     amount: payment.amount,
     currency: payment.currency,
+    /** The Code promo's reduction on this payment (FCFA), and the code. */
+    discount: payment.discount,
+    promoCode: payment.promoCodeId ? ((await prisma.promoCode.findUnique({ where: { id: payment.promoCodeId }, select: { code: true } }))?.code ?? null) : null,
     charged: payment.charged === null ? null : Number(payment.charged),
     fee: payment.fee === null ? null : Number(payment.fee),
     /** The currency of `fee` and `charged`, once paid (card: USD). */

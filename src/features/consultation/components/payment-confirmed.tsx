@@ -170,8 +170,14 @@ export function PaymentConfirmed({ payment }: { payment: PaymentView }): ReactNo
         <dl className="flex flex-col gap-3 text-body-sm leading-5">
           <div className="flex justify-between">
             <dt className="text-slate">{t('price')}</dt>
-            <dd className="text-ink">{fcfa(payment.amount, locale)}</dd>
+            <dd className="text-ink">{fcfa(payment.amount + payment.discount, locale)}</dd>
           </div>
+          {payment.discount > 0 ? (
+            <div className="flex justify-between">
+              <dt className="font-semibold text-leaf">{payment.promoCode ?? t('promo')}</dt>
+              <dd className="font-bold text-leaf">−{fcfa(payment.discount, locale)}</dd>
+            </div>
+          ) : null}
           {payment.fee ? (
             <div className="flex justify-between">
               <dt className="text-slate">{payment.network === CARD_NETWORK || !payment.networkName ? t('feesCard') : t('fees', { network: payment.networkName })}</dt>
