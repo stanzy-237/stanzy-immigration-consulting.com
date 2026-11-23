@@ -4616,6 +4616,58 @@
         "tip": "« Notez vos questions avant l’appel : on les passe toutes en revue, dans l’ordre qui compte pour vous. »",
         "tipBy": "Stanzy"
       },
+      "recap": {
+        "eyebrow": "Après l’appel",
+        "title": "Un aperçu de votre récap",
+        "lead": "Voici ce que vous trouvez dans Mon espace une fois que Stanzy l’a publié. Essayez : touchez un moment, cochez une étape.",
+        "leadShort": "Ce que vous trouvez dans Mon espace. Touchez un moment, cochez une étape.",
+        "features": [
+          "La vidéo, à revoir quand vous voulez",
+          "Les notes de Stanzy et la transcription",
+          "Vos prochaines étapes, à cocher"
+        ],
+        "readOnly": "Lecture seule : rien ne se télécharge. Visible par vous et Stanzy seulement.",
+        "example": "Exemple",
+        "demo": "Exemple de récap",
+        "play": "Lecture",
+        "length": "44:12",
+        "position": "{time} · {chapter}",
+        "tabs": [
+          "Notes de Stanzy",
+          "Transcription",
+          "Documents cités · 2"
+        ],
+        "seen": "Ce qu’on a vu · exemple",
+        "seek": "Aller à {time}",
+        "notes": [
+          {
+            "time": "02:40",
+            "chapter": "Admissibilité",
+            "text": "Votre profil est admissible à Entrée express (catégorie Travailleurs qualifiés).",
+            "short": "Votre profil est admissible à Entrée express."
+          },
+          {
+            "time": "09:12",
+            "chapter": "Points CRS",
+            "text": "Avec 452 points, le test de langue est le levier le plus rapide pour gagner des points.",
+            "short": "Avec 452 points, le test de langue est le levier le plus rapide."
+          },
+          {
+            "time": "27:05",
+            "chapter": "Documents",
+            "text": "Les documents à préparer avant de créer votre profil.",
+            "short": "Les documents à préparer avant de créer votre profil."
+          }
+        ],
+        "stepsTitle": "Vos prochaines étapes",
+        "stepsCount": "Prochaines étapes · {done} sur {total}",
+        "steps": [
+          "Passer le test de langue",
+          "Faire évaluer votre diplôme",
+          "Créer votre profil Entrée express"
+        ],
+        "stepsNote": "Exemple · Stanzy écrit cette liste après la Réunion."
+      },
       "deliverables": {
         "eyebrow": "Ce que vous repartez avec",
         "plan": {

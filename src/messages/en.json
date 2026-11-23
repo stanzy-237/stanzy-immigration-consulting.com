@@ -4599,6 +4599,58 @@
         "tip": "“Write your questions down before the call: we go through them all, in the order that matters to you.”",
         "tipBy": "Stanzy"
       },
+      "recap": {
+        "eyebrow": "After the call",
+        "title": "A preview of your recap",
+        "lead": "This is what you find in My space once Stanzy has published it. Try it: tap a moment, tick a step.",
+        "leadShort": "What you find in My space. Tap a moment, tick a step.",
+        "features": [
+          "The video, to watch again whenever you like",
+          "Stanzy’s notes and the transcript",
+          "Your next steps, to tick off"
+        ],
+        "readOnly": "Read only: nothing downloads. Visible to you and Stanzy only.",
+        "example": "Example",
+        "demo": "Example recap",
+        "play": "Play",
+        "length": "44:12",
+        "position": "{time} · {chapter}",
+        "tabs": [
+          "Stanzy’s notes",
+          "Transcript",
+          "Documents mentioned · 2"
+        ],
+        "seen": "What we covered · example",
+        "seek": "Go to {time}",
+        "notes": [
+          {
+            "time": "02:40",
+            "chapter": "Eligibility",
+            "text": "Your profile is eligible for Express Entry (Federal Skilled Worker).",
+            "short": "Your profile is eligible for Express Entry."
+          },
+          {
+            "time": "09:12",
+            "chapter": "CRS points",
+            "text": "With 452 points, the language test is the fastest way to gain points.",
+            "short": "With 452 points, the language test is the fastest lever."
+          },
+          {
+            "time": "27:05",
+            "chapter": "Documents",
+            "text": "The documents to prepare before you create your profile.",
+            "short": "The documents to prepare before you create your profile."
+          }
+        ],
+        "stepsTitle": "Your next steps",
+        "stepsCount": "Next steps · {done} of {total}",
+        "steps": [
+          "Take the language test",
+          "Get your degree assessed",
+          "Create your Express Entry profile"
+        ],
+        "stepsNote": "Example · Stanzy writes this list after the Meeting."
+      },
       "deliverables": {
         "eyebrow": "What you leave with",
         "plan": {

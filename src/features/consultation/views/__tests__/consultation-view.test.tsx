@@ -141,6 +141,30 @@ describe('ConsultationView, « Ce qu’on aborde »', () => {
   });
 });
 
+describe('ConsultationView, « Un aperçu de votre récap »', () => {
+  const demo = () => within(screen.getByRole('group', { name: 'Exemple de récap' }));
+
+  it('moves the video to the moment the visitor taps', () => {
+    renderPage();
+    expect(demo().getByText('09:12 · Points CRS')).toBeInTheDocument();
+    const moment = demo().getByRole('button', { name: /Aller à 02:40/ });
+    fireEvent.click(moment);
+    expect(moment).toHaveAttribute('aria-current', 'true');
+    expect(demo().getByText('02:40 · Admissibilité')).toBeInTheDocument();
+  });
+
+  it('ticks and unticks a next step, and counts them', () => {
+    renderPage();
+    expect(demo().getByText('Prochaines étapes · 1 sur 3')).toBeInTheDocument();
+    const step = demo().getByRole('checkbox', { name: 'Faire évaluer votre diplôme' });
+    fireEvent.click(step);
+    expect(step).toBeChecked();
+    expect(demo().getByText('Prochaines étapes · 2 sur 3')).toBeInTheDocument();
+    fireEvent.click(demo().getByRole('checkbox', { name: 'Passer le test de langue' }));
+    expect(demo().getByText('Prochaines étapes · 1 sur 3')).toBeInTheDocument();
+  });
+});
+
 describe('ConsultationView, FAQ', () => {
   it('opens one answer at a time', async () => {
     renderPage();

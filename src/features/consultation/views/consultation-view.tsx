@@ -13,6 +13,7 @@ import { CallPreview } from '@/features/consultation/components/call-preview';
 import { ConsultationJourney } from '@/features/consultation/components/consultation-journey';
 import { ConsultationFaq } from '@/features/consultation/components/consultation-faq';
 import { ConsultationTopics } from '@/features/consultation/components/consultation-topics';
+import { RecapPreview } from '@/features/consultation/components/recap-preview';
 import { LABEL_CLASS, SECTION_TITLE_CLASS } from '@/features/consultation/lib/styles';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
@@ -79,6 +80,8 @@ function ConsultationPage(): ReactNode {
       <ConsultationJourney minutes={minutes} />
 
       <ConsultationTopics />
+
+      <RecapPreview />
 
       {/* Ce que vous repartez avec */}
       <section aria-labelledby="consultation-deliverables" className="bg-off-white px-5 py-14 md:px-7 lg:py-20">
