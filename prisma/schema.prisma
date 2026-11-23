@@ -79,6 +79,7 @@ model Account {
   incomesEntered    Income[]             @relation("IncomeCreator")
   chargesEntered    Charge[]             @relation("ChargeCreator")
   problemReports    ProblemReport[]
+  consultations     Consultation[]
 
   @@map("account")
 }
@@ -1144,6 +1145,7 @@ model Meeting {
   recordings        MeetingRecording[]
   participants      MeetingParticipant[]
   joinRequests      MeetingJoinRequest[]
+  consultation      Consultation?
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
 
@@ -1545,4 +1547,46 @@ model ConsultationSettings {
   updatedAt       DateTime @updatedAt
 
   @@map("consultation_settings")
+}
+
+/// Where a Consultation stands (docs/design/consultation.md, Lifecycle). A HELD
+/// one whose `heldUntil` has passed is « Créneau libéré »: it no longer counts.
+enum ConsultationStatus {
+  HELD
+  PAID
+  CANCELLED
+}
+
+/// GLOSSARY: Consultation (#15). A paid video appointment with the consultant,
+/// booked from the public page: its slot, who booked it, what they prepared.
+model Consultation {
+  id                String             @id @default(cuid())
+  accountId         String
+  account           Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  status            ConsultationStatus @default(HELD)
+  startsAt          DateTime
+  durationMinutes   Int
+  /// The slot is kept for this Compte until then, while it pays; cleared once paid.
+  heldUntil         DateTime?
+  /// SHA-256 of the secret the booking browser keeps when its booker is not
+  /// signed in; never the secret itself.
+  holdTokenHash     String?            @unique
+  /// Step 1, Vos coordonnées: ISO country of residence and the WhatsApp number (E.164).
+  country           String
+  phone             String
+  whatsappReminders Boolean            @default(true)
+  /// Step 2, Préparer l'échange, all optional.
+  topics            String[]           @default([])
+  crsScore          Int?
+  itaReceived       Boolean?
+  situation         String?
+  /// The Réunion it is held in, created once paid.
+  meetingId         String?            @unique
+  meeting           Meeting?           @relation(fields: [meetingId], references: [id], onDelete: SetNull)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([status, startsAt])
+  @@index([accountId, createdAt])
+  @@map("consultation")
 }
