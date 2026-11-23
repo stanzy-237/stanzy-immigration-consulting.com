@@ -41,6 +41,8 @@
 
   /* Third-party brand marks (used only on their own CTAs). */
   --whatsapp: #25d366;
+  --mtn: #ffcb05; /* MTN Mobile Money yellow: payment marks and the Consultation's illustrations */
+  --stanzy-skin: #9a6440; /* Stanzy's skin in illustrations, as the content studio's mascot draws him */
 
   /* Type de tirage pills (Derniers tirages, #49): ink, tint and line per group. */
   --iris: #4338ca; /* PNP */
@@ -131,6 +133,8 @@
   --color-ink: var(--ink);
   --color-ink-deep: var(--ink-deep);
   --color-whatsapp: var(--whatsapp);
+  --color-mtn: var(--mtn);
+  --color-stanzy-skin: var(--stanzy-skin);
   /* The two inks a Client signs with (#96): black and ballpoint blue. */
   --color-pen-black: #111111;
   --color-pen-blue: #1d3fb8;
@@ -376,6 +380,12 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* An SVG layer that scales around its own centre (an illustration's « · anim » layer). */
+@utility fill-box {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 /* Holds a CSS animation where it is (a looping detail scrolled off screen). */

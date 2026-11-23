@@ -4494,17 +4494,20 @@
         "before": {
           "eyebrow": "Before",
           "title": "You book and pay",
-          "body": "A time, Mobile Money or card. You get the payment receipt and a reminder the day before."
+          "body": "A time, Mobile Money or card. You get the payment receipt and a reminder the day before.",
+          "short": "Mobile Money or card. Receipt and a reminder the day before."
         },
         "during": {
           "eyebrow": "During",
           "title": "{minutes} min with Stanzy",
-          "body": "“Join” from My space. Eligibility, CRS score, documents, what comes next."
+          "body": "“Join” from My space. Eligibility, CRS score, documents, what comes next.",
+          "short": "“Join” from My space, on your phone."
         },
         "after": {
           "eyebrow": "After",
           "title": "You watch it all again",
-          "body": "Recording and transcript in My space, announced by email."
+          "body": "Recording and transcript in My space, announced by email.",
+          "short": "Video and transcript in My space, announced by email."
         }
       },
       "topics": {

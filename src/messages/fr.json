@@ -4511,17 +4511,20 @@
         "before": {
           "eyebrow": "Avant",
           "title": "Vous réservez et payez",
-          "body": "Un créneau, Mobile Money ou carte. Vous recevez la Reconnaissance et un rappel la veille."
+          "body": "Un créneau, Mobile Money ou carte. Vous recevez la Reconnaissance et un rappel la veille.",
+          "short": "Mobile Money ou carte. Reconnaissance et rappel la veille."
         },
         "during": {
           "eyebrow": "Pendant",
           "title": "{minutes} min avec Stanzy",
-          "body": "« Rejoindre » depuis Mon espace. Admissibilité, score CRS, documents, la suite."
+          "body": "« Rejoindre » depuis Mon espace. Admissibilité, score CRS, documents, la suite.",
+          "short": "« Rejoindre » depuis Mon espace, sur votre téléphone."
         },
         "after": {
           "eyebrow": "Après",
           "title": "Vous revoyez tout",
-          "body": "Enregistrement et transcription dans Mon espace, annoncés par e-mail."
+          "body": "Enregistrement et transcription dans Mon espace, annoncés par e-mail.",
+          "short": "Vidéo et transcription dans Mon espace, annoncées par e-mail."
         }
       },
       "topics": {

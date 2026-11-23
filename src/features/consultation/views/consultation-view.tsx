@@ -10,6 +10,7 @@ import { Reveal } from '@/components/ui/reveal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BookingCard } from '@/features/consultation/components/booking-card';
 import { CallPreview } from '@/features/consultation/components/call-preview';
+import { ConsultationJourney } from '@/features/consultation/components/consultation-journey';
 import { ConsultationFaq } from '@/features/consultation/components/consultation-faq';
 import { ConsultationTopics } from '@/features/consultation/components/consultation-topics';
 import { LABEL_CLASS, SECTION_TITLE_CLASS } from '@/features/consultation/lib/styles';
@@ -21,7 +22,6 @@ import { useTRPC } from '@/trpc/client';
 /** A client's words: real ones only, written in `messages/*.json`. */
 type Review = { quote: string; author: string };
 
-const STEPS = ['before', 'during', 'after'] as const;
 const DELIVERABLES = ['plan', 'recording', 'documents'] as const;
 
 /**
@@ -76,35 +76,7 @@ function ConsultationPage(): ReactNode {
         </div>
       </section>
 
-      {/* Avant · Pendant · Après */}
-      <section aria-labelledby="consultation-steps" className="bg-ice-blue px-5 py-14 md:px-7 lg:py-22">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:gap-10">
-          <Reveal>
-            <h2 id="consultation-steps" className={SECTION_TITLE_CLASS}>
-              {t('steps.title')}
-            </h2>
-          </Reveal>
-          <ol className="grid gap-4 lg:grid-cols-3 lg:gap-6">
-            {STEPS.map((step, index) => {
-              const after = step === 'after';
-              return (
-                <li key={step}>
-                  <Reveal
-                    delay={index * 0.06}
-                    className={cn('flex h-full flex-col gap-3.5 rounded-2xl p-6 lg:p-7', after ? 'bg-navy-deep' : 'bg-white')}
-                  >
-                    <p className={cn(LABEL_CLASS, after ? 'text-rose' : 'text-rouge')}>{t(`steps.${step}.eyebrow`)}</p>
-                    <h3 className={cn('font-heading text-h4 leading-6.5 font-bold', after ? 'text-white' : 'text-ink')}>
-                      {t(`steps.${step}.title`, { minutes })}
-                    </h3>
-                    <p className={cn('text-body leading-6', after ? 'text-ice-blue' : 'text-slate')}>{t(`steps.${step}.body`)}</p>
-                  </Reveal>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-      </section>
+      <ConsultationJourney minutes={minutes} />
 
       <ConsultationTopics />
 
