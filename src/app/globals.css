@@ -307,6 +307,37 @@
       transform: scaleX(1);
     }
   }
+
+  /* The « REC » dot of the Consultation page's call preview: a slow blink while recording. */
+  --animate-rec: rec 1.2s ease-in-out infinite alternate;
+
+  @keyframes rec {
+    to {
+      opacity: 0.4;
+    }
+  }
+
+  /* Floating chips (Consultation hero): a slow ±4 px drift, as if on water. */
+  --animate-drift: drift 3s ease-in-out infinite alternate;
+
+  @keyframes drift {
+    from {
+      transform: translateY(-4px);
+    }
+    to {
+      transform: translateY(4px);
+    }
+  }
+
+  /* An illustration's « · anim » layer breathing while in view (2–3 s, docs/design/consultation-motion.md). */
+  --animate-breathe: breathe 2.5s ease-in-out infinite alternate;
+
+  @keyframes breathe {
+    to {
+      opacity: 0.55;
+      transform: scale(0.96);
+    }
+  }
 }
 
 @layer base {
@@ -345,6 +376,11 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Holds a CSS animation where it is (a looping detail scrolled off screen). */
+@utility paused {
+  animation-play-state: paused;
 }
 
 /* A side panel that sticks below the sticky site nav and scrolls on its own

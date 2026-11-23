@@ -9,6 +9,7 @@ import { QueryBoundary } from '@/components/query-boundary';
 import { Reveal } from '@/components/ui/reveal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BookingCard } from '@/features/consultation/components/booking-card';
+import { CallPreview } from '@/features/consultation/components/call-preview';
 import { ConsultationFaq } from '@/features/consultation/components/consultation-faq';
 import { ConsultationTopics } from '@/features/consultation/components/consultation-topics';
 import { LABEL_CLASS, SECTION_TITLE_CLASS } from '@/features/consultation/lib/styles';
@@ -17,8 +18,7 @@ import { SiteNav } from '@/features/landing/components/site-nav';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
-/** A figure under the hero or a client's words: real ones only, written in `messages/*.json`. */
-type Stat = { value: string; label: string };
+/** A client's words: real ones only, written in `messages/*.json`. */
 type Review = { quote: string; author: string };
 
 const STEPS = ['before', 'during', 'after'] as const;
@@ -48,7 +48,6 @@ function ConsultationPage(): ReactNode {
   // The length and the move cutoff are the consultant's Disponibilités, read with the slots.
   const { data } = useSuspenseQuery(trpc.consultation.slots.queryOptions());
   const { durationMinutes: minutes, moveCutoffHours } = data;
-  const stats = t.raw('hero.stats') as Stat[];
   const reviews = t.raw('reviews.items') as Review[];
 
   return (
@@ -68,20 +67,7 @@ function ConsultationPage(): ReactNode {
               {t('hero.title')}
             </h1>
             <p className="max-w-136 text-body leading-6 text-ice-blue lg:text-body-lg lg:leading-7">{t('hero.lead', { minutes })}</p>
-            <dl className="flex max-w-136 gap-5 border-t border-white/15 pt-4.5 lg:gap-12 lg:pt-6">
-              {[
-                ...stats,
-                {
-                  value: t('hero.duration', { minutes }),
-                  label: t('hero.durationLabel'),
-                },
-              ].map((stat) => (
-                <div key={stat.label} className="flex flex-col-reverse gap-0.5 lg:gap-1">
-                  <dt className="text-caption text-fog lg:text-body-sm lg:leading-5">{stat.label}</dt>
-                  <dd className="font-heading text-h4 leading-6 font-extrabold text-white lg:text-h3 lg:leading-8">{stat.value}</dd>
-                </div>
-              ))}
-            </dl>
+            <CallPreview className="lg:w-140" />
           </div>
           <div className="relative px-4 pb-12 lg:w-130 lg:shrink-0 lg:p-0">
             <div aria-hidden={true} className="absolute inset-x-0 top-0 h-18 bg-navy-deep lg:hidden" />

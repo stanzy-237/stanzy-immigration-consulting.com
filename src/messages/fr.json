@@ -4475,9 +4475,22 @@
         "pill": "Consultation en vidéo · {minutes} min",
         "title": "Vos questions, les réponses de Stanzy.",
         "lead": "{minutes} minutes en vidéo avec Stanzy : votre profil, votre score CRS, le bon programme. Vous repartez avec un plan, et l’enregistrement.",
-        "duration": "{minutes} min",
-        "durationLabel": "en vidéo, enregistrées",
-        "stats": []
+        "call": {
+          "rec": "REC · {time}",
+          "recShort": "REC {time}",
+          "where": "Consultation · heure de Douala",
+          "stanzy": "Stanzy",
+          "you": "Vous",
+          "captions": [
+            "« Avec le français en 2e langue, votre meilleur levier… »",
+            "« Demandez votre EDE tôt : c’est le plus long à obtenir. »",
+            "« On vise la FSW, avec le PNP en plan B. »"
+          ],
+          "crsLabel": "Score CRS",
+          "crsLabelShort": "CRS",
+          "crsValue": "462 → 512",
+          "admissible": "FSW · admissible"
+        }
       },
       "booking": {
         "title": "Choisissez votre créneau",

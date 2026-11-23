@@ -4458,9 +4458,22 @@
         "pill": "Video consultation · {minutes} min",
         "title": "Your questions, answered by Stanzy.",
         "lead": "{minutes} minutes on video with Stanzy: your profile, your CRS score, the right program. You leave with a plan, and the recording.",
-        "duration": "{minutes} min",
-        "durationLabel": "on video, recorded",
-        "stats": []
+        "call": {
+          "rec": "REC · {time}",
+          "recShort": "REC {time}",
+          "where": "Consultation · Douala time",
+          "stanzy": "Stanzy",
+          "you": "You",
+          "captions": [
+            "“With French as a second language, your best lever…”",
+            "“Request your ECA early: it takes the longest.”",
+            "“We aim for FSW, with a PNP as plan B.”"
+          ],
+          "crsLabel": "CRS score",
+          "crsLabelShort": "CRS",
+          "crsValue": "462 → 512",
+          "admissible": "FSW · eligible"
+        }
       },
       "booking": {
         "title": "Choose your time",
