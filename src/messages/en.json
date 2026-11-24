@@ -455,19 +455,23 @@
       "Verification": {
         "subject": "Confirm your email address — Stanzy",
         "greeting": "Hi {name},",
-        "body": "Thanks for signing up to Stanzy Immigration Consulting. Confirm your email address to activate your account:",
+        "body": "Thanks for signing up to Stanzy Immigration Consulting. Confirm your email address to activate your account.",
         "cta": "Confirm my address",
         "expiry": "This link expires in 1 hour.",
-        "ignore": "If you didn’t sign up, you can safely ignore this email."
+        "ignore": "If you didn’t sign up, you can safely ignore this email.",
+        "title": "Confirm your address"
       },
       "ResetPassword": {
         "subject": "Reset your password — Stanzy",
         "greeting": "Hello {name},",
-        "body": "You asked to reset the password of your Stanzy account. Choose a new one with this link:",
+        "body": "You asked to reset the password of your Stanzy account. Choose a new one with this link.",
         "cta": "Choose a new password",
         "expiry": "This link expires in 1 hour and works only once.",
-        "ignore": "If you didn’t ask for this, ignore this email: your password stays the same."
-      }
+        "ignore": "If you didn’t ask for this, ignore this email: your password stays the same.",
+        "title": "A new password"
+      },
+      "eyebrow": "Your account",
+      "footer": "Stanzy Immigration Consulting · your account e-mail"
     },
     "MotDePasseOublie": {
       "metaTitle": "Forgot password",
@@ -1834,42 +1838,69 @@
       "cta": "View my space",
       "opened": {
         "subject": "Your {service} file is open",
-        "body": "Your {service} file is open. It starts at the “{stage}” stage. You can follow its progress in your space."
+        "body": "Your {service} file is open. It starts at the “{stage}” stage. You can follow its progress in your space.",
+        "title": "Your file is open"
       },
       "stageChanged": {
         "subject": "Your {service} file changed stage",
-        "body": "Your {service} file is now at the “{stage}” stage."
+        "body": "Your {service} file is now at the “{stage}” stage.",
+        "title": "A new stage",
+        "bodyShort": "Your {service} file is moving forward."
       },
       "closed": {
         "subject": "Your {service} file is closed",
-        "body": "Your {service} file has been closed. Reason: {reason}"
+        "body": "Your {service} file has been closed. Reason: {reason}",
+        "title": "File closed",
+        "bodyShort": "Your {service} file has been closed."
       },
       "newVersion": {
         "subject": "New file in your {service} file",
-        "body": "Stanzy added a new version of “{document}” to your {service} file."
+        "body": "Stanzy added a new version of “{document}” to your {service} file.",
+        "title": "A new file"
       },
       "comment": {
         "subject": "New comment in your {service} file",
-        "body": "Stanzy commented on “{document}” in your {service} file: “{excerpt}”"
+        "body": "Stanzy commented on “{document}” in your {service} file: “{excerpt}”",
+        "title": "Stanzy commented",
+        "bodyShort": "Stanzy commented on “{document}” in your {service} file."
       },
       "signatureRequested": {
         "subject": "A document to sign in your {service} file",
         "body": "Stanzy sent you “{document}” to sign in your {service} file. Open your space to read it and sign it online.",
-        "cta": "Sign the document"
+        "cta": "Sign the document",
+        "title": "A document to sign",
+        "eyebrow": "To sign",
+        "file": "To sign online"
       },
       "signed": {
         "subject": "Document signed in your {service} file",
-        "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file."
+        "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file.",
+        "title": "It’s signed",
+        "eyebrow": "Signed",
+        "file": "Signed · with its signing certificate"
       },
       "signatureReminder": {
         "subject": "Reminder: a document to sign in your {service} file",
         "body": "“{document}” is still waiting for your signature in your {service} file. Open your space to read it and sign it online.",
-        "cta": "Sign the document"
+        "cta": "Sign the document",
+        "title": "It’s waiting for your signature",
+        "eyebrow": "Reminder · to sign",
+        "file": "To sign online"
       },
       "message": {
         "subject": "New message in your {service} file",
-        "body": "Stanzy wrote to you in your {service} file: “{excerpt}”"
-      }
+        "body": "Stanzy wrote to you in your {service} file: “{excerpt}”",
+        "title": "Stanzy wrote to you",
+        "bodyShort": "Stanzy wrote to you in your {service} file."
+      },
+      "eyebrow": "Your file",
+      "footer": "Stanzy Immigration Consulting · your {service} file",
+      "stage": "Stage",
+      "newStage": "New stage",
+      "reason": "Reason",
+      "document": "Document",
+      "on": "On “{document}”",
+      "messageLabel": "Message"
     },
     "dashboard": {
       "title": "Files",
@@ -1966,19 +1997,26 @@
       "cta": "Open the file",
       "clientUpload": {
         "subject": "{client} added “{document}”",
-        "body": "{client} uploaded a new version of “{document}” to their {service} file."
+        "body": "{client} uploaded a new version of “{document}” to their {service} file.",
+        "tag": "File",
+        "bodyShort": "{client} uploaded a new version of “{document}” to their {service} file."
       },
       "clientComment": {
         "subject": "{client} commented on “{document}”",
-        "body": "{client} commented on “{document}” in their {service} file: “{excerpt}”"
+        "body": "{client} commented on “{document}” in their {service} file: “{excerpt}”",
+        "tag": "Comment",
+        "bodyShort": "{client} commented on “{document}” in their {service} file."
       },
       "clientSigned": {
         "subject": "{client} signed “{document}”",
-        "body": "{client} signed “{document}” in their {service} file. The signed PDF was added as a new version of the document."
+        "body": "{client} signed “{document}” in their {service} file. The signed PDF was added as a new version of the document.",
+        "tag": "Signature"
       },
       "clientMessage": {
         "subject": "{client} wrote to you",
-        "body": "{client} wrote to you in their {service} file: “{excerpt}”"
+        "body": "{client} wrote to you in their {service} file: “{excerpt}”",
+        "tag": "Message",
+        "bodyShort": "{client} wrote to you in their {service} file."
       }
     },
     "documents": {
@@ -2193,11 +2231,15 @@
         "subject": "Invoice {number} – Stanzy Immigration Consulting",
         "body": "Here is your invoice {number} for your {service} file, for {total}. It is attached.",
         "bodyDue": "Here is your invoice {number} for your {service} file, for {total}, due by {due}. It is attached.",
-        "proof": "Once you have paid, upload your proof of payment in your space."
+        "proof": "Once you have paid, upload your proof of payment in your space.",
+        "eyebrow": "Invoice",
+        "title": "Your invoice {number}"
       },
       "paid": {
         "subject": "Payment received – invoice {number}",
-        "body": "We have received your payment of {total} for invoice {number}. Thank you!"
+        "body": "We have received your payment of {total} for invoice {number}. Thank you!",
+        "eyebrow": "Payment received",
+        "title": "Thank you, it’s paid"
       },
       "proof": {
         "subject": "{client} sent a proof of payment ({number})",
@@ -2206,12 +2248,24 @@
       },
       "dueSoon": {
         "subject": "Reminder: invoice {number} is due by {due}",
-        "body": "Your invoice {number} ({total}) is due on {due}."
+        "body": "Your invoice {number} ({total}) is due on {due}.",
+        "eyebrow": "Reminder · in 3 days",
+        "title": "Due in 3 days"
       },
       "overdue": {
         "subject": "Invoice {number}: the due date has passed",
-        "body": "Your invoice {number} ({total}) was due on {due}. If you have already paid, just upload your proof of payment."
-      }
+        "body": "Your invoice {number} ({total}) was due on {due}. If you have already paid, just upload your proof of payment.",
+        "eyebrow": "Past due",
+        "title": "The due date has passed"
+      },
+      "footer": "Stanzy Immigration Consulting · invoices of your file",
+      "amount": "Amount",
+      "dueBy": "To pay by",
+      "due": "Due date",
+      "duePassed": "{due} · passed",
+      "status": "Status",
+      "paidStatus": "Paid",
+      "tag": "Invoice"
     },
     "list": {
       "title": "Invoices",
@@ -2861,17 +2915,26 @@
       "sent": {
         "subject": "Your contract {number} to sign",
         "body": "Stanzy sent you “{title}” ({number}) for your {service} file. Read it and sign it online.",
-        "cta": "Read and sign"
+        "cta": "Read and sign",
+        "eyebrow": "Contract to sign",
+        "title": "Your contract is ready",
+        "file": "{number} · to sign online"
       },
       "amendmentSent": {
         "subject": "Amendment {number} to sign",
         "body": "Stanzy sent you the amendment “{title}” ({number}) to your contract, for your {service} file. Read it and sign it online.",
-        "cta": "Read and sign"
+        "cta": "Read and sign",
+        "eyebrow": "Amendment to sign",
+        "title": "An amendment to your contract",
+        "file": "{number} · amendment to sign"
       },
       "signed": {
         "subject": "Your signed contract {number}",
         "body": "You signed “{title}” ({number}). Here it is attached, with its signature certificate. You can find it in your space at any time.",
-        "cta": "See my space"
+        "cta": "See my space",
+        "eyebrow": "Contract signed",
+        "title": "Your contract is signed",
+        "file": "Attached · with its certificate"
       },
       "consultantSigned": {
         "subject": "{client} signed {number}",
@@ -2881,8 +2944,13 @@
       "reminder": {
         "subject": "Reminder: {number} to sign",
         "body": "“{title}” ({number}) is still waiting for your signature, for your {service} file. Read it and sign it online.",
-        "cta": "Read and sign"
-      }
+        "cta": "Read and sign",
+        "eyebrow": "Reminder · contract",
+        "title": "Your contract is waiting",
+        "file": "{number} · waiting for your signature"
+      },
+      "footer": "Stanzy Immigration Consulting · your {service} file",
+      "tag": "Contract"
     },
     "panel": {
       "title": "Contract",
@@ -3006,30 +3074,42 @@
       "submitted": {
         "subject": "New expression of interest: {client}",
         "body": "{client} sent an Express Entry Accompagnement request. Level worked out: {level}.",
-        "cta": "See the request"
+        "cta": "See the request",
+        "tag": "Interest request",
+        "level": "Level {level}"
       },
       "approved": {
         "subject": "Your Accompagnement request is accepted",
         "body": "Good news: Stanzy will guide you. Your file is open at the “{stage}” stage, with the list of documents to prepare.",
         "next": "Your support contract follows: sign it online in your space, then the invoice comes. There you’ll also see what’s missing and can ask your questions.",
-        "cta": "Open my file"
+        "cta": "Open my file",
+        "title": "Stanzy is with you",
+        "nextLabel": "What’s next"
       },
       "rejected": {
         "subject": "Your Accompagnement request",
         "body": "Stanzy can’t take your request forward for now.",
         "again": "You can send a new request when your situation changes.",
-        "cta": "See my request"
+        "cta": "See my request",
+        "title": "Your request"
       },
       "stanzyRequested": {
         "subject": "{client} asks Stanzy to get a document",
         "body": "{client} asks Stanzy to get “{document}”.",
-        "cta": "Open the file"
+        "cta": "Open the file",
+        "tag": "Document"
       },
       "stanzyDeclined": {
         "subject": "“{document}”: to get yourself",
         "body": "Stanzy won’t be able to get “{document}” for you: it’s still yours to provide.",
-        "cta": "See the document"
-      }
+        "cta": "See the document",
+        "eyebrow": "Document",
+        "title": "Yours to provide"
+      },
+      "eyebrow": "Accompaniment",
+      "footer": "Stanzy Immigration Consulting · Express Entry accompaniment",
+      "reasonLabel": "Reason",
+      "context": "Express Entry accompaniment"
     },
     "page": {
       "apply": "Send a request",
@@ -3411,28 +3491,44 @@
       "openDossier": "Open my file",
       "scheduled": {
         "subject": "Meeting planned: {subject}",
-        "body": "Stanzy invites you to a video meeting “{subject}” on {when}, for {minutes} minutes. It takes place in your space: the button below opens it 15 minutes before."
+        "body": "Stanzy invites you to a video meeting “{subject}” on {when}, for {minutes} minutes. It takes place in your space: the button below opens it 15 minutes before.",
+        "eyebrow": "Meeting planned",
+        "title": "A meeting with Stanzy"
       },
       "moved": {
         "subject": "Meeting moved: {subject}",
-        "body": "The meeting “{subject}” has changed: it will take place on {when}, for {minutes} minutes."
+        "body": "The meeting “{subject}” has changed: it will take place on {when}, for {minutes} minutes.",
+        "eyebrow": "Meeting moved",
+        "title": "New date"
       },
       "cancelled": {
         "subject": "Meeting cancelled: {subject}",
-        "body": "The meeting “{subject}” planned on {when} is cancelled."
+        "body": "The meeting “{subject}” planned on {when} is cancelled.",
+        "eyebrow": "Meeting cancelled",
+        "title": "Meeting cancelled"
       },
       "dayBefore": {
         "subject": "Tomorrow: {subject}",
-        "body": "Reminder: your meeting “{subject}” takes place on {when}."
+        "body": "Reminder: your meeting “{subject}” takes place on {when}.",
+        "eyebrow": "Reminder · tomorrow",
+        "title": "It’s tomorrow, {name}."
       },
       "soon": {
         "subject": "In 15 minutes: {subject}",
-        "body": "Your meeting “{subject}” starts soon, on {when}. You can join it now."
+        "body": "Your meeting “{subject}” starts soon, on {when}. You can join it now.",
+        "eyebrow": "Reminder · 15 min",
+        "title": "In 15 minutes."
       },
       "instant": {
         "subject": "Stanzy is waiting for you: {subject}",
-        "body": "Stanzy opened a video meeting “{subject}”, now. Join it with the button below."
-      }
+        "body": "Stanzy opened a video meeting “{subject}”, now. Join it with the button below.",
+        "eyebrow": "Now",
+        "title": "Stanzy is waiting for you"
+      },
+      "footer": "Stanzy Immigration Consulting · your meetings",
+      "sub": "Douala time · {minutes} min",
+      "subRecorded": "Douala time · {minutes} min · recorded",
+      "subCancelled": "Douala time · cancelled"
     },
     "panel": {
       "title": "Meetings",
@@ -4981,8 +5077,13 @@
         "receipt": "Paid: {amount} with {network}.",
         "room": "The meeting takes place in My space: the “Join” button opens 15 minutes before. It is recorded, and the recording stays available to you afterwards.",
         "noRefund": "The Consultation can’t be refunded; you can move it from My space.",
-        "cta": "Open My space",
-        "invoice": "Your paid invoice is attached."
+        "cta": "Prepare the meeting",
+        "invoice": "Your paid invoice is attached.",
+        "eyebrow": "Consultation confirmed",
+        "title": "You’re booked, {name}.",
+        "row": "Paid · {how}",
+        "card": "bank card",
+        "lead": "Your payment came through. Stanzy is expecting you for {minutes} minutes on video, in My space."
       },
       "failed": {
         "subject": "Your payment didn’t go through",
@@ -4990,8 +5091,15 @@
         "nothing": "Nothing was charged.",
         "held": "Your slot on {when} stays held until {time}: you can try again until then.",
         "released": "Your slot has been released; you can choose another one.",
-        "cta": "Try again"
-      }
+        "cta": "Try again",
+        "eyebrow": "Payment not completed",
+        "title": "The payment didn’t go through.",
+        "row": "To pay · {how}"
+      },
+      "help": "A question? Reply on WhatsApp to Stanzy.",
+      "footer": "Stanzy Immigration Consulting · sent because you booked a consultation.",
+      "where": "Douala time · video in My space",
+      "whatsapp": "Message Stanzy"
     },
     "promoCodes": {
       "eyebrow": "Billing",

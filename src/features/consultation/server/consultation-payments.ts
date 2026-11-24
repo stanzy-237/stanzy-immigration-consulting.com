@@ -258,8 +258,10 @@ export async function settlePayment(prisma: Db, paymentId: string, verdict: SasP
       name: consultation.account.name,
       locale: lang,
       startsAt: consultation.startsAt,
+      durationMinutes: consultation.durationMinutes,
       heldUntil: consultation.heldUntil,
       network: payment.networkName,
+      amount: payment.amount,
       url: `${siteUrl()}/${lang}/services/consultation/reserver`,
     }),
   );
@@ -281,7 +283,10 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(${BOOKING_LOCK})`;
     const payment = await tx.consultationPayment.findUniqueOrThrow({
       where: { id: paymentId },
-      include: { consultation: { include: { account: { select: { id: true, name: true, email: true, locale: true } } } } },
+      include: {
+        consultation: { include: { account: { select: { id: true, name: true, email: true, locale: true } } } },
+        promoCode: { select: { code: true, reductionType: true, reductionValue: true } },
+      },
     });
     if (payment.status === 'SUCCESS') return null;
     // Its Facture payée: the next number of the year, shared with the Dossiers' Factures.
@@ -339,7 +344,10 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
       data: { status: 'PAID', paidAt: now, paidById: paymentId, meetingId: meeting.id, heldUntil: null, startsAt },
     });
     await tx.account.updateMany({ where: { id: consultation.accountId, status: 'USER' }, data: { status: 'LEAD' } });
-    return { account: consultation.account, startsAt, moved, meetingId: meeting.id, durationMinutes: consultation.durationMinutes, payment };
+    const code = payment.promoCode;
+    // « BLACKFRIDAY −70 % » on the confirmation's money row.
+    const promo = code ? `${code.code} −${code.reductionType === 'PERCENT' ? `${code.reductionValue} %` : `${payment.discount} FCFA`}` : null;
+    return { account: consultation.account, startsAt, moved, meetingId: meeting.id, durationMinutes: consultation.durationMinutes, payment, promo };
   });
   if (!done) return;
 
@@ -358,6 +366,7 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
       durationMinutes: done.durationMinutes,
       paid: verdict.charged ? { amount: Number(verdict.charged), currency: verdict.currency ?? done.payment.currency } : { amount: done.payment.amount, currency: done.payment.currency },
       network: done.payment.networkName,
+      promo: done.promo,
       moved: done.moved,
       url: `${siteUrl()}/${lang}${clientRoomPath(done.meetingId)}`,
     });

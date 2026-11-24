@@ -13,7 +13,9 @@ describe('the Client’s Dossier emails', () => {
       change: { kind: 'stageChanged', stage: 'envoi' },
     });
     expect(fr.subject).toBe('Votre dossier Évaluation des diplômes (EDE) a changé d’étape');
-    expect(fr.text).toContain('« Envoi à l’organisme »');
+    // The new stage, in the card under the text (board 3.4).
+    expect(fr.text).toContain('Nouvelle étape · Envoi à l’organisme');
+    expect(fr.html).toContain('Envoi à l’organisme');
     expect(fr.text).toContain(base.url);
 
     const en = dossierEmail({
@@ -22,7 +24,7 @@ describe('the Client’s Dossier emails', () => {
       service: 'EDE',
       change: { kind: 'stageChanged', stage: 'envoi' },
     });
-    expect(en.text).toContain('“Sending to the body”');
+    expect(en.text).toContain('New stage · Sending to the body');
   });
 
   it('gives the reason when the Dossier is closed, escaped in the HTML', () => {
@@ -32,7 +34,7 @@ describe('the Client’s Dossier emails', () => {
       service: 'VERIFICATION',
       change: { kind: 'closed', reason: 'Refus <IRCC>' },
     });
-    expect(email.text).toContain('Motif : Refus <IRCC>');
+    expect(email.text).toContain('Motif · Refus <IRCC>');
     expect(email.html).toContain('Refus &lt;IRCC&gt;');
   });
 });

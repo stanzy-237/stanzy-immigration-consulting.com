@@ -3,17 +3,10 @@ import { createTranslator } from 'next-intl';
 import { toLocale } from '@/i18n/routing';
 import en from '@/messages/en.json';
 import fr from '@/messages/fr.json';
+import { brandEmail } from '@/server/email/brand-email';
 import type { EmailMessage } from '@/server/email/mailer';
 
 const MESSAGES = { fr, en } as const;
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
-}
 
 type LinkEmailOptions = {
   to: string;
@@ -33,8 +26,8 @@ export function resetPasswordEmail(opts: LinkEmailOptions): EmailMessage {
 }
 
 /**
- * A short email whose point is one link: greeting, body, button, expiry and
- * "ignore this if it wasn't you". Copy comes from `Auth.Emails.<kind>`.
+ * A short email whose point is one link (board 3.1): greeting and body,
+ * button, expiry and "ignore this if it wasn't you". Copy comes from `Auth.Emails.<kind>`.
  */
 function linkEmail(
   kind: 'Verification' | 'ResetPassword',
@@ -46,19 +39,19 @@ function linkEmail(
     messages: MESSAGES[locale],
     namespace: `Auth.Emails.${kind}`,
   });
-  const greeting = t('greeting', { name: opts.name });
+  const shared = createTranslator({ locale, messages: MESSAGES[locale], namespace: 'Auth.Emails' });
 
-  return {
+  // Board 3.1: the link is the e-mail's only point; its expiry and « ignore it » under the button.
+  return brandEmail({
     to: opts.to,
     subject: t('subject'),
-    text: [greeting, '', t('body'), '', opts.url, '', t('expiry'), t('ignore')].join(
-      '\n',
-    ),
-    html: `<div style="font-family:Arial,sans-serif;color:#0D1F4E;line-height:1.5">
-<p>${escapeHtml(greeting)}</p>
-<p>${escapeHtml(t('body'))}</p>
-<p><a href="${escapeHtml(opts.url)}" style="display:inline-block;background:#CC1627;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">${escapeHtml(t('cta'))}</a></p>
-<p style="font-size:13px;color:#5B6478">${escapeHtml(t('expiry'))}<br>${escapeHtml(t('ignore'))}</p>
-</div>`,
-  };
+    eyebrow: shared('eyebrow'),
+    art: kind === 'Verification' ? 'envelope' : 'lock',
+    title: t('title'),
+    // « Bonjour Aminata, merci pour… »: one sentence, as the board reads.
+    lines: [`${t('greeting', { name: opts.name })} ${t('body').charAt(0).toLowerCase()}${t('body').slice(1)}`],
+    cta: { label: t('cta'), url: opts.url },
+    note: `${t('expiry')} ${t('ignore')}`,
+    footer: shared('footer'),
+  });
 }
