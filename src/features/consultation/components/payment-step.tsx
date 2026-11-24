@@ -193,8 +193,9 @@ function PaymentForm({
     <form ref={formRef} onSubmit={submit} className="flex flex-1 flex-col gap-6 pb-28 lg:pb-0">
       {/* Where one pays from: the step 1 country, or another (« Payer depuis un autre pays »). */}
       <div className="flex flex-col gap-3 rounded-xl bg-off-white px-4 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-body-sm leading-5 text-ink">{t.rich('country', { country: countryName, b: (c) => <b>{c}</b> })}</p>
+        {/* Mobile: the country, then the link under it; desktop: side by side. */}
+        <div className="flex flex-col items-start gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+          <p className="text-body-sm leading-5 text-ink">{t.rich('country', { country: countryName, b: (c) => <b className="whitespace-nowrap">{c}</b> })}</p>
           <button
             type="button"
             onClick={() => setPicking((open) => !open)}

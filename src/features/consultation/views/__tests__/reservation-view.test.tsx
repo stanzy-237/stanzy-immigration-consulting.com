@@ -351,6 +351,25 @@ describe('ReservationView, a Code promo', () => {
     expect(screen.getByRole('button', { name: /Payer 3.?879 FCFA/ })).toBeInTheDocument();
   });
 
+  it('mobile: « Appliquer » in the promo sheet applies the code and never pays', async () => {
+    const applyPromo = vi.fn(() => ({ code: 'BLACKFRIDAY' }));
+    const pay = vi.fn();
+    await toPayment({ 'consultation.booking': () => held(), 'consultation.applyPromo': applyPromo, 'consultation.pay': pay });
+
+    // The row inside step 3 (mobile), not the summary's link (desktop).
+    const row = await waitFor(() => {
+      const found = screen.getAllByRole('button', { name: /Vous avez un code promo/ }).find((button) => button.closest('form'));
+      if (!found) throw new Error('step 3 not loaded yet');
+      return found;
+    });
+    fireEvent.click(row);
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Code promo' }), { target: { value: 'BLACKFRIDAY' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Appliquer' }));
+
+    await waitFor(() => expect(applyPromo).toHaveBeenCalled());
+    expect(pay).not.toHaveBeenCalled();
+  });
+
   it('suggests the code a typo meant', async () => {
     await toPayment({
       'consultation.booking': () => held(),

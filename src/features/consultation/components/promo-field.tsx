@@ -93,6 +93,9 @@ function PromoForm({ bookingRef, price, onApplied, autoFocus = false }: { bookin
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    // The mobile sheet is portalled out of step 3's form, but React still bubbles its submit
+    // up the component tree: without this, « Appliquer » would also press « Payer ».
+    event.stopPropagation();
     if (!code.trim()) return;
     try {
       await apply.mutateAsync({ ...bookingRef, code });

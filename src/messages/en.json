@@ -4495,8 +4495,8 @@
         "before": {
           "eyebrow": "Before",
           "title": "You book and pay",
-          "body": "A time, Mobile Money or card. You get the payment receipt and a reminder the day before.",
-          "short": "Mobile Money or card. Receipt and a reminder the day before."
+          "body": "A time, Mobile Money or card. You get your paid invoice and a reminder the day before.",
+          "short": "Mobile Money or card. Invoice and a reminder the day before."
         },
         "during": {
           "eyebrow": "During",
@@ -4834,7 +4834,7 @@
         "included": [
           "Video Meeting in My space",
           "Recording and transcript",
-          "Payment receipt by email"
+          "Paid invoice by e-mail"
         ],
         "price": "Consultation",
         "total": "Total",
@@ -4920,7 +4920,7 @@
       },
       "confirmed": {
         "title": "You’re booked, {name}.",
-        "lead": "Payment received. The confirmation is on its way by e-mail.",
+        "lead": "Payment received. The confirmation and your paid invoice are on their way by e-mail.",
         "when": "{weekday} · {start} – {end}",
         "what": "Video with Stanzy · {minutes} min · Douala time",
         "note": "The meeting takes place in My space. The “Join” button opens 15 minutes before, and the recording stays available to you afterwards.",
@@ -4935,7 +4935,9 @@
         "card": "Bank card, on the SasPay page",
         "paidAt": "Paid on {date} at {time}",
         "converted": "Charged in {currency} by SasPay, at the day’s rate.",
-        "promo": "Promo code"
+        "promo": "Promo code",
+        "invoice": "Download the invoice (PDF)",
+        "receiptNumber": "Paid invoice · {number}"
       },
       "returned": {
         "back": "Back to my booking"
@@ -4979,7 +4981,8 @@
         "receipt": "Paid: {amount} with {network}.",
         "room": "The meeting takes place in My space: the “Join” button opens 15 minutes before. It is recorded, and the recording stays available to you afterwards.",
         "noRefund": "The Consultation can’t be refunded; you can move it from My space.",
-        "cta": "Open My space"
+        "cta": "Open My space",
+        "invoice": "Your paid invoice is attached."
       },
       "failed": {
         "subject": "Your payment didn’t go through",
@@ -5057,7 +5060,18 @@
           "services": "Choose at least one service.",
           "taken": "An active code already has this name."
         }
-      }
+      },
+      "endPrefix": "Ends"
+    },
+    "invoice": {
+      "service": "Video consultation",
+      "serviceLabel": "Service",
+      "line": "Video consultation with Stanzy · {minutes} min · {when}",
+      "promo": "Promo code {code}",
+      "card": "bank card",
+      "paid": "Paid on {date} by {how}, through SasPay.",
+      "fees": "Charged: {charged}, including {fee} of SasPay fees paid by the client.",
+      "noRefund": "Non-refundable: the Consultation can be moved from My space."
     }
   }
 }

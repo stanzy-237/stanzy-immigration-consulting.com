@@ -12,8 +12,8 @@ const MESSAGES = { fr, en } as const;
 
 /**
  * « Votre Consultation est confirmée » (board `3.2`): sent once SasPay said
- * `SUCCESS`, with the slot (« heure de Douala »), what was paid and a button
- * to its Réunion in Mon espace. `moved`: the slot was taken while the payment
+ * `SUCCESS`, with the slot (« heure de Douala »), what was paid, its Facture
+ * payée attached (by the caller), and a button to its Réunion in Mon espace. `moved`: the slot was taken while the payment
  * was on its way, so it is the next free one; the Client can still move it.
  */
 export function consultationPaidEmail(opts: {
@@ -36,6 +36,7 @@ export function consultationPaidEmail(opts: {
     t('paid.body', { when, minutes: opts.durationMinutes }),
     ...(opts.moved ? [t('paid.moved')] : []),
     t('paid.receipt', { amount: money(opts.paid.amount, opts.paid.currency, lang === 'fr' ? 'fr-FR' : 'en-CA'), network: opts.network ?? 'SasPay' }),
+    t('paid.invoice'),
     t('paid.room'),
     t('paid.noRefund'),
   ];

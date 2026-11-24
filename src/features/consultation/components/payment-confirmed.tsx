@@ -1,5 +1,6 @@
 'use client';
 
+import { Download } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
@@ -8,7 +9,7 @@ import type { ReactNode } from 'react';
 import { NetworkMark } from '@/features/consultation/components/payment-step';
 import type { PaymentView } from '@/features/consultation/components/payment-progress';
 import { isFcfa, money } from '@/features/consultation/lib/money';
-import { CARD_NETWORK } from '@/features/consultation/lib/payment';
+import { CARD_NETWORK, consultationInvoicePath } from '@/features/consultation/lib/payment';
 import { fcfa, timeOf } from '@/features/consultation/lib/slot-format';
 import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
 import { clientRoomPath } from '@/features/meetings/lib/meeting-schema';
@@ -165,7 +166,7 @@ export function PaymentConfirmed({ payment }: { payment: PaymentView }): ReactNo
       {/* The receipt. */}
       <section aria-labelledby="payment-receipt" className="flex w-full flex-col gap-4 rounded-3xl border border-fog-light bg-white p-6 lg:w-105 lg:p-7">
         <h2 id="payment-receipt" className={cn(LABEL_CLASS, 'text-slate')}>
-          {t('receipt')}
+          {payment.invoiceNumber ? t('receiptNumber', { number: payment.invoiceNumber }) : t('receipt')}
         </h2>
         <dl className="flex flex-col gap-3 text-body-sm leading-5">
           <div className="flex justify-between">
@@ -199,6 +200,13 @@ export function PaymentConfirmed({ payment }: { payment: PaymentView }): ReactNo
             </span>
           </p>
         </div>
+        <a
+          href={`${consultationInvoicePath(payment.id)}?download`}
+          className={cn('flex h-12 items-center justify-center gap-2 rounded-full border-2 border-navy-deep font-heading text-body-sm font-bold text-ink', PRESS)}
+        >
+          <Download aria-hidden={true} className="size-4" strokeWidth={2.5} />
+          {t('invoice')}
+        </a>
       </section>
     </div>
   );

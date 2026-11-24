@@ -330,6 +330,8 @@ async function paymentView(prisma: Db, payment: ConsultationPaymentRow) {
     currency: payment.currency,
     /** The Code promo's reduction on this payment (FCFA), and the code. */
     discount: payment.discount,
+    /** The Facture payée's number, once SasPay said `SUCCESS`. */
+    invoiceNumber: payment.invoiceNumber,
     promoCode: payment.promoCodeId ? ((await prisma.promoCode.findUnique({ where: { id: payment.promoCodeId }, select: { code: true } }))?.code ?? null) : null,
     charged: payment.charged === null ? null : Number(payment.charged),
     fee: payment.fee === null ? null : Number(payment.fee),

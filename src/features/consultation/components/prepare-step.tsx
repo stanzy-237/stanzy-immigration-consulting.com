@@ -140,9 +140,10 @@ export function PrepareStep({
             onChange={(e) => setCrs(e.target.value.replace(/\D/g, ''))}
             className="h-14 rounded-xl border border-fog bg-white px-4 text-center font-heading text-h4 font-bold text-ink outline-none focus:border-2 focus:border-navy-deep lg:h-12 lg:rounded-lg lg:text-left lg:font-body lg:text-body lg:font-normal"
           />
-          <p className="flex items-center gap-1 text-caption leading-4 text-slate">
-            {t('noScore')}
-            <Link href="/outils/crs" target="_blank" className="flex items-center gap-0.5 font-semibold text-ink underline underline-offset-2">
+          {/* Flowing text, so a narrow column wraps between words, never inside the link. */}
+          <p className="text-caption leading-4 text-slate">
+            {t('noScore')}{' '}
+            <Link href="/outils/crs" target="_blank" className="inline-flex items-center gap-0.5 font-semibold whitespace-nowrap text-ink underline underline-offset-2">
               <span className="lg:hidden">{t('calculatorMobile')}</span>
               <span className="hidden lg:inline">{t('calculator')}</span>
               <ArrowUpRight aria-hidden={true} className="hidden size-3 lg:block" strokeWidth={2.2} />

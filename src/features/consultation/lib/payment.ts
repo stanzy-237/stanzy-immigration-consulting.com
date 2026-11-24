@@ -62,3 +62,6 @@ export const CARD_NETWORK = 'card';
 
 /** A payment as its page follows it: the booking it belongs to, and its own id. */
 export const paymentRefSchema = bookingRefSchema.extend({ paymentId: z.uuid() });
+
+/** Where a paid Consultation's Facture is downloaded: the payment's id (a random UUID) is its key. */
+export const consultationInvoicePath = (paymentId: string): string => `/api/consultation/invoices/${paymentId}`;

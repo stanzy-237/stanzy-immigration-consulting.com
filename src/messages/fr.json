@@ -4512,8 +4512,8 @@
         "before": {
           "eyebrow": "Avant",
           "title": "Vous réservez et payez",
-          "body": "Un créneau, Mobile Money ou carte. Vous recevez la Reconnaissance et un rappel la veille.",
-          "short": "Mobile Money ou carte. Reconnaissance et rappel la veille."
+          "body": "Un créneau, Mobile Money ou carte. Vous recevez votre facture payée et un rappel la veille.",
+          "short": "Mobile Money ou carte. Facture et rappel la veille."
         },
         "during": {
           "eyebrow": "Pendant",
@@ -4851,7 +4851,7 @@
         "included": [
           "Réunion vidéo dans Mon espace",
           "Enregistrement et transcription",
-          "Reconnaissance de paiement par e-mail"
+          "Facture payée par e-mail"
         ],
         "price": "Consultation",
         "total": "Total",
@@ -4937,7 +4937,7 @@
       },
       "confirmed": {
         "title": "C’est réservé, {name}.",
-        "lead": "Paiement reçu. La confirmation est partie par e-mail.",
+        "lead": "Paiement reçu. La confirmation et votre facture payée sont parties par e-mail.",
         "when": "{weekday} · {start} – {end}",
         "what": "Vidéo avec Stanzy · {minutes} min · heure de Douala",
         "note": "La réunion se passe dans Mon espace. Le bouton « Rejoindre » s’active 15 minutes avant, et l’enregistrement vous reste ensuite.",
@@ -4952,7 +4952,9 @@
         "card": "Carte bancaire, sur la page SasPay",
         "paidAt": "Payé le {date} à {time}",
         "converted": "Débité en {currency} par SasPay, au taux du jour.",
-        "promo": "Code promo"
+        "promo": "Code promo",
+        "invoice": "Télécharger la facture (PDF)",
+        "receiptNumber": "Facture payée · {number}"
       },
       "returned": {
         "back": "Reprendre ma réservation"
@@ -4996,7 +4998,8 @@
         "receipt": "Payé : {amount} avec {network}.",
         "room": "La réunion se passe dans Mon espace : le bouton « Rejoindre » s’active 15 minutes avant. Elle est enregistrée, et l’enregistrement vous reste ensuite.",
         "noRefund": "La Consultation n’est pas remboursable ; vous pouvez la déplacer depuis Mon espace.",
-        "cta": "Ouvrir Mon espace"
+        "cta": "Ouvrir Mon espace",
+        "invoice": "Votre facture payée est en pièce jointe."
       },
       "failed": {
         "subject": "Votre paiement n’est pas passé",
@@ -5074,7 +5077,18 @@
           "services": "Choisissez au moins un service.",
           "taken": "Un code actif porte déjà ce nom."
         }
-      }
+      },
+      "endPrefix": "Fin"
+    },
+    "invoice": {
+      "service": "Consultation vidéo",
+      "serviceLabel": "Service",
+      "line": "Consultation vidéo avec Stanzy · {minutes} min · {when}",
+      "promo": "Code promo {code}",
+      "card": "carte bancaire",
+      "paid": "Payée le {date} par {how}, via SasPay.",
+      "fees": "Débité : {charged}, dont {fee} de frais SasPay à la charge du client.",
+      "noRefund": "Non remboursable : la Consultation peut être déplacée depuis Mon espace."
     }
   }
 }

@@ -11,12 +11,15 @@ import { feeFor, type FeeTier } from '@/features/consultation/lib/payment-fees';
 import { discountFor, PROMO_ERRORS } from '@/features/consultation/lib/promo';
 import { freeSlots, MINUTE } from '@/features/consultation/lib/slots';
 import { BOOKING_LOCK, busyTimes, loadAvailability, overlapsBusy, type Db } from '@/features/consultation/server/booking-calendar';
+import { consultationInvoice } from '@/features/consultation/server/consultation-invoice';
 import { checkPromo } from '@/features/consultation/server/promo-codes';
 import { SasPayError, type SasPay, type SasPayNetwork, type SasPayVerdict } from '@/features/consultation/server/saspay';
+import { invoiceNumber } from '@/features/invoices/lib/invoice-status';
 import { clientRoomPath, newInviteToken } from '@/features/meetings/lib/meeting-schema';
 import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
 import { appMailer } from '@/server/email/app-mailer';
+import type { EmailMessage } from '@/server/email/mailer';
 
 /** FCFA: the price's currency, and the two currencies SasPay can take it in as is (1 XAF = 1 XOF). */
 const FCFA = new Set(['XAF', 'XOF']);
@@ -249,7 +252,7 @@ export async function settlePayment(prisma: Db, paymentId: string, verdict: SasP
   const { consultation } = payment;
   if (consultation.status !== 'HELD') return;
   const lang = toLocale(consultation.account.locale);
-  mailLater(
+  mailLater(async () =>
     consultationFailedEmail({
       to: consultation.account.email,
       name: consultation.account.name,
@@ -281,9 +284,13 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
       include: { consultation: { include: { account: { select: { id: true, name: true, email: true, locale: true } } } } },
     });
     if (payment.status === 'SUCCESS') return null;
+    // Its Facture payée: the next number of the year, shared with the Dossiers' Factures.
+    const year = now.getUTCFullYear();
+    const counter = await tx.invoiceCounter.upsert({ where: { year }, create: { year, last: 1 }, update: { last: { increment: 1 } } });
     await tx.consultationPayment.update({
       where: { id: paymentId },
       data: {
+        invoiceNumber: invoiceNumber(year, counter.last),
         status: 'SUCCESS',
         fee: decimal(verdict.fee),
         charged: decimal(verdict.charged),
@@ -337,8 +344,13 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
   if (!done) return;
 
   const lang = toLocale(done.account.locale);
-  mailLater(
-    consultationPaidEmail({
+  // The confirmation carries the Facture payée as a PDF.
+  mailLater(async () => {
+    const invoice = await consultationInvoice(prisma, paymentId).catch((error: unknown) => {
+      console.error('[consultation] could not draw the Facture', paymentId, error);
+      return null;
+    });
+    const message = consultationPaidEmail({
       to: done.account.email,
       name: done.account.name,
       locale: lang,
@@ -348,17 +360,18 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
       network: done.payment.networkName,
       moved: done.moved,
       url: `${siteUrl()}/${lang}${clientRoomPath(done.meetingId)}`,
-    }),
-  );
+    });
+    return invoice ? { ...message, attachments: [{ filename: `${invoice.number}.pdf`, content: invoice.pdf }] } : message;
+  });
 }
 
 /** Sends after the response; a failure is logged, never thrown (the payment is already recorded). */
-function mailLater(message: Parameters<typeof appMailer.send>[0]): void {
+function mailLater(make: () => Promise<EmailMessage>): void {
   const send = async () => {
     try {
-      await appMailer.send(message);
+      await appMailer.send(await make());
     } catch (error) {
-      console.error('[consultation] could not send', message.subject, error);
+      console.error('[consultation] could not send an e-mail', error);
     }
   };
   try {

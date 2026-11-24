@@ -148,8 +148,9 @@ function CodeRow({ code }: { code: Code }): ReactNode {
   const share = code.places ? Math.min(1, code.used / code.places) : 0;
   const services = code.services.map((s) => t(`services.${s as PromoService}`)).join(', ');
   const end = code.endsAt ? new Date(code.endsAt) : null;
+  // « Ven. 27 nov. · 23:59 »: the day and the time apart, as the design reads.
   const endLabel = end
-    ? format.dateTime(end, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: DOUALA })
+    ? `${format.dateTime(end, { weekday: 'short', day: 'numeric', month: 'short', timeZone: DOUALA })} · ${format.dateTime(end, { hour: '2-digit', minute: '2-digit', timeZone: DOUALA })}`
     : t('noEnd');
   const endNote = end ? (end > now ? t('endIn', { relative: format.relativeTime(end, now) }) : t('ended')) : code.status === 'SOLD_OUT' ? t('limitReached') : null;
 
@@ -163,9 +164,13 @@ function CodeRow({ code }: { code: Code }): ReactNode {
             {reduction(code)} · {services}
           </p>
         </div>
-        <p className="font-heading text-body font-extrabold text-ink tabular-nums lg:hidden">
-          {code.places === null ? t('usedOnly', { used: code.used }) : `${code.used} / ${code.places}`}
-        </p>
+        {code.places === null ? (
+          <p className="shrink-0 text-body-sm leading-5 font-semibold text-slate tabular-nums lg:hidden">{t('usedOnly', { used: code.used })}</p>
+        ) : (
+          <p className="shrink-0 font-heading text-body font-extrabold text-ink tabular-nums lg:hidden">
+            {code.used} / {code.places}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-2 lg:col-span-3">
@@ -187,9 +192,12 @@ function CodeRow({ code }: { code: Code }): ReactNode {
       </div>
 
       <div className="flex items-center justify-between gap-3 lg:col-span-4">
-        <div className="flex flex-col gap-0.5 text-caption leading-4 text-slate lg:text-body-sm lg:leading-5">
-          <span className="font-semibold text-ink first-letter:uppercase">{endLabel}</span>
-          {endNote ? <span>{end ? `${t('douala')} · ${endNote}` : endNote}</span> : null}
+        <div className="flex flex-col gap-0.5">
+          <span className="text-body-sm leading-5 font-bold text-ink tabular-nums first-letter:uppercase lg:text-body lg:leading-6">
+            <span className="text-slate lg:hidden">{end ? `${t('endPrefix')} ` : ''}</span>
+            {endLabel}
+          </span>
+          {endNote ? <span className="text-caption leading-4 text-slate lg:text-body-sm lg:leading-5">{end ? `${t('douala')} · ${endNote}` : endNote}</span> : null}
         </div>
         <button
           type="button"

@@ -9,6 +9,9 @@ import { createCaller } from '@/server/trpc/root';
 vi.mock('@/server/bot-check', () => ({ isBotRequest: vi.fn(async () => false) }));
 const mail = vi.hoisted(() => ({ appMailer: { send: vi.fn(async () => {}) } }));
 vi.mock('@/server/email/app-mailer', () => mail);
+// The Facture's PDF is drawn from the letterhead and the consultant's signature: tested on its own.
+const invoice = vi.hoisted(() => ({ consultationInvoice: vi.fn(async () => ({ number: 'STZ-2026-0001', pdf: Buffer.from('%PDF') })) }));
+vi.mock('@/features/consultation/server/consultation-invoice', () => invoice);
 
 /** Seam: SasPay itself, as the sandbox's magic numbers would answer. */
 const gateway = vi.hoisted(() => ({
@@ -75,6 +78,7 @@ function fakeDatabase({ meetings = [] as Row[], others = [] as Row[], codes = []
   ];
   // `paid`: payments made earlier by others (or this Compte, `accountId`), with a code.
   const payments: Row[] = paid.map((p) => ({ status: 'SUCCESS', createdAt: new Date(), ...p }));
+  let invoices = 0;
   const promoCodes: Row[] = codes.map((c) => ({ deletedAt: null, endsAt: null, places: null, oncePerAccount: true, services: ['CONSULTATION'], ...c }));
   const createdMeetings: Row[] = [...meetings];
   const withAccount = (row: Row | undefined) => (row ? { ...row, account } : null);
@@ -155,6 +159,9 @@ function fakeDatabase({ meetings = [] as Row[], others = [] as Row[], codes = []
         const row = find(payments, where)!;
         return { ...row, consultation: withAccount(find(consultations, { id: row.consultationId })) };
       },
+    },
+    invoiceCounter: {
+      upsert: async () => ({ year: 2026, last: ++invoices }),
     },
     $executeRaw: async () => 0,
     $transaction: async (work: unknown) => (typeof work === 'function' ? work(db) : Promise.all(work as Promise<unknown>[])),
@@ -303,6 +310,12 @@ describe('consultation.payment, after paying', () => {
     expect(consultations[0]).toMatchObject({ status: 'PAID', meetingId: 'meet_1', heldUntil: null, startsAt: START });
     expect(meetings[0]).toMatchObject({ startsAt: START, recording: true, plannedById: 'acc_stanzy', participants: { create: [{ accountId: 'acc_1' }] } });
     expect(account.status).toBe('LEAD');
+    // Its Facture payée, numbered with the Dossiers' Factures, attached to the confirmation.
+    expect(payments[0]!.invoiceNumber).toBe('STZ-2026-0001');
+    expect(view).toMatchObject({ invoiceNumber: 'STZ-2026-0001' });
+    expect(mail.appMailer.send).toHaveBeenCalledWith(
+      expect.objectContaining({ attachments: [{ filename: 'STZ-2026-0001.pdf', content: expect.any(Buffer) }] }),
+    );
     expect(mail.appMailer.send).toHaveBeenCalledTimes(1);
     expect(mail.appMailer.send).toHaveBeenCalledWith(
       expect.objectContaining({ to: 'aminata@example.com', subject: expect.stringContaining('Votre Consultation est confirmée') }),
