@@ -1448,7 +1448,22 @@
       "noneYet": "No published article yet.",
       "newArticle": "New article",
       "allArticles": "All articles",
-      "loading": "Loading…"
+      "loading": "Loading…",
+      "draws": {
+        "title": "IRCC draws",
+        "lastRead": "IRCC feed read",
+        "never": "Never",
+        "newest": "Latest draw",
+        "newestValue": "#{round} · {date} · CRS {crs}",
+        "none": "No draws",
+        "schedule": "Read automatically once a day. A draw announced? Refresh right away.",
+        "refresh": "Refresh now",
+        "refreshing": "Reading IRCC’s feed…",
+        "found": "{count, plural, one {# new draw} other {# new draws}}",
+        "nothingNew": "Up to date: no new draw",
+        "alerted": "{count, plural, one {Alert sent for # draw} other {Alerts sent for # draws}}",
+        "failed": "IRCC’s feed didn’t answer. Try again in a moment."
+      }
     },
     "greeting": "Hello {name}"
   },

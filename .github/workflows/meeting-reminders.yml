@@ -1,12 +1,18 @@
 name: Meeting reminders
 
-# Every 5 minutes (#94): reminds of the coming Réunions, the day before and
-# 15 minutes before. GitHub may start a scheduled run a few minutes late; the
-# app sends each reminder once, whenever the run comes.
+# Every 10 minutes from 07:00 to 23:50 in Douala (#94): reminds of the coming
+# Réunions, the day before and 15 minutes before. GitHub may start a scheduled
+# run a few minutes late; the app sends each reminder once, whenever the run
+# comes, so the « 15 minutes » one lands 5 to 15 minutes before the start.
+# Not every 5 minutes, night and day: each run wakes the database, and the
+# old schedule kept it awake around the clock (Neon's free plan ran out in
+# November 2026). A Réunion between midnight and 07:15 in Douala gets its
+# day-before reminder but not the 15-minute one; run the workflow by hand if needed.
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    # 06:00–22:50 UTC = 07:00–23:50 in Douala.
+    - cron: '*/10 6-22 * * *'
   workflow_dispatch:
 
 concurrency:

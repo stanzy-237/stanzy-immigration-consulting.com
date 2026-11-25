@@ -1465,7 +1465,22 @@
       "noneYet": "Aucun article publié pour l’instant.",
       "newArticle": "Nouvel article",
       "allArticles": "Tous les articles",
-      "loading": "Chargement…"
+      "loading": "Chargement…",
+      "draws": {
+        "title": "Tirages IRCC",
+        "lastRead": "Flux IRCC lu",
+        "never": "Jamais",
+        "newest": "Dernier tirage",
+        "newestValue": "n° {round} · {date} · CRS {crs}",
+        "none": "Aucun tirage",
+        "schedule": "Lu automatiquement une fois par jour. Un tirage annoncé ? Actualisez tout de suite.",
+        "refresh": "Actualiser maintenant",
+        "refreshing": "Lecture du flux IRCC…",
+        "found": "{count, plural, one {# nouveau tirage} other {# nouveaux tirages}}",
+        "nothingNew": "À jour : pas de nouveau tirage",
+        "alerted": "{count, plural, one {Alerte envoyée pour # tirage} other {Alertes envoyées pour # tirages}}",
+        "failed": "Le flux IRCC n’a pas répondu. Réessayez dans un moment."
+      }
     },
     "greeting": "Bonjour {name}"
   },
