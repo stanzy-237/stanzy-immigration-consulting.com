@@ -5049,8 +5049,12 @@
         "paidAt": "Payé le {date} à {time}",
         "converted": "Débité en {currency} par SasPay, au taux du jour.",
         "promo": "Code promo",
-        "invoice": "Télécharger la facture (PDF)",
-        "receiptNumber": "Facture payée · {number}"
+        "invoice": "Voir la facture (PDF)",
+        "receiptNumber": "Facture payée · {number}",
+        "calendarGoogle": "Google Agenda",
+        "calendarApple": "Calendrier Apple (iPhone, Mac)",
+        "calendarOutlook": "Outlook",
+        "calendarDetails": "Consultation vidéo avec Stanzy, dans Mon espace. « Rejoindre » s’ouvre 15 minutes avant."
       },
       "returned": {
         "back": "Reprendre ma réservation"

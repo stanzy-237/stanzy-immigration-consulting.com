@@ -1,12 +1,14 @@
 'use client';
 
-import { Download } from 'lucide-react';
+import { CalendarPlus, ChevronDown, FileText } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { NetworkMark } from '@/features/consultation/components/payment-step';
+import { calendarPath, googleCalendarUrl, outlookCalendarUrl, type CalendarEvent } from '@/features/consultation/lib/calendar-links';
 import type { PaymentView } from '@/features/consultation/components/payment-progress';
 import { isFcfa, money } from '@/features/consultation/lib/money';
 import { CARD_NETWORK, consultationInvoicePath } from '@/features/consultation/lib/payment';
@@ -19,30 +21,6 @@ import { cn } from '@/lib/utils';
 const DOUALA = 'Africa/Douala';
 const part = (date: Date, locale: string, options: Intl.DateTimeFormatOptions) =>
   new Intl.DateTimeFormat(locale, { timeZone: DOUALA, ...options }).format(date);
-
-/** `20261124T080000Z`, as a calendar file wants it. */
-const icsTime = (date: Date) => date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-
-/** « Ajouter au calendrier »: a one-event .ics, made in the browser. */
-export function calendarFile(opts: { id: string; title: string; startsAt: Date; minutes: number; url: string }): string {
-  const end = new Date(opts.startsAt.getTime() + opts.minutes * 60_000);
-  const ics = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Stanzy Immigration//Consultation//FR',
-    'BEGIN:VEVENT',
-    `UID:${opts.id}@stanzy-immigration-consulting.com`,
-    `DTSTAMP:${icsTime(new Date())}`,
-    `DTSTART:${icsTime(opts.startsAt)}`,
-    `DTEND:${icsTime(end)}`,
-    `SUMMARY:${opts.title}`,
-    `URL:${opts.url}`,
-    `DESCRIPTION:${opts.url}`,
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].join('\r\n');
-  return `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
-}
 
 /** The confetti's spots around Stanzy: where each lands, its tone. */
 const CONFETTI = [
@@ -146,19 +124,17 @@ export function PaymentConfirmed({ payment }: { payment: PaymentView }): ReactNo
             <Link href={roomPath} className={cn('flex h-13 flex-1 items-center justify-center rounded-full bg-rouge px-6 font-heading text-body font-bold text-white hover:bg-crimson', PRESS)}>
               {t('space')}
             </Link>
-            <a
-              href={calendarFile({
+            <AddToCalendar
+              paymentId={payment.id}
+              event={{
                 id: booked.meetingId ?? payment.id,
                 title: t('calendarTitle'),
+                details: t('calendarDetails'),
                 startsAt,
                 minutes: booked.durationMinutes,
                 url: typeof window === 'undefined' ? roomPath : `${window.location.origin}/${locale}${roomPath}`,
-              })}
-              download="consultation-stanzy.ics"
-              className={cn('flex h-13 flex-1 items-center justify-center rounded-full bg-white px-6 font-heading text-body font-bold text-ink', PRESS)}
-            >
-              {t('calendar')}
-            </a>
+              }}
+            />
           </div>
         </div>
       </div>
@@ -200,14 +176,51 @@ export function PaymentConfirmed({ payment }: { payment: PaymentView }): ReactNo
             </span>
           </p>
         </div>
+        {/* Opens in a new tab, in the browser's PDF viewer: read first, download from there. */}
         <a
-          href={`${consultationInvoicePath(payment.id)}?download`}
+          href={consultationInvoicePath(payment.id)}
+          target="_blank"
+          rel="noopener noreferrer"
           className={cn('flex h-12 items-center justify-center gap-2 rounded-full border-2 border-navy-deep font-heading text-body-sm font-bold text-ink', PRESS)}
         >
-          <Download aria-hidden={true} className="size-4" strokeWidth={2.5} />
+          <FileText aria-hidden={true} className="size-4" strokeWidth={2.5} />
           {t('invoice')}
         </a>
       </section>
     </div>
+  );
+}
+
+/**
+ * « Ajouter au calendrier »: a menu, each choice opening the payer's own
+ * calendar on the event: Google and Outlook in a new tab, ready to save;
+ * Apple Calendar (iPhone, Mac) from the .ics the site serves inline. Nothing
+ * lands in Téléchargements.
+ */
+function AddToCalendar({ paymentId, event }: { paymentId: string; event: CalendarEvent }): ReactNode {
+  const t = useTranslations('Consultation.reservation.confirmed');
+  const locale = useLocale();
+  const open = (url: string) => window.open(url, '_blank', 'noopener,noreferrer');
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className={cn('flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-white px-6 font-heading text-body font-bold text-ink', PRESS)}
+      >
+        <CalendarPlus aria-hidden={true} className="size-4.5" strokeWidth={2.2} />
+        {t('calendar')}
+        <ChevronDown aria-hidden={true} className="size-4" strokeWidth={2.5} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="center" className="w-64 p-1.5">
+        <DropdownMenuItem onClick={() => open(googleCalendarUrl(event))} className="px-3 py-2.5 text-body-sm font-semibold text-ink">
+          {t('calendarGoogle')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => (window.location.href = calendarPath(paymentId, locale))} className="px-3 py-2.5 text-body-sm font-semibold text-ink">
+          {t('calendarApple')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => open(outlookCalendarUrl(event))} className="px-3 py-2.5 text-body-sm font-semibold text-ink">
+          {t('calendarOutlook')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

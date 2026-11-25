@@ -5032,8 +5032,12 @@
         "paidAt": "Paid on {date} at {time}",
         "converted": "Charged in {currency} by SasPay, at the day’s rate.",
         "promo": "Promo code",
-        "invoice": "Download the invoice (PDF)",
-        "receiptNumber": "Paid invoice · {number}"
+        "invoice": "View the invoice (PDF)",
+        "receiptNumber": "Paid invoice · {number}",
+        "calendarGoogle": "Google Calendar",
+        "calendarApple": "Apple Calendar (iPhone, Mac)",
+        "calendarOutlook": "Outlook",
+        "calendarDetails": "Video consultation with Stanzy, in My space. “Join” opens 15 minutes before."
       },
       "returned": {
         "back": "Back to my booking"

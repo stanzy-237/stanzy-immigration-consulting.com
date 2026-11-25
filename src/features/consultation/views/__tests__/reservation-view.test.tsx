@@ -253,6 +253,11 @@ describe('ReservationView, paying', () => {
     });
     expect(await screen.findByRole('heading', { name: 'C’est réservé, Aminata.' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Aller à Mon espace' })).toHaveAttribute('href', '/fr/mon-espace/reunions/meet_1');
+    // The Facture opens in a new tab to be read first; the calendar is a menu of calendars, not a download.
+    const invoice = screen.getByRole('link', { name: /Voir la facture/ });
+    expect(invoice).toHaveAttribute('target', '_blank');
+    expect(invoice.getAttribute('href')).not.toContain('download');
+    expect(screen.getByRole('button', { name: /Ajouter au calendrier/ })).toBeInTheDocument();
     expect(screen.getByText(/12.?932 FCFA/)).toBeInTheDocument();
   });
 
