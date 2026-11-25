@@ -39,7 +39,11 @@ Product screens are designed in Paper before they are built. The file is **« St
 
 ## Consultation (mandatory)
 
-Read `docs/design/consultation.md` before any work on the paid Consultation: booking, its payment, promo codes, the Client's Mon espace for it, the dashboard's Consultations, Codes promo or Aperçu, or its e-mails. It lists the Paper artboards to build from and the rules they imply (slot hold, paid only on SasPay `SUCCESS`, promo places, publishing to the Client, motion per interaction).
+Read `docs/design/consultation.md` before any work on the paid Consultation: booking, its payment, promo codes, the Client's Mon espace for it, the dashboard's Consultations, Codes promo or Aperçu, or its e-mails. It lists the Paper artboards to build from and the rules they imply (slot hold, paid only on SasPay `SUCCESS`, promo places, publishing to the Client).
+
+## Consultation motion (mandatory)
+
+Read `docs/design/consultation-motion.md` before animating anything on a Consultation screen, the public Consultation page (« Ce qu'on aborde », FAQ, section reveals) included. It holds the motion rules (only `transform` and `opacity`, ease-out entries under 300 ms, reduced motion kept gentle, tokens from `globals.css`) and one row per interaction. Anything not in its table does not animate: add the row there first, then build it.
 
 ## Payments (SasPay)
 

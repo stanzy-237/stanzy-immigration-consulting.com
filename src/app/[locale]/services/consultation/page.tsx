@@ -1,8 +1,13 @@
-import { Video } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { ServicePlaceholderView } from '@/features/service-placeholder/views/service-placeholder-view';
+import { DEFAULT_AVAILABILITY } from '@/features/consultation/lib/availability';
+import { ConsultationView } from '@/features/consultation/views/consultation-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { HydrateClient, prefetch, publicTrpc } from '@/trpc/server';
+
+// Static with the free slots in its HTML, refreshed every 5 minutes; the
+// booking step checks the chosen slot again before holding it.
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,
@@ -10,11 +15,12 @@ export async function generateMetadata({
   params: LocaleParams;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({
-    locale,
-    namespace: 'Home.ServicesGrid.Items',
-  });
-  return { title: t('consultationName') };
+  const t = await getTranslations({ locale, namespace: 'Home.ServicesGrid.Items' });
+  const copy = await getTranslations({ locale, namespace: 'Consultation.page' });
+  return {
+    title: t('consultationName'),
+    description: copy('metaDescription', { minutes: DEFAULT_AVAILABILITY.durationMinutes }),
+  };
 }
 
 export default async function Page({
@@ -24,5 +30,10 @@ export default async function Page({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ServicePlaceholderView nameKey="consultationName" icon={Video} />;
+  prefetch(publicTrpc.consultation.slots.queryOptions());
+  return (
+    <HydrateClient>
+      <ConsultationView />
+    </HydrateClient>
+  );
 }

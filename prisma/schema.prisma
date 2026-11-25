@@ -1522,3 +1522,30 @@ model ProblemReport {
   @@index([status, createdAt])
   @@map("problem_report")
 }
+
+// ─── Consultation (#15) ─────────────────────────────────────────────────────
+
+/// GLOSSARY: Consultation. The consultant's Disponibilités and the Consultation's price, one row
+/// (`id` "default"), set in the Tableau de bord. Until it exists the app uses its defaults
+/// (src/features/consultation/lib/availability.ts). The price lives here only, never in code.
+model ConsultationSettings {
+  id              String   @id @default("default")
+  /// XAF. Null: not set yet, so the public page shows no price.
+  price           Int?
+  durationMinutes Int
+  /// The pause kept free before and after each Réunion.
+  bufferMinutes   Int
+  /// How early one can book: no start sooner than this after now.
+  minNoticeHours  Int
+  /// How far ahead one can book, in days from today (Douala).
+  horizonDays     Int
+  /// How long before the start the Client can still move it (« Déplacer »).
+  moveCutoffHours Int
+  /// Open hours per ISO weekday, Douala time: `{ day: 1–7, start: "HH:MM", end: "HH:MM" }[]`.
+  weeklyHours     Json
+  /// « Bloquer une date »: `YYYY-MM-DD` days with no booking.
+  blockedDates    String[] @default([])
+  updatedAt       DateTime @updatedAt
+
+  @@map("consultation_settings")
+}

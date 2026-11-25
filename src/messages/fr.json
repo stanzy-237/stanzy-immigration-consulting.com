@@ -4481,5 +4481,262 @@
       "failed": "Le statut n’a pas pu être mis à jour. Réessayez.",
       "loading": "Chargement des signalements"
     }
+  },
+  "Consultation": {
+    "page": {
+      "metaDescription": "{minutes} minutes en vidéo avec Stanzy : votre profil, votre score CRS, le bon programme. Réservez et payez en ligne.",
+      "hero": {
+        "section": "Services",
+        "pill": "Consultation en vidéo · {minutes} min",
+        "title": "Vos questions, les réponses de Stanzy.",
+        "lead": "{minutes} minutes en vidéo avec Stanzy : votre profil, votre score CRS, le bon programme. Vous repartez avec un plan, et l’enregistrement.",
+        "call": {
+          "rec": "REC · {time}",
+          "recShort": "REC {time}",
+          "where": "Consultation · heure de Douala",
+          "stanzy": "Stanzy",
+          "you": "Vous",
+          "captions": [
+            "« Avec le français en 2e langue, votre meilleur levier… »",
+            "« Demandez votre EDE tôt : c’est le plus long à obtenir. »",
+            "« On vise la FSW, avec le PNP en plan B. »"
+          ],
+          "crsLabel": "Score CRS",
+          "crsLabelShort": "CRS",
+          "crsValue": "462 → 512",
+          "admissible": "FSW · admissible"
+        }
+      },
+      "booking": {
+        "title": "Choisissez votre créneau",
+        "subtitle": "{minutes} min en vidéo · Heure de Douala",
+        "subtitlePrice": "{minutes} min en vidéo · Heure de Douala · {price}",
+        "days": "Jour",
+        "times": "Heure",
+        "full": "{day} · complet",
+        "earlier": "Jours précédents",
+        "later": "Jours suivants",
+        "book": "Réserver {weekday} {day} à {time}",
+        "hold": "Créneau gardé 15 min pendant le paiement · Mobile Money ou carte",
+        "none": "Aucun créneau libre pour le moment. De nouvelles dates s’ouvrent chaque semaine : revenez bientôt.",
+        "loading": "Recherche des créneaux libres"
+      },
+      "steps": {
+        "title": "Comment se passe la consultation",
+        "before": {
+          "eyebrow": "Avant",
+          "title": "Vous réservez et payez",
+          "body": "Un créneau, Mobile Money ou carte. Vous recevez la Reconnaissance et un rappel la veille.",
+          "short": "Mobile Money ou carte. Reconnaissance et rappel la veille."
+        },
+        "during": {
+          "eyebrow": "Pendant",
+          "title": "{minutes} min avec Stanzy",
+          "body": "« Rejoindre » depuis Mon espace. Admissibilité, score CRS, documents, la suite.",
+          "short": "« Rejoindre » depuis Mon espace, sur votre téléphone."
+        },
+        "after": {
+          "eyebrow": "Après",
+          "title": "Vous revoyez tout",
+          "body": "Enregistrement et transcription dans Mon espace, annoncés par e-mail.",
+          "short": "Vidéo et transcription dans Mon espace, annoncées par e-mail."
+        }
+      },
+      "topics": {
+        "title": "Ce qu’on aborde",
+        "lead": "Arrivez avec vos questions. On part de votre profil réel, pas d’un cas général.",
+        "label": "Les sujets",
+        "example": "Profil d’exemple · on vérifie le vôtre ensemble",
+        "count": "{current} / {total}",
+        "eligibility": {
+          "tab": "Admissibilité",
+          "title": "Votre admissibilité",
+          "body": "FSW, CEC ou PNP : où vous en êtes vraiment.",
+          "preview": "Votre admissibilité",
+          "rows": {
+            "fsw": {
+              "name": "FSW · Travailleurs qualifiés",
+              "value": "67 points"
+            },
+            "cec": {
+              "name": "CEC · Expérience canadienne",
+              "value": "1 an au Canada"
+            },
+            "pnp": {
+              "name": "PNP · Programme provincial",
+              "value": "selon la province"
+            }
+          }
+        },
+        "points": {
+          "tab": "Gagner des points",
+          "title": "Gagner des points",
+          "body": "Langues, études, emploi : les leviers sur votre score CRS.",
+          "preview": "Gagner des points",
+          "rows": {
+            "english": {
+              "name": "Anglais · NCLC 9 et plus",
+              "value": "le plus gros levier"
+            },
+            "french": {
+              "name": "Français · 2e langue",
+              "value": "jusqu’à 50 points"
+            },
+            "studies": {
+              "name": "Études au Canada",
+              "value": "jusqu’à 30 points"
+            }
+          }
+        },
+        "documents": {
+          "tab": "Documents",
+          "title": "Vos documents",
+          "body": "Ce qu’il faut préparer, et dans quel ordre.",
+          "preview": "Vos documents",
+          "rows": {
+            "test": {
+              "name": "Test de langue",
+              "value": "valable 2 ans"
+            },
+            "ede": {
+              "name": "EDE · WES ou IQAS",
+              "value": "à demander tôt"
+            },
+            "funds": {
+              "name": "Preuve de fonds",
+              "value": "6 mois de relevés"
+            }
+          }
+        },
+        "next": {
+          "tab": "La suite",
+          "title": "La suite",
+          "body": "Seul avec nos outils, ou accompagné jusqu’à l’ITA.",
+          "preview": "La suite",
+          "rows": {
+            "tools": {
+              "name": "Calculateur CRS et Checklist",
+              "value": "gratuits"
+            },
+            "accompagnement": {
+              "name": "Accompagnement Entrée Express",
+              "value": "avec Stanzy"
+            },
+            "pool": {
+              "name": "Votre profil dans le bassin",
+              "value": "jusqu’à l’ITA"
+            }
+          }
+        },
+        "tip": "« Notez vos questions avant l’appel : on les passe toutes en revue, dans l’ordre qui compte pour vous. »",
+        "tipBy": "Stanzy"
+      },
+      "recap": {
+        "eyebrow": "Après l’appel",
+        "title": "Un aperçu de votre récap",
+        "lead": "Voici ce que vous trouvez dans Mon espace une fois que Stanzy l’a publié. Essayez : touchez un moment, cochez une étape.",
+        "leadShort": "Ce que vous trouvez dans Mon espace. Touchez un moment, cochez une étape.",
+        "features": [
+          "La vidéo, à revoir quand vous voulez",
+          "Les notes de Stanzy et la transcription",
+          "Vos prochaines étapes, à cocher"
+        ],
+        "readOnly": "Lecture seule : rien ne se télécharge. Visible par vous et Stanzy seulement.",
+        "example": "Exemple",
+        "demo": "Exemple de récap",
+        "play": "Lecture",
+        "length": "44:12",
+        "position": "{time} · {chapter}",
+        "tabs": [
+          "Notes de Stanzy",
+          "Transcription",
+          "Documents cités · 2"
+        ],
+        "seen": "Ce qu’on a vu · exemple",
+        "seek": "Aller à {time}",
+        "notes": [
+          {
+            "time": "02:40",
+            "chapter": "Admissibilité",
+            "text": "Votre profil est admissible à Entrée express (catégorie Travailleurs qualifiés).",
+            "short": "Votre profil est admissible à Entrée express."
+          },
+          {
+            "time": "09:12",
+            "chapter": "Points CRS",
+            "text": "Avec 452 points, le test de langue est le levier le plus rapide pour gagner des points.",
+            "short": "Avec 452 points, le test de langue est le levier le plus rapide."
+          },
+          {
+            "time": "27:05",
+            "chapter": "Documents",
+            "text": "Les documents à préparer avant de créer votre profil.",
+            "short": "Les documents à préparer avant de créer votre profil."
+          }
+        ],
+        "stepsTitle": "Vos prochaines étapes",
+        "stepsCount": "Prochaines étapes · {done} sur {total}",
+        "steps": [
+          "Passer le test de langue",
+          "Faire évaluer votre diplôme",
+          "Créer votre profil Entrée express"
+        ],
+        "stepsNote": "Exemple · Stanzy écrit cette liste après la Réunion."
+      },
+      "deliverables": {
+        "eyebrow": "Ce que vous repartez avec",
+        "plan": {
+          "title": "Un plan d’action",
+          "body": "Le programme à viser (FSW, CEC ou PNP), les leviers sur votre score CRS, et l’ordre des étapes."
+        },
+        "recording": {
+          "title": "L’enregistrement",
+          "body": "La vidéo et sa transcription dans Mon espace. Revoyez chaque réponse quand vous en avez besoin."
+        },
+        "documents": {
+          "title": "Vos documents, triés",
+          "body": "Ce qu’il faut préparer en premier, et ce qui peut attendre."
+        }
+      },
+      "invite": {
+        "title": "On en parle de vive voix ?",
+        "next": "Prochain créneau libre : <b>{slot}</b> · heure de Douala",
+        "at": "à",
+        "cta": "Réserver ce créneau"
+      },
+      "reviews": {
+        "title": "Ils en parlent",
+        "items": []
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "titleLead": "Vos questions,",
+        "titleAccent": "nos réponses.",
+        "lead": "Vous ne trouvez pas la réponse que vous cherchez ? Contactez-nous directement.",
+        "cta": "Poser une question",
+        "app": {
+          "q": "Faut-il installer une application ?",
+          "a": "Non. Le jour J, cliquez « Rejoindre » dans Mon espace, depuis votre téléphone ou votre ordinateur."
+        },
+        "refused": {
+          "q": "Et si le paiement est refusé ?",
+          "a": "Rien n’est débité. Votre créneau reste gardé 15 minutes : réessayez, avec le même moyen de paiement ou un autre. Passé ce délai, il est libéré."
+        },
+        "move": {
+          "q": "Puis-je déplacer mon rendez-vous ?",
+          "a": "Oui, depuis Mon espace, jusqu’à {hours} h avant le début. Une Consultation payée n’est pas remboursée : vous la déplacez."
+        },
+        "recording": {
+          "q": "Qui voit l’enregistrement ?",
+          "a": "Vous et Stanzy, personne d’autre. Une fois publiés par Stanzy, la vidéo et sa transcription apparaissent dans Mon espace : vous les regardez, sans les télécharger."
+        }
+      },
+      "sticky": {
+        "meta": "{minutes} min",
+        "metaPrice": "{minutes} min · {price}",
+        "change": "Changer",
+        "book": "Réserver"
+      }
+    }
   }
 }
