@@ -1,14 +1,16 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowRight, FileText, Plus } from 'lucide-react';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { ArrowRight, FileText, Plus, RefreshCw, TrendingUp } from 'lucide-react';
+import { useFormatter, useNow, useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/components/ui/toast';
+import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
 /** The Blog's counts and its last published Article. */
@@ -59,10 +61,88 @@ function BlogSummarySkeleton(): ReactNode {
   );
 }
 
+/**
+ * « Tirages IRCC »: when IRCC's feed was last read, the newest Tirage, and
+ * « Actualiser maintenant », the daily refresh run at once.
+ */
+function DrawsSync(): ReactNode {
+  const t = useTranslations('Dashboard.overview.draws');
+  const format = useFormatter();
+  const now = useNow({ updateInterval: 60_000 });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const { data } = useSuspenseQuery(trpc.draws.sync.queryOptions());
+  const refresh = useMutation(
+    trpc.draws.refresh.mutationOptions({
+      onSuccess: async (report) => {
+        await queryClient.invalidateQueries({ queryKey: trpc.draws.sync.queryKey() });
+        toast.add({
+          title: report.inserted > 0 ? t('found', { count: report.inserted }) : t('nothingNew'),
+          description: report.alerted > 0 ? t('alerted', { count: report.alerted }) : undefined,
+          type: 'success',
+        });
+      },
+      onError: () => toast.add({ title: t('failed'), type: 'error' }),
+    }),
+  );
+
+  return (
+    <>
+      <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl bg-off-white px-4 py-3">
+          <dt className="text-xs font-semibold tracking-wide text-slate uppercase">{t('lastRead')}</dt>
+          <dd className="mt-1 font-heading text-lg font-bold text-navy-deep">
+            {data.lastSyncedAt ? format.relativeTime(data.lastSyncedAt, now) : t('never')}
+          </dd>
+        </div>
+        <div className="rounded-xl bg-off-white px-4 py-3">
+          <dt className="text-xs font-semibold tracking-wide text-slate uppercase">{t('newest')}</dt>
+          <dd className="mt-1 font-heading text-lg font-bold text-navy-deep">
+            {data.newest
+              ? t('newestValue', {
+                  round: data.newest.round,
+                  date: format.dateTime(data.newest.date, { day: 'numeric', month: 'short', timeZone: 'UTC' }),
+                  crs: data.newest.crsMin,
+                })
+              : t('none')}
+          </dd>
+        </div>
+      </dl>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-slate">{t('schedule')}</p>
+        <button
+          type="button"
+          onClick={() => refresh.mutate()}
+          disabled={refresh.isPending}
+          className="inline-flex h-11 items-center gap-2 rounded-full border-2 border-navy-deep px-5 text-sm font-semibold text-navy-deep hover:bg-ice-blue disabled:opacity-60"
+        >
+          <RefreshCw aria-hidden={true} className={cn('size-4', refresh.isPending && 'animate-spin motion-reduce:animate-none')} />
+          {refresh.isPending ? t('refreshing') : t('refresh')}
+        </button>
+      </div>
+    </>
+  );
+}
+
+function DrawsSyncSkeleton(): ReactNode {
+  const t = useTranslations('Dashboard');
+  return (
+    <div role="status">
+      <span className="sr-only">{t('overview.loading')}</span>
+      <div aria-hidden={true} className="mt-5 grid gap-3 sm:grid-cols-2">
+        <Skeleton className="h-18 rounded-xl" />
+        <Skeleton className="h-18 rounded-xl" />
+      </div>
+      <Skeleton aria-hidden={true} className="mt-4 h-11 w-52 rounded-full" />
+    </div>
+  );
+}
+
 /** The Tableau de bord's home: each section at a glance, starting with the Blog. */
 export function DashboardOverviewView(): ReactNode {
   const t = useTranslations('Dashboard');
   const blogId = useId();
+  const drawsId = useId();
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -95,6 +175,16 @@ export function DashboardOverviewView(): ReactNode {
           {t('overview.allArticles')}
           <ArrowRight aria-hidden={true} className="size-4" />
         </Link>
+      </section>
+
+      <section aria-labelledby={drawsId} className="mt-6 rounded-2xl border border-fog-light bg-white p-5 shadow-sm sm:p-6">
+        <h2 id={drawsId} className="flex items-center gap-2 font-heading text-xl font-bold text-navy-deep">
+          <TrendingUp aria-hidden={true} className="size-5 text-rouge" />
+          {t('overview.draws.title')}
+        </h2>
+        <QueryBoundary fallback={<DrawsSyncSkeleton />}>
+          <DrawsSync />
+        </QueryBoundary>
       </section>
     </div>
   );

@@ -113,8 +113,15 @@ const columns = (draw: NormalizedDraw) => ({
   invitations: draw.invitations,
   crsMin: draw.crsMin,
   irccUrl: draw.irccUrl,
+  drawCutOff: cutOffOf(draw.raw),
   raw: draw.raw as Prisma.InputJsonObject,
 });
+
+/** IRCC's tie-breaking time, as published, kept in its own column for the pages. */
+const cutOffOf = (raw: unknown): string | null => {
+  const value = (raw as { drawCutOff?: unknown } | null)?.drawCutOff;
+  return typeof value === 'string' && value.trim() ? value : null;
+};
 
 /**
  * A round reaching the table later than this after its draw date (a round that
