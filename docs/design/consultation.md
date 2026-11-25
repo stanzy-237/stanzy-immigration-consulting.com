@@ -16,7 +16,7 @@ Before building any part, open its artboards (names below) with the Paper MCP an
 
 ## Words
 
-Use `GLOSSARY.md`. Terms this design relies on: Consultation, Réunion, Enregistrement, Transcription, Lead, Client, Compte, Reconnaissance de paiement, Demande d'intérêt, Dossier, Code promo.
+Use `GLOSSARY.md`. Terms this design relies on: Consultation, Réunion, Enregistrement, Transcription, Lead, Client, Compte, Facture, Demande d'intérêt, Dossier, Code promo.
 
 Recordings stay the consultant's, with one exception: a **Consultation's** Enregistrement and Transcription, once published, are shown to its Client to watch and read only. Never a download, and never for other Réunions (Dossier meetings stay consultant-only).
 
@@ -48,7 +48,7 @@ PAYÉE ─► DÉPLACÉE (new slot, same Réunion; by the Client, or automatical
 
 - **Slot hold.** Choosing a slot holds it for that person for 15 minutes (`Réservation v2` timer « créneau gardé jusqu'à HH:MM »). Held slots disappear for everyone else. After 15 minutes unpaid it is released and the booker sees `4 Créneau libéré`.
 - **Paid means SasPay `SUCCESS` only**, read from `GET /payments/{id}/verify/` or a verified webhook. A redirect, a timer or `PENDING` never confirms a Consultation. Deliver once (unique constraint in the database).
-- **On `SUCCESS`, in one transaction:** mark the Consultation paid, create its Réunion (`MeetingKind` scheduled, recorded, the Client invited), count the promo place if a code was used, issue the Reconnaissance de paiement, queue the confirmation e-mail. The account becomes a **Lead** if it was a plain User.
+- **On `SUCCESS`, in one transaction:** mark the Consultation paid, create its Réunion (`MeetingKind` scheduled, recorded, the Client invited), count the promo place if a code was used, number its **Facture payée**, queue the confirmation e-mail with the Facture attached. The account becomes a **Lead** if it was a plain User.
 - **Fees:** the client pays SasPay fees on top (`fee_charge_mode: ADD_ON`). Screens show « + frais selon le moyen de paiement ».
 - **Payment methods** come from SasPay per country (`GET /pricing/my-rates/`); never hard-code a list. Push networks show `1 Validez sur le téléphone`; networks with a `checkout_url` (Orange, Wave, card) open `2 Page SasPay`; Orange CI asks for its code first (`3c`); countries without Mobile Money get card (`3b`).
 - **Time zone:** every time is shown « heure de Douala » (`Africa/Douala`), like the meeting e-mails (`fr.json` « {when} (heure de Douala) »).
@@ -72,11 +72,11 @@ Managed in Tableau de bord → Facturation → **Codes promo** (new sidebar item
 
 ## Client space (Mon espace)
 
-- **1 Avant:** date, countdown, what to prepare, « Tester ma caméra », « Déplacer », the Reconnaissance.
+- **1 Avant:** date, countdown, what to prepare, « Tester ma caméra », « Déplacer », the Facture payée.
 - **2 Salle d'attente:** « Rejoindre » opens **15 minutes before** the start (same rule as `meeting-schema.ts`). Recording consent is asked before joining.
-- **3 Après · Récap:** only after the consultant publishes: video (streamed, **no download**), Notes de Stanzy with timestamps (a timestamp seeks the video), Transcription, « Vos prochaines étapes » checklist (the Client ticks them), documents cited, the Reconnaissance (downloadable PDF), and the Accompagnement call to action (« Envoyer ma demande » → Demande d'intérêt). The video stays visible as long as the Enregistrement is kept (2 years, glossary).
+- **3 Après · Récap:** only after the consultant publishes: video (streamed, **no download**), Notes de Stanzy with timestamps (a timestamp seeks the video), Transcription, « Vos prochaines étapes » checklist (the Client ticks them), documents cited, the Facture payée (downloadable PDF), and the Accompagnement call to action (« Envoyer ma demande » → Demande d'intérêt). The video stays visible as long as the Enregistrement is kept (2 years, glossary).
 - **4 Déplacer le créneau:** pick another free slot; the Réunion moves (meeting e-mail « Déplacée »). How long before the start moving closes is a Disponibilités setting.
-- **No refund.** A paid Consultation is never refunded; the way out is « Déplacer ». Say so on the Reconnaissance and before paying.
+- **No refund.** A paid Consultation is never refunded; the way out is « Déplacer ». Say so on the Facture and before paying.
 - **When the consultant cancels**, the Consultation is not lost: it moves at once to the **next free slot**, the Client is told (e-mail « Déplacée » with the consultant's reason, bell, WhatsApp when built) and can still change it with « Déplacer ».
 - **5 Mes consultations / 6 Aucune consultation:** list and empty state with its own illustration.
 
@@ -105,7 +105,7 @@ Tabs « À venir », « Passées », « Paiements échoués » (count = unresolv
 
 One route, two states:
 
-- **1 Avant:** header (name, « Payée · réseau », date, « Déplacer », « Rejoindre » greyed with « S'ouvre à HH:MM » until 15 min before), « Ce qu'[prénom] a préparé » (booking answers, the situation as a quote), **Vos notes** (private, autosaved, stored as the Réunion's `notes`), Paiement (price, promo line, paid amount + frais, network, time, Reconnaissance), Son Compte (Lead badge, contact, « Ouvrir un dossier »), reminders sent (day before; 15 min before), « Annuler ce créneau » (asks for a reason, shows the next free slot the Client will be moved to, then moves and notifies; no refund, no lost Consultation).
+- **1 Avant:** header (name, « Payée · réseau », date, « Déplacer », « Rejoindre » greyed with « S'ouvre à HH:MM » until 15 min before), « Ce qu'[prénom] a préparé » (booking answers, the situation as a quote), **Vos notes** (private, autosaved, stored as the Réunion's `notes`), Paiement (price, promo line, paid amount + frais, network, time, Facture), Son Compte (Lead badge, contact, « Ouvrir un dossier »), reminders sent (day before; 15 min before), « Annuler ce créneau » (asks for a reason, shows the next free slot the Client will be moved to, then moves and notifies; no refund, no lost Consultation).
 - **2 Après:** header « Terminée · N min », the recording with markers, tabs « Notes pour [prénom] » (timestamped notes written for the Client) / Transcription / « Vos notes privées », « Ses prochaines étapes » (checklist written for the Client), « Dans son espace » (what she will see), « Ouvrir un dossier ».
 - **Publier dans son espace:** nothing reaches the Client before it. Publishing makes the video, transcription, notes for the Client and next steps visible in her Mon espace and sends « Votre enregistrement est prêt ». Private notes are never shown. The consultant can edit after publishing.
 
@@ -115,8 +115,8 @@ Mobile: same content; « Rejoindre » or « Publier » in the bottom bar; « Dé
 
 | When | E-mail (board) | Status |
 |---|---|---|
-| Paid | Confirmation + Reconnaissance (`3.2`) | to build |
-| Payment failed | Paiement non abouti (`3.2`) | to build |
+| Paid | Confirmation + Facture payée attached (`3.2`) | built (`lib/consultation-emails.ts`, `server/consultation-invoice.ts`) |
+| Payment failed | Paiement non abouti (`3.2`) | built (`lib/consultation-emails.ts`) |
 | Published | Enregistrement prêt (`3.2`) | to build |
 | Published, with steps | Prochaines étapes (`3.2`) | to build |
 | Day before / 15 min before / moved | Réunion e-mails (`3.3`) | exist (`meetings/lib/meeting-emails.ts`) |
@@ -138,3 +138,8 @@ Every animation on these screens, and the rules behind them, is in `docs/design/
 - **Moving:** allowed, up to a Disponibilités setting before the start. **Refunds:** never. (2026-11-23)
 - **Consultant cancels:** the Client is moved to the next free slot, notified, and can change it. (2026-11-23)
 - **Accounts:** booking step 1 creates or finds the Compte before the slot is held, so failed payments always link to a Compte. (2026-11-23)
+- **Paying keeps the slot a little longer:** « Payer » extends the hold to 10 minutes from then, never past 45 minutes after the slot was first held, so someone validating on their phone doesn't lose it. If SasPay still says `SUCCESS` after the slot went to someone else, the Consultation is delivered on the next free slot and the confirmation e-mail says so: a paid Consultation is never lost. (2026-11-24)
+- **Card is SasPay's `card` network** (listed by my-rates in a country of its own, `XX`), paid on SasPay's card page and charged in USD at the day's rate: the receipt shows SasPay's own amounts in that currency. Every softpay carries a `return_url` to `/reserver/paiement/<id>` (not in the OpenAPI spec, required by SasPay for `card`, accepted on every network). « Payer depuis un autre pays » lists every country; one with no Mobile Money offers card (`3b`). (2026-11-24)
+- **Codes promo, built:** a percentage (1–99) or an FCFA amount, never leaving less than 100 FCFA to pay (SasPay can't take a free Consultation). Just before paying, the places of payments still on their way (PENDING, at most 45 min old) count too, so the cap is never exceeded; a code refused then comes off the booking and the page shows the full price before anything is sent. Deleting is soft: the code stops at once, held bookings lose it, paid reductions stay on their payments. An unknown code suggests the live code at most 2 letters away. (2026-11-24)
+- **A Facture payée, not a Reconnaissance:** a paid Consultation gets a Facture, stamped « Payée » and signed like the Dossiers' (numbered with them, `STZ-<year>-<0001>`), downloadable from « C'est réservé » and attached to the confirmation. The Paper screens still say « Reconnaissance »: the Facture replaces it. (2026-11-24)
+- **Sandbox outside production:** the app calls `sandbox-api.saspay.me` everywhere but Vercel production, and refuses an `sk_live_` key there (`server/saspay.ts`). (2026-11-24)

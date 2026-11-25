@@ -455,19 +455,23 @@
       "Verification": {
         "subject": "Confirmez votre adresse e-mail — Stanzy",
         "greeting": "Bonjour {name},",
-        "body": "Merci pour votre inscription sur Stanzy Immigration Consulting. Confirmez votre adresse e-mail pour activer votre compte :",
+        "body": "Merci pour votre inscription sur Stanzy Immigration Consulting. Confirmez votre adresse e-mail pour activer votre compte.",
         "cta": "Confirmer mon adresse",
         "expiry": "Ce lien expire dans 1 heure.",
-        "ignore": "Si vous n’êtes pas à l’origine de cette inscription, ignorez simplement cet e-mail."
+        "ignore": "Si vous n’êtes pas à l’origine de cette inscription, ignorez simplement cet e-mail.",
+        "title": "Confirmez votre adresse"
       },
       "ResetPassword": {
         "subject": "Réinitialisez votre mot de passe — Stanzy",
         "greeting": "Bonjour {name},",
-        "body": "Vous avez demandé à réinitialiser le mot de passe de votre compte Stanzy. Choisissez-en un nouveau grâce à ce lien :",
+        "body": "Vous avez demandé à réinitialiser le mot de passe de votre compte Stanzy. Choisissez-en un nouveau grâce à ce lien.",
         "cta": "Choisir un nouveau mot de passe",
         "expiry": "Ce lien expire dans 1 heure et ne fonctionne qu’une seule fois.",
-        "ignore": "Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail : votre mot de passe reste inchangé."
-      }
+        "ignore": "Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail : votre mot de passe reste inchangé.",
+        "title": "Un nouveau mot de passe"
+      },
+      "eyebrow": "Votre compte",
+      "footer": "Stanzy Immigration Consulting · e-mail de votre compte"
     },
     "MotDePasseOublie": {
       "metaTitle": "Mot de passe oublié",
@@ -1448,7 +1452,8 @@
       "reunions": "Réunions",
       "services": "Services documentaires",
       "services-en-cours": "Services en cours",
-      "signalements": "Signalements"
+      "signalements": "Signalements",
+      "codes-promo": "Codes promo"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -1865,42 +1870,69 @@
       "cta": "Voir mon espace",
       "opened": {
         "subject": "Votre dossier {service} est ouvert",
-        "body": "Votre dossier {service} est ouvert. Il commence à l’étape « {stage} ». Vous pouvez suivre son avancement dans votre espace."
+        "body": "Votre dossier {service} est ouvert. Il commence à l’étape « {stage} ». Vous pouvez suivre son avancement dans votre espace.",
+        "title": "Votre dossier est ouvert"
       },
       "stageChanged": {
         "subject": "Votre dossier {service} a changé d’étape",
-        "body": "Votre dossier {service} est maintenant à l’étape « {stage} »."
+        "body": "Votre dossier {service} est maintenant à l’étape « {stage} ».",
+        "title": "Une nouvelle étape",
+        "bodyShort": "Votre dossier {service} avance."
       },
       "closed": {
         "subject": "Votre dossier {service} est clôturé",
-        "body": "Votre dossier {service} a été clôturé. Motif : {reason}"
+        "body": "Votre dossier {service} a été clôturé. Motif : {reason}",
+        "title": "Dossier clôturé",
+        "bodyShort": "Votre dossier {service} a été clôturé."
       },
       "newVersion": {
         "subject": "Nouveau fichier dans votre dossier {service}",
-        "body": "Stanzy a ajouté une nouvelle version de « {document} » à votre dossier {service}."
+        "body": "Stanzy a ajouté une nouvelle version de « {document} » à votre dossier {service}.",
+        "title": "Un nouveau fichier"
       },
       "comment": {
         "subject": "Nouveau commentaire dans votre dossier {service}",
-        "body": "Stanzy a commenté « {document} » dans votre dossier {service} : « {excerpt} »"
+        "body": "Stanzy a commenté « {document} » dans votre dossier {service} : « {excerpt} »",
+        "title": "Stanzy a commenté",
+        "bodyShort": "Stanzy a commenté « {document} » dans votre dossier {service}."
       },
       "signatureRequested": {
         "subject": "Un document à signer dans votre dossier {service}",
         "body": "Stanzy vous a envoyé « {document} » à signer dans votre dossier {service}. Ouvrez votre espace pour le lire et le signer en ligne.",
-        "cta": "Signer le document"
+        "cta": "Signer le document",
+        "title": "Un document à signer",
+        "eyebrow": "À signer",
+        "file": "À signer en ligne"
       },
       "signed": {
         "subject": "Document signé dans votre dossier {service}",
-        "body": "Vous avez signé « {document} ». Le document signé, avec son certificat de signature, est dans votre dossier {service}."
+        "body": "Vous avez signé « {document} ». Le document signé, avec son certificat de signature, est dans votre dossier {service}.",
+        "title": "C’est signé",
+        "eyebrow": "Signé",
+        "file": "Signé · avec certificat de signature"
       },
       "signatureReminder": {
         "subject": "Rappel : un document à signer dans votre dossier {service}",
         "body": "« {document} » attend toujours votre signature dans votre dossier {service}. Ouvrez votre espace pour le lire et le signer en ligne.",
-        "cta": "Signer le document"
+        "cta": "Signer le document",
+        "title": "Il attend votre signature",
+        "eyebrow": "Rappel · à signer",
+        "file": "À signer en ligne"
       },
       "message": {
         "subject": "Nouveau message dans votre dossier {service}",
-        "body": "Stanzy vous a écrit dans votre dossier {service} : « {excerpt} »"
-      }
+        "body": "Stanzy vous a écrit dans votre dossier {service} : « {excerpt} »",
+        "title": "Stanzy vous a écrit",
+        "bodyShort": "Stanzy vous a écrit dans votre dossier {service}."
+      },
+      "eyebrow": "Votre dossier",
+      "footer": "Stanzy Immigration Consulting · votre dossier {service}",
+      "stage": "Étape",
+      "newStage": "Nouvelle étape",
+      "reason": "Motif",
+      "document": "Document",
+      "on": "Sur « {document} »",
+      "messageLabel": "Message"
     },
     "dashboard": {
       "title": "Dossiers",
@@ -1997,19 +2029,26 @@
       "cta": "Ouvrir le dossier",
       "clientUpload": {
         "subject": "{client} a ajouté « {document} »",
-        "body": "{client} a téléversé une nouvelle version de « {document} » dans son dossier {service}."
+        "body": "{client} a téléversé une nouvelle version de « {document} » dans son dossier {service}.",
+        "tag": "Fichier",
+        "bodyShort": "{client} a téléversé une nouvelle version de « {document} » dans son dossier {service}."
       },
       "clientComment": {
         "subject": "{client} a commenté « {document} »",
-        "body": "{client} a commenté « {document} » dans son dossier {service} : « {excerpt} »"
+        "body": "{client} a commenté « {document} » dans son dossier {service} : « {excerpt} »",
+        "tag": "Commentaire",
+        "bodyShort": "{client} a commenté « {document} » dans son dossier {service}."
       },
       "clientSigned": {
         "subject": "{client} a signé « {document} »",
-        "body": "{client} a signé « {document} » dans son dossier {service}. Le PDF signé est ajouté comme nouvelle version du document."
+        "body": "{client} a signé « {document} » dans son dossier {service}. Le PDF signé est ajouté comme nouvelle version du document.",
+        "tag": "Signature"
       },
       "clientMessage": {
         "subject": "{client} vous a écrit",
-        "body": "{client} vous a écrit dans son dossier {service} : « {excerpt} »"
+        "body": "{client} vous a écrit dans son dossier {service} : « {excerpt} »",
+        "tag": "Message",
+        "bodyShort": "{client} vous a écrit dans son dossier {service}."
       }
     },
     "documents": {
@@ -2224,11 +2263,15 @@
         "subject": "Facture {number} – Stanzy Immigration Consulting",
         "body": "Voici votre facture {number} pour votre dossier {service}, d’un montant de {total}. Vous la trouverez en pièce jointe.",
         "bodyDue": "Voici votre facture {number} pour votre dossier {service}, d’un montant de {total}, à régler avant le {due}. Vous la trouverez en pièce jointe.",
-        "proof": "Une fois le paiement fait, téléversez votre preuve de paiement dans votre espace."
+        "proof": "Une fois le paiement fait, téléversez votre preuve de paiement dans votre espace.",
+        "eyebrow": "Facture",
+        "title": "Votre facture {number}"
       },
       "paid": {
         "subject": "Paiement reçu – facture {number}",
-        "body": "Nous avons bien reçu votre paiement de {total} pour la facture {number}. Merci !"
+        "body": "Nous avons bien reçu votre paiement de {total} pour la facture {number}. Merci !",
+        "eyebrow": "Paiement reçu",
+        "title": "Merci, c’est payé"
       },
       "proof": {
         "subject": "{client} a envoyé une preuve de paiement ({number})",
@@ -2237,12 +2280,24 @@
       },
       "dueSoon": {
         "subject": "Rappel : facture {number} à régler avant le {due}",
-        "body": "Votre facture {number} ({total}) arrive à échéance le {due}."
+        "body": "Votre facture {number} ({total}) arrive à échéance le {due}.",
+        "eyebrow": "Rappel · dans 3 jours",
+        "title": "Échéance dans 3 jours"
       },
       "overdue": {
         "subject": "Facture {number} : l’échéance est passée",
-        "body": "L’échéance de votre facture {number} ({total}) était le {due}. Si vous avez déjà payé, il vous suffit de téléverser votre preuve de paiement."
-      }
+        "body": "L’échéance de votre facture {number} ({total}) était le {due}. Si vous avez déjà payé, il vous suffit de téléverser votre preuve de paiement.",
+        "eyebrow": "Échéance passée",
+        "title": "L’échéance est passée"
+      },
+      "footer": "Stanzy Immigration Consulting · factures de votre dossier",
+      "amount": "Montant",
+      "dueBy": "À régler avant le",
+      "due": "Échéance",
+      "duePassed": "{due} · passée",
+      "status": "Statut",
+      "paidStatus": "Payée",
+      "tag": "Facture"
     },
     "list": {
       "title": "Factures",
@@ -2892,17 +2947,26 @@
       "sent": {
         "subject": "Votre contrat {number} à signer",
         "body": "Stanzy vous a envoyé « {title} » ({number}) pour votre dossier {service}. Lisez-le et signez-le en ligne.",
-        "cta": "Lire et signer"
+        "cta": "Lire et signer",
+        "eyebrow": "Contrat à signer",
+        "title": "Votre contrat est prêt",
+        "file": "{number} · à signer en ligne"
       },
       "amendmentSent": {
         "subject": "Avenant {number} à signer",
         "body": "Stanzy vous a envoyé l’avenant « {title} » ({number}) à votre contrat, pour votre dossier {service}. Lisez-le et signez-le en ligne.",
-        "cta": "Lire et signer"
+        "cta": "Lire et signer",
+        "eyebrow": "Avenant à signer",
+        "title": "Un avenant à votre contrat",
+        "file": "{number} · avenant à signer"
       },
       "signed": {
         "subject": "Votre contrat signé {number}",
         "body": "Vous avez signé « {title} » ({number}). Le voici en pièce jointe, avec son certificat de signature. Vous le retrouvez à tout moment dans votre espace.",
-        "cta": "Voir mon espace"
+        "cta": "Voir mon espace",
+        "eyebrow": "Contrat signé",
+        "title": "Votre contrat est signé",
+        "file": "En pièce jointe · avec certificat"
       },
       "consultantSigned": {
         "subject": "{client} a signé {number}",
@@ -2912,8 +2976,13 @@
       "reminder": {
         "subject": "Rappel : {number} à signer",
         "body": "« {title} » ({number}) attend toujours votre signature, pour votre dossier {service}. Lisez-le et signez-le en ligne.",
-        "cta": "Lire et signer"
-      }
+        "cta": "Lire et signer",
+        "eyebrow": "Rappel · contrat",
+        "title": "Votre contrat attend",
+        "file": "{number} · en attente de signature"
+      },
+      "footer": "Stanzy Immigration Consulting · votre dossier {service}",
+      "tag": "Contrat"
     },
     "panel": {
       "title": "Contrat",
@@ -3037,30 +3106,42 @@
       "submitted": {
         "subject": "Nouvelle demande d’intérêt : {client}",
         "body": "{client} a envoyé une demande d’Accompagnement Entrée Express. Niveau calculé : {level}.",
-        "cta": "Voir la demande"
+        "cta": "Voir la demande",
+        "tag": "Demande d’intérêt",
+        "level": "Niveau {level}"
       },
       "approved": {
         "subject": "Votre demande d’accompagnement est acceptée",
         "body": "Bonne nouvelle : Stanzy vous accompagne. Votre dossier est ouvert à l’étape « {stage} », avec la liste des documents à préparer.",
         "next": "Votre contrat d’accompagnement suit : signez-le en ligne dans votre espace, la facture viendra ensuite. Vous y verrez aussi ce qui manque et pourrez poser vos questions.",
-        "cta": "Ouvrir mon dossier"
+        "cta": "Ouvrir mon dossier",
+        "title": "Stanzy vous accompagne",
+        "nextLabel": "Et ensuite"
       },
       "rejected": {
         "subject": "Votre demande d’accompagnement",
         "body": "Stanzy ne peut pas donner suite à votre demande pour le moment.",
         "again": "Vous pouvez envoyer une nouvelle demande quand votre situation change.",
-        "cta": "Voir ma demande"
+        "cta": "Voir ma demande",
+        "title": "Votre demande"
       },
       "stanzyRequested": {
         "subject": "{client} demande à Stanzy d’obtenir un document",
         "body": "{client} demande à Stanzy d’obtenir « {document} ».",
-        "cta": "Ouvrir le dossier"
+        "cta": "Ouvrir le dossier",
+        "tag": "Document"
       },
       "stanzyDeclined": {
         "subject": "« {document} » : à obtenir par vous-même",
         "body": "Stanzy ne pourra pas obtenir « {document} » pour vous : il reste à fournir de votre côté.",
-        "cta": "Voir le document"
-      }
+        "cta": "Voir le document",
+        "eyebrow": "Document",
+        "title": "À fournir de votre côté"
+      },
+      "eyebrow": "Accompagnement",
+      "footer": "Stanzy Immigration Consulting · Accompagnement Entrée Express",
+      "reasonLabel": "Motif",
+      "context": "Accompagnement Entrée Express"
     },
     "page": {
       "apply": "Faire une demande",
@@ -3442,28 +3523,44 @@
       "openDossier": "Ouvrir mon dossier",
       "scheduled": {
         "subject": "Réunion planifiée : {subject}",
-        "body": "Stanzy vous propose une réunion vidéo « {subject} » le {when}, pour {minutes} minutes. Elle se tient dans votre espace : le bouton ci-dessous l’ouvre 15 minutes avant."
+        "body": "Stanzy vous propose une réunion vidéo « {subject} » le {when}, pour {minutes} minutes. Elle se tient dans votre espace : le bouton ci-dessous l’ouvre 15 minutes avant.",
+        "eyebrow": "Réunion planifiée",
+        "title": "Une réunion avec Stanzy"
       },
       "moved": {
         "subject": "Réunion déplacée : {subject}",
-        "body": "La réunion « {subject} » change : elle aura lieu le {when}, pour {minutes} minutes."
+        "body": "La réunion « {subject} » change : elle aura lieu le {when}, pour {minutes} minutes.",
+        "eyebrow": "Réunion déplacée",
+        "title": "Nouvelle date"
       },
       "cancelled": {
         "subject": "Réunion annulée : {subject}",
-        "body": "La réunion « {subject} » prévue le {when} est annulée."
+        "body": "La réunion « {subject} » prévue le {when} est annulée.",
+        "eyebrow": "Réunion annulée",
+        "title": "Réunion annulée"
       },
       "dayBefore": {
         "subject": "Demain : {subject}",
-        "body": "Rappel : votre réunion « {subject} » a lieu le {when}."
+        "body": "Rappel : votre réunion « {subject} » a lieu le {when}.",
+        "eyebrow": "Rappel · demain",
+        "title": "C’est demain, {name}."
       },
       "soon": {
         "subject": "Dans 15 minutes : {subject}",
-        "body": "Votre réunion « {subject} » commence bientôt, le {when}. Vous pouvez la rejoindre dès maintenant."
+        "body": "Votre réunion « {subject} » commence bientôt, le {when}. Vous pouvez la rejoindre dès maintenant.",
+        "eyebrow": "Rappel · 15 min",
+        "title": "Dans 15 minutes."
       },
       "instant": {
         "subject": "Stanzy vous attend : {subject}",
-        "body": "Stanzy a ouvert une réunion vidéo « {subject} », maintenant. Rejoignez-la avec le bouton ci-dessous."
-      }
+        "body": "Stanzy a ouvert une réunion vidéo « {subject} », maintenant. Rejoignez-la avec le bouton ci-dessous.",
+        "eyebrow": "Maintenant",
+        "title": "Stanzy vous attend"
+      },
+      "footer": "Stanzy Immigration Consulting · vos réunions",
+      "sub": "Heure de Douala · {minutes} min",
+      "subRecorded": "Heure de Douala · {minutes} min · enregistrée",
+      "subCancelled": "Heure de Douala · annulée"
     },
     "panel": {
       "title": "Réunions",
@@ -4526,8 +4623,8 @@
         "before": {
           "eyebrow": "Avant",
           "title": "Vous réservez et payez",
-          "body": "Un créneau, Mobile Money ou carte. Vous recevez la Reconnaissance et un rappel la veille.",
-          "short": "Mobile Money ou carte. Reconnaissance et rappel la veille."
+          "body": "Un créneau, Mobile Money ou carte. Vous recevez votre facture payée et un rappel la veille.",
+          "short": "Mobile Money ou carte. Facture et rappel la veille."
         },
         "during": {
           "eyebrow": "Pendant",
@@ -4737,6 +4834,388 @@
         "change": "Changer",
         "book": "Réserver"
       }
+    },
+    "reservation": {
+      "metaTitle": "Réserver une Consultation",
+      "back": "Consultation",
+      "title": "Finalisez votre réservation",
+      "stepOf": "Étape {step} sur 3",
+      "edit": "Modifier",
+      "hold": {
+        "timer": "<b>{time}</b> · créneau gardé pour vous le temps de payer",
+        "timerShort": "Gardé <b>{time}</b>",
+        "released": "<b>00:00</b> · le créneau de {time} a été libéré"
+      },
+      "contact": {
+        "title": "Vos coordonnées",
+        "mobileTitle": "Qui êtes-vous ?",
+        "mobileLead": "Pour vous envoyer le lien de la Réunion et vos rappels.",
+        "haveAccount": "Déjà un compte ?",
+        "signIn": "Se connecter",
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "fullName": "Nom complet",
+        "country": "Pays de résidence",
+        "countryMobile": "Pays où vous vivez",
+        "countryHint": "Ouvert à tous les pays : Mobile Money dans 22 pays d’Afrique, carte bancaire partout ailleurs. L’indicatif et l’heure s’adaptent aussi.",
+        "email": "E-mail",
+        "emailHint": "La confirmation et le lien de la Réunion arrivent ici.",
+        "emailPlaceholder": "vous@exemple.com",
+        "phone": "Numéro WhatsApp",
+        "reminders": "Recevoir les rappels sur WhatsApp (la veille et 15 min avant)",
+        "remindersMobile": "Rappels sur WhatsApp",
+        "remindersMobileHint": "La veille et 15 min avant",
+        "accountNote": "Un Compte est créé pour vous : Mon espace garde la Réunion et l’enregistrement.",
+        "submit": "Continuer",
+        "saving": "Un instant…",
+        "summary": "{name} · {country} · {email} · {phone}",
+        "errors": {
+          "name": "Écrivez votre nom.",
+          "email": "Cet e-mail ne semble pas valide.",
+          "phone": "Ce numéro ne semble pas valide pour ce pays.",
+          "accountExists": "Un Compte existe déjà avec cet e-mail. Connectez-vous pour réserver : votre créneau vous attend.",
+          "slotTaken": "Ce créneau vient d’être pris. Choisissez-en un autre."
+        },
+        "chooseAnother": "Choisir un autre créneau"
+      },
+      "prepare": {
+        "title": "Préparer l’échange",
+        "mobileTitle": "Pour bien préparer",
+        "lead": "Stanzy lit vos réponses avant la Réunion. Tout est facultatif.",
+        "topics": "De quoi voulez-vous parler ?",
+        "topic": {
+          "eligibility": "Mon admissibilité",
+          "points": "Gagner des points CRS",
+          "documents": "Mes documents",
+          "next": "La suite"
+        },
+        "crs": "Votre score CRS",
+        "crsMobile": "Score CRS",
+        "noScore": "Pas de score ?",
+        "calculator": "Calculateur CRS",
+        "calculatorMobile": "Calculez-le",
+        "selected": "Avez-vous déjà été sélectionné ?",
+        "selectedMobile": "Déjà sélectionné ?",
+        "no": "Non, pas encore",
+        "noShort": "Non",
+        "yes": "Oui, invitation reçue (ITA)",
+        "yesShort": "Oui, ITA",
+        "itaHint": "Avec une ITA, la consultation porte sur le dépôt du dossier dans les 60 jours.",
+        "situation": "Votre situation en quelques lignes",
+        "addSituation": "Ajouter un mot sur votre situation",
+        "count": "{count} / {max}",
+        "submit": "Continuer vers le paiement",
+        "submitMobile": "Continuer",
+        "skip": "Passer cette étape",
+        "summary": "{parts}",
+        "crsSummary": "Score CRS {score}",
+        "itaSummaryNo": "pas encore sélectionné",
+        "itaSummaryYes": "ITA reçue",
+        "nothing": "Rien de précisé"
+      },
+      "payment": {
+        "title": "Paiement",
+        "titleWith": "Paiement · {network}",
+        "soon": "Le paiement en ligne (Mobile Money ou carte, via SasPay) arrive très bientôt. Votre créneau reste gardé jusqu’à {time}.",
+        "country": "Payer depuis : <b>{country}</b>, via SasPay",
+        "otherCountry": "Payer depuis un autre pays",
+        "countryLabel": "Pays du moyen de paiement",
+        "payWith": "Payer avec",
+        "onPhone": "Confirmation sur votre téléphone",
+        "withCode": "Avec un code de paiement",
+        "number": "Numéro {network}",
+        "numberHint": "Repris de vos coordonnées. Vous recevez une demande à valider avec votre code secret.",
+        "numberHintOther": "Le numéro qui paie : le vôtre ou celui d’un proche.",
+        "otpFallback": "Sur votre téléphone, obtenez votre code de paiement auprès de votre opérateur.",
+        "otpEnter": "Saisissez le code reçu ci-dessous.",
+        "noMobileMoney": "Pas de Mobile Money pour ce pays : {country}",
+        "noMobileMoneyLead": "Payez par carte bancaire sur la page sécurisée SasPay, ou avec un numéro Mobile Money d’un autre pays (« Payer depuis un autre pays »).",
+        "card": "Carte bancaire",
+        "cardHint": "Visa, Mastercard · débitée en {currency} au taux du jour, sur la page SasPay",
+        "cardSafe": "Les données de carte sont saisies sur la page SasPay, jamais sur Stanzy.",
+        "total": "Total à payer",
+        "totalBeforeFees": "Total avant frais",
+        "pay": "Payer {amount}",
+        "payShort": "Payer",
+        "payCard": "Payer par carte",
+        "fine": "Selon l’opérateur, vous validez sur votre téléphone ou sur sa page de paiement. Non remboursable : vous pourrez déplacer le créneau.",
+        "fineCard": "Vous êtes redirigé vers la page de paiement SasPay, dans un nouvel onglet. Non remboursable : vous pourrez déplacer le créneau.",
+        "error": "Le paiement n’a pas pu partir. Réessayez.",
+        "errors": {
+          "phone": "Ce numéro ne semble pas valide pour ce pays.",
+          "otp": "Saisissez le code de paiement reçu sur votre téléphone.",
+          "refused": "SasPay n’a pas pu lancer ce paiement : rien n’a été débité. Vérifiez le numéro, ou choisissez un autre moyen."
+        },
+        "noWay": "SasPay ne propose pas de moyen de paiement pour ce pays. Choisissez-en un autre avec « Payer depuis un autre pays ».",
+        "price": "Consultation",
+        "fees": "Frais de paiement",
+        "feesFor": "Frais {network}",
+        "feesBySasPay": "calculés par SasPay",
+        "promoEnded": "Le code {code} n’est plus valable : le prix normal s’applique. Rien n’a été débité ; vérifiez le total et payez à nouveau."
+      },
+      "summary": {
+        "eyebrow": "Votre consultation",
+        "title": "Vidéo avec Stanzy · {minutes} min",
+        "time": "{weekday} · {start} – {end}",
+        "zone": "Heure de Douala",
+        "change": "Changer",
+        "included": [
+          "Réunion vidéo dans Mon espace",
+          "Enregistrement et transcription",
+          "Facture payée par e-mail"
+        ],
+        "price": "Consultation",
+        "total": "Total",
+        "fees": "+ frais selon le moyen de paiement",
+        "noPrice": "Prix communiqué avant le paiement",
+        "secured": "Mobile Money ou carte selon votre pays, sécurisé par SasPay",
+        "chip": "{date} · {time} · Vidéo avec Stanzy",
+        "feesFor": "Frais {network}",
+        "feesCard": "Frais de paiement",
+        "feesBySasPay": "calculés par SasPay",
+        "totalToPay": "Total à payer",
+        "totalBeforeFees": "Total avant frais"
+      },
+      "released": {
+        "title": "Votre créneau a été libéré",
+        "lead": "Le paiement n’a pas été fait dans les 15 min. Rien n’a été débité, et vos réponses sont gardées.",
+        "next": "Prochains créneaux libres",
+        "other": "Autre date",
+        "keep": "Garder {day} à {time} et payer",
+        "none": "Aucun autre créneau libre pour le moment."
+      },
+      "missing": {
+        "title": "Choisissez d’abord un créneau",
+        "lead": "Les créneaux libres sont sur la page Consultation.",
+        "cta": "Voir les créneaux"
+      },
+      "loading": "Préparation de votre réservation",
+      "toast": {
+        "held": "Créneau gardé 15 minutes",
+        "saved": "Réponses enregistrées",
+        "error": "Ça n’a pas marché. Réessayez."
+      },
+      "progress": {
+        "sent": "Demande envoyée à {network}",
+        "confirms": "Stanzy confirme votre rendez-vous",
+        "expires": "expire dans {time}",
+        "change": "Changer de moyen de paiement",
+        "phone": {
+          "title": "Validez sur votre téléphone",
+          "lead": "Une demande de <b>{amount}</b> est partie vers le <b>{phone}</b>. Tapez votre code secret {network} pour l’accepter.",
+          "validating": "Vous validez avec votre code secret",
+          "help": "Rien ne s’affiche ? Ouvrez votre menu Mobile Money pour voir les demandes en attente, ou renvoyez-la. Gardez cette page ouverte : elle se met à jour toute seule.",
+          "resend": "Renvoyer la demande"
+        },
+        "page": {
+          "title": "Finissez sur la page SasPay",
+          "lead": "Un nouvel onglet s’est ouvert sur la page sécurisée de SasPay pour payer <b>{amount}</b> avec {network}. Revenez ici quand c’est fait.",
+          "leadCard": "Un nouvel onglet s’est ouvert sur la page sécurisée de SasPay pour payer <b>{amount}</b>. Revenez ici quand c’est fait.",
+          "opened": "Page de paiement SasPay ouverte",
+          "paying": "Vous payez sur SasPay",
+          "held": "créneau gardé {time}",
+          "help": "L’onglet ne s’est pas ouvert ? Rouvrez la page. Si le paiement échoue sur SasPay, fermez simplement l’onglet : cette page vous dira quoi faire, et rien ne sera débité.",
+          "reopen": "Rouvrir la page SasPay"
+        },
+        "verifying": {
+          "title": "On vérifie votre paiement",
+          "lead": "SasPay vous a renvoyé ici. On confirme le paiement : quelques secondes suffisent en général. <b>Ne payez pas une deuxième fois.</b>",
+          "done": "Paiement fait sur SasPay",
+          "checking": "Confirmation par {network}",
+          "seconds": "quelques secondes",
+          "confirmed": "Votre rendez-vous est confirmé",
+          "help": "Gardez cette page ouverte : elle passe toute seule à la confirmation."
+        },
+        "failed": {
+          "title": "Le paiement n’est pas passé",
+          "lead": "{network} a refusé la demande, ou elle a expiré. <b>Rien n’a été débité</b>, et votre créneau reste gardé jusqu’à {time}.",
+          "leadCard": "Le paiement sur SasPay n’a pas abouti. <b>Rien n’a été débité</b>, et votre créneau reste gardé jusqu’à {time}.",
+          "leadReleased": "La demande a été refusée ou a expiré. <b>Rien n’a été débité.</b>",
+          "step": "Demande refusée ou expirée",
+          "nothing": "0 FCFA débité",
+          "help": "Causes fréquentes : solde insuffisant, code secret erroné, ou demande validée trop tard.",
+          "retry": "Réessayer · {amount}"
+        },
+        "slow": {
+          "title": "C’est plus long que prévu",
+          "lead": "{network} n’a pas encore confirmé votre paiement de <b>{amount}</b>. Si vous l’avez validé, il est en route : on vous prévient par e-mail dès qu’il arrive. <b>Ne payez pas une deuxième fois.</b>",
+          "waiting": "En attente de la réponse de {network}",
+          "held": "créneau toujours gardé",
+          "help": "Vous pouvez fermer cette page sans risque. Si {network} refuse finalement le paiement, rien ne sera débité et on vous proposera de réessayer.",
+          "check": "Vérifier maintenant",
+          "whatsapp": "Écrire à Stanzy sur WhatsApp"
+        }
+      },
+      "confirmed": {
+        "title": "C’est réservé, {name}.",
+        "lead": "Paiement reçu. La confirmation et votre facture payée sont parties par e-mail.",
+        "when": "{weekday} · {start} – {end}",
+        "what": "Vidéo avec Stanzy · {minutes} min · heure de Douala",
+        "note": "La réunion se passe dans Mon espace. Le bouton « Rejoindre » s’active 15 minutes avant, et l’enregistrement vous reste ensuite.",
+        "space": "Aller à Mon espace",
+        "calendar": "Ajouter au calendrier",
+        "calendarTitle": "Consultation vidéo avec Stanzy",
+        "receipt": "Reçu",
+        "price": "Consultation",
+        "fees": "Frais {network}",
+        "feesCard": "Frais",
+        "paid": "Payé",
+        "card": "Carte bancaire, sur la page SasPay",
+        "paidAt": "Payé le {date} à {time}",
+        "converted": "Débité en {currency} par SasPay, au taux du jour.",
+        "promo": "Code promo",
+        "invoice": "Voir la facture (PDF)",
+        "receiptNumber": "Facture payée · {number}",
+        "calendarGoogle": "Google Agenda",
+        "calendarApple": "Calendrier Apple (iPhone, Mac)",
+        "calendarOutlook": "Outlook",
+        "calendarDetails": "Consultation vidéo avec Stanzy, dans Mon espace. « Rejoindre » s’ouvre 15 minutes avant."
+      },
+      "returned": {
+        "back": "Reprendre ma réservation"
+      },
+      "promo": {
+        "ask": "Vous avez un code promo ?",
+        "label": "Code promo",
+        "placeholder": "Votre code",
+        "apply": "Appliquer",
+        "clear": "Effacer",
+        "remove": "Retirer le code {code}",
+        "removeShort": "Retirer",
+        "sheetTitle": "Code promo",
+        "close": "Fermer",
+        "left": "Plus que {left, plural, one {# place} other {# places}} sur {places}",
+        "until": "valable jusqu’au {date}",
+        "errors": {
+          "unknown": "Ce code n’existe pas. Vérifiez l’orthographe.",
+          "unknownSuggest": "Ce code n’existe pas. Vérifiez l’orthographe :",
+          "ended": "Cette offre est terminée. La consultation reste à {price}.",
+          "soldOut": "Les places de ce code sont toutes parties. La consultation reste à {price}.",
+          "used": "Vous avez déjà utilisé ce code : il ne vaut qu’une fois par Compte.",
+          "service": "Ce code ne s’applique pas à la Consultation."
+        },
+        "lastPlace": {
+          "title": "Dernière place partie",
+          "lead": "Quelqu’un a validé son paiement juste avant vous : les places <b>{code}</b> sont prises. <b>Rien n’a été débité.</b>",
+          "with": "Avec {code}",
+          "now": "Consultation + frais",
+          "pay": "Payer {total}",
+          "close": "Fermer"
+        }
+      }
+    },
+    "emails": {
+      "greeting": "Bonjour {name},",
+      "paid": {
+        "subject": "Votre Consultation est confirmée : {when}",
+        "body": "Votre paiement est bien reçu : votre Consultation vidéo avec Stanzy est réservée le {when}, pour {minutes} minutes.",
+        "moved": "Le créneau que vous aviez choisi a été pris pendant que votre paiement arrivait : votre Consultation a été placée sur le créneau libre suivant, ci-dessus. S’il ne vous convient pas, choisissez-en un autre avec « Déplacer » dans Mon espace.",
+        "receipt": "Payé : {amount} avec {network}.",
+        "room": "La réunion se passe dans Mon espace : le bouton « Rejoindre » s’active 15 minutes avant. Elle est enregistrée, et l’enregistrement vous reste ensuite.",
+        "noRefund": "La Consultation n’est pas remboursable ; vous pouvez la déplacer depuis Mon espace.",
+        "cta": "Préparer la Réunion",
+        "invoice": "Votre facture payée est en pièce jointe.",
+        "eyebrow": "Consultation confirmée",
+        "title": "C’est réservé, {name}.",
+        "row": "Payé · {how}",
+        "card": "carte bancaire",
+        "lead": "Votre paiement est reçu. Stanzy vous attend pour {minutes} minutes en vidéo, dans Mon espace."
+      },
+      "failed": {
+        "subject": "Votre paiement n’est pas passé",
+        "body": "Votre paiement {network} pour la Consultation n’est pas passé : la demande a été refusée ou a expiré.",
+        "nothing": "Rien n’a été débité.",
+        "held": "Votre créneau du {when} reste gardé jusqu’à {time} : vous pouvez réessayer d’ici là.",
+        "released": "Votre créneau a été libéré ; vous pouvez en choisir un autre.",
+        "cta": "Réessayer",
+        "eyebrow": "Paiement non abouti",
+        "title": "Le paiement n’est pas passé.",
+        "row": "À payer · {how}"
+      },
+      "help": "Une question ? Répondez sur WhatsApp à Stanzy.",
+      "footer": "Stanzy Immigration Consulting · e-mail envoyé car vous avez réservé une consultation.",
+      "where": "Heure de Douala · vidéo dans Mon espace",
+      "whatsapp": "Écrire à Stanzy"
+    },
+    "promoCodes": {
+      "eyebrow": "Facturation",
+      "title": "Codes promo",
+      "lead": "Appliqués au paiement, jamais affichés sur les pages. Créez-les et supprimez-les quand vous voulez.",
+      "listLabel": "Vos codes promo",
+      "empty": "Aucun code promo pour l’instant. Créez-en un : il ne s’affiche nulle part, il se tape au paiement.",
+      "new": "Nouveau code",
+      "columns": {
+        "code": "Code",
+        "used": "Utilisations",
+        "end": "Fin"
+      },
+      "status": {
+        "ACTIVE": "Actif",
+        "SOLD_OUT": "Épuisé",
+        "ENDED": "Terminé"
+      },
+      "services": {
+        "CONSULTATION": "Consultation",
+        "ACCOMPAGNEMENT": "Accompagnement",
+        "VERIFICATION": "Vérification",
+        "EDE": "EDE"
+      },
+      "usedOnly": "{used, plural, =0 {Aucune utilisation} one {# utilisation} other {# utilisations}}",
+      "placesUsed": "Places utilisées",
+      "noEnd": "Sans date de fin",
+      "douala": "Heure de Douala",
+      "endIn": "{relative}",
+      "ended": "terminé",
+      "limitReached": "Limite atteinte",
+      "delete": "Supprimer le code {code}",
+      "deleteShort": "Supprimer",
+      "deleted": "Code {code} supprimé",
+      "created": "Code {code} créé",
+      "error": "Ça n’a pas marché. Réessayez.",
+      "loading": "Chargement des codes promo",
+      "note": "Une place est comptée quand le paiement réussit. Supprimer un code l’arrête tout de suite ; les paiements déjà faits gardent leur réduction.",
+      "confirm": {
+        "title": "Supprimer {code} ?",
+        "text": "Le code s’arrête tout de suite : plus personne ne peut l’utiliser, et ceux qui l’avaient appliqué paieront le prix normal. Les paiements déjà faits gardent leur réduction.",
+        "cancel": "Annuler",
+        "delete": "Supprimer"
+      },
+      "form": {
+        "title": "Nouveau code",
+        "close": "Fermer",
+        "code": "Code",
+        "reduction": "Réduction",
+        "percent": "Pourcentage de réduction",
+        "amount": "Réduction en FCFA",
+        "services": "Services",
+        "places": "Nombre de places",
+        "noLimit": "Sans limite",
+        "end": "Fin",
+        "endHint": "Heure de Douala. Vide : sans date de fin.",
+        "once": "Une seule fois par Compte",
+        "atCheckout": "Au paiement",
+        "plusFees": "+ frais",
+        "cancel": "Annuler",
+        "create": "Créer le code",
+        "errors": {
+          "code": "Au moins 3 lettres ou chiffres.",
+          "value": "Indiquez la réduction.",
+          "percent": "Au plus 99 % : la Consultation ne peut pas être gratuite.",
+          "services": "Choisissez au moins un service.",
+          "taken": "Un code actif porte déjà ce nom."
+        }
+      },
+      "endPrefix": "Fin"
+    },
+    "invoice": {
+      "service": "Consultation vidéo",
+      "serviceLabel": "Service",
+      "line": "Consultation vidéo avec Stanzy · {minutes} min · {when}",
+      "promo": "Code promo {code}",
+      "card": "carte bancaire",
+      "paid": "Payée le {date} par {how}, via SasPay.",
+      "fees": "Débité : {charged}, dont {fee} de frais SasPay à la charge du client.",
+      "noRefund": "Non remboursable : la Consultation peut être déplacée depuis Mon espace."
     }
   }
 }

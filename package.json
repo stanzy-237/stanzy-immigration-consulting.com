@@ -60,6 +60,7 @@
     "embla-carousel-react": "^8.6.0",
     "heic2any": "^0.0.4",
     "input-otp": "^1.5.0",
+    "libphonenumber-js": "^1.13.17",
     "lucide-react": "^1.57.0",
     "motion": "^14.9.1",
     "next": "^16.4.6",

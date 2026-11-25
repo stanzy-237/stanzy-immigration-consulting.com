@@ -104,6 +104,16 @@ const schema = z.object({
   // Réunions can be planned but not joined. Set both or neither.
   STREAM_API_KEY: z.string().min(1).optional(),
   STREAM_API_SECRET: z.string().min(1).optional(),
+  // SasPay (#15): the Consultation's payment. A secret key from app.saspay.me →
+  // Développeur. Outside Vercel production only a sandbox key (`sk_test_`) is
+  // used, against the sandbox; production takes `sk_live_` (see
+  // features/consultation/server/saspay.ts). Optional: without it « Payer » is
+  // refused and the page says payment is not open yet.
+  SASPAY_API_KEY: z.string().regex(/^sk_(test|live)_/, 'Expected a SasPay secret key (sk_test_… or sk_live_…)').optional(),
+  // Signs SasPay's webhooks: shown once when the webhook is created in the
+  // dashboard (URL: <site>/api/consultation/saspay). Optional: without it the
+  // webhook is refused and payments are confirmed by checking SasPay instead.
+  SASPAY_WEBHOOK_SECRET: z.string().min(1).optional(),
   // Rollbar (#160), added by its Vercel Marketplace integration under these
   // names. The server token posts server errors; the client one, public by
   // design, is read in the browser bundle (features/reports/lib/rollbar-config.ts).

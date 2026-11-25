@@ -268,7 +268,7 @@ describe('the Demande d’intérêt', () => {
     await callerFor(db, consultant).accompagnement.dashboard.reject({ id, reason: 'Profil trop jeune' });
     expect(interests[0]).toMatchObject({ status: 'REJECTED', rejectReason: 'Profil trop jeune' });
     expect(mailer.appMailer.send).toHaveBeenLastCalledWith(
-      expect.objectContaining({ to: 'aminata@example.com', text: expect.stringContaining('Motif : Profil trop jeune') }),
+      expect.objectContaining({ to: 'aminata@example.com', text: expect.stringContaining('Motif · Profil trop jeune') }),
     );
     await expect(callerFor(db, user()).accompagnement.submit(answers())).resolves.toMatchObject({ id: expect.any(String) });
   });

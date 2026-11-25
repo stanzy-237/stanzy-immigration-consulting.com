@@ -455,19 +455,23 @@
       "Verification": {
         "subject": "Confirm your email address — Stanzy",
         "greeting": "Hi {name},",
-        "body": "Thanks for signing up to Stanzy Immigration Consulting. Confirm your email address to activate your account:",
+        "body": "Thanks for signing up to Stanzy Immigration Consulting. Confirm your email address to activate your account.",
         "cta": "Confirm my address",
         "expiry": "This link expires in 1 hour.",
-        "ignore": "If you didn’t sign up, you can safely ignore this email."
+        "ignore": "If you didn’t sign up, you can safely ignore this email.",
+        "title": "Confirm your address"
       },
       "ResetPassword": {
         "subject": "Reset your password — Stanzy",
         "greeting": "Hello {name},",
-        "body": "You asked to reset the password of your Stanzy account. Choose a new one with this link:",
+        "body": "You asked to reset the password of your Stanzy account. Choose a new one with this link.",
         "cta": "Choose a new password",
         "expiry": "This link expires in 1 hour and works only once.",
-        "ignore": "If you didn’t ask for this, ignore this email: your password stays the same."
-      }
+        "ignore": "If you didn’t ask for this, ignore this email: your password stays the same.",
+        "title": "A new password"
+      },
+      "eyebrow": "Your account",
+      "footer": "Stanzy Immigration Consulting · your account e-mail"
     },
     "MotDePasseOublie": {
       "metaTitle": "Forgot password",
@@ -1431,7 +1435,8 @@
       "reunions": "Meetings",
       "services": "Document services",
       "services-en-cours": "Services under way",
-      "signalements": "Reports"
+      "signalements": "Reports",
+      "codes-promo": "Promo codes"
     },
     "viewSite": "View the site",
     "overview": {
@@ -1848,42 +1853,69 @@
       "cta": "View my space",
       "opened": {
         "subject": "Your {service} file is open",
-        "body": "Your {service} file is open. It starts at the “{stage}” stage. You can follow its progress in your space."
+        "body": "Your {service} file is open. It starts at the “{stage}” stage. You can follow its progress in your space.",
+        "title": "Your file is open"
       },
       "stageChanged": {
         "subject": "Your {service} file changed stage",
-        "body": "Your {service} file is now at the “{stage}” stage."
+        "body": "Your {service} file is now at the “{stage}” stage.",
+        "title": "A new stage",
+        "bodyShort": "Your {service} file is moving forward."
       },
       "closed": {
         "subject": "Your {service} file is closed",
-        "body": "Your {service} file has been closed. Reason: {reason}"
+        "body": "Your {service} file has been closed. Reason: {reason}",
+        "title": "File closed",
+        "bodyShort": "Your {service} file has been closed."
       },
       "newVersion": {
         "subject": "New file in your {service} file",
-        "body": "Stanzy added a new version of “{document}” to your {service} file."
+        "body": "Stanzy added a new version of “{document}” to your {service} file.",
+        "title": "A new file"
       },
       "comment": {
         "subject": "New comment in your {service} file",
-        "body": "Stanzy commented on “{document}” in your {service} file: “{excerpt}”"
+        "body": "Stanzy commented on “{document}” in your {service} file: “{excerpt}”",
+        "title": "Stanzy commented",
+        "bodyShort": "Stanzy commented on “{document}” in your {service} file."
       },
       "signatureRequested": {
         "subject": "A document to sign in your {service} file",
         "body": "Stanzy sent you “{document}” to sign in your {service} file. Open your space to read it and sign it online.",
-        "cta": "Sign the document"
+        "cta": "Sign the document",
+        "title": "A document to sign",
+        "eyebrow": "To sign",
+        "file": "To sign online"
       },
       "signed": {
         "subject": "Document signed in your {service} file",
-        "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file."
+        "body": "You signed “{document}”. The signed document, with its signature certificate, is in your {service} file.",
+        "title": "It’s signed",
+        "eyebrow": "Signed",
+        "file": "Signed · with its signing certificate"
       },
       "signatureReminder": {
         "subject": "Reminder: a document to sign in your {service} file",
         "body": "“{document}” is still waiting for your signature in your {service} file. Open your space to read it and sign it online.",
-        "cta": "Sign the document"
+        "cta": "Sign the document",
+        "title": "It’s waiting for your signature",
+        "eyebrow": "Reminder · to sign",
+        "file": "To sign online"
       },
       "message": {
         "subject": "New message in your {service} file",
-        "body": "Stanzy wrote to you in your {service} file: “{excerpt}”"
-      }
+        "body": "Stanzy wrote to you in your {service} file: “{excerpt}”",
+        "title": "Stanzy wrote to you",
+        "bodyShort": "Stanzy wrote to you in your {service} file."
+      },
+      "eyebrow": "Your file",
+      "footer": "Stanzy Immigration Consulting · your {service} file",
+      "stage": "Stage",
+      "newStage": "New stage",
+      "reason": "Reason",
+      "document": "Document",
+      "on": "On “{document}”",
+      "messageLabel": "Message"
     },
     "dashboard": {
       "title": "Files",
@@ -1980,19 +2012,26 @@
       "cta": "Open the file",
       "clientUpload": {
         "subject": "{client} added “{document}”",
-        "body": "{client} uploaded a new version of “{document}” to their {service} file."
+        "body": "{client} uploaded a new version of “{document}” to their {service} file.",
+        "tag": "File",
+        "bodyShort": "{client} uploaded a new version of “{document}” to their {service} file."
       },
       "clientComment": {
         "subject": "{client} commented on “{document}”",
-        "body": "{client} commented on “{document}” in their {service} file: “{excerpt}”"
+        "body": "{client} commented on “{document}” in their {service} file: “{excerpt}”",
+        "tag": "Comment",
+        "bodyShort": "{client} commented on “{document}” in their {service} file."
       },
       "clientSigned": {
         "subject": "{client} signed “{document}”",
-        "body": "{client} signed “{document}” in their {service} file. The signed PDF was added as a new version of the document."
+        "body": "{client} signed “{document}” in their {service} file. The signed PDF was added as a new version of the document.",
+        "tag": "Signature"
       },
       "clientMessage": {
         "subject": "{client} wrote to you",
-        "body": "{client} wrote to you in their {service} file: “{excerpt}”"
+        "body": "{client} wrote to you in their {service} file: “{excerpt}”",
+        "tag": "Message",
+        "bodyShort": "{client} wrote to you in their {service} file."
       }
     },
     "documents": {
@@ -2207,11 +2246,15 @@
         "subject": "Invoice {number} – Stanzy Immigration Consulting",
         "body": "Here is your invoice {number} for your {service} file, for {total}. It is attached.",
         "bodyDue": "Here is your invoice {number} for your {service} file, for {total}, due by {due}. It is attached.",
-        "proof": "Once you have paid, upload your proof of payment in your space."
+        "proof": "Once you have paid, upload your proof of payment in your space.",
+        "eyebrow": "Invoice",
+        "title": "Your invoice {number}"
       },
       "paid": {
         "subject": "Payment received – invoice {number}",
-        "body": "We have received your payment of {total} for invoice {number}. Thank you!"
+        "body": "We have received your payment of {total} for invoice {number}. Thank you!",
+        "eyebrow": "Payment received",
+        "title": "Thank you, it’s paid"
       },
       "proof": {
         "subject": "{client} sent a proof of payment ({number})",
@@ -2220,12 +2263,24 @@
       },
       "dueSoon": {
         "subject": "Reminder: invoice {number} is due by {due}",
-        "body": "Your invoice {number} ({total}) is due on {due}."
+        "body": "Your invoice {number} ({total}) is due on {due}.",
+        "eyebrow": "Reminder · in 3 days",
+        "title": "Due in 3 days"
       },
       "overdue": {
         "subject": "Invoice {number}: the due date has passed",
-        "body": "Your invoice {number} ({total}) was due on {due}. If you have already paid, just upload your proof of payment."
-      }
+        "body": "Your invoice {number} ({total}) was due on {due}. If you have already paid, just upload your proof of payment.",
+        "eyebrow": "Past due",
+        "title": "The due date has passed"
+      },
+      "footer": "Stanzy Immigration Consulting · invoices of your file",
+      "amount": "Amount",
+      "dueBy": "To pay by",
+      "due": "Due date",
+      "duePassed": "{due} · passed",
+      "status": "Status",
+      "paidStatus": "Paid",
+      "tag": "Invoice"
     },
     "list": {
       "title": "Invoices",
@@ -2875,17 +2930,26 @@
       "sent": {
         "subject": "Your contract {number} to sign",
         "body": "Stanzy sent you “{title}” ({number}) for your {service} file. Read it and sign it online.",
-        "cta": "Read and sign"
+        "cta": "Read and sign",
+        "eyebrow": "Contract to sign",
+        "title": "Your contract is ready",
+        "file": "{number} · to sign online"
       },
       "amendmentSent": {
         "subject": "Amendment {number} to sign",
         "body": "Stanzy sent you the amendment “{title}” ({number}) to your contract, for your {service} file. Read it and sign it online.",
-        "cta": "Read and sign"
+        "cta": "Read and sign",
+        "eyebrow": "Amendment to sign",
+        "title": "An amendment to your contract",
+        "file": "{number} · amendment to sign"
       },
       "signed": {
         "subject": "Your signed contract {number}",
         "body": "You signed “{title}” ({number}). Here it is attached, with its signature certificate. You can find it in your space at any time.",
-        "cta": "See my space"
+        "cta": "See my space",
+        "eyebrow": "Contract signed",
+        "title": "Your contract is signed",
+        "file": "Attached · with its certificate"
       },
       "consultantSigned": {
         "subject": "{client} signed {number}",
@@ -2895,8 +2959,13 @@
       "reminder": {
         "subject": "Reminder: {number} to sign",
         "body": "“{title}” ({number}) is still waiting for your signature, for your {service} file. Read it and sign it online.",
-        "cta": "Read and sign"
-      }
+        "cta": "Read and sign",
+        "eyebrow": "Reminder · contract",
+        "title": "Your contract is waiting",
+        "file": "{number} · waiting for your signature"
+      },
+      "footer": "Stanzy Immigration Consulting · your {service} file",
+      "tag": "Contract"
     },
     "panel": {
       "title": "Contract",
@@ -3020,30 +3089,42 @@
       "submitted": {
         "subject": "New expression of interest: {client}",
         "body": "{client} sent an Express Entry Accompagnement request. Level worked out: {level}.",
-        "cta": "See the request"
+        "cta": "See the request",
+        "tag": "Interest request",
+        "level": "Level {level}"
       },
       "approved": {
         "subject": "Your Accompagnement request is accepted",
         "body": "Good news: Stanzy will guide you. Your file is open at the “{stage}” stage, with the list of documents to prepare.",
         "next": "Your support contract follows: sign it online in your space, then the invoice comes. There you’ll also see what’s missing and can ask your questions.",
-        "cta": "Open my file"
+        "cta": "Open my file",
+        "title": "Stanzy is with you",
+        "nextLabel": "What’s next"
       },
       "rejected": {
         "subject": "Your Accompagnement request",
         "body": "Stanzy can’t take your request forward for now.",
         "again": "You can send a new request when your situation changes.",
-        "cta": "See my request"
+        "cta": "See my request",
+        "title": "Your request"
       },
       "stanzyRequested": {
         "subject": "{client} asks Stanzy to get a document",
         "body": "{client} asks Stanzy to get “{document}”.",
-        "cta": "Open the file"
+        "cta": "Open the file",
+        "tag": "Document"
       },
       "stanzyDeclined": {
         "subject": "“{document}”: to get yourself",
         "body": "Stanzy won’t be able to get “{document}” for you: it’s still yours to provide.",
-        "cta": "See the document"
-      }
+        "cta": "See the document",
+        "eyebrow": "Document",
+        "title": "Yours to provide"
+      },
+      "eyebrow": "Accompaniment",
+      "footer": "Stanzy Immigration Consulting · Express Entry accompaniment",
+      "reasonLabel": "Reason",
+      "context": "Express Entry accompaniment"
     },
     "page": {
       "apply": "Send a request",
@@ -3425,28 +3506,44 @@
       "openDossier": "Open my file",
       "scheduled": {
         "subject": "Meeting planned: {subject}",
-        "body": "Stanzy invites you to a video meeting “{subject}” on {when}, for {minutes} minutes. It takes place in your space: the button below opens it 15 minutes before."
+        "body": "Stanzy invites you to a video meeting “{subject}” on {when}, for {minutes} minutes. It takes place in your space: the button below opens it 15 minutes before.",
+        "eyebrow": "Meeting planned",
+        "title": "A meeting with Stanzy"
       },
       "moved": {
         "subject": "Meeting moved: {subject}",
-        "body": "The meeting “{subject}” has changed: it will take place on {when}, for {minutes} minutes."
+        "body": "The meeting “{subject}” has changed: it will take place on {when}, for {minutes} minutes.",
+        "eyebrow": "Meeting moved",
+        "title": "New date"
       },
       "cancelled": {
         "subject": "Meeting cancelled: {subject}",
-        "body": "The meeting “{subject}” planned on {when} is cancelled."
+        "body": "The meeting “{subject}” planned on {when} is cancelled.",
+        "eyebrow": "Meeting cancelled",
+        "title": "Meeting cancelled"
       },
       "dayBefore": {
         "subject": "Tomorrow: {subject}",
-        "body": "Reminder: your meeting “{subject}” takes place on {when}."
+        "body": "Reminder: your meeting “{subject}” takes place on {when}.",
+        "eyebrow": "Reminder · tomorrow",
+        "title": "It’s tomorrow, {name}."
       },
       "soon": {
         "subject": "In 15 minutes: {subject}",
-        "body": "Your meeting “{subject}” starts soon, on {when}. You can join it now."
+        "body": "Your meeting “{subject}” starts soon, on {when}. You can join it now.",
+        "eyebrow": "Reminder · 15 min",
+        "title": "In 15 minutes."
       },
       "instant": {
         "subject": "Stanzy is waiting for you: {subject}",
-        "body": "Stanzy opened a video meeting “{subject}”, now. Join it with the button below."
-      }
+        "body": "Stanzy opened a video meeting “{subject}”, now. Join it with the button below.",
+        "eyebrow": "Now",
+        "title": "Stanzy is waiting for you"
+      },
+      "footer": "Stanzy Immigration Consulting · your meetings",
+      "sub": "Douala time · {minutes} min",
+      "subRecorded": "Douala time · {minutes} min · recorded",
+      "subCancelled": "Douala time · cancelled"
     },
     "panel": {
       "title": "Meetings",
@@ -4509,8 +4606,8 @@
         "before": {
           "eyebrow": "Before",
           "title": "You book and pay",
-          "body": "A time, Mobile Money or card. You get the payment receipt and a reminder the day before.",
-          "short": "Mobile Money or card. Receipt and a reminder the day before."
+          "body": "A time, Mobile Money or card. You get your paid invoice and a reminder the day before.",
+          "short": "Mobile Money or card. Invoice and a reminder the day before."
         },
         "during": {
           "eyebrow": "During",
@@ -4720,6 +4817,388 @@
         "change": "Change",
         "book": "Book"
       }
+    },
+    "reservation": {
+      "metaTitle": "Book a Consultation",
+      "back": "Consultation",
+      "title": "Complete your booking",
+      "stepOf": "Step {step} of 3",
+      "edit": "Edit",
+      "hold": {
+        "timer": "<b>{time}</b> · slot held for you while you pay",
+        "timerShort": "Held <b>{time}</b>",
+        "released": "<b>00:00</b> · the {time} slot was released"
+      },
+      "contact": {
+        "title": "Your details",
+        "mobileTitle": "Who are you?",
+        "mobileLead": "So we can send you the Meeting link and your reminders.",
+        "haveAccount": "Already have an account?",
+        "signIn": "Sign in",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "fullName": "Full name",
+        "country": "Country of residence",
+        "countryMobile": "Country you live in",
+        "countryHint": "Open to every country: Mobile Money in 22 African countries, bank card everywhere else. The dialling code and time adapt too.",
+        "email": "Email",
+        "emailHint": "Your confirmation and the Meeting link arrive here.",
+        "emailPlaceholder": "you@example.com",
+        "phone": "WhatsApp number",
+        "reminders": "Get reminders on WhatsApp (the day before and 15 min before)",
+        "remindersMobile": "WhatsApp reminders",
+        "remindersMobileHint": "The day before and 15 min before",
+        "accountNote": "An account is created for you: My space keeps the Meeting and the recording.",
+        "submit": "Continue",
+        "saving": "One moment…",
+        "summary": "{name} · {country} · {email} · {phone}",
+        "errors": {
+          "name": "Write your name.",
+          "email": "This email doesn’t look valid.",
+          "phone": "This number doesn’t look valid for this country.",
+          "accountExists": "An account already exists with this email. Sign in to book: your slot is waiting.",
+          "slotTaken": "This slot was just taken. Choose another one."
+        },
+        "chooseAnother": "Choose another slot"
+      },
+      "prepare": {
+        "title": "Prepare the call",
+        "mobileTitle": "Get ready",
+        "lead": "Stanzy reads your answers before the Meeting. Everything is optional.",
+        "topics": "What would you like to talk about?",
+        "topic": {
+          "eligibility": "My eligibility",
+          "points": "Gaining CRS points",
+          "documents": "My documents",
+          "next": "What comes next"
+        },
+        "crs": "Your CRS score",
+        "crsMobile": "CRS score",
+        "noScore": "No score yet?",
+        "calculator": "CRS calculator",
+        "calculatorMobile": "Work it out",
+        "selected": "Have you been selected already?",
+        "selectedMobile": "Selected already?",
+        "no": "No, not yet",
+        "noShort": "No",
+        "yes": "Yes, invitation received (ITA)",
+        "yesShort": "Yes, ITA",
+        "itaHint": "With an ITA, the consultation covers filing your application within 60 days.",
+        "situation": "Your situation in a few lines",
+        "addSituation": "Add a word about your situation",
+        "count": "{count} / {max}",
+        "submit": "Continue to payment",
+        "submitMobile": "Continue",
+        "skip": "Skip this step",
+        "summary": "{parts}",
+        "crsSummary": "CRS score {score}",
+        "itaSummaryNo": "not selected yet",
+        "itaSummaryYes": "ITA received",
+        "nothing": "Nothing specified"
+      },
+      "payment": {
+        "title": "Payment",
+        "titleWith": "Payment · {network}",
+        "soon": "Online payment (Mobile Money or card, through SasPay) is coming very soon. Your slot stays held until {time}.",
+        "country": "Paying from: <b>{country}</b>, through SasPay",
+        "otherCountry": "Pay from another country",
+        "countryLabel": "Country of the payment method",
+        "payWith": "Pay with",
+        "onPhone": "Confirm on your phone",
+        "withCode": "With a payment code",
+        "number": "{network} number",
+        "numberHint": "From your details. You’ll get a request to approve with your PIN.",
+        "numberHintOther": "The number that pays: yours or a relative’s.",
+        "otpFallback": "On your phone, get your payment code from your operator.",
+        "otpEnter": "Enter the code you received below.",
+        "noMobileMoney": "No Mobile Money for this country: {country}",
+        "noMobileMoneyLead": "Pay by card on SasPay’s secure page, or with a Mobile Money number from another country (“Pay from another country”).",
+        "card": "Bank card",
+        "cardHint": "Visa, Mastercard · charged in {currency} at the day’s rate, on the SasPay page",
+        "cardSafe": "Card details are entered on SasPay’s page, never on Stanzy.",
+        "total": "Total to pay",
+        "totalBeforeFees": "Total before fees",
+        "pay": "Pay {amount}",
+        "payShort": "Pay",
+        "payCard": "Pay by card",
+        "fine": "Depending on the operator, you approve on your phone or on its payment page. Non-refundable: you can move the slot.",
+        "fineCard": "You’ll go to SasPay’s payment page, in a new tab. Non-refundable: you can move the slot.",
+        "error": "The payment couldn’t start. Try again.",
+        "errors": {
+          "phone": "This number doesn’t look valid for this country.",
+          "otp": "Enter the payment code you received on your phone.",
+          "refused": "SasPay couldn’t start this payment: nothing was charged. Check the number, or choose another method."
+        },
+        "noWay": "SasPay offers no way to pay for this country. Pick another one with “Pay from another country”.",
+        "price": "Consultation",
+        "fees": "Payment fees",
+        "feesFor": "{network} fees",
+        "feesBySasPay": "set by SasPay",
+        "promoEnded": "The code {code} is no longer valid: the normal price applies. Nothing was charged; check the total and pay again."
+      },
+      "summary": {
+        "eyebrow": "Your consultation",
+        "title": "Video with Stanzy · {minutes} min",
+        "time": "{weekday} · {start} – {end}",
+        "zone": "Douala time",
+        "change": "Change",
+        "included": [
+          "Video Meeting in My space",
+          "Recording and transcript",
+          "Paid invoice by e-mail"
+        ],
+        "price": "Consultation",
+        "total": "Total",
+        "fees": "+ fees depending on the payment method",
+        "noPrice": "Price shown before payment",
+        "secured": "Mobile Money or card depending on your country, secured by SasPay",
+        "chip": "{date} · {time} · Video with Stanzy",
+        "feesFor": "{network} fees",
+        "feesCard": "Payment fees",
+        "feesBySasPay": "set by SasPay",
+        "totalToPay": "Total to pay",
+        "totalBeforeFees": "Total before fees"
+      },
+      "released": {
+        "title": "Your slot was released",
+        "lead": "Payment wasn’t made within 15 min. Nothing was charged, and your answers are kept.",
+        "next": "Next free slots",
+        "other": "Another date",
+        "keep": "Hold {day} at {time} and pay",
+        "none": "No other free slot for now."
+      },
+      "missing": {
+        "title": "Choose a slot first",
+        "lead": "The free slots are on the Consultation page.",
+        "cta": "See the slots"
+      },
+      "loading": "Getting your booking ready",
+      "toast": {
+        "held": "Slot held for 15 minutes",
+        "saved": "Answers saved",
+        "error": "That didn’t work. Try again."
+      },
+      "progress": {
+        "sent": "Request sent to {network}",
+        "confirms": "Stanzy confirms your appointment",
+        "expires": "expires in {time}",
+        "change": "Change payment method",
+        "phone": {
+          "title": "Approve on your phone",
+          "lead": "A request for <b>{amount}</b> went to <b>{phone}</b>. Enter your {network} PIN to accept it.",
+          "validating": "You approve with your PIN",
+          "help": "Nothing showing? Open your Mobile Money menu to see pending requests, or send it again. Keep this page open: it updates by itself.",
+          "resend": "Send the request again"
+        },
+        "page": {
+          "title": "Finish on the SasPay page",
+          "lead": "A new tab opened on SasPay’s secure page to pay <b>{amount}</b> with {network}. Come back here once it’s done.",
+          "leadCard": "A new tab opened on SasPay’s secure page to pay <b>{amount}</b>. Come back here once it’s done.",
+          "opened": "SasPay payment page opened",
+          "paying": "You pay on SasPay",
+          "held": "slot held until {time}",
+          "help": "The tab didn’t open? Open the page again. If the payment fails on SasPay, just close the tab: this page will tell you what to do, and nothing will be charged.",
+          "reopen": "Open the SasPay page again"
+        },
+        "verifying": {
+          "title": "We’re checking your payment",
+          "lead": "SasPay sent you back here. We’re confirming the payment: it usually takes a few seconds. <b>Don’t pay a second time.</b>",
+          "done": "Paid on SasPay",
+          "checking": "Confirmation by {network}",
+          "seconds": "a few seconds",
+          "confirmed": "Your appointment is confirmed",
+          "help": "Keep this page open: it moves on to the confirmation by itself."
+        },
+        "failed": {
+          "title": "The payment didn’t go through",
+          "lead": "{network} declined the request, or it expired. <b>Nothing was charged</b>, and your slot stays held until {time}.",
+          "leadCard": "The payment on SasPay didn’t go through. <b>Nothing was charged</b>, and your slot stays held until {time}.",
+          "leadReleased": "The request was declined or expired. <b>Nothing was charged.</b>",
+          "step": "Request declined or expired",
+          "nothing": "0 FCFA charged",
+          "help": "Common causes: not enough balance, a wrong PIN, or the request approved too late.",
+          "retry": "Try again · {amount}"
+        },
+        "slow": {
+          "title": "It’s taking longer than expected",
+          "lead": "{network} hasn’t confirmed your <b>{amount}</b> payment yet. If you approved it, it’s on its way: we’ll e-mail you as soon as it arrives. <b>Don’t pay a second time.</b>",
+          "waiting": "Waiting for {network}’s answer",
+          "held": "slot still held",
+          "help": "You can safely close this page. If {network} finally declines the payment, nothing will be charged and you’ll be offered to try again.",
+          "check": "Check now",
+          "whatsapp": "Message Stanzy on WhatsApp"
+        }
+      },
+      "confirmed": {
+        "title": "You’re booked, {name}.",
+        "lead": "Payment received. The confirmation and your paid invoice are on their way by e-mail.",
+        "when": "{weekday} · {start} – {end}",
+        "what": "Video with Stanzy · {minutes} min · Douala time",
+        "note": "The meeting takes place in My space. The “Join” button opens 15 minutes before, and the recording stays available to you afterwards.",
+        "space": "Go to My space",
+        "calendar": "Add to calendar",
+        "calendarTitle": "Video Consultation with Stanzy",
+        "receipt": "Receipt",
+        "price": "Consultation",
+        "fees": "{network} fees",
+        "feesCard": "Fees",
+        "paid": "Paid",
+        "card": "Bank card, on the SasPay page",
+        "paidAt": "Paid on {date} at {time}",
+        "converted": "Charged in {currency} by SasPay, at the day’s rate.",
+        "promo": "Promo code",
+        "invoice": "View the invoice (PDF)",
+        "receiptNumber": "Paid invoice · {number}",
+        "calendarGoogle": "Google Calendar",
+        "calendarApple": "Apple Calendar (iPhone, Mac)",
+        "calendarOutlook": "Outlook",
+        "calendarDetails": "Video consultation with Stanzy, in My space. “Join” opens 15 minutes before."
+      },
+      "returned": {
+        "back": "Back to my booking"
+      },
+      "promo": {
+        "ask": "Have a promo code?",
+        "label": "Promo code",
+        "placeholder": "Your code",
+        "apply": "Apply",
+        "clear": "Clear",
+        "remove": "Remove the code {code}",
+        "removeShort": "Remove",
+        "sheetTitle": "Promo code",
+        "close": "Close",
+        "left": "Only {left, plural, one {# place} other {# places}} left of {places}",
+        "until": "valid until {date}",
+        "errors": {
+          "unknown": "This code doesn’t exist. Check the spelling.",
+          "unknownSuggest": "This code doesn’t exist. Check the spelling:",
+          "ended": "This offer has ended. The consultation stays at {price}.",
+          "soldOut": "All places for this code are gone. The consultation stays at {price}.",
+          "used": "You’ve already used this code: it’s once per account.",
+          "service": "This code doesn’t apply to the Consultation."
+        },
+        "lastPlace": {
+          "title": "Last place gone",
+          "lead": "Someone approved their payment just before you: the <b>{code}</b> places are taken. <b>Nothing was charged.</b>",
+          "with": "With {code}",
+          "now": "Consultation + fees",
+          "pay": "Pay {total}",
+          "close": "Close"
+        }
+      }
+    },
+    "emails": {
+      "greeting": "Hello {name},",
+      "paid": {
+        "subject": "Your Consultation is confirmed: {when}",
+        "body": "Your payment came through: your video Consultation with Stanzy is booked for {when}, for {minutes} minutes.",
+        "moved": "The slot you chose was taken while your payment was on its way, so your Consultation was placed on the next free slot, above. If it doesn’t suit you, pick another with “Move” in My space.",
+        "receipt": "Paid: {amount} with {network}.",
+        "room": "The meeting takes place in My space: the “Join” button opens 15 minutes before. It is recorded, and the recording stays available to you afterwards.",
+        "noRefund": "The Consultation can’t be refunded; you can move it from My space.",
+        "cta": "Prepare the meeting",
+        "invoice": "Your paid invoice is attached.",
+        "eyebrow": "Consultation confirmed",
+        "title": "You’re booked, {name}.",
+        "row": "Paid · {how}",
+        "card": "bank card",
+        "lead": "Your payment came through. Stanzy is expecting you for {minutes} minutes on video, in My space."
+      },
+      "failed": {
+        "subject": "Your payment didn’t go through",
+        "body": "Your {network} payment for the Consultation didn’t go through: the request was declined or expired.",
+        "nothing": "Nothing was charged.",
+        "held": "Your slot on {when} stays held until {time}: you can try again until then.",
+        "released": "Your slot has been released; you can choose another one.",
+        "cta": "Try again",
+        "eyebrow": "Payment not completed",
+        "title": "The payment didn’t go through.",
+        "row": "To pay · {how}"
+      },
+      "help": "A question? Reply on WhatsApp to Stanzy.",
+      "footer": "Stanzy Immigration Consulting · sent because you booked a consultation.",
+      "where": "Douala time · video in My space",
+      "whatsapp": "Message Stanzy"
+    },
+    "promoCodes": {
+      "eyebrow": "Billing",
+      "title": "Promo codes",
+      "lead": "Applied at payment, never shown on the pages. Create and delete them whenever you like.",
+      "listLabel": "Your promo codes",
+      "empty": "No promo codes yet. Create one: it shows nowhere, it’s typed at payment.",
+      "new": "New code",
+      "columns": {
+        "code": "Code",
+        "used": "Uses",
+        "end": "End"
+      },
+      "status": {
+        "ACTIVE": "Active",
+        "SOLD_OUT": "Sold out",
+        "ENDED": "Ended"
+      },
+      "services": {
+        "CONSULTATION": "Consultation",
+        "ACCOMPAGNEMENT": "Accompaniment",
+        "VERIFICATION": "Verification",
+        "EDE": "EDE"
+      },
+      "usedOnly": "{used, plural, =0 {Not used yet} one {# use} other {# uses}}",
+      "placesUsed": "Places used",
+      "noEnd": "No end date",
+      "douala": "Douala time",
+      "endIn": "{relative}",
+      "ended": "ended",
+      "limitReached": "Limit reached",
+      "delete": "Delete the code {code}",
+      "deleteShort": "Delete",
+      "deleted": "Code {code} deleted",
+      "created": "Code {code} created",
+      "error": "That didn’t work. Try again.",
+      "loading": "Loading promo codes",
+      "note": "A place counts when the payment succeeds. Deleting a code stops it at once; payments already made keep their reduction.",
+      "confirm": {
+        "title": "Delete {code}?",
+        "text": "The code stops at once: nobody can use it any more, and those who had applied it will pay the normal price. Payments already made keep their reduction.",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "form": {
+        "title": "New code",
+        "close": "Close",
+        "code": "Code",
+        "reduction": "Reduction",
+        "percent": "Percentage off",
+        "amount": "Amount off in FCFA",
+        "services": "Services",
+        "places": "Number of places",
+        "noLimit": "No limit",
+        "end": "End",
+        "endHint": "Douala time. Empty: no end date.",
+        "once": "Once per account",
+        "atCheckout": "At payment",
+        "plusFees": "+ fees",
+        "cancel": "Cancel",
+        "create": "Create the code",
+        "errors": {
+          "code": "At least 3 letters or digits.",
+          "value": "Enter the reduction.",
+          "percent": "99 % at most: the Consultation can’t be free.",
+          "services": "Choose at least one service.",
+          "taken": "An active code already has this name."
+        }
+      },
+      "endPrefix": "Ends"
+    },
+    "invoice": {
+      "service": "Video consultation",
+      "serviceLabel": "Service",
+      "line": "Video consultation with Stanzy · {minutes} min · {when}",
+      "promo": "Promo code {code}",
+      "card": "bank card",
+      "paid": "Paid on {date} by {how}, through SasPay.",
+      "fees": "Charged: {charged}, including {fee} of SasPay fees paid by the client.",
+      "noRefund": "Non-refundable: the Consultation can be moved from My space."
     }
   }
 }

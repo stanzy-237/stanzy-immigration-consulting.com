@@ -42,6 +42,7 @@
   /* Third-party brand marks (used only on their own CTAs). */
   --whatsapp: #25d366;
   --mtn: #ffcb05; /* MTN Mobile Money yellow: payment marks and the Consultation's illustrations */
+  --orange-money: #ff7900; /* Orange Money orange: its payment mark, and the « page SasPay » illustration's arrow */
   --stanzy-skin: #9a6440; /* Stanzy's skin in illustrations, as the content studio's mascot draws him */
 
   /* Type de tirage pills (Derniers tirages, #49): ink, tint and line per group. */
@@ -134,6 +135,7 @@
   --color-ink-deep: var(--ink-deep);
   --color-whatsapp: var(--whatsapp);
   --color-mtn: var(--mtn);
+  --color-orange-money: var(--orange-money);
   --color-stanzy-skin: var(--stanzy-skin);
   /* The two inks a Client signs with (#96): black and ballpoint blue. */
   --color-pen-black: #111111;

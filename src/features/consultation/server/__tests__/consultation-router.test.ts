@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TRPCContext } from '@/server/trpc/context';
 import { createCaller } from '@/server/trpc/root';
 
+vi.mock('@/features/consultation/server/booking-account', () => ({ createBookingAccount: vi.fn() }));
+
 type Row = Record<string, unknown>;
 
 /**
@@ -25,6 +27,7 @@ function fakeDatabase(settings: Row | null, meetings: Row[]) {
   return {
     consultationSettings: { findUnique: vi.fn(async () => settings) },
     meeting: { findMany: vi.fn(async ({ where }: { where: Row }) => meetings.filter((m) => matches(m, where))) },
+    consultation: { findMany: vi.fn(async () => []) },
   };
 }
 

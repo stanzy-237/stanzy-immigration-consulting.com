@@ -5,6 +5,7 @@ import { renderEmail } from '@/features/dossiers/lib/dossier-emails';
 import { toLocale } from '@/i18n/routing';
 import en from '@/messages/en.json';
 import fr from '@/messages/fr.json';
+import { teamEmail } from '@/server/email/brand-email';
 import type { EmailMessage } from '@/server/email/mailer';
 
 const MESSAGES = { fr, en } as const;
@@ -38,6 +39,11 @@ export function contractSentEmail(opts: {
   return renderEmail({
     to: opts.to,
     subject: t(`Contracts.emails.${kind}.subject`, values),
+    eyebrow: t(`Contracts.emails.${kind}.eyebrow`),
+    art: 'signature',
+    title: t(`Contracts.emails.${kind}.title`),
+    card: { kind: 'file', title: opts.contract.title, sub: t(`Contracts.emails.${kind}.file`, values) },
+    footer: t('Contracts.emails.footer', values),
     lines: [t('Contracts.emails.greeting', { name: opts.name }), t(`Contracts.emails.${kind}.body`, values)],
     cta: t(`Contracts.emails.${kind}.cta`),
     url: opts.url,
@@ -54,11 +60,16 @@ export function contractSignedEmail(opts: {
   url: string;
 }): EmailMessage {
   const t = translator(opts.locale);
-  const values = { number: opts.contract.number, title: opts.contract.title };
+  const values = { number: opts.contract.number, title: opts.contract.title, service: t(`Dossiers.services.${opts.contract.service}`) };
   return {
     ...renderEmail({
       to: opts.to,
       subject: t('Contracts.emails.signed.subject', values),
+      eyebrow: t('Contracts.emails.signed.eyebrow'),
+      art: 'signature',
+      title: t('Contracts.emails.signed.title'),
+      card: { kind: 'file', title: `${opts.contract.number}.pdf`, sub: t('Contracts.emails.signed.file', values) },
+      footer: t('Contracts.emails.footer', values),
       lines: [t('Contracts.emails.greeting', { name: opts.name }), t('Contracts.emails.signed.body', values)],
       cta: t('Contracts.emails.signed.cta'),
       url: opts.url,
@@ -83,14 +94,15 @@ export function consultantContractSignedEmail(opts: {
     title: opts.contract.title,
     service: t(`Dossiers.services.${opts.contract.service}`),
   };
-  return {
-    ...renderEmail({
-      to: opts.to,
-      subject: t('Contracts.emails.consultantSigned.subject', values),
-      lines: [t('Contracts.emails.consultantSigned.body', values)],
-      cta: t('Contracts.emails.consultantSigned.cta'),
-      url: opts.url,
-    }),
+  // Board 3.8: compact, to the team, the signed PDF attached.
+  return teamEmail({
+    to: opts.to,
+    subject: t('Contracts.emails.consultantSigned.subject', values),
+    person: { name: opts.client, context: values.service },
+    tag: t('Contracts.emails.tag'),
+    lines: [t('Contracts.emails.consultantSigned.body', values)],
+    note: { label: `${opts.contract.number}.pdf`, text: opts.contract.title },
+    cta: { label: t('Contracts.emails.consultantSigned.cta'), url: opts.url },
     attachments: [{ filename: `${opts.contract.number}.pdf`, content: opts.pdf }],
-  };
+  });
 }

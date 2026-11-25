@@ -1,12 +1,11 @@
+import { brandEmail } from '@/server/email/brand-email';
 import type { EmailMessage } from '@/server/email/mailer';
-
-const escape = (value: string): string =>
-  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /**
  * The hand-off to a service's partner (#148): the PDF the consultant put
  * together (the note, then the pieces), attached. In French: the partners
- * are in Cameroon. No button: the partner has no account.
+ * are in Cameroon. No button: the partner has no account. Board 3.9: plain
+ * text under the logo, no illustration, the PDF shown as a file.
  */
 export function handoffEmail(opts: {
   to: string;
@@ -22,13 +21,13 @@ export function handoffEmail(opts: {
     'Merci de nous confirmer sa bonne réception.',
     'L’équipe Stanzy Immigration Consulting',
   ];
-  return {
+  return brandEmail({
     to: opts.to,
     subject: `${opts.service} – ${opts.client}`,
-    text: lines.join('\n\n'),
-    html: `<div style="font-family:Arial,sans-serif;color:#0D1F4E;line-height:1.5">\n${lines
-      .map((line) => `<p>${escape(line)}</p>`)
-      .join('\n')}\n</div>`,
+    eyebrow: 'Service documentaire',
+    lines,
+    card: { kind: 'file', title: opts.fileName, sub: 'Note de Stanzy, puis les pièces' },
+    footer: 'Stanzy Immigration Consulting',
     attachments: [{ filename: opts.fileName, content: opts.pdf }],
-  };
+  });
 }

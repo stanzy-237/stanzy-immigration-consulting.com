@@ -1,4 +1,4 @@
-import { ClipboardList, FileCheck2, FileSignature, FileStack, Flag, FolderKanban, Inbox, ScrollText, LayoutDashboard, Newspaper, ReceiptText, Users, Video, Wallet, type LucideIcon } from 'lucide-react';
+import { ClipboardList, FileCheck2, FileSignature, FileStack, Flag, FolderKanban, Inbox, ScrollText, LayoutDashboard, Newspaper, ReceiptText, TicketPercent, Users, Video, Wallet, type LucideIcon } from 'lucide-react';
 
 /**
  * The Tableau de bord's sections, in sidebar order. A new section (Leads,
@@ -7,7 +7,7 @@ import { ClipboardList, FileCheck2, FileSignature, FileStack, Flag, FolderKanban
  */
 export type DashboardSection = {
   /** Its label is `Dashboard.nav.<key>`. */
-  key: 'overview' | 'demandes' | 'dossiers' | 'services-en-cours' | 'reunions' | 'comptes' | 'factures' | 'finances' | 'outils-pdf' | 'signatures' | 'contrats' | 'services' | 'blog' | 'signalements';
+  key: 'overview' | 'demandes' | 'dossiers' | 'services-en-cours' | 'reunions' | 'comptes' | 'factures' | 'finances' | 'outils-pdf' | 'signatures' | 'contrats' | 'services' | 'codes-promo' | 'blog' | 'signalements';
   /** Its address on the dashboard's subdomain. */
   href: string;
   /** The first route segment below the dashboard it owns; null for the Aperçu. */
@@ -34,6 +34,8 @@ export const DASHBOARD_SECTIONS: readonly DashboardSection[] = [
   { key: 'contrats', href: '/contrats', segment: 'contrats', icon: ScrollText, group: 'clients' },
   { key: 'signatures', href: '/signatures', segment: 'signatures', icon: FileSignature, group: 'clients' },
   { key: 'services', href: '/services', segment: 'services', icon: FileCheck2, group: 'billing' },
+  // The Consultation's Codes promo (#15): applied at checkout only.
+  { key: 'codes-promo', href: '/codes-promo', segment: 'codes-promo', icon: TicketPercent, group: 'billing' },
   { key: 'factures', href: '/factures', segment: 'factures', icon: ReceiptText, group: 'billing' },
   { key: 'finances', href: '/finances', segment: 'finances', icon: Wallet, group: 'billing' },
   { key: 'outils-pdf', href: '/outils-pdf', segment: 'outils-pdf', icon: FileStack, group: 'tools' },

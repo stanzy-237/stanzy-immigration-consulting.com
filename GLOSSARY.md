@@ -177,7 +177,7 @@ A file a User uploads on a service's fulfillment page to evidence an offline pay
 The ordered set of stages the consultant moves a Dossier through by hand for a given service type, visible to the Client as progress. Stages can move back, and a Dossier can be closed early as Clôturé with a reason. Each service type has its own stage set; Accompagnement has 10, from Évaluation du profil to COPR.
 
 **Facture** (Invoice):
-A bill the consultant writes in the Tableau de bord for a Dossier, in a currency of its own (XAF by default), sent by email as a PDF: Brouillon → Envoyée → Preuve reçue → Payée (or En retard, Annulée). A Dossier can have several.
+A bill the consultant writes in the Tableau de bord for a Dossier, in a currency of its own (XAF by default), sent by email as a PDF: Brouillon → Envoyée → Preuve reçue → Payée (or En retard, Annulée). A Dossier can have several. A paid Consultation also gets one, issued Payée as soon as SasPay confirms the payment (same numbering, no Dossier), instead of a Reconnaissance.
 Accompagnement, Vérification and Services documentaires have no Devis: the quoted amount goes straight on the Facture.
 
 **Contrat** (Service contract):
