@@ -201,6 +201,9 @@ model Draw {
   invitations Int
   crsMin      Int
   irccUrl     String?
+  /// IRCC's tie-breaking time as published (`drawCutOff`), copied out of `raw`
+  /// so the pages never read the whole feed object (it is most of the table).
+  drawCutOff  String?
   /// The feed's object for this round, untouched.
   raw         Json
   firstSeenAt DateTime  @default(now())

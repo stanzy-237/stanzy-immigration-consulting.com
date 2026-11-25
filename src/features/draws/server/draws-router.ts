@@ -3,10 +3,12 @@ import { z } from 'zod';
 
 import type { DrawGroup } from '@/features/draws/lib/draw-type';
 import { irccInstant, roundOrder, type DrawSummary } from '@/features/draws/lib/draw-summary';
+import { cachedDraws } from '@/features/draws/server/draws-cache';
 import { SYNC_ID } from '@/features/draws/server/ingest-draws';
 import { ingestNow } from '@/features/draws/server/ingest-now';
 import { routing } from '@/i18n/routing';
 import { pushEndpoint, pushSubscriptionInput } from '@/server/push/subscription-schema';
+import type { TRPCContext } from '@/server/trpc/context';
 import { consultantProcedure, createTRPCRouter, humanOnly, publicProcedure } from '@/server/trpc/trpc';
 
 export type { DrawSummary };
@@ -22,50 +24,59 @@ const SUMMARY = {
   invitations: true,
   crsMin: true,
   irccUrl: true,
-  // Read for the tie-breaking rule only; never sent to the browser.
-  raw: true,
+  // The tie-breaking time; never `raw`, the feed object that is most of the table.
+  drawCutOff: true,
 } as const;
 
-type Row = Omit<DrawSummary, 'date' | 'crsChange' | 'tieBreakAt'> & { date: Date; raw: unknown };
+type Row = Omit<DrawSummary, 'date' | 'crsChange' | 'tieBreakAt'> & { date: Date; drawCutOff: string | null };
 
 /** `rows` newest first; each gets its change from the next older row of its group. */
 function withCrsChange(rows: Row[]): DrawSummary[] {
   const older = new Map<DrawGroup, number>();
   return rows
     .toReversed()
-    .map(({ raw, ...row }) => {
+    .map(({ drawCutOff, ...row }) => {
       const previous = older.get(row.group);
       older.set(row.group, row.crsMin);
       return {
         ...row,
         date: row.date.toISOString().slice(0, 10),
         crsChange: previous === undefined ? null : row.crsMin - previous,
-        tieBreakAt: irccInstant((raw as { drawCutOff?: unknown } | null)?.drawCutOff),
+        tieBreakAt: irccInstant(drawCutOff),
       };
     })
     .toReversed();
 }
 
+type Db = TRPCContext['prisma'];
+
 const endpoint = pushEndpoint;
 const pushSubscription = pushSubscriptionInput;
+
+/** Every Tirage's summary, newest first: cached until IRCC's feed is read again. */
+const summaries = async (db: Db): Promise<Row[]> => {
+  const rows = await cachedDraws(db, 'summaries', (prisma) => prisma.draw.findMany({ select: SUMMARY, orderBy: [...NEWEST_FIRST] }));
+  // The cache keeps dates as strings: back to dates.
+  return rows.map((row) => ({ ...row, date: new Date(row.date) }));
+};
+
+/** When IRCC's feed was last read: cached the same way (a date survives the cache as a string). */
+const lastSync = async (db: Db): Promise<Date | null> => {
+  const at = await cachedDraws(db, 'sync', async (prisma) => (await prisma.drawSync.findUnique({ where: { id: SYNC_ID } }))?.syncedAt ?? null);
+  return at === null ? null : new Date(at);
+};
 
 /** Derniers tirages: IRCC rounds stored by `ingestDraws`, and Alertes tirages opt-in. */
 export const drawsRouter = createTRPCRouter({
   /** Every stored Tirage, newest first. A few hundred small rows: the page filters them itself. */
-  list: publicProcedure.query(async ({ ctx }) => {
-    const rows = await ctx.prisma.draw.findMany({ select: SUMMARY, orderBy: [...NEWEST_FIRST] });
-    return withCrsChange(rows);
-  }),
+  list: publicProcedure.query(async ({ ctx }) => withCrsChange(await summaries(ctx.prisma))),
 
   /** The newest `take` Tirages and when IRCC's feed was last read. */
   latest: publicProcedure
     .input(z.object({ take: z.number().int().min(1).max(20).default(4) }))
     .query(async ({ ctx, input }) => {
-      const [rows, sync] = await Promise.all([
-        ctx.prisma.draw.findMany({ select: SUMMARY, orderBy: [...NEWEST_FIRST] }),
-        ctx.prisma.drawSync.findUnique({ where: { id: SYNC_ID } }),
-      ]);
-      return { draws: withCrsChange(rows).slice(0, input.take), lastSyncedAt: sync?.syncedAt ?? null };
+      const [rows, lastSyncedAt] = await Promise.all([summaries(ctx.prisma), lastSync(ctx.prisma)]);
+      return { draws: withCrsChange(rows).slice(0, input.take), lastSyncedAt };
     }),
 
   /** Opts this device in. Signed in, the subscription is linked to the Account. */

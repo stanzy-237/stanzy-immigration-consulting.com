@@ -422,4 +422,16 @@ describe('draws ingestion and router', () => {
     refresh.ingestNow.mockRejectedValueOnce(new Error('ECONNRESET'));
     await expect(callerAs(fakeDatabase(), sessionFor({ role: 'CONSULTANT' })).draws.refresh()).rejects.toThrow('IRCC_UNREACHABLE');
   });
+
+  it('never reads IRCC’s raw feed object for the pages: it is most of the table', async () => {
+    const db = fakeDatabase();
+    await ingest(db, fullFeed());
+    const findMany = vi.spyOn(db.draw, 'findMany');
+
+    await callerAs(db).draws.list();
+    await callerAs(db).draws.latest({ take: 4 });
+
+    for (const [args] of findMany.mock.calls) expect(args?.select).not.toHaveProperty('raw');
+    expect(findMany).toHaveBeenCalledTimes(2);
+  });
 });
