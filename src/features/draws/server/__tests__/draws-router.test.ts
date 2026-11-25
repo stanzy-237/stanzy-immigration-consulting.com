@@ -7,6 +7,10 @@ import type { CurrentSession } from '@/server/auth/session';
 import type { TRPCContext } from '@/server/trpc/context';
 import { createCaller } from '@/server/trpc/root';
 
+/** Seam: « Actualiser maintenant » runs the same refresh as the daily job; here it is watched. */
+const refresh = vi.hoisted(() => ({ ingestNow: vi.fn() }));
+vi.mock('@/features/draws/server/ingest-now', () => refresh);
+
 /**
  * Seam: ingestion (`ingestDraws`, what the scheduled job runs) and the `draws`
  * tRPC router, through a server-side caller. The database is an in-memory
@@ -47,6 +51,9 @@ function table(rows: Row[], key: string) {
     async findUnique({ where }: { where: Where }) {
       const row = rows.find((r) => matches(r, where));
       return row ? { ...row } : null;
+    },
+    async findFirst(args: { where?: Where; select?: Record<string, boolean>; orderBy?: OrderBy[] } = {}) {
+      return (await this.findMany({ ...args, take: 1 }))[0] ?? null;
     },
     async createMany({ data }: { data: Row[] }) {
       let count = 0;
@@ -393,5 +400,26 @@ describe('draws ingestion and router', () => {
   it('answers an empty table before the first run', async () => {
     const latest = await callerAs(fakeDatabase()).draws.latest({ take: 4 });
     expect(latest).toEqual({ draws: [], lastSyncedAt: null });
+  });
+
+  it('shows the consultant when IRCC’s feed was last read and the newest Tirage', async () => {
+    const db = fakeDatabase();
+    await ingest(db, fullFeed());
+    const sync = await callerAs(db, sessionFor({ role: 'CONSULTANT' })).draws.sync();
+    expect(sync).toEqual({ lastSyncedAt: NOW, newest: expect.objectContaining({ round: '450', crsMin: 435 }) });
+  });
+
+  it('« Actualiser maintenant » runs the daily refresh at once, for the consultant only', async () => {
+    refresh.ingestNow.mockResolvedValueOnce({ fetched: 25, inserted: 1, updated: 0, skipped: [], alerted: 1 });
+    const db = fakeDatabase();
+    expect(await callerAs(db, sessionFor({ role: 'CONSULTANT' })).draws.refresh()).toEqual({ inserted: 1, updated: 0, alerted: 1 });
+    await expect(callerAs(db, sessionFor()).draws.refresh()).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(callerAs(db).draws.sync()).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
+  });
+
+  it('says IRCC did not answer when the refresh fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    refresh.ingestNow.mockRejectedValueOnce(new Error('ECONNRESET'));
+    await expect(callerAs(fakeDatabase(), sessionFor({ role: 'CONSULTANT' })).draws.refresh()).rejects.toThrow('IRCC_UNREACHABLE');
   });
 });

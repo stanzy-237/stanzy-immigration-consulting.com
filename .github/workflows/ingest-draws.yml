@@ -1,15 +1,19 @@
 name: Ingest Express Entry draws
 
-# Hourly refresh of the Derniers tirages (#49): asks the app to read IRCC's
+# Daily refresh of the Derniers tirages (#49): asks the app to read IRCC's
 # rounds feed, store new rounds and send Alertes tirages. Runs on GitHub
 # Actions instead of Vercel Cron so the project stays on Vercel's free plan.
+# Once a day, not hourly: each run reads the database, and hourly runs ate
+# Neon's free data transfer. On a draw day the consultant refreshes at once
+# with « Actualiser maintenant » (Tableau de bord → Aperçu → Tirages IRCC).
 # Scheduled runs can start a few minutes late, and GitHub pauses schedules
 # after 60 days without commits; re-enable from the Actions tab if so.
 
 on:
   schedule:
-    # Every hour at :07, off the top-of-the-hour queue.
-    - cron: '7 * * * *'
+    # Every day at 23:07 UTC (18:07 Ottawa, 00:07 Douala): after IRCC's
+    # working day, when the day's round is published; off the top of the hour.
+    - cron: '7 23 * * *'
   workflow_dispatch:
 
 concurrency:

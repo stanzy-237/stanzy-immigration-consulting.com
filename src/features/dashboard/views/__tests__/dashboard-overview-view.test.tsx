@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -29,9 +29,17 @@ beforeEach(() => {
 });
 
 /** The Aperçu as the route serves it: the summary prefetched, unless `summary` is unset (still on its way). */
+const SYNC = { lastSyncedAt: new Date(Date.now() - 3 * 3600_000), newest: { round: '450', date: new Date('2026-10-06T00:00:00Z'), crsMin: 435, typeLabel: 'French' } };
+const refreshDraws = vi.fn(() => ({ inserted: 1, updated: 0, alerted: 1 }));
+
 const page = () => {
-  const { trpc, queryClient, wrap } = createTestTRPC({ 'blog.dashboard.summary': () => new Promise(() => {}) });
+  const { trpc, queryClient, wrap } = createTestTRPC({
+    'blog.dashboard.summary': () => new Promise(() => {}),
+    'draws.sync': () => SYNC,
+    'draws.refresh': refreshDraws,
+  });
   if (summary) queryClient.setQueryData(trpc.blog.dashboard.summary.queryKey(), summary);
+  queryClient.setQueryData(trpc.draws.sync.queryKey(), SYNC as never);
   return render(
     withIntl(
       wrap(
@@ -91,6 +99,15 @@ describe('Tableau de bord — Aperçu', () => {
     expect(blog.getByRole('status')).toBeInTheDocument();
     expect(blog.queryByText(/brouillon/)).not.toBeInTheDocument();
     expect(blog.getByRole('link', { name: /Nouvel article/ })).toBeInTheDocument();
+  });
+
+  it('shows when IRCC’s feed was last read, and refreshes the Tirages on demand', async () => {
+    page();
+    const draws = within(screen.getByRole('region', { name: 'Tirages IRCC' }));
+    expect(draws.getByText(/il y a 3 heures/)).toBeInTheDocument();
+    expect(draws.getByText(/n° 450 · 6 oct\. · CRS 435/)).toBeInTheDocument();
+    fireEvent.click(draws.getByRole('button', { name: 'Actualiser maintenant' }));
+    await waitFor(() => expect(refreshDraws).toHaveBeenCalled());
   });
 
   it('has no axe violations', async () => {

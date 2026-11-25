@@ -1,11 +1,13 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import type { DrawGroup } from '@/features/draws/lib/draw-type';
 import { irccInstant, roundOrder, type DrawSummary } from '@/features/draws/lib/draw-summary';
 import { SYNC_ID } from '@/features/draws/server/ingest-draws';
+import { ingestNow } from '@/features/draws/server/ingest-now';
 import { routing } from '@/i18n/routing';
 import { pushEndpoint, pushSubscriptionInput } from '@/server/push/subscription-schema';
-import { createTRPCRouter, humanOnly, publicProcedure } from '@/server/trpc/trpc';
+import { consultantProcedure, createTRPCRouter, humanOnly, publicProcedure } from '@/server/trpc/trpc';
 
 export type { DrawSummary };
 
@@ -99,4 +101,31 @@ export const drawsRouter = createTRPCRouter({
         data: { drawAlerts: false },
       });
     }),
+
+  /**
+   * Tableau de bord → Aperçu, « Tirages IRCC »: when IRCC's feed was last
+   * read and the newest Tirage stored.
+   */
+  sync: consultantProcedure.query(async ({ ctx }) => {
+    const [sync, newest] = await Promise.all([
+      ctx.prisma.drawSync.findUnique({ where: { id: SYNC_ID } }),
+      ctx.prisma.draw.findFirst({ orderBy: [...NEWEST_FIRST], select: { round: true, date: true, crsMin: true, typeLabel: true } }),
+    ]);
+    return { lastSyncedAt: sync?.syncedAt ?? null, newest };
+  }),
+
+  /**
+   * « Actualiser maintenant »: the daily refresh, run at once by the
+   * consultant instead of waiting for it (or opening GitHub). Reads IRCC's
+   * feed from here, stores new rounds and sends their Alertes tirages.
+   */
+  refresh: consultantProcedure.mutation(async () => {
+    try {
+      const report = await ingestNow();
+      return { inserted: report.inserted, updated: report.updated, alerted: report.alerted };
+    } catch (error) {
+      console.error('[draws] refresh from the Tableau de bord failed', error);
+      throw new TRPCError({ code: 'BAD_GATEWAY', message: 'IRCC_UNREACHABLE' });
+    }
+  }),
 });
