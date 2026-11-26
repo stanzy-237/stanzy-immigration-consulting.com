@@ -1577,7 +1577,8 @@
           "signatures": "Pending signatures",
           "signaturesSub": "Sent, not yet signed by the client",
           "reports": "Reports",
-          "reportsSub": "A problem reported from the site"
+          "reportsSub": "A problem reported from the site",
+          "none": "Nothing waiting"
         },
         "today": "Today",
         "doualaTime": "Douala time",
@@ -1597,7 +1598,9 @@
         "allDossiers": "All files",
         "stageOf": "{position} of {total}",
         "instant": "Instant meeting",
-        "newDossier": "Open a file"
+        "newDossier": "Open a file",
+        "noPromo": "No code running",
+        "createPromo": "Create a code"
       }
     },
     "greeting": "Hello {name}"

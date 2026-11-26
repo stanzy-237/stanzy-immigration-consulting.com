@@ -1,7 +1,7 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowRight, ChevronRight, Flag, Inbox, NotebookPen, ReceiptText, Signature, Video, type LucideIcon } from 'lucide-react';
+import { ArrowRight, ChevronRight, Flag, Inbox, NotebookPen, ReceiptText, Signature, TicketPercent, Video, type LucideIcon } from 'lucide-react';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Image from 'next/image';
@@ -43,10 +43,10 @@ export function OverviewToday({ blog }: { blog: ReactNode }): ReactNode {
           <ToHandle data={data} />
         </div>
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <div className="max-lg:hidden">
+          <div className="flex flex-1 flex-col max-lg:hidden">
             <TodayList data={data} />
           </div>
-          {data.promo ? <Promo promo={data.promo} /> : null}
+          {data.promo ? <Promo promo={data.promo} /> : <NoPromo />}
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
@@ -114,60 +114,63 @@ function ToHandle({ data }: { data: Today }): ReactNode {
   const t = useTranslations('Dashboard.overview.today');
   const format = useFormatter();
   const { interests, orders, overdue, signatures, reports } = data.toHandle;
-  const rows: Row[] = [];
-  if (overdue.count && 'id' in overdue)
-    rows.push({
-      key: 'overdue',
-      icon: ReceiptText,
-      title: t('rows.overdue'),
-      sub: [overdue.number, overdue.name, overdue.dueDate ? t('rows.dueOn', { date: format.dateTime(new Date(overdue.dueDate), { day: 'numeric', month: 'long', timeZone: DOUALA }) }) : null].filter(Boolean).join(' · '),
-      count: overdue.count,
-      href: overdue.count === 1 ? `/factures/${overdue.id}` : '/factures',
-      urgent: true,
-    });
-  if (interests.count)
-    rows.push({
-      key: 'interests',
-      icon: Inbox,
-      title: t('rows.interests'),
-      sub: t('rows.interestsSub', { name: interests.names[0] ?? '', others: interests.count - 1 }),
-      count: interests.count,
-      href: '/demandes',
-    });
-  if (orders.count) rows.push({ key: 'orders', icon: NotebookPen, title: t('rows.orders'), sub: [orders.service, orders.name].filter(Boolean).join(' · '), count: orders.count, href: '/services-en-cours' });
-  if (signatures) rows.push({ key: 'signatures', icon: Signature, title: t('rows.signatures'), sub: t('rows.signaturesSub'), count: signatures, href: '/signatures', waiting: true });
-  if (reports) rows.push({ key: 'reports', icon: Flag, title: t('rows.reports'), sub: t('rows.reportsSub'), count: reports, href: '/signalements' });
+  const none = t('rows.none');
+  // The five always show, as on the board: what has nothing waiting stays grey (« Rien en attente »).
+  const overdueRow: Row = {
+    key: 'overdue',
+    icon: ReceiptText,
+    title: t('rows.overdue'),
+    sub:
+      overdue.count && 'id' in overdue
+        ? [overdue.number, overdue.name, overdue.dueDate ? t('rows.dueOn', { date: format.dateTime(new Date(overdue.dueDate), { day: 'numeric', month: 'long', timeZone: DOUALA }) }) : null].filter(Boolean).join(' · ')
+        : none,
+    count: overdue.count,
+    href: overdue.count === 1 && 'id' in overdue ? `/factures/${overdue.id}` : '/factures',
+    urgent: overdue.count > 0,
+  };
+  const rest: Row[] = [
+    { key: 'interests', icon: Inbox, title: t('rows.interests'), sub: interests.count ? t('rows.interestsSub', { name: interests.names[0] ?? '', others: interests.count - 1 }) : none, count: interests.count, href: '/demandes' },
+    { key: 'orders', icon: NotebookPen, title: t('rows.orders'), sub: orders.count ? [orders.service, orders.name].filter(Boolean).join(' · ') : none, count: orders.count, href: '/services-en-cours' },
+    { key: 'signatures', icon: Signature, title: t('rows.signatures'), sub: signatures ? t('rows.signaturesSub') : none, count: signatures, href: '/signatures', waiting: true },
+    { key: 'reports', icon: Flag, title: t('rows.reports'), sub: reports ? t('rows.reportsSub') : none, count: reports, href: '/signalements' },
+  ];
+  // Overdue Factures lead when there are some; otherwise they take their place among the rest.
+  const rows = overdue.count ? [overdueRow, ...rest] : [...rest.slice(0, 2), overdueRow, ...rest.slice(2)];
+  const allDone = rows.every((row) => row.count === 0);
 
   return (
-    <section aria-labelledby="to-handle" className={cn(card, 'overflow-hidden')}>
+    <section aria-labelledby="to-handle" className={cn(card, 'flex h-full flex-col overflow-hidden')}>
       <div className="flex items-baseline justify-between gap-3 px-5 pt-5 pb-3 lg:px-6 lg:pt-6">
         <h2 id="to-handle" className="font-heading text-h4 font-bold text-navy-deep">
           {t('toHandle')}
         </h2>
         <span className="text-caption text-slate max-lg:hidden">{t('oldestFirst')}</span>
       </div>
-      {rows.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 px-6 pt-2 pb-8 text-center">
+      {allDone ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 pt-2 pb-8 text-center">
           <Image src="/stanzy/idle.svg" alt="" width={96} height={110} className="h-24 w-auto" />
           <p className="font-heading text-body font-bold text-navy-deep">{t('allDone')}</p>
           <p className="text-body-sm text-slate">{t('allDoneSub')}</p>
         </div>
       ) : (
-        <ul className="divide-y divide-fog-light border-t border-fog-light">
+        <ul className="flex flex-1 flex-col divide-y divide-fog-light border-t border-fog-light">
           {rows.map((row) => (
-            <li key={row.key}>
-              <Link href={row.href} className={cn('flex items-center gap-4 px-5 py-4 lg:px-6', row.urgent ? 'bg-blush hover:bg-blush/70' : 'hover:bg-off-white')}>
-                <span aria-hidden={true} className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', row.urgent ? 'bg-white text-rouge' : 'bg-ice-blue text-navy-deep')}>
+            <li key={row.key} className="flex flex-1">
+              <Link href={row.href} className={cn('flex flex-1 items-center gap-4 px-5 py-4 lg:px-6', row.urgent ? 'bg-blush hover:bg-blush/70' : 'hover:bg-off-white')}>
+                <span
+                  aria-hidden={true}
+                  className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', row.urgent ? 'bg-white text-rouge' : row.count ? 'bg-ice-blue text-navy-deep' : 'bg-off-white text-slate-mute')}
+                >
                   <row.icon className="size-4.5" strokeWidth={2.2} />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className={cn('text-body font-bold', row.urgent ? 'text-rouge' : 'text-navy-deep')}>{row.title}</span>
+                  <span className={cn('text-body font-bold', row.urgent ? 'text-rouge' : row.count ? 'text-navy-deep' : 'text-slate')}>{row.title}</span>
                   <span className="truncate text-body-sm text-slate">{row.sub}</span>
                 </span>
                 <span
                   className={cn(
                     'flex size-6 shrink-0 items-center justify-center rounded-full text-caption font-bold tabular-nums',
-                    row.urgent ? 'bg-rouge text-white' : row.waiting ? 'bg-ice-blue text-slate' : 'bg-navy-deep text-white',
+                    row.urgent ? 'bg-rouge text-white' : !row.count ? 'bg-off-white text-slate-mute' : row.waiting ? 'bg-ice-blue text-slate' : 'bg-navy-deep text-white',
                   )}
                 >
                   {row.count}
@@ -193,7 +196,7 @@ function TodayList({ data }: { data: Today }): ReactNode {
   const now = useNow({ updateInterval: 30_000 });
   const { today, next } = data.meetings;
   return (
-    <section aria-labelledby="today" className={cn(card, 'flex flex-col gap-3 p-5 lg:p-6')}>
+    <section aria-labelledby="today" className={cn(card, 'flex flex-1 flex-col gap-3 p-5 lg:p-6')}>
       <div className="flex items-baseline justify-between gap-3">
         <h2 id="today" className="font-heading text-h4 font-bold text-navy-deep">
           {t('today')}
@@ -223,7 +226,7 @@ function TodayList({ data }: { data: Today }): ReactNode {
           })}
         </ul>
       )}
-      <Link href="/reunions" className="flex items-center gap-1 self-start text-body-sm font-bold text-rouge">
+      <Link href="/reunions" className="mt-auto flex items-center gap-1 self-start pt-2 text-body-sm font-bold text-rouge">
         {t('allMeetings')}
         <ArrowRight aria-hidden={true} className="size-4" />
       </Link>
@@ -288,6 +291,26 @@ function NextMeeting({ data }: { data: Today }): ReactNode {
         </ul>
       ) : null}
     </section>
+  );
+}
+
+/** No live code: the place says so and offers one (Codes promo). */
+function NoPromo(): ReactNode {
+  const t = useTranslations('Dashboard.overview.today');
+  return (
+    <Link href="/codes-promo" className={cn(card, 'flex items-center gap-4 border-dashed p-5 hover:border-fog lg:p-6')}>
+      <span aria-hidden={true} className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blush text-rouge">
+        <TicketPercent className="size-4.5" strokeWidth={2.2} />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="font-label text-label font-bold tracking-wide text-slate uppercase">{t('activePromo')}</span>
+        <span className="text-body-sm text-ink">{t('noPromo')}</span>
+      </span>
+      <span className="flex shrink-0 items-center gap-1 text-body-sm font-bold text-rouge">
+        {t('createPromo')}
+        <ArrowRight aria-hidden={true} className="size-4" />
+      </span>
+    </Link>
   );
 }
 

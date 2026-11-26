@@ -1594,7 +1594,8 @@
           "signatures": "Signatures en attente",
           "signaturesSub": "Envoyées, pas encore signées par le Client",
           "reports": "Signalements",
-          "reportsSub": "Un problème signalé depuis le site"
+          "reportsSub": "Un problème signalé depuis le site",
+          "none": "Rien en attente"
         },
         "today": "Aujourd’hui",
         "doualaTime": "Heure de Douala",
@@ -1614,7 +1615,9 @@
         "allDossiers": "Tous les dossiers",
         "stageOf": "{position} sur {total}",
         "instant": "Réunion instantanée",
-        "newDossier": "Ouvrir un dossier"
+        "newDossier": "Ouvrir un dossier",
+        "noPromo": "Aucun code en cours",
+        "createPromo": "Créer un code"
       }
     },
     "greeting": "Bonjour {name}"
