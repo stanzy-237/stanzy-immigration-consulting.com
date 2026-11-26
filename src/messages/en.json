@@ -5480,6 +5480,119 @@
         "cancel": "Cancel",
         "error": "That didn’t work. Try again."
       }
+    },
+    "space": {
+      "eyebrow": "My space",
+      "listTitle": "My consultations",
+      "detailTitle": "My consultation",
+      "tabs": {
+        "label": "My space",
+        "home": "Home",
+        "consultations": "My consultations"
+      },
+      "yourConsultation": "Your consultation",
+      "where": "Video with Stanzy in your space · Douala time",
+      "join": "Join the meeting",
+      "prepare": "Prepare",
+      "calendarTitle": "Video consultation with Stanzy",
+      "calendarDetails": "Join the meeting from your space, 15 minutes before.",
+      "book": "Book a consultation",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "row": {
+        "title": "Video consultation · {day} {start} – {end}",
+        "pastTitle": "Video consultation · {minutes} min",
+        "paid": "Paid {amount}",
+        "pending": "{network} hasn’t confirmed the payment yet · don’t pay twice",
+        "published": "Stanzy’s notes · transcript · {steps, plural, =0 {no step} one {# next step, {done} done} other {# next steps, {done} done}}",
+        "preparing": "Stanzy is preparing your recap"
+      },
+      "badge": {
+        "pending": "Payment pending",
+        "recording": "Recording available",
+        "preparing": "Recap on its way"
+      },
+      "cta": {
+        "see": "See",
+        "review": "Review",
+        "prepare": "Prepare"
+      },
+      "empty": {
+        "title": "No consultation yet.",
+        "lead": "45 minutes on video with Stanzy to review your plans: eligibility, CRS score, documents. You keep the recording and the transcript.",
+        "book": "Book a consultation",
+        "crs": "Calculate my CRS score"
+      },
+      "stanzyRole": "Your adviser · answers on WhatsApp",
+      "stanzyLead": "He reads your answers before the meeting. A question until then? Write to him.",
+      "whatsapp": "Write on WhatsApp",
+      "invoice": "Paid invoice {number}",
+      "paid": "Payment received",
+      "paidBadge": "Paid",
+      "before": {
+        "move": "Move",
+        "title": "Before the meeting",
+        "progress": "{done} of {total} done",
+        "answers": "Stanzy has your answers",
+        "noAnswers": "No answers at booking: you’ll talk it through live",
+        "crs": "CRS score {score}",
+        "camera": "Test your camera and microphone",
+        "cameraHint": "1 minute. So nothing goes wrong on the day.",
+        "test": "Test",
+        "retest": "Again",
+        "obstacle": "Can’t make it?",
+        "moveUntil": "Move your slot up to {hours} h before the meeting (until {until}). The Consultation isn’t refundable.",
+        "moveClosed": "It’s too late to move it online. Write to Stanzy on WhatsApp.",
+        "moveSlot": "Move the slot"
+      },
+      "camera": {
+        "title": "Test my camera and microphone",
+        "lead": "Allow the camera and the microphone: you should see yourself, and the bar moves when you speak.",
+        "failed": "The browser can’t reach the camera or microphone. Allow them in the site settings, then try again.",
+        "mic": "Microphone",
+        "works": "It works",
+        "done": "Camera and microphone ready"
+      },
+      "move": {
+        "title": "Choose another slot",
+        "lead": "Current: {current}. Your payment and answers follow.",
+        "days": "Free days",
+        "times": "Free times",
+        "none": "No free slot right now. Write to Stanzy on WhatsApp.",
+        "pick": "Pick a time",
+        "confirm": "Move to {when}",
+        "keep": "Keep my slot",
+        "cancelHint": "Need to cancel? Write to Stanzy on WhatsApp.",
+        "moved": "Consultation moved: an e-mail confirms it",
+        "taken": "That slot was just taken: pick another.",
+        "closed": "It’s too late to move it online.",
+        "error": "That didn’t work. Try again."
+      },
+      "preparing": {
+        "title": "Consultation on {date}",
+        "lead": "Stanzy is preparing your recap: the recording, his notes and your next steps. You’ll get an e-mail as soon as it’s ready."
+      },
+      "after": {
+        "title": "Consultation on {date}",
+        "meta": "Video with Stanzy · {minutes} min · recorded with your consent",
+        "video": "Recording",
+        "goTo": "Go to {time}",
+        "noVideo": "The recording isn’t available for this meeting.",
+        "tabsLabel": "After the Consultation",
+        "notes": "Stanzy’s notes",
+        "transcript": "Transcript",
+        "noNotes": "No note from Stanzy.",
+        "noTranscript": "The transcript isn’t available.",
+        "steps": "Your next steps",
+        "stepsProgress": "{done} of {total}",
+        "stepDone": "Step ticked",
+        "stepUndone": "Step unticked",
+        "andNow": "What now?",
+        "accompanyTitle": "Get support all the way to the ITA.",
+        "accompanyLead": "Stanzy follows you step by step with the Express Entry support.",
+        "accompanyCta": "Send my request",
+        "error": "That didn’t work. Try again."
+      }
     }
   }
 }

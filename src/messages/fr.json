@@ -5497,6 +5497,119 @@
         "cancel": "Annuler",
         "error": "Ça n’a pas marché. Réessayez."
       }
+    },
+    "space": {
+      "eyebrow": "Mon espace",
+      "listTitle": "Mes consultations",
+      "detailTitle": "Ma consultation",
+      "tabs": {
+        "label": "Mon espace",
+        "home": "Accueil",
+        "consultations": "Mes consultations"
+      },
+      "yourConsultation": "Votre consultation",
+      "where": "Vidéo avec Stanzy dans Mon espace · heure de Douala",
+      "join": "Rejoindre la Réunion",
+      "prepare": "Préparer",
+      "calendarTitle": "Consultation vidéo avec Stanzy",
+      "calendarDetails": "Rejoignez la Réunion depuis Mon espace, 15 minutes avant.",
+      "book": "Réserver une consultation",
+      "upcoming": "À venir",
+      "past": "Passées",
+      "row": {
+        "title": "Consultation vidéo · {day} {start} – {end}",
+        "pastTitle": "Consultation vidéo · {minutes} min",
+        "paid": "Payée {amount}",
+        "pending": "{network} n’a pas encore confirmé le paiement · ne payez pas deux fois",
+        "published": "Notes de Stanzy · transcription · {steps, plural, =0 {sans étape} one {# prochaine étape, {done} faite} other {# prochaines étapes, {done} faites}}",
+        "preparing": "Stanzy prépare votre récapitulatif"
+      },
+      "badge": {
+        "pending": "Paiement en attente",
+        "recording": "Enregistrement disponible",
+        "preparing": "Récap en préparation"
+      },
+      "cta": {
+        "see": "Voir",
+        "review": "Revoir",
+        "prepare": "Préparer"
+      },
+      "empty": {
+        "title": "Pas encore de consultation.",
+        "lead": "45 minutes en vidéo avec Stanzy pour faire le point sur votre projet : admissibilité, score CRS, documents. L’enregistrement et la transcription vous restent.",
+        "book": "Réserver une consultation",
+        "crs": "Calculer mon score CRS"
+      },
+      "stanzyRole": "Votre conseiller · répond sur WhatsApp",
+      "stanzyLead": "Il lit vos réponses avant la Réunion. Une question d’ici là ? Écrivez-lui.",
+      "whatsapp": "Écrire sur WhatsApp",
+      "invoice": "Facture payée {number}",
+      "paid": "Paiement reçu",
+      "paidBadge": "Payée",
+      "before": {
+        "move": "Déplacer",
+        "title": "Avant la Réunion",
+        "progress": "{done} sur {total} fait",
+        "answers": "Vos réponses sont chez Stanzy",
+        "noAnswers": "Pas de réponse à la réservation : vous en parlerez en direct",
+        "crs": "Score CRS {score}",
+        "camera": "Testez votre caméra et votre micro",
+        "cameraHint": "1 minute. Pour ne rien rater le jour J.",
+        "test": "Tester",
+        "retest": "Refaire",
+        "obstacle": "Un empêchement ?",
+        "moveUntil": "Déplacez votre créneau jusqu’à {hours} h avant la Réunion (jusqu’au {until}). La Consultation n’est pas remboursable.",
+        "moveClosed": "Il est trop tard pour déplacer en ligne. Écrivez à Stanzy sur WhatsApp.",
+        "moveSlot": "Déplacer le créneau"
+      },
+      "camera": {
+        "title": "Tester ma caméra et mon micro",
+        "lead": "Autorisez la caméra et le micro : vous devez vous voir, et la barre bouge quand vous parlez.",
+        "failed": "Le navigateur n’a pas accès à la caméra ou au micro. Autorisez-les dans les réglages du site, puis réessayez.",
+        "mic": "Micro",
+        "works": "Ça marche",
+        "done": "Caméra et micro prêts"
+      },
+      "move": {
+        "title": "Choisir un autre créneau",
+        "lead": "Actuel : {current}. Votre paiement et vos réponses suivent.",
+        "days": "Jours libres",
+        "times": "Heures libres",
+        "none": "Aucun créneau libre pour l’instant. Écrivez à Stanzy sur WhatsApp.",
+        "pick": "Choisissez une heure",
+        "confirm": "Déplacer à {when}",
+        "keep": "Garder mon créneau",
+        "cancelHint": "Besoin d’annuler ? Écrivez à Stanzy sur WhatsApp.",
+        "moved": "Consultation déplacée : un e-mail vous le confirme",
+        "taken": "Ce créneau vient d’être pris : choisissez-en un autre.",
+        "closed": "Il est trop tard pour déplacer en ligne.",
+        "error": "Ça n’a pas marché. Réessayez."
+      },
+      "preparing": {
+        "title": "Consultation du {date}",
+        "lead": "Stanzy prépare votre récapitulatif : l’enregistrement, ses notes et vos prochaines étapes. Vous recevez un e-mail dès que c’est prêt."
+      },
+      "after": {
+        "title": "Consultation du {date}",
+        "meta": "Vidéo avec Stanzy · {minutes} min · enregistrée avec votre accord",
+        "video": "Enregistrement",
+        "goTo": "Aller à {time}",
+        "noVideo": "L’enregistrement n’est pas disponible pour cette Réunion.",
+        "tabsLabel": "Après la Consultation",
+        "notes": "Notes de Stanzy",
+        "transcript": "Transcription",
+        "noNotes": "Pas de note de Stanzy.",
+        "noTranscript": "La transcription n’est pas disponible.",
+        "steps": "Vos prochaines étapes",
+        "stepsProgress": "{done} sur {total}",
+        "stepDone": "Étape cochée",
+        "stepUndone": "Étape décochée",
+        "andNow": "Et maintenant ?",
+        "accompanyTitle": "Faites-vous accompagner jusqu’à l’ITA.",
+        "accompanyLead": "Stanzy vous suit étape par étape avec l’Accompagnement Entrée express.",
+        "accompanyCta": "Envoyer ma demande",
+        "error": "Ça n’a pas marché. Réessayez."
+      }
     }
   }
 }

@@ -18,6 +18,7 @@ export default async function Page({ params }: { params: LocaleParams }) {
   setRequestLocale(locale);
   await requireSession({ locale, next: '/mon-espace' });
   prefetch(trpc.dossiers.mine.queryOptions());
+  prefetch(trpc.consultationSpace.list.queryOptions());
   prefetch(trpc.documentServices.requirements.mine.queryOptions());
   return (
     <HydrateClient>

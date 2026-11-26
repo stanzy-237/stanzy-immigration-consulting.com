@@ -6,6 +6,7 @@ import { isSupportedCountry } from 'libphonenumber-js/min';
 import { after } from 'next/server';
 
 import { consultationFailedEmail, consultationPaidEmail } from '@/features/consultation/lib/consultation-emails';
+import { consultationSpacePath } from '@/features/consultation/lib/payment';
 import { CARD_NETWORK, HOLD_LIMIT_MINUTES, PAYING_MINUTES, PAYMENT_ERRORS, type PayInput } from '@/features/consultation/lib/payment';
 import { feeFor, type FeeTier } from '@/features/consultation/lib/payment-fees';
 import { discountFor, PROMO_ERRORS } from '@/features/consultation/lib/promo';
@@ -15,7 +16,7 @@ import { consultationInvoice } from '@/features/consultation/server/consultation
 import { checkPromo } from '@/features/consultation/server/promo-codes';
 import { SasPayError, type SasPay, type SasPayNetwork, type SasPayVerdict } from '@/features/consultation/server/saspay';
 import { invoiceNumber } from '@/features/invoices/lib/invoice-status';
-import { clientRoomPath, newInviteToken } from '@/features/meetings/lib/meeting-schema';
+import { newInviteToken } from '@/features/meetings/lib/meeting-schema';
 import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
 import { appMailer } from '@/server/email/app-mailer';
@@ -366,7 +367,7 @@ export async function paidConfirmation(prisma: Db, paymentId: string, moved = fa
   const payment = await prisma.consultationPayment.findUnique({
     where: { id: paymentId },
     include: {
-      consultation: { select: { startsAt: true, durationMinutes: true, meetingId: true, account: { select: { name: true, email: true, locale: true } } } },
+      consultation: { select: { id: true, startsAt: true, durationMinutes: true, meetingId: true, account: { select: { name: true, email: true, locale: true } } } },
       promoCode: { select: { code: true, reductionType: true, reductionValue: true } },
     },
   });
@@ -391,7 +392,7 @@ export async function paidConfirmation(prisma: Db, paymentId: string, moved = fa
     network: payment.networkName,
     promo,
     moved,
-    url: `${siteUrl()}/${lang}${clientRoomPath(meetingId)}`,
+    url: `${siteUrl()}/${lang}${consultationSpacePath(consultation.id)}`,
   });
   return invoice ? { ...message, attachments: [{ filename: `${invoice.number}.pdf`, content: invoice.pdf }] } : message;
 }

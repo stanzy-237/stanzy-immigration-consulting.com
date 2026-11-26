@@ -7,6 +7,8 @@ import type { ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ConsultationHome } from '@/features/consultation/components/space-home';
+import { SpaceTabs } from '@/features/consultation/components/space-parts';
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
@@ -27,8 +29,16 @@ export function MySpaceView({ notice }: { notice?: ReactNode }): ReactNode {
       <SiteNav />
       <main className="min-h-screen bg-off-white px-4 py-10 md:py-14">
         <div className="mx-auto max-w-3xl">
-          <h1 className="font-heading text-3xl font-bold text-navy-deep md:text-4xl">{t('title')}</h1>
-          <p className="mt-2 text-slate">{t('subtitle')}</p>
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h1 className="font-heading text-3xl font-bold text-navy-deep md:text-4xl">{t('title')}</h1>
+              <p className="mt-2 text-slate">{t('subtitle')}</p>
+            </div>
+            <SpaceTabs />
+          </div>
+          <div className="mt-6 empty:hidden">
+            <ConsultationHome />
+          </div>
           {notice ? <div className="mt-6">{notice}</div> : null}
           <ServicesLink />
           <div className="mt-8">

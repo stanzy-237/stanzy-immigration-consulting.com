@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
+import { consultationSpacePath } from '@/features/consultation/lib/payment';
 import { cancelSlotSchema, clientNoteSchema, moveSlotSchema, nextStepSchema, notesSchema, settingsInputSchema } from '@/features/consultation/lib/settings';
 import { freeSlots, MINUTE, type Busy } from '@/features/consultation/lib/slots';
 import { isDay, mondayOf, startOfDay } from '@/features/consultation/lib/week-calendar';
@@ -10,7 +11,6 @@ import { BOOKING_LOCK, busyTimes, loadAvailability, type Db } from '@/features/c
 import { emailParticipantsLater, meetingParams } from '@/features/meetings/server/meeting-notify';
 import { notifyLater } from '@/features/notifications/server/notify';
 import { consultationPublishedEmail } from '@/features/consultation/lib/consultation-emails';
-import { clientRoomPath } from '@/features/meetings/lib/meeting-schema';
 import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
 import { appMailer } from '@/server/email/app-mailer';
@@ -31,10 +31,10 @@ export const ADMIN_ERRORS = {
 const ended = (c: { startsAt: Date; durationMinutes: number }, now: Date) => c.startsAt.getTime() + c.durationMinutes * MINUTE <= now.getTime();
 
 /** Over: its time has passed, or its Réunion was ended for everyone. */
-const isOver = (c: { startsAt: Date; durationMinutes: number; meeting?: { endedAt: Date | null } | null }, now: Date) => ended(c, now) || Boolean(c.meeting?.endedAt);
+export const isOver = (c: { startsAt: Date; durationMinutes: number; meeting?: { endedAt: Date | null } | null }, now: Date) => ended(c, now) || Boolean(c.meeting?.endedAt);
 
 /** The Enregistrement to show: the first video, with how long it lasts and its Transcription's words. */
-function recordingOf(files: { id: string; kind: string; startedAt: Date; endedAt: Date; text: string | null }[]) {
+export function recordingOf(files: { id: string; kind: string; startedAt: Date; endedAt: Date; text: string | null }[]) {
   const video = files.find((f) => f.kind === 'RECORDING');
   if (!video) return null;
   const transcript = files.find((f) => f.kind === 'TRANSCRIPTION');
@@ -58,7 +58,7 @@ const accountSelect = { select: { id: true, name: true, email: true, status: tru
  * The paid Consultation's free starts for a move: the Disponibilités, minus
  * what is taken (its own Réunion left out, `alsoBusy` added).
  */
-async function startsFor(db: Db, meetingId: string | null, alsoBusy: Busy[] = []) {
+export async function startsFor(db: Db, meetingId: string | null, alsoBusy: Busy[] = []) {
   const now = new Date();
   const { availability } = await loadAvailability(db);
   const busy = [...(await busyTimes(db, now, availability.horizonDays, undefined, meetingId ?? undefined)), ...alsoBusy];
@@ -66,7 +66,7 @@ async function startsFor(db: Db, meetingId: string | null, alsoBusy: Busy[] = []
 }
 
 /** A paid Consultation still to come, with its Réunion and Client; else the error the page shows. */
-async function movable(db: Db, id: string) {
+export async function movable(db: Db, id: string) {
   const consultation = await db.consultation.findUnique({
     where: { id },
     include: { account: accountSelect, meeting: { select: { id: true, subject: true, recording: true, dossierId: true } } },
@@ -84,7 +84,15 @@ async function movable(db: Db, id: string) {
  * Client: the « Déplacée » e-mail (with `reason` when the consultant cancelled
  * the slot) and the bell.
  */
-async function moveTo(db: Db, actorId: string, consultation: Awaited<ReturnType<typeof movable>>, start: Date, reason: string | null) {
+export async function moveTo(
+  db: Db,
+  actorId: string,
+  consultation: Awaited<ReturnType<typeof movable>>,
+  start: Date,
+  reason: string | null,
+  /** Who gets the bell: the Client when the consultant moved it, the consultant when the Client did. */
+  bellTo: string = consultation.accountId,
+) {
   await db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(${BOOKING_LOCK})`;
     const free = await startsFor(tx as unknown as Db, consultation.meeting.id);
@@ -104,7 +112,7 @@ async function moveTo(db: Db, actorId: string, consultation: Awaited<ReturnType<
     recording: consultation.meeting.recording,
   };
   emailParticipantsLater({ mailer: appMailer, siteUrl: siteUrl() }, [consultation.account], facts, 'moved', reason);
-  notifyLater(db, { kind: 'MEETING_MOVED', actorId, recipients: [consultation.accountId], target: {}, params: meetingParams(facts) });
+  notifyLater(db, { kind: 'MEETING_MOVED', actorId, recipients: [bellTo], target: {}, params: meetingParams(facts) });
 }
 
 /**
@@ -379,7 +387,7 @@ export const consultationAdminRouter = createTRPCRouter({
         locale: lang,
         startsAt: consultation.startsAt,
         steps: consultation.nextSteps.map((s) => s.text),
-        url: `${siteUrl()}/${lang}${clientRoomPath(consultation.meeting!.id)}`,
+        url: `${siteUrl()}/${lang}${consultationSpacePath(consultation.id)}`,
       }),
     );
     return { publishedAt, first: true };

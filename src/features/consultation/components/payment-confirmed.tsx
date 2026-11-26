@@ -197,7 +197,7 @@ export function PaymentConfirmed({ payment }: { payment: PaymentView }): ReactNo
  * Apple Calendar (iPhone, Mac) from the .ics the site serves inline. Nothing
  * lands in Téléchargements.
  */
-function AddToCalendar({ paymentId, event }: { paymentId: string; event: CalendarEvent }): ReactNode {
+export function AddToCalendar({ paymentId, event }: { paymentId: string; event: CalendarEvent }): ReactNode {
   const t = useTranslations('Consultation.reservation.confirmed');
   const locale = useLocale();
   const open = (url: string) => window.open(url, '_blank', 'noopener,noreferrer');

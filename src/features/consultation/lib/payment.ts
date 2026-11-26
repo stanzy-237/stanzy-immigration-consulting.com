@@ -65,3 +65,6 @@ export const paymentRefSchema = bookingRefSchema.extend({ paymentId: z.uuid() })
 
 /** Where a paid Consultation's Facture is downloaded: the payment's id (a random UUID) is its key. */
 export const consultationInvoicePath = (paymentId: string): string => `/api/consultation/invoices/${paymentId}`;
+
+/** A Consultation's page in its Client's Mon espace (`Mon espace v2`). */
+export const consultationSpacePath = (consultationId: string): string => `/mon-espace/consultations/${consultationId}`;
