@@ -10,7 +10,7 @@ Before building any part, open its artboards (names below) with the Paper MCP an
 
 ## Never in the repo
 
-- **No prices.** The Consultation price lives in the dashboard catalogue. Code, tests and docs say « le prix de la Consultation », mocks use `XX XXX FCFA`.
+- **No prices.** The Consultation price lives in the dashboard, Consultations → Disponibilités → « Tarif » (`consultation_settings.price`); without one, payment stays closed. Code, tests and docs say « le prix de la Consultation », mocks use `XX XXX FCFA`.
 - **No promo codes or percentages.** Codes are created in the dashboard (Codes promo). Tests use made-up codes.
 - **Test payments with a `sk_test_` key only.** Load the `saspay-integration` skill before any payment code.
 
@@ -142,4 +142,5 @@ Every animation on these screens, and the rules behind them, is in `docs/design/
 - **Card is SasPay's `card` network** (listed by my-rates in a country of its own, `XX`), paid on SasPay's card page and charged in USD at the day's rate: the receipt shows SasPay's own amounts in that currency. Every softpay carries a `return_url` to `/reserver/paiement/<id>` (not in the OpenAPI spec, required by SasPay for `card`, accepted on every network). « Payer depuis un autre pays » lists every country; one with no Mobile Money offers card (`3b`). (2026-11-24)
 - **Codes promo, built:** a percentage (1–99) or an FCFA amount, never leaving less than 100 FCFA to pay (SasPay can't take a free Consultation). Just before paying, the places of payments still on their way (PENDING, at most 45 min old) count too, so the cap is never exceeded; a code refused then comes off the booking and the page shows the full price before anything is sent. Deleting is soft: the code stops at once, held bookings lose it, paid reductions stay on their payments. An unknown code suggests the live code at most 2 letters away. (2026-11-24)
 - **A Facture payée, not a Reconnaissance:** a paid Consultation gets a Facture, stamped « Payée » and signed like the Dossiers' (numbered with them, `STZ-<year>-<0001>`), downloadable from « C'est réservé » and attached to the confirmation. The Paper screens still say « Reconnaissance »: the Facture replaces it. (2026-11-24)
+- **Consultations in the Tableau de bord, built (point 4.1):** the tabs, the Disponibilités with several ranges a day typed as « 09:00 – 12:00 · 14:00 – 16:00 » (empty: unavailable) and the price, and « 1 Avant ». « Déplacer » and « Annuler ce créneau » move the Consultation and its Réunion together, under the booking lock, and reset the reminders. A Consultation's Réunion moved from the Réunions page instead would not move the Consultation: move Consultations from their own page. (2026-11-26)
 - **Sandbox outside production:** the app calls `sandbox-api.saspay.me` everywhere but Vercel production, and refuses an `sk_live_` key there (`server/saspay.ts`). (2026-11-24)

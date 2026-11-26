@@ -1,4 +1,4 @@
-import { ClipboardList, FileCheck2, FileSignature, FileStack, Flag, FolderKanban, Inbox, ScrollText, LayoutDashboard, Newspaper, ReceiptText, TicketPercent, Users, Video, Wallet, type LucideIcon } from 'lucide-react';
+import { CalendarCheck, ClipboardList, FileCheck2, FileSignature, FileStack, Flag, FolderKanban, Inbox, ScrollText, LayoutDashboard, Newspaper, ReceiptText, TicketPercent, Users, Video, Wallet, type LucideIcon } from 'lucide-react';
 
 /**
  * The Tableau de bord's sections, in sidebar order. A new section (Leads,
@@ -7,7 +7,7 @@ import { ClipboardList, FileCheck2, FileSignature, FileStack, Flag, FolderKanban
  */
 export type DashboardSection = {
   /** Its label is `Dashboard.nav.<key>`. */
-  key: 'overview' | 'demandes' | 'dossiers' | 'services-en-cours' | 'reunions' | 'comptes' | 'factures' | 'finances' | 'outils-pdf' | 'signatures' | 'contrats' | 'services' | 'codes-promo' | 'blog' | 'signalements';
+  key: 'overview' | 'demandes' | 'dossiers' | 'services-en-cours' | 'reunions' | 'comptes' | 'factures' | 'finances' | 'outils-pdf' | 'signatures' | 'contrats' | 'services' | 'codes-promo' | 'consultations' | 'blog' | 'signalements';
   /** Its address on the dashboard's subdomain. */
   href: string;
   /** The first route segment below the dashboard it owns; null for the Aperçu. */
@@ -30,6 +30,8 @@ export const DASHBOARD_SECTIONS: readonly DashboardSection[] = [
   // The Services documentaires under way for Clients; the catalogue stays under Facturation.
   { key: 'services-en-cours', href: '/services-en-cours', segment: 'services-en-cours', icon: ClipboardList, group: 'clients' },
   { key: 'reunions', href: '/reunions', segment: 'reunions', icon: Video, group: 'clients' },
+  // Booked and paid online (#15); each has its Réunion.
+  { key: 'consultations', href: '/consultations', segment: 'consultations', icon: CalendarCheck, group: 'clients' },
   { key: 'comptes', href: '/comptes', segment: 'comptes', icon: Users, group: 'clients' },
   { key: 'contrats', href: '/contrats', segment: 'contrats', icon: ScrollText, group: 'clients' },
   { key: 'signatures', href: '/signatures', segment: 'signatures', icon: FileSignature, group: 'clients' },
