@@ -125,10 +125,11 @@ export const consultationAdminRouter = createTRPCRouter({
     };
     const failedWhere = { status: 'FAILED' as const };
     const [upcomingRows, failedUnresolved] = await Promise.all([
-      ctx.prisma.consultation.findMany({ where: upcomingWhere, select: { startsAt: true, durationMinutes: true } }),
+      ctx.prisma.consultation.findMany({ where: upcomingWhere, select: { startsAt: true, durationMinutes: true, meeting: { select: { endedAt: true } } } }),
       ctx.prisma.consultationPayment.count({ where: { ...failedWhere, consultation: { status: { not: 'PAID' } } } }),
     ]);
-    const counts = { upcoming: upcomingRows.filter((c) => !ended(c, now)).length, failed: failedUnresolved };
+    // Ended for everyone counts as over, even before its time runs out.
+    const counts = { upcoming: upcomingRows.filter((c) => !isOver(c, now)).length, failed: failedUnresolved };
 
     if (input.tab === 'failed') {
       const payments = await ctx.prisma.consultationPayment.findMany({
@@ -173,7 +174,7 @@ export const consultationAdminRouter = createTRPCRouter({
       counts,
       failed: [],
       rows: rows
-        .filter((c) => (input.tab === 'upcoming' ? !ended(c, now) : ended(c, now)))
+        .filter((c) => (input.tab === 'upcoming' ? !isOver(c, now) : isOver(c, now)))
         .map((c) => ({
           id: c.id,
           status: c.status,

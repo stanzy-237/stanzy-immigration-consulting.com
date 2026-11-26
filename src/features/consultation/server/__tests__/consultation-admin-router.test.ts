@@ -349,6 +349,14 @@ describe('consultationAdmin, « Renvoyer la confirmation »', () => {
 });
 
 describe('consultationAdmin, « 2 Après »', () => {
+  it('a Réunion ended for everyone moves to « Passées » at once, before its time runs out', async () => {
+    const { db } = fakeDatabase({ consultations: [paid()], payments: [payment()], meetings: [meeting({ id: 'meet_1', endedAt: NOW })] });
+    vi.setSystemTime(new Date(at('2026-11-26', '09:20').getTime()));
+    const upcoming = await callerFor(db).list({ tab: 'upcoming' });
+    expect(upcoming.rows).toHaveLength(0);
+    expect(upcoming.counts.upcoming).toBe(0);
+  });
+
   const finished = () => ({ consultations: [paid({ id: 'con_1', startsAt: at('2026-11-23', '15:00') })], payments: [payment()], meetings: [meeting({ id: 'meet_1', startsAt: at('2026-11-23', '15:00') })] });
 
   it('writes notes for the Client at a moment of the video, and next steps in order', async () => {
