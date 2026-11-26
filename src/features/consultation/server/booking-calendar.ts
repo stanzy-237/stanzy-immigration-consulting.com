@@ -24,11 +24,24 @@ export async function loadAvailability(prisma: Db): Promise<{ availability: Cons
  * Consultation held or paid but not yet in a Réunion. `holder` leaves out that
  * Compte's own holds, so a booker never collides with the slot they hold.
  */
-export async function busyTimes(prisma: Db, now: Date, horizonDays: number, holder?: string): Promise<Busy[]> {
+export async function busyTimes(
+  prisma: Db,
+  now: Date,
+  horizonDays: number,
+  holder?: string,
+  /** A Réunion being moved: its own time doesn't block it. */
+  exceptMeetingId?: string,
+): Promise<Busy[]> {
   const window = { gt: new Date(now.getTime() - DAY), lt: new Date(now.getTime() + (horizonDays + 2) * DAY) };
   const [meetings, bookings] = await Promise.all([
     prisma.meeting.findMany({
-      where: { status: 'SCHEDULED', kind: { in: ['SCHEDULED', 'INSTANT'] }, endedAt: null, startsAt: window },
+      where: {
+        status: 'SCHEDULED',
+        kind: { in: ['SCHEDULED', 'INSTANT'] },
+        endedAt: null,
+        startsAt: window,
+        ...(exceptMeetingId ? { id: { not: exceptMeetingId } } : {}),
+      },
       select: { startsAt: true, durationMinutes: true },
     }),
     prisma.consultation.findMany({

@@ -7,6 +7,7 @@ import { clientFormsRouter } from '@/features/client-forms/server/client-forms-r
 import { crsRouter } from '@/features/crs/server/crs-router';
 import { documentServicesRouter } from '@/features/document-services/server/document-services-router';
 import { accountsRouter } from '@/features/accounts/server/accounts-router';
+import { consultationAdminRouter } from '@/features/consultation/server/consultation-admin-router';
 import { consultationRouter } from '@/features/consultation/server/consultation-router';
 import { promoCodesRouter } from '@/features/consultation/server/promo-router';
 import { contractsRouter } from '@/features/contracts/server/contracts-router';
@@ -35,6 +36,7 @@ export const appRouter = createTRPCRouter({
   checklist: checklistRouter,
   clientForms: clientFormsRouter,
   consultation: consultationRouter,
+  consultationAdmin: consultationAdminRouter,
   promoCodes: promoCodesRouter,
   contracts: contractsRouter,
   crs: crsRouter,
