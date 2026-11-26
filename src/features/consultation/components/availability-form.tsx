@@ -6,6 +6,8 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
 import { toast } from '@/components/ui/toast';
+import { WeekHours } from '@/features/consultation/components/week-hours';
+import { mergeTouching } from '@/features/consultation/lib/day-ranges';
 import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
@@ -36,8 +38,6 @@ export function parseRanges(day: number, text: string): Range[] | null {
   return ranges;
 }
 
-const toMinutes = (time: string) => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
-
 /**
  * The Disponibilités being edited: each day's ranges as typed, the numbers,
  * the price and the blocked dates; `submit` checks the hours and saves.
@@ -58,7 +58,7 @@ function useAvailabilityDraft(settings: Settings, onSaved?: () => void) {
   const [blocked, setBlocked] = useState<string[]>(settings.blockedDates);
   const [badDays, setBadDays] = useState<number[]>([]);
 
-  const save = useMutation(
+  const save_ = useMutation(
     trpc.consultationAdmin.saveSettings.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: trpc.consultationAdmin.settings.queryKey() });
@@ -69,19 +69,19 @@ function useAvailabilityDraft(settings: Settings, onSaved?: () => void) {
     }),
   );
 
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  /** Checks every day's hours and saves it all; `current` when the days were just changed. */
+  function save(current: Record<number, string> = days) {
     const weeklyHours: Range[] = [];
     const bad: number[] = [];
     for (const day of DAYS) {
-      const ranges = parseRanges(day, days[day] ?? '');
+      const ranges = parseRanges(day, current[day] ?? '');
       if (ranges === null) bad.push(day);
       else weeklyHours.push(...ranges);
     }
     setBadDays(bad);
     if (bad.length) return;
     const int = (value: string, fallback: number) => (Number.isFinite(Number.parseInt(value, 10)) ? Number.parseInt(value, 10) : fallback);
-    save.mutate({
+    save_.mutate({
       weeklyHours,
       durationMinutes: int(duration, 45),
       bufferMinutes: int(buffer, 0),
@@ -91,6 +91,11 @@ function useAvailabilityDraft(settings: Settings, onSaved?: () => void) {
       price: price.trim() ? int(price.replace(/\D/g, ''), 0) || null : null,
       blockedDates: blocked,
     });
+  }
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    save();
   }
 
   const digits = (set: (v: string) => void) => (value: string) => set(value.replace(/\D/g, ''));
@@ -111,7 +116,14 @@ function useAvailabilityDraft(settings: Settings, onSaved?: () => void) {
     block: (day: string) => setBlocked((all) => [...new Set([...all, day])].toSorted()),
     unblock: (day: string) => setBlocked((all) => all.filter((d) => d !== day)),
     submit,
-    saving: save.isPending,
+    saving: save_.isPending,
+    ranges: (day: number) => parseRanges(day, days[day] ?? '') ?? [],
+    setRanges: (day: number, ranges: Range[]) => setDays((all) => ({ ...all, [day]: rangesText(mergeTouching(ranges)) })),
+    saveDays: (changes: Record<number, Range[]>) => {
+      const next = { ...days, ...Object.fromEntries(Object.entries(changes).map(([day, ranges]) => [day, rangesText(mergeTouching(ranges))])) };
+      setDays(next);
+      save(next);
+    },
   };
 }
 
@@ -185,7 +197,7 @@ function PageLayout({ draft }: { draft: Draft }): ReactNode {
           </h2>
           <span className="hidden text-caption whitespace-nowrap text-slate sm:inline">{t('douala')}</span>
         </div>
-        <DayFields draft={draft} withTimeline />
+        <WeekHours source={draft} />
       </section>
 
       <div className="flex w-full shrink-0 flex-col gap-4 lg:w-90">
@@ -210,51 +222,23 @@ function PageLayout({ draft }: { draft: Draft }): ReactNode {
   );
 }
 
-/** Each day's ranges, as text; on the page, drawn on a timeline beside it. */
-function DayFields({ draft, withTimeline = false }: { draft: Draft; withTimeline?: boolean }): ReactNode {
+/** Each day's ranges, as text (the side panel). */
+function DayFields({ draft }: { draft: Draft }): ReactNode {
   const t = useTranslations('Consultation.admin.availability');
   const format = useFormatter();
   const id = useId();
   const dayName = (day: number) => format.dateTime(new Date(Date.UTC(2026, 10, 22 + day)), { weekday: 'short', timeZone: 'UTC' }).replace('.', '');
 
-  // The timeline runs 08:00 – 20:00, widened to whatever is typed.
-  const typed = DAYS.flatMap((day) => parseRanges(day, draft.days[day] ?? '') ?? []);
-  const from = Math.min(8, ...typed.map((r) => Math.floor(toMinutes(r.start) / 60)));
-  const to = Math.max(20, ...typed.map((r) => Math.ceil(toMinutes(r.end) / 60)));
-  const span = (to - from) * 60;
-  const marks = [0, 1, 2, 3].map((i) => `${String(Math.round(from + (i * (to - from)) / 3)).padStart(2, '0')}:00`);
-
   return (
     <fieldset className="flex flex-col gap-2">
       <legend className="sr-only">{t('hours')}</legend>
-      {withTimeline ? (
-        <div aria-hidden={true} className="hidden pl-14 md:flex">
-          <div className="flex w-72 justify-between text-label text-slate-mute">
-            {marks.map((mark) => (
-              <span key={mark}>{mark}</span>
-            ))}
-          </div>
-        </div>
-      ) : null}
       {DAYS.map((day) => {
         const text = draft.days[day] ?? '';
         const off = !text.trim();
-        const ranges = parseRanges(day, text) ?? [];
         const bad = draft.badDays.includes(day);
         return (
-          <label key={day} className="flex items-center gap-3 md:gap-4">
+          <label key={day} className="flex items-center gap-3">
             <span className={cn('w-10 shrink-0 text-body-sm font-bold capitalize', off ? 'text-slate-mute' : 'text-ink')}>{dayName(day)}</span>
-            {withTimeline ? (
-              <span aria-hidden={true} className="relative hidden h-7 w-72 shrink-0 rounded-lg bg-off-white md:block">
-                {ranges.map((r) => (
-                  <span
-                    key={r.start}
-                    className="absolute inset-y-1 rounded-md bg-steel-blue"
-                    style={{ left: `${((toMinutes(r.start) - from * 60) / span) * 100}%`, width: `${((toMinutes(r.end) - toMinutes(r.start)) / span) * 100}%` }}
-                  />
-                ))}
-              </span>
-            ) : null}
             <input
               value={text}
               onChange={(e) => draft.setDay(day, e.target.value)}

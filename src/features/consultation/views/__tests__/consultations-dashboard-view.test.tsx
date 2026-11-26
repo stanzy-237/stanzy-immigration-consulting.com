@@ -80,13 +80,18 @@ describe('Tableau de bord → Consultations', () => {
     expect(failed.getByRole('link', { name: 'Voir le Compte' })).toHaveAttribute('href', '/comptes/acc_3');
   });
 
-  it('« Disponibilités » saves everything: several ranges a day, and the price', async () => {
+  it('« Disponibilités »: a day’s slots on its timeline, « + » adds one, then everything is saved', async () => {
     const save = vi.fn(() => ({ saved: true }));
     renderList({ 'consultationAdmin.saveSettings': save });
     fireEvent.click(screen.getByRole('radio', { name: 'Disponibilités' }));
-    const panel = within(await screen.findByRole('region', { name: 'Horaires de la semaine' })).getByDisplayValue('09:00 – 12:00 · 14:00 – 16:00');
-    expect(panel).toBeInTheDocument();
+    await screen.findByRole('region', { name: 'Horaires de la semaine' });
+    const monday = within(screen.getByRole('group', { name: 'lundi' }));
+    expect(monday.getByRole('button', { name: '9h–12h, modifier' })).toBeInTheDocument();
+    expect(monday.getByRole('button', { name: '14h–16h, modifier' })).toBeInTheDocument();
     expect(screen.getByText('Sans tarif, le paiement reste fermé.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter une plage le lundi' }));
+    // 12h–13h touches 9h–12h: they become one slot.
+    expect(monday.getByRole('button', { name: '9h–13h, modifier' })).toBeInTheDocument();
     fireEvent.change(screen.getByRole('textbox', { name: /^Tarif/ }), { target: { value: '12345' } });
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
     await waitFor(() =>
@@ -94,7 +99,7 @@ describe('Tableau de bord → Consultations', () => {
         expect.objectContaining({
           price: 12_345,
           weeklyHours: [
-            { day: 1, start: '09:00', end: '12:00' },
+            { day: 1, start: '09:00', end: '13:00' },
             { day: 1, start: '14:00', end: '16:00' },
           ],
         }),
@@ -102,14 +107,22 @@ describe('Tableau de bord → Consultations', () => {
     );
   });
 
-  it('says which day’s hours it cannot read, and saves nothing', async () => {
-    const save = vi.fn();
+  it('on a phone, a day opens its sheet: another slot, copied to Friday, saved at once', async () => {
+    const save = vi.fn(() => ({ saved: true }));
     renderList({ 'consultationAdmin.saveSettings': save });
     fireEvent.click(screen.getByRole('radio', { name: 'Disponibilités' }));
-    fireEvent.change(await screen.findByDisplayValue('09:00 – 12:00 · 14:00 – 16:00'), { target: { value: 'le matin' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
-    expect(screen.getByRole('alert')).toHaveTextContent('Une plage n’est pas lisible');
-    expect(save).not.toHaveBeenCalled();
+    fireEvent.click(await screen.findByRole('button', { name: /^lundi/ }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'lundi' }));
+    fireEvent.click(sheet.getByRole('button', { name: 'Ajouter une plage' }));
+    fireEvent.click(sheet.getByRole('checkbox', { name: 'vendredi' }));
+    fireEvent.click(sheet.getByRole('button', { name: 'Enregistrer' }));
+    await waitFor(() => expect(save).toHaveBeenCalled());
+    const hours = (save.mock.calls[0] as unknown as [{ weeklyHours: { day: number }[] }])[0].weeklyHours;
+    expect(hours.filter((h) => h.day === 1)).toEqual([
+      { day: 1, start: '09:00', end: '13:00' },
+      { day: 1, start: '14:00', end: '16:00' },
+    ]);
+    expect(hours.filter((h) => h.day === 5)).toHaveLength(2);
   });
 });
 
@@ -253,13 +266,22 @@ describe('Tableau de bord → Consultations, « Calendrier »', () => {
   it('sums up the Disponibilités above the week; « Modifier » opens them beside it', async () => {
     renderCalendar();
     const bar = within(await screen.findByRole('region', { name: 'Disponibilités' }));
-    expect(bar.getByText('lun 09–12 · 14–16')).toBeInTheDocument();
+    expect(bar.getByText('lun 9h–12h · 14h–16h')).toBeInTheDocument();
     expect(bar.getByText('Sans tarif')).toBeInTheDocument();
     fireEvent.click(bar.getByRole('button', { name: 'Modifier' }));
     const panel = within(await screen.findByRole('dialog', { name: 'Disponibilités' }));
     expect(panel.getByDisplayValue('09:00 – 12:00 · 14:00 – 16:00')).toBeInTheDocument();
     fireEvent.click(panel.getByRole('button', { name: 'Annuler' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('in the side panel, says which day’s hours it cannot read, and saves nothing', async () => {
+    renderCalendar();
+    fireEvent.click(within(await screen.findByRole('region', { name: 'Disponibilités' })).getByRole('button', { name: 'Modifier' }));
+    const panel = within(await screen.findByRole('dialog', { name: 'Disponibilités' }));
+    fireEvent.change(panel.getByDisplayValue('09:00 – 12:00 · 14:00 – 16:00'), { target: { value: 'le matin' } });
+    fireEvent.click(panel.getByRole('button', { name: 'Enregistrer' }));
+    expect(panel.getByRole('alert')).toHaveTextContent('Une plage n’est pas lisible');
   });
 
   it('moves a week at a time, and back to this one', async () => {

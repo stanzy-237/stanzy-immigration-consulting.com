@@ -7,6 +7,7 @@ import { useState, type ReactNode } from 'react';
 
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { AvailabilityForm } from '@/features/consultation/components/availability-form';
+import { shortHour } from '@/features/consultation/lib/day-ranges';
 import { fcfa } from '@/features/consultation/lib/slot-format';
 import { PRESS } from '@/features/consultation/lib/styles';
 import { cn } from '@/lib/utils';
@@ -14,17 +15,14 @@ import { useTRPC } from '@/trpc/client';
 
 type Window = { day: number; start: string; end: string };
 
-/** « 09:00 » → « 09 », « 09:30 » stays. */
-const short = (time: string) => (time.endsWith(':00') ? time.slice(0, 2) : time);
-
-/** Days with the same hours together: [« 1,2 », « 09–12 · 14–16 »], Monday first. */
+/** Days with the same hours together: [« 1,2 », « 9h–12h · 14h–16h »], Monday first. */
 export function groupHours(weeklyHours: Window[]): { days: number[]; hours: string }[] {
   const byDay = new Map<number, string>();
   for (const day of [1, 2, 3, 4, 5, 6, 7]) {
     const hours = weeklyHours
       .filter((w) => w.day === day)
       .toSorted((a, b) => a.start.localeCompare(b.start))
-      .map((w) => `${short(w.start)}–${short(w.end)}`)
+      .map((w) => `${shortHour(w.start)}–${shortHour(w.end)}`)
       .join(' · ');
     if (hours) byDay.set(day, hours);
   }
