@@ -5,6 +5,7 @@ import { TRPCError } from '@trpc/server';
 import { isSupportedCountry } from 'libphonenumber-js/min';
 import { after } from 'next/server';
 
+import { sendAccountReadyLater } from '@/features/auth/server/account-ready';
 import { consultationFailedEmail, consultationPaidEmail } from '@/features/consultation/lib/consultation-emails';
 import { consultationSpacePath } from '@/features/consultation/lib/payment';
 import { CARD_NETWORK, HOLD_LIMIT_MINUTES, PAYING_MINUTES, PAYMENT_ERRORS, type PayInput } from '@/features/consultation/lib/payment';
@@ -345,7 +346,7 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
       data: { status: 'PAID', paidAt: now, paidById: paymentId, meetingId: meeting.id, heldUntil: null, startsAt },
     });
     await tx.account.updateMany({ where: { id: consultation.accountId, status: 'USER' }, data: { status: 'LEAD' } });
-    return { moved };
+    return { moved, accountId: consultation.accountId };
   });
   if (!done) return;
 
@@ -355,6 +356,8 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
     if (!message) throw new Error(`no confirmation to send for ${paymentId}`);
     return message;
   });
+  // Booked without an Account: « Votre compte est prêt », to choose a password.
+  sendAccountReadyLater(prisma, done.accountId);
 }
 
 /**

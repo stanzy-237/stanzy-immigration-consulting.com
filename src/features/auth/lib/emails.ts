@@ -55,3 +55,32 @@ function linkEmail(
     footer: shared('footer'),
   });
 }
+
+/**
+ * « Votre compte est prêt » (`Mon compte · 2 E-mail`): the Account created at
+ * a booking without one has no password; the link sets the first one. It
+ * shows the address they sign in with, never a password.
+ */
+export function accountReadyEmail(opts: LinkEmailOptions & { days: number }): EmailMessage {
+  const locale = toLocale(opts.locale);
+  const t = createTranslator({ locale, messages: MESSAGES[locale], namespace: 'Auth.Emails.AccountReady' });
+  const shared = createTranslator({ locale, messages: MESSAGES[locale], namespace: 'Auth.Emails' });
+  return brandEmail({
+    to: opts.to,
+    subject: t('subject'),
+    eyebrow: shared('eyebrow'),
+    art: 'lock',
+    title: t('title', { name: opts.name.trim().split(/\s+/)[0] ?? opts.name }),
+    lines: [t('body')],
+    card: {
+      kind: 'rows',
+      rows: [
+        { label: t('login'), value: opts.to },
+        { label: t('password'), value: t('passwordValue') },
+      ],
+    },
+    cta: { label: t('cta'), url: opts.url },
+    note: `${t('expiry', { days: opts.days })} ${t('ignore')}`,
+    footer: shared('footer'),
+  });
+}

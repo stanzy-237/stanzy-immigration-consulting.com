@@ -22,7 +22,8 @@ import { useTRPC } from '@/trpc/client';
  * Services documentaires too (#80). `notice`: the pieces still to hand over
  * for them, passed in by the route.
  */
-export function MySpaceView({ notice }: { notice?: ReactNode }): ReactNode {
+/** `consultations`: the Client's own Consultations (tabs, next one); off for the consultant, whose are in the Tableau de bord. */
+export function MySpaceView({ notice, consultations = true }: { notice?: ReactNode; consultations?: boolean }): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
   return (
     <>
@@ -34,11 +35,13 @@ export function MySpaceView({ notice }: { notice?: ReactNode }): ReactNode {
               <h1 className="font-heading text-3xl font-bold text-navy-deep md:text-4xl">{t('title')}</h1>
               <p className="mt-2 text-slate">{t('subtitle')}</p>
             </div>
-            <SpaceTabs />
+            {consultations ? <SpaceTabs /> : null}
           </div>
-          <div className="mt-6 empty:hidden">
-            <ConsultationHome />
-          </div>
+          {consultations ? (
+            <div className="mt-6 empty:hidden">
+              <ConsultationHome />
+            </div>
+          ) : null}
           {notice ? <div className="mt-6">{notice}</div> : null}
           <ServicesLink />
           <div className="mt-8">

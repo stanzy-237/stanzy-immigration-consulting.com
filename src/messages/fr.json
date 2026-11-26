@@ -68,7 +68,8 @@
       "dashboard": "Tableau de bord",
       "allTools": "Voir tous les outils",
       "mySpace": "Mon espace",
-      "report": "Signaler un problème"
+      "report": "Signaler un problème",
+      "myAccount": "Mon compte"
     },
     "TikTok": {
       "eyebrow": "Stanzy sur TikTok",
@@ -446,10 +447,83 @@
     },
     "Compte": {
       "metaTitle": "Mon compte",
+      "eyebrow": "Mon espace",
       "title": "Mon compte",
-      "signedInAs": "Connecté en tant que {name} ({email}).",
-      "comingSoon": "Votre espace personnel arrive bientôt : sécurité du compte, Coffre-fort et suivi de vos démarches.",
-      "backHome": "Retour à l’accueil"
+      "edit": "Modifier",
+      "create": "Créer",
+      "manage": "Gérer",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "error": "Ça n’a pas marché. Réessayez.",
+      "banner": {
+        "title": "Créez votre mot de passe",
+        "lead": "Votre compte a été créé à la réservation. Choisissez un mot de passe pour revenir sans lien par e-mail.",
+        "short": "Pour revenir sans lien par e-mail",
+        "cta": "Créer mon mot de passe"
+      },
+      "profile": {
+        "title": "Profil",
+        "name": "Nom",
+        "nameHint": "Sur vos Factures et dans les e-mails de Stanzy",
+        "email": "E-mail",
+        "emailHint": "Pour vous connecter et recevoir vos confirmations",
+        "verified": "Vérifié",
+        "whatsapp": "Numéro WhatsApp",
+        "whatsappHint": "Pour les rappels avant vos Réunions",
+        "whatsappLead": "Avec l’indicatif du pays. Il vaut pour vos consultations à venir.",
+        "locale": "Langue des e-mails",
+        "localeHint": "Confirmations, rappels et Factures"
+      },
+      "signIn": {
+        "title": "Connexion",
+        "password": "Mot de passe",
+        "passwordHint": "{min} caractères minimum",
+        "noPassword": "Pas encore créé",
+        "googleHint": "Se connecter en un clic avec le même e-mail",
+        "linked": "Associé",
+        "notLinked": "Non associé",
+        "link": "Associer",
+        "devices": "Appareils connectés",
+        "devicesHint": "Un téléphone perdu ? Déconnectez-le d’ici.",
+        "deviceCount": "{count, plural, one {# appareil} other {# appareils}}"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "reminders": "Rappels sur WhatsApp",
+        "remindersHint": "La veille et 1 heure avant chaque Réunion",
+        "device": "Notifications sur cet appareil",
+        "deviceHint": "Quand Stanzy publie votre récap ou vous écrit",
+        "always": "Les e-mails de confirmation, de paiement et de Facture partent toujours."
+      },
+      "signOut": "Se déconnecter",
+      "delete": "Supprimer votre compte ? <link>Écrivez à Stanzy sur WhatsApp</link>.",
+      "password": {
+        "createTitle": "Créer mon mot de passe",
+        "createLead": "Vous vous connecterez avec votre e-mail et ce mot de passe.",
+        "changeTitle": "Changer de mot de passe",
+        "changeLead": "Vos autres appareils seront déconnectés.",
+        "current": "Mot de passe actuel",
+        "new": "Nouveau mot de passe",
+        "rule": "{min} caractères minimum.",
+        "tooShort": "Choisissez au moins {min} caractères.",
+        "wrongCurrent": "Le mot de passe actuel n’est pas le bon.",
+        "create": "Créer mon mot de passe",
+        "change": "Changer",
+        "created": "Mot de passe créé",
+        "changed": "Mot de passe changé",
+        "sent": "Pour votre sécurité, un lien vous a été envoyé par e-mail.",
+        "error": "Ça n’a pas marché. Réessayez."
+      },
+      "devices": {
+        "title": "Appareils connectés",
+        "lead": "Ceux où votre compte est ouvert. Vous ne reconnaissez pas l’un d’eux ? Déconnectez les autres, puis changez de mot de passe.",
+        "unknown": "Appareil inconnu",
+        "since": "Depuis le {date, date, medium}",
+        "this": "Cet appareil",
+        "signOutOthers": "Déconnecter les autres appareils",
+        "done": "Les autres appareils sont déconnectés",
+        "error": "Ça n’a pas marché. Réessayez."
+      }
     },
     "Emails": {
       "Verification": {
@@ -471,7 +545,18 @@
         "title": "Un nouveau mot de passe"
       },
       "eyebrow": "Votre compte",
-      "footer": "Stanzy Immigration Consulting · e-mail de votre compte"
+      "footer": "Stanzy Immigration Consulting · e-mail de votre compte",
+      "AccountReady": {
+        "subject": "Votre compte Stanzy est prêt",
+        "title": "Votre compte est prêt, {name}.",
+        "body": "Votre consultation est confirmée. Nous avons créé votre compte pour que vous retrouviez tout au même endroit : la Réunion, votre Facture et, après, l’enregistrement.",
+        "login": "Identifiant",
+        "password": "Mot de passe",
+        "passwordValue": "À choisir vous-même",
+        "cta": "Créer mon mot de passe",
+        "expiry": "Le lien marche {days} jours, une seule fois. Passé ce délai : « Mot de passe oublié » sur la page de connexion.",
+        "ignore": "Vous n’avez pas réservé chez Stanzy ? Ignorez cet e-mail : sans mot de passe, personne ne peut se connecter."
+      }
     },
     "MotDePasseOublie": {
       "metaTitle": "Mot de passe oublié",
@@ -496,7 +581,10 @@
       "vaultBody": "Votre Coffre-fort est chiffré avec une phrase secrète que vous seul connaissez. Changer de mot de passe ne la modifie pas et ne permet pas de la retrouver : si vous l’avez oubliée, personne, pas même Stanzy, ne peut rouvrir son contenu.",
       "invalidTitle": "Lien invalide ou expiré",
       "invalidBody": "Ce lien de réinitialisation a déjà été utilisé ou a expiré. Demandez-en un nouveau : il arrive en quelques minutes.",
-      "requestNew": "Demander un nouveau lien"
+      "requestNew": "Demander un nouveau lien",
+      "createTitle": "Créez votre mot de passe",
+      "createSubtitle": "Vous vous connecterez avec votre e-mail et ce mot de passe.",
+      "createSubmit": "Créer mon mot de passe"
     }
   },
   "Crs": {

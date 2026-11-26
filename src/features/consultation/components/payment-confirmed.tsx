@@ -204,7 +204,7 @@ export function AddToCalendar({ paymentId, event }: { paymentId: string; event: 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className={cn('flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-white px-6 font-heading text-body font-bold text-ink', PRESS)}
+        className={cn('flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-white px-6 font-heading text-body font-bold whitespace-nowrap text-ink', PRESS)}
       >
         <CalendarPlus aria-hidden={true} className="size-4.5" strokeWidth={2.2} />
         {t('calendar')}

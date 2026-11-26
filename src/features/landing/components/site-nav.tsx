@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, ChevronDown, Flag, FolderOpen, LayoutDashboard, LogOut, Menu } from 'lucide-react';
+import { ArrowRight, ChevronDown, Flag, FolderOpen, LayoutDashboard, LogOut, Menu, UserRound } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
@@ -214,6 +214,7 @@ export function SiteNav(): ReactNode {
               triggerLabel={t('account', { name: accountName })}
               dashboard={dashboardUrl ? { href: dashboardUrl, label: t('dashboard') } : null}
               mySpaceLabel={account?.isConsultant ? null : t('mySpace')}
+              myAccountLabel={t('myAccount')}
               reportLabel={t('report')}
               onReport={(): void => setReporting(true)}
               signOutLabel={t('signOut')}
@@ -322,6 +323,16 @@ export function SiteNav(): ReactNode {
                   </Link>
                 ) : null}
                 {accountName ? (
+                  <Link
+                    href="/compte"
+                    className="text-navy-deep inline-flex items-center justify-center gap-2 rounded-md border border-fog px-3 py-2 text-sm font-semibold"
+                    onClick={closeMobile}
+                  >
+                    <UserRound aria-hidden={true} className="size-4" />
+                    {t('myAccount')}
+                  </Link>
+                ) : null}
+                {accountName ? (
                   <button
                     type="button"
                     className="text-navy-deep inline-flex items-center justify-center gap-2 rounded-md border border-fog px-3 py-2 text-sm font-medium"
@@ -380,6 +391,8 @@ type AccountMenuProps = {
   dashboard: { href: string; label: string } | null;
   /** « Mon espace », for everyone but the consultant. */
   mySpaceLabel: string | null;
+  /** « Mon compte »: name, password, devices, notifications. */
+  myAccountLabel: string;
   /** « Signaler un problème » (#160). */
   reportLabel: string;
   onReport: () => void;
@@ -392,6 +405,7 @@ function AccountMenu({
   triggerLabel,
   dashboard,
   mySpaceLabel,
+  myAccountLabel,
   reportLabel,
   onReport,
   signOutLabel,
@@ -425,6 +439,10 @@ function AccountMenu({
             {mySpaceLabel}
           </DropdownMenuItem>
         ) : null}
+        <DropdownMenuItem render={<Link href="/compte" />}>
+          <UserRound aria-hidden={true} />
+          {myAccountLabel}
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={onReport}>
           <Flag aria-hidden={true} />
           {reportLabel}

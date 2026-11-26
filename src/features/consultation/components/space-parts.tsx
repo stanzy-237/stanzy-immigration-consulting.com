@@ -12,7 +12,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { AddToCalendar } from '@/features/consultation/components/payment-confirmed';
 import { PRESS } from '@/features/consultation/lib/styles';
-import { FOOTER_SOCIALS } from '@/features/landing/data/footer';
 import { clientRoomPath } from '@/features/meetings/lib/meeting-schema';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -21,7 +20,8 @@ import { useTRPC } from '@/trpc/client';
 const DOUALA = 'Africa/Douala';
 /** « Rejoindre » opens 15 minutes before the start (meeting-schema's rule). */
 export const JOIN_BEFORE_MS = 15 * 60_000;
-export const WHATSAPP_URL = FOOTER_SOCIALS.find((s) => s.key === 'whatsapp')?.href ?? null;
+/** Stanzy's WhatsApp, for Clients writing from Mon espace. */
+export const WHATSAPP_URL: string | null = 'https://wa.me/237679306015';
 
 /** Mon espace's tabs (`Mon espace v2`): Accueil, Mes consultations. */
 export function SpaceTabs(): ReactNode {
@@ -91,7 +91,7 @@ export function NextConsultationCard({ consultation, action }: { consultation: N
           </Link>
         ) : null}
         {consultation.paymentId ? (
-          <div className="flex sm:w-64">
+          <div className="flex sm:shrink-0">
             <AddToCalendar
               paymentId={consultation.paymentId}
               event={{

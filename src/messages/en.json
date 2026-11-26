@@ -68,7 +68,8 @@
       "dashboard": "Dashboard",
       "allTools": "See all tools",
       "mySpace": "My space",
-      "report": "Report a problem"
+      "report": "Report a problem",
+      "myAccount": "My account"
     },
     "TikTok": {
       "eyebrow": "Stanzy on TikTok",
@@ -446,10 +447,83 @@
     },
     "Compte": {
       "metaTitle": "My account",
+      "eyebrow": "My space",
       "title": "My account",
-      "signedInAs": "Signed in as {name} ({email}).",
-      "comingSoon": "Your personal space is coming soon: account security, the Coffre-fort and tracking for your applications.",
-      "backHome": "Back to home"
+      "edit": "Edit",
+      "create": "Create",
+      "manage": "Manage",
+      "save": "Save",
+      "saved": "Saved",
+      "error": "That didn’t work. Try again.",
+      "banner": {
+        "title": "Create your password",
+        "lead": "Your account was created when you booked. Choose a password to come back without an e-mail link.",
+        "short": "To come back without an e-mail link",
+        "cta": "Create my password"
+      },
+      "profile": {
+        "title": "Profile",
+        "name": "Name",
+        "nameHint": "On your invoices and in Stanzy’s e-mails",
+        "email": "E-mail",
+        "emailHint": "To sign in and receive your confirmations",
+        "verified": "Verified",
+        "whatsapp": "WhatsApp number",
+        "whatsappHint": "For reminders before your meetings",
+        "whatsappLead": "With the country code. It applies to your upcoming consultations.",
+        "locale": "E-mail language",
+        "localeHint": "Confirmations, reminders and invoices"
+      },
+      "signIn": {
+        "title": "Sign-in",
+        "password": "Password",
+        "passwordHint": "At least {min} characters",
+        "noPassword": "Not created yet",
+        "googleHint": "Sign in in one click with the same e-mail",
+        "linked": "Linked",
+        "notLinked": "Not linked",
+        "link": "Link",
+        "devices": "Signed-in devices",
+        "devicesHint": "Lost a phone? Sign it out from here.",
+        "deviceCount": "{count, plural, one {# device} other {# devices}}"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "reminders": "WhatsApp reminders",
+        "remindersHint": "The day before and 1 hour before each meeting",
+        "device": "Notifications on this device",
+        "deviceHint": "When Stanzy publishes your recap or writes to you",
+        "always": "Confirmation, payment and invoice e-mails are always sent."
+      },
+      "signOut": "Sign out",
+      "delete": "Delete your account? <link>Write to Stanzy on WhatsApp</link>.",
+      "password": {
+        "createTitle": "Create my password",
+        "createLead": "You’ll sign in with your e-mail and this password.",
+        "changeTitle": "Change password",
+        "changeLead": "Your other devices will be signed out.",
+        "current": "Current password",
+        "new": "New password",
+        "rule": "At least {min} characters.",
+        "tooShort": "Choose at least {min} characters.",
+        "wrongCurrent": "The current password is wrong.",
+        "create": "Create my password",
+        "change": "Change",
+        "created": "Password created",
+        "changed": "Password changed",
+        "sent": "For your security, we e-mailed you a link.",
+        "error": "That didn’t work. Try again."
+      },
+      "devices": {
+        "title": "Signed-in devices",
+        "lead": "Where your account is open. Don’t recognise one? Sign the others out, then change your password.",
+        "unknown": "Unknown device",
+        "since": "Since {date, date, medium}",
+        "this": "This device",
+        "signOutOthers": "Sign out the other devices",
+        "done": "The other devices are signed out",
+        "error": "That didn’t work. Try again."
+      }
     },
     "Emails": {
       "Verification": {
@@ -471,7 +545,18 @@
         "title": "A new password"
       },
       "eyebrow": "Your account",
-      "footer": "Stanzy Immigration Consulting · your account e-mail"
+      "footer": "Stanzy Immigration Consulting · your account e-mail",
+      "AccountReady": {
+        "subject": "Your Stanzy account is ready",
+        "title": "Your account is ready, {name}.",
+        "body": "Your consultation is confirmed. We created your account so everything is in one place: the meeting, your invoice and, afterwards, the recording.",
+        "login": "Sign-in e-mail",
+        "password": "Password",
+        "passwordValue": "Yours to choose",
+        "cta": "Create my password",
+        "expiry": "The link works for {days} days, once. After that: “Forgot password” on the sign-in page.",
+        "ignore": "Didn’t book with Stanzy? Ignore this e-mail: without a password, no one can sign in."
+      }
     },
     "MotDePasseOublie": {
       "metaTitle": "Forgot password",
@@ -496,7 +581,10 @@
       "vaultBody": "Your Coffre-fort is encrypted with a passphrase only you know. Changing your password doesn’t change it and can’t recover it: if you’ve forgotten it, no one, not even Stanzy, can reopen its contents.",
       "invalidTitle": "Invalid or expired link",
       "invalidBody": "This reset link has already been used or has expired. Request a new one: it arrives within a few minutes.",
-      "requestNew": "Request a new link"
+      "requestNew": "Request a new link",
+      "createTitle": "Create your password",
+      "createSubtitle": "You’ll sign in with your e-mail and this password.",
+      "createSubmit": "Create my password"
     }
   },
   "Crs": {

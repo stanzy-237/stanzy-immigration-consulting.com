@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { requireSession } from '@/features/auth/server/guards';
+import { requireClient } from '@/features/auth/server/guards';
 import { MyConsultationView } from '@/features/consultation/views/my-consultation-view';
 import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 export default async function Page({ params }: { params: Params }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  await requireSession({ locale, next: `/mon-espace/consultations/${id}` });
+  await requireClient({ locale, dashboardPath: `/consultations/${id}`, next: `/mon-espace/consultations/${id}` });
   prefetch(trpc.consultationSpace.detail.queryOptions({ id }));
   return (
     <HydrateClient>
