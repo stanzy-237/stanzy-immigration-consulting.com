@@ -157,9 +157,12 @@ const DETAIL: Detail = {
   publishedAt: null,
 };
 
+const AFTER_START = new Date(Date.now() - 2 * 3_600_000);
 const AFTER: Detail = {
   ...DETAIL,
-  startsAt: new Date(Date.now() - 2 * 3_600_000),
+  startsAt: AFTER_START,
+  // Ended for everyone after 44 minutes: the badge reads « Terminée · 44 min ».
+  meeting: { ...DETAIL.meeting!, endedAt: new Date(AFTER_START.getTime() + 44 * 60_000) },
   ended: true,
   over: true,
   recording: { id: 'rec_1', seconds: 44 * 60 + 12, transcript: 'Bonjour Aminata, parlons de votre profil.' },
