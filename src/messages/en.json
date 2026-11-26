@@ -5293,7 +5293,6 @@
         "paid": "Paid · {network}",
         "card": "Bank card",
         "held": "Awaiting payment",
-        "when": "Consultation · {date} · {start} – {end} · Douala time · {relative}",
         "move": "Move",
         "join": "Join",
         "opensAt": "Opens at {time}",
@@ -5321,10 +5320,6 @@
         "dossiers": "{count, plural, one {# file} other {# files}}",
         "seeAccount": "See the account",
         "openDossier": "Open a file",
-        "reminders": "Reminders sent",
-        "dayBefore": "E-mail the day before",
-        "soon": "15 min before · e-mail and bell",
-        "notYet": "not yet",
         "moveTitle": "Move the consultation",
         "moveLead": "Pick a free slot. The Client gets the “Moved” e-mail with the new date.",
         "moveConfirm": "Move here",
@@ -5332,7 +5327,6 @@
         "slotTaken": "That slot was just taken: pick another.",
         "noFreeSlot": "No free slot in your availability.",
         "cancel": "Cancel",
-        "cancelSlot": "Cancel this slot → {name} moves to the next free slot",
         "cancelTitle": "Cancel this slot",
         "cancelLead": "{name} will move to the next free slot: {when}. The consultation is neither lost nor refunded; they’re told your reason and can still change it.",
         "looking": "Looking for the next free slot…",
@@ -5341,7 +5335,30 @@
         "cancelConfirm": "Cancel and move",
         "cancelled": "{name} moves to {when}: told by e-mail",
         "error": "That didn’t work. Try again.",
-        "preparedElided": "What {name} prepared"
+        "preparedElided": "What {name} prepared",
+        "whenShort": "{date} · {start} – {end} · Douala time",
+        "timeline": {
+          "title": "Timeline",
+          "lead": "What {name} receives, and when",
+          "paid": "Booked and paid",
+          "paidDetail": "{when} · confirmation and invoice sent",
+          "dayBefore": "E-mail reminder the day before",
+          "soon": "Reminder 15 min before",
+          "soonDetail": "e-mail and bell · « Join » opens",
+          "sent": "Sent {when}",
+          "planned": "Planned {when}",
+          "tooLate": "Not sent: booked less than 24 h ahead",
+          "consultation": "Consultation",
+          "over": "over"
+        },
+        "menu": {
+          "label": "More actions",
+          "resend": "Resend the confirmation",
+          "resendHint": "E-mail with the invoice and the link",
+          "resent": "Confirmation sent again to {email}",
+          "cancel": "Cancel this slot",
+          "cancelHint": "{name} moves to the next free slot"
+        }
       },
       "calendar": {
         "view": {

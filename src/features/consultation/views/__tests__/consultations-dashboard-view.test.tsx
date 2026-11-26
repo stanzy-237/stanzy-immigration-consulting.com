@@ -136,7 +136,7 @@ const DETAIL: Detail = {
     settledAt: new Date(),
     invoiceNumber: 'STZ-2026-0007',
   },
-  meeting: { id: 'meet_1', notes: null, remindedDayBefore: null, remindedSoon: null, endedAt: null, status: 'SCHEDULED' },
+  meeting: { id: 'meet_1', notes: null, remindedDayBefore: null, remindedSoon: null, endedAt: null, status: 'SCHEDULED', createdAt: new Date(Date.now() - 3 * 86_400_000) },
 };
 
 function renderDetail(handlers: Handlers = {}) {
@@ -157,6 +157,24 @@ describe('Tableau de bord → a Consultation', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
+  it('shows the Déroulé: paid, the reminders planned, then the Consultation', () => {
+    renderDetail();
+    const timeline = within(screen.getByRole('region', { name: 'Déroulé' }));
+    expect(timeline.getByText('Réservée et payée')).toBeInTheDocument();
+    expect(timeline.getByText('Rappel e-mail la veille')).toBeInTheDocument();
+    expect(timeline.getAllByText(/^Prévu /)).toHaveLength(2);
+    expect(screen.queryByText('Rappels envoyés')).not.toBeInTheDocument();
+  });
+
+  it('« ⋯ » sends the confirmation again', async () => {
+    const resendConfirmation = vi.fn(() => ({ sent: true }));
+    renderDetail({ 'consultationAdmin.resendConfirmation': resendConfirmation });
+    fireEvent.click(screen.getByRole('button', { name: 'Plus d’actions' }));
+    fireEvent.click(await screen.findByRole('menuitem', { name: /Renvoyer la confirmation/ }));
+    await waitFor(() => expect(resendConfirmation).toHaveBeenCalledWith({ id: 'con_1' }));
+    expect(await screen.findByText('Confirmation renvoyée à aminata@example.com')).toBeInTheDocument();
+  });
+
   it('saves the private notes a moment after typing stops', async () => {
     const saveNotes = vi.fn(() => ({ saved: true }));
     renderDetail({ 'consultationAdmin.saveNotes': saveNotes });
@@ -171,7 +189,8 @@ describe('Tableau de bord → a Consultation', () => {
       'consultationAdmin.moveOptions': () => ({ days: [], next: new Date(IN_TWO_DAYS.getTime() + 3600_000).toISOString() }),
       'consultationAdmin.cancelSlot': cancelSlot,
     });
-    fireEvent.click(screen.getByRole('button', { name: /Annuler ce créneau/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Plus d’actions' }));
+    fireEvent.click(await screen.findByRole('menuitem', { name: /Annuler ce créneau/ }));
     expect(await screen.findByText(/Aminata passera au prochain créneau libre/)).toBeInTheDocument();
     const confirm = screen.getByRole('button', { name: 'Annuler et déplacer' });
     expect(confirm).toBeDisabled();

@@ -5310,7 +5310,6 @@
         "paid": "Payée · {network}",
         "card": "Carte bancaire",
         "held": "En attente de paiement",
-        "when": "Consultation · {date} · {start} – {end} · heure de Douala · {relative}",
         "move": "Déplacer",
         "join": "Rejoindre",
         "opensAt": "S’ouvre à {time}",
@@ -5338,10 +5337,6 @@
         "dossiers": "{count, plural, one {# Dossier} other {# Dossiers}}",
         "seeAccount": "Voir le Compte",
         "openDossier": "Ouvrir un dossier",
-        "reminders": "Rappels envoyés",
-        "dayBefore": "E-mail la veille",
-        "soon": "15 min avant · e-mail et cloche",
-        "notYet": "pas encore",
         "moveTitle": "Déplacer la consultation",
         "moveLead": "Choisissez un créneau libre. Le Client reçoit l’e-mail « Déplacée » avec la nouvelle date.",
         "moveConfirm": "Déplacer ici",
@@ -5349,7 +5344,6 @@
         "slotTaken": "Ce créneau vient d’être pris : choisissez-en un autre.",
         "noFreeSlot": "Aucun créneau libre dans vos disponibilités.",
         "cancel": "Annuler",
-        "cancelSlot": "Annuler ce créneau → {name} passe au prochain créneau libre",
         "cancelTitle": "Annuler ce créneau",
         "cancelLead": "{name} passera au prochain créneau libre : {when}. La consultation n’est ni perdue ni remboursée ; la personne est prévenue avec votre motif et peut encore changer.",
         "looking": "Recherche du prochain créneau libre…",
@@ -5358,7 +5352,30 @@
         "cancelConfirm": "Annuler et déplacer",
         "cancelled": "{name} passe au {when} : prévenue par e-mail",
         "error": "Ça n’a pas marché. Réessayez.",
-        "preparedElided": "Ce qu’{name} a préparé"
+        "preparedElided": "Ce qu’{name} a préparé",
+        "whenShort": "{date} · {start} – {end} · heure de Douala",
+        "timeline": {
+          "title": "Déroulé",
+          "lead": "Ce que {name} reçoit, et quand",
+          "paid": "Réservée et payée",
+          "paidDetail": "{when} · confirmation et Facture envoyées",
+          "dayBefore": "Rappel e-mail la veille",
+          "soon": "Rappel 15 min avant",
+          "soonDetail": "e-mail et cloche · « Rejoindre » s’ouvre",
+          "sent": "Envoyé {when}",
+          "planned": "Prévu {when}",
+          "tooLate": "Pas envoyé : réservée moins de 24 h avant",
+          "consultation": "Consultation",
+          "over": "terminée"
+        },
+        "menu": {
+          "label": "Plus d’actions",
+          "resend": "Renvoyer la confirmation",
+          "resendHint": "E-mail avec la Facture et le lien",
+          "resent": "Confirmation renvoyée à {email}",
+          "cancel": "Annuler ce créneau",
+          "cancelHint": "{name} passe au prochain créneau libre"
+        }
       },
       "calendar": {
         "view": {

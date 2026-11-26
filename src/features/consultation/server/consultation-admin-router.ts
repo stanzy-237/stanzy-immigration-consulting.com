@@ -5,6 +5,7 @@ import { cancelSlotSchema, moveSlotSchema, notesSchema, settingsInputSchema } fr
 import { freeSlots, MINUTE, type Busy } from '@/features/consultation/lib/slots';
 import { isDay, mondayOf, startOfDay } from '@/features/consultation/lib/week-calendar';
 import { addDays } from '@/features/notifications/lib/douala-days';
+import { paidConfirmation } from '@/features/consultation/server/consultation-payments';
 import { BOOKING_LOCK, busyTimes, loadAvailability, type Db } from '@/features/consultation/server/booking-calendar';
 import { emailParticipantsLater, meetingParams } from '@/features/meetings/server/meeting-notify';
 import { notifyLater } from '@/features/notifications/server/notify';
@@ -217,7 +218,7 @@ export const consultationAdminRouter = createTRPCRouter({
       include: {
         account: { select: { id: true, name: true, email: true, status: true, _count: { select: { dossiers: true } } } },
         paidBy: { include: { promoCode: { select: { code: true, reductionType: true, reductionValue: true } } } },
-        meeting: { select: { id: true, notes: true, remindedDayBefore: true, remindedSoon: true, endedAt: true, status: true } },
+        meeting: { select: { id: true, notes: true, remindedDayBefore: true, remindedSoon: true, endedAt: true, status: true, createdAt: true } },
       },
     });
     if (!c) throw new TRPCError({ code: 'NOT_FOUND' });
@@ -257,6 +258,19 @@ export const consultationAdminRouter = createTRPCRouter({
         : null,
       meeting: c.meeting,
     };
+  }),
+
+  /**
+   * « Renvoyer la confirmation »: the paid Consultation's e-mail again, as
+   * it stands now (its slot, the link to its Réunion), with its Facture payée.
+   */
+  resendConfirmation: consultantProcedure.input(z.object({ id: z.string().min(1) })).mutation(async ({ ctx, input }) => {
+    const consultation = await ctx.prisma.consultation.findUnique({ where: { id: input.id }, select: { status: true, paidById: true } });
+    if (!consultation) throw new TRPCError({ code: 'NOT_FOUND' });
+    const message = consultation.status === 'PAID' && consultation.paidById ? await paidConfirmation(ctx.prisma, consultation.paidById) : null;
+    if (!message) throw new TRPCError({ code: 'BAD_REQUEST', message: ADMIN_ERRORS.notMovable });
+    await appMailer.send(message);
+    return { sent: true };
   }),
 
   /** « Vos notes »: private, autosaved, kept with the Réunion; the Client never sees them. */

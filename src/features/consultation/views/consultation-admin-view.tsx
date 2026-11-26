@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { TRPCClientError } from '@trpc/client';
-import { ArrowRight, ChevronLeft, Lock, Video } from 'lucide-react';
+import { ArrowRight, Check, ChevronLeft, Ellipsis, Lock, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
@@ -17,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { TOPIC_KEYS, type TopicKey } from '@/features/consultation/lib/booking-fields';
@@ -24,7 +25,7 @@ import { money } from '@/features/consultation/lib/money';
 import { consultationInvoicePath } from '@/features/consultation/lib/payment';
 import { fcfa } from '@/features/consultation/lib/slot-format';
 import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
-import { consultantRoomPath } from '@/features/meetings/lib/meeting-schema';
+import { consultantRoomPath, DAY_BEFORE_MS } from '@/features/meetings/lib/meeting-schema';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
@@ -38,10 +39,11 @@ const cardTitle = 'font-heading text-h4 font-bold text-navy-deep';
 
 /**
  * One Consultation in the Tableau de bord (`Tableau de bord · Consultation ·
- * 1 Avant`): who and when, « Déplacer » and « Rejoindre » (open 15 minutes
- * before), what the Client prepared, Vos notes (private, autosaved), the
- * payment with its Facture, their Compte, the reminders sent, and « Annuler
- * ce créneau », which moves them to the next free slot.
+ * 1 Avant`): who and when, « Rejoindre » (open 15 minutes before),
+ * « Déplacer » and « ⋯ » (Renvoyer la confirmation, Voir le Compte, Annuler
+ * ce créneau), what the Client prepared, Vos notes (private, autosaved), the
+ * Déroulé of what they receive and when, the payment with its Facture, and
+ * their Compte.
  */
 export function ConsultationAdminView({ id }: { id: string }): ReactNode {
   return (
@@ -60,6 +62,7 @@ function Consultation({ id }: { id: string }): ReactNode {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.consultationAdmin.detail.queryOptions({ id }));
   const [moving, setMoving] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const firstName = data.client.name.trim().split(/\s+/)[0] ?? data.client.name;
   const starts = new Date(data.startsAt);
   const ends = new Date(starts.getTime() + data.durationMinutes * 60_000);
@@ -82,47 +85,54 @@ function Consultation({ id }: { id: string }): ReactNode {
         {t('back')}
       </Link>
 
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex items-start gap-4">
-          <span aria-hidden={true} className="flex size-14 shrink-0 items-center justify-center rounded-full bg-blush font-heading text-h4 font-extrabold text-rouge">
+      <header className="flex flex-col gap-4 rounded-3xl border border-fog-light bg-white p-5 lg:flex-row lg:items-center lg:justify-between lg:px-6">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <span aria-hidden={true} className="flex size-13 shrink-0 items-center justify-center rounded-full bg-blush font-heading text-body-lg font-extrabold text-rouge">
             {initials}
           </span>
-          <div className="flex flex-col gap-1.5">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="font-heading text-h3 leading-8 font-extrabold tracking-tight text-navy-deep lg:text-h2 lg:leading-11">{data.client.name}</h1>
-              <span className={cn('inline-block rounded-full px-2 py-0.5 font-label tracking-wide whitespace-nowrap', paid ? 'bg-leaf-tint text-leaf' : 'bg-honey-tint text-honey')}>
+          <div className="flex min-w-0 flex-col gap-1">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <h1 title={data.client.name} className="truncate text-h4 leading-7 font-bold tracking-tight text-navy-deep lg:text-2xl">
+                {data.client.name}
+              </h1>
+              <span className={cn('inline-block shrink-0 rounded-full px-2 py-0.5 font-label tracking-wide whitespace-nowrap', paid ? 'bg-leaf-tint text-leaf' : 'bg-honey-tint text-honey')}>
                 {paid ? t('paid', { network: data.payment?.network === 'card' ? t('card') : (data.payment?.networkName ?? 'SasPay') }) : t('held')}
               </span>
             </div>
-            <p className="text-body leading-6 text-slate">
-              {t('when', {
-                date: format.dateTime(starts, { weekday: 'long', day: 'numeric', month: 'short', timeZone: DOUALA }),
+            <p className="text-body-sm leading-5 text-slate">
+              {t('whenShort', {
+                date: format.dateTime(starts, { weekday: 'short', day: 'numeric', month: 'short', timeZone: DOUALA }),
                 start: time(starts),
                 end: time(ends),
-                relative: format.relativeTime(starts, now),
-              })}
+              })}{' '}
+              · <span className="font-bold text-ink">{format.relativeTime(starts, now)}</span>
             </p>
           </div>
         </div>
-        {live ? (
-          <div className="flex flex-col items-stretch gap-1.5 lg:items-end">
-            <div className="flex gap-3">
-              <button type="button" onClick={() => setMoving(true)} className={cn('h-12 flex-1 rounded-full border-2 border-fog-light bg-white px-6 font-heading text-body-sm font-bold text-ink lg:flex-none', PRESS)}>
-                {t('move')}
-              </button>
-              {canJoin ? (
-                <Link href={consultantRoomPath(data.meeting!.id)} className={cn('flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-navy-deep px-6 font-heading text-body-sm font-bold text-white lg:flex-none', PRESS)}>
-                  <Video aria-hidden={true} className="size-4.5" strokeWidth={2.2} />
-                  {t('join')}
-                </Link>
-              ) : (
-                <span aria-disabled={true} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-ice-blue px-6 font-heading text-body-sm font-bold text-slate lg:flex-none">
-                  <Video aria-hidden={true} className="size-4.5" strokeWidth={2.2} />
-                  {t('join')}
-                </span>
-              )}
-            </div>
-            {canJoin ? null : <p className="text-center text-caption text-slate lg:text-right">{t('opensAt', { time: time(opensAt) })}</p>}
+        {paid ? (
+          <div className="flex items-start gap-2.5">
+            {live ? (
+              <>
+                <div className="flex flex-1 flex-col items-center gap-1 lg:flex-none">
+                  {canJoin ? (
+                    <Link href={consultantRoomPath(data.meeting!.id)} className={cn('flex h-11 w-full items-center justify-center gap-2 rounded-full bg-navy-deep px-5 font-heading text-body-sm font-bold text-white', PRESS)}>
+                      <Video aria-hidden={true} className="size-4" strokeWidth={2.2} />
+                      {t('join')}
+                    </Link>
+                  ) : (
+                    <span aria-disabled={true} className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-ice-blue px-5 font-heading text-body-sm font-bold text-slate">
+                      <Video aria-hidden={true} className="size-4" strokeWidth={2.2} />
+                      {t('join')}
+                    </span>
+                  )}
+                  {canJoin ? null : <span className="text-label text-slate">{t('opensAt', { time: time(opensAt) })}</span>}
+                </div>
+                <button type="button" onClick={() => setMoving(true)} className={cn('h-11 flex-1 rounded-full border-2 border-fog-light bg-white px-5 font-heading text-body-sm font-bold text-ink lg:flex-none', PRESS)}>
+                  {t('move')}
+                </button>
+              </>
+            ) : null}
+            <MoreMenu data={data} firstName={firstName} live={live} onCancel={() => setCancelling(true)} />
           </div>
         ) : null}
       </header>
@@ -133,13 +143,13 @@ function Consultation({ id }: { id: string }): ReactNode {
           {data.meeting ? <Notes id={data.id} initial={data.meeting.notes ?? ''} firstName={firstName} /> : null}
         </div>
         <div className="flex w-full flex-col gap-6 lg:w-105 lg:shrink-0">
+          {paid && data.meeting ? <Timeline data={data} meeting={data.meeting} firstName={firstName} /> : null}
           {data.payment ? <Payment payment={data.payment} /> : null}
           <Account data={data} />
-          {data.meeting ? <Reminders meeting={data.meeting} /> : null}
         </div>
       </div>
 
-      {live ? <CancelSlot id={data.id} firstName={firstName} /> : null}
+      {live ? <CancelSlot id={data.id} firstName={firstName} open={cancelling} onOpenChange={setCancelling} /> : null}
       {live && moving ? <MoveDialog id={data.id} onClose={() => setMoving(false)} /> : null}
     </>
   );
@@ -325,29 +335,127 @@ function Account({ data }: { data: Detail }): ReactNode {
   );
 }
 
-function Reminders({ meeting }: { meeting: NonNullable<Detail['meeting']> }): ReactNode {
-  const t = useTranslations('Consultation.admin.detail');
+type Step = { key: string; label: string; detail: string; state: 'done' | 'next' | 'later' | 'event' };
+
+/**
+ * « Déroulé » (`Tableau de bord · Consultation · 1 Avant`): what the Client
+ * receives and when, step by step: booked and paid, the reminder the day
+ * before (only when booked at least 24 h ahead), 15 minutes before, then the
+ * Consultation. Done steps show when they went out; the next one is marked.
+ */
+function Timeline({ data, meeting, firstName }: { data: Detail; meeting: NonNullable<Detail['meeting']>; firstName: string }): ReactNode {
+  const t = useTranslations('Consultation.admin.detail.timeline');
   const format = useFormatter();
-  const at = (d: Date | null, withDay: boolean) =>
-    d
-      ? format.dateTime(new Date(d), withDay ? { weekday: 'short', day: 'numeric', month: 'short', timeZone: DOUALA } : { hour: '2-digit', minute: '2-digit', timeZone: DOUALA })
-      : t('notYet');
+  const starts = new Date(data.startsAt);
+  const ends = new Date(starts.getTime() + data.durationMinutes * 60_000);
+  const at = (d: Date | string) => format.dateTime(new Date(d), { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: DOUALA });
+  const time = (d: Date) => format.dateTime(d, { hour: '2-digit', minute: '2-digit', timeZone: DOUALA });
+  const dayBefore = new Date(starts.getTime() - DAY_BEFORE_MS);
+  const plannedAhead = starts.getTime() - new Date(meeting.createdAt).getTime() >= DAY_BEFORE_MS;
+  const over = data.ended || meeting.endedAt !== null;
+
+  const steps: Omit<Step, 'state'>[] = [
+    { key: 'paid', label: t('paid'), detail: data.payment?.settledAt ? t('paidDetail', { when: at(data.payment.settledAt) }) : '' },
+    {
+      key: 'dayBefore',
+      label: t('dayBefore'),
+      detail: meeting.remindedDayBefore ? t('sent', { when: at(meeting.remindedDayBefore) }) : plannedAhead ? t('planned', { when: at(dayBefore) }) : t('tooLate'),
+    },
+    {
+      key: 'soon',
+      label: t('soon'),
+      detail: `${meeting.remindedSoon ? t('sent', { when: at(meeting.remindedSoon) }) : t('planned', { when: at(new Date(starts.getTime() - JOIN_BEFORE_MS)) })} · ${t('soonDetail')}`,
+    },
+    { key: 'consultation', label: t('consultation'), detail: `${format.dateTime(starts, { weekday: 'short', day: 'numeric', month: 'short', timeZone: DOUALA })} · ${time(starts)} – ${time(ends)}${over ? ` · ${t('over')}` : ''}` },
+  ];
+  const isDone = (key: string) =>
+    key === 'paid' || (key === 'dayBefore' && (meeting.remindedDayBefore !== null || !plannedAhead)) || (key === 'soon' && meeting.remindedSoon !== null) || (key === 'consultation' && over);
+  let nextGiven = false;
+  const states: Step[] = steps.map((step) => {
+    if (isDone(step.key)) return { ...step, state: 'done' };
+    if (step.key === 'consultation') return { ...step, state: 'event' };
+    if (!nextGiven) {
+      nextGiven = true;
+      return { ...step, state: 'next' };
+    }
+    return { ...step, state: 'later' };
+  });
+  // A reminder skipped because it was booked late is not « done »: it never went out.
+  const skipped = (step: Step) => step.key === 'dayBefore' && !plannedAhead && meeting.remindedDayBefore === null;
+
   return (
-    <section aria-labelledby="reminders" className={card}>
-      <h2 id="reminders" className={cardTitle}>
-        {t('reminders')}
-      </h2>
-      <dl className="flex flex-col gap-2 text-body-sm">
-        <div className="flex justify-between">
-          <dt className="text-ink">{t('dayBefore')}</dt>
-          <dd className="text-slate">{at(meeting.remindedDayBefore, true)}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-ink">{t('soon')}</dt>
-          <dd className="text-slate">{at(meeting.remindedSoon, false)}</dd>
-        </div>
-      </dl>
+    <section aria-labelledby="timeline" className={card}>
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id="timeline" className={cardTitle}>
+          {t('title')}
+        </h2>
+        <span className="text-caption text-slate">{t('lead', { name: firstName })}</span>
+      </div>
+      <ol className="flex flex-col">
+        {states.map((step, i) => (
+          <li key={step.key} className="flex gap-3">
+            <span aria-hidden={true} className="flex w-5 flex-col items-center">
+              <span
+                className={cn(
+                  'flex size-5 shrink-0 items-center justify-center rounded-full',
+                  step.state === 'done' && !skipped(step) && 'bg-leaf',
+                  skipped(step) && 'border-2 border-dashed border-fog bg-white',
+                  step.state === 'next' && 'border-2 border-steel-blue bg-white',
+                  step.state === 'later' && 'border-2 border-fog bg-white',
+                  step.state === 'event' && 'border-2 border-fog bg-white',
+                )}
+              >
+                {step.state === 'done' && !skipped(step) ? <Check className="size-3 text-white" strokeWidth={3.5} /> : null}
+                {step.state === 'event' ? <span className="size-2 rounded-full bg-rouge" /> : null}
+              </span>
+              {i < states.length - 1 ? <span className={cn('min-h-4 w-0.5 flex-1', step.state === 'done' && !skipped(step) ? 'bg-leaf' : 'bg-fog-light')} /> : null}
+            </span>
+            <span className={cn('flex flex-col gap-0.5', i < states.length - 1 && 'pb-3.5')}>
+              <span className={cn('text-body-sm font-bold', skipped(step) ? 'text-slate' : 'text-ink')}>{step.label}</span>
+              <span className={cn('text-caption leading-4', step.state === 'next' ? 'font-semibold text-steel-blue' : 'text-slate')}>{step.detail}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
     </section>
+  );
+}
+
+/** « ⋯ »: Renvoyer la confirmation, Voir le Compte, Annuler ce créneau. */
+function MoreMenu({ data, firstName, live, onCancel }: { data: Detail; firstName: string; live: boolean; onCancel: () => void }): ReactNode {
+  const t = useTranslations('Consultation.admin.detail');
+  const trpc = useTRPC();
+  const resend = useMutation(
+    trpc.consultationAdmin.resendConfirmation.mutationOptions({
+      onSuccess: () => toast.add({ title: t('menu.resent', { email: data.client.email }), type: 'success' }),
+      onError: () => toast.add({ title: t('error'), type: 'error' }),
+    }),
+  );
+  const item = 'flex flex-col items-start gap-0.5 rounded-xl px-3 py-2.5';
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger aria-label={t('menu.label')} className={cn('flex size-11 shrink-0 items-center justify-center rounded-full border-2 border-navy-deep text-ink', PRESS)}>
+        <Ellipsis aria-hidden={true} className="size-5" strokeWidth={2.4} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-72 p-1.5">
+        <DropdownMenuItem disabled={resend.isPending} onClick={() => resend.mutate({ id: data.id })} className={item}>
+          <span className="text-body-sm font-semibold text-ink">{t('menu.resend')}</span>
+          <span className="text-caption text-slate">{t('menu.resendHint')}</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem render={<Link href={`/comptes/${data.client.id}`} />} className={item}>
+          <span className="text-body-sm font-semibold text-ink">{t('seeAccount')}</span>
+        </DropdownMenuItem>
+        {live ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onCancel} className={cn(item, 'focus:bg-blush data-highlighted:bg-blush')}>
+              <span className="text-body-sm font-bold text-rouge">{t('menu.cancel')}</span>
+              <span className="text-caption text-rouge">{t('menu.cancelHint', { name: firstName })}</span>
+            </DropdownMenuItem>
+          </>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -416,14 +524,14 @@ function MoveDialog({ id, onClose }: { id: string; onClose: () => void }): React
   );
 }
 
-/** « Annuler ce créneau → Aminata passe au prochain créneau libre »: asks why, shows that slot, then moves. */
-function CancelSlot({ id, firstName }: { id: string; firstName: string }): ReactNode {
+/** « Annuler ce créneau » (from « ⋯ »): asks why, shows the next free slot the Client moves to, then moves. */
+function CancelSlot({ id, firstName, open, onOpenChange }: { id: string; firstName: string; open: boolean; onOpenChange: (open: boolean) => void }): ReactNode {
   const t = useTranslations('Consultation.admin.detail');
   const format = useFormatter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const reasonId = useId();
-  const [open, setOpen] = useState(false);
+  const setOpen = onOpenChange;
   const [reason, setReason] = useState('');
   const options = useQuery({ ...trpc.consultationAdmin.moveOptions.queryOptions({ id }), enabled: open });
   const cancel = useMutation(
@@ -445,9 +553,6 @@ function CancelSlot({ id, firstName }: { id: string; firstName: string }): React
   const next = options.data?.next;
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="self-end text-body-sm font-bold text-rouge">
-        {t('cancelSlot', { name: firstName })}
-      </button>
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent className="gap-5 p-6">
           <AlertDialogHeader>

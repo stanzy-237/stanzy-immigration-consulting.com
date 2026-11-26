@@ -11,6 +11,13 @@ vi.mock('@/features/meetings/server/meeting-notify', async (original) => ({
   ...(await original<typeof import('@/features/meetings/server/meeting-notify')>()),
   emailParticipantsLater: told.emailParticipantsLater,
 }));
+/** Seam: « Renvoyer la confirmation » builds the paid e-mail and sends it. */
+const resend = vi.hoisted(() => ({ paidConfirmation: vi.fn(), send: vi.fn() }));
+vi.mock('@/features/consultation/server/consultation-payments', async (original) => ({
+  ...(await original<typeof import('@/features/consultation/server/consultation-payments')>()),
+  paidConfirmation: resend.paidConfirmation,
+}));
+vi.mock('@/server/email/app-mailer', () => ({ appMailer: { send: resend.send } }));
 vi.mock('@/features/notifications/server/notify', async (original) => ({
   ...(await original<typeof import('@/features/notifications/server/notify')>()),
   notifyLater: told.notifyLater,
@@ -295,5 +302,22 @@ describe('consultationAdmin, the calendar', () => {
     const { db } = fakeDatabase();
     await expect(callerFor(db).calendar({ week: '26/11/2026' })).rejects.toThrow();
     await expect(callerFor(db, sessionFor({ id: 'acc_1', role: 'MEMBER' })).calendar({ week: '2026-11-23' })).rejects.toThrow();
+  });
+});
+
+describe('consultationAdmin, « Renvoyer la confirmation »', () => {
+  it('sends the paid e-mail again, built as the Consultation stands now', async () => {
+    const message = { to: 'aminata@example.com', subject: 'Consultation confirmée', html: '', text: '' };
+    resend.paidConfirmation.mockResolvedValue(message);
+    const { db } = fakeDatabase({ consultations: [paid()], payments: [payment()], meetings: [meeting()] });
+    await expect(callerFor(db).resendConfirmation({ id: 'con_1' })).resolves.toEqual({ sent: true });
+    expect(resend.paidConfirmation).toHaveBeenCalledWith(db, 'pay_1');
+    expect(resend.send).toHaveBeenCalledWith(message);
+  });
+
+  it('refuses one that is not paid', async () => {
+    const { db } = fakeDatabase({ consultations: [paid({ id: 'con_1', status: 'HELD', paidById: null })] });
+    await expect(callerFor(db).resendConfirmation({ id: 'con_1' })).rejects.toThrow('CONSULTATION_NOT_MOVABLE');
+    expect(resend.send).not.toHaveBeenCalled();
   });
 });
