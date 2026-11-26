@@ -1,15 +1,17 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowRight, FileText, Plus, RefreshCw, TrendingUp } from 'lucide-react';
+import { ArrowRight, Plus, RefreshCw, TrendingUp, Video } from 'lucide-react';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
-import { useId, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
+import { OverviewDate, OverviewToday, OverviewTodaySkeleton } from '@/features/dashboard/components/overview-today';
+import { InstantDialog } from '@/features/meetings/components/meeting-dialogs';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
@@ -138,47 +140,65 @@ function DrawsSyncSkeleton(): ReactNode {
   );
 }
 
-/** The Tableau de bord's home: each section at a glance, starting with the Blog. */
+/**
+ * The Tableau de bord's home (`Tableau de bord · Aperçu`, Desktop and
+ * Mobile): the consultant's day. Four figures, « À traiter », « Aujourd'hui »
+ * with the next Réunion, the live promo code, the Dossiers that moved last,
+ * the Blog; the IRCC draws at the end.
+ */
 export function DashboardOverviewView(): ReactNode {
   const t = useTranslations('Dashboard');
   const blogId = useId();
   const drawsId = useId();
+  const [instant, setInstant] = useState(false);
+
+  const blog = (
+    <section aria-labelledby={blogId} className="rounded-3xl border border-fog-light bg-white p-5 lg:col-span-2 lg:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id={blogId} className="font-heading text-h4 font-bold text-navy-deep">
+          {t('overview.blogTitle')}
+        </h2>
+        <Link href="/blog/nouveau" className="inline-flex h-9 items-center gap-1.5 rounded-full bg-rouge px-4 text-body-sm font-semibold text-white hover:bg-crimson">
+          <Plus aria-hidden={true} className="size-4" />
+          {t('overview.newArticle')}
+        </Link>
+      </div>
+      <QueryBoundary fallback={<BlogSummarySkeleton />}>
+        <BlogSummary />
+      </QueryBoundary>
+      <Link href="/blog" className="mt-5 inline-flex items-center gap-1.5 text-body-sm font-semibold text-rouge hover:text-crimson">
+        {t('overview.allArticles')}
+        <ArrowRight aria-hidden={true} className="size-4" />
+      </Link>
+    </section>
+  );
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <h1 className="font-heading text-3xl font-bold text-navy-deep">{t('nav.overview')}</h1>
-      <p className="mt-1 text-sm text-slate">{t('overview.subtitle')}</p>
-
-      <section aria-labelledby={blogId} className="mt-8 rounded-2xl border border-fog-light bg-white p-5 shadow-sm sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id={blogId} className="flex items-center gap-2 font-heading text-xl font-bold text-navy-deep">
-            <FileText aria-hidden={true} className="size-5 text-rouge" />
-            {t('overview.blogTitle')}
-          </h2>
-          <Link
-            href="/blog/nouveau"
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-rouge px-5 text-sm font-semibold text-white hover:bg-crimson"
-          >
-            <Plus aria-hidden={true} className="size-4" />
-            {t('overview.newArticle')}
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-24 lg:gap-8 lg:pb-0">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-1.5">
+          <OverviewDate />
+          <h1 className="font-heading text-h2 leading-11 font-extrabold tracking-tight text-navy-deep lg:text-h1 lg:leading-14">{t('nav.overview')}</h1>
+          <p className="text-body text-slate max-lg:hidden">{t('overview.subtitle')}</p>
+        </div>
+        <div className="flex gap-3 max-lg:hidden">
+          <button type="button" onClick={() => setInstant(true)} className="inline-flex h-12 items-center gap-2 rounded-full border-2 border-navy-deep px-5 font-heading text-body-sm font-bold text-navy-deep">
+            <Video aria-hidden={true} className="size-4.5" strokeWidth={2.2} />
+            {t('overview.today.instant')}
+          </button>
+          <Link href="/dossiers/nouveau" className="inline-flex h-12 items-center gap-2 rounded-full bg-rouge px-5 font-heading text-body-sm font-bold text-white hover:bg-crimson">
+            <Plus aria-hidden={true} className="size-4.5" strokeWidth={2.4} />
+            {t('overview.today.newDossier')}
           </Link>
         </div>
+      </header>
 
-        <QueryBoundary fallback={<BlogSummarySkeleton />}>
-          <BlogSummary />
-        </QueryBoundary>
+      <QueryBoundary fallback={<OverviewTodaySkeleton />}>
+        <OverviewToday blog={blog} />
+      </QueryBoundary>
 
-        <Link
-          href="/blog"
-          className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-rouge hover:text-crimson"
-        >
-          {t('overview.allArticles')}
-          <ArrowRight aria-hidden={true} className="size-4" />
-        </Link>
-      </section>
-
-      <section aria-labelledby={drawsId} className="mt-6 rounded-2xl border border-fog-light bg-white p-5 shadow-sm sm:p-6">
-        <h2 id={drawsId} className="flex items-center gap-2 font-heading text-xl font-bold text-navy-deep">
+      <section aria-labelledby={drawsId} className="rounded-3xl border border-fog-light bg-white p-5 lg:p-6">
+        <h2 id={drawsId} className="flex items-center gap-2 font-heading text-h4 font-bold text-navy-deep">
           <TrendingUp aria-hidden={true} className="size-5 text-rouge" />
           {t('overview.draws.title')}
         </h2>
@@ -186,6 +206,16 @@ export function DashboardOverviewView(): ReactNode {
           <DrawsSync />
         </QueryBoundary>
       </section>
+
+      {/* Phone: « Ouvrir un dossier » floats over the page. */}
+      <Link
+        href="/dossiers/nouveau"
+        className="fixed right-4 bottom-6 z-30 inline-flex h-14 items-center gap-2 rounded-full bg-rouge px-6 font-heading text-body font-bold text-white shadow-lg lg:hidden"
+      >
+        <Plus aria-hidden={true} className="size-5" strokeWidth={2.4} />
+        {t('overview.today.newDossier')}
+      </Link>
+      <InstantDialog open={instant} onOpenChange={setInstant} />
     </div>
   );
 }

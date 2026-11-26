@@ -1,5 +1,6 @@
 import { accompagnementRouter } from '@/features/accompagnement/server/accompagnement-router';
 import { accountRouter } from '@/features/auth/server/account-router';
+import { overviewRouter } from '@/features/dashboard/server/overview-router';
 import { authRouter } from '@/features/auth/server/auth-router';
 import { blogRouter } from '@/features/blog/server/blog-router';
 import { budgetRouter } from '@/features/budget/server/budget-router';
@@ -34,6 +35,7 @@ export const appRouter = createTRPCRouter({
   accompagnement: accompagnementRouter,
   auth: authRouter,
   account: accountRouter,
+  overview: overviewRouter,
   blog: blogRouter,
   budget: budgetRouter,
   checklist: checklistRouter,
