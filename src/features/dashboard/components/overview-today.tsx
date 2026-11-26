@@ -33,9 +33,11 @@ export function OverviewToday({ blog }: { blog: ReactNode }): ReactNode {
     <div className="flex flex-col gap-6">
       <Figures data={data} />
       {/* Phone (`Aperçu · Mobile`): the next Réunion right under the figures. */}
-      <div className="lg:hidden">
-        <NextMeeting data={data} />
-      </div>
+      {data.meetings.next ? (
+        <div className="lg:hidden">
+          <NextMeeting data={data} />
+        </div>
+      ) : null}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
           <ToHandle data={data} />
@@ -88,7 +90,7 @@ function Figures({ data }: { data: Today }): ReactNode {
         <li
           key={f.key}
           className={cn(
-            'flex w-28 shrink-0 snap-start flex-col gap-1.5 rounded-2xl border p-3.5 lg:w-auto lg:gap-2 lg:rounded-3xl lg:p-5',
+            'flex w-32 shrink-0 snap-start flex-col gap-1.5 rounded-2xl border p-3.5 lg:w-auto lg:gap-2 lg:rounded-3xl lg:p-5',
             f.dark ? 'border-navy-deep bg-navy-deep text-white' : 'border-fog-light bg-white text-navy-deep',
           )}
         >
@@ -96,7 +98,8 @@ function Figures({ data }: { data: Today }): ReactNode {
             <span className="lg:hidden">{f.short}</span>
             <span className="max-lg:hidden">{f.label}</span>
           </span>
-          <span className="order-1 font-heading text-h3 leading-8 font-extrabold tabular-nums lg:order-2 lg:text-h2 lg:leading-11">{f.value}</span>
+          {/* A long amount (« 2 592 500 ») steps down a size so it stays in its card. */}
+          <span className={cn('order-1 font-heading text-h3 leading-8 font-extrabold whitespace-nowrap tabular-nums lg:order-2', f.value.length > 6 ? 'lg:text-h3 lg:leading-11' : 'lg:text-h2 lg:leading-11')}>{f.value}</span>
           {f.sub ? <span className={cn('order-3 text-caption max-lg:hidden', f.dark ? 'text-white/80' : 'text-slate')}>{f.sub}</span> : null}
         </li>
       ))}
@@ -359,7 +362,7 @@ function RecentDossiers({ data }: { data: Today }): ReactNode {
                     <span className="block h-full rounded-full bg-navy-deep" style={{ width: `${Math.round((d.position / Math.max(1, d.total)) * 100)}%` }} />
                   </span>
                 </span>
-                <span className="w-20 shrink-0 text-right text-caption text-slate">{format.relativeTime(new Date(d.updatedAt), now)}</span>
+                <span className="w-28 shrink-0 text-right text-caption whitespace-nowrap text-slate">{format.relativeTime(new Date(d.updatedAt), now)}</span>
               </Link>
             </li>
           );

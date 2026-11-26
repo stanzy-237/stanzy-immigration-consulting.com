@@ -1578,7 +1578,7 @@
         "meetingsShort": "Réunions auj.",
         "nextAt": "La prochaine à {time}",
         "openDossiers": "Dossiers ouverts",
-        "openedThisMonth": "{count, plural, =0 {aucun ouvert ce mois-ci} one {# ouvert ce mois-ci} other {# ouverts ce mois-ci}}",
+        "openedThisMonth": "{count, plural, =0 {aucun créé ce mois-ci} one {# créé ce mois-ci} other {# créés ce mois-ci}}",
         "collected": "Encaissé en {month}",
         "collectedShort": "Encaissé ce mois",
         "collectedSub": "FCFA · Recettes et Consultations",

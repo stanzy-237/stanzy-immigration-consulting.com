@@ -1561,7 +1561,7 @@
         "meetingsShort": "Meetings today",
         "nextAt": "Next at {time}",
         "openDossiers": "Open files",
-        "openedThisMonth": "{count, plural, =0 {none opened this month} one {# opened this month} other {# opened this month}}",
+        "openedThisMonth": "{count, plural, =0 {none created this month} one {# created this month} other {# created this month}}",
         "collected": "Collected in {month}",
         "collectedShort": "Collected this month",
         "collectedSub": "FCFA · Income and consultations",
