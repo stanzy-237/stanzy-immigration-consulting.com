@@ -70,21 +70,19 @@ export function ConsultationsDashboardView(): ReactNode {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="flex flex-col gap-2">
           <p className={cn(LABEL_CLASS, 'text-steel-blue lg:hidden')}>{t('eyebrow')}</p>
-          <h1 className="font-heading text-h2 leading-11 font-extrabold tracking-tight text-navy-deep lg:text-h1 lg:leading-14">{t('title')}</h1>
+          <h1 className="font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep sm:text-h2 sm:leading-11 lg:text-h1 lg:leading-14">{t('title')}</h1>
           <p className="hidden text-body leading-6 text-slate lg:block">{t('lead')}</p>
         </div>
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <ViewSwitch view={view} onView={setView} />
+      </div>
+
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
           {view === 'list' ? (
             <QueryBoundary fallback={<Skeleton className="h-11 w-96 rounded-full" />}>
               <Tabs tab={tab} onTab={setTab} />
             </QueryBoundary>
           ) : null}
-          <ViewSwitch view={view} onView={setView} />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="min-w-0 flex-1">
           {view === 'calendar' ? (
             <QueryBoundary fallback={<Skeleton className="h-150 rounded-3xl" />}>
               <ConsultationsCalendar week={week} onWeek={(next) => startTransition(() => setWeek(next))} />
@@ -140,7 +138,7 @@ function ViewSwitch({ view, onView }: { view: View; onView: (view: View) => void
     { key: 'calendar' as const, label: t('calendar'), Icon: CalendarDays },
   ];
   return (
-    <div role="radiogroup" aria-label={t('label')} className="order-first flex gap-1 rounded-full bg-ice-blue p-1 lg:order-last">
+    <div role="radiogroup" aria-label={t('label')} className="flex gap-1 rounded-full bg-ice-blue p-1">
       {options.map(({ key, label, Icon }) => (
         <button
           key={key}

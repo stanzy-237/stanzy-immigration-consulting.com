@@ -131,7 +131,7 @@ function WeekView({ days, blocks, settings, today, now, onWeek }: ViewProps): Re
               </span>
               <span
                 className={cn(
-                  'flex size-8 items-center justify-center rounded-full font-heading text-body font-extrabold',
+                  'flex size-8 items-center justify-center rounded-full text-body font-bold tabular-nums',
                   isToday ? 'bg-rouge text-white' : past ? 'text-slate-mute' : 'text-ink',
                 )}
               >
@@ -172,7 +172,7 @@ function DayView({ days, initial, blocks, settings, today, now, onWeek }: ViewPr
     <section aria-label={format.dateTime(dayDate(selected), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })} className="flex flex-col gap-4 lg:hidden">
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
-          <h2 className="font-heading text-body-lg font-extrabold text-navy-deep first-letter:uppercase">
+          <h2 className="font-heading text-body font-extrabold whitespace-nowrap text-navy-deep first-letter:uppercase">
             {format.dateTime(dayDate(selected), { month: 'long', year: 'numeric', timeZone: 'UTC' })}
           </h2>
           <WeekNav days={days} today={today} onWeek={onWeek} />

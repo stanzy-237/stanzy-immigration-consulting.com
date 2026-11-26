@@ -107,7 +107,7 @@ export function AvailabilityForm({ settings, onSaved }: { settings: Settings; on
       <span className="text-slate">{label}</span>
       <span className="flex items-center gap-2">
         <input inputMode="numeric" value={value} onChange={(e) => set(e.target.value.replace(/\D/g, ''))} className={number} />
-        <span className="w-12 text-caption text-slate">{unit}</span>
+        <span className="w-16 text-caption text-slate">{unit}</span>
       </span>
     </label>
   );
@@ -157,7 +157,7 @@ export function AvailabilityForm({ settings, onSaved }: { settings: Settings; on
         </span>
         <span className="flex items-center gap-2">
           <input inputMode="numeric" value={price} placeholder="—" onChange={(e) => setPrice(e.target.value.replace(/\D/g, ''))} className={cn(number, 'w-28')} />
-          <span className="w-12 text-caption text-slate">FCFA</span>
+          <span className="w-16 text-caption text-slate">FCFA</span>
         </span>
       </label>
 

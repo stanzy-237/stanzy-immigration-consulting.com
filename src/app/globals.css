@@ -378,7 +378,7 @@
 
 /* A blocked date in the Consultations calendar: blush stripes. */
 @utility bg-hatch-blush {
-  background-image: repeating-linear-gradient(135deg, var(--color-blush) 0 6px, var(--color-white, #fff) 6px 12px);
+  background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--color-rose) 40%, white) 0 3px, white 3px 8px);
 }
 
 /* A row that scrolls sideways without showing a scrollbar (filter chips on phones). */
