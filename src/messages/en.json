@@ -5119,7 +5119,16 @@
       "help": "A question? Reply on WhatsApp to Stanzy.",
       "footer": "Stanzy Immigration Consulting · sent because you booked a consultation.",
       "where": "Douala time · video in My space",
-      "whatsapp": "Message Stanzy"
+      "whatsapp": "Message Stanzy",
+      "published": {
+        "subject": "Your recording is ready",
+        "eyebrow": "After your Consultation",
+        "title": "It’s in your space, {name}.",
+        "lead": "The recording of your Consultation on {date}, its transcript and Stanzy’s notes are waiting in your space. Watch them again whenever you like.",
+        "leadSteps": "{count, plural, one {A next step is waiting too, to tick once done.} other {# next steps are waiting too, to tick once done.}}",
+        "stepsLabel": "Your next steps",
+        "cta": "Open my space"
+      }
     },
     "promoCodes": {
       "eyebrow": "Billing",
@@ -5376,7 +5385,10 @@
           "resent": "Confirmation sent again to {email}",
           "cancel": "Cancel this slot",
           "cancelHint": "{name} moves to the next free slot"
-        }
+        },
+        "over": "Over · {minutes} min",
+        "recorded": "recorded with their consent",
+        "notRecorded": "no recording"
       },
       "calendar": {
         "view": {
@@ -5405,6 +5417,68 @@
           "open": "Open",
           "blocked": "Blocked date"
         }
+      },
+      "after": {
+        "tabs": {
+          "label": "After the Consultation",
+          "notes": "Notes for {name}",
+          "transcript": "Transcript",
+          "private": "Your private notes"
+        },
+        "recording": "Recording",
+        "recordingLength": "Recording · {length}",
+        "transcriptReady": "Transcript ready",
+        "transcriptPending": "Transcript on its way",
+        "noRecordingTitle": "No recording yet",
+        "noRecording": "It arrives a few minutes after the meeting ends. If it doesn’t, the meeting wasn’t recorded: your notes and next steps can still be published.",
+        "placeMarker": "Place a marker at this moment of the video",
+        "goTo": "Go to {time}",
+        "markersHint": "Markers come from your notes · click the bar to place one",
+        "notesLead": "What you covered · read under the video, each marker jumps to its moment",
+        "noNotes": "No note for {name} yet.",
+        "addNoteAtVideo": "Add a note at this moment of the video",
+        "addNote": "Add a note",
+        "noteLabel": "Note, read by the Client",
+        "editNote": "Edit the note",
+        "removeNote": "Remove the note",
+        "noteSaved": "Note saved",
+        "noteRemoved": "Note removed",
+        "noTranscript": "The transcript isn’t ready yet.",
+        "steps": "Their next steps",
+        "stepsLead": "A checklist in their space, written for them",
+        "stepLabel": "Step",
+        "stepPlaceholder": "E.g. Take the language test",
+        "addStep": "Add a step",
+        "add": "Add",
+        "editStep": "Edit « {step} »",
+        "removeStep": "Remove « {step} »",
+        "stepDone": "Ticked by the Client",
+        "stepSaved": "Step saved",
+        "stepRemoved": "Step removed",
+        "space": {
+          "title": "In their space",
+          "video": "Video and transcript",
+          "ready": "Ready",
+          "videoOnly": "Video ready",
+          "none": "Not yet",
+          "notes": "{count, plural, one {# note} other {# notes}} · {markers, plural, =0 {no marker} one {# marker} other {# markers}}",
+          "never": "Never shared",
+          "beforePublish": "Nothing shows before « Publish ». You can edit afterwards.",
+          "published": "Published {date}: your changes show right away, with no new e-mail."
+        },
+        "andThen": {
+          "eyebrow": "And then",
+          "title": "Support for {name}?",
+          "lead": "Their space offers to send an Interest request. Or open their Dossier right away.",
+          "cta": "Open a dossier"
+        },
+        "publish": "Publish to their space",
+        "publishHint": "They get « Your recording is ready »",
+        "publishedBadge": "Published",
+        "publishedToast": "Published: {name} is told by e-mail",
+        "save": "Save",
+        "cancel": "Cancel",
+        "error": "That didn’t work. Try again."
       }
     }
   }

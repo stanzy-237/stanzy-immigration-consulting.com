@@ -36,13 +36,17 @@ const aminata = { id: 'acc_1', name: 'Aminata Diallo', email: 'aminata@example.c
  * caller, over in-memory Consultations, payments, Réunions and settings.
  */
 function fakeDatabase({ consultations = [] as Row[], payments = [] as Row[], meetings = [] as Row[], settings = null as Row | null } = {}) {
-  const store = { consultations, payments, meetings, settings };
+  const notes: Row[] = [];
+  const steps: Row[] = [];
+  const store = { consultations, payments, meetings, settings, notes, steps };
   const byId = <T extends Row>(rows: T[], id: unknown) => rows.find((r) => r.id === id);
   const withRelations = (c: Row) => ({
     ...c,
     account: { ...aminata, _count: { dossiers: 0 } },
     paidBy: byId(payments, c.paidById) ? { ...byId(payments, c.paidById)!, promoCode: null } : null,
-    meeting: byId(meetings, c.meetingId) ?? null,
+    meeting: byId(meetings, c.meetingId) ? { ...byId(meetings, c.meetingId)!, recordings: [] } : null,
+    clientNotes: notes.filter((n) => n.consultationId === c.id),
+    nextSteps: steps.filter((n) => n.consultationId === c.id).toSorted((a, b) => (a.position as number) - (b.position as number)),
   });
   const isUpcoming = (c: Row, where: { OR?: { status: string; startsAt?: { gt: Date }; heldUntil?: { gt: Date } }[] }) =>
     (where.OR ?? []).some(
@@ -89,6 +93,28 @@ function fakeDatabase({ consultations = [] as Row[], payments = [] as Row[], mee
             (!where.startsAt?.gte || ((m.startsAt as Date) >= where.startsAt.gte && (m.startsAt as Date) < where.startsAt.lt)),
         ),
       update: async ({ where, data }: { where: { id: string }; data: Row }) => Object.assign(byId(meetings, where.id)!, data),
+    },
+    consultationNote: {
+      create: async ({ data }: { data: Row }) => {
+        const row = { ...data, id: `note_${notes.length + 1}` };
+        notes.push(row);
+        return row;
+      },
+      update: async ({ where, data }: { where: { id: string }; data: Row }) => Object.assign(byId(notes, where.id)!, data),
+      deleteMany: async ({ where }: { where: { id: string } }) => {
+        notes.splice(notes.findIndex((n) => n.id === where.id), 1);
+        return { count: 1 };
+      },
+    },
+    consultationStep: {
+      findFirst: async ({ where }: { where: { consultationId: string } }) => steps.filter((s) => s.consultationId === where.consultationId).at(-1) ?? null,
+      create: async ({ data }: { data: Row }) => {
+        const row = { ...data, id: `step_${steps.length + 1}` };
+        steps.push(row);
+        return row;
+      },
+      update: async ({ where, data }: { where: { id: string }; data: Row }) => Object.assign(byId(steps, where.id)!, data),
+      deleteMany: async () => ({ count: 1 }),
     },
     $executeRaw: async () => 0,
     $transaction: async (work: (tx: unknown) => unknown) => work(db),
@@ -319,5 +345,41 @@ describe('consultationAdmin, « Renvoyer la confirmation »', () => {
     const { db } = fakeDatabase({ consultations: [paid({ id: 'con_1', status: 'HELD', paidById: null })] });
     await expect(callerFor(db).resendConfirmation({ id: 'con_1' })).rejects.toThrow('CONSULTATION_NOT_MOVABLE');
     expect(resend.send).not.toHaveBeenCalled();
+  });
+});
+
+describe('consultationAdmin, « 2 Après »', () => {
+  const finished = () => ({ consultations: [paid({ id: 'con_1', startsAt: at('2026-11-23', '15:00') })], payments: [payment()], meetings: [meeting({ id: 'meet_1', startsAt: at('2026-11-23', '15:00') })] });
+
+  it('writes notes for the Client at a moment of the video, and next steps in order', async () => {
+    const { db, store } = fakeDatabase(finished());
+    await callerFor(db).saveClientNote({ id: 'con_1', atSeconds: 160, text: 'Votre profil est admissible.' });
+    await callerFor(db).saveNextStep({ id: 'con_1', text: 'Passer le test de langue' });
+    await callerFor(db).saveNextStep({ id: 'con_1', text: 'Faire évaluer votre diplôme' });
+    expect(store.notes).toEqual([expect.objectContaining({ consultationId: 'con_1', atSeconds: 160, text: 'Votre profil est admissible.' })]);
+    expect(store.steps.map((s) => [s.text, s.position])).toEqual([
+      ['Passer le test de langue', 0],
+      ['Faire évaluer votre diplôme', 1],
+    ]);
+    const detail = await callerFor(db).detail({ id: 'con_1' });
+    expect(detail).toMatchObject({ over: true, recording: null });
+    expect(detail.publishedAt).toBeFalsy();
+  });
+
+  it('refuses before it is over', async () => {
+    const { db } = fakeDatabase({ consultations: [paid()], payments: [payment()], meetings: [meeting()] });
+    await expect(callerFor(db).saveClientNote({ id: 'con_1', atSeconds: null, text: 'Trop tôt' })).rejects.toThrow('CONSULTATION_NOT_OVER');
+    await expect(callerFor(db).publish({ id: 'con_1' })).rejects.toThrow('CONSULTATION_NOT_OVER');
+  });
+
+  it('publishes once: « Votre enregistrement est prêt » with the next steps, then no e-mail again', async () => {
+    const { db, store } = fakeDatabase(finished());
+    await callerFor(db).saveNextStep({ id: 'con_1', text: 'Passer le test de langue' });
+    await expect(callerFor(db).publish({ id: 'con_1' })).resolves.toMatchObject({ first: true });
+    expect(store.consultations[0]!.publishedAt).toBeInstanceOf(Date);
+    expect(resend.send).toHaveBeenCalledTimes(1);
+    expect(resend.send).toHaveBeenCalledWith(expect.objectContaining({ to: 'aminata@example.com', subject: 'Votre enregistrement est prêt', html: expect.stringContaining('Passer le test de langue') }));
+    await expect(callerFor(db).publish({ id: 'con_1' })).resolves.toMatchObject({ first: false });
+    expect(resend.send).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
-import { cancelSlotSchema, moveSlotSchema, notesSchema, settingsInputSchema } from '@/features/consultation/lib/settings';
+import { cancelSlotSchema, clientNoteSchema, moveSlotSchema, nextStepSchema, notesSchema, settingsInputSchema } from '@/features/consultation/lib/settings';
 import { freeSlots, MINUTE, type Busy } from '@/features/consultation/lib/slots';
 import { isDay, mondayOf, startOfDay } from '@/features/consultation/lib/week-calendar';
 import { addDays } from '@/features/notifications/lib/douala-days';
@@ -9,6 +9,9 @@ import { paidConfirmation } from '@/features/consultation/server/consultation-pa
 import { BOOKING_LOCK, busyTimes, loadAvailability, type Db } from '@/features/consultation/server/booking-calendar';
 import { emailParticipantsLater, meetingParams } from '@/features/meetings/server/meeting-notify';
 import { notifyLater } from '@/features/notifications/server/notify';
+import { consultationPublishedEmail } from '@/features/consultation/lib/consultation-emails';
+import { clientRoomPath } from '@/features/meetings/lib/meeting-schema';
+import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
 import { appMailer } from '@/server/email/app-mailer';
 import { consultantProcedure, createTRPCRouter } from '@/server/trpc/trpc';
@@ -21,9 +24,33 @@ export const ADMIN_ERRORS = {
   slotTaken: 'SLOT_TAKEN',
   /** No free slot left within the horizon. */
   noSlot: 'NO_FREE_SLOT',
+  /** Not over yet: there is nothing to write about or publish. */
+  notOver: 'CONSULTATION_NOT_OVER',
 } as const;
 
 const ended = (c: { startsAt: Date; durationMinutes: number }, now: Date) => c.startsAt.getTime() + c.durationMinutes * MINUTE <= now.getTime();
+
+/** Over: its time has passed, or its Réunion was ended for everyone. */
+const isOver = (c: { startsAt: Date; durationMinutes: number; meeting?: { endedAt: Date | null } | null }, now: Date) => ended(c, now) || Boolean(c.meeting?.endedAt);
+
+/** The Enregistrement to show: the first video, with how long it lasts and its Transcription's words. */
+function recordingOf(files: { id: string; kind: string; startedAt: Date; endedAt: Date; text: string | null }[]) {
+  const video = files.find((f) => f.kind === 'RECORDING');
+  if (!video) return null;
+  const transcript = files.find((f) => f.kind === 'TRANSCRIPTION');
+  return { id: video.id, seconds: Math.max(1, Math.round((video.endedAt.getTime() - video.startedAt.getTime()) / 1000)), transcript: transcript?.text ?? null };
+}
+
+/** A paid Consultation that is over, for « 2 Après »; else the error the page shows. */
+async function over(db: Db, id: string) {
+  const consultation = await db.consultation.findUnique({
+    where: { id },
+    include: { account: { select: { name: true, email: true, locale: true } }, meeting: { select: { id: true, endedAt: true } }, nextSteps: { orderBy: { position: 'asc' }, select: { text: true } } },
+  });
+  if (!consultation) throw new TRPCError({ code: 'NOT_FOUND' });
+  if (consultation.status !== 'PAID' || !isOver(consultation, new Date())) throw new TRPCError({ code: 'BAD_REQUEST', message: ADMIN_ERRORS.notOver });
+  return consultation;
+}
 
 const accountSelect = { select: { id: true, name: true, email: true, status: true, locale: true } } as const;
 
@@ -218,7 +245,20 @@ export const consultationAdminRouter = createTRPCRouter({
       include: {
         account: { select: { id: true, name: true, email: true, status: true, _count: { select: { dossiers: true } } } },
         paidBy: { include: { promoCode: { select: { code: true, reductionType: true, reductionValue: true } } } },
-        meeting: { select: { id: true, notes: true, remindedDayBefore: true, remindedSoon: true, endedAt: true, status: true, createdAt: true } },
+        meeting: {
+          select: {
+            id: true,
+            notes: true,
+            remindedDayBefore: true,
+            remindedSoon: true,
+            endedAt: true,
+            status: true,
+            createdAt: true,
+            recordings: { orderBy: { startedAt: 'asc' }, select: { id: true, kind: true, startedAt: true, endedAt: true, text: true } },
+          },
+        },
+        clientNotes: { orderBy: [{ atSeconds: { sort: 'asc', nulls: 'last' } }, { createdAt: 'asc' }], select: { id: true, atSeconds: true, text: true } },
+        nextSteps: { orderBy: { position: 'asc' }, select: { id: true, text: true, doneAt: true } },
       },
     });
     if (!c) throw new TRPCError({ code: 'NOT_FOUND' });
@@ -256,7 +296,23 @@ export const consultationAdminRouter = createTRPCRouter({
             invoiceNumber: p.invoiceNumber,
           }
         : null,
-      meeting: c.meeting,
+      meeting: c.meeting
+        ? {
+            id: c.meeting.id,
+            notes: c.meeting.notes,
+            remindedDayBefore: c.meeting.remindedDayBefore,
+            remindedSoon: c.meeting.remindedSoon,
+            endedAt: c.meeting.endedAt,
+            status: c.meeting.status,
+            createdAt: c.meeting.createdAt,
+          }
+        : null,
+      // « 2 Après »: once over (its time passed, or « Terminer pour tous »).
+      over: isOver(c, new Date()),
+      recording: recordingOf(c.meeting?.recordings ?? []),
+      clientNotes: c.clientNotes,
+      nextSteps: c.nextSteps,
+      publishedAt: c.publishedAt,
     };
   }),
 
@@ -271,6 +327,61 @@ export const consultationAdminRouter = createTRPCRouter({
     if (!message) throw new TRPCError({ code: 'BAD_REQUEST', message: ADMIN_ERRORS.notMovable });
     await appMailer.send(message);
     return { sent: true };
+  }),
+
+  /** « Notes pour Aminata »: adds one, or changes it; `atSeconds` ties it to a moment of the video. */
+  saveClientNote: consultantProcedure.input(clientNoteSchema).mutation(async ({ ctx, input }) => {
+    await over(ctx.prisma, input.id);
+    const data = { atSeconds: input.atSeconds, text: input.text };
+    const note = input.noteId
+      ? await ctx.prisma.consultationNote.update({ where: { id: input.noteId, consultationId: input.id }, data, select: { id: true } })
+      : await ctx.prisma.consultationNote.create({ data: { ...data, consultationId: input.id }, select: { id: true } });
+    return note;
+  }),
+
+  removeClientNote: consultantProcedure.input(z.object({ id: z.string().min(1), noteId: z.string().min(1) })).mutation(async ({ ctx, input }) => {
+    await ctx.prisma.consultationNote.deleteMany({ where: { id: input.noteId, consultationId: input.id } });
+    return { removed: true };
+  }),
+
+  /** « Ses prochaines étapes »: adds one at the end, or rewrites it. */
+  saveNextStep: consultantProcedure.input(nextStepSchema).mutation(async ({ ctx, input }) => {
+    await over(ctx.prisma, input.id);
+    if (input.stepId) {
+      return ctx.prisma.consultationStep.update({ where: { id: input.stepId, consultationId: input.id }, data: { text: input.text }, select: { id: true } });
+    }
+    const last = await ctx.prisma.consultationStep.findFirst({ where: { consultationId: input.id }, orderBy: { position: 'desc' }, select: { position: true } });
+    return ctx.prisma.consultationStep.create({ data: { consultationId: input.id, text: input.text, position: (last?.position ?? -1) + 1 }, select: { id: true } });
+  }),
+
+  removeNextStep: consultantProcedure.input(z.object({ id: z.string().min(1), stepId: z.string().min(1) })).mutation(async ({ ctx, input }) => {
+    await ctx.prisma.consultationStep.deleteMany({ where: { id: input.stepId, consultationId: input.id } });
+    return { removed: true };
+  }),
+
+  /**
+   * « Publier dans son espace »: from now on the Client sees the video, the
+   * Transcription, the notes for them and the next steps (never the private
+   * notes). The first time, they get « Votre enregistrement est prêt »;
+   * later edits show without a new e-mail.
+   */
+  publish: consultantProcedure.input(z.object({ id: z.string().min(1) })).mutation(async ({ ctx, input }) => {
+    const consultation = await over(ctx.prisma, input.id);
+    if (consultation.publishedAt) return { publishedAt: consultation.publishedAt, first: false };
+    const publishedAt = new Date();
+    await ctx.prisma.consultation.update({ where: { id: input.id }, data: { publishedAt } });
+    const lang = toLocale(consultation.account.locale);
+    await appMailer.send(
+      consultationPublishedEmail({
+        to: consultation.account.email,
+        name: consultation.account.name,
+        locale: lang,
+        startsAt: consultation.startsAt,
+        steps: consultation.nextSteps.map((s) => s.text),
+        url: `${siteUrl()}/${lang}${clientRoomPath(consultation.meeting!.id)}`,
+      }),
+    );
+    return { publishedAt, first: true };
   }),
 
   /** « Vos notes »: private, autosaved, kept with the Réunion; the Client never sees them. */

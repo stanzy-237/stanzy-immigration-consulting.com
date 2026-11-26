@@ -118,7 +118,7 @@ One route, two states:
 - **1 Avant (v2):** a header card: initials, the name on one line (cut with « … »), « Payée · réseau », the date; « Rejoindre » (greyed until 15 min before), « Déplacer », « ⋯ » (Renvoyer la confirmation: the paid e-mail again with its Facture; Voir le Compte; Annuler ce créneau). Right column: « Déroulé » first (Réservée et payée, the reminder the day before, planned or sent, or « pas envoyé » when booked under 24 h ahead, 15 min before, then the Consultation), then Paiement, Son Compte. The details below still hold.
 
 - **1 Avant:** header (name, « Payée · réseau », date, « Déplacer », « Rejoindre » greyed with « S'ouvre à HH:MM » until 15 min before), « Ce qu'[prénom] a préparé » (booking answers, the situation as a quote), **Vos notes** (private, autosaved, stored as the Réunion's `notes`), Paiement (price, promo line, paid amount + frais, network, time, Facture), Son Compte (Lead badge, contact, « Ouvrir un dossier »), reminders sent (day before; 15 min before), « Annuler ce créneau » (asks for a reason, shows the next free slot the Client will be moved to, then moves and notifies; no refund, no lost Consultation).
-- **2 Après:** header « Terminée · N min », the recording with markers, tabs « Notes pour [prénom] » (timestamped notes written for the Client) / Transcription / « Vos notes privées », « Ses prochaines étapes » (checklist written for the Client), « Dans son espace » (what she will see), « Ouvrir un dossier ».
+- **2 Après** (built for the consultant; shown once its time has passed or « Terminer pour tous » ended it; data: `consultation_note` with `atSeconds`, `consultation_step`, `consultation.publishedAt`; the Client's side is part of Mon espace, point 4.2): header « Terminée · N min », the recording with markers, tabs « Notes pour [prénom] » (timestamped notes written for the Client) / Transcription / « Vos notes privées », « Ses prochaines étapes » (checklist written for the Client), « Dans son espace » (what she will see), « Ouvrir un dossier ».
 - **Publier dans son espace:** nothing reaches the Client before it. Publishing makes the video, transcription, notes for the Client and next steps visible in her Mon espace and sends « Votre enregistrement est prêt ». Private notes are never shown. The consultant can edit after publishing.
 
 Mobile: same content; « Rejoindre » or « Publier » in the bottom bar; « Déplacer » and « Annuler » in the « ⋯ » menu.
@@ -129,8 +129,7 @@ Mobile: same content; « Rejoindre » or « Publier » in the bottom bar; « Dé
 |---|---|---|
 | Paid | Confirmation + Facture payée attached (`3.2`) | built (`lib/consultation-emails.ts`, `server/consultation-invoice.ts`) |
 | Payment failed | Paiement non abouti (`3.2`) | built (`lib/consultation-emails.ts`) |
-| Published | Enregistrement prêt (`3.2`) | to build |
-| Published, with steps | Prochaines étapes (`3.2`) | to build |
+| Published | Enregistrement prêt (`3.2`); with steps, they are listed and it uses the « next steps » art | built (`lib/consultation-emails.ts` `consultationPublishedEmail`), sent the first time only |
 | Day before / 15 min before / moved | Réunion e-mails (`3.3`) | exist (`meetings/lib/meeting-emails.ts`) |
 | Consultant cancels → auto-moved | « Déplacée » with the reason and a « Choisir un autre créneau » button | extend `moved` |
 

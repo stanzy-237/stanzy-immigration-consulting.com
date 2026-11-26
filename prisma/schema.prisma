@@ -1597,10 +1597,49 @@ model Consultation {
   updatedAt         DateTime              @updatedAt
   promoCode         PromoCode?            @relation(fields: [promoCodeId], references: [id])
   promoCodeId       String?
+  /// « Publier dans son espace »: from then on its Client sees the
+  /// Enregistrement, the Transcription, the notes for them and the next steps.
+  publishedAt       DateTime?
+  clientNotes       ConsultationNote[]
+  nextSteps         ConsultationStep[]
 
   @@index([status, startsAt])
   @@index([accountId, createdAt])
   @@map("consultation")
+}
+
+/// GLOSSARY: Consultation (#15). A note the consultant writes for the
+/// Client after the Consultation, maybe tied to a moment of its
+/// Enregistrement (a repère). Shown in Mon espace once published.
+model ConsultationNote {
+  id             String       @id @default(cuid())
+  consultationId String
+  consultation   Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  /// Seconds into the Enregistrement; null for a note tied to no moment.
+  atSeconds      Int?
+  text           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([consultationId])
+  @@map("consultation_note")
+}
+
+/// GLOSSARY: Consultation (#15). « Ses prochaines étapes »: a checklist the
+/// consultant writes for the Client, who ticks it off in Mon espace.
+model ConsultationStep {
+  id             String       @id @default(cuid())
+  consultationId String
+  consultation   Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  text           String
+  position       Int
+  /// Ticked by the Client.
+  doneAt         DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([consultationId, position])
+  @@map("consultation_step")
 }
 
 enum ConsultationPaymentStatus {

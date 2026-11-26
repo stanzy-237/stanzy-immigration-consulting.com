@@ -42,3 +42,13 @@ export type SettingsInput = z.input<typeof settingsInputSchema>;
 export const cancelSlotSchema = z.object({ id: z.string().min(1), reason: z.string().trim().min(3).max(500) });
 export const moveSlotSchema = z.object({ id: z.string().min(1), start: z.iso.datetime() });
 export const notesSchema = z.object({ id: z.string().min(1), notes: z.string().max(20_000) });
+
+/** A note for the Client (« Notes pour Aminata »), maybe at a moment of the Enregistrement. */
+export const clientNoteSchema = z.object({
+  id: z.string().min(1),
+  noteId: z.string().min(1).optional(),
+  atSeconds: z.number().int().min(0).max(6 * 3600).nullable(),
+  text: z.string().trim().min(1).max(2000),
+});
+/** One of « Ses prochaines étapes ». */
+export const nextStepSchema = z.object({ id: z.string().min(1), stepId: z.string().min(1).optional(), text: z.string().trim().min(1).max(300) });

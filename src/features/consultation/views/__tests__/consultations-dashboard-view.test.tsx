@@ -150,11 +150,32 @@ const DETAIL: Detail = {
     invoiceNumber: 'STZ-2026-0007',
   },
   meeting: { id: 'meet_1', notes: null, remindedDayBefore: null, remindedSoon: null, endedAt: null, status: 'SCHEDULED', createdAt: new Date(Date.now() - 3 * 86_400_000) },
+  over: false,
+  recording: null,
+  clientNotes: [],
+  nextSteps: [],
+  publishedAt: null,
 };
 
-function renderDetail(handlers: Handlers = {}) {
-  const { trpc, queryClient, wrap } = createTestTRPC({ 'consultationAdmin.detail': () => DETAIL, ...handlers });
-  queryClient.setQueryData(trpc.consultationAdmin.detail.queryKey({ id: 'con_1' }), DETAIL);
+const AFTER: Detail = {
+  ...DETAIL,
+  startsAt: new Date(Date.now() - 2 * 3_600_000),
+  ended: true,
+  over: true,
+  recording: { id: 'rec_1', seconds: 44 * 60 + 12, transcript: 'Bonjour Aminata, parlons de votre profil.' },
+  clientNotes: [
+    { id: 'note_1', atSeconds: 160, text: 'Votre profil est admissible à Entrée express.' },
+    { id: 'note_2', atSeconds: null, text: 'Gardez vos relevés de notes.' },
+  ],
+  nextSteps: [
+    { id: 'step_1', text: 'Passer le test de langue', doneAt: null },
+    { id: 'step_2', text: 'Faire évaluer votre diplôme', doneAt: new Date() },
+  ],
+};
+
+function renderDetail(handlers: Handlers = {}, detail: Detail = DETAIL) {
+  const { trpc, queryClient, wrap } = createTestTRPC({ 'consultationAdmin.detail': () => detail, ...handlers });
+  queryClient.setQueryData(trpc.consultationAdmin.detail.queryKey({ id: 'con_1' }), detail);
   return render(withIntl(wrap(<ConsultationAdminView id="con_1" />)));
 }
 
@@ -227,6 +248,45 @@ const WEEK: Week = {
   ],
   meetings: [{ id: 'meet_9', subject: 'Signature', startsAt: douala('2026-11-26', '15:00'), durationMinutes: 60 }],
 };
+
+describe('Tableau de bord → a Consultation, « 2 Après »', () => {
+  it('shows the recording with its repères, the notes for the Client, the next steps and what their space will show', async () => {
+    const { container } = renderDetail({}, AFTER);
+    expect(screen.getByText('Terminée · 44 min')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Déplacer' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Aller à 2:40' })).toBeInTheDocument();
+    expect(screen.getByText('Votre profil est admissible à Entrée express.')).toBeInTheDocument();
+    expect(screen.getByText('Faire évaluer votre diplôme')).toHaveClass('line-through');
+    const space = within(screen.getByRole('region', { name: 'Dans son espace' }));
+    expect(space.getByText('2 notes · 1 repère')).toBeInTheDocument();
+    expect(space.getByText('Jamais partagées')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Transcription' }));
+    expect(screen.getByText('Bonjour Aminata, parlons de votre profil.')).toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('adds a note for the Client and a next step', async () => {
+    const saveClientNote = vi.fn(() => ({ id: 'note_3' }));
+    const saveNextStep = vi.fn(() => ({ id: 'step_3' }));
+    renderDetail({ 'consultationAdmin.saveClientNote': saveClientNote, 'consultationAdmin.saveNextStep': saveNextStep }, AFTER);
+    fireEvent.click(screen.getByRole('button', { name: /Ajouter une note au moment de la vidéo/ }));
+    fireEvent.change(screen.getByRole('textbox', { name: /Note, lue par le Client/ }), { target: { value: 'Comparer EE et PNP.' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
+    await waitFor(() => expect(saveClientNote).toHaveBeenCalledWith(expect.objectContaining({ id: 'con_1', text: 'Comparer EE et PNP.' })));
+    fireEvent.click(screen.getByRole('button', { name: /Ajouter une étape/ }));
+    fireEvent.change(screen.getByRole('textbox', { name: 'Étape' }), { target: { value: 'Créer votre profil' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter' }));
+    await waitFor(() => expect(saveNextStep).toHaveBeenCalledWith({ id: 'con_1', text: 'Créer votre profil' }));
+  });
+
+  it('« Publier dans son espace » publishes and says the Client is told', async () => {
+    const publish = vi.fn(() => ({ publishedAt: new Date(), first: true }));
+    renderDetail({ 'consultationAdmin.publish': publish }, AFTER);
+    fireEvent.click(screen.getByRole('button', { name: 'Publier dans son espace' }));
+    await waitFor(() => expect(publish).toHaveBeenCalledWith({ id: 'con_1' }));
+    expect(await screen.findByText(/Publiée : Aminata est prévenu/)).toBeInTheDocument();
+  });
+});
 
 describe('Tableau de bord → Consultations, « Calendrier »', () => {
   beforeEach(() => {

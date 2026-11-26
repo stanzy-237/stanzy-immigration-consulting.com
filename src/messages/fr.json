@@ -5136,7 +5136,16 @@
       "help": "Une question ? Répondez sur WhatsApp à Stanzy.",
       "footer": "Stanzy Immigration Consulting · e-mail envoyé car vous avez réservé une consultation.",
       "where": "Heure de Douala · vidéo dans Mon espace",
-      "whatsapp": "Écrire à Stanzy"
+      "whatsapp": "Écrire à Stanzy",
+      "published": {
+        "subject": "Votre enregistrement est prêt",
+        "eyebrow": "Après votre Consultation",
+        "title": "C’est dans votre espace, {name}.",
+        "lead": "L’enregistrement de votre Consultation du {date}, sa transcription et les notes de Stanzy vous attendent dans Mon espace. Vous pouvez les revoir quand vous voulez.",
+        "leadSteps": "{count, plural, one {Une prochaine étape vous attend aussi, à cocher une fois faite.} other {# prochaines étapes vous attendent aussi, à cocher une fois faites.}}",
+        "stepsLabel": "Vos prochaines étapes",
+        "cta": "Voir dans Mon espace"
+      }
     },
     "promoCodes": {
       "eyebrow": "Facturation",
@@ -5393,7 +5402,10 @@
           "resent": "Confirmation renvoyée à {email}",
           "cancel": "Annuler ce créneau",
           "cancelHint": "{name} passe au prochain créneau libre"
-        }
+        },
+        "over": "Terminée · {minutes} min",
+        "recorded": "enregistrée avec son accord",
+        "notRecorded": "pas d’enregistrement"
       },
       "calendar": {
         "view": {
@@ -5422,6 +5434,68 @@
           "open": "Ouvert",
           "blocked": "Date bloquée"
         }
+      },
+      "after": {
+        "tabs": {
+          "label": "Après la Consultation",
+          "notes": "Notes pour {name}",
+          "transcript": "Transcription",
+          "private": "Vos notes privées"
+        },
+        "recording": "Enregistrement",
+        "recordingLength": "Enregistrement · {length}",
+        "transcriptReady": "Transcription prête",
+        "transcriptPending": "Transcription en cours",
+        "noRecordingTitle": "Pas encore d’enregistrement",
+        "noRecording": "Il arrive quelques minutes après la fin de la Réunion. S’il ne vient pas, elle n’a pas été enregistrée : vos notes et ses prochaines étapes peuvent quand même lui être publiées.",
+        "placeMarker": "Placer un repère à ce moment de la vidéo",
+        "goTo": "Aller à {time}",
+        "markersHint": "Repères ajoutés depuis vos notes · cliquez la barre pour en placer un",
+        "notesLead": "Ce qu’on a vu · la personne les lit sous la vidéo, chaque repère la renvoie au bon moment",
+        "noNotes": "Pas encore de note pour {name}.",
+        "addNoteAtVideo": "Ajouter une note au moment de la vidéo",
+        "addNote": "Ajouter une note",
+        "noteLabel": "Note, lue par le Client",
+        "editNote": "Modifier la note",
+        "removeNote": "Supprimer la note",
+        "noteSaved": "Note enregistrée",
+        "noteRemoved": "Note supprimée",
+        "noTranscript": "La transcription n’est pas encore prête.",
+        "steps": "Ses prochaines étapes",
+        "stepsLead": "Une liste à cocher dans son espace, écrite pour la personne",
+        "stepLabel": "Étape",
+        "stepPlaceholder": "Ex. Passer le test de langue",
+        "addStep": "Ajouter une étape",
+        "add": "Ajouter",
+        "editStep": "Modifier « {step} »",
+        "removeStep": "Supprimer « {step} »",
+        "stepDone": "Cochée par le Client",
+        "stepSaved": "Étape enregistrée",
+        "stepRemoved": "Étape supprimée",
+        "space": {
+          "title": "Dans son espace",
+          "video": "Vidéo et transcription",
+          "ready": "Prêtes",
+          "videoOnly": "Vidéo prête",
+          "none": "Pas encore",
+          "notes": "{count, plural, one {# note} other {# notes}} · {markers, plural, =0 {sans repère} one {# repère} other {# repères}}",
+          "never": "Jamais partagées",
+          "beforePublish": "Rien n’est visible avant « Publier ». Vous pourrez modifier ensuite.",
+          "published": "Publié le {date} : vos changements s’affichent tout de suite, sans nouvel e-mail."
+        },
+        "andThen": {
+          "eyebrow": "Et ensuite",
+          "title": "Un accompagnement pour {name} ?",
+          "lead": "Son espace lui propose d’envoyer une Demande d’intérêt. Ou ouvrez son Dossier tout de suite.",
+          "cta": "Ouvrir un dossier"
+        },
+        "publish": "Publier dans son espace",
+        "publishHint": "La personne reçoit « Votre enregistrement est prêt »",
+        "publishedBadge": "Publiée",
+        "publishedToast": "Publiée : {name} est prévenu·e par e-mail",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "error": "Ça n’a pas marché. Réessayez."
       }
     }
   }
