@@ -158,7 +158,8 @@ function Consultation({ id }: { id: string }): ReactNode {
             ) : (
               <PublishButton data={data} firstName={firstName} />
             )}
-            <MoreMenu data={data} firstName={firstName} live={live} onCancel={() => setCancelling(true)} />
+            {/* « 2 Après » has no « ⋯ »: nothing to resend or cancel once it is over. */}
+            {live ? <MoreMenu data={data} firstName={firstName} live={live} onCancel={() => setCancelling(true)} /> : null}
           </div>
         ) : null}
       </header>

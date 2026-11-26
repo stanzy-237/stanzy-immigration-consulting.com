@@ -257,6 +257,7 @@ describe('Tableau de bord → a Consultation, « 2 Après »', () => {
     const { container } = renderDetail({}, AFTER);
     expect(screen.getByText('Terminée · 44 min')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Déplacer' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Plus d’actions' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Aller à 2:40' })).toBeInTheDocument();
     expect(screen.getByText('Votre profil est admissible à Entrée express.')).toBeInTheDocument();
     expect(screen.getByText('Faire évaluer votre diplôme')).toHaveClass('line-through');
