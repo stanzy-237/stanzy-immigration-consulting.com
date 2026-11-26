@@ -3,6 +3,8 @@ import { z } from 'zod';
 
 import { cancelSlotSchema, moveSlotSchema, notesSchema, settingsInputSchema } from '@/features/consultation/lib/settings';
 import { freeSlots, MINUTE, type Busy } from '@/features/consultation/lib/slots';
+import { isDay, mondayOf, startOfDay } from '@/features/consultation/lib/week-calendar';
+import { addDays } from '@/features/notifications/lib/douala-days';
 import { BOOKING_LOCK, busyTimes, loadAvailability, type Db } from '@/features/consultation/server/booking-calendar';
 import { emailParticipantsLater, meetingParams } from '@/features/meetings/server/meeting-notify';
 import { notifyLater } from '@/features/notifications/server/notify';
@@ -158,6 +160,38 @@ export const consultationAdminRouter = createTRPCRouter({
         })),
     };
   }),
+
+  /**
+   * One week for the calendar (Monday `week`, Douala time): its paid
+   * Consultations, those held while their Compte pays, and the consultant's
+   * other Réunions, since they take the time too.
+   */
+  calendar: consultantProcedure
+    .input(z.object({ week: z.string().refine(isDay, 'A YYYY-MM-DD day') }))
+    .query(async ({ ctx, input }) => {
+      const now = new Date();
+      const monday = mondayOf(input.week);
+      const window = { gte: startOfDay(monday), lt: startOfDay(addDays(monday, 7)) };
+      const [consultations, meetings] = await Promise.all([
+        ctx.prisma.consultation.findMany({
+          where: { startsAt: window, status: { in: ['PAID', 'HELD'] } },
+          orderBy: { startsAt: 'asc' },
+          select: { id: true, status: true, startsAt: true, durationMinutes: true, heldUntil: true, account: { select: { name: true } } },
+        }),
+        ctx.prisma.meeting.findMany({
+          where: { startsAt: window, status: 'SCHEDULED', kind: { in: ['SCHEDULED', 'INSTANT'] }, consultation: { is: null } },
+          orderBy: { startsAt: 'asc' },
+          select: { id: true, subject: true, startsAt: true, durationMinutes: true },
+        }),
+      ]);
+      return {
+        week: monday,
+        consultations: consultations
+          .filter((c) => c.status === 'PAID' || (c.heldUntil !== null && c.heldUntil > now))
+          .map((c) => ({ id: c.id, status: c.status, startsAt: c.startsAt, durationMinutes: c.durationMinutes, heldUntil: c.heldUntil, name: c.account.name })),
+        meetings,
+      };
+    }),
 
   /** The Disponibilités and the price, as set (or the defaults, with no price). */
   settings: consultantProcedure.query(async ({ ctx }) => {

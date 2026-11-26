@@ -5350,6 +5350,33 @@
         "cancelled": "{name} passe au {when} : prévenue par e-mail",
         "error": "Ça n’a pas marché. Réessayez.",
         "preparedElided": "Ce qu’{name} a préparé"
+      },
+      "calendar": {
+        "view": {
+          "label": "Affichage",
+          "list": "Liste",
+          "calendar": "Calendrier"
+        },
+        "weekLabel": "Semaine du {week}",
+        "days": "Jours de la semaine",
+        "today": "Aujourd’hui",
+        "previous": "Semaine précédente",
+        "next": "Semaine suivante",
+        "douala": "Heure de Douala",
+        "blocked": "Bloquée",
+        "blockedDay": "Date bloquée : personne ne peut réserver ce jour-là.",
+        "closedDay": "Fermé ce jour-là, et rien de prévu.",
+        "paid": "Payée",
+        "held": "Gardé {minutes} min",
+        "meeting": "Réunion",
+        "blockLabel": "{title}, {time}, {status}",
+        "legend": {
+          "paid": "Payée",
+          "held": "Gardée, paiement en cours",
+          "meeting": "Autre Réunion",
+          "open": "Ouvert",
+          "blocked": "Date bloquée"
+        }
       }
     }
   }

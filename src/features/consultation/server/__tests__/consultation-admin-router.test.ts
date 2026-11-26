@@ -52,6 +52,11 @@ function fakeDatabase({ consultations = [] as Row[], payments = [] as Row[], mee
     consultation: {
       findMany: async ({ where }: { where: Record<string, unknown> }) => {
         let rows = consultations;
+        const inWindow = (c: Row) => {
+          const w = where.startsAt as { gte?: Date; lt?: Date } | undefined;
+          return (!w?.gte || (c.startsAt as Date) >= w.gte) && (!w?.lt || (c.startsAt as Date) < w.lt);
+        };
+        if ((where.status as { in?: string[] })?.in) return rows.filter((c) => (where.status as { in: string[] }).in.includes(c.status as string) && inWindow(c)).map(withRelations);
         if (where.OR && !where.meetingId) rows = rows.filter((c) => isUpcoming(c, where as never));
         else if (where.status === 'PAID' && (where.startsAt as { lt?: Date })?.lt) rows = rows.filter((c) => c.status === 'PAID' && (c.startsAt as Date) < (where.startsAt as { lt: Date }).lt);
         else if (where.meetingId === null) rows = rows.filter((c) => c.meetingId === null && (c.status === 'PAID' || (c.heldUntil as Date) > NOW));
@@ -69,7 +74,13 @@ function fakeDatabase({ consultations = [] as Row[], payments = [] as Row[], mee
         payments.filter((p) => p.status === 'FAILED').map((p) => ({ ...p, consultation: { ...byId(consultations, p.consultationId)!, account: aminata } })),
     },
     meeting: {
-      findMany: async ({ where }: { where: { id?: { not: string } } }) => meetings.filter((m) => m.id !== where.id?.not),
+      findMany: async ({ where }: { where: { id?: { not: string }; consultation?: { is: null }; startsAt?: { gte: Date; lt: Date } } }) =>
+        meetings.filter(
+          (m) =>
+            m.id !== where.id?.not &&
+            (!where.consultation || !consultations.some((c) => c.meetingId === m.id)) &&
+            (!where.startsAt?.gte || ((m.startsAt as Date) >= where.startsAt.gte && (m.startsAt as Date) < where.startsAt.lt)),
+        ),
       update: async ({ where, data }: { where: { id: string }; data: Row }) => Object.assign(byId(meetings, where.id)!, data),
     },
     $executeRaw: async () => 0,
@@ -259,5 +270,30 @@ describe('consultationAdmin, a Consultation', () => {
     });
     await expect(callerFor(db).moveOptions({ id: 'con_held' })).rejects.toThrow('CONSULTATION_NOT_MOVABLE');
     await expect(callerFor(db).cancelSlot({ id: 'con_past', reason: 'Trop tard.' })).rejects.toThrow('CONSULTATION_NOT_MOVABLE');
+  });
+});
+
+describe('consultationAdmin, the calendar', () => {
+  it('gives one week: paid Consultations, those still held, and the other Réunions, not a Consultation’s own', async () => {
+    const { db } = fakeDatabase({
+      consultations: [
+        paid(),
+        paid({ id: 'con_held', status: 'HELD', meetingId: null, paidById: null, startsAt: at('2026-11-27', '09:00'), heldUntil: new Date(NOW.getTime() + 9 * 60_000) }),
+        paid({ id: 'con_gone', status: 'HELD', meetingId: null, paidById: null, startsAt: at('2026-11-27', '10:00'), heldUntil: new Date(NOW.getTime() - 60_000) }),
+        paid({ id: 'con_next_week', meetingId: 'meet_3', startsAt: at('2026-12-01', '09:00') }),
+      ],
+      meetings: [meeting(), meeting({ id: 'meet_2', subject: 'Signature', startsAt: at('2026-11-26', '15:00') }), meeting({ id: 'meet_3', startsAt: at('2026-12-01', '09:00') })],
+    });
+    const week = await callerFor(db).calendar({ week: '2026-11-26' });
+    expect(week.week).toBe('2026-11-23');
+    expect(week.consultations.map((c) => c.id)).toEqual(['con_1', 'con_held']);
+    expect(week.consultations[0]).toMatchObject({ name: 'Aminata Diallo', status: 'PAID' });
+    expect(week.meetings.map((m) => m.id)).toEqual(['meet_2']);
+  });
+
+  it('refuses a day it cannot read, and a Client', async () => {
+    const { db } = fakeDatabase();
+    await expect(callerFor(db).calendar({ week: '26/11/2026' })).rejects.toThrow();
+    await expect(callerFor(db, sessionFor({ id: 'acc_1', role: 'MEMBER' })).calendar({ week: '2026-11-23' })).rejects.toThrow();
   });
 });

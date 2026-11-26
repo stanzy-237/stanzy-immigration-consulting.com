@@ -1,22 +1,47 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { CalendarDays, ChevronRight, X } from 'lucide-react';
+import { CalendarDays, ChevronRight, List, X } from 'lucide-react';
 import Link from 'next/link';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
-import { useState, type ReactNode } from 'react';
+import { useState, useSyncExternalStore, useTransition, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AvailabilityForm } from '@/features/consultation/components/availability-form';
+import { ConsultationsCalendar } from '@/features/consultation/components/consultations-calendar';
 import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
+import { mondayOf } from '@/features/consultation/lib/week-calendar';
 import { consultantRoomPath } from '@/features/meetings/lib/meeting-schema';
+import { doualaDay } from '@/features/notifications/lib/douala-days';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
 
 type Tab = 'upcoming' | 'past' | 'failed';
+type View = 'list' | 'calendar';
+
+/** « Liste / Calendrier »: the consultant's last choice, kept on this device. */
+const VIEW_KEY = 'stanzy.consultations.view';
+const viewListeners = new Set<() => void>();
+const subscribeView = (listener: () => void) => {
+  viewListeners.add(listener);
+  window.addEventListener('storage', listener);
+  return () => {
+    viewListeners.delete(listener);
+    window.removeEventListener('storage', listener);
+  };
+};
+const readView = (): View => (window.localStorage.getItem(VIEW_KEY) === 'calendar' ? 'calendar' : 'list');
+function useView(): [View, (view: View) => void] {
+  const view = useSyncExternalStore(subscribeView, readView, () => 'list' as const);
+  const setView = (next: View) => {
+    window.localStorage.setItem(VIEW_KEY, next);
+    for (const listener of viewListeners) listener();
+  };
+  return [view, setView];
+}
 type Listing = RouterOutputs['consultationAdmin']['list'];
 type ConsultationRow = Listing['rows'][number];
 type FailedRow = Listing['failed'][number];
@@ -34,6 +59,11 @@ export function ConsultationsDashboardView(): ReactNode {
   const t = useTranslations('Consultation.admin');
   const [tab, setTab] = useState<Tab>('upcoming');
   const [sheet, setSheet] = useState(false);
+  const [view, setView] = useView();
+  const now = useNow();
+  const [week, setWeek] = useState(() => mondayOf(doualaDay(now)));
+  // Another week keeps this one on screen until it has loaded, instead of a skeleton.
+  const [, startTransition] = useTransition();
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6 pb-28 lg:pb-0">
@@ -43,16 +73,27 @@ export function ConsultationsDashboardView(): ReactNode {
           <h1 className="font-heading text-h2 leading-11 font-extrabold tracking-tight text-navy-deep lg:text-h1 lg:leading-14">{t('title')}</h1>
           <p className="hidden text-body leading-6 text-slate lg:block">{t('lead')}</p>
         </div>
-        <QueryBoundary fallback={<Skeleton className="h-11 w-96 rounded-full" />}>
-          <Tabs tab={tab} onTab={setTab} />
-        </QueryBoundary>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+          {view === 'list' ? (
+            <QueryBoundary fallback={<Skeleton className="h-11 w-96 rounded-full" />}>
+              <Tabs tab={tab} onTab={setTab} />
+            </QueryBoundary>
+          ) : null}
+          <ViewSwitch view={view} onView={setView} />
+        </div>
       </div>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1">
-          <QueryBoundary fallback={<ListSkeleton />}>
-            {tab === 'failed' ? <FailedList /> : <ConsultationList tab={tab} />}
-          </QueryBoundary>
+          {view === 'calendar' ? (
+            <QueryBoundary fallback={<Skeleton className="h-150 rounded-3xl" />}>
+              <ConsultationsCalendar week={week} onWeek={(next) => startTransition(() => setWeek(next))} />
+            </QueryBoundary>
+          ) : (
+            <QueryBoundary fallback={<ListSkeleton />}>
+              {tab === 'failed' ? <FailedList /> : <ConsultationList tab={tab} />}
+            </QueryBoundary>
+          )}
         </div>
         <section aria-labelledby="availability" className="hidden w-100 shrink-0 rounded-3xl border border-fog-light bg-white p-6 lg:block">
           <AvailabilityHeading />
@@ -87,6 +128,36 @@ export function ConsultationsDashboardView(): ReactNode {
           </QueryBoundary>
         </DrawerContent>
       </Drawer>
+    </div>
+  );
+}
+
+/** « Liste / Calendrier ». */
+function ViewSwitch({ view, onView }: { view: View; onView: (view: View) => void }): ReactNode {
+  const t = useTranslations('Consultation.admin.calendar.view');
+  const options = [
+    { key: 'list' as const, label: t('list'), Icon: List },
+    { key: 'calendar' as const, label: t('calendar'), Icon: CalendarDays },
+  ];
+  return (
+    <div role="radiogroup" aria-label={t('label')} className="order-first flex gap-1 rounded-full bg-ice-blue p-1 lg:order-last">
+      {options.map(({ key, label, Icon }) => (
+        <button
+          key={key}
+          type="button"
+          role="radio"
+          aria-checked={view === key}
+          onClick={() => onView(key)}
+          className={cn(
+            'flex h-9 flex-1 items-center justify-center gap-2 rounded-full px-4 text-body-sm font-semibold whitespace-nowrap lg:flex-none',
+            view === key ? 'bg-white text-navy-deep shadow-sm' : 'text-slate',
+            PRESS,
+          )}
+        >
+          <Icon aria-hidden={true} className="size-4" strokeWidth={2.2} />
+          {label}
+        </button>
+      ))}
     </div>
   );
 }

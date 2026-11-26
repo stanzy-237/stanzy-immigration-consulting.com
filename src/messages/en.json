@@ -5333,6 +5333,33 @@
         "cancelled": "{name} moves to {when}: told by e-mail",
         "error": "That didn’t work. Try again.",
         "preparedElided": "What {name} prepared"
+      },
+      "calendar": {
+        "view": {
+          "label": "View",
+          "list": "List",
+          "calendar": "Calendar"
+        },
+        "weekLabel": "Week of {week}",
+        "days": "Days of the week",
+        "today": "Today",
+        "previous": "Previous week",
+        "next": "Next week",
+        "douala": "Douala time",
+        "blocked": "Blocked",
+        "blockedDay": "Blocked date: nobody can book that day.",
+        "closedDay": "Closed that day, and nothing planned.",
+        "paid": "Paid",
+        "held": "Held {minutes} min",
+        "meeting": "Meeting",
+        "blockLabel": "{title}, {time}, {status}",
+        "legend": {
+          "paid": "Paid",
+          "held": "Held, payment in progress",
+          "meeting": "Other meeting",
+          "open": "Open",
+          "blocked": "Blocked date"
+        }
       }
     }
   }

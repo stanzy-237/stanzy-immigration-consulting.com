@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { withIntl } from '@/features/auth/views/__tests__/test-utils';
@@ -174,5 +174,76 @@ describe('Tableau de bord → a Consultation', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Motif, dit au Client' }), { target: { value: 'Un empêchement.' } });
     fireEvent.click(confirm);
     await waitFor(() => expect(cancelSlot).toHaveBeenCalledWith({ id: 'con_1', reason: 'Un empêchement.' }));
+  });
+});
+
+type Week = RouterOutputs['consultationAdmin']['calendar'];
+
+// Thursday 26 November 2026, 11:20 in Douala (UTC+1).
+const THURSDAY = new Date('2026-11-26T10:20:00Z');
+const douala = (day: string, time: string) => new Date(`${day}T${time}:00+01:00`);
+const WEEK: Week = {
+  week: '2026-11-23',
+  consultations: [
+    { id: 'con_past', status: 'PAID', startsAt: douala('2026-11-23', '10:00'), durationMinutes: 45, heldUntil: null, name: 'Paul Mbarga' },
+    { id: 'con_held', status: 'HELD', startsAt: douala('2026-11-27', '09:00'), durationMinutes: 45, heldUntil: new Date(THURSDAY.getTime() + 9 * 60_000), name: 'Grace Nkeng' },
+    { id: 'con_paid', status: 'PAID', startsAt: douala('2026-11-27', '11:00'), durationMinutes: 45, heldUntil: null, name: 'Richil Stanley Nouping Nouping' },
+  ],
+  meetings: [{ id: 'meet_9', subject: 'Signature', startsAt: douala('2026-11-26', '15:00'), durationMinutes: 60 }],
+};
+
+describe('Tableau de bord → Consultations, « Calendrier »', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(THURSDAY);
+    window.localStorage.clear();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  function renderCalendar(calendar = vi.fn(({ week }: { week: string }) => (week === '2026-11-23' ? WEEK : { week, consultations: [], meetings: [] }))) {
+    const blocked = { ...SETTINGS, weeklyHours: [...SETTINGS.weeklyHours, { day: 5, start: '09:00', end: '12:00' }], blockedDates: ['2026-11-24'] };
+    const { trpc, queryClient, wrap } = createTestTRPC({
+      'consultationAdmin.list': () => LIST,
+      'consultationAdmin.settings': () => blocked,
+      'consultationAdmin.calendar': calendar,
+    });
+    queryClient.setQueryData(trpc.consultationAdmin.list.queryKey({ tab: 'upcoming' }), LIST);
+    queryClient.setQueryData(trpc.consultationAdmin.settings.queryKey(), blocked);
+    queryClient.setQueryData(trpc.consultationAdmin.calendar.queryKey({ week: '2026-11-23' }), WEEK);
+    const view = render(withIntl(wrap(<ConsultationsDashboardView />)));
+    fireEvent.click(screen.getByRole('radio', { name: 'Calendrier' }));
+    return { ...view, calendar };
+  }
+
+  it('shows the week: Consultations open their page, other Réunions theirs, the blocked date says so', async () => {
+    const { container } = renderCalendar();
+    const week = within(await screen.findByRole('region', { name: /Semaine du/ }));
+    expect(week.getByRole('link', { name: 'Grace Nkeng, 09:00 – 09:45, Gardé 9 min' })).toHaveAttribute('href', '/consultations/con_held');
+    expect(week.getByRole('link', { name: /Richil Stanley Nouping Nouping, 11:00 – 11:45, Payée/ })).toHaveTextContent('Richil N.');
+    expect(week.getByRole('link', { name: /Signature, 15:00 – 16:00, Réunion/ })).toHaveAttribute('href', '/reunions/meet_9');
+    expect(within(week.getByRole('group', { name: 'mardi 24 novembre' })).getByText('Bloquée')).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Passées' })).not.toBeInTheDocument();
+    expect(window.localStorage.getItem('stanzy.consultations.view')).toBe('calendar');
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('moves a week at a time, and back to this one', async () => {
+    const { calendar } = renderCalendar();
+    await screen.findByRole('region', { name: /Semaine du/ });
+    fireEvent.click(screen.getAllByRole('button', { name: 'Semaine suivante' })[0]!);
+    await waitFor(() => expect(calendar).toHaveBeenCalledWith({ week: '2026-11-30' }));
+    fireEvent.click(screen.getAllByRole('button', { name: 'Aujourd’hui' })[0]!);
+    expect(await screen.findAllByRole('link', { name: /Grace Nkeng/ })).not.toHaveLength(0);
+  });
+
+  it('on mobile, one day at a time: today first, then the day tapped', async () => {
+    renderCalendar();
+    const today = await screen.findByRole('tab', { name: 'jeudi 26 novembre' });
+    expect(today).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(screen.getByRole('tab', { name: 'mardi 24 novembre' }));
+    expect(screen.getByText('Date bloquée : personne ne peut réserver ce jour-là.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'vendredi 27 novembre' }));
+    const day = within(screen.getByRole('region', { name: 'vendredi 27 novembre' }));
+    expect(day.getByRole('link', { name: /Grace Nkeng/ })).toHaveTextContent('Grace Nkeng');
   });
 });
