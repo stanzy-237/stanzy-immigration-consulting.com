@@ -90,7 +90,7 @@ function Consultation({ id }: { id: string }): ReactNode {
           <div className="flex flex-col gap-1.5">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="font-heading text-h3 leading-8 font-extrabold tracking-tight text-navy-deep lg:text-h2 lg:leading-11">{data.client.name}</h1>
-              <span className={cn('rounded-full px-2.5 py-1 font-label text-caption font-bold', paid ? 'bg-leaf-tint text-leaf' : 'bg-honey-tint text-honey')}>
+              <span className={cn('inline-block rounded-full px-2 py-0.5 font-label tracking-wide whitespace-nowrap', paid ? 'bg-leaf-tint text-leaf' : 'bg-honey-tint text-honey')}>
                 {paid ? t('paid', { network: data.payment?.network === 'card' ? t('card') : (data.payment?.networkName ?? 'SasPay') }) : t('held')}
               </span>
             </div>
@@ -304,7 +304,7 @@ function Account({ data }: { data: Detail }): ReactNode {
         <h2 id="account" className={cardTitle}>
           {t('account')}
         </h2>
-        <span className="rounded-full bg-iris-tint px-2.5 py-1 font-label text-caption font-bold text-iris">{tStatus(client.status as 'USER' | 'LEAD' | 'CLIENT')}</span>
+        <span className="inline-block rounded-full bg-iris-tint px-2 py-0.5 font-label tracking-wide whitespace-nowrap text-iris">{tStatus(client.status as 'USER' | 'LEAD' | 'CLIENT')}</span>
       </div>
       <div className="flex flex-col gap-1 text-body-sm text-ink">
         <p>{client.email}</p>

@@ -139,18 +139,23 @@ function Availability({ onSaved }: { onSaved?: () => void }): ReactNode {
   return <AvailabilityForm settings={data} onSaved={onSaved} />;
 }
 
+/** A status pill: small, never wraps. */
+const PILL = 'inline-block rounded-full px-2 py-0.5 font-label tracking-wide whitespace-nowrap';
+/** A Client's name in a row: one line, cut with « … », the full name on hover. */
+const NAME = 'max-w-full truncate text-body-sm leading-5 font-bold text-ink';
+
 /** « Payée · MTN », « Payée · carte », « En attente », « Gardé N min ». */
 function PaymentBadge({ row, now }: { row: ConsultationRow; now: Date }): ReactNode {
   const t = useTranslations('Consultation.admin.row');
   if (row.status === 'PAID') {
     return (
-      <span className="rounded-full bg-leaf-tint px-2.5 py-1 font-label text-caption font-bold whitespace-nowrap text-leaf">
+      <span className={cn(PILL, 'bg-leaf-tint text-leaf')}>
         {t('paid', { network: row.card ? t('card') : shortNetwork(row.network) })}
       </span>
     );
   }
   const left = row.heldUntil ? Math.max(0, Math.ceil((new Date(row.heldUntil).getTime() - now.getTime()) / 60_000)) : 0;
-  return <span className="rounded-full bg-honey-tint px-2.5 py-1 font-label text-caption font-bold whitespace-nowrap text-honey">{t('held', { minutes: left })}</span>;
+  return <span className={cn(PILL, 'bg-honey-tint text-honey')}>{t('held', { minutes: left })}</span>;
 }
 
 /** « MTN Mobile Money » → « MTN »: the badge keeps the operator. */
@@ -197,15 +202,15 @@ function ConsultationList({ tab }: { tab: 'upcoming' | 'past' }): ReactNode {
             return (
               <li key={row.id} className="relative grid grid-cols-12 items-center gap-4 px-5 py-4 hover:bg-off-white">
                 <div className="col-span-3 flex flex-col">
-                  <Link href={`/consultations/${row.id}`} className="font-bold text-ink after:absolute after:inset-0 first-letter:uppercase">
+                  <Link href={`/consultations/${row.id}`} className="text-body-sm leading-5 font-bold text-ink after:absolute after:inset-0 first-letter:uppercase">
                     {day(starts)}
                   </Link>
                   <span className="text-caption text-slate">
                     {time(starts)} – {time(ends)}
                   </span>
                 </div>
-                <div className="col-span-4 flex flex-col">
-                  <span className="font-semibold text-ink">{row.client.name}</span>
+                <div className="col-span-4 flex min-w-0 flex-col">
+                  <span title={row.client.name} className={NAME}>{row.client.name}</span>
                   <span className="text-caption text-slate">{who(row)}</span>
                 </div>
                 <div className="col-span-3">
@@ -248,7 +253,7 @@ function ConsultationList({ tab }: { tab: 'upcoming' | 'past' }): ReactNode {
                   <span className="text-caption text-slate">{row.durationMinutes} min</span>
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col items-start gap-1">
-                  <span className="truncate font-bold text-ink">{row.client.name}</span>
+                  <span title={row.client.name} className={NAME}>{row.client.name}</span>
                   <PaymentBadge row={row} now={now} />
                 </span>
                 <ChevronRight aria-hidden={true} className="size-4 text-slate" />
@@ -285,14 +290,14 @@ function FailedList(): ReactNode {
         {data.failed.map((row) => (
           <li key={row.id} className="grid grid-cols-2 items-center gap-3 px-5 py-4 lg:grid-cols-12 lg:gap-4">
             <div className="flex flex-col lg:col-span-3">
-              <span className="font-bold text-ink first-letter:uppercase">{when(new Date(row.at))}</span>
+              <span className="text-body-sm leading-5 font-bold text-ink first-letter:uppercase">{when(new Date(row.at))}</span>
               <span className="text-caption text-slate">
                 {time(new Date(row.at))}
                 {row.released ? ` · ${t('released')}` : ''}
               </span>
             </div>
-            <div className="flex flex-col lg:col-span-4">
-              <span className="font-semibold text-ink">{row.client.name}</span>
+            <div className="flex min-w-0 flex-col lg:col-span-4">
+              <span title={row.client.name} className={NAME}>{row.client.name}</span>
               <span className="text-caption text-slate">
                 {row.paidLater && row.minutesToPaid !== null
                   ? t('retried', { minutes: row.minutesToPaid })
@@ -300,14 +305,14 @@ function FailedList(): ReactNode {
               </span>
             </div>
             <div className="lg:col-span-3">
-              <span className={cn('rounded-full px-2.5 py-1 font-label text-caption font-bold whitespace-nowrap', row.refusedAtOnce ? 'bg-honey-tint text-honey' : 'bg-blush text-rouge')}>
+              <span className={cn(PILL, row.refusedAtOnce ? 'bg-honey-tint text-honey' : 'bg-blush text-rouge')}>
                 {outcome(row)}
                 {row.network ? ` · ${shortNetwork(row.network)}` : ''}
               </span>
             </div>
             <div className="text-right lg:col-span-2">
               {row.paidLater ? (
-                <span className="rounded-full bg-leaf-tint px-2.5 py-1 font-label text-caption font-bold text-leaf">{t('paidLater')}</span>
+                <span className={cn(PILL, 'bg-leaf-tint text-leaf')}>{t('paidLater')}</span>
               ) : (
                 <Link href={`/comptes/${row.client.id}`} className="text-caption font-bold text-ink underline underline-offset-2">
                   {t('account')}
