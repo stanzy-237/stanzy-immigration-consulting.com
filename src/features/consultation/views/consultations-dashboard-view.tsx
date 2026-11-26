@@ -1,16 +1,17 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { CalendarDays, ChevronRight, List, X } from 'lucide-react';
+import { CalendarDays, ChevronRight, Clock, List } from 'lucide-react';
 import Link from 'next/link';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
 import { useState, useSyncExternalStore, useTransition, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
-import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AvailabilityBar } from '@/features/consultation/components/availability-bar';
 import { AvailabilityForm } from '@/features/consultation/components/availability-form';
 import { ConsultationsCalendar } from '@/features/consultation/components/consultations-calendar';
+import { TOPIC_KEYS, type TopicKey } from '@/features/consultation/lib/booking-fields';
 import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
 import { mondayOf } from '@/features/consultation/lib/week-calendar';
 import { consultantRoomPath } from '@/features/meetings/lib/meeting-schema';
@@ -20,9 +21,9 @@ import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
 
 type Tab = 'upcoming' | 'past' | 'failed';
-type View = 'list' | 'calendar';
+type View = 'list' | 'calendar' | 'availability';
 
-/** « Liste / Calendrier »: the consultant's last choice, kept on this device. */
+/** « Liste / Calendrier / Disponibilités »: the consultant's last choice, kept on this device. */
 const VIEW_KEY = 'stanzy.consultations.view';
 const viewListeners = new Set<() => void>();
 const subscribeView = (listener: () => void) => {
@@ -33,7 +34,8 @@ const subscribeView = (listener: () => void) => {
     window.removeEventListener('storage', listener);
   };
 };
-const readView = (): View => (window.localStorage.getItem(VIEW_KEY) === 'calendar' ? 'calendar' : 'list');
+const VIEWS: View[] = ['list', 'calendar', 'availability'];
+const readView = (): View => VIEWS.find((v) => v === window.localStorage.getItem(VIEW_KEY)) ?? 'list';
 function useView(): [View, (view: View) => void] {
   const view = useSyncExternalStore(subscribeView, readView, () => 'list' as const);
   const setView = (next: View) => {
@@ -51,14 +53,15 @@ const DOUALA = 'Africa/Douala';
 const JOIN_BEFORE_MS = 15 * 60_000;
 
 /**
- * Tableau de bord → Consultations (#15, `Tableau de bord · Consultations`):
- * « À venir », « Passées », « Paiements échoués », with the Disponibilités
- * beside them (desktop) or in their sheet (mobile, « Mes disponibilités »).
+ * Tableau de bord → Consultations (#15, `Consultations · C`): three views.
+ * « Liste »: « À venir », « Passées », « Paiements échoués », full width.
+ * « Calendrier »: the Disponibilités in one bar (« Modifier » opens the side
+ * panel) above the week. « Disponibilités »: every setting, with the week's
+ * hours on timelines.
  */
 export function ConsultationsDashboardView(): ReactNode {
   const t = useTranslations('Consultation.admin');
   const [tab, setTab] = useState<Tab>('upcoming');
-  const [sheet, setSheet] = useState(false);
   const [view, setView] = useView();
   const now = useNow();
   const [week, setWeek] = useState(() => mondayOf(doualaDay(now)));
@@ -66,7 +69,7 @@ export function ConsultationsDashboardView(): ReactNode {
   const [, startTransition] = useTransition();
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6 pb-28 lg:pb-0">
+    <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="flex flex-col gap-2">
           <p className={cn(LABEL_CLASS, 'text-steel-blue lg:hidden')}>{t('eyebrow')}</p>
@@ -76,66 +79,42 @@ export function ConsultationsDashboardView(): ReactNode {
         <ViewSwitch view={view} onView={setView} />
       </div>
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="flex min-w-0 flex-1 flex-col gap-4">
-          {view === 'list' ? (
-            <QueryBoundary fallback={<Skeleton className="h-11 w-96 rounded-full" />}>
-              <Tabs tab={tab} onTab={setTab} />
-            </QueryBoundary>
-          ) : null}
-          {view === 'calendar' ? (
-            <QueryBoundary fallback={<Skeleton className="h-150 rounded-3xl" />}>
-              <ConsultationsCalendar week={week} onWeek={(next) => startTransition(() => setWeek(next))} />
-            </QueryBoundary>
-          ) : (
-            <QueryBoundary fallback={<ListSkeleton />}>
-              {tab === 'failed' ? <FailedList /> : <ConsultationList tab={tab} />}
-            </QueryBoundary>
-          )}
+      {view === 'list' ? (
+        <div className="flex flex-col gap-4">
+          <QueryBoundary fallback={<Skeleton className="h-11 w-96 rounded-full" />}>
+            <Tabs tab={tab} onTab={setTab} />
+          </QueryBoundary>
+          <QueryBoundary fallback={<ListSkeleton />}>{tab === 'failed' ? <FailedList /> : <ConsultationList tab={tab} />}</QueryBoundary>
         </div>
-        <section aria-labelledby="availability" className="hidden w-100 shrink-0 rounded-3xl border border-fog-light bg-white p-6 lg:block">
-          <AvailabilityHeading />
-          <QueryBoundary fallback={<Skeleton className="h-130 rounded-2xl" />}>
-            <Availability />
-          </QueryBoundary>
-        </section>
-      </div>
+      ) : null}
 
-      {/* Mobile: « Mes disponibilités » in the bottom bar opens its sheet. */}
-      <div className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t border-fog-light bg-white px-5 pt-4 pb-6 lg:hidden">
-        <button
-          type="button"
-          onClick={() => setSheet(true)}
-          className={cn('flex h-14 items-center justify-center gap-2.5 rounded-full bg-navy-deep font-heading text-body font-bold text-white', PRESS)}
-        >
-          <CalendarDays aria-hidden={true} className="size-5" strokeWidth={2.2} />
-          {t('availability.mine')}
-        </button>
-        <p className="text-center text-caption leading-4 text-slate">{t('availability.mineHint')}</p>
-      </div>
-      <Drawer open={sheet} onOpenChange={setSheet} showSwipeHandle={true}>
-        <DrawerContent className="max-h-dvh overflow-y-auto rounded-t-3xl px-5 pt-2 pb-8 lg:hidden">
-          <div className="flex items-center justify-between py-4">
-            <DrawerTitle className="font-heading text-h4 font-bold text-navy-deep">{t('availability.title')}</DrawerTitle>
-            <DrawerClose aria-label={t('close')} className="flex size-9 items-center justify-center rounded-full bg-off-white">
-              <X aria-hidden={true} className="size-4 text-ink" strokeWidth={2.5} />
-            </DrawerClose>
-          </div>
-          <QueryBoundary fallback={<Skeleton className="h-130 rounded-2xl" />}>
-            <Availability onSaved={() => setSheet(false)} />
+      {view === 'calendar' ? (
+        <div className="flex flex-col gap-4">
+          <QueryBoundary fallback={<Skeleton className="h-16 rounded-2xl" />}>
+            <AvailabilityBar />
           </QueryBoundary>
-        </DrawerContent>
-      </Drawer>
+          <QueryBoundary fallback={<Skeleton className="h-150 rounded-3xl" />}>
+            <ConsultationsCalendar week={week} onWeek={(next) => startTransition(() => setWeek(next))} />
+          </QueryBoundary>
+        </div>
+      ) : null}
+
+      {view === 'availability' ? (
+        <QueryBoundary fallback={<Skeleton className="h-130 rounded-3xl" />}>
+          <AvailabilityPage />
+        </QueryBoundary>
+      ) : null}
     </div>
   );
 }
 
-/** « Liste / Calendrier ». */
+/** « Liste / Calendrier / Disponibilités ». */
 function ViewSwitch({ view, onView }: { view: View; onView: (view: View) => void }): ReactNode {
   const t = useTranslations('Consultation.admin.calendar.view');
   const options = [
     { key: 'list' as const, label: t('list'), Icon: List },
     { key: 'calendar' as const, label: t('calendar'), Icon: CalendarDays },
+    { key: 'availability' as const, label: t('availability'), Icon: Clock },
   ];
   return (
     <div role="radiogroup" aria-label={t('label')} className="flex gap-1 rounded-full bg-ice-blue p-1">
@@ -147,12 +126,12 @@ function ViewSwitch({ view, onView }: { view: View; onView: (view: View) => void
           aria-checked={view === key}
           onClick={() => onView(key)}
           className={cn(
-            'flex h-9 flex-1 items-center justify-center gap-2 rounded-full px-4 text-body-sm font-semibold whitespace-nowrap lg:flex-none',
+            'flex h-9 flex-1 items-center justify-center gap-2 rounded-full px-3 text-body-sm font-semibold whitespace-nowrap sm:px-4 lg:flex-none',
             view === key ? 'bg-white text-navy-deep shadow-sm' : 'text-slate',
             PRESS,
           )}
         >
-          <Icon aria-hidden={true} className="size-4" strokeWidth={2.2} />
+          <Icon aria-hidden={true} className="hidden size-4 sm:block" strokeWidth={2.2} />
           {label}
         </button>
       ))}
@@ -190,22 +169,11 @@ function Tabs({ tab, onTab }: { tab: Tab; onTab: (tab: Tab) => void }): ReactNod
   );
 }
 
-function AvailabilityHeading(): ReactNode {
-  const t = useTranslations('Consultation.admin.availability');
-  return (
-    <div className="flex flex-col gap-1 pb-5">
-      <h2 id="availability" className="font-heading text-h4 font-bold text-navy-deep">
-        {t('title')}
-      </h2>
-      <p className="text-body-sm leading-5 text-slate">{t('lead')}</p>
-    </div>
-  );
-}
-
-function Availability({ onSaved }: { onSaved?: () => void }): ReactNode {
+/** The « Disponibilités » view: every setting at once. */
+function AvailabilityPage(): ReactNode {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.consultationAdmin.settings.queryOptions());
-  return <AvailabilityForm settings={data} onSaved={onSaved} />;
+  return <AvailabilityForm settings={data} layout="page" />;
 }
 
 /** A status pill: small, never wraps. */
@@ -235,6 +203,7 @@ function ConsultationList({ tab }: { tab: 'upcoming' | 'past' }): ReactNode {
   const format = useFormatter();
   const now = useNow({ updateInterval: 30_000 });
   const trpc = useTRPC();
+  const tTopics = useTranslations('Consultation.reservation.prepare.topic');
   const { data } = useSuspenseQuery(trpc.consultationAdmin.list.queryOptions({ tab }));
   if (data.rows.length === 0) {
     return <p className="rounded-3xl border border-fog-light bg-white p-8 text-center text-body-sm leading-5 text-slate">{t(tab === 'upcoming' ? 'emptyUpcoming' : 'emptyPast')}</p>;
@@ -246,6 +215,11 @@ function ConsultationList({ tab }: { tab: 'upcoming' | 'past' }): ReactNode {
     row.status === 'HELD'
       ? t('row.holding')
       : [t(`row.status.${row.client.status as 'USER' | 'LEAD' | 'CLIENT'}`), row.crsScore !== null ? t('row.crs', { score: row.crsScore }) : null].filter(Boolean).join(' · ');
+  const prepared = (row: ConsultationRow) =>
+    row.topics
+      .filter((topic): topic is TopicKey => (TOPIC_KEYS as readonly string[]).includes(topic))
+      .map((topic) => tTopics(topic))
+      .join(' · ');
   const canJoin = (row: ConsultationRow) => row.status === 'PAID' && row.meetingId && now.getTime() >= new Date(row.startsAt).getTime() - JOIN_BEFORE_MS;
 
   // Mobile: grouped by day.
@@ -259,9 +233,10 @@ function ConsultationList({ tab }: { tab: 'upcoming' | 'past' }): ReactNode {
     <>
       <section aria-label={t('tabs.label')} className="hidden overflow-hidden rounded-3xl border border-fog-light bg-white lg:block">
         <div className={cn(LABEL_CLASS, 'grid grid-cols-12 gap-4 border-b border-fog-light px-5 py-4 text-slate')}>
-          <span className="col-span-3">{t('columns.when')}</span>
-          <span className="col-span-4">{t('columns.client')}</span>
-          <span className="col-span-3">{t('columns.payment')}</span>
+          <span className="col-span-2">{t('columns.when')}</span>
+          <span className="col-span-3">{t('columns.client')}</span>
+          <span className="col-span-2">{t('columns.payment')}</span>
+          <span className="col-span-3">{t('columns.prepared')}</span>
           <span className="col-span-2 text-right">{t('columns.action')}</span>
         </div>
         <ul className="divide-y divide-fog-light">
@@ -270,7 +245,7 @@ function ConsultationList({ tab }: { tab: 'upcoming' | 'past' }): ReactNode {
             const ends = new Date(starts.getTime() + row.durationMinutes * 60_000);
             return (
               <li key={row.id} className="relative grid grid-cols-12 items-center gap-4 px-5 py-4 hover:bg-off-white">
-                <div className="col-span-3 flex flex-col">
+                <div className="col-span-2 flex flex-col">
                   <Link href={`/consultations/${row.id}`} className="text-body-sm leading-5 font-bold text-ink after:absolute after:inset-0 first-letter:uppercase">
                     {day(starts)}
                   </Link>
@@ -278,12 +253,21 @@ function ConsultationList({ tab }: { tab: 'upcoming' | 'past' }): ReactNode {
                     {time(starts)} – {time(ends)}
                   </span>
                 </div>
-                <div className="col-span-4 flex min-w-0 flex-col">
+                <div className="col-span-3 flex min-w-0 flex-col">
                   <span title={row.client.name} className={NAME}>{row.client.name}</span>
                   <span className="text-caption text-slate">{who(row)}</span>
                 </div>
-                <div className="col-span-3">
+                <div className="col-span-2">
                   <PaymentBadge row={row} now={now} />
+                </div>
+                <div className="col-span-3 min-w-0">
+                  {prepared(row) ? (
+                    <span title={prepared(row)} className="block truncate text-caption text-slate">
+                      {prepared(row)}
+                    </span>
+                  ) : (
+                    <span className="text-caption text-slate-mute">—</span>
+                  )}
                 </div>
                 <div className="relative z-10 col-span-2 text-right">
                   {canJoin(row) ? (

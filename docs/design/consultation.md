@@ -99,7 +99,13 @@ The overview becomes a daily view (`Tableau de bord · Aperçu`): four figures (
 
 Tabs « À venir », « Passées », « Paiements échoués » (count = unresolved failures). Right column: Disponibilités (weekly hours, duration, pause between, how early one can book, how far ahead, « Bloquer une date »). Rows link to the Consultation page.
 
-**Liste / Calendrier** (switch above the tabs, the last choice remembered; boards `Tableau de bord · Consultations · Calendrier · Desktop` and `· Mobile`, built): desktop shows one week (Monday to Sunday, from the earliest to the latest open hour, « ‹ Aujourd'hui › »); mobile shows one day, with a strip of the week's days to tap. It shows paid Consultations (leaf), held ones (honey, dashed, « Gardé N min »), the consultant's other Réunions (white, grey border, since they block slots too), the Disponibilités (ice-blue background) and blocked dates (hatched, crossed out on mobile); past ones faded, a rouge « now » line on today. Read-only: a Consultation opens its page, a Réunion opens it; no drag to move (« Déplacer » asks for a reason and tells the Client), and Disponibilités stay in their form beside it. No month view: 45-minute Consultations would only be dots.
+**Three views** (switch top right, the last choice remembered on the device; boards `Consultations · C · Liste`, `Variante C — Barre`, `C · Modifier en panneau`, `C · Modifier en onglet`). No right column any more: each view has the full width.
+
+- **Liste:** tabs « À venir », « Passées », « Paiements échoués », then the table (Quand, Client, Paiement, Préparé = the topics chosen, Action). No Disponibilités here.
+- **Calendrier:** the Disponibilités in one bar (open days grouped, « lun – ven 09–17 », the rules, the price, « Modifier ») above the week. « Modifier » opens the side panel, to change something on the go: hours, rules one per line, price, blocked dates, « Annuler / Enregistrer ». Desktop shows one week (Monday to Sunday, from the earliest to the latest open hour, « ‹ Aujourd'hui › »); mobile one day, with a strip of the week's days. It shows paid Consultations (leaf), held ones (honey, dashed, « Gardé N min »), the consultant's other Réunions (white, grey border, since they block slots too), the open hours (ice-blue) and blocked dates (hatched, crossed out on mobile); past ones faded, a rouge « now » line on today. Read-only: a block opens its Consultation or Réunion; no drag to move (« Déplacer » asks for a reason and tells the Client). No month view.
+- **Disponibilités:** full control. Left, « Horaires de la semaine », each day's hours drawn on a timeline beside its field (timeline hidden on phones); right, the rules, the price and blocked dates, « Enregistrer ».
+
+The mobile « Mes disponibilités » bottom bar is gone: the three views replace it.
 
 **Rows:** the Client's name on one line, cut with « … » (full name on hover), body-sm; status pills small (label size, tight tracking) and never wrap.
 

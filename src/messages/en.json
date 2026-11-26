@@ -5221,7 +5221,8 @@
         "when": "When",
         "client": "Client",
         "payment": "Payment",
-        "action": "Action"
+        "action": "Action",
+        "prepared": "Prepared"
       },
       "row": {
         "paid": "Paid · {network}",
@@ -5256,8 +5257,6 @@
       "availability": {
         "title": "Availability",
         "lead": "Douala time. Taken or blocked slots disappear.",
-        "mine": "My availability",
-        "mineHint": "Opens a sheet: days, hours, block a date",
         "hours": "Hours per day",
         "off": "Unavailable",
         "hoursHint": "One or more ranges: 09:00 – 12:00 · 14:00 – 16:00. Empty: unavailable.",
@@ -5277,7 +5276,17 @@
         "add": "Add",
         "save": "Save",
         "saved": "Availability saved",
-        "error": "That didn’t work. Check the fields and try again."
+        "error": "That didn’t work. Check the fields and try again.",
+        "hoursShort": "Hours",
+        "rules": "Rules",
+        "cancel": "Cancel",
+        "weekHours": "Weekly hours",
+        "douala": "Douala time",
+        "edit": "Edit",
+        "panelLead": "Douala time. The public page follows as soon as you save.",
+        "noHours": "No open hours",
+        "noPriceShort": "No price",
+        "rulesSummary": "{duration} + {buffer} min · {notice} h notice · {weeks} wk"
       },
       "detail": {
         "back": "Consultations",
@@ -5338,7 +5347,8 @@
         "view": {
           "label": "View",
           "list": "List",
-          "calendar": "Calendar"
+          "calendar": "Calendar",
+          "availability": "Availability"
         },
         "weekLabel": "Week of {week}",
         "days": "Days of the week",

@@ -153,6 +153,7 @@ export const consultationAdminRouter = createTRPCRouter({
           durationMinutes: c.durationMinutes,
           heldUntil: c.heldUntil,
           crsScore: c.crsScore,
+          topics: c.topics,
           client: c.account,
           network: c.paidBy?.network === 'card' ? null : (c.paidBy?.networkName ?? null),
           card: c.paidBy?.network === 'card',

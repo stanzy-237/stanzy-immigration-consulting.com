@@ -34,12 +34,6 @@ type Block = {
   heldMinutes: number;
 };
 
-/** « Grace Nkeng » → « Grace N. », for the week's narrow columns. */
-export const shortName = (name: string): string => {
-  const words = name.trim().split(/\s+/);
-  return words.length > 1 ? `${words[0]} ${words.at(-1)!.charAt(0)}.` : name;
-};
-
 const clock = (minutes: number) => `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
 
 function blocksOf(week: Week, now: Date): Block[] {
@@ -325,7 +319,7 @@ function DayColumn({ day, blocks, settings, range, perHour, today, now, compact 
               >
                 <span className="flex min-w-0 flex-col">
                   <span className={cn('truncate font-bold text-ink', compact ? 'text-caption leading-4' : 'text-body-sm leading-5')}>
-                    {compact && block.kind !== 'meeting' ? shortName(block.title) : block.title}
+                    {block.title}
                   </span>
                   <span className={cn('truncate leading-4', compact ? cn('text-label', KIND_TEXT[block.kind]) : 'text-caption text-slate')}>
                     {compact ? (block.kind === 'held' ? `${clock(block.start)} · ${block.heldMinutes} min` : clock(block.start)) : time}

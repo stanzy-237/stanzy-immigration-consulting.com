@@ -5238,7 +5238,8 @@
         "when": "Quand",
         "client": "Client",
         "payment": "Paiement",
-        "action": "Action"
+        "action": "Action",
+        "prepared": "Préparé"
       },
       "row": {
         "paid": "Payée · {network}",
@@ -5273,8 +5274,6 @@
       "availability": {
         "title": "Disponibilités",
         "lead": "Heure de Douala. Les créneaux pris ou bloqués disparaissent.",
-        "mine": "Mes disponibilités",
-        "mineHint": "Ouvre une feuille : jours, heures, bloquer une date",
         "hours": "Heures par jour",
         "off": "Indisponible",
         "hoursHint": "Une ou plusieurs plages : 09:00 – 12:00 · 14:00 – 16:00. Vide : indisponible.",
@@ -5294,7 +5293,17 @@
         "add": "Ajouter",
         "save": "Enregistrer",
         "saved": "Disponibilités enregistrées",
-        "error": "Ça n’a pas marché. Vérifiez les champs et réessayez."
+        "error": "Ça n’a pas marché. Vérifiez les champs et réessayez.",
+        "hoursShort": "Horaires",
+        "rules": "Règles",
+        "cancel": "Annuler",
+        "weekHours": "Horaires de la semaine",
+        "douala": "Heure de Douala",
+        "edit": "Modifier",
+        "panelLead": "Heure de Douala. La page publique suit dès l’enregistrement.",
+        "noHours": "Aucune heure ouverte",
+        "noPriceShort": "Sans tarif",
+        "rulesSummary": "{duration} + {buffer} min · {notice} h avant · {weeks} sem."
       },
       "detail": {
         "back": "Consultations",
@@ -5355,7 +5364,8 @@
         "view": {
           "label": "Affichage",
           "list": "Liste",
-          "calendar": "Calendrier"
+          "calendar": "Calendrier",
+          "availability": "Disponibilités"
         },
         "weekLabel": "Semaine du {week}",
         "days": "Jours de la semaine",

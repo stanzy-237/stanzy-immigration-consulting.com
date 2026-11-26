@@ -20,7 +20,7 @@ const LIST: Listing = {
   counts: { upcoming: 2, failed: 1 },
   failed: [],
   rows: [
-    { id: 'con_1', status: 'PAID', startsAt: IN_TWO_DAYS, durationMinutes: 45, heldUntil: null, crsScore: 452, client, network: 'MTN Mobile Money', card: false, meetingId: 'meet_1' },
+    { id: 'con_1', status: 'PAID', startsAt: IN_TWO_DAYS, durationMinutes: 45, heldUntil: null, crsScore: 452, topics: ['eligibility', 'points'], client, network: 'MTN Mobile Money', card: false, meetingId: 'meet_1' },
     {
       id: 'con_2',
       status: 'HELD',
@@ -28,6 +28,7 @@ const LIST: Listing = {
       durationMinutes: 45,
       heldUntil: new Date(Date.now() + 9 * 60_000),
       crsScore: null,
+      topics: [],
       client: { ...client, id: 'acc_2', name: 'Grace Nkeng', status: 'USER' as const },
       network: null,
       card: false,
@@ -65,6 +66,8 @@ describe('Tableau de bord → Consultations', () => {
     expect(screen.getAllByText('Payée · MTN').length).toBeGreaterThan(0);
     expect(screen.getAllByText('En attente · gardé 9 min').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Lead · CRS 452').length).toBeGreaterThan(0);
+    expect(screen.getByText('Mon admissibilité · Gagner des points CRS')).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Disponibilités' })).not.toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
   });
 
@@ -77,14 +80,15 @@ describe('Tableau de bord → Consultations', () => {
     expect(failed.getByRole('link', { name: 'Voir le Compte' })).toHaveAttribute('href', '/comptes/acc_3');
   });
 
-  it('saves the Disponibilités: several ranges a day, and the price', async () => {
+  it('« Disponibilités » saves everything: several ranges a day, and the price', async () => {
     const save = vi.fn(() => ({ saved: true }));
     renderList({ 'consultationAdmin.saveSettings': save });
-    const panel = within(screen.getByRole('region', { name: 'Disponibilités' }));
-    expect(panel.getByDisplayValue('09:00 – 12:00 · 14:00 – 16:00')).toBeInTheDocument();
-    expect(panel.getByText('Sans tarif, le paiement reste fermé.')).toBeInTheDocument();
-    fireEvent.change(panel.getByRole('textbox', { name: /^Tarif/ }), { target: { value: '12345' } });
-    fireEvent.click(panel.getByRole('button', { name: 'Enregistrer' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Disponibilités' }));
+    const panel = within(await screen.findByRole('region', { name: 'Horaires de la semaine' })).getByDisplayValue('09:00 – 12:00 · 14:00 – 16:00');
+    expect(panel).toBeInTheDocument();
+    expect(screen.getByText('Sans tarif, le paiement reste fermé.')).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('textbox', { name: /^Tarif/ }), { target: { value: '12345' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
     await waitFor(() =>
       expect(save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -98,13 +102,13 @@ describe('Tableau de bord → Consultations', () => {
     );
   });
 
-  it('says which day’s hours it cannot read, and saves nothing', () => {
+  it('says which day’s hours it cannot read, and saves nothing', async () => {
     const save = vi.fn();
     renderList({ 'consultationAdmin.saveSettings': save });
-    const panel = within(screen.getByRole('region', { name: 'Disponibilités' }));
-    fireEvent.change(panel.getByDisplayValue('09:00 – 12:00 · 14:00 – 16:00'), { target: { value: 'le matin' } });
-    fireEvent.click(panel.getByRole('button', { name: 'Enregistrer' }));
-    expect(panel.getByRole('alert')).toHaveTextContent('Une plage n’est pas lisible');
+    fireEvent.click(screen.getByRole('radio', { name: 'Disponibilités' }));
+    fireEvent.change(await screen.findByDisplayValue('09:00 – 12:00 · 14:00 – 16:00'), { target: { value: 'le matin' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
+    expect(screen.getByRole('alert')).toHaveTextContent('Une plage n’est pas lisible');
     expect(save).not.toHaveBeenCalled();
   });
 });
@@ -219,12 +223,24 @@ describe('Tableau de bord → Consultations, « Calendrier »', () => {
     const { container } = renderCalendar();
     const week = within(await screen.findByRole('region', { name: /Semaine du/ }));
     expect(week.getByRole('link', { name: 'Grace Nkeng, 09:00 – 09:45, Gardé 9 min' })).toHaveAttribute('href', '/consultations/con_held');
-    expect(week.getByRole('link', { name: /Richil Stanley Nouping Nouping, 11:00 – 11:45, Payée/ })).toHaveTextContent('Richil N.');
+    expect(week.getByRole('link', { name: /Richil Stanley Nouping Nouping, 11:00 – 11:45, Payée/ })).toHaveTextContent('Richil Stanley Nouping Nouping');
     expect(week.getByRole('link', { name: /Signature, 15:00 – 16:00, Réunion/ })).toHaveAttribute('href', '/reunions/meet_9');
     expect(within(week.getByRole('group', { name: 'mardi 24 novembre' })).getByText('Bloquée')).toBeInTheDocument();
     expect(screen.queryByRole('tab', { name: 'Passées' })).not.toBeInTheDocument();
     expect(window.localStorage.getItem('stanzy.consultations.view')).toBe('calendar');
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('sums up the Disponibilités above the week; « Modifier » opens them beside it', async () => {
+    renderCalendar();
+    const bar = within(await screen.findByRole('region', { name: 'Disponibilités' }));
+    expect(bar.getByText('lun 09–12 · 14–16')).toBeInTheDocument();
+    expect(bar.getByText('Sans tarif')).toBeInTheDocument();
+    fireEvent.click(bar.getByRole('button', { name: 'Modifier' }));
+    const panel = within(await screen.findByRole('dialog', { name: 'Disponibilités' }));
+    expect(panel.getByDisplayValue('09:00 – 12:00 · 14:00 – 16:00')).toBeInTheDocument();
+    fireEvent.click(panel.getByRole('button', { name: 'Annuler' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('moves a week at a time, and back to this one', async () => {
