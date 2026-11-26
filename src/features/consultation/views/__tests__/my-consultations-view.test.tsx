@@ -87,7 +87,7 @@ describe('Mon espace → Mes consultations', () => {
     expect(upcoming.getByText('Payée 15 713 FCFA')).toBeInTheDocument();
     expect(upcoming.getByRole('link', { name: 'Préparer' })).toHaveAttribute('href', '/mon-espace/consultations/con_1');
     const past = within(screen.getByRole('region', { name: 'Passées' }));
-    expect(past.getByText('Enregistrement disponible')).toBeInTheDocument();
+    expect(past.getAllByText('Enregistrement disponible')[0]).toBeInTheDocument();
     expect(past.getByText(/3 prochaines étapes, 1 faites/)).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
   });

@@ -130,11 +130,11 @@ function Consultation({ id }: { id: string }): ReactNode {
           <div className="flex items-start gap-2.5">
             {live ? (
               <>
-                <div className="flex flex-1 flex-col items-center gap-1 lg:flex-none">
+                <div className="flex flex-1 flex-col items-center gap-1 max-sm:hidden lg:flex-none">
                   {canJoin ? (
                     <Link
                       href={consultantRoomPath(data.meeting!.id)}
-                      className={cn('flex h-11 w-full items-center justify-center gap-2 rounded-full bg-navy-deep px-5 font-heading text-body-sm font-bold text-white', PRESS)}
+                      className={cn('flex h-11 w-full animate-ring-once items-center justify-center gap-2 rounded-full bg-navy-deep px-5 font-heading text-body-sm font-bold text-white motion-reduce:animate-none', PRESS)}
                     >
                       <Video aria-hidden={true} className="size-4" strokeWidth={2.2} />
                       {t('join')}
@@ -150,19 +150,54 @@ function Consultation({ id }: { id: string }): ReactNode {
                 <button
                   type="button"
                   onClick={() => setMoving(true)}
-                  className={cn('h-11 flex-1 rounded-full border-2 border-fog-light bg-white px-5 font-heading text-body-sm font-bold text-ink lg:flex-none', PRESS)}
+                  className={cn('h-11 flex-1 rounded-full border-2 border-fog-light bg-white px-5 font-heading text-body-sm font-bold text-ink max-sm:hidden lg:flex-none', PRESS)}
                 >
                   {t('move')}
                 </button>
               </>
             ) : (
-              <PublishButton data={data} firstName={firstName} />
+              <span className="flex flex-1 max-sm:hidden lg:flex-none">
+                <PublishButton data={data} firstName={firstName} />
+              </span>
             )}
             {/* « 2 Après » has no « ⋯ »: nothing to resend or cancel once it is over. */}
-            {live ? <MoreMenu data={data} firstName={firstName} live={live} onCancel={() => setCancelling(true)} /> : null}
+            {live ? <MoreMenu data={data} firstName={firstName} live={live} onCancel={() => setCancelling(true)} onMove={() => setMoving(true)} /> : null}
           </div>
         ) : null}
       </header>
+
+      {/* Phone (`Consultation · 1 Avant / 2 Après · Mobile`): « Rejoindre » or « Publier » at the bottom; « Déplacer » and « Annuler » in « ⋯ ». */}
+      {paid ? (
+        <>
+          <div aria-hidden={true} className="h-28 sm:hidden" />
+          <div
+            className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center gap-2 border-t border-fog-light bg-white px-4 pt-3 sm:hidden"
+            style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+          >
+            {live ? (
+              <>
+                {canJoin ? (
+                  <Link
+                    href={consultantRoomPath(data.meeting!.id)}
+                    className={cn('flex h-13 w-full animate-ring-once items-center justify-center gap-2 rounded-full bg-navy-deep font-heading text-body font-bold text-white motion-reduce:animate-none', PRESS)}
+                  >
+                    <Video aria-hidden={true} className="size-4.5" strokeWidth={2.2} />
+                    {t('join')}
+                  </Link>
+                ) : (
+                  <span aria-disabled={true} className="flex h-13 w-full items-center justify-center gap-2 rounded-full bg-ice-blue font-heading text-body font-bold text-slate">
+                    <Video aria-hidden={true} className="size-4.5" strokeWidth={2.2} />
+                    {t('joinOpensAt', { time: time(opensAt) })}
+                  </span>
+                )}
+                <span className="text-caption text-slate">{t('phoneMenuHint')}</span>
+              </>
+            ) : (
+              <PublishButton data={data} firstName={firstName} />
+            )}
+          </div>
+        </>
+      ) : null}
 
       {after ? (
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
@@ -499,7 +534,7 @@ function Timeline({ data, meeting, firstName }: { data: Detail; meeting: NonNull
 }
 
 /** « ⋯ »: Renvoyer la confirmation, Voir le Compte, Annuler ce créneau. */
-function MoreMenu({ data, firstName, live, onCancel }: { data: Detail; firstName: string; live: boolean; onCancel: () => void }): ReactNode {
+function MoreMenu({ data, firstName, live, onCancel, onMove }: { data: Detail; firstName: string; live: boolean; onCancel: () => void; onMove: () => void }): ReactNode {
   const t = useTranslations('Consultation.admin.detail');
   const trpc = useTRPC();
   const resend = useMutation(
@@ -528,6 +563,10 @@ function MoreMenu({ data, firstName, live, onCancel }: { data: Detail; firstName
         </DropdownMenuItem>
         {live ? (
           <>
+            {/* On phones « Déplacer » lives here (the header has no room for it). */}
+            <DropdownMenuItem onClick={onMove} className={cn(item, 'sm:hidden')}>
+              <span className="text-body-sm font-semibold text-ink">{t('move')}</span>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onCancel} className={cn(item, 'focus:bg-blush data-highlighted:bg-blush')}>
               <span className="text-body-sm font-bold text-rouge">{t('menu.cancel')}</span>

@@ -10,12 +10,14 @@ import { useRouter as useNextRouter } from 'next/navigation';
 import { useCallback, useEffect, useId, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
+import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { ConsultantPart } from '@/features/meetings/components/dossier-meetings';
 import type { RoomAccess } from '@/features/meetings/components/meeting-call';
+import { JoinPreview } from '@/features/meetings/components/join-preview';
 import { Avatars, useCopyInvitation } from '@/features/meetings/components/meeting-parts';
 import { useMeetingErrors } from '@/features/meetings/hooks/use-meeting-errors';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -66,6 +68,7 @@ function Room({ meetingId, viewer }: { meetingId: string; viewer: Viewer }): Rea
   const failed = useMeetingErrors();
   const copy = useCopyInvitation();
   const consultant = viewer === 'consultant';
+  const { account } = useCurrentAccount();
   const [accepted, setAccepted] = useState(false);
   const [access, setAccess] = useState<RoomAccess | null>(null);
   const [state, setState] = useState<'waiting' | 'in' | 'left' | 'ended' | 'failed'>('waiting');
@@ -218,7 +221,37 @@ function Room({ meetingId, viewer }: { meetingId: string; viewer: Viewer }): Rea
   else if (meeting.past) body = notice(t('room.over'));
   else if (!meeting.configured) body = notice(t('room.unconfigured'));
   else if (!meeting.joinable) body = notice(t('room.notOpen'));
-  else {
+  else if (!consultant) {
+    // The Client's waiting room: their camera and microphone, then « Rejoindre ».
+    const needsConsent = meeting.recording && !meeting.consentedAt;
+    body = (
+      <JoinPreview
+        name={account?.name.trim().split(/\s+/)[0] ?? ''}
+        when={when}
+        recording={meeting.recording}
+        needsConsent={needsConsent}
+        accepted={accepted}
+        onAccept={setAccepted}
+        consentNote={
+          meeting.consentedAt
+            ? t('room.acceptedOn', { date: format.dateTime(meeting.consentedAt, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) })
+            : null
+        }
+        notice={
+          state === 'left' ? (
+            <p className="text-body-sm text-slate">{t('room.left')}</p>
+          ) : state === 'failed' ? (
+            <p role="alert" className="text-body-sm text-crimson">
+              {t('room.failed')}
+            </p>
+          ) : null
+        }
+        pending={join.isPending}
+        label={join.isPending ? t('room.joining') : state === 'left' ? t('room.rejoin') : t('room.preview.join')}
+        onJoin={() => join.mutate({ id: meeting.id, accepted })}
+      />
+    );
+  } else {
     const needsConsent = meeting.recording && !meeting.consentedAt;
     body = (
       <div className="grid grid-cols-1 gap-4 rounded-2xl border border-fog-light bg-white p-6 shadow-sm">

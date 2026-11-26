@@ -2141,7 +2141,8 @@
       "openDossier": "See the file and its documents",
       "loadingDossier": "Loading the file",
       "services": "Document services",
-      "servicesHint": "Proof of funds, police certificate, CNPS… obtained by Stanzy."
+      "servicesHint": "Proof of funds, police certificate, CNPS… obtained by Stanzy.",
+      "hello": "Hello {name}"
     },
     "consultantEmails": {
       "cta": "Open the file",
@@ -3758,7 +3759,20 @@
       "recordingNow": "Recording",
       "left": "You left the meeting.",
       "rejoin": "Back to the meeting",
-      "failed": "Couldn’t connect. Check the camera and microphone, then try again."
+      "failed": "Couldn’t connect. Check the camera and microphone, then try again.",
+      "preview": {
+        "you": "You · {name}",
+        "heard": "We can hear you",
+        "speak": "Say a few words",
+        "starting": "Opening the camera…",
+        "blocked": "The browser can’t reach the camera or microphone. Allow them in the site settings, then reload the page.",
+        "ready": "Camera and microphone ready",
+        "notReady": "Check your camera and microphone",
+        "title": "All set for the meeting",
+        "consent": "I agree that the meeting is recorded and transcribed. I’ll find it in my space afterwards.",
+        "join": "Join the meeting",
+        "trouble": "Connection trouble? <link>Tell Stanzy on WhatsApp</link>"
+      }
     },
     "toast": {
       "scheduled": "Meeting planned",
@@ -5522,7 +5536,9 @@
         },
         "over": "Over · {minutes} min",
         "recorded": "recorded with their consent",
-        "notRecorded": "no recording"
+        "notRecorded": "no recording",
+        "joinOpensAt": "Join · opens at {time}",
+        "phoneMenuHint": "Move or cancel this slot: ⋯ menu at the top"
       },
       "calendar": {
         "view": {
@@ -5639,7 +5655,8 @@
         "paid": "Paid {amount}",
         "pending": "{network} hasn’t confirmed the payment yet · don’t pay twice",
         "published": "Stanzy’s notes · transcript · {steps, plural, =0 {no step} one {# next step, {done} done} other {# next steps, {done} done}}",
-        "preparing": "Stanzy is preparing your recap"
+        "preparing": "Stanzy is preparing your recap",
+        "phonePast": "{minutes} min · {done} of {total} steps"
       },
       "badge": {
         "pending": "Payment pending",
@@ -5725,8 +5742,21 @@
         "accompanyTitle": "Get support all the way to the ITA.",
         "accompanyLead": "Stanzy follows you step by step with the Express Entry support.",
         "accompanyCta": "Send my request",
-        "error": "That didn’t work. Try again."
-      }
+        "error": "That didn’t work. Try again.",
+        "phoneMeta": "{minutes} min · with Stanzy",
+        "phoneAccompany": "Support all the way to the ITA",
+        "phoneCta": "Ask"
+      },
+      "phoneTitle": "Consultations"
+    }
+  },
+  "Shared": {
+    "spaceTabs": {
+      "label": "My space tabs",
+      "home": "Home",
+      "consultations": "Consultations",
+      "documents": "Documents",
+      "profile": "Profile"
     }
   }
 }

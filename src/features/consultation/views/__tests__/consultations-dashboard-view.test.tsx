@@ -286,7 +286,8 @@ describe('Tableau de bord → a Consultation, « 2 Après »', () => {
   it('« Publier dans son espace » publishes and says the Client is told', async () => {
     const publish = vi.fn(() => ({ publishedAt: new Date(), first: true }));
     renderDetail({ 'consultationAdmin.publish': publish }, AFTER);
-    fireEvent.click(screen.getByRole('button', { name: 'Publier dans son espace' }));
+    // The header's (wider screens); the phone's bottom bar has its own.
+    fireEvent.click(screen.getAllByRole('button', { name: 'Publier dans son espace' })[0]!);
     await waitFor(() => expect(publish).toHaveBeenCalledWith({ id: 'con_1' }));
     expect(await screen.findByText(/Publiée : Aminata est prévenu/)).toBeInTheDocument();
   });

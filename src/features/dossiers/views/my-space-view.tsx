@@ -2,7 +2,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowRight, FileCheck2, FolderOpen } from 'lucide-react';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useFormatter, useNow, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
@@ -12,8 +12,11 @@ import { SpaceTabs } from '@/features/consultation/components/space-parts';
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
+import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { PushBanner } from '@/features/shared/components/push-banner';
+import { SpaceTabBar, TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
 /**
@@ -28,9 +31,11 @@ export function MySpaceView({ notice, consultations = true }: { notice?: ReactNo
   return (
     <>
       <SiteNav />
-      <main className="min-h-screen bg-off-white px-4 py-10 md:py-14">
+      <main className={cn('min-h-screen bg-off-white px-4 py-8 sm:py-10 md:py-14', consultations && TAB_BAR_ROOM)}>
         <div className="mx-auto max-w-3xl">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          {/* Phone (`Mon espace v2 · 1 Avant · Mobile`): the day and « Bonjour Aminata ». */}
+          <PhoneGreeting />
+          <div className="flex flex-col gap-4 max-sm:hidden md:flex-row md:items-end md:justify-between">
             <div>
               <h1 className="font-heading text-3xl font-bold text-navy-deep md:text-4xl">{t('title')}</h1>
               <p className="mt-2 text-slate">{t('subtitle')}</p>
@@ -51,6 +56,7 @@ export function MySpaceView({ notice, consultations = true }: { notice?: ReactNo
           </div>
         </div>
       </main>
+      {consultations ? <SpaceTabBar /> : null}
       <SiteFooter />
     </>
   );
@@ -152,6 +158,26 @@ function MyDossiersSkeleton(): ReactNode {
       <div aria-hidden={true} className="grid grid-cols-1 gap-5">
         <Skeleton className="h-96 rounded-2xl" />
       </div>
+    </div>
+  );
+}
+
+function PhoneGreeting(): ReactNode {
+  const t = useTranslations('Dossiers.mySpace');
+  const tTabs = useTranslations('Shared.spaceTabs');
+  const format = useFormatter();
+  const now = useNow({ updateInterval: 60_000 });
+  const { account } = useCurrentAccount();
+  const name = account?.name.trim().split(/\s+/)[0] ?? '';
+  return (
+    <div className="flex items-center justify-between gap-3 sm:hidden">
+      <div className="flex min-w-0 flex-col">
+        <p className="text-body-sm text-slate first-letter:uppercase">{format.dateTime(now, { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'Africa/Douala' })}</p>
+        <h1 className="truncate font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep">{t('hello', { name })}</h1>
+      </div>
+      <Link href="/compte" aria-label={tTabs('profile')} className="flex size-11 shrink-0 items-center justify-center rounded-full bg-navy-deep font-heading text-body font-extrabold text-white">
+        {name.charAt(0).toUpperCase()}
+      </Link>
     </div>
   );
 }

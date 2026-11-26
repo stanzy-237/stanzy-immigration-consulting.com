@@ -16,6 +16,7 @@ import { MIN_PASSWORD_LENGTH } from '@/features/auth/lib/password';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { useNotificationPush } from '@/features/notifications/hooks/use-notification-push';
+import { SpaceTabBar, TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
 import { useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
@@ -34,7 +35,7 @@ export function CompteView(): ReactNode {
   return (
     <>
       <SiteNav />
-      <main className="min-h-screen bg-off-white px-4 py-8 md:py-14">
+      <main className={cn('min-h-screen bg-off-white px-4 py-8 md:py-14', TAB_BAR_ROOM)}>
         <div className="mx-auto flex max-w-3xl flex-col gap-8 md:gap-10">
           <QueryBoundary fallback={<Skeleton className="h-96 rounded-3xl" />}>
             <Account />
@@ -42,6 +43,7 @@ export function CompteView(): ReactNode {
         </div>
       </main>
       <SiteFooter />
+      <SpaceTabBar />
     </>
   );
 }
@@ -97,7 +99,7 @@ function Account(): ReactNode {
           label={t('profile.email')}
           hint={t('profile.emailHint')}
           value={
-            <span className="flex items-center gap-2">
+            <span className="flex min-w-0 items-center justify-end gap-2">
               <span className="truncate">{data.email}</span>
               {data.emailVerified ? <Pill tone="leaf">{t('profile.verified')}</Pill> : null}
             </span>
@@ -153,11 +155,11 @@ function Section({ title, footnote, children }: { title: string; footnote?: stri
 function Row({ label, hint, value, action, onAction, control }: { label: string; hint?: string; value?: ReactNode; action?: string; onAction?: () => void; control?: ReactNode }): ReactNode {
   return (
     <div className="flex min-h-12.5 items-center gap-3 py-2 sm:gap-6 sm:py-4.5">
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="text-body text-ink sm:font-semibold">{label}</span>
+      <div className="flex shrink-0 flex-col gap-0.5 sm:min-w-0 sm:flex-1 sm:shrink">
+        <span className="text-body whitespace-nowrap text-ink sm:font-semibold">{label}</span>
         {hint ? <span className="text-caption text-slate max-sm:hidden">{hint}</span> : null}
       </div>
-      {value !== undefined ? <div className="min-w-0 text-right text-body-sm text-slate sm:text-body sm:text-ink">{value}</div> : null}
+      {value !== undefined ? <div className="min-w-0 flex-1 truncate text-right text-body-sm text-slate sm:flex-none sm:text-body sm:text-ink">{value}</div> : null}
       {control ?? (
         <div className="flex shrink-0 justify-end sm:w-18">
           {onAction && action ? (

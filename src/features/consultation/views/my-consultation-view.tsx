@@ -17,6 +17,7 @@ import { consultationInvoicePath } from '@/features/consultation/lib/payment';
 import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
+import { SpaceTabBar, TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
@@ -36,7 +37,7 @@ export function MyConsultationView({ id }: { id: string }): ReactNode {
   return (
     <>
       <SiteNav />
-      <main className="min-h-screen bg-off-white px-4 py-8 md:py-12">
+      <main className={cn('min-h-screen bg-off-white px-4 py-8 md:py-12', TAB_BAR_ROOM)}>
         <div className="mx-auto flex max-w-6xl flex-col gap-6">
           <QueryBoundary fallback={<Skeleton className="h-96 rounded-3xl" />}>
             <Consultation id={id} />
@@ -51,8 +52,13 @@ export function MyConsultationView({ id }: { id: string }): ReactNode {
 function Consultation({ id }: { id: string }): ReactNode {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.consultationSpace.detail.queryOptions({ id }));
-  if (!data.over) return <Before data={data} />;
-  return data.published ? <After data={data} published={data.published} /> : <Preparing data={data} />;
+  if (data.over && data.published) return <After data={data} published={data.published} />;
+  return (
+    <>
+      {data.over ? <Preparing data={data} /> : <Before data={data} />}
+      <SpaceTabBar />
+    </>
+  );
 }
 
 function Back(): ReactNode {
@@ -191,10 +197,14 @@ function Preparing({ data }: { data: Detail }): ReactNode {
 /** « Consultation du 25 novembre » (`3 Après · Récap`): video, notes, transcript, steps, and what comes next. */
 function After({ data, published }: { data: Detail; published: Published }): ReactNode {
   const t = useTranslations('Consultation.space.after');
+  const tSpace = useTranslations('Consultation.space');
   const format = useFormatter();
   const video = useRef<HTMLVideoElement>(null);
   const [tab, setTab] = useState<'notes' | 'transcript'>('notes');
-  const seek = (seconds: number) => {
+  // The note whose time was tapped: its background changes (consultation-motion: 150 ms ease).
+  const [current, setCurrent] = useState<string | null>(null);
+  const seek = (seconds: number, noteId?: string) => {
+    if (noteId) setCurrent(noteId);
     if (!video.current) return;
     video.current.currentTime = seconds;
     void video.current.play().catch(() => undefined);
@@ -202,12 +212,24 @@ function After({ data, published }: { data: Detail; published: Published }): Rea
   const recording = published.recording;
   return (
     <>
-      <Back />
-      <div className="flex flex-col gap-1.5">
-        <h1 className="font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep md:text-h2 md:leading-11">
-          {t('title', { date: format.dateTime(new Date(data.startsAt), { day: 'numeric', month: 'long', timeZone: DOUALA }) })}
-        </h1>
-        <p className="text-body text-slate">{t('meta', { minutes: data.minutes })}</p>
+      <div className="max-sm:hidden">
+        <Back />
+      </div>
+      <div className="flex items-center gap-3">
+        {/* Phone (`3 Après · Récap · Mobile`): a round back button beside the title. */}
+        <Link href="/mon-espace/consultations" aria-label={tSpace('tabs.consultations')} className="flex size-11 shrink-0 items-center justify-center rounded-full border border-fog-light bg-white sm:hidden">
+          <ChevronLeft aria-hidden={true} className="size-5 text-navy-deep" strokeWidth={2.5} />
+        </Link>
+        <div className="flex min-w-0 flex-col gap-0.5 sm:gap-1.5">
+          <h1 className="font-heading text-h4 leading-7 font-extrabold tracking-tight text-navy-deep sm:text-h3 sm:leading-9 md:text-h2 md:leading-11">
+            <span className="sm:hidden">{t('title', { date: format.dateTime(new Date(data.startsAt), { day: 'numeric', month: 'short', timeZone: DOUALA }) })}</span>
+            <span className="max-sm:hidden">{t('title', { date: format.dateTime(new Date(data.startsAt), { day: 'numeric', month: 'long', timeZone: DOUALA }) })}</span>
+          </h1>
+          <p className="text-body-sm text-slate sm:text-body">
+            <span className="sm:hidden">{t('phoneMeta', { minutes: data.minutes })}</span>
+            <span className="max-sm:hidden">{t('meta', { minutes: data.minutes })}</span>
+          </p>
+        </div>
       </div>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <div className="flex min-w-0 flex-1 flex-col gap-5">
@@ -232,7 +254,7 @@ function After({ data, published }: { data: Detail; published: Published }): Rea
                       type="button"
                       aria-label={t('goTo', { time: clockOfSeconds(note.atSeconds) })}
                       title={note.text}
-                      onClick={() => seek(note.atSeconds)}
+                      onClick={() => seek(note.atSeconds, note.id)}
                       className="absolute top-0 h-3 w-1 -translate-x-1/2 rounded-full bg-white hover:bg-rose"
                       style={{ left: `${Math.min(100, (note.atSeconds / recording.seconds) * 100)}%` }}
                     />
@@ -242,7 +264,7 @@ function After({ data, published }: { data: Detail; published: Published }): Rea
           ) : (
             <p className="rounded-3xl bg-navy-deep p-6 text-body-sm text-white/80">{t('noVideo')}</p>
           )}
-          <div role="tablist" aria-label={t('tabsLabel')} className="flex gap-6 border-b border-fog-light">
+          <div role="tablist" aria-label={t('tabsLabel')} className="flex gap-6 border-b border-fog-light max-sm:gap-0 max-sm:rounded-full max-sm:border-0 max-sm:bg-ice-blue max-sm:p-1">
             {(['notes', 'transcript'] as const).map((key) => (
               <button
                 key={key}
@@ -250,7 +272,10 @@ function After({ data, published }: { data: Detail; published: Published }): Rea
                 role="tab"
                 aria-selected={tab === key}
                 onClick={() => setTab(key)}
-                className={cn('-mb-px border-b-2 pb-2.5 text-body font-bold', tab === key ? 'border-rouge text-navy-deep' : 'border-transparent text-slate')}
+                className={cn(
+                  '-mb-px border-b-2 pb-2.5 text-body font-bold max-sm:mb-0 max-sm:flex-1 max-sm:rounded-full max-sm:border-0 max-sm:py-2.5 max-sm:text-body-sm',
+                  tab === key ? 'border-rouge text-navy-deep max-sm:bg-white max-sm:shadow-sm' : 'border-transparent text-slate',
+                )}
               >
                 {t(key)}
               </button>
@@ -260,9 +285,9 @@ function After({ data, published }: { data: Detail; published: Published }): Rea
             published.notes.length ? (
               <ul className="flex flex-col gap-3">
                 {published.notes.map((note) => (
-                  <li key={note.id} className="flex items-start gap-3">
+                  <li key={note.id} className={cn('-mx-2 flex items-start gap-3 rounded-xl px-2 py-1.5 transition-colors duration-150 ease-out', current === note.id && 'bg-ice-blue/60')}>
                     {note.atSeconds !== null ? (
-                      <button type="button" onClick={() => seek(note.atSeconds!)} className="shrink-0 rounded-md bg-ice-blue px-2 py-0.5 text-caption font-bold text-ink tabular-nums">
+                      <button type="button" onClick={() => seek(note.atSeconds!, note.id)} className="shrink-0 rounded-md bg-ice-blue px-2 py-0.5 text-caption font-bold text-ink tabular-nums">
                         {clockOfSeconds(note.atSeconds)}
                       </button>
                     ) : null}
@@ -281,7 +306,7 @@ function After({ data, published }: { data: Detail; published: Published }): Rea
         </div>
         <aside className="flex w-full flex-col gap-4 lg:w-110 lg:shrink-0">
           {published.steps.length ? <Steps id={data.id} steps={published.steps} /> : null}
-          <section aria-labelledby="and-now" className="flex flex-col gap-3 rounded-3xl bg-navy-deep p-6 text-white">
+          <section aria-labelledby="and-now" className="flex flex-col gap-3 rounded-3xl bg-navy-deep p-6 text-white max-sm:hidden">
             <p className={cn(LABEL_CLASS, 'text-rose')}>{t('andNow')}</p>
             <h2 id="and-now" className="font-heading text-h4 font-bold">
               {t('accompanyTitle')}
@@ -293,6 +318,19 @@ function After({ data, published }: { data: Detail; published: Published }): Rea
           </section>
           {data.payment ? <InvoiceCard payment={data.payment} /> : null}
         </aside>
+      </div>
+      {/* Phone: « Et maintenant ? » stays at the bottom, in reach. */}
+      <div
+        className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-4 border-t border-fog-light bg-white px-5 pt-4 sm:hidden"
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+      >
+        <div className="flex min-w-0 flex-1 flex-col">
+          <span className="font-label text-label font-bold tracking-wide text-rouge uppercase">{t('andNow')}</span>
+          <span className="truncate text-body-sm font-bold text-navy-deep">{t('phoneAccompany')}</span>
+        </div>
+        <Link href="/services/accompagnement" className={cn('flex h-12 shrink-0 items-center rounded-full bg-rouge px-6 font-heading text-body-sm font-bold text-white', PRESS)}>
+          {t('phoneCta')}
+        </Link>
       </div>
     </>
   );
@@ -332,7 +370,7 @@ function Steps({ id, steps }: { id: string; steps: Published['steps'] }): ReactN
                 onChange={(e) => toggle.mutate({ id, stepId: step.id, done: e.target.checked })}
                 className="size-5 shrink-0 accent-leaf"
               />
-              <span className={cn('text-body-sm text-ink', step.doneAt && 'text-slate line-through')}>{step.text}</span>
+              <span className={cn('text-body-sm text-ink line-through decoration-transparent transition-colors delay-150 duration-150 ease-out', step.doneAt && 'text-slate decoration-slate')}>{step.text}</span>
             </label>
           </li>
         ))}

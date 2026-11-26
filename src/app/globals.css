@@ -344,6 +344,18 @@
       transform: scale(0.96);
     }
   }
+
+  /* « Rejoindre » just opened (T−15 min): one soft ring, never a loop (docs/design/consultation-motion.md). */
+  --animate-ring-once: ring-once 900ms ease-out 1 both;
+
+  @keyframes ring-once {
+    from {
+      box-shadow: 0 0 0 0 rgb(204 22 39 / 0.45);
+    }
+    to {
+      box-shadow: 0 0 0 14px rgb(204 22 39 / 0);
+    }
+  }
 }
 
 @layer base {

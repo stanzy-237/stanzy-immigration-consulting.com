@@ -2158,7 +2158,8 @@
       "openDossier": "Voir le dossier et ses documents",
       "loadingDossier": "Chargement du dossier",
       "services": "Services documentaires",
-      "servicesHint": "Preuve de fonds, certificat de police, CNPS… obtenus par Stanzy."
+      "servicesHint": "Preuve de fonds, certificat de police, CNPS… obtenus par Stanzy.",
+      "hello": "Bonjour {name}"
     },
     "consultantEmails": {
       "cta": "Ouvrir le dossier",
@@ -3775,7 +3776,20 @@
       "recordingNow": "Enregistrement en cours",
       "left": "Vous avez quitté la réunion.",
       "rejoin": "Revenir dans la réunion",
-      "failed": "Connexion impossible. Vérifiez la caméra et le micro, puis réessayez."
+      "failed": "Connexion impossible. Vérifiez la caméra et le micro, puis réessayez.",
+      "preview": {
+        "you": "Vous · {name}",
+        "heard": "On vous entend",
+        "speak": "Dites quelques mots",
+        "starting": "Ouverture de la caméra…",
+        "blocked": "Le navigateur n’a pas accès à la caméra ou au micro. Autorisez-les dans les réglages du site, puis rechargez la page.",
+        "ready": "Caméra et micro prêts",
+        "notReady": "Caméra et micro à vérifier",
+        "title": "Tout est prêt pour la Réunion",
+        "consent": "J’accepte que la Réunion soit enregistrée et transcrite. Je la retrouve ensuite dans Mon espace.",
+        "join": "Rejoindre la Réunion",
+        "trouble": "Un souci de connexion ? <link>Prévenir Stanzy sur WhatsApp</link>"
+      }
     },
     "toast": {
       "scheduled": "Réunion planifiée",
@@ -5539,7 +5553,9 @@
         },
         "over": "Terminée · {minutes} min",
         "recorded": "enregistrée avec son accord",
-        "notRecorded": "pas d’enregistrement"
+        "notRecorded": "pas d’enregistrement",
+        "joinOpensAt": "Rejoindre · s’ouvre à {time}",
+        "phoneMenuHint": "Déplacer ou annuler ce créneau : menu ⋯ en haut"
       },
       "calendar": {
         "view": {
@@ -5656,7 +5672,8 @@
         "paid": "Payée {amount}",
         "pending": "{network} n’a pas encore confirmé le paiement · ne payez pas deux fois",
         "published": "Notes de Stanzy · transcription · {steps, plural, =0 {sans étape} one {# prochaine étape, {done} faite} other {# prochaines étapes, {done} faites}}",
-        "preparing": "Stanzy prépare votre récapitulatif"
+        "preparing": "Stanzy prépare votre récapitulatif",
+        "phonePast": "{minutes} min · {done} étape sur {total}"
       },
       "badge": {
         "pending": "Paiement en attente",
@@ -5742,8 +5759,21 @@
         "accompanyTitle": "Faites-vous accompagner jusqu’à l’ITA.",
         "accompanyLead": "Stanzy vous suit étape par étape avec l’Accompagnement Entrée express.",
         "accompanyCta": "Envoyer ma demande",
-        "error": "Ça n’a pas marché. Réessayez."
-      }
+        "error": "Ça n’a pas marché. Réessayez.",
+        "phoneMeta": "{minutes} min · avec Stanzy",
+        "phoneAccompany": "Accompagnement jusqu’à l’ITA",
+        "phoneCta": "Demander"
+      },
+      "phoneTitle": "Consultations"
+    }
+  },
+  "Shared": {
+    "spaceTabs": {
+      "label": "Onglets de Mon espace",
+      "home": "Accueil",
+      "consultations": "Consultations",
+      "documents": "Documents",
+      "profile": "Profil"
     }
   }
 }

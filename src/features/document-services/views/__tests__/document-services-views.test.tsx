@@ -23,6 +23,7 @@ vi.mock('@/i18n/navigation', () => ({
     </a>
   ),
   useRouter: () => router,
+  usePathname: () => '/mon-espace/services',
 }));
 vi.mock('next/navigation', () => ({ useRouter: () => router }));
 

@@ -146,10 +146,10 @@ describe('the room', () => {
 
   it('sends the Client to their Consultation once its Réunion is ended for everyone, never back to « Rejoindre »', async () => {
     open(room({ consentedAt: new Date('2026-11-11T12:45:00Z'), consultationId: 'con_1' }), joined);
-    fireEvent.click(screen.getByRole('button', { name: 'Rejoindre' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Rejoindre la Réunion' }));
     fireEvent.click(await screen.findByRole('button', { name: 'call ended' }));
     await waitFor(() => expect(go.client).toHaveBeenCalledWith('/mon-espace/consultations/con_1'));
-    expect(screen.queryByRole('button', { name: 'Rejoindre' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Rejoindre/ })).toBeNull();
   });
 
   it('sends the consultant to the Consultation’s « 2 Après », also when he opens a Réunion already over', async () => {
@@ -162,12 +162,12 @@ describe('the room', () => {
     const { container } = open(room(), {
       'meetings.join': (input) => join(input) ?? { apiKey: 'k', token: 't', callId: 'meeting_m_1', user: { id: 'acc_1', name: 'A' } },
     });
-    expect(screen.getByRole('heading', { name: 'Cette réunion est enregistrée' })).toBeInTheDocument();
-    const button = screen.getByRole('button', { name: 'Rejoindre' });
+    expect(screen.getByRole('heading', { name: 'Tout est prêt pour la Réunion' })).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: 'Rejoindre la Réunion' });
     expect(button).toBeDisabled();
     expect(await axe(container)).toHaveNoViolations();
 
-    fireEvent.click(screen.getByLabelText('J’accepte que la réunion soit enregistrée'));
+    fireEvent.click(screen.getByLabelText(/J’accepte que la Réunion soit enregistrée et transcrite/));
     fireEvent.click(button);
     await waitFor(() => expect(join).toHaveBeenCalledWith({ id: 'm_1', accepted: true }));
     expect(await screen.findByText('call meeting_m_1')).toBeInTheDocument();

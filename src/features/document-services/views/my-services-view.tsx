@@ -13,6 +13,8 @@ import { textIn } from '@/features/document-services/lib/service-schema';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { Link } from '@/i18n/navigation';
+import { SpaceTabBar, TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
+import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
 /**
@@ -25,7 +27,7 @@ export function MyServicesView({ documentId }: { documentId: string | null }): R
   return (
     <>
       <SiteNav />
-      <main className="min-h-screen bg-off-white">
+      <main className={cn('min-h-screen bg-off-white', TAB_BAR_ROOM)}>
         <section className="relative overflow-hidden bg-navy-deep px-4 pt-10 pb-24 text-white md:pt-14">
           <div aria-hidden={true} className="absolute -top-24 -right-24 size-80 rounded-full bg-rouge/30 blur-3xl" />
           <div aria-hidden={true} className="absolute -bottom-32 -left-16 size-72 rounded-full bg-steel-blue/30 blur-3xl" />
@@ -71,6 +73,7 @@ export function MyServicesView({ documentId }: { documentId: string | null }): R
           </ol>
         </div>
       </main>
+      <SpaceTabBar />
       <SiteFooter />
     </>
   );

@@ -18,6 +18,10 @@ import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
 const DOUALA = 'Africa/Douala';
+/** On a phone a dialog rises from the bottom as a sheet (`4 Déplacer le créneau · Mobile`). */
+export const PHONE_SHEET =
+  'max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:pb-8 max-sm:data-open:slide-in-from-bottom-10 max-sm:data-open:zoom-in-100';
+const Handle = (): ReactNode => <span aria-hidden={true} className="mx-auto -mt-2 h-1 w-10 rounded-full bg-fog sm:hidden" />;
 /** « Rejoindre » opens 15 minutes before the start (meeting-schema's rule). */
 export const JOIN_BEFORE_MS = 15 * 60_000;
 /** Stanzy's WhatsApp, for Clients writing from Mon espace. */
@@ -85,7 +89,7 @@ export function NextConsultationCard({ consultation, action }: { consultation: N
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         {canJoin ? (
-          <Link href={roomPath} className={cn('flex h-13 items-center justify-center gap-2 rounded-full bg-rouge px-6 font-heading text-body font-bold text-white hover:bg-crimson', PRESS)}>
+          <Link href={roomPath} className={cn('flex h-13 animate-ring-once items-center justify-center gap-2 rounded-full bg-rouge px-6 font-heading text-body font-bold text-white hover:bg-crimson motion-reduce:animate-none', PRESS)}>
             <Video aria-hidden={true} className="size-4.5" strokeWidth={2.2} />
             {t('join')}
           </Link>
@@ -172,7 +176,8 @@ export function CameraTest({ open, onOpenChange }: { open: boolean; onOpenChange
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-w-lg flex-col gap-4 rounded-3xl bg-white p-6">
+      <DialogContent className={cn('flex max-w-lg flex-col gap-4 rounded-3xl bg-white p-6', PHONE_SHEET)}>
+        <Handle />
         <DialogTitle className="font-heading text-h4 font-bold text-navy-deep">{t('title')}</DialogTitle>
         <DialogDescription className="text-body-sm text-slate">{failed ? t('failed') : t('lead')}</DialogDescription>
         <video ref={video} autoPlay={true} muted={true} playsInline={true} className="aspect-video w-full rounded-2xl bg-navy-deep object-cover" />
@@ -229,7 +234,8 @@ export function MoveDialog({ id, startsAt, open, onOpenChange }: { id: string; s
   );
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-dvh max-w-xl flex-col gap-5 overflow-y-auto rounded-3xl bg-white p-6">
+      <DialogContent className={cn('flex max-h-dvh max-w-xl flex-col gap-5 overflow-y-auto rounded-3xl bg-white p-6', PHONE_SHEET)}>
+        <Handle />
         <div className="flex items-center gap-4">
           <Image src="/email/moved.png" alt="" width={72} height={72} className="size-18 shrink-0" />
           <div className="flex flex-col gap-1">
@@ -268,7 +274,8 @@ export function MoveDialog({ id, startsAt, open, onOpenChange }: { id: string; s
                 );
               })}
             </div>
-            <div role="radiogroup" aria-label={t('times')} className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+            {/* Phone: one row per time with its radio; wider screens: a grid of times. */}
+            <div role="radiogroup" aria-label={t('times')} className="grid gap-2 max-sm:gap-0 max-sm:divide-y max-sm:divide-fog-light max-sm:overflow-hidden max-sm:rounded-2xl max-sm:border max-sm:border-fog-light sm:grid-cols-4">
               {starts.map((iso) => (
                 <button
                   key={iso}
@@ -276,9 +283,15 @@ export function MoveDialog({ id, startsAt, open, onOpenChange }: { id: string; s
                   role="radio"
                   aria-checked={start === iso}
                   onClick={() => setStart(iso)}
-                  className={cn('h-12 rounded-xl border font-heading text-body font-bold', start === iso ? 'border-2 border-rouge bg-blush text-rouge' : 'border-fog text-ink')}
+                  className={cn(
+                    'flex h-12 items-center justify-center rounded-xl border font-heading text-body font-bold max-sm:justify-between max-sm:rounded-none max-sm:border-0 max-sm:px-4',
+                    start === iso ? 'border-2 border-rouge bg-blush text-rouge' : 'border-fog text-ink',
+                  )}
                 >
                   {format.dateTime(new Date(iso), { hour: '2-digit', minute: '2-digit', timeZone: DOUALA })}
+                  <span aria-hidden={true} className={cn('flex size-5 items-center justify-center rounded-full border-2 sm:hidden', start === iso ? 'border-rouge' : 'border-fog')}>
+                    {start === iso ? <span className="size-2.5 rounded-full bg-rouge" /> : null}
+                  </span>
                 </button>
               ))}
             </div>
