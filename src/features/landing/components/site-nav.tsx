@@ -214,7 +214,7 @@ export function SiteNav(): ReactNode {
               triggerLabel={t('account', { name: accountName })}
               dashboard={dashboardUrl ? { href: dashboardUrl, label: t('dashboard') } : null}
               mySpaceLabel={account?.isConsultant ? null : t('mySpace')}
-              myAccountLabel={t('myAccount')}
+              myAccountLabel={account?.isConsultant ? null : t('myAccount')}
               reportLabel={t('report')}
               onReport={(): void => setReporting(true)}
               signOutLabel={t('signOut')}
@@ -322,7 +322,7 @@ export function SiteNav(): ReactNode {
                     {t('mySpace')}
                   </Link>
                 ) : null}
-                {accountName ? (
+                {accountName && !account?.isConsultant ? (
                   <Link
                     href="/compte"
                     className="text-navy-deep inline-flex items-center justify-center gap-2 rounded-md border border-fog px-3 py-2 text-sm font-semibold"
@@ -391,8 +391,8 @@ type AccountMenuProps = {
   dashboard: { href: string; label: string } | null;
   /** « Mon espace », for everyone but the consultant. */
   mySpaceLabel: string | null;
-  /** « Mon compte »: name, password, devices, notifications. */
-  myAccountLabel: string;
+  /** « Mon compte » (name, password, devices, notifications), for everyone but the consultant. */
+  myAccountLabel: string | null;
   /** « Signaler un problème » (#160). */
   reportLabel: string;
   onReport: () => void;
@@ -439,10 +439,12 @@ function AccountMenu({
             {mySpaceLabel}
           </DropdownMenuItem>
         ) : null}
-        <DropdownMenuItem render={<Link href="/compte" />}>
-          <UserRound aria-hidden={true} />
-          {myAccountLabel}
-        </DropdownMenuItem>
+        {myAccountLabel ? (
+          <DropdownMenuItem render={<Link href="/compte" />}>
+            <UserRound aria-hidden={true} />
+            {myAccountLabel}
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuItem onClick={onReport}>
           <Flag aria-hidden={true} />
           {reportLabel}

@@ -1,4 +1,4 @@
-import { requireSession } from '@/features/auth/server/guards';
+import { requireClient } from '@/features/auth/server/guards';
 import type { LocaleParams } from '@/i18n/routing';
 
 // Everything under /compte needs a signed-in Account. The proxy only checks
@@ -13,6 +13,7 @@ export default async function CompteLayout({
   params: LocaleParams;
 }) {
   const { locale } = await params;
-  await requireSession({ locale, next: '/compte' });
+  // The consultant's settings live in the Tableau de bord, not here.
+  await requireClient({ locale, next: '/compte', dashboardPath: '/' });
   return children;
 }

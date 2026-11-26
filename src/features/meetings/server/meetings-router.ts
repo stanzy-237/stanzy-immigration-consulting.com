@@ -161,7 +161,7 @@ export const meetingsRouter = createTRPCRouter({
     const consultant = isConsultant(ctx.session);
     if (consultant) await syncMeetingFiles(ctx.prisma);
     const meeting = await meetingFor(ctx.prisma, ctx.session, input.id);
-    const [consent, extra] = await Promise.all([
+    const [consent, extra, consultation] = await Promise.all([
       ctx.prisma.meetingConsent.findUnique({
         where: { meetingId_accountId: { meetingId: meeting.id, accountId: ctx.session.account.id } },
         select: { acceptedAt: true },
@@ -169,6 +169,8 @@ export const meetingsRouter = createTRPCRouter({
       consultant
         ? ctx.prisma.meeting.findUnique({ where: { id: meeting.id }, select: consultantOnly })
         : Promise.resolve(null),
+      // A Consultation's Réunion: once over, each side goes to its « après » page.
+      ctx.prisma.consultation.findFirst({ where: { meetingId: meeting.id }, select: { id: true } }),
     ]);
     const now = new Date();
     const dossierOpen = !meeting.dossier || meeting.dossier.state === 'OPEN';
@@ -180,6 +182,7 @@ export const meetingsRouter = createTRPCRouter({
       past: isPast(meeting, now),
       consentedAt: consent?.acceptedAt ?? null,
       configured: streamConfigured(),
+      consultationId: consultation?.id ?? null,
     };
   }),
 

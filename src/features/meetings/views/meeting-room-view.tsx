@@ -6,7 +6,8 @@ import { useFormatter, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 // The consultant's room is on admin.<site>'s short paths (see dashboard-host).
 import NextLink from 'next/link';
-import { useCallback, useId, useState, type ReactNode } from 'react';
+import { useRouter as useNextRouter } from 'next/navigation';
+import { useCallback, useEffect, useId, useState, type ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,7 +18,7 @@ import { ConsultantPart } from '@/features/meetings/components/dossier-meetings'
 import type { RoomAccess } from '@/features/meetings/components/meeting-call';
 import { Avatars, useCopyInvitation } from '@/features/meetings/components/meeting-parts';
 import { useMeetingErrors } from '@/features/meetings/hooks/use-meeting-errors';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useTRPC } from '@/trpc/client';
 
 // Stream's call runs in the browser only (camera, micro, WebRTC).
@@ -78,7 +79,9 @@ function Room({ meetingId, viewer }: { meetingId: string; viewer: Viewer }): Rea
       const data = query.state.data;
       if (!data) return false;
       if (outAt !== null && data.recording && data.consultant && Date.now() - outAt < 5 * 60_000) return 20_000;
-      return data.joinable ? false : 30_000;
+      // Out of the call, the room keeps checking: ended for everyone, « Rejoindre » must go at once.
+      if (state === 'in') return false;
+      return data.joinable ? 15_000 : 30_000;
     },
   });
   const join = useMutation(
@@ -101,6 +104,16 @@ function Room({ meetingId, viewer }: { meetingId: string; viewer: Viewer }): Rea
     void queryClient.invalidateQueries({ queryKey: trpc.meetings.pathKey() });
   }, [queryClient, trpc]);
   const fail = useCallback(() => setState('failed'), []);
+  // A Consultation's Réunion, over (ended for everyone, or its room closed):
+  // the consultant goes to its « 2 Après », the Client to their recap page.
+  const router = useRouter();
+  const nextRouter = useNextRouter();
+  const over = meeting.consultationId !== null && (state === 'ended' || (meeting.past && state !== 'in'));
+  useEffect(() => {
+    if (!over || !meeting.consultationId) return;
+    if (consultant) nextRouter.replace(`/consultations/${meeting.consultationId}`);
+    else router.replace(`/mon-espace/consultations/${meeting.consultationId}`);
+  }, [over, consultant, meeting.consultationId, nextRouter, router]);
   const personal = meeting.kind === 'PERSONAL';
   const when = format.dateTime(meeting.startsAt, {
     weekday: 'long',
