@@ -14,6 +14,9 @@ export const SHARE_CARDS = [
 
 export type ShareCard = (typeof SHARE_CARDS)[number];
 
+/** The site's name in every preview (`og:site_name`). */
+export const SITE_NAME = 'Stanzy Immigration Consulting';
+
 export const SHARE_IMAGE_SIZE = { width: 1200, height: 630 } as const;
 
 const OG_LOCALES: Record<string, string> = { fr: 'fr_CA', en: 'en_CA' };
@@ -77,7 +80,7 @@ export function shareMetadata({
       : { robots: { index: false } }),
     openGraph: {
       type: 'website',
-      siteName: 'Stanzy Immigration Consulting',
+      siteName: SITE_NAME,
       url,
       title,
       ...(description ? { description } : {}),

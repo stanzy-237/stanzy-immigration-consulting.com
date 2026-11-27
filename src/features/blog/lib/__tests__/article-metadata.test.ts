@@ -27,6 +27,7 @@ describe('articleMetadata', () => {
       alternates: { canonical: 'https://stanzy.ca/fr/blog/reussir-le-tcf-canada' },
       openGraph: {
         type: 'article',
+        siteName: 'Stanzy Immigration Consulting',
         url: 'https://stanzy.ca/fr/blog/reussir-le-tcf-canada',
         title: 'Réussir le TCF Canada du premier coup',
         description: 'Les quatre épreuves, le barème et un plan de six semaines.',

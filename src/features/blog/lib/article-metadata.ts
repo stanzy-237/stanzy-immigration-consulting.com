@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { ogLocale, SITE_NAME } from '@/lib/share-metadata';
+
 /** What an Article's search and share tags are made of. */
 export type MetadataArticle = {
   slug: string;
@@ -34,10 +36,11 @@ export function articleMetadata(article: MetadataArticle, siteUrl: string): Meta
     alternates: { canonical: url },
     openGraph: {
       type: 'article',
+      siteName: SITE_NAME,
       url,
       title,
       description,
-      locale: article.locale === 'en' ? 'en_CA' : 'fr_CA',
+      locale: ogLocale(article.locale),
       publishedTime: article.publishedAt.toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
       section: article.categoryName,

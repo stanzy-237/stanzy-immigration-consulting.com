@@ -19,11 +19,31 @@ const ICE = '#E8EDF5';
 const asset = (...path: string[]) => readFile(join(process.cwd(), ...path));
 const dataUri = (bytes: Buffer, type: string) => `data:${type};base64,${bytes.toString('base64')}`;
 
-/** A cover in `public/` is read from disk; an uploaded one (Blob storage) is fetched by Satori. */
-async function coverSource(coverUrl: string): Promise<string> {
-  if (!coverUrl.startsWith('/')) return coverUrl;
-  const type = coverUrl.endsWith('.png') ? 'image/png' : coverUrl.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
-  return dataUri(await asset('public', coverUrl), type);
+/** The only cover formats Satori decodes; a WebP or AVIF upload would make the whole card fail. */
+const DRAWABLE = new Set(['image/png', 'image/jpeg']);
+const COVER_TIMEOUT_MS = 5000;
+
+const typeFromName = (name: string) =>
+  /\.png$/i.test(name) ? 'image/png' : /\.jpe?g$/i.test(name) ? 'image/jpeg' : null;
+
+/**
+ * The cover as a data URI Satori can draw, or null (the card then shows the
+ * logo): a cover in `public/` is read from disk, an uploaded one (Blob storage)
+ * is fetched here, so a failed fetch or an undrawable format never reaches Satori.
+ */
+export async function coverSource(coverUrl: string): Promise<string | null> {
+  try {
+    if (coverUrl.startsWith('/')) {
+      const type = typeFromName(coverUrl);
+      return type ? dataUri(await asset('public', coverUrl), type) : null;
+    }
+    const response = await fetch(coverUrl, { signal: AbortSignal.timeout(COVER_TIMEOUT_MS) });
+    const type = response.headers.get('content-type')?.split(';')[0].trim() ?? '';
+    if (!response.ok || !DRAWABLE.has(type)) return null;
+    return dataUri(Buffer.from(await response.arrayBuffer()), type);
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -45,7 +65,7 @@ export async function articleShareImage(slug: string, locale: string): Promise<I
   const title = article ? article.seoTitle || article.title : t('metaTitle');
   const eyebrow = article ? `Blog · ${categoryName(article.category, locale)}` : 'Blog';
   const meta = article ? `${t('readingMinutes', { minutes: article.readingMinutes })} · Stanzy` : 'Stanzy';
-  const cover = article?.coverUrl ? await coverSource(article.coverUrl).catch(() => null) : null;
+  const cover = article?.coverUrl ? await coverSource(article.coverUrl) : null;
   const logoSrc = dataUri(logo, 'image/png');
 
   return new ImageResponse(

@@ -11,7 +11,7 @@ import { ErrorTracking } from '@/features/reports/components/error-tracking';
 import { Toaster } from '@/components/ui/toast';
 import { DrawAlertsAuto } from '@/features/draws/components/draw-alerts-auto';
 import { routing, type LocaleParams } from '@/i18n/routing';
-import { ogLocale, shareImage } from '@/lib/share-metadata';
+import { ogLocale, shareImage, SITE_NAME } from '@/lib/share-metadata';
 import { siteUrl } from '@/lib/site-url';
 import { TRPCReactProvider } from '@/trpc/client';
 
@@ -56,7 +56,7 @@ export async function generateMetadata({
     // The default card, for a page without its own (see shareMetadata).
     openGraph: {
       type: 'website',
-      siteName: 'Stanzy Immigration Consulting',
+      siteName: SITE_NAME,
       title: t('title'),
       description: t('description'),
       locale: ogLocale(locale),
