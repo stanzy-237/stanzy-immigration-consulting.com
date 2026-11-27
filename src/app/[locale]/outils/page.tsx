@@ -2,6 +2,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { ToolsView } from '@/features/landing/views/tools-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { HydrateClient, prefetch, publicTrpc } from '@/trpc/server';
+
+// Static with the latest Tirage in its HTML, refreshed every 5 minutes (like the home page).
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,
@@ -20,5 +24,11 @@ export default async function Page({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <ToolsView />;
+  // The phone's « Dernier tirage » card.
+  prefetch(publicTrpc.draws.latest.queryOptions({ take: 4 }));
+  return (
+    <HydrateClient>
+      <ToolsView />
+    </HydrateClient>
+  );
 }

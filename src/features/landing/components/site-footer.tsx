@@ -36,7 +36,7 @@ export function SiteFooter(): ReactNode {
   const year: number = new Date().getFullYear();
 
   return (
-    <footer
+    <footer data-site-footer=""
       aria-label={t("ariaLabel")}
       className="bg-ink-deep text-white w-full border-t border-white/10"
     >

@@ -31,10 +31,14 @@ function redirectTarget(response: Response): URL | null {
 }
 
 describe('proxy', () => {
-  it('sends a signed-out visitor from /compte to Connexion with next', async () => {
-    const target = redirectTarget(await visit('/fr/compte'));
+  it('sends a signed-out visitor from Mon espace to Connexion with next', async () => {
+    const target = redirectTarget(await visit('/fr/mon-espace'));
     expect(target?.pathname).toBe('/fr/connexion');
-    expect(target?.searchParams.get('next')).toBe('/compte');
+    expect(target?.searchParams.get('next')).toBe('/mon-espace');
+  });
+
+  it('lets a signed-out visitor see « Compte » (Connexion / Créer un compte)', async () => {
+    expect(redirectTarget(await visit('/fr/compte'))).toBeNull();
   });
 
   it('sends a signed-out visitor from the Parcours to Connexion with next', async () => {

@@ -5,6 +5,7 @@ import { toBlogLocale } from "@/features/blog/lib/blog-schema";
 import { getLatestArticles } from "@/features/blog/server/blog-pages";
 
 import { Hero } from "@/features/landing/components/hero";
+import { PhoneHome } from "@/features/landing/components/phone-home";
 import { SiteFooter } from "@/features/landing/components/site-footer";
 import { SiteNav } from "@/features/landing/components/site-nav";
 import { BlogRow } from "@/features/landing/components/blog-row";
@@ -24,13 +25,18 @@ export async function HomeView({ locale }: { locale: string }): Promise<ReactNod
     <>
       <SiteNav />
       <main>
-        <Hero />
+        <PhoneHome />
+        <div className="max-md:hidden">
+          <Hero />
+        </div>
         <TikTokRow />
         <ToolsGrid />
         <BlogRow articles={articles} locale={locale} />
         <Draws />
         <ConsultationCta />
-        <ServicesGrid />
+        <div className="max-md:hidden">
+          <ServicesGrid />
+        </div>
         <WhyStanzy />
         <Subscribe />
         <Faq />

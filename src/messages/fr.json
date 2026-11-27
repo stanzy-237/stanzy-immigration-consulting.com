@@ -380,6 +380,68 @@
       "documentsBody": "Au Cameroun, Stanzy obtient pour vous les documents les plus longs à réunir : preuve de fonds, certificat de police, attestation CNPS… Les conditions et les prix sont visibles dans votre espace.",
       "documentsCta": "Voir dans Mon espace",
       "metaTitle": "Nos services"
+    },
+    "Tabs": {
+      "label": "Onglets",
+      "home": "Accueil",
+      "tools": "Outils",
+      "services": "Services",
+      "blog": "Blog",
+      "account": "Compte"
+    },
+    "Phone": {
+      "lastDraw": "Dernier tirage",
+      "drawLine": "n° {round} · CRS {crs}",
+      "drawFacts": "{date} · {invitations} invitations",
+      "draws": "Tirages",
+      "toolsTitle": "Outils",
+      "toolsLead": "Gratuits, en français, pour Entrée express.",
+      "tools": {
+        "crs": {
+          "name": "Calculateur CRS",
+          "lead": "Votre score, en 5 min"
+        },
+        "points": {
+          "name": "67 points",
+          "lead": "Êtes-vous admissible ?"
+        },
+        "nclc": {
+          "name": "NCLC",
+          "lead": "Vos notes de TCF en niveau"
+        },
+        "cnp": {
+          "name": "CNP",
+          "lead": "Le code de votre métier"
+        },
+        "ita": {
+          "name": "Après l’ITA",
+          "lead": "Les 60 jours, au jour près"
+        },
+        "pdf": {
+          "name": "Outil PDF",
+          "lead": "Assembler, compresser"
+        }
+      },
+      "eyebrow": "Entrée express · Canada",
+      "title": "Votre projet Canada, pas à pas.",
+      "lead": "Un conseiller qui parle votre langue, des outils gratuits, un suivi jusqu’à la RP.",
+      "book": "Réserver une consultation",
+      "crs": "Calculer mon score CRS",
+      "services": "Nos services",
+      "service": {
+        "consultation": {
+          "name": "Consultation vidéo",
+          "lead": "45 min avec Stanzy · enregistrée pour vous"
+        },
+        "accompagnement": {
+          "name": "Accompagnement Entrée express",
+          "lead": "De l’évaluation à la RP, étape par étape"
+        },
+        "documents": {
+          "name": "Services documentaires",
+          "lead": "Certificat de police, preuve de fonds…"
+        }
+      }
     }
   },
   "Auth": {
@@ -585,6 +647,20 @@
       "createTitle": "Créez votre mot de passe",
       "createSubtitle": "Vous vous connecterez avec votre e-mail et ce mot de passe.",
       "createSubmit": "Créer mon mot de passe"
+    },
+    "Visitor": {
+      "title": "Compte",
+      "spaceTitle": "Votre espace Stanzy",
+      "spaceLead": "Vos consultations, vos documents et votre dossier, au même endroit.",
+      "signUp": "Créer un compte",
+      "language": "Langue",
+      "install": "Installer l’app sur ce téléphone",
+      "whatsapp": "Écrire à Stanzy sur WhatsApp",
+      "installTitle": "Stanzy sur votre écran d’accueil",
+      "installShare": "Dans Safari, touchez « Partager ».",
+      "installAdd": "Puis « Sur l’écran d’accueil », et « Ajouter ».",
+      "installAndroid": "Sur Android, ouvrez le menu ⋮ de Chrome, puis « Installer l’application ».",
+      "signIn": "Se connecter"
     }
   },
   "Crs": {

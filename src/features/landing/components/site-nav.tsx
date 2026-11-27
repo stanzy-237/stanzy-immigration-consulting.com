@@ -35,6 +35,7 @@ import { cn } from '@/lib/utils';
 
 import { MapleLeafIcon } from '@/features/landing/components/brand-icons';
 import { LocaleToggle } from '@/features/landing/components/locale-toggle';
+import { isTaskPath, SiteTabBar } from '@/features/landing/components/site-tab-bar';
 import {
   SERVICE_ENTRIES,
   TOOL_ENTRIES,
@@ -124,10 +125,15 @@ export function SiteNav(): ReactNode {
   // « Signaler un problème » (#160), from the account menu.
   const [reporting, setReporting] = useState<boolean>(false);
 
+  // Phones, signed out (`PWA · Visiteur`): no header and no ≡ menu, the tab bar
+  // instead, except on a task screen. Signed-in Clients keep the header for now.
+  const visitorTabs: boolean = !account && !isTaskPath(pathname);
+
   return (
+    <>
     <nav
       aria-label={t('ariaLabel')}
-      className="bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-backdrop-filter:bg-surface/80"
+      className={cn('bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-backdrop-filter:bg-surface/80', visitorTabs && 'max-md:hidden')}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 md:px-6">
         <Link
@@ -381,6 +387,8 @@ export function SiteNav(): ReactNode {
       </div>
       {accountName ? <ReportProblemDialog open={reporting} onOpenChange={setReporting} /> : null}
     </nav>
+    {visitorTabs ? <SiteTabBar /> : null}
+    </>
   );
 }
 

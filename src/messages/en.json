@@ -380,6 +380,68 @@
       "documentsBody": "In Cameroon, Stanzy gets the documents that take longest to gather: proof of funds, police certificate, CNPS certificate… Conditions and prices are in your space.",
       "documentsCta": "See in My space",
       "metaTitle": "Our services"
+    },
+    "Tabs": {
+      "label": "Tabs",
+      "home": "Home",
+      "tools": "Tools",
+      "services": "Services",
+      "blog": "Blog",
+      "account": "Account"
+    },
+    "Phone": {
+      "lastDraw": "Latest draw",
+      "drawLine": "No. {round} · CRS {crs}",
+      "drawFacts": "{date} · {invitations} invitations",
+      "draws": "Draws",
+      "toolsTitle": "Tools",
+      "toolsLead": "Free, for Express Entry.",
+      "tools": {
+        "crs": {
+          "name": "CRS calculator",
+          "lead": "Your score in 5 min"
+        },
+        "points": {
+          "name": "67 points",
+          "lead": "Are you eligible?"
+        },
+        "nclc": {
+          "name": "CLB",
+          "lead": "Your test scores as a level"
+        },
+        "cnp": {
+          "name": "NOC",
+          "lead": "Your job’s code"
+        },
+        "ita": {
+          "name": "After the ITA",
+          "lead": "The 60 days, day by day"
+        },
+        "pdf": {
+          "name": "PDF tool",
+          "lead": "Merge, compress"
+        }
+      },
+      "eyebrow": "Express Entry · Canada",
+      "title": "Your Canada plan, step by step.",
+      "lead": "An adviser who speaks your language, free tools, support all the way to PR.",
+      "book": "Book a consultation",
+      "crs": "Work out my CRS score",
+      "services": "Our services",
+      "service": {
+        "consultation": {
+          "name": "Video consultation",
+          "lead": "45 min with Stanzy · recorded for you"
+        },
+        "accompagnement": {
+          "name": "Express Entry support",
+          "lead": "From assessment to PR, step by step"
+        },
+        "documents": {
+          "name": "Document services",
+          "lead": "Police certificate, proof of funds…"
+        }
+      }
     }
   },
   "Auth": {
@@ -585,6 +647,20 @@
       "createTitle": "Create your password",
       "createSubtitle": "You’ll sign in with your e-mail and this password.",
       "createSubmit": "Create my password"
+    },
+    "Visitor": {
+      "title": "Account",
+      "spaceTitle": "Your Stanzy space",
+      "spaceLead": "Your consultations, documents and file, in one place.",
+      "signUp": "Create an account",
+      "language": "Language",
+      "install": "Install the app on this phone",
+      "whatsapp": "Message Stanzy on WhatsApp",
+      "installTitle": "Stanzy on your home screen",
+      "installShare": "In Safari, tap “Share”.",
+      "installAdd": "Then “Add to Home Screen”, and “Add”.",
+      "installAndroid": "On Android, open Chrome’s ⋮ menu, then “Install app”.",
+      "signIn": "Sign in"
     }
   },
   "Crs": {
