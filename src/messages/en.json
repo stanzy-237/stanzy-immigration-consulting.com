@@ -5570,7 +5570,8 @@
         "recorded": "recorded with their consent",
         "notRecorded": "no recording",
         "joinOpensAt": "Join · opens at {time}",
-        "phoneMenuHint": "Move or cancel this slot: ⋯ menu at the top"
+        "phoneMenuHint": "Move or cancel this slot: ⋯ menu at the top",
+        "overLine": "Over · {minutes} min · {date}"
       },
       "calendar": {
         "view": {
@@ -5605,7 +5606,11 @@
           "label": "After the Consultation",
           "notes": "Notes for {name}",
           "transcript": "Transcript",
-          "private": "Your private notes"
+          "private": "Your private notes",
+          "notesShort": "Notes · {count}",
+          "stepsShort": "Steps · {count}",
+          "transcriptShort": "Text",
+          "privateShort": "Private"
         },
         "recording": "Recording",
         "recordingLength": "Recording · {length}",
@@ -5652,7 +5657,9 @@
           "eyebrow": "And then",
           "title": "Support for {name}?",
           "lead": "Their space offers to send an Interest request. Or open their Dossier right away.",
-          "cta": "Open a dossier"
+          "cta": "Open a dossier",
+          "phoneTitle": "Open their file",
+          "phoneLead": "If they go on with the support"
         },
         "publish": "Publish to their space",
         "publishHint": "They get « Your recording is ready »",

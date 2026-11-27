@@ -5587,7 +5587,8 @@
         "recorded": "enregistrée avec son accord",
         "notRecorded": "pas d’enregistrement",
         "joinOpensAt": "Rejoindre · s’ouvre à {time}",
-        "phoneMenuHint": "Déplacer ou annuler ce créneau : menu ⋯ en haut"
+        "phoneMenuHint": "Déplacer ou annuler ce créneau : menu ⋯ en haut",
+        "overLine": "Terminée · {minutes} min · {date}"
       },
       "calendar": {
         "view": {
@@ -5622,7 +5623,11 @@
           "label": "Après la Consultation",
           "notes": "Notes pour {name}",
           "transcript": "Transcription",
-          "private": "Vos notes privées"
+          "private": "Vos notes privées",
+          "notesShort": "Notes · {count}",
+          "stepsShort": "Étapes · {count}",
+          "transcriptShort": "Texte",
+          "privateShort": "Privé"
         },
         "recording": "Enregistrement",
         "recordingLength": "Enregistrement · {length}",
@@ -5669,7 +5674,9 @@
           "eyebrow": "Et ensuite",
           "title": "Un accompagnement pour {name} ?",
           "lead": "Son espace lui propose d’envoyer une Demande d’intérêt. Ou ouvrez son Dossier tout de suite.",
-          "cta": "Ouvrir un dossier"
+          "cta": "Ouvrir un dossier",
+          "phoneTitle": "Ouvrir son Dossier",
+          "phoneLead": "S’il ou elle continue avec l’Accompagnement"
         },
         "publish": "Publier dans son espace",
         "publishHint": "La personne reçoit « Votre enregistrement est prêt »",

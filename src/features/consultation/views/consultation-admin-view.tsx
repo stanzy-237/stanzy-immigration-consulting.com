@@ -78,14 +78,33 @@ function Consultation({ id }: { id: string }): ReactNode {
     .slice(0, 2)
     .toUpperCase();
 
+  const minutes = Math.max(1, Math.round((ends.getTime() - starts.getTime()) / 60_000));
+
   return (
     <>
-      <Link href="/consultations" className="flex items-center gap-1.5 self-start text-body-sm font-semibold text-ink">
+      {/* Phones (`Mobile v2`): a round « ‹ », and « ⋯ »; after it, the name and « Terminée · 44 min · date » too. */}
+      <div className="flex items-center gap-3 md:hidden">
+        <Link href="/consultations" aria-label={t('back')} className="flex size-11 shrink-0 items-center justify-center rounded-full border border-fog-light bg-white text-navy-deep">
+          <ChevronLeft aria-hidden={true} className="size-5" strokeWidth={2.4} />
+        </Link>
+        {after ? (
+          <div className="flex min-w-0 flex-1 flex-col">
+            <h1 className="truncate font-heading text-h4 leading-7 font-extrabold tracking-tight text-navy-deep">{data.client.name}</h1>
+            <p className="truncate text-caption text-slate">
+              {t('overLine', { minutes, date: format.dateTime(starts, { weekday: 'short', day: 'numeric', month: 'short', timeZone: DOUALA }) })}
+            </p>
+          </div>
+        ) : (
+          <p className="flex-1 font-heading text-body font-bold text-navy-deep">{t('back')}</p>
+        )}
+        {live ? <MoreMenu data={data} firstName={firstName} live={live} onCancel={() => setCancelling(true)} onMove={() => setMoving(true)} /> : null}
+      </div>
+      <Link href="/consultations" className="flex items-center gap-1.5 self-start text-body-sm font-semibold text-ink max-md:hidden">
         <ChevronLeft aria-hidden={true} className="size-4" strokeWidth={2.5} />
         {t('back')}
       </Link>
 
-      <header className="flex flex-col gap-4 rounded-3xl border border-fog-light bg-white p-5 lg:flex-row lg:items-center lg:justify-between lg:px-6">
+      <header className={cn('flex flex-col gap-4 rounded-3xl border border-fog-light bg-white p-5 lg:flex-row lg:items-center lg:justify-between lg:px-6', after && 'max-md:hidden')}>
         <div className="flex min-w-0 flex-1 items-center gap-4">
           <span aria-hidden={true} className="flex size-13 shrink-0 items-center justify-center rounded-full bg-blush font-heading text-body-lg font-extrabold text-rouge">
             {initials}
@@ -126,11 +145,12 @@ function Consultation({ id }: { id: string }): ReactNode {
             </p>
           </div>
         </div>
+        {/* Phones: these move to the top bar (« ⋯ ») and the bottom bar (« Rejoindre », « Publier »). */}
         {paid ? (
-          <div className="flex items-start gap-2.5">
+          <div className="flex items-start gap-2.5 max-md:hidden">
             {live ? (
               <>
-                <div className="flex flex-1 flex-col items-center gap-1 max-sm:hidden lg:flex-none">
+                <div className="flex flex-1 flex-col items-center gap-1 max-md:hidden lg:flex-none">
                   {canJoin ? (
                     <Link
                       href={consultantRoomPath(data.meeting!.id)}
@@ -150,13 +170,13 @@ function Consultation({ id }: { id: string }): ReactNode {
                 <button
                   type="button"
                   onClick={() => setMoving(true)}
-                  className={cn('h-11 flex-1 rounded-full border-2 border-fog-light bg-white px-5 font-heading text-body-sm font-bold text-ink max-sm:hidden lg:flex-none', PRESS)}
+                  className={cn('h-11 flex-1 rounded-full border-2 border-fog-light bg-white px-5 font-heading text-body-sm font-bold text-ink max-md:hidden lg:flex-none', PRESS)}
                 >
                   {t('move')}
                 </button>
               </>
             ) : (
-              <span className="flex flex-1 max-sm:hidden lg:flex-none">
+              <span className="flex flex-1 max-md:hidden lg:flex-none">
                 <PublishButton data={data} firstName={firstName} />
               </span>
             )}
@@ -169,9 +189,8 @@ function Consultation({ id }: { id: string }): ReactNode {
       {/* Phone (`Consultation · 1 Avant / 2 Après · Mobile`): « Rejoindre » or « Publier » at the bottom; « Déplacer » and « Annuler » in « ⋯ ». */}
       {paid ? (
         <>
-          <div aria-hidden={true} className="h-28 sm:hidden" />
           <div
-            className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center gap-2 border-t border-fog-light bg-white px-4 pt-3 sm:hidden"
+            className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center gap-2 border-t border-fog-light bg-white px-4 pt-3 md:hidden"
             style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
           >
             {live ? (
@@ -564,7 +583,7 @@ function MoreMenu({ data, firstName, live, onCancel, onMove }: { data: Detail; f
         {live ? (
           <>
             {/* On phones « Déplacer » lives here (the header has no room for it). */}
-            <DropdownMenuItem onClick={onMove} className={cn(item, 'sm:hidden')}>
+            <DropdownMenuItem onClick={onMove} className={cn(item, 'md:hidden')}>
               <span className="text-body-sm font-semibold text-ink">{t('move')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

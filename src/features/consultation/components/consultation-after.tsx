@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Check, Pencil, Plus, X } from 'lucide-react';
+import { Check, ChevronRight, FolderPlus, Pencil, Plus, X } from 'lucide-react';
 import Link from 'next/link';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId, useRef, useState, type ReactNode, type RefObject } from 'react';
@@ -46,12 +46,14 @@ function useAfterMutation(id: string) {
 export function AfterMain({ data, firstName, privateNotes }: { data: Detail; firstName: string; privateNotes: ReactNode }): ReactNode {
   const t = useTranslations('Consultation.admin.after');
   const video = useRef<HTMLVideoElement>(null);
-  const [tab, setTab] = useState<'notes' | 'transcript' | 'private'>('notes');
+  const [tab, setTab] = useState<'notes' | 'steps' | 'transcript' | 'private'>('notes');
   const [draftAt, setDraftAt] = useState<number | null | undefined>(undefined);
+  // Phones (`Mobile v2 · 4 Après`): four short tabs, the steps among them; wider screens keep the steps beside.
   const tabs = [
-    { key: 'notes' as const, label: t('tabs.notes', { name: firstName }) },
-    { key: 'transcript' as const, label: t('tabs.transcript') },
-    { key: 'private' as const, label: t('tabs.private') },
+    { key: 'notes' as const, label: t('tabs.notes', { name: firstName }), short: t('tabs.notesShort', { count: data.clientNotes.length }) },
+    { key: 'steps' as const, label: t('steps'), short: t('tabs.stepsShort', { count: data.nextSteps.length }), phoneOnly: true },
+    { key: 'transcript' as const, label: t('tabs.transcript'), short: t('tabs.transcriptShort') },
+    { key: 'private' as const, label: t('tabs.private'), short: t('tabs.privateShort') },
   ];
   const seek = (seconds: number) => {
     if (!video.current) return;
@@ -66,17 +68,28 @@ export function AfterMain({ data, firstName, privateNotes }: { data: Detail; fir
   return (
     <div className="flex flex-col gap-5">
       <Recording data={data} video={video} onPlace={placeAt} onSeek={seek} />
-      <div role="tablist" aria-label={t('tabs.label')} className="flex gap-6 overflow-x-auto border-b border-fog-light">
-        {tabs.map(({ key, label }) => (
+      <div
+        role="tablist"
+        aria-label={t('tabs.label')}
+        className="flex gap-6 overflow-x-auto border-b border-fog-light max-md:gap-0 max-md:rounded-full max-md:border-0 max-md:bg-ice-blue max-md:p-1"
+      >
+        {tabs.map(({ key, label, short, phoneOnly }) => (
           <button
             key={key}
             type="button"
             role="tab"
+            aria-label={label}
             aria-selected={tab === key}
             onClick={() => setTab(key)}
-            className={cn('-mb-px border-b-2 pb-2.5 font-heading text-body font-bold whitespace-nowrap', tab === key ? 'border-rouge text-navy-deep' : 'border-transparent text-slate')}
+            className={cn(
+              '-mb-px border-b-2 pb-2.5 font-heading text-body font-bold whitespace-nowrap',
+              'max-md:mb-0 max-md:h-9 max-md:flex-1 max-md:rounded-full max-md:border-0 max-md:p-0 max-md:font-body max-md:text-caption',
+              tab === key ? 'border-rouge text-navy-deep max-md:bg-white max-md:shadow-sm' : 'border-transparent text-slate',
+              phoneOnly && 'md:hidden',
+            )}
           >
-            {label}
+            <span className="md:hidden">{short}</span>
+            <span className="max-md:hidden">{label}</span>
           </button>
         ))}
       </div>
@@ -93,6 +106,11 @@ export function AfterMain({ data, firstName, privateNotes }: { data: Detail; fir
         </section>
       ) : null}
       {tab === 'private' ? privateNotes : null}
+      {tab === 'steps' ? (
+        <div className="md:hidden">
+          <NextSteps data={data} />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -110,7 +128,7 @@ function Recording({ data, video, onPlace, onSeek }: { data: Detail; video: RefO
   }
   const markers = data.clientNotes.filter((n): n is Note & { atSeconds: number } => n.atSeconds !== null);
   return (
-    <section aria-label={t('recording')} className="flex flex-col gap-3 overflow-hidden rounded-3xl bg-navy-deep p-4 text-white lg:p-5">
+    <section aria-label={t('recording')} className="flex flex-col gap-3 overflow-hidden rounded-3xl bg-navy-deep p-4 text-white max-md:-mx-4 max-md:rounded-none lg:p-5">
       <div className="flex items-center justify-between text-caption text-white/75">
         <span>{t('recordingLength', { length: clockOfSeconds(recording.seconds) })}</span>
         <span>{recording.transcript ? t('transcriptReady') : t('transcriptPending')}</span>
@@ -262,11 +280,30 @@ function NoteEditor({ id, note, atSeconds, onDone }: { id: string; note?: Note; 
  * and « Et ensuite » (open her Dossier).
  */
 export function AfterSide({ data, firstName }: { data: Detail; firstName: string }): ReactNode {
+  const t = useTranslations('Consultation.admin.after');
   return (
     <>
-      <NextSteps data={data} />
-      <InTheirSpace data={data} firstName={firstName} />
-      <AndThen data={data} firstName={firstName} />
+      {/* Phones: the steps are a tab, « Dans son espace » is said under « Publier », « Et ensuite » is one line. */}
+      <div className="max-md:hidden">
+        <NextSteps data={data} />
+      </div>
+      <div className="max-md:hidden">
+        <InTheirSpace data={data} firstName={firstName} />
+      </div>
+      <div className="max-md:hidden">
+        <AndThen data={data} firstName={firstName} />
+      </div>
+      <Link
+        href={`/dossiers/nouveau?account=${data.client.id}`}
+        className="flex items-center gap-3 rounded-2xl border border-dashed border-fog bg-white px-4 py-3 md:hidden"
+      >
+        <FolderPlus aria-hidden={true} className="size-5 shrink-0 text-navy-deep" strokeWidth={2} />
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="text-body-sm font-bold text-ink">{t('andThen.phoneTitle')}</span>
+          <span className="text-caption text-slate">{t('andThen.phoneLead')}</span>
+        </span>
+        <ChevronRight aria-hidden={true} className="size-4 shrink-0 text-slate-mute" strokeWidth={2.4} />
+      </Link>
     </>
   );
 }

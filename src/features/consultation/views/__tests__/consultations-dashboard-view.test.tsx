@@ -206,7 +206,7 @@ describe('Tableau de bord → a Consultation', () => {
   it('« ⋯ » sends the confirmation again', async () => {
     const resendConfirmation = vi.fn(() => ({ sent: true }));
     renderDetail({ 'consultationAdmin.resendConfirmation': resendConfirmation });
-    fireEvent.click(screen.getByRole('button', { name: 'Plus d’actions' }));
+    fireEvent.click(screen.getAllByRole('button', { name: 'Plus d’actions' })[0]!);
     fireEvent.click(await screen.findByRole('menuitem', { name: /Renvoyer la confirmation/ }));
     await waitFor(() => expect(resendConfirmation).toHaveBeenCalledWith({ id: 'con_1' }));
     expect(await screen.findByText('Confirmation renvoyée à aminata@example.com')).toBeInTheDocument();
@@ -226,7 +226,7 @@ describe('Tableau de bord → a Consultation', () => {
       'consultationAdmin.moveOptions': () => ({ days: [], next: new Date(IN_TWO_DAYS.getTime() + 3600_000).toISOString() }),
       'consultationAdmin.cancelSlot': cancelSlot,
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Plus d’actions' }));
+    fireEvent.click(screen.getAllByRole('button', { name: 'Plus d’actions' })[0]!);
     fireEvent.click(await screen.findByRole('menuitem', { name: /Annuler ce créneau/ }));
     expect(await screen.findByText(/Aminata passera au prochain créneau libre/)).toBeInTheDocument();
     const confirm = screen.getByRole('button', { name: 'Annuler et déplacer' });
