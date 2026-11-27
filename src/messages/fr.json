@@ -5982,5 +5982,64 @@
       "documents": "Documents",
       "profile": "Profil"
     }
+  },
+  "ToolAnswers": {
+    "eyebrow": "En bref",
+    "crs": {
+      "title": "Vos questions sur le score CRS",
+      "q1": "Qu'est-ce que le score CRS ?",
+      "a1": "Le score CRS (Système de classement global) note votre profil Entrée Express sur 1 200 points : âge, études, langues, expérience de travail, plus les points de votre conjoint et les points supplémentaires (français, études au Canada, nomination provinciale). IRCC invite en priorité les profils les mieux classés.",
+      "q2": "Quel score CRS faut-il pour recevoir une invitation ?",
+      "a2": "Il n'existe pas de score fixe. À chaque tirage, IRCC fixe un score minimum selon le nombre d'invitations et le type de tirage : général, par programme ou par catégorie (français, santé, métiers…). Comparez votre score au dernier tirage pour savoir où vous en êtes."
+    },
+    "fsw": {
+      "title": "Vos questions sur les 67 points",
+      "q1": "Qu'est-ce que la grille des 67 points ?",
+      "a1": "C'est le test d'admissibilité au Programme des travailleurs qualifiés (fédéral). Six facteurs sont notés sur 100 : langues, études, expérience, âge, offre d'emploi réservée et adaptabilité. Avec 67 points ou plus, vous pouvez créer un profil Entrée Express au titre de ce programme.",
+      "q2": "Quelle différence entre les 67 points et le score CRS ?",
+      "a2": "Les 67 points décident si vous pouvez entrer dans le bassin au titre du Programme des travailleurs qualifiés. Le score CRS, sur 1 200, vous classe ensuite face aux autres candidats pour les invitations. Il faut d'abord atteindre 67, puis viser un bon score CRS."
+    },
+    "nclc": {
+      "title": "Vos questions sur le NCLC / CLB",
+      "q1": "Qu'est-ce que le NCLC (CLB) ?",
+      "a1": "Les Niveaux de compétence linguistique canadiens (NCLC, ou CLB en anglais) traduisent vos résultats de test sur une échelle de 1 à 12, pour chaque compétence : compréhension de l'oral, compréhension de l'écrit, expression orale et expression écrite. IRCC s'en sert pour l'admissibilité et les points CRS.",
+      "q2": "Quel niveau NCLC faut-il pour l'Entrée Express ?",
+      "a2": "Le Programme des travailleurs qualifiés demande NCLC 7 dans les quatre compétences. Pour l'expérience canadienne, c'est NCLC 7 pour les emplois FEER 0 et 1, et NCLC 5 pour les FEER 2 et 3. Un NCLC 7 en français dans les quatre compétences ajoute jusqu'à 50 points CRS."
+    },
+    "draws": {
+      "title": "Vos questions sur les tirages",
+      "q1": "Qu'est-ce qu'un tirage Entrée Express ?",
+      "a1": "Lors d'un tirage, IRCC invite les candidats du bassin dont le score CRS atteint le minimum de la ronde à présenter une demande de résidence permanente (ITA). Un tirage peut viser tout le bassin, un programme (expérience canadienne, candidats des provinces) ou une catégorie (français, santé, métiers…).",
+      "q2": "À quelle fréquence ont lieu les tirages ?",
+      "a2": "Il n'y a pas de calendrier officiel. IRCC organise en général plusieurs tirages par mois, souvent à quelques jours d'intervalle, et publie les résultats le jour même. Tirages généraux et tirages par catégorie alternent selon les objectifs de l'année."
+    },
+    "ita": {
+      "title": "Vos questions sur l’ITA",
+      "q1": "Combien de temps a-t-on après l'ITA pour déposer sa demande ?",
+      "a1": "Vous avez 60 jours à partir de l'invitation pour soumettre en ligne une demande complète de résidence permanente. Passé ce délai, l'invitation expire et il faudra en obtenir une nouvelle : préparez vos documents avant de la recevoir.",
+      "q2": "Que préparer pendant les 60 jours ?",
+      "a2": "Ce qui prend le plus de temps : les certificats de police de chaque pays où vous avez vécu six mois ou plus depuis vos 18 ans, l'examen médical, les lettres de référence de vos employeurs et la preuve de fonds. Vous payez ensuite les frais de traitement et de résidence permanente."
+    },
+    "budget": {
+      "title": "Vos questions sur le budget",
+      "q1": "Combien coûte une demande Entrée Express ?",
+      "a1": "Comptez les frais officiels d'IRCC (traitement de la demande et droit de résidence permanente, par adulte), la biométrie, l'examen médical, les tests de langue, l'évaluation des diplômes (WES ou autre) et les certificats de police. L'estimateur additionne ces postes selon votre situation.",
+      "q2": "Faut-il prouver des fonds pour l'Entrée Express ?",
+      "a2": "Oui pour les travailleurs qualifiés (fédéral) et les métiers spécialisés, sauf si vous êtes autorisé à travailler au Canada et avez une offre d'emploi valide. Pas pour l'expérience canadienne. Le montant dépend de la taille de votre famille, et IRCC le met à jour chaque année."
+    },
+    "checklist": {
+      "title": "Vos questions sur les documents",
+      "q1": "Quels documents faut-il pour l'Entrée Express ?",
+      "a1": "Pour créer le profil : passeport, résultats du test de langue et évaluation des diplômes. Après l'invitation : lettres de référence d'emploi, certificats de police, examen médical, preuve de fonds, photos et actes d'état civil. La liste exacte dépend de votre programme et de votre famille.",
+      "q2": "Quand commencer à préparer ses documents ?",
+      "a2": "Avant l'invitation. Une fois l'ITA reçue, vous n'avez que 60 jours pour déposer une demande complète, et certains documents, comme les certificats de police ou l'évaluation des diplômes, prennent plusieurs semaines à obtenir."
+    },
+    "pdf": {
+      "title": "Vos questions sur les fichiers IRCC",
+      "q1": "Quelle taille de fichier IRCC accepte-t-il ?",
+      "a1": "Sur le portail de résidence permanente, chaque document téléversé doit peser 4 Mo au maximum. Au-delà, le portail refuse le fichier : il faut le compresser ou le découper sans perdre en lisibilité.",
+      "q2": "Comment passer un PDF sous 4 Mo ?",
+      "a2": "Regroupez les pages d'un même document dans un seul PDF, dans l'ordre demandé, puis compressez-le jusqu'à passer sous 4 Mo. Vérifiez ensuite que le texte reste lisible : un document illisible peut retarder ou bloquer votre demande."
+    }
   }
 }

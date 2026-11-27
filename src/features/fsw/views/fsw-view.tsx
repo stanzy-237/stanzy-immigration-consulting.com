@@ -6,6 +6,7 @@ import { FswCalculator } from "@/features/fsw/components/fsw-calculator";
 import { SiteFooter } from "@/features/landing/components/site-footer";
 import { SiteNav } from "@/features/landing/components/site-nav";
 import { NextStepsGuide } from "@/features/shared/components/next-steps-guide";
+import { ToolAnswers } from "@/features/shared/components/tool-answers";
 
 /** The Calculateur 67 points page: header, calculator and "À savoir" band. */
 export function FswView(): ReactNode {
@@ -39,6 +40,8 @@ export function FswView(): ReactNode {
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8 lg:py-14">
           <FswCalculator />
         </div>
+
+        <ToolAnswers tool="fsw" />
 
         <NextStepsGuide
           id="fsw"

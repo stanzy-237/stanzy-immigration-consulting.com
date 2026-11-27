@@ -5965,5 +5965,64 @@
       "documents": "Documents",
       "profile": "Profile"
     }
+  },
+  "ToolAnswers": {
+    "eyebrow": "In short",
+    "crs": {
+      "title": "Your questions about the CRS score",
+      "q1": "What is the CRS score?",
+      "a1": "The CRS (Comprehensive Ranking System) score rates your Express Entry profile out of 1,200 points: age, education, languages and work experience, plus your spouse's points and additional points (French, Canadian studies, a provincial nomination). IRCC invites the highest-ranked profiles first.",
+      "q2": "What CRS score do you need for an invitation?",
+      "a2": "There is no fixed score. In each draw, IRCC sets a minimum score based on the number of invitations and the type of draw: general, program-specific or category-based (French, healthcare, trades…). Compare your score with the latest draw to see where you stand."
+    },
+    "fsw": {
+      "title": "Your questions about the 67 points",
+      "q1": "What is the 67-point grid?",
+      "a1": "It is the eligibility test for the Federal Skilled Worker Program. Six factors are scored out of 100: languages, education, experience, age, arranged employment and adaptability. With 67 points or more, you can create an Express Entry profile under this program.",
+      "q2": "What is the difference between the 67 points and the CRS score?",
+      "a2": "The 67 points decide whether you can enter the pool under the Federal Skilled Worker Program. The CRS score, out of 1,200, then ranks you against other candidates for invitations. You first need 67, then a strong CRS score."
+    },
+    "nclc": {
+      "title": "Your questions about CLB / NCLC",
+      "q1": "What is CLB (NCLC)?",
+      "a1": "The Canadian Language Benchmarks (CLB, or NCLC in French) turn your test results into a 1-to-12 scale for each skill: listening, reading, speaking and writing. IRCC uses them for eligibility and CRS points.",
+      "q2": "What CLB level do you need for Express Entry?",
+      "a2": "The Federal Skilled Worker Program requires CLB 7 in all four skills. For the Canadian Experience Class, it is CLB 7 for TEER 0 and 1 jobs and CLB 5 for TEER 2 and 3. NCLC 7 in French in all four skills adds up to 50 CRS points."
+    },
+    "draws": {
+      "title": "Your questions about draws",
+      "q1": "What is an Express Entry draw?",
+      "a1": "In a draw, IRCC invites pool candidates whose CRS score reaches that round's minimum to apply for permanent residence (an ITA). A draw can target the whole pool, one program (Canadian Experience Class, Provincial Nominee) or a category (French, healthcare, trades…).",
+      "q2": "How often are Express Entry draws held?",
+      "a2": "There is no official calendar. IRCC usually holds several draws a month, often a few days apart, and publishes the results the same day. General and category-based draws alternate according to the year's goals."
+    },
+    "ita": {
+      "title": "Your questions about the ITA",
+      "q1": "How long do you have after an ITA to apply?",
+      "a1": "You have 60 days from the invitation to submit a complete permanent residence application online. After that, the invitation expires and you would need a new one: prepare your documents before you receive it.",
+      "q2": "What should you prepare during the 60 days?",
+      "a2": "What takes the longest: police certificates from every country where you lived six months or more since age 18, the medical exam, reference letters from your employers and proof of funds. You then pay the processing and permanent residence fees."
+    },
+    "budget": {
+      "title": "Your questions about the budget",
+      "q1": "How much does an Express Entry application cost?",
+      "a1": "Count IRCC's official fees (processing and the right of permanent residence fee, per adult), biometrics, the medical exam, language tests, the credential assessment (WES or another) and police certificates. The estimator adds these up for your situation.",
+      "q2": "Do you need proof of funds for Express Entry?",
+      "a2": "Yes for the Federal Skilled Worker and Federal Skilled Trades programs, unless you are authorised to work in Canada and have a valid job offer. Not for the Canadian Experience Class. The amount depends on your family size, and IRCC updates it every year."
+    },
+    "checklist": {
+      "title": "Your questions about documents",
+      "q1": "Which documents do you need for Express Entry?",
+      "a1": "To create your profile: passport, language test results and the credential assessment. After the invitation: employment reference letters, police certificates, the medical exam, proof of funds, photos and civil status documents. The exact list depends on your program and family.",
+      "q2": "When should you start preparing your documents?",
+      "a2": "Before the invitation. Once you receive the ITA, you have only 60 days to submit a complete application, and some documents, like police certificates or the credential assessment, take several weeks to obtain."
+    },
+    "pdf": {
+      "title": "Your questions about IRCC files",
+      "q1": "What file size does IRCC accept?",
+      "a1": "On the permanent residence portal, each uploaded document must be 4 MB or less. Above that, the portal rejects the file: it has to be compressed or split without losing readability.",
+      "q2": "How do you get a PDF under 4 MB?",
+      "a2": "Merge the pages of one document into a single PDF, in the order requested, then compress it until it is under 4 MB. Then check the text is still readable: an unreadable document can delay or stop your application."
+    }
   }
 }

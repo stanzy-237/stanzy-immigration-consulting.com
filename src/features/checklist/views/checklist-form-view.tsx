@@ -6,6 +6,7 @@ import { ChecklistHeader } from '@/features/checklist/components/checklist-heade
 import { ChecklistIntro } from '@/features/checklist/components/checklist-intro';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
+import { ToolAnswers } from '@/features/shared/components/tool-answers';
 
 /**
  * `/outils/checklist`, laid out like the calculators: the questions, with
@@ -22,6 +23,7 @@ export function ChecklistFormView(): ReactNode {
           <ChecklistFormPanel />
         </div>
         <ChecklistIntro />
+        <ToolAnswers tool="checklist" />
       </main>
       <SiteFooter />
     </>
