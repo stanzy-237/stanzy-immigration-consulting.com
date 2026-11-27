@@ -4,6 +4,7 @@ import { requireSession } from '@/features/auth/server/guards';
 import { ParcoursView } from '@/features/parcours/views/parcours-view';
 import type { LocaleParams } from '@/i18n/routing';
 import { HydrateClient, prefetch, trpc } from '@/trpc/server';
+import { shareMetadata } from '@/lib/share-metadata';
 
 export async function generateMetadata({
   params,
@@ -15,7 +16,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ToolsGrid.Items',
   });
-  return { title: t('timelineName') };
+  return shareMetadata({ locale, path: '/outils/timeline', card: 'timeline', title: t('timelineName'), description: t('timelineDesc') });
 }
 
 // A Parcours is private to its Account (ADR 0005: one guard call in the shell).

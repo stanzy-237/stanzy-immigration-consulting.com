@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { HomeView } from '@/features/landing/views/home-view';
 import type { LocaleParams } from '@/i18n/routing';
 import { HydrateClient, prefetch, publicTrpc } from '@/trpc/server';
+import { shareMetadata } from '@/lib/share-metadata';
 
 // Static with the latest Tirages and Articles in its HTML, refreshed every 5 minutes.
 export const revalidate = 300;
@@ -14,7 +15,8 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Home' });
-  return { title: t('title') };
+  const meta = await getTranslations({ locale, namespace: 'Metadata' });
+  return shareMetadata({ locale, path: '', card: 'accueil', title: meta('title'), description: t('Hero.subtitle') });
 }
 
 export default async function HomePage({

@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { DrawsView } from '@/features/draws/views/draws-view';
 import type { LocaleParams } from '@/i18n/routing';
 import { HydrateClient, prefetch, publicTrpc } from '@/trpc/server';
+import { shareMetadata } from '@/lib/share-metadata';
 
 // Static with the Tirages in its HTML, refreshed every 5 minutes; the browser
 // also refetches them when they're older than 30 s.
@@ -15,7 +16,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Draws' });
-  return { title: t('metaTitle') };
+  return shareMetadata({ locale, path: '/outils/dernier-tirage', card: 'dernier-tirage', title: t('metaTitle'), description: t('subtitle') });
 }
 
 export default async function Page({

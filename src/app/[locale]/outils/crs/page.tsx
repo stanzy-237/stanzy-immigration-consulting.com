@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { CrsView } from '@/features/crs/views/crs-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { shareMetadata } from '@/lib/share-metadata';
 
 export async function generateMetadata({
   params,
@@ -13,7 +14,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ToolsGrid.Items',
   });
-  return { title: t('crsName') };
+  return shareMetadata({ locale, path: '/outils/crs', card: 'crs', title: t('crsName'), description: t('crsDesc') });
 }
 
 export default async function Page({

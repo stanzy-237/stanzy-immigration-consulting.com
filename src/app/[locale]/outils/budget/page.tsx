@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { BudgetView } from '@/features/budget/views/budget-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { shareMetadata } from '@/lib/share-metadata';
 
 export async function generateMetadata({
   params,
@@ -13,7 +14,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ToolsGrid.Items',
   });
-  return { title: t('budgetName') };
+  return shareMetadata({ locale, path: '/outils/budget', card: 'budget', title: t('budgetName'), description: t('budgetDesc') });
 }
 
 // Public and static, unlike the Parcours: the estimator needs no Account. Only
