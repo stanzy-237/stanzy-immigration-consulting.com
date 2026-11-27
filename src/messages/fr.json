@@ -643,6 +643,13 @@
         "signOutOthers": "Déconnecter les autres appareils",
         "done": "Les autres appareils sont déconnectés",
         "error": "Ça n’a pas marché. Réessayez."
+      },
+      "site": {
+        "title": "Le site Stanzy",
+        "home": "Accueil du site",
+        "services": "Nos services",
+        "blog": "Blog",
+        "contact": "Contact"
       }
     },
     "Emails": {
@@ -4346,7 +4353,9 @@
           "title": "Stanzy livre",
           "body": "Le document arrive dans votre dossier, prêt pour IRCC."
         }
-      }
+      },
+      "catalogueTitle": "Ce que Stanzy peut obtenir pour vous",
+      "toMySpace": "Retour à Mon espace"
     },
     "service": {
       "back": "Tous les services",
@@ -4642,7 +4651,9 @@
       "confirmed": "Pièces confirmées",
       "underWay": "En cours",
       "open": "Voir le service",
-      "openLabel": "Voir le service {service}"
+      "openLabel": "Voir le service {service}",
+      "emptyTitle": "Aucun document pour l’instant",
+      "emptyLead": "Quand Stanzy obtient un document pour vous, il arrive ici avec son suivi."
     },
     "inProgress": {
       "title": "Services en cours",

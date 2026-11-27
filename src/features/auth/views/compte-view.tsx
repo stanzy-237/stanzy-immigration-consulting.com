@@ -17,7 +17,7 @@ import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { useNotificationPush } from '@/features/notifications/hooks/use-notification-push';
 import { TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
@@ -127,6 +127,18 @@ function Account(): ReactNode {
         <PushRow />
       </Section>
 
+      {/* Phones: the site's header is gone, so the way out of Mon espace is here (`PWA · Navigation mobile · Règles`). */}
+      <div className="sm:hidden">
+        <Section title={t('site.title')}>
+          {SITE_LINKS.map((link) => (
+            <Link key={link.key} href={link.href} className="flex min-h-12.5 items-center gap-3 py-2 text-body text-ink">
+              <span className="flex-1">{t(`site.${link.key}`)}</span>
+              <ChevronRight aria-hidden={true} className="size-4 text-slate-mute" strokeWidth={2.4} />
+            </Link>
+          ))}
+        </Section>
+      </div>
+
       <SignOut />
 
       <NameDialog open={editing === 'name'} onOpenChange={close} name={data.name} />
@@ -136,6 +148,13 @@ function Account(): ReactNode {
     </>
   );
 }
+
+const SITE_LINKS = [
+  { key: 'home', href: '/' },
+  { key: 'services', href: '/services' },
+  { key: 'blog', href: '/blog' },
+  { key: 'contact', href: '/contact' },
+] as const;
 
 function Section({ title, footnote, children }: { title: string; footnote?: string; children: ReactNode }): ReactNode {
   const id = useId();

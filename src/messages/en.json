@@ -643,6 +643,13 @@
         "signOutOthers": "Sign out the other devices",
         "done": "The other devices are signed out",
         "error": "That didn’t work. Try again."
+      },
+      "site": {
+        "title": "The Stanzy site",
+        "home": "Site home",
+        "services": "Our services",
+        "blog": "Blog",
+        "contact": "Contact"
       }
     },
     "Emails": {
@@ -4329,7 +4336,9 @@
           "title": "Stanzy delivers",
           "body": "The document arrives in your file, ready for IRCC."
         }
-      }
+      },
+      "catalogueTitle": "What Stanzy can get for you",
+      "toMySpace": "Back to My space"
     },
     "service": {
       "back": "All services",
@@ -4625,7 +4634,9 @@
       "confirmed": "Pieces confirmed",
       "underWay": "Under way",
       "open": "View the service",
-      "openLabel": "View the service {service}"
+      "openLabel": "View the service {service}",
+      "emptyTitle": "No document yet",
+      "emptyLead": "When Stanzy gets a document for you, it lands here with its progress."
     },
     "inProgress": {
       "title": "Services under way",

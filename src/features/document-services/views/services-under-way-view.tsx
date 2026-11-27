@@ -3,6 +3,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { FileStack } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
@@ -33,7 +34,7 @@ function UnderWayList(): ReactNode {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.documentServices.requirements.mine.queryOptions());
   const services = data.filter((request) => request.service);
-  if (services.length === 0) return null;
+  if (services.length === 0) return <NothingYet />;
   return (
     <section id="en-cours" aria-labelledby="en-cours-title" className="grid scroll-mt-24 grid-cols-1 gap-3 rounded-2xl bg-white p-6 shadow-sm">
       <h2 id="en-cours-title" className="flex items-center gap-2 font-heading text-xl font-bold text-navy-deep">
@@ -70,5 +71,23 @@ function Row({ request }: { request: UnderWay }): ReactNode {
         {t('open')}
       </Link>
     </li>
+  );
+}
+
+/** A Client with no document from Stanzy yet: say so plainly, the catalogue follows. */
+function NothingYet(): ReactNode {
+  const t = useTranslations('DocumentServices.underWay');
+  return (
+    <section aria-labelledby="nothing-yet" className="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm">
+      <span className="relative size-18 shrink-0 overflow-hidden rounded-full bg-ice-blue">
+        <Image unoptimized={true} src="/stanzy/idle.svg" alt="" width={240} height={420} className="absolute -top-2 left-1/2 h-auto w-26 max-w-none -translate-x-1/2" />
+      </span>
+      <div className="flex min-w-0 flex-col gap-1">
+        <h2 id="nothing-yet" className="font-heading text-body-lg font-extrabold text-navy-deep">
+          {t('emptyTitle')}
+        </h2>
+        <p className="text-body-sm leading-5 text-slate">{t('emptyLead')}</p>
+      </div>
+    </section>
   );
 }

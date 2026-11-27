@@ -2,6 +2,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowRight, FileCheck2, FolderOpen } from 'lucide-react';
+import Image from 'next/image';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -164,26 +165,25 @@ function MyDossiersSkeleton(): ReactNode {
 
 function PhoneGreeting(): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
-  const tTabs = useTranslations('Shared.spaceTabs');
+  const tSite = useTranslations('Auth.Compte.site');
   const format = useFormatter();
   const now = useNow({ updateInterval: 60_000 });
   const { account } = useCurrentAccount();
   const name = account?.name.trim().split(/\s+/)[0] ?? '';
   return (
     <div className="flex items-center justify-between gap-3 sm:hidden">
-      <div className="flex min-w-0 flex-col">
+      {/* The logo goes back to the site, as on every app's home. */}
+      <Link href="/" aria-label={tSite('home')} className="relative size-11 shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-fog-light">
+        <Image src="/Logo-white-background.svg" alt="" fill={true} className="scale-125 object-contain" />
+      </Link>
+      <div className="flex min-w-0 flex-1 flex-col">
         <p className="text-body-sm text-slate first-letter:uppercase">{format.dateTime(now, { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'Africa/Douala' })}</p>
-        <h1 className="truncate font-heading text-2xl leading-8 font-extrabold tracking-tight text-navy-deep">{t('hello', { name })}</h1>
+        <h1 className="line-clamp-2 font-heading text-2xl leading-7 font-extrabold tracking-tight text-navy-deep">{t('hello', { name })}</h1>
       </div>
-      {/* The bell lived in the site header, which phones no longer show: here, beside the profile. */}
-      <div className="flex shrink-0 items-center gap-2">
-        <span className="grid size-11 place-items-center rounded-full border border-fog-light bg-white">
-          <NotificationBell audience="client" />
-        </span>
-        <Link href="/compte" aria-label={tTabs('profile')} className="flex size-11 items-center justify-center rounded-full bg-navy-deep font-heading text-body font-extrabold text-white">
-          {name.charAt(0).toUpperCase()}
-        </Link>
-      </div>
+      {/* The bell lived in the site header, which phones no longer show; the profile is the « Profil » tab. */}
+      <span className="grid size-11 shrink-0 place-items-center rounded-full border border-fog-light bg-white">
+        <NotificationBell audience="client" />
+      </span>
     </div>
   );
 }

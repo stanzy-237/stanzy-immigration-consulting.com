@@ -84,13 +84,24 @@ function Services({ documentId }: { documentId: string | null }): ReactNode {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.documentServices.list.queryOptions());
   if (!data.available) {
-    return <p className="rounded-2xl bg-white px-6 py-10 text-center text-sm text-slate shadow-sm">{t('unavailable')}</p>;
+    return (
+      <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-6 py-8 text-center shadow-sm">
+        <p className="text-sm text-slate">{t('unavailable')}</p>
+        <Link href="/mon-espace" className="text-sm font-semibold text-rouge hover:text-crimson">
+          {t('toMySpace')}
+        </Link>
+      </div>
+    );
   }
   if (data.services.length === 0) {
     return <p className="rounded-2xl bg-white px-6 py-10 text-center text-sm text-slate shadow-sm">{t('empty')}</p>;
   }
   const query = documentId ? `?document=${documentId}` : '';
   return (
+    <section aria-labelledby="catalogue" className="flex flex-col gap-3">
+    <h2 id="catalogue" className="font-heading text-h4 font-extrabold text-navy-deep">
+      {t('catalogueTitle')}
+    </h2>
     <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {data.services.map((service) => (
         <li key={service.id}>
@@ -122,6 +133,7 @@ function Services({ documentId }: { documentId: string | null }): ReactNode {
         </li>
       ))}
     </ul>
+    </section>
   );
 }
 
