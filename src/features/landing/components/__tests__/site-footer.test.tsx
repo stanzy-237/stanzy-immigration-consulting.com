@@ -11,10 +11,14 @@ describe('SiteFooter', () => {
   it('renders a contentinfo landmark with the four social links', () => {
     render(withIntl(<SiteFooter />));
     const footer = screen.getByRole('contentinfo');
+    // Once in the desktop footer, once in the phone one.
     for (const label of ['Facebook', 'Instagram', 'WhatsApp']) {
-      const link = within(footer).getByRole('link', { name: label });
-      expect(link).toHaveAttribute('target', '_blank');
-      expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
+      const links = within(footer).getAllByRole('link', { name: label });
+      expect(links).toHaveLength(2);
+      for (const link of links) {
+        expect(link).toHaveAttribute('target', '_blank');
+        expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
+      }
     }
     const tiktokLinks = within(footer).getAllByRole('link', { name: 'TikTok' });
     expect(
@@ -24,10 +28,14 @@ describe('SiteFooter', () => {
 
   it('shows the brand logo as a round white-background image', () => {
     render(withIntl(<SiteFooter />));
-    const img = screen.getByAltText('STANZY IMMIGRATION');
-    expect(img.tagName).toBe('IMG');
-    expect(img.getAttribute('src') ?? '').toContain('Logo-white-background');
-    expect(img.closest('span')).toHaveClass('rounded-full');
+    // The desktop footer's and the phone footer's: the same round logo.
+    const imgs = screen.getAllByAltText('STANZY IMMIGRATION');
+    expect(imgs).toHaveLength(2);
+    for (const img of imgs) {
+      expect(img.tagName).toBe('IMG');
+      expect(img.getAttribute('src') ?? '').toContain('Logo-white-background');
+      expect(img.closest('.rounded-full')).not.toBeNull();
+    }
   });
 
   it('exposes the "Réserver une consultation" CTA pointing to the service page', () => {
@@ -42,8 +50,10 @@ describe('SiteFooter', () => {
   it('shows the current year and "Fait avec" tagline in the copyright line', () => {
     render(withIntl(<SiteFooter />));
     const year = new Date().getFullYear();
-    expect(screen.getByText(new RegExp(String(year)))).toBeInTheDocument();
-    expect(screen.getByText(/Fait avec/)).toBeInTheDocument();
+    expect(screen.getAllByText(new RegExp(String(year))).length).toBeGreaterThan(0);
+    // Desktop: « Fait avec ♥ pour la communauté » ; phone: « Fait avec ♥ à Douala · © year ».
+    expect(screen.getAllByText(/Fait avec/)).toHaveLength(2);
+    expect(screen.getByText(new RegExp(`Fait avec ♥ à Douala · © ${year} Stanzy`))).toBeInTheDocument();
   });
 
   it('lists the tools and services from the design', () => {
