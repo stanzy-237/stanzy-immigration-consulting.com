@@ -35,7 +35,14 @@ export type PublishedArticle = ArticleCard & {
 };
 
 export type BlogListInput = { locale: BlogLocale; category?: string; tag?: string; page?: number };
-export type BlogList = { items: ArticleCard[]; total: number; page: number; pageSize: number };
+export type BlogList = {
+  items: ArticleCard[];
+  total: number;
+  page: number;
+  pageSize: number;
+  /** Articles per category slug (and `all`), for the same locale and tag: the filters' counts. */
+  counts?: Record<string, number>;
+};
 
 type PostWithCategory = Awaited<ReturnType<Db['blogPost']['findMany']>>[number] & {
   category: BlogCategory;
@@ -71,10 +78,11 @@ export async function listPublished(db: Db, input: BlogListInput): Promise<BlogL
   })) as PostWithCategory[];
 
   const rank = (locale: string) => (locale === input.locale ? 0 : 1);
-  const matching = rows
-    .filter((row) => (input.locale === 'fr' ? row.locale === 'fr' : true))
+  const listed = rows.filter((row) => (input.locale === 'fr' ? row.locale === 'fr' : true)).filter((row) => !input.tag || row.tags.includes(input.tag));
+  const counts: Record<string, number> = { all: listed.length };
+  for (const row of listed) counts[row.category.slug] = (counts[row.category.slug] ?? 0) + 1;
+  const matching = listed
     .filter((row) => !input.category || row.category.slug === input.category)
-    .filter((row) => !input.tag || row.tags.includes(input.tag))
     .toSorted((a, b) => rank(a.locale) - rank(b.locale) || b.publishedAt!.getTime() - a.publishedAt!.getTime());
 
   return {
@@ -82,6 +90,7 @@ export async function listPublished(db: Db, input: BlogListInput): Promise<BlogL
     total: matching.length,
     page,
     pageSize: BLOG_PAGE_SIZE,
+    counts,
   };
 }
 

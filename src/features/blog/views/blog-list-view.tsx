@@ -26,6 +26,9 @@ const blogHref = (params: { categorie?: string; tag?: string; page?: number }) =
 const chip = 'inline-flex h-9 items-center rounded-full border-2 px-4 text-sm font-semibold no-underline transition-colors';
 const chipIdle = `${chip} border-fog-light bg-white text-navy-deep hover:border-navy-deep`;
 const chipActive = `${chip} border-navy-deep bg-navy-deep text-white`;
+const PILL = 'flex shrink-0 snap-start items-center gap-1.5 rounded-full border border-fog-light bg-white px-4 py-2.5 text-body-sm font-semibold whitespace-nowrap text-ink';
+const PILL_ACTIVE = 'flex shrink-0 snap-start items-center gap-1.5 rounded-full border border-navy-deep bg-navy-deep px-4 py-2.5 text-body-sm font-bold whitespace-nowrap text-white';
+const PILL_TAG = 'flex shrink-0 snap-start items-center gap-1.5 rounded-full border border-rose bg-blush px-4 py-2.5 text-body-sm font-semibold whitespace-nowrap text-rouge';
 
 /**
  * The public Blog: published Articles newest first, filtered by category and
@@ -41,12 +44,46 @@ export async function BlogListView({ locale: rawLocale, params }: { locale: stri
   ]);
   const pages = Math.max(1, Math.ceil(list.total / list.pageSize));
   const filtered = Boolean(params.categorie || params.tag);
+  const counts: Record<string, number> | undefined = list.counts;
 
   return (
     <>
       <SiteNav />
       <main>
-        <header className="bg-linear-135 from-navy-deep to-navy-80 py-12 sm:py-16">
+        {/* Phones (`PWA · Blog · Filtres · Retenu`): a short header, then one row of pills that scrolls. */}
+        <header className="flex flex-col gap-0.5 px-5 pt-6 md:hidden">
+          <h1 className="font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep">{t('phoneTitle')}</h1>
+          <p className="text-body-sm text-slate">{t('title')}</p>
+        </header>
+        <nav aria-label={t('filtersLabel')} className="no-scrollbar mt-4 flex snap-x scroll-px-5 gap-2 overflow-x-auto px-5 pb-1 md:hidden">
+          {params.tag && (
+            <Link href={blogHref({ categorie: params.categorie })} className={PILL_TAG} aria-label={t('clearTag', { tag: params.tag })}>
+              {t('tagFilter', { tag: params.tag })}
+              <X aria-hidden={true} className="size-4" />
+            </Link>
+          )}
+          {[{ slug: undefined, name: t('allCategories'), count: counts?.all }, ...categories.map((c) => ({ slug: c.slug, name: categoryName(c, locale), count: counts?.[c.slug] ?? (counts ? 0 : undefined) }))]
+            // Empty categories are left out once the counts are known (a list cached before them has none).
+            .filter((pill) => pill.slug === undefined || pill.count !== 0 || pill.slug === params.categorie)
+            .map((pill) => {
+              const active = (params.categorie ?? undefined) === pill.slug;
+              return (
+                <Link
+                  key={pill.slug ?? 'all'}
+                  href={blogHref({ categorie: pill.slug, tag: params.tag })}
+                  aria-current={active ? 'page' : undefined}
+                  className={active ? PILL_ACTIVE : PILL}
+                >
+                  {pill.name}
+                  {pill.count === undefined ? null : (
+                    <span className={active ? 'text-caption font-semibold text-white/60' : 'text-caption text-slate'}>{pill.count}</span>
+                  )}
+                </Link>
+              );
+            })}
+        </nav>
+
+        <header className="bg-linear-135 from-navy-deep to-navy-80 py-12 max-md:hidden sm:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-7">
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-rouge/30 bg-rouge/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-rose">
               <span aria-hidden={true} className="size-1.5 rounded-full bg-rose" />
@@ -57,8 +94,8 @@ export async function BlogListView({ locale: rawLocale, params }: { locale: stri
           </div>
         </header>
 
-        <section className="mx-auto max-w-7xl px-4 py-8 sm:px-7 sm:py-12">
-          <nav aria-label={t('filtersLabel')} className="mb-8 flex flex-wrap items-center gap-2">
+        <section className="mx-auto max-w-7xl px-4 py-8 max-md:pt-5 sm:px-7 sm:py-12">
+          <nav aria-label={t('filtersLabel')} className="mb-8 flex flex-wrap items-center gap-2 max-md:hidden">
             <Link href={blogHref({ tag: params.tag })} className={params.categorie ? chipIdle : chipActive} aria-current={params.categorie ? undefined : 'page'}>
               {t('allCategories')}
             </Link>

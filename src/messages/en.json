@@ -1624,7 +1624,8 @@
     "by": "By {author}",
     "tags": "Tags",
     "cardLabel": "Read the article: {title}",
-    "read": "Read the article"
+    "read": "Read the article",
+    "phoneTitle": "Blog"
   },
   "Dashboard": {
     "metaTitle": "Dashboard",
