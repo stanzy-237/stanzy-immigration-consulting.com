@@ -154,7 +154,10 @@ function fakeDatabase({ meetings = [] as Row[], others = [] as Row[], codes = []
         return { count: 1 };
       },
       findFirst: async ({ where }: { where: Row }) => find(payments, where) ?? null,
-      findUnique: async ({ where }: { where: Row }) => find(payments, where) ?? null,
+      findUnique: async ({ where }: { where: Row }) => {
+        const row = find(payments, where);
+        return row ? { ...row, consultation: withAccount(find(consultations, { id: row.consultationId })) } : null;
+      },
       findUniqueOrThrow: async ({ where }: { where: { id: string } }) => {
         const row = find(payments, where)!;
         return { ...row, consultation: withAccount(find(consultations, { id: row.consultationId })) };

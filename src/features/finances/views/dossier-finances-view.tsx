@@ -78,9 +78,10 @@ function DossierFinances({ dossierId }: { dossierId: string }): ReactNode {
               {editing === line.id ? (
                 <PricingForm dossierId={dossierId} line={line} name={nameOf(line)} onDone={() => setEditing(null)} />
               ) : (
-                <div className="flex flex-wrap items-center gap-3">
-                  <p className="min-w-40 flex-1 font-semibold text-navy-deep">{nameOf(line)}</p>
-                  <dl className="grid flex-2 grid-cols-2 gap-3">
+                // Phones: the name with the pencil beside it, the two prices on their own line under it.
+                <div className="flex flex-wrap items-start gap-x-3 gap-y-2 sm:flex-nowrap sm:items-center">
+                  <p className="min-w-0 flex-1 font-semibold text-navy-deep sm:min-w-40">{nameOf(line)}</p>
+                  <dl className="order-last grid basis-full grid-cols-2 gap-3 sm:order-0 sm:flex-2 sm:basis-auto">
                     <Priced label={t('agreedPrice')} amount={line.price} source={line.priceSource} />
                     {line.kind === 'REQUEST' ? (
                       <Priced label={t('partnerPrice')} amount={line.partnerPrice} source={line.partnerSource} />
@@ -90,10 +91,10 @@ function DossierFinances({ dossierId }: { dossierId: string }): ReactNode {
                     type="button"
                     onClick={() => setEditing(line.id)}
                     aria-label={t('editFor', { service: nameOf(line) })}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-fog px-3 py-1.5 text-sm font-semibold text-navy-deep hover:bg-fog-light"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-fog px-3 py-1.5 text-sm font-semibold text-navy-deep hover:bg-fog-light"
                   >
                     <Pencil aria-hidden={true} className="size-3.5" />
-                    {t('edit')}
+                    <span className="max-sm:hidden">{t('edit')}</span>
                   </button>
                 </div>
               )}
@@ -147,7 +148,7 @@ function Priced({ label, amount, source }: { label: string; amount: number | nul
         {amount !== null && source ? (
           <>
             {' '}
-            <span className="text-xs font-normal text-slate">({t(`source.${source}`)})</span>
+            <span className="block text-xs font-normal text-slate">({t(`source.${source}`)})</span>
           </>
         ) : null}
       </dd>

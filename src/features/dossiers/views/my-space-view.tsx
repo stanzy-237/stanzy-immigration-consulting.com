@@ -2,16 +2,23 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { ArrowRight, FileCheck2, FolderOpen } from 'lucide-react';
-import { useFormatter, useTranslations } from 'next-intl';
+import Image from 'next/image';
+import { useFormatter, useNow, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ConsultationHome } from '@/features/consultation/components/space-home';
+import { SpaceTabs } from '@/features/consultation/components/space-parts';
 import { DossierStatePill, StageStepper } from '@/features/dossiers/components/stage-stepper';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
+import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { PushBanner } from '@/features/shared/components/push-banner';
+import { NotificationBell } from '@/features/shared/components/notification-bell';
+import { TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
 /**
@@ -20,15 +27,28 @@ import { useTRPC } from '@/trpc/client';
  * Services documentaires too (#80). `notice`: the pieces still to hand over
  * for them, passed in by the route.
  */
-export function MySpaceView({ notice }: { notice?: ReactNode }): ReactNode {
+/** `consultations`: the Client's own Consultations (tabs, next one); off for the consultant, whose are in the Tableau de bord. */
+export function MySpaceView({ notice, consultations = true }: { notice?: ReactNode; consultations?: boolean }): ReactNode {
   const t = useTranslations('Dossiers.mySpace');
   return (
     <>
       <SiteNav />
-      <main className="min-h-screen bg-off-white px-4 py-10 md:py-14">
+      <main className={cn('min-h-screen bg-off-white px-4 py-8 sm:py-10 md:py-14', consultations && TAB_BAR_ROOM)}>
         <div className="mx-auto max-w-3xl">
-          <h1 className="font-heading text-3xl font-bold text-navy-deep md:text-4xl">{t('title')}</h1>
-          <p className="mt-2 text-slate">{t('subtitle')}</p>
+          {/* Phone (`Mon espace v2 · 1 Avant · Mobile`): the day and « Bonjour Aminata ». */}
+          <PhoneGreeting />
+          <div className="flex flex-col gap-4 max-sm:hidden md:flex-row md:items-end md:justify-between">
+            <div>
+              <h1 className="font-heading text-3xl font-bold text-navy-deep md:text-4xl">{t('title')}</h1>
+              <p className="mt-2 text-slate">{t('subtitle')}</p>
+            </div>
+            {consultations ? <SpaceTabs /> : null}
+          </div>
+          {consultations ? (
+            <div className="mt-6 empty:hidden">
+              <ConsultationHome />
+            </div>
+          ) : null}
           {notice ? <div className="mt-6">{notice}</div> : null}
           <ServicesLink />
           <div className="mt-8">
@@ -139,6 +159,31 @@ function MyDossiersSkeleton(): ReactNode {
       <div aria-hidden={true} className="grid grid-cols-1 gap-5">
         <Skeleton className="h-96 rounded-2xl" />
       </div>
+    </div>
+  );
+}
+
+function PhoneGreeting(): ReactNode {
+  const t = useTranslations('Dossiers.mySpace');
+  const tSite = useTranslations('Auth.Compte.site');
+  const format = useFormatter();
+  const now = useNow({ updateInterval: 60_000 });
+  const { account } = useCurrentAccount();
+  const name = account?.name.trim().split(/\s+/)[0] ?? '';
+  return (
+    <div className="flex items-center justify-between gap-3 sm:hidden">
+      {/* The logo goes back to the site, as on every app's home. */}
+      <Link href="/" aria-label={tSite('home')} className="relative size-11 shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-fog-light">
+        <Image src="/Logo-white-background.svg" alt="" fill={true} className="scale-125 object-contain" />
+      </Link>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <p className="text-body-sm text-slate first-letter:uppercase">{format.dateTime(now, { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'Africa/Douala' })}</p>
+        <h1 className="line-clamp-2 font-heading text-2xl leading-7 font-extrabold tracking-tight text-navy-deep">{t('hello', { name })}</h1>
+      </div>
+      {/* The bell lived in the site header, which phones no longer show; the profile is the « Profil » tab. */}
+      <span className="grid size-11 shrink-0 place-items-center rounded-full border border-fog-light bg-white">
+        <NotificationBell audience="client" />
+      </span>
     </div>
   );
 }

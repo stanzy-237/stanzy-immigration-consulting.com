@@ -58,55 +58,59 @@ function StanzyRequests({ dossierId }: { dossierId: string }): ReactNode {
         <HandHelping aria-hidden={true} className="size-5" />
         {t('panelTitle')}
       </h2>
-      <p className="mt-1 text-sm text-slate">{t('panelIntro')}</p>
+      <p className="mt-1 text-sm text-slate max-md:hidden">{t('panelIntro')}</p>
       <ul className="mt-4 grid grid-cols-1 gap-2">
         {requests.map((request) => (
           <li
             key={request.id}
             className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-fog-light bg-white p-4 shadow-sm"
           >
-            <div className="min-w-0">
-              <p className="flex flex-wrap items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="flex items-start justify-between gap-2">
                 <span className="font-semibold text-navy-deep">{request.document.title}</span>
-                <span className="rounded-full bg-ice-blue px-2.5 py-0.5 text-xs font-semibold text-navy-deep">
+                <span className="shrink-0 rounded-full bg-ice-blue px-2.5 py-0.5 text-xs font-semibold text-navy-deep">
                   {t(`status.${request.status}`)}
                 </span>
               </p>
-              <p className="truncate text-sm text-slate">
-                {request.document.section.title} ·{' '}
-                {format.dateTime(request.createdAt, { day: 'numeric', month: 'short', year: 'numeric' })}
-                {request.declineNote ? ` · ${request.declineNote}` : ''}
+              {/* Phones: the document, its state, the service that gets it and what's left; the rest from md up. */}
+              <p className="truncate text-sm text-slate max-md:hidden">
+                {request.document.section.title} · {format.dateTime(request.createdAt, { day: 'numeric', month: 'short', year: 'numeric' })}
               </p>
+              {request.declineNote ? <p className="text-sm text-slate">{request.declineNote}</p> : null}
               <p className="mt-1 text-sm text-navy-deep">
                 {request.service ? (
                   <>
                     <span className="font-semibold">{textIn(request.service.name, locale)}</span>
-                    {' · '}
-                    {request.service.priceKind === 'FIXED'
-                      ? formatMoney(request.service.price, 'XAF', locale)
-                      : format.number(request.service.price / PERCENT_MAX, { style: 'percent', maximumFractionDigits: 2 })}{' '}
-                    {textIn(request.service.unit, locale)}
-                    {request.acceptedAt ? ` · ${t('conditionsAccepted')}` : ''}
+                    <span className="max-md:hidden">
+                      {' · '}
+                      {request.service.priceKind === 'FIXED'
+                        ? formatMoney(request.service.price, 'XAF', locale)
+                        : format.number(request.service.price / PERCENT_MAX, { style: 'percent', maximumFractionDigits: 2 })}{' '}
+                      {textIn(request.service.unit, locale)}
+                      {request.acceptedAt ? ` · ${t('conditionsAccepted')}` : ''}
+                    </span>
                   </>
                 ) : (
                   <span className="text-honey">{t('noService')}</span>
                 )}
               </p>
-              {request.contract ? (
-                <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate">
-                  <FileSignature aria-hidden={true} className="size-3.5" />
-                  {t('contract', { number: request.contract.number, status: request.contract.status })}
-                </p>
-              ) : null}
-              {request.service && (request.service.questionnaire || prerequisitesOf(request.service.prerequisites).length > 0) ? (
-                <Link
-                  href={`/dossiers/${dossierId}/services/${request.id}`}
-                  className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-rouge hover:text-crimson"
-                >
-                  <FileStack aria-hidden={true} className="size-4" />
-                  {t('requirements', { count: request._count.files })}
-                </Link>
-              ) : null}
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 empty:hidden">
+                {request.contract ? (
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-slate">
+                    <FileSignature aria-hidden={true} className="size-3.5" />
+                    {t('contract', { number: request.contract.number, status: request.contract.status })}
+                  </span>
+                ) : null}
+                {request.service && (request.service.questionnaire || prerequisitesOf(request.service.prerequisites).length > 0) ? (
+                  <Link
+                    href={`/dossiers/${dossierId}/services/${request.id}`}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-rouge hover:text-crimson"
+                  >
+                    <FileStack aria-hidden={true} className="size-4" />
+                    {t('requirements', { count: request._count.files })}
+                  </Link>
+                ) : null}
+              </div>
             </div>
             {request.status === 'REQUESTED' ? (
               <div className="flex flex-wrap items-center gap-1">

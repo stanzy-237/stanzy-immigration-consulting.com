@@ -61,6 +61,10 @@ A User whom the consultant is onboarding — typically after they booked a consu
 **Consultation**:
 A paid, booked video appointment between a User and the consultant, and the primary funnel into becoming a Client. Booked and paid in the app: a slot is held 15 minutes while its Compte pays through SasPay, and the Consultation exists only once the payment succeeds; it then has its own Réunion. It can be moved to another free slot, never refunded; if the consultant cancels, it moves to the next free slot and its Client is told and may change it. After it, the consultant may publish its Enregistrement, Transcription, notes and next steps to its Client. Design: `docs/design/consultation.md`.
 
+**Disponibilités**:
+The hours, each day of the week, when a Consultation can be booked, with the dates the consultant blocks; a slot is free only inside them and away from every other Réunion. Set by the consultant in the Tableau de bord, together with the Consultation's length, its price and how far ahead it can be booked.
+_Avoid_: "agenda", "planning".
+
 **Réunion** (Meeting):
 A video meeting held in the app between the consultant and the people invited, each with an account (Clients, partners): planned ahead, started at once (« Réunion instantanée »), or in the Salle personnelle. About a Dossier (its Client invited) or on its own. Someone with the invitation link but not invited asks to enter and waits until the consultant lets them in. Recorded unless the consultant turns it off, after everyone accepted it; « Terminer pour tous » ends it for everyone.
 _Avoid_: "Consultation" (the paid appointment a User books and pays in the app; it has a Réunion, but not every Réunion is a Consultation).

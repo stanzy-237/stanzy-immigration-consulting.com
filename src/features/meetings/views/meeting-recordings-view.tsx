@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 
 import { QueryBoundary } from '@/components/query-boundary';
 import { MeetingCardsSkeleton, MeetingsNav } from '@/features/meetings/components/meeting-parts';
-import { consultantRoomPath, recordingUrl } from '@/features/meetings/lib/meeting-schema';
+import { consultantAfterPath, recordingUrl } from '@/features/meetings/lib/meeting-schema';
 import { useTRPC } from '@/trpc/client';
 
 /** « Enregistrements » (#94): every recorded Réunion, newest first, to play or open. For the consultant only. */
@@ -75,10 +75,10 @@ function Recordings(): ReactNode {
                 {t('play')}
               </a>
               <Link
-                href={consultantRoomPath(recording.meeting.id)}
+                href={consultantAfterPath(recording.meeting)}
                 className="inline-flex h-10 items-center justify-center rounded-full bg-off-white px-4 text-sm font-semibold text-navy-deep hover:bg-fog-light"
               >
-                {t('open')}
+                {recording.meeting.consultation ? t('openConsultation') : t('open')}
               </Link>
             </div>
           </li>

@@ -72,7 +72,7 @@ export const FOOTER_SOCIALS: ReadonlyArray<SocialLink> = [
   { key: 'facebook', iconSrc: '/icons/social/facebook.svg', href: 'https://facebook.com/stanzycanada' },
   { key: 'tiktok', iconSrc: '/icons/social/tiktok.svg', href: 'https://www.tiktok.com/@stanzycanada' },
   { key: 'instagram', iconSrc: '/icons/social/instagram.svg', href: 'https://instagram.com/stanzycanada' },
-  { key: 'whatsapp', iconSrc: '/icons/social/whatsapp.svg', href: 'https://wa.me/message/stanzycanada' },
+  { key: 'whatsapp', iconSrc: '/icons/social/whatsapp.svg', href: 'https://wa.me/237679306015' },
 ] as const;
 
 // Contact details come from the MagicPath design.

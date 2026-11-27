@@ -45,6 +45,8 @@ export function ReinitialiserMotDePasseView({
   const vaultTitleId = useId();
 
   const token = first(searchParams.token);
+  // The booking's « Créer mon mot de passe » (no password yet), not a reset.
+  const creating = first(searchParams.nouveau) === '1';
   const [linkDead, setLinkDead] = useState(!token || Boolean(first(searchParams.error)));
   const [password, setPassword] = useState('');
   const [passwordInvalid, setPasswordInvalid] = useState(false);
@@ -74,7 +76,7 @@ export function ReinitialiserMotDePasseView({
     // The server set a new session cookie; tell the client's session store
     // (the nav reads it) to fetch it, as it does after a sign-in.
     authClient.$store.notify('$sessionSignal');
-    router.push('/');
+    router.push(creating ? '/mon-espace' : '/');
   }
 
   if (linkDead) {
@@ -91,7 +93,7 @@ export function ReinitialiserMotDePasseView({
   }
 
   return (
-    <AuthShell title={t('title')} subtitle={t('subtitle')}>
+    <AuthShell title={creating ? t('createTitle') : t('title')} subtitle={creating ? t('createSubtitle') : t('subtitle')}>
       <form onSubmit={onSubmit}>
         <FieldGroup>
           <section
@@ -137,7 +139,7 @@ export function ReinitialiserMotDePasseView({
             disabled={pending}
             className="bg-rouge hover:bg-rouge/90 h-11 w-full font-semibold text-white"
           >
-            {pending ? t('submitting') : t('submit')}
+            {pending ? t('submitting') : creating ? t('createSubmit') : t('submit')}
           </Button>
         </FieldGroup>
       </form>

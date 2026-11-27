@@ -59,7 +59,8 @@ export function meetingEmail(opts: {
     minutes: opts.meeting.durationMinutes,
   };
   const lines = [t('Meetings.emails.greeting', { name: opts.name }), t(`Meetings.emails.${opts.kind}.body`, values)];
-  if (opts.kind === 'cancelled' && opts.reason) lines.push(t('Meetings.emails.reason', { reason: opts.reason }));
+  // A Consultation moved because the consultant cancelled its slot says why, like a cancelled Réunion.
+  if ((opts.kind === 'cancelled' || opts.kind === 'moved') && opts.reason) lines.push(t('Meetings.emails.reason', { reason: opts.reason }));
   const firstName = opts.name.trim().split(/\s+/)[0] ?? opts.name;
   const slot = slotParts(opts.meeting.startsAt, opts.meeting.durationMinutes, lang);
   const minutes = opts.meeting.durationMinutes;

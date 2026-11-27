@@ -115,6 +115,9 @@ export function transcriptText(jsonl: string, names: Record<string, string>): st
 /** Where a Réunion's room is, for a Client or partner (« Mon espace ») or the consultant (Tableau de bord). */
 export const clientRoomPath = (meetingId: string): string => `/mon-espace/reunions/${meetingId}`;
 export const consultantRoomPath = (meetingId: string): string => `/reunions/${meetingId}`;
+/** Where the consultant reviews a Réunion that is over: a Consultation's « 2 Après », else its room. */
+export const consultantAfterPath = (meeting: { id: string; consultation?: { id: string } | null }): string =>
+  meeting.consultation ? `/consultations/${meeting.consultation.id}` : consultantRoomPath(meeting.id);
 /** The invitation link's path on the site (signed in only; the uninvited wait to be let in). */
 export const invitationPath = (token: string): string => `/reunion/${token}`;
 

@@ -99,6 +99,7 @@ function fakeDatabase() {
   ];
   const incomes: Row[] = [];
   const charges: Row[] = [];
+  const consultationPayments: { amount: number; currency: string; status: string; settledAt: Date | null }[] = [];
   const rates: Row[] = [];
   let seq = 0;
 
@@ -144,6 +145,12 @@ function fakeDatabase() {
         payments
           .map((payment) => ({ ...payment, invoice: invoices.find((i) => i.id === payment.invoiceId)! }))
           .filter(({ invoice }) => invoice.status !== where.invoice.status.not && linked(where.invoice, invoice)),
+    },
+    consultationPayment: {
+      findMany: async ({ where }: { where: { status: string; settledAt: { gte: Date; lt: Date } } }) =>
+        consultationPayments.filter(
+          (p) => p.status === where.status && p.settledAt && p.settledAt >= where.settledAt.gte && p.settledAt < where.settledAt.lt,
+        ),
     },
     income: {
       findMany: async ({ where }: { where?: Record<string, unknown> } = {}) =>
@@ -218,7 +225,7 @@ function fakeDatabase() {
       },
     },
   };
-  return { db: db as unknown as TRPCContext['prisma'], incomes, charges, categories, dossiers, requests };
+  return { db: db as unknown as TRPCContext['prisma'], incomes, charges, categories, dossiers, requests, consultationPayments };
 }
 
 const consultant = sessionFor({ id: 'acc_stanzy', role: 'CONSULTANT' });
@@ -278,6 +285,21 @@ describe('finances', () => {
       ['2026-02-20', 'STZ-2026-0002'],
       ['2026-02-03', 'STZ-2026-0001'],
     ]);
+  });
+
+  it('counts a paid Consultation as a Recette of its month, under « Consultations », not a failed one', async () => {
+    const { db, consultationPayments } = fakeDatabase();
+    consultationPayments.push(
+      { amount: 13_500, currency: 'XAF', status: 'SUCCESS', settledAt: new Date('2026-04-12T10:00:00Z') },
+      { amount: 15_000, currency: 'XAF', status: 'FAILED', settledAt: null },
+    );
+    const caller = callerFor(db, consultant);
+
+    const { report, margins } = await caller.finances.overview({ year: 2026 });
+    expect(report.months[3]!.income).toBe(13_500);
+    expect(report.byService).toContainEqual({ service: 'CONSULTATION', income: 13_500 });
+    // No Dossier: not in the margins.
+    expect(margins.every((row) => row.income !== 13_500)).toBe(true);
   });
 
   it('lists each service sold on the Dossier with its price and its partner’s, prefilled (#158)', async () => {

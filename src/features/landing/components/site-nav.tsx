@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, ChevronDown, Flag, FolderOpen, LayoutDashboard, LogOut, Menu } from 'lucide-react';
+import { ArrowRight, ChevronDown, Flag, FolderOpen, LayoutDashboard, LogOut, Menu, UserRound } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
@@ -35,6 +35,8 @@ import { cn } from '@/lib/utils';
 
 import { MapleLeafIcon } from '@/features/landing/components/brand-icons';
 import { LocaleToggle } from '@/features/landing/components/locale-toggle';
+import { ContactButton } from '@/features/landing/components/contact-button';
+import { isOwnBarPath, isTaskPath, SiteTabBar } from '@/features/landing/components/site-tab-bar';
 import {
   SERVICE_ENTRIES,
   TOOL_ENTRIES,
@@ -124,10 +126,19 @@ export function SiteNav(): ReactNode {
   // « Signaler un problème » (#160), from the account menu.
   const [reporting, setReporting] = useState<boolean>(false);
 
+  // Phones (`PWA · Navigation mobile · Règles`): no header and no ≡ menu, the tab bar
+  // instead, except on a task screen.
+  // Signed-in Clients get theirs (Mon espace · Consultations · Documents · Outils · Profil); the consultant has the Tableau de bord.
+  const tabsFor: 'visitor' | 'client' | null = account?.isConsultant ? null : account ? 'client' : 'visitor';
+  const visitorTabs: boolean = tabsFor !== null && !isTaskPath(pathname);
+  // The home page stays as designed, its header included; the tab bar still sits at the bottom.
+  const hideHeader: boolean = (visitorTabs || (tabsFor === 'client' && isOwnBarPath(pathname))) && pathname !== '/';
+
   return (
+    <>
     <nav
       aria-label={t('ariaLabel')}
-      className="bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-backdrop-filter:bg-surface/80"
+      className={cn('bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-backdrop-filter:bg-surface/80', hideHeader && 'max-md:hidden')}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 md:px-6">
         <Link
@@ -214,6 +225,7 @@ export function SiteNav(): ReactNode {
               triggerLabel={t('account', { name: accountName })}
               dashboard={dashboardUrl ? { href: dashboardUrl, label: t('dashboard') } : null}
               mySpaceLabel={account?.isConsultant ? null : t('mySpace')}
+              myAccountLabel={account?.isConsultant ? null : t('myAccount')}
               reportLabel={t('report')}
               onReport={(): void => setReporting(true)}
               signOutLabel={t('signOut')}
@@ -321,6 +333,16 @@ export function SiteNav(): ReactNode {
                     {t('mySpace')}
                   </Link>
                 ) : null}
+                {accountName && !account?.isConsultant ? (
+                  <Link
+                    href="/compte"
+                    className="text-navy-deep inline-flex items-center justify-center gap-2 rounded-md border border-fog px-3 py-2 text-sm font-semibold"
+                    onClick={closeMobile}
+                  >
+                    <UserRound aria-hidden={true} className="size-4" />
+                    {t('myAccount')}
+                  </Link>
+                ) : null}
                 {accountName ? (
                   <button
                     type="button"
@@ -370,6 +392,14 @@ export function SiteNav(): ReactNode {
       </div>
       {accountName ? <ReportProblemDialog open={reporting} onOpenChange={setReporting} /> : null}
     </nav>
+    {visitorTabs ? (
+      <>
+        <SiteTabBar audience={tabsFor ?? 'visitor'} />
+        {/* Visitors only (`PWA · Pied de page mobile · C`), and not on the Contact page, which has it all. */}
+        {pathname === '/contact' || tabsFor !== 'visitor' ? null : <ContactButton />}
+      </>
+    ) : null}
+    </>
   );
 }
 
@@ -380,6 +410,8 @@ type AccountMenuProps = {
   dashboard: { href: string; label: string } | null;
   /** « Mon espace », for everyone but the consultant. */
   mySpaceLabel: string | null;
+  /** « Mon compte » (name, password, devices, notifications), for everyone but the consultant. */
+  myAccountLabel: string | null;
   /** « Signaler un problème » (#160). */
   reportLabel: string;
   onReport: () => void;
@@ -392,6 +424,7 @@ function AccountMenu({
   triggerLabel,
   dashboard,
   mySpaceLabel,
+  myAccountLabel,
   reportLabel,
   onReport,
   signOutLabel,
@@ -423,6 +456,12 @@ function AccountMenu({
           <DropdownMenuItem render={<Link href="/mon-espace" />}>
             <FolderOpen aria-hidden={true} />
             {mySpaceLabel}
+          </DropdownMenuItem>
+        ) : null}
+        {myAccountLabel ? (
+          <DropdownMenuItem render={<Link href="/compte" />}>
+            <UserRound aria-hidden={true} />
+            {myAccountLabel}
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuItem onClick={onReport}>

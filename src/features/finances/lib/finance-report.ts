@@ -7,14 +7,17 @@ export const XAF_PER_EUR = 655.957;
 /** `xafPerCad` for each `YYYY-MM` the consultant entered. */
 export type CadRates = Readonly<Record<string, number>>;
 
+/** What a Recette is for: a Dossier's service, or a paid Consultation (not a Dossier service). */
+export type IncomeService = ServiceType | 'CONSULTATION';
+
 /** One Recette or Charge as the reports read it; `day` is `YYYY-MM-DD`. */
 export type Entry = {
   kind: 'income' | 'charge';
   day: string;
   amount: number;
   currency: Currency;
-  /** A Recette's service (a paid Facture's is its Dossier's). */
-  service?: ServiceType | null;
+  /** A Recette's service (a paid Facture's is its Dossier's; a paid Consultation's, `CONSULTATION`). */
+  service?: IncomeService | null;
   /** A Charge's category name. */
   category?: string | null;
   dossierId?: string | null;
@@ -49,7 +52,7 @@ export type YearReport = {
   /** January to December. */
   months: Totals[];
   /** Recettes per service; `null` holds those with no service (a source instead). */
-  byService: { service: ServiceType | null; income: number }[];
+  byService: { service: IncomeService | null; income: number }[];
   /** Charges per category, largest first. */
   byCategory: { category: string; charges: number }[];
   /** Months with CAD amounts but no rate: those amounts are left out until it is entered. */
@@ -60,7 +63,7 @@ export type YearReport = {
 export function yearReport(entries: Entry[], rates: CadRates, year: number): YearReport {
   const months = Array.from({ length: 12 }, empty);
   const total = empty();
-  const services = new Map<ServiceType | null, number>();
+  const services = new Map<IncomeService | null, number>();
   const categories = new Map<string, number>();
   const missing = new Set<string>();
 

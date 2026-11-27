@@ -50,19 +50,17 @@ describe('DashboardShell', () => {
 });
 
 describe('DashboardShell on a phone', () => {
-  it('keeps the bottom drawer: the menu button opens it, choosing a section closes it', async () => {
+  it('has the tab bar instead of the sidebar; a section without a tab lights « Plus »', async () => {
     const width = window.innerWidth;
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 375 });
     try {
       shell();
-      expect(document.querySelector('[data-slot="sidebar"]')).toBeNull();
-      fireEvent.click(await screen.findByRole('button', { name: 'Afficher ou replier le menu' }));
-      const drawer = await screen.findByRole('dialog', { name: 'Tableau de bord' });
-      const factures = within(drawer).getByRole('link', { name: 'Factures' });
-      expect(factures).toHaveAttribute('aria-current', 'page');
-      expect(within(drawer).getByText('Facturation')).toBeInTheDocument();
-      fireEvent.click(within(drawer).getByRole('link', { name: 'Comptes' }));
-      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      await waitFor(() => expect(document.querySelector('[data-slot="sidebar"]')).toBeNull());
+      const tabs = within(screen.getByRole('navigation', { name: 'Onglets du tableau de bord' }));
+      expect(tabs.getByRole('link', { name: 'Aperçu' })).toHaveAttribute('href', '/');
+      expect(tabs.getByRole('link', { name: 'Consultations' })).toHaveAttribute('href', '/consultations');
+      // On Factures, which has no tab of its own.
+      expect(tabs.getByRole('link', { name: 'Plus' })).toHaveAttribute('aria-current', 'page');
     } finally {
       Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
     }

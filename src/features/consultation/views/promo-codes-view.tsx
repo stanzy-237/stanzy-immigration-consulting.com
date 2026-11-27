@@ -2,7 +2,9 @@
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { TRPCClientError } from '@trpc/client';
-import { Check, Info, Plus, Trash2, X } from 'lucide-react';
+import { Check, ChevronLeft, Info, Plus, Trash2, X } from 'lucide-react';
+// The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
+import Link from 'next/link';
 import { useFormatter, useLocale, useNow, useTranslations } from 'next-intl';
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
@@ -41,8 +43,15 @@ const DOUALA = 'Africa/Douala';
 export function PromoCodesView(): ReactNode {
   const t = useTranslations('Consultation.promoCodes');
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6 pb-28 lg:pb-0">
-      <div className="flex flex-col gap-2">
+    <div className="mx-auto flex max-w-6xl flex-col gap-5 pb-28 md:gap-6 lg:pb-0">
+      {/* Phones (`Mobile v2 · 5 Codes promo`): « ‹ » back to « Plus » and the title. */}
+      <div className="flex items-center gap-3 md:hidden">
+        <Link href="/plus" aria-label={t('back')} className="flex size-11 shrink-0 items-center justify-center rounded-full border border-fog-light bg-white text-navy-deep">
+          <ChevronLeft aria-hidden={true} className="size-5" strokeWidth={2.4} />
+        </Link>
+        <h1 className="font-heading text-h4 leading-7 font-extrabold tracking-tight text-navy-deep">{t('title')}</h1>
+      </div>
+      <div className="flex flex-col gap-2 max-md:hidden">
         <p className={cn(LABEL_CLASS, 'text-steel-blue lg:hidden')}>{t('eyebrow')}</p>
         <h1 className="font-heading text-h2 leading-11 font-extrabold tracking-tight text-navy-deep lg:text-h1 lg:leading-14">{t('title')}</h1>
         <p className="hidden text-body leading-6 text-slate lg:block">{t('lead')}</p>
@@ -62,7 +71,8 @@ function PromoCodes(): ReactNode {
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-      <div className="flex flex-1 flex-col gap-4">
+      <PhoneCodes codes={data.codes} />
+      <div className="flex flex-1 flex-col gap-4 max-md:hidden">
         {data.codes.length === 0 ? (
           <p className="rounded-3xl border border-fog-light bg-white p-8 text-center text-body-sm leading-5 text-slate">{t('empty')}</p>
         ) : (
@@ -94,7 +104,10 @@ function PromoCodes(): ReactNode {
       </section>
 
       {/* Mobile: « + Nouveau code » in the bottom bar opens the sheet. */}
-      <div className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t border-fog-light bg-white px-5 pt-4 pb-6 lg:hidden">
+      <div
+        className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t border-fog-light bg-white px-5 pt-4 lg:hidden"
+        style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+      >
         <button
           type="button"
           onClick={() => setSheet(true)}
@@ -103,7 +116,7 @@ function PromoCodes(): ReactNode {
           <Plus aria-hidden={true} className="size-4.5" strokeWidth={2.5} />
           {t('new')}
         </button>
-        <p className="text-center text-caption leading-4 text-slate">{t('lead')}</p>
+        <p className="text-center text-caption leading-4 text-slate max-md:hidden">{t('lead')}</p>
       </div>
       <Drawer open={sheet} onOpenChange={setSheet} showSwipeHandle={true}>
         <DrawerContent className="max-h-dvh overflow-y-auto rounded-t-3xl px-5 pt-2 pb-8 lg:hidden">
@@ -116,6 +129,163 @@ function PromoCodes(): ReactNode {
           <NewCodeForm price={data.consultationPrice} onDone={() => setSheet(false)} />
         </DrawerContent>
       </Drawer>
+    </div>
+  );
+}
+
+/**
+ * Phones: « Actifs / Terminés », then a compact card per code (its text, the
+ * reduction, the places used, the end); a card opens its sheet, where
+ * « Supprimer » is.
+ */
+function PhoneCodes({ codes }: { codes: Code[] }): ReactNode {
+  const t = useTranslations('Consultation.promoCodes');
+  const [filter, setFilter] = useState<'live' | 'over'>('live');
+  const [open, setOpen] = useState<Code | null>(null);
+  const live = codes.filter((c) => c.status === 'ACTIVE');
+  const over = codes.filter((c) => c.status !== 'ACTIVE');
+  const shown = filter === 'live' ? live : over;
+  return (
+    <div className="flex flex-col gap-4 md:hidden">
+      <div role="tablist" aria-label={t('listLabel')} className="flex rounded-full bg-ice-blue p-1">
+        {(
+          [
+            ['live', t('filter.live', { count: live.length })],
+            ['over', t('filter.over', { count: over.length })],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={filter === key}
+            onClick={() => setFilter(key)}
+            className={cn('h-10 flex-1 rounded-full text-body-sm font-bold', filter === key ? 'bg-white text-navy-deep shadow-sm' : 'text-slate')}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {shown.length === 0 ? (
+        <p className="rounded-2xl border border-fog-light bg-white p-6 text-center text-body-sm text-slate">{filter === 'live' ? t('empty') : t('noneOver')}</p>
+      ) : (
+        <ul className="flex flex-col gap-3">
+          {shown.map((code) => (
+            <li key={code.id}>
+              <PhoneCodeCard code={code} onOpen={() => setOpen(code)} />
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="px-1 text-caption leading-4 text-slate">{t('phoneNote')}</p>
+      <Drawer open={open !== null} onOpenChange={(o) => !o && setOpen(null)} showSwipeHandle={true}>
+        <DrawerContent className="rounded-t-3xl bg-white px-5 pt-2 pb-8 md:hidden">{open ? <CodeSheet code={open} onDone={() => setOpen(null)} /> : null}</DrawerContent>
+      </Drawer>
+    </div>
+  );
+}
+
+function useEndLine(code: Code): string {
+  const t = useTranslations('Consultation.promoCodes');
+  const format = useFormatter();
+  const now = useNow({ updateInterval: 60_000 });
+  const end = code.endsAt ? new Date(code.endsAt) : null;
+  if (!end) return code.status === 'SOLD_OUT' ? t('limitReached') : t('noEnd');
+  const day = format.dateTime(end, { weekday: 'short', day: 'numeric', month: 'short', timeZone: DOUALA });
+  return end > now ? `${t('endPrefix')} ${day} · ${format.relativeTime(end, now)}` : `${t('endedOn', { day })}`;
+}
+
+function PhoneCodeCard({ code, onOpen }: { code: Code; onOpen: () => void }): ReactNode {
+  const t = useTranslations('Consultation.promoCodes');
+  const reduction = useReduction();
+  const endLine = useEndLine(code);
+  const live = code.status === 'ACTIVE';
+  const share = code.places ? Math.min(1, code.used / code.places) : 0;
+  return (
+    <button type="button" onClick={onOpen} className="flex w-full flex-col gap-2.5 rounded-2xl border border-fog-light bg-white p-4 text-left">
+      <span className="flex items-center justify-between gap-3">
+        <span className={cn('truncate font-heading text-body-lg font-extrabold tracking-wide', live ? 'text-navy-deep' : 'text-slate')}>{code.code}</span>
+        <span className={cn('shrink-0 rounded-full px-2.5 py-0.5 text-caption font-bold', live ? 'bg-blush text-rouge' : 'bg-fog-light text-slate')}>{reduction(code)}</span>
+      </span>
+      {code.places !== null ? (
+        <span aria-hidden={true} className="relative h-1.5 overflow-hidden rounded-full bg-fog-light">
+          <span className={cn('absolute inset-0 origin-left rounded-full', live ? 'bg-rouge' : 'bg-fog')} style={{ transform: `scaleX(${share})` }} />
+        </span>
+      ) : null}
+      <span className="flex justify-between gap-3 text-caption text-slate">
+        <span>
+          {code.places === null ? (
+            t('usedOnly', { used: code.used })
+          ) : (
+            <>
+              <span className="font-bold text-ink tabular-nums">
+                {code.used} / {code.places}
+              </span>{' '}
+              {t('places')}
+            </>
+          )}
+        </span>
+        <span className="truncate text-right first-letter:uppercase">{endLine}</span>
+      </span>
+    </button>
+  );
+}
+
+/** A code's sheet: what it gives, to whom, until when; « Supprimer » (asked twice). */
+function CodeSheet({ code, onDone }: { code: Code; onDone: () => void }): ReactNode {
+  const t = useTranslations('Consultation.promoCodes');
+  const reduction = useReduction();
+  const endLine = useEndLine(code);
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const [sure, setSure] = useState(false);
+  const remove = useMutation(
+    trpc.promoCodes.remove.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: trpc.promoCodes.list.queryKey() });
+        toast.add({ title: t('deleted', { code: code.code }), type: 'success' });
+        onDone();
+      },
+      onError: () => toast.add({ title: t('error'), type: 'error' }),
+    }),
+  );
+  const rows = [
+    [t('sheet.reduction'), reduction(code)],
+    [t('sheet.services'), code.services.map((s) => t(`services.${s as PromoService}`)).join(', ')],
+    [t('sheet.used'), code.places === null ? t('usedOnly', { used: code.used }) : `${code.used} / ${code.places}`],
+    [t('sheet.end'), endLine],
+    [t('sheet.status'), t(`status.${code.status}`)],
+  ];
+  return (
+    <div className="flex flex-col gap-4 pt-3">
+      <DrawerTitle className="font-heading text-h4 font-extrabold tracking-wide text-navy-deep">{code.code}</DrawerTitle>
+      <dl className="flex flex-col divide-y divide-fog-light rounded-2xl border border-fog-light">
+        {rows.map(([label, value]) => (
+          <div key={label} className="flex justify-between gap-4 px-4 py-3 text-body-sm">
+            <dt className="text-slate">{label}</dt>
+            <dd className="text-right font-semibold text-ink first-letter:uppercase">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      {code.status !== 'ENDED' ? (
+        sure ? (
+          <div className="flex flex-col gap-3">
+            <p className="text-body-sm text-slate">{t('confirm.text')}</p>
+            <button
+              type="button"
+              disabled={remove.isPending}
+              onClick={() => remove.mutate({ id: code.id })}
+              className={cn('h-13 rounded-full bg-rouge font-heading text-body font-bold text-white disabled:opacity-50', PRESS)}
+            >
+              {t('confirm.delete')}
+            </button>
+          </div>
+        ) : (
+          <button type="button" onClick={() => setSure(true)} className="h-12 rounded-full border-2 border-rouge font-heading text-body-sm font-bold text-rouge">
+            {t('deleteShort')}
+          </button>
+        )
+      ) : null}
     </div>
   );
 }

@@ -68,7 +68,8 @@
       "dashboard": "Dashboard",
       "allTools": "See all tools",
       "mySpace": "My space",
-      "report": "Report a problem"
+      "report": "Report a problem",
+      "myAccount": "My account"
     },
     "TikTok": {
       "eyebrow": "Stanzy on TikTok",
@@ -371,7 +372,10 @@
         "tiktok": "TikTok",
         "instagram": "Instagram",
         "whatsapp": "WhatsApp"
-      }
+      },
+      "phoneTitle": "Your Canada plan,\nstep by step.",
+      "phoneDisclaimer": "An independent service, not linked to IRCC or the Government of Canada.",
+      "phoneMade": "Made with ♥ in Douala · © {year} Stanzy"
     },
     "ServicesPage": {
       "subtitle": "From consultation to permanent residence: each service moves you one step forward, with an online file and Stanzy beside you.",
@@ -379,6 +383,123 @@
       "documentsBody": "In Cameroon, Stanzy gets the documents that take longest to gather: proof of funds, police certificate, CNPS certificate… Conditions and prices are in your space.",
       "documentsCta": "See in My space",
       "metaTitle": "Our services"
+    },
+    "Tabs": {
+      "label": "Tabs",
+      "home": "Home",
+      "tools": "Tools",
+      "services": "Services",
+      "blog": "Blog",
+      "account": "Account",
+      "mySpace": "My space",
+      "consultations": "Consultations",
+      "documents": "Documents",
+      "profile": "Profile"
+    },
+    "Phone": {
+      "lastDraw": "Latest draw",
+      "drawLine": "No. {round} · CRS {crs}",
+      "drawFacts": "{date} · {invitations} invitations",
+      "draws": "Draws",
+      "toolsTitle": "Tools",
+      "toolsLead": "Free, for Express Entry.",
+      "tools": {
+        "crs": {
+          "name": "CRS calculator",
+          "lead": "Your score in 5 min"
+        },
+        "nclc": {
+          "name": "CLB",
+          "lead": "Your test scores as a level"
+        },
+        "ita": {
+          "name": "After the ITA",
+          "lead": "The 60 days, day by day"
+        },
+        "pdf": {
+          "name": "PDF tool",
+          "lead": "Merge, compress"
+        },
+        "fsw": {
+          "name": "67 points",
+          "lead": "Are you eligible?"
+        },
+        "timeline": {
+          "name": "My journey",
+          "lead": "Every step to PR"
+        },
+        "draw": {
+          "name": "Latest draw",
+          "lead": "Score and invitations"
+        },
+        "prediction": {
+          "name": "Next draw",
+          "lead": "Likely date and score"
+        },
+        "budget": {
+          "name": "Budget",
+          "lead": "What the plan costs"
+        },
+        "checklist": {
+          "name": "Checklist",
+          "lead": "Your documents, one by one"
+        }
+      },
+      "eyebrow": "Express Entry · Canada",
+      "title": "Your Canada plan, step by step.",
+      "lead": "An adviser who speaks your language, free tools, support all the way to PR.",
+      "book": "Book a consultation",
+      "crs": "Work out my CRS score",
+      "services": "Our services",
+      "service": {
+        "consultation": {
+          "name": "Video consultation",
+          "lead": "45 min with Stanzy · recorded for you"
+        },
+        "accompagnement": {
+          "name": "Express Entry support",
+          "lead": "From assessment to PR, step by step"
+        },
+        "documents": {
+          "name": "Document services",
+          "lead": "Police certificate, proof of funds…"
+        }
+      }
+    },
+    "ContactButton": {
+      "open": "Talk to Stanzy",
+      "title": "Talk to Stanzy",
+      "reply": "Reply within the day",
+      "close": "Close",
+      "message": "Message on WhatsApp",
+      "channel": "Join the WhatsApp channel",
+      "channelLead": "Draws and news, live",
+      "contact": "Contact page",
+      "contactLead": "Email, phone, office in Douala"
+    },
+    "ContactPage": {
+      "metaTitle": "Contact · Stanzy",
+      "title": "Contact",
+      "lead": "A question about your Canada plan? Write to Stanzy, reply within the day.",
+      "email": {
+        "label": "Email",
+        "value": "contact@stanzy-immigration-consulting.com"
+      },
+      "phone": {
+        "label": "Phone",
+        "value": "+237 679 306 015"
+      },
+      "office": {
+        "label": "Office",
+        "value": "Douala, Cameroon"
+      },
+      "hello": "Hello! I’m Stanzy.",
+      "ask": "Tell me what brings you here.",
+      "call": "Call Stanzy",
+      "copy": "Copy the email address",
+      "copied": "Email address copied",
+      "map": "See Douala on the map",
+      "follow": "Follow @stanzycanada"
     }
   },
   "Auth": {
@@ -446,10 +567,90 @@
     },
     "Compte": {
       "metaTitle": "My account",
+      "eyebrow": "My space",
       "title": "My account",
-      "signedInAs": "Signed in as {name} ({email}).",
-      "comingSoon": "Your personal space is coming soon: account security, the Coffre-fort and tracking for your applications.",
-      "backHome": "Back to home"
+      "edit": "Edit",
+      "create": "Create",
+      "manage": "Manage",
+      "save": "Save",
+      "saved": "Saved",
+      "error": "That didn’t work. Try again.",
+      "banner": {
+        "title": "Create your password",
+        "lead": "Your account was created when you booked. Choose a password to come back without an e-mail link.",
+        "short": "To come back without an e-mail link",
+        "cta": "Create my password"
+      },
+      "profile": {
+        "title": "Profile",
+        "name": "Name",
+        "nameHint": "On your invoices and in Stanzy’s e-mails",
+        "email": "E-mail",
+        "emailHint": "To sign in and receive your confirmations",
+        "verified": "Verified",
+        "whatsapp": "WhatsApp number",
+        "whatsappHint": "For reminders before your meetings",
+        "whatsappLead": "With the country code. It applies to your upcoming consultations.",
+        "locale": "E-mail language",
+        "localeHint": "Confirmations, reminders and invoices"
+      },
+      "signIn": {
+        "title": "Sign-in",
+        "password": "Password",
+        "passwordHint": "At least {min} characters",
+        "noPassword": "Not created yet",
+        "googleHint": "Sign in in one click with the same e-mail",
+        "linked": "Linked",
+        "notLinked": "Not linked",
+        "link": "Link",
+        "devices": "Signed-in devices",
+        "devicesHint": "Lost a phone? Sign it out from here.",
+        "deviceCount": "{count, plural, one {# device} other {# devices}}"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "reminders": "WhatsApp reminders",
+        "remindersHint": "The day before and 1 hour before each meeting",
+        "device": "Notifications on this device",
+        "deviceHint": "When Stanzy publishes your recap or writes to you",
+        "always": "Confirmation, payment and invoice e-mails are always sent."
+      },
+      "signOut": "Sign out",
+      "delete": "Delete your account? <link>Write to Stanzy on WhatsApp</link>.",
+      "password": {
+        "createTitle": "Create my password",
+        "createLead": "You’ll sign in with your e-mail and this password.",
+        "changeTitle": "Change password",
+        "changeLead": "Your other devices will be signed out.",
+        "current": "Current password",
+        "new": "New password",
+        "rule": "At least {min} characters.",
+        "tooShort": "Choose at least {min} characters.",
+        "wrongCurrent": "The current password is wrong.",
+        "create": "Create my password",
+        "change": "Change",
+        "created": "Password created",
+        "changed": "Password changed",
+        "sent": "For your security, we e-mailed you a link.",
+        "error": "That didn’t work. Try again."
+      },
+      "devices": {
+        "title": "Signed-in devices",
+        "lead": "Where your account is open. Don’t recognise one? Sign the others out, then change your password.",
+        "unknown": "Unknown device",
+        "since": "Since {date, date, medium}",
+        "this": "This device",
+        "signOutOthers": "Sign out the other devices",
+        "done": "The other devices are signed out",
+        "error": "That didn’t work. Try again."
+      },
+      "site": {
+        "title": "The Stanzy site",
+        "home": "Site home",
+        "services": "Our services",
+        "blog": "Blog",
+        "contact": "Contact"
+      }
     },
     "Emails": {
       "Verification": {
@@ -471,7 +672,18 @@
         "title": "A new password"
       },
       "eyebrow": "Your account",
-      "footer": "Stanzy Immigration Consulting · your account e-mail"
+      "footer": "Stanzy Immigration Consulting · your account e-mail",
+      "AccountReady": {
+        "subject": "Your Stanzy account is ready",
+        "title": "Your account is ready, {name}.",
+        "body": "Your consultation is confirmed. We created your account so everything is in one place: the meeting, your invoice and, afterwards, the recording.",
+        "login": "Sign-in e-mail",
+        "password": "Password",
+        "passwordValue": "Yours to choose",
+        "cta": "Create my password",
+        "expiry": "The link works for {days} days, once. After that: “Forgot password” on the sign-in page.",
+        "ignore": "Didn’t book with Stanzy? Ignore this e-mail: without a password, no one can sign in."
+      }
     },
     "MotDePasseOublie": {
       "metaTitle": "Forgot password",
@@ -496,7 +708,24 @@
       "vaultBody": "Your Coffre-fort is encrypted with a passphrase only you know. Changing your password doesn’t change it and can’t recover it: if you’ve forgotten it, no one, not even Stanzy, can reopen its contents.",
       "invalidTitle": "Invalid or expired link",
       "invalidBody": "This reset link has already been used or has expired. Request a new one: it arrives within a few minutes.",
-      "requestNew": "Request a new link"
+      "requestNew": "Request a new link",
+      "createTitle": "Create your password",
+      "createSubtitle": "You’ll sign in with your e-mail and this password.",
+      "createSubmit": "Create my password"
+    },
+    "Visitor": {
+      "title": "Account",
+      "spaceTitle": "Your Stanzy space",
+      "spaceLead": "Your consultations, documents and file, in one place.",
+      "signUp": "Create an account",
+      "language": "Language",
+      "install": "Install the app on this phone",
+      "whatsapp": "Message Stanzy on WhatsApp",
+      "installTitle": "Stanzy on your home screen",
+      "installShare": "In Safari, tap “Share”.",
+      "installAdd": "Then “Add to Home Screen”, and “Add”.",
+      "installAndroid": "On Android, open Chrome’s ⋮ menu, then “Install app”.",
+      "signIn": "Sign in"
     }
   },
   "Crs": {
@@ -1406,7 +1635,8 @@
     "by": "By {author}",
     "tags": "Tags",
     "cardLabel": "Read the article: {title}",
-    "read": "Read the article"
+    "read": "Read the article",
+    "phoneTitle": "Blog"
   },
   "Dashboard": {
     "metaTitle": "Dashboard",
@@ -1436,7 +1666,8 @@
       "services": "Document services",
       "services-en-cours": "Services under way",
       "signalements": "Reports",
-      "codes-promo": "Promo codes"
+      "codes-promo": "Promo codes",
+      "consultations": "Consultations"
     },
     "viewSite": "View the site",
     "overview": {
@@ -1463,9 +1694,80 @@
         "nothingNew": "Up to date: no new draw",
         "alerted": "{count, plural, one {Alert sent for # draw} other {Alerts sent for # draws}}",
         "failed": "IRCC’s feed didn’t answer. Try again in a moment."
-      }
+      },
+      "today": {
+        "figures": "Today’s figures",
+        "toHandle": "To handle",
+        "overdueSub": "{count, plural, one {incl. # overdue invoice} other {incl. # overdue invoices}}",
+        "meetingsToday": "Meetings today",
+        "meetingsShort": "Meetings today",
+        "nextAt": "Next at {time}",
+        "openDossiers": "Open files",
+        "openedThisMonth": "{count, plural, =0 {none created this month} one {# created this month} other {# created this month}}",
+        "collected": "Collected in {month}",
+        "collectedShort": "Collected this month",
+        "collectedSub": "FCFA · Income and consultations",
+        "oldestFirst": "Oldest first",
+        "allDone": "All handled",
+        "allDoneSub": "Nothing is waiting on you right now.",
+        "rows": {
+          "overdue": "Overdue invoices",
+          "dueOn": "due {date}",
+          "interests": "Interest requests",
+          "interestsSub": "{others, plural, =0 {{name} is waiting for your answer} one {{name} and 1 other are waiting} other {{name} and # others are waiting}}",
+          "orders": "Service orders",
+          "signatures": "Pending signatures",
+          "signaturesSub": "Sent, not yet signed by the client",
+          "reports": "Reports",
+          "reportsSub": "A problem reported from the site",
+          "none": "Nothing waiting"
+        },
+        "today": "Today",
+        "doualaTime": "Douala time",
+        "noMeetings": "No meetings today.",
+        "paid": "paid",
+        "paidConsultation": "Paid consultation",
+        "join": "Join",
+        "allMeetings": "All meetings",
+        "nextMeeting": "Next meeting",
+        "activePromo": "Active promo code",
+        "active": "Active",
+        "exhausted": "Used up",
+        "usedCount": "{count, plural, =0 {not used yet} one {# use} other {# uses}}",
+        "endsAt": "Ends {date} · {in}",
+        "noEnd": "No end date",
+        "recentDossiers": "Recent files",
+        "allDossiers": "All files",
+        "stageOf": "{position} of {total}",
+        "instant": "Instant meeting",
+        "newDossier": "Open a file",
+        "noPromo": "No code running",
+        "createPromo": "Create a code",
+        "overduePill": "{count} overdue",
+        "nextPill": "Next {time}",
+        "createdPill": "+{count} this month",
+        "collectedLabel": "FCFA collected",
+        "nextShort": "Next",
+        "consultation": "Consultation",
+        "meeting": "Meeting",
+        "opensAt": "Opens {time}",
+        "restUpToDate": "The rest is up to date"
+      },
+      "hello": "Hello {name}"
     },
-    "greeting": "Hello {name}"
+    "greeting": "Hello {name}",
+    "tabs": {
+      "label": "Dashboard tabs",
+      "overview": "Overview",
+      "consultations": "Consultations",
+      "reunions": "Meetings",
+      "dossiers": "Files",
+      "more": "More"
+    },
+    "more": {
+      "overdue": "{count} overdue",
+      "report": "Report a problem"
+    }
   },
   "BlogDashboard": {
     "title": "Articles",
@@ -2006,7 +2308,8 @@
       "openDossier": "See the file and its documents",
       "loadingDossier": "Loading the file",
       "services": "Document services",
-      "servicesHint": "Proof of funds, police certificate, CNPS… obtained by Stanzy."
+      "servicesHint": "Proof of funds, police certificate, CNPS… obtained by Stanzy.",
+      "hello": "Hello {name}"
     },
     "consultantEmails": {
       "cta": "Open the file",
@@ -3623,7 +3926,20 @@
       "recordingNow": "Recording",
       "left": "You left the meeting.",
       "rejoin": "Back to the meeting",
-      "failed": "Couldn’t connect. Check the camera and microphone, then try again."
+      "failed": "Couldn’t connect. Check the camera and microphone, then try again.",
+      "preview": {
+        "you": "You · {name}",
+        "heard": "We can hear you",
+        "speak": "Say a few words",
+        "starting": "Opening the camera…",
+        "blocked": "The browser can’t reach the camera or microphone. Allow them in the site settings, then reload the page.",
+        "ready": "Camera and microphone ready",
+        "notReady": "Check your camera and microphone",
+        "title": "All set for the meeting",
+        "consent": "I agree that the meeting is recorded and transcribed. I’ll find it in my space afterwards.",
+        "join": "Join the meeting",
+        "trouble": "Connection trouble? <link>Tell Stanzy on WhatsApp</link>"
+      }
     },
     "toast": {
       "scheduled": "Meeting planned",
@@ -3696,7 +4012,8 @@
         "recordings": "{count, plural, one {# recording} other {# recordings}}",
         "nobody": "No participants",
         "more": "and {count} more",
-        "invitation": "Invitation to the meeting “{subject}” ({when}): {link}"
+        "invitation": "Invitation to the meeting “{subject}” ({when}): {link}",
+        "after": "See the follow-up"
       },
       "recordings": {
         "empty": "No recordings yet: they arrive a few minutes after a recorded meeting ends.",
@@ -3704,7 +4021,8 @@
         "playLabel": "Play the recording of “{subject}”",
         "transcribed": "Transcribed",
         "open": "See the meeting",
-        "duration": "{minutes} min"
+        "duration": "{minutes} min",
+        "openConsultation": "See the follow-up"
       },
       "personal": {
         "intro": "Your room, always open. Share its link: people who aren’t invited wait until you let them in.",
@@ -3843,7 +4161,8 @@
       "dossier": "File",
       "margin": "Margin",
       "missingRates": "CAD rate missing for {months}: CAD amounts in those months aren’t counted.",
-      "setRates": "Enter the rates"
+      "setRates": "Enter the rates",
+      "consultation": "Consultations"
     },
     "form": {
       "amount": "Amount",
@@ -4018,7 +4337,9 @@
           "title": "Stanzy delivers",
           "body": "The document arrives in your file, ready for IRCC."
         }
-      }
+      },
+      "catalogueTitle": "What Stanzy can get for you",
+      "toMySpace": "Back to My space"
     },
     "service": {
       "back": "All services",
@@ -4314,7 +4635,9 @@
       "confirmed": "Pieces confirmed",
       "underWay": "Under way",
       "open": "View the service",
-      "openLabel": "View the service {service}"
+      "openLabel": "View the service {service}",
+      "emptyTitle": "No document yet",
+      "emptyLead": "When Stanzy gets a document for you, it lands here with its progress."
     },
     "inProgress": {
       "title": "Services under way",
@@ -5118,7 +5441,16 @@
       "help": "A question? Reply on WhatsApp to Stanzy.",
       "footer": "Stanzy Immigration Consulting · sent because you booked a consultation.",
       "where": "Douala time · video in My space",
-      "whatsapp": "Message Stanzy"
+      "whatsapp": "Message Stanzy",
+      "published": {
+        "subject": "Your recording is ready",
+        "eyebrow": "After your Consultation",
+        "title": "It’s in your space, {name}.",
+        "lead": "The recording of your Consultation on {date}, its transcript and Stanzy’s notes are waiting in your space. Watch them again whenever you like.",
+        "leadSteps": "{count, plural, one {A next step is waiting too, to tick once done.} other {# next steps are waiting too, to tick once done.}}",
+        "stepsLabel": "Your next steps",
+        "cta": "Open my space"
+      }
     },
     "promoCodes": {
       "eyebrow": "Billing",
@@ -5188,7 +5520,23 @@
           "taken": "An active code already has this name."
         }
       },
-      "endPrefix": "Ends"
+      "endPrefix": "Ends",
+      "back": "More",
+      "filter": {
+        "live": "Live · {count}",
+        "over": "Over · {count}"
+      },
+      "noneOver": "No finished code.",
+      "phoneNote": "A place counts when the payment goes through. Tap a code to see or stop it.",
+      "places": "places",
+      "endedOn": "Ended {day}",
+      "sheet": {
+        "reduction": "Reduction",
+        "services": "For",
+        "used": "Uses",
+        "end": "End",
+        "status": "Status"
+      }
     },
     "invoice": {
       "service": "Video consultation",
@@ -5199,6 +5547,421 @@
       "paid": "Paid on {date} by {how}, through SasPay.",
       "fees": "Charged: {charged}, including {fee} of SasPay fees paid by the client.",
       "noRefund": "Non-refundable: the Consultation can be moved from My space."
+    },
+    "admin": {
+      "eyebrow": "Clients",
+      "title": "Consultations",
+      "lead": "Booked and paid online. The video meeting is created as soon as it’s paid.",
+      "loading": "Loading consultations",
+      "close": "Close",
+      "join": "Join",
+      "move": "Move",
+      "emptyUpcoming": "No upcoming consultations yet.",
+      "emptyPast": "No past consultations.",
+      "tabs": {
+        "label": "Consultations",
+        "upcoming": "Upcoming · {count}",
+        "past": "Past",
+        "failed": "Failed payments · {count}",
+        "failedBanner": "{count, plural, one {# payment that didn’t go through} other {# payments that didn’t go through}}",
+        "failedHint": "Nobody was charged",
+        "failedBack": "Tap to go back to the consultations"
+      },
+      "columns": {
+        "when": "When",
+        "client": "Client",
+        "payment": "Payment",
+        "action": "Action",
+        "prepared": "Prepared"
+      },
+      "row": {
+        "paid": "Paid · {network}",
+        "card": "card",
+        "held": "Pending · held {minutes} min",
+        "holding": "Slot held, payment in progress",
+        "crs": "CRS {score}",
+        "status": {
+          "USER": "New account",
+          "LEAD": "Lead",
+          "CLIENT": "Client"
+        }
+      },
+      "failed": {
+        "label": "Failed payments",
+        "empty": "No failed payments.",
+        "columns": {
+          "attempt": "Attempt",
+          "client": "Client",
+          "payment": "Payment",
+          "next": "Then"
+        },
+        "released": "slot released",
+        "wanted": "Wanted {when}",
+        "retried": "Retried {minutes} min later",
+        "refused": "Declined",
+        "notSent": "Not started",
+        "paidLater": "Paid later",
+        "account": "See the account",
+        "note": "The Client gets “Your payment didn’t go through” and can try again. Nothing is charged; the slot stays held 15 min, then it’s released."
+      },
+      "availability": {
+        "title": "Availability",
+        "lead": "Douala time. Taken or blocked slots disappear.",
+        "hours": "Hours per day",
+        "off": "Unavailable",
+        "hoursHint": "One or more ranges: 09:00 – 12:00 · 14:00 – 16:00. Empty: unavailable.",
+        "hoursError": "A range can’t be read: write for example 09:00 – 12:00 · 14:00 – 16:00.",
+        "duration": "Length",
+        "buffer": "Pause between two",
+        "notice": "Book at the earliest",
+        "horizon": "Open over",
+        "cutoff": "Move until",
+        "hoursUnit": "h before",
+        "weeksUnit": "weeks",
+        "price": "Price",
+        "noPrice": "Without a price, payment stays closed.",
+        "blocked": "Blocked dates",
+        "blockDate": "Block a date",
+        "unblock": "Unblock {day}",
+        "add": "Add",
+        "save": "Save",
+        "saved": "Availability saved",
+        "error": "That didn’t work. Check the fields and try again.",
+        "hoursShort": "Hours",
+        "rules": "Rules",
+        "cancel": "Cancel",
+        "weekHours": "Weekly hours",
+        "douala": "Douala time",
+        "edit": "Edit",
+        "panelLead": "Douala time. The public page follows as soon as you save.",
+        "noHours": "No open hours",
+        "noPriceShort": "No price",
+        "rulesSummary": "{duration} + {buffer} min · {notice} h notice · {weeks} wk",
+        "addAt": "Add {time}",
+        "addSlot": "Add a time slot",
+        "addSlotDay": "Add a time slot on {day}",
+        "editSlot": "{range}, edit",
+        "removeSlot": "Remove {range}",
+        "from": "From",
+        "to": "To",
+        "remove": "Remove",
+        "ok": "OK",
+        "overlap": "These hours overlap another slot, or end before they start.",
+        "closed": "Closed",
+        "hoverHint": "Hover to add a time slot",
+        "helpHover": "<b>Hover</b> a gap: « + Add »",
+        "helpDrag": "<b>Drag</b> an edge: lengthen",
+        "helpClick": "<b>Click</b> a slot: exact hours",
+        "weeklyTotal": "{hours} h a week",
+        "available": "Available",
+        "copyTo": "Copy to",
+        "durationRow": "Length and break",
+        "hoursBefore": "{hours} h before",
+        "weeksAhead": "{weeks, plural, one {# week} other {# weeks}}",
+        "unblockShort": "Remove",
+        "savedAtOnce": "Every change is saved at once. Consultations already paid keep their slot."
+      },
+      "detail": {
+        "back": "Consultations",
+        "paid": "Paid · {network}",
+        "card": "Bank card",
+        "held": "Awaiting payment",
+        "move": "Move",
+        "join": "Join",
+        "opensAt": "Opens at {time}",
+        "prepared": "What {name} prepared",
+        "preparedLead": "Their answers to “Prepare the conversation”, when booking",
+        "nothingPrepared": "Nothing prepared: no answers when booking.",
+        "topics": "What to talk about",
+        "crs": "CRS score",
+        "ita": "Invitation (ITA)",
+        "itaYes": "Yes, received",
+        "itaNo": "Not yet",
+        "situation": "Their situation",
+        "notes": "Your notes",
+        "private": "Private · {name} doesn’t see them",
+        "autosaved": "Saved automatically · kept with the meeting",
+        "saving": "Saving…",
+        "saveError": "Not saved: check the connection, they’ll be sent again at the next keystroke.",
+        "payment": "Payment",
+        "price": "Consultation",
+        "paidAmount": "Paid",
+        "invoice": "Paid invoice {number}",
+        "view": "View",
+        "account": "Their account",
+        "noDossier": "No file yet. Open one after the conversation if they want support.",
+        "dossiers": "{count, plural, one {# file} other {# files}}",
+        "seeAccount": "See the account",
+        "openDossier": "Open a file",
+        "moveTitle": "Move the consultation",
+        "moveLead": "Pick a free slot. The Client gets the “Moved” e-mail with the new date.",
+        "moveConfirm": "Move here",
+        "moved": "Consultation moved: the Client is told",
+        "slotTaken": "That slot was just taken: pick another.",
+        "noFreeSlot": "No free slot in your availability.",
+        "cancel": "Cancel",
+        "cancelTitle": "Cancel this slot",
+        "cancelLead": "{name} will move to the next free slot: {when}. The consultation is neither lost nor refunded; they’re told your reason and can still change it.",
+        "looking": "Looking for the next free slot…",
+        "reason": "Reason, told to the Client",
+        "keep": "Keep this slot",
+        "cancelConfirm": "Cancel and move",
+        "cancelled": "{name} moves to {when}: told by e-mail",
+        "error": "That didn’t work. Try again.",
+        "preparedElided": "What {name} prepared",
+        "whenShort": "{date} · {start} – {end} · Douala time",
+        "timeline": {
+          "title": "Timeline",
+          "lead": "What {name} receives, and when",
+          "paid": "Booked and paid",
+          "paidDetail": "{when} · confirmation and invoice sent",
+          "dayBefore": "E-mail reminder the day before",
+          "soon": "Reminder 15 min before",
+          "soonDetail": "e-mail and bell · « Join » opens",
+          "sent": "Sent {when}",
+          "planned": "Planned {when}",
+          "tooLate": "Not sent: booked less than 24 h ahead",
+          "consultation": "Consultation",
+          "over": "over"
+        },
+        "menu": {
+          "label": "More actions",
+          "resend": "Resend the confirmation",
+          "resendHint": "E-mail with the invoice and the link",
+          "resent": "Confirmation sent again to {email}",
+          "cancel": "Cancel this slot",
+          "cancelHint": "{name} moves to the next free slot"
+        },
+        "over": "Over · {minutes} min",
+        "recorded": "recorded with their consent",
+        "notRecorded": "no recording",
+        "joinOpensAt": "Join · opens at {time}",
+        "phoneMenuHint": "Move or cancel this slot: ⋯ menu at the top",
+        "overLine": "Over · {minutes} min · {date}"
+      },
+      "calendar": {
+        "view": {
+          "label": "View",
+          "list": "List",
+          "calendar": "Calendar",
+          "availability": "Availability"
+        },
+        "weekLabel": "Week of {week}",
+        "days": "Days of the week",
+        "today": "Today",
+        "previous": "Previous week",
+        "next": "Next week",
+        "douala": "Douala time",
+        "blocked": "Blocked",
+        "blockedDay": "Blocked date: nobody can book that day.",
+        "closedDay": "Closed that day, and nothing planned.",
+        "paid": "Paid",
+        "held": "Held {minutes} min",
+        "meeting": "Meeting",
+        "blockLabel": "{title}, {time}, {status}",
+        "legend": {
+          "paid": "Paid",
+          "held": "Held, payment in progress",
+          "meeting": "Other meeting",
+          "open": "Open",
+          "blocked": "Blocked date"
+        }
+      },
+      "after": {
+        "tabs": {
+          "label": "After the Consultation",
+          "notes": "Notes for {name}",
+          "transcript": "Transcript",
+          "private": "Your private notes",
+          "notesShort": "Notes · {count}",
+          "stepsShort": "Steps · {count}",
+          "transcriptShort": "Text",
+          "privateShort": "Private"
+        },
+        "recording": "Recording",
+        "recordingLength": "Recording · {length}",
+        "transcriptReady": "Transcript ready",
+        "transcriptPending": "Transcript on its way",
+        "noRecordingTitle": "No recording yet",
+        "noRecording": "It arrives a few minutes after the meeting ends. If it doesn’t, the meeting wasn’t recorded: your notes and next steps can still be published.",
+        "placeMarker": "Place a marker at this moment of the video",
+        "goTo": "Go to {time}",
+        "markersHint": "Markers come from your notes · click the bar to place one",
+        "notesLead": "What you covered · read under the video, each marker jumps to its moment",
+        "noNotes": "No note for {name} yet.",
+        "addNoteAtVideo": "Add a note at this moment of the video",
+        "addNote": "Add a note",
+        "noteLabel": "Note, read by the Client",
+        "editNote": "Edit the note",
+        "removeNote": "Remove the note",
+        "noteSaved": "Note saved",
+        "noteRemoved": "Note removed",
+        "noTranscript": "The transcript isn’t ready yet.",
+        "steps": "Their next steps",
+        "stepsLead": "A checklist in their space, written for them",
+        "stepLabel": "Step",
+        "stepPlaceholder": "E.g. Take the language test",
+        "addStep": "Add a step",
+        "add": "Add",
+        "editStep": "Edit « {step} »",
+        "removeStep": "Remove « {step} »",
+        "stepDone": "Ticked by the Client",
+        "stepSaved": "Step saved",
+        "stepRemoved": "Step removed",
+        "space": {
+          "title": "In their space",
+          "video": "Video and transcript",
+          "ready": "Ready",
+          "videoOnly": "Video ready",
+          "none": "Not yet",
+          "notes": "{count, plural, one {# note} other {# notes}} · {markers, plural, =0 {no marker} one {# marker} other {# markers}}",
+          "never": "Never shared",
+          "beforePublish": "Nothing shows before « Publish ». You can edit afterwards.",
+          "published": "Published {date}: your changes show right away, with no new e-mail."
+        },
+        "andThen": {
+          "eyebrow": "And then",
+          "title": "Support for {name}?",
+          "lead": "Their space offers to send an Interest request. Or open their Dossier right away.",
+          "cta": "Open a dossier",
+          "phoneTitle": "Open their file",
+          "phoneLead": "If they go on with the support"
+        },
+        "publish": "Publish to their space",
+        "publishHint": "They get « Your recording is ready »",
+        "publishedBadge": "Published",
+        "publishedToast": "Published: {name} is told by e-mail",
+        "save": "Save",
+        "cancel": "Cancel",
+        "error": "That didn’t work. Try again."
+      }
+    },
+    "space": {
+      "eyebrow": "My space",
+      "listTitle": "My consultations",
+      "detailTitle": "My consultation",
+      "tabs": {
+        "label": "My space",
+        "home": "Home",
+        "consultations": "My consultations"
+      },
+      "yourConsultation": "Your consultation",
+      "where": "Video with Stanzy in your space · Douala time",
+      "join": "Join the meeting",
+      "prepare": "Prepare",
+      "calendarTitle": "Video consultation with Stanzy",
+      "calendarDetails": "Join the meeting from your space, 15 minutes before.",
+      "book": "Book a consultation",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "row": {
+        "title": "Video consultation · {day} {start} – {end}",
+        "pastTitle": "Video consultation · {minutes} min",
+        "paid": "Paid {amount}",
+        "pending": "{network} hasn’t confirmed the payment yet · don’t pay twice",
+        "published": "Stanzy’s notes · transcript · {steps, plural, =0 {no step} one {# next step, {done} done} other {# next steps, {done} done}}",
+        "preparing": "Stanzy is preparing your recap",
+        "phonePast": "{minutes} min · {done} of {total} steps"
+      },
+      "badge": {
+        "pending": "Payment pending",
+        "recording": "Recording available",
+        "preparing": "Recap on its way"
+      },
+      "cta": {
+        "see": "See",
+        "review": "Review",
+        "prepare": "Prepare"
+      },
+      "empty": {
+        "title": "No consultation yet.",
+        "lead": "45 minutes on video with Stanzy to review your plans: eligibility, CRS score, documents. You keep the recording and the transcript.",
+        "book": "Book a consultation",
+        "crs": "Calculate my CRS score"
+      },
+      "stanzyRole": "Your adviser · answers on WhatsApp",
+      "stanzyLead": "He reads your answers before the meeting. A question until then? Write to him.",
+      "whatsapp": "Write on WhatsApp",
+      "invoice": "Paid invoice {number}",
+      "paid": "Payment received",
+      "paidBadge": "Paid",
+      "before": {
+        "move": "Move",
+        "title": "Before the meeting",
+        "progress": "{done} of {total} done",
+        "answers": "Stanzy has your answers",
+        "noAnswers": "No answers at booking: you’ll talk it through live",
+        "crs": "CRS score {score}",
+        "camera": "Test your camera and microphone",
+        "cameraHint": "1 minute. So nothing goes wrong on the day.",
+        "test": "Test",
+        "retest": "Again",
+        "obstacle": "Can’t make it?",
+        "moveUntil": "Move your slot up to {hours} h before the meeting (until {until}). The Consultation isn’t refundable.",
+        "moveClosed": "It’s too late to move it online. Write to Stanzy on WhatsApp.",
+        "moveSlot": "Move the slot"
+      },
+      "camera": {
+        "title": "Test my camera and microphone",
+        "lead": "Allow the camera and the microphone: you should see yourself, and the bar moves when you speak.",
+        "failed": "The browser can’t reach the camera or microphone. Allow them in the site settings, then try again.",
+        "mic": "Microphone",
+        "works": "It works",
+        "done": "Camera and microphone ready"
+      },
+      "move": {
+        "title": "Choose another slot",
+        "lead": "Current: {current}. Your payment and answers follow.",
+        "days": "Free days",
+        "times": "Free times",
+        "none": "No free slot right now. Write to Stanzy on WhatsApp.",
+        "pick": "Pick a time",
+        "confirm": "Move to {when}",
+        "keep": "Keep my slot",
+        "cancelHint": "Need to cancel? Write to Stanzy on WhatsApp.",
+        "moved": "Consultation moved: an e-mail confirms it",
+        "taken": "That slot was just taken: pick another.",
+        "closed": "It’s too late to move it online.",
+        "error": "That didn’t work. Try again."
+      },
+      "preparing": {
+        "title": "Consultation on {date}",
+        "lead": "Stanzy is preparing your recap: the recording, his notes and your next steps. You’ll get an e-mail as soon as it’s ready."
+      },
+      "after": {
+        "title": "Consultation on {date}",
+        "meta": "Video with Stanzy · {minutes} min · recorded with your consent",
+        "video": "Recording",
+        "goTo": "Go to {time}",
+        "noVideo": "The recording isn’t available for this meeting.",
+        "tabsLabel": "After the Consultation",
+        "notes": "Stanzy’s notes",
+        "transcript": "Transcript",
+        "noNotes": "No note from Stanzy.",
+        "noTranscript": "The transcript isn’t available.",
+        "steps": "Your next steps",
+        "stepsProgress": "{done} of {total}",
+        "stepDone": "Step ticked",
+        "stepUndone": "Step unticked",
+        "andNow": "What now?",
+        "accompanyTitle": "Get support all the way to the ITA.",
+        "accompanyLead": "Stanzy follows you step by step with the Express Entry support.",
+        "accompanyCta": "Send my request",
+        "error": "That didn’t work. Try again.",
+        "phoneMeta": "{minutes} min · with Stanzy",
+        "phoneAccompany": "Support all the way to the ITA",
+        "phoneCta": "Ask"
+      },
+      "phoneTitle": "Consultations"
+    }
+  },
+  "Shared": {
+    "spaceTabs": {
+      "label": "My space tabs",
+      "home": "Home",
+      "consultations": "Consultations",
+      "documents": "Documents",
+      "profile": "Profile"
     }
   }
 }

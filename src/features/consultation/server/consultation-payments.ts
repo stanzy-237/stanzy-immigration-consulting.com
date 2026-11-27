@@ -5,7 +5,9 @@ import { TRPCError } from '@trpc/server';
 import { isSupportedCountry } from 'libphonenumber-js/min';
 import { after } from 'next/server';
 
+import { sendAccountReadyLater } from '@/features/auth/server/account-ready';
 import { consultationFailedEmail, consultationPaidEmail } from '@/features/consultation/lib/consultation-emails';
+import { consultationSpacePath } from '@/features/consultation/lib/payment';
 import { CARD_NETWORK, HOLD_LIMIT_MINUTES, PAYING_MINUTES, PAYMENT_ERRORS, type PayInput } from '@/features/consultation/lib/payment';
 import { feeFor, type FeeTier } from '@/features/consultation/lib/payment-fees';
 import { discountFor, PROMO_ERRORS } from '@/features/consultation/lib/promo';
@@ -15,7 +17,7 @@ import { consultationInvoice } from '@/features/consultation/server/consultation
 import { checkPromo } from '@/features/consultation/server/promo-codes';
 import { SasPayError, type SasPay, type SasPayNetwork, type SasPayVerdict } from '@/features/consultation/server/saspay';
 import { invoiceNumber } from '@/features/invoices/lib/invoice-status';
-import { clientRoomPath, newInviteToken } from '@/features/meetings/lib/meeting-schema';
+import { newInviteToken } from '@/features/meetings/lib/meeting-schema';
 import { toLocale } from '@/i18n/routing';
 import { siteUrl } from '@/lib/site-url';
 import { appMailer } from '@/server/email/app-mailer';
@@ -344,34 +346,58 @@ async function deliver(prisma: Db, paymentId: string, verdict: SasPayVerdict): P
       data: { status: 'PAID', paidAt: now, paidById: paymentId, meetingId: meeting.id, heldUntil: null, startsAt },
     });
     await tx.account.updateMany({ where: { id: consultation.accountId, status: 'USER' }, data: { status: 'LEAD' } });
-    const code = payment.promoCode;
-    // « BLACKFRIDAY −70 % » on the confirmation's money row.
-    const promo = code ? `${code.code} −${code.reductionType === 'PERCENT' ? `${code.reductionValue} %` : `${payment.discount} FCFA`}` : null;
-    return { account: consultation.account, startsAt, moved, meetingId: meeting.id, durationMinutes: consultation.durationMinutes, payment, promo };
+    return { moved, accountId: consultation.accountId };
   });
   if (!done) return;
 
-  const lang = toLocale(done.account.locale);
   // The confirmation carries the Facture payée as a PDF.
   mailLater(async () => {
-    const invoice = await consultationInvoice(prisma, paymentId).catch((error: unknown) => {
-      console.error('[consultation] could not draw the Facture', paymentId, error);
-      return null;
-    });
-    const message = consultationPaidEmail({
-      to: done.account.email,
-      name: done.account.name,
-      locale: lang,
-      startsAt: done.startsAt,
-      durationMinutes: done.durationMinutes,
-      paid: verdict.charged ? { amount: Number(verdict.charged), currency: verdict.currency ?? done.payment.currency } : { amount: done.payment.amount, currency: done.payment.currency },
-      network: done.payment.networkName,
-      promo: done.promo,
-      moved: done.moved,
-      url: `${siteUrl()}/${lang}${clientRoomPath(done.meetingId)}`,
-    });
-    return invoice ? { ...message, attachments: [{ filename: `${invoice.number}.pdf`, content: invoice.pdf }] } : message;
+    const message = await paidConfirmation(prisma, paymentId, done.moved);
+    if (!message) throw new Error(`no confirmation to send for ${paymentId}`);
+    return message;
   });
+  // Booked without an Account: « Votre compte est prêt », to choose a password.
+  sendAccountReadyLater(prisma, done.accountId);
+}
+
+/**
+ * « Consultation confirmée » for a paid Consultation, as it stands now (its
+ * slot, its Réunion), with its Facture payée attached when it can be drawn.
+ * Sent once the payment succeeds, and again by « Renvoyer la confirmation ».
+ * Null when the payment is not a success.
+ */
+export async function paidConfirmation(prisma: Db, paymentId: string, moved = false): Promise<EmailMessage | null> {
+  const payment = await prisma.consultationPayment.findUnique({
+    where: { id: paymentId },
+    include: {
+      consultation: { select: { id: true, startsAt: true, durationMinutes: true, meetingId: true, account: { select: { name: true, email: true, locale: true } } } },
+      promoCode: { select: { code: true, reductionType: true, reductionValue: true } },
+    },
+  });
+  const meetingId = payment?.consultation.meetingId;
+  if (!payment || payment.status !== 'SUCCESS' || !meetingId) return null;
+  const { consultation } = payment;
+  const lang = toLocale(consultation.account.locale);
+  const code = payment.promoCode;
+  // « BLACKFRIDAY −70 % » on the confirmation's money row.
+  const promo = code ? `${code.code} −${code.reductionType === 'PERCENT' ? `${code.reductionValue} %` : `${payment.discount} FCFA`}` : null;
+  const invoice = await consultationInvoice(prisma, paymentId).catch((error: unknown) => {
+    console.error('[consultation] could not draw the Facture', paymentId, error);
+    return null;
+  });
+  const message = consultationPaidEmail({
+    to: consultation.account.email,
+    name: consultation.account.name,
+    locale: lang,
+    startsAt: consultation.startsAt,
+    durationMinutes: consultation.durationMinutes,
+    paid: payment.charged ? { amount: Number(payment.charged), currency: payment.settledCurrency ?? payment.currency } : { amount: payment.amount, currency: payment.currency },
+    network: payment.networkName,
+    promo,
+    moved,
+    url: `${siteUrl()}/${lang}${consultationSpacePath(consultation.id)}`,
+  });
+  return invoice ? { ...message, attachments: [{ filename: `${invoice.number}.pdf`, content: invoice.pdf }] } : message;
 }
 
 /** Sends after the response; a failure is logged, never thrown (the payment is already recorded). */

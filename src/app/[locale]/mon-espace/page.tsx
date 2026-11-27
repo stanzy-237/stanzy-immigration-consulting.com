@@ -16,12 +16,14 @@ export async function generateMetadata({ params }: { params: LocaleParams }) {
 export default async function Page({ params }: { params: LocaleParams }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requireSession({ locale, next: '/mon-espace' });
+  const session = await requireSession({ locale, next: '/mon-espace' });
+  const consultations = session.account.role !== 'CONSULTANT';
   prefetch(trpc.dossiers.mine.queryOptions());
+  if (consultations) prefetch(trpc.consultationSpace.list.queryOptions());
   prefetch(trpc.documentServices.requirements.mine.queryOptions());
   return (
     <HydrateClient>
-      <MySpaceView notice={<PendingPiecesNoticeView />} />
+      <MySpaceView notice={<PendingPiecesNoticeView />} consultations={consultations} />
     </HydrateClient>
   );
 }

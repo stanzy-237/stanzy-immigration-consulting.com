@@ -117,7 +117,7 @@ function Overview({ year }: { year: number }): ReactNode {
           empty={t('nothing', { year })}
           rows={report.byService.map((row) => ({
             key: row.service ?? 'other',
-            label: row.service ? services(row.service) : t('otherSource'),
+            label: row.service === 'CONSULTATION' ? t('consultation') : row.service ? services(row.service) : t('otherSource'),
             amount: xaf(row.income),
           }))}
         />

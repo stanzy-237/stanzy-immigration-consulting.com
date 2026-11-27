@@ -156,6 +156,8 @@ function fakeDatabase() {
         Object.assign(requests.find((r) => r.id === where.id)!, data);
       },
     },
+    // No Consultation here: these Réunions are a Dossier's or instant ones.
+    consultation: { findFirst: async () => null },
     meetingConsent: {
       findUnique: async ({ where }: { where: { meetingId_accountId: Row } }) =>
         consents.find(

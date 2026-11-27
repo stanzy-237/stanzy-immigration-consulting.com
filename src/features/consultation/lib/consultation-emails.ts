@@ -107,3 +107,29 @@ export function consultationFailedEmail(opts: {
     footer: t('footer'),
   });
 }
+
+/**
+ * « Votre enregistrement est prêt » (board `3.2`): sent the first time the
+ * consultant publishes a Consultation to its Client's space. With next
+ * steps, they are listed and the e-mail leads with them.
+ */
+export function consultationPublishedEmail(opts: { to: string; name: string; locale: unknown; startsAt: Date; steps: string[]; url: string }): EmailMessage {
+  const lang = toLocale(opts.locale);
+  const t = createTranslator({ locale: lang, messages: MESSAGES[lang], namespace: 'Consultation.emails' });
+  const firstName = opts.name.trim().split(/\s+/)[0] ?? opts.name;
+  const date = new Intl.DateTimeFormat(lang === 'fr' ? 'fr-FR' : 'en-CA', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Africa/Douala' }).format(opts.startsAt);
+  const withSteps = opts.steps.length > 0;
+  return renderEmail({
+    to: opts.to,
+    subject: t('published.subject'),
+    eyebrow: t('published.eyebrow'),
+    art: withSteps ? 'next-steps' : 'recording',
+    title: t('published.title', { name: firstName }),
+    lines: [t('published.lead', { date }), ...(withSteps ? [t('published.leadSteps', { count: opts.steps.length })] : [])],
+    card: withSteps ? { kind: 'note', label: t('published.stepsLabel'), text: opts.steps.map((step, i) => `${i + 1}. ${step}`).join('  ·  ') } : undefined,
+    cta: t('published.cta'),
+    url: opts.url,
+    help: t('help'),
+    footer: t('footer'),
+  });
+}

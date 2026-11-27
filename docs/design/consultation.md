@@ -10,7 +10,7 @@ Before building any part, open its artboards (names below) with the Paper MCP an
 
 ## Never in the repo
 
-- **No prices.** The Consultation price lives in the dashboard catalogue. Code, tests and docs say « le prix de la Consultation », mocks use `XX XXX FCFA`.
+- **No prices.** The Consultation price lives in the dashboard, Consultations → Disponibilités → « Tarif » (`consultation_settings.price`); without one, payment stays closed. Code, tests and docs say « le prix de la Consultation », mocks use `XX XXX FCFA`.
 - **No promo codes or percentages.** Codes are created in the dashboard (Codes promo). Tests use made-up codes.
 - **Test payments with a `sk_test_` key only.** Load the `saspay-integration` skill before any payment code.
 
@@ -99,14 +99,26 @@ The overview becomes a daily view (`Tableau de bord · Aperçu`): four figures (
 
 Tabs « À venir », « Passées », « Paiements échoués » (count = unresolved failures). Right column: Disponibilités (weekly hours, duration, pause between, how early one can book, how far ahead, « Bloquer une date »). Rows link to the Consultation page.
 
+**Three views** (switch top right, the last choice remembered on the device; boards `Consultations · C · Liste`, `Variante C — Barre`, `C · Modifier en panneau`, `C · Modifier en onglet`). No right column any more: each view has the full width.
+
+- **Liste:** tabs « À venir », « Passées », « Paiements échoués », then the table (Quand, Client, Paiement, Préparé = the topics chosen, Action). No Disponibilités here.
+- **Calendrier:** the Disponibilités in one bar (open days grouped, « lun – ven 09–17 », the rules, the price, « Modifier ») above the week. « Modifier » opens the side panel, to change something on the go: hours, rules one per line, price, blocked dates, « Annuler / Enregistrer ». Desktop shows one week (Monday to Sunday, from the earliest to the latest open hour, « ‹ Aujourd'hui › »); mobile one day, with a strip of the week's days. It shows paid Consultations (leaf), held ones (honey, dashed, « Gardé N min »), the consultant's other Réunions (white, grey border, since they block slots too), the open hours (ice-blue) and blocked dates (hatched, crossed out on mobile); past ones faded, a rouge « now » line on today. Read-only: a block opens its Consultation or Réunion; no drag to move (« Déplacer » asks for a reason and tells the Client). No month view.
+- **Disponibilités** (`Consultations · 3 Disponibilités`, `3b Feuille jour`): full control, several slots a day. Desktop: a timeline per day (8h → 22h, widened to the slots). Hovering a gap shows a dashed hour and « + Ajouter 14h »; a click adds it, shortened before the next slot. Dragging a slot's edge resizes it in 30-minute steps, between its neighbours. Clicking a slot opens De / À with « Supprimer » and « OK ». Slots that touch merge. A « + » per day adds the first free hour from 9h (keyboard). Phones: one line per day, « 9h–13h · 18h–22h » or « Fermé », opening the day's sheet: Disponible, De / À per slot, « Ajouter une plage », « Copier vers » other days, Annuler / Enregistrer (saves at once). Right column (stacked on phones): the rules, the price and blocked dates, « Enregistrer ».
+
+The mobile « Mes disponibilités » bottom bar is gone: the three views replace it.
+
+**Rows:** the Client's name on one line, cut with « … » (full name on hover), body-sm; status pills small (label size, tight tracking) and never wrap.
+
 **Paiements échoués:** attempt time, who, the slot they wanted, network and outcome (Refusé / Non validé), and « Payée ensuite » when a retry succeeded. Note under the table: the Client got « Votre paiement n'est pas passé », nothing was charged, the slot stays held 15 minutes then is released.
 
 ### Consultation page
 
 One route, two states:
 
+- **1 Avant (v2):** a header card: initials, the name on one line (cut with « … »), « Payée · réseau », the date; « Rejoindre » (greyed until 15 min before), « Déplacer », « ⋯ » (Renvoyer la confirmation: the paid e-mail again with its Facture; Voir le Compte; Annuler ce créneau). Right column: « Déroulé » first (Réservée et payée, the reminder the day before, planned or sent, or « pas envoyé » when booked under 24 h ahead, 15 min before, then the Consultation), then Paiement, Son Compte. The details below still hold.
+
 - **1 Avant:** header (name, « Payée · réseau », date, « Déplacer », « Rejoindre » greyed with « S'ouvre à HH:MM » until 15 min before), « Ce qu'[prénom] a préparé » (booking answers, the situation as a quote), **Vos notes** (private, autosaved, stored as the Réunion's `notes`), Paiement (price, promo line, paid amount + frais, network, time, Facture), Son Compte (Lead badge, contact, « Ouvrir un dossier »), reminders sent (day before; 15 min before), « Annuler ce créneau » (asks for a reason, shows the next free slot the Client will be moved to, then moves and notifies; no refund, no lost Consultation).
-- **2 Après:** header « Terminée · N min », the recording with markers, tabs « Notes pour [prénom] » (timestamped notes written for the Client) / Transcription / « Vos notes privées », « Ses prochaines étapes » (checklist written for the Client), « Dans son espace » (what she will see), « Ouvrir un dossier ».
+- **2 Après** (built for the consultant; shown once its time has passed or « Terminer pour tous » ended it; data: `consultation_note` with `atSeconds`, `consultation_step`, `consultation.publishedAt`; the Client's side is part of Mon espace, point 4.2): header « Terminée · N min », the recording with markers, tabs « Notes pour [prénom] » (timestamped notes written for the Client) / Transcription / « Vos notes privées », « Ses prochaines étapes » (checklist written for the Client), « Dans son espace » (what she will see), « Ouvrir un dossier ».
 - **Publier dans son espace:** nothing reaches the Client before it. Publishing makes the video, transcription, notes for the Client and next steps visible in her Mon espace and sends « Votre enregistrement est prêt ». Private notes are never shown. The consultant can edit after publishing.
 
 Mobile: same content; « Rejoindre » or « Publier » in the bottom bar; « Déplacer » and « Annuler » in the « ⋯ » menu.
@@ -117,8 +129,7 @@ Mobile: same content; « Rejoindre » or « Publier » in the bottom bar; « Dé
 |---|---|---|
 | Paid | Confirmation + Facture payée attached (`3.2`) | built (`lib/consultation-emails.ts`, `server/consultation-invoice.ts`) |
 | Payment failed | Paiement non abouti (`3.2`) | built (`lib/consultation-emails.ts`) |
-| Published | Enregistrement prêt (`3.2`) | to build |
-| Published, with steps | Prochaines étapes (`3.2`) | to build |
+| Published | Enregistrement prêt (`3.2`); with steps, they are listed and it uses the « next steps » art | built (`lib/consultation-emails.ts` `consultationPublishedEmail`), sent the first time only |
 | Day before / 15 min before / moved | Réunion e-mails (`3.3`) | exist (`meetings/lib/meeting-emails.ts`) |
 | Consultant cancels → auto-moved | « Déplacée » with the reason and a « Choisir un autre créneau » button | extend `moved` |
 
@@ -142,4 +153,5 @@ Every animation on these screens, and the rules behind them, is in `docs/design/
 - **Card is SasPay's `card` network** (listed by my-rates in a country of its own, `XX`), paid on SasPay's card page and charged in USD at the day's rate: the receipt shows SasPay's own amounts in that currency. Every softpay carries a `return_url` to `/reserver/paiement/<id>` (not in the OpenAPI spec, required by SasPay for `card`, accepted on every network). « Payer depuis un autre pays » lists every country; one with no Mobile Money offers card (`3b`). (2026-11-24)
 - **Codes promo, built:** a percentage (1–99) or an FCFA amount, never leaving less than 100 FCFA to pay (SasPay can't take a free Consultation). Just before paying, the places of payments still on their way (PENDING, at most 45 min old) count too, so the cap is never exceeded; a code refused then comes off the booking and the page shows the full price before anything is sent. Deleting is soft: the code stops at once, held bookings lose it, paid reductions stay on their payments. An unknown code suggests the live code at most 2 letters away. (2026-11-24)
 - **A Facture payée, not a Reconnaissance:** a paid Consultation gets a Facture, stamped « Payée » and signed like the Dossiers' (numbered with them, `STZ-<year>-<0001>`), downloadable from « C'est réservé » and attached to the confirmation. The Paper screens still say « Reconnaissance »: the Facture replaces it. (2026-11-24)
+- **Consultations in the Tableau de bord, built (point 4.1):** the tabs, the Disponibilités with several ranges a day typed as « 09:00 – 12:00 · 14:00 – 16:00 » (empty: unavailable) and the price, and « 1 Avant ». « Déplacer » and « Annuler ce créneau » move the Consultation and its Réunion together, under the booking lock, and reset the reminders. A Consultation's Réunion moved from the Réunions page instead would not move the Consultation: move Consultations from their own page. (2026-11-26)
 - **Sandbox outside production:** the app calls `sandbox-api.saspay.me` everywhere but Vercel production, and refuses an `sk_live_` key there (`server/saspay.ts`). (2026-11-24)

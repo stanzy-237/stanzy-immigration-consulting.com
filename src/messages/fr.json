@@ -68,7 +68,8 @@
       "dashboard": "Tableau de bord",
       "allTools": "Voir tous les outils",
       "mySpace": "Mon espace",
-      "report": "Signaler un problème"
+      "report": "Signaler un problème",
+      "myAccount": "Mon compte"
     },
     "TikTok": {
       "eyebrow": "Stanzy sur TikTok",
@@ -371,7 +372,10 @@
         "tiktok": "TikTok",
         "instagram": "Instagram",
         "whatsapp": "WhatsApp"
-      }
+      },
+      "phoneTitle": "Votre projet Canada,\npas à pas.",
+      "phoneDisclaimer": "Service indépendant, sans lien avec IRCC ni le gouvernement du Canada.",
+      "phoneMade": "Fait avec ♥ à Douala · © {year} Stanzy"
     },
     "ServicesPage": {
       "subtitle": "De la consultation à la résidence permanente : chaque service vous fait avancer d’un pas, avec un dossier en ligne et Stanzy à vos côtés.",
@@ -379,6 +383,123 @@
       "documentsBody": "Au Cameroun, Stanzy obtient pour vous les documents les plus longs à réunir : preuve de fonds, certificat de police, attestation CNPS… Les conditions et les prix sont visibles dans votre espace.",
       "documentsCta": "Voir dans Mon espace",
       "metaTitle": "Nos services"
+    },
+    "Tabs": {
+      "label": "Onglets",
+      "home": "Accueil",
+      "tools": "Outils",
+      "services": "Services",
+      "blog": "Blog",
+      "account": "Compte",
+      "mySpace": "Mon espace",
+      "consultations": "Consultations",
+      "documents": "Documents",
+      "profile": "Profil"
+    },
+    "Phone": {
+      "lastDraw": "Dernier tirage",
+      "drawLine": "n° {round} · CRS {crs}",
+      "drawFacts": "{date} · {invitations} invitations",
+      "draws": "Tirages",
+      "toolsTitle": "Outils",
+      "toolsLead": "Gratuits, en français, pour Entrée express.",
+      "tools": {
+        "crs": {
+          "name": "Calculateur CRS",
+          "lead": "Votre score, en 5 min"
+        },
+        "nclc": {
+          "name": "NCLC",
+          "lead": "Vos notes de TCF en niveau"
+        },
+        "ita": {
+          "name": "Après l’ITA",
+          "lead": "Les 60 jours, au jour près"
+        },
+        "pdf": {
+          "name": "Outil PDF",
+          "lead": "Assembler, compresser"
+        },
+        "fsw": {
+          "name": "67 points",
+          "lead": "Êtes-vous admissible ?"
+        },
+        "timeline": {
+          "name": "Mon parcours",
+          "lead": "Chaque étape jusqu’à la RP"
+        },
+        "draw": {
+          "name": "Dernier tirage",
+          "lead": "Score et invitations"
+        },
+        "prediction": {
+          "name": "Prochain tirage",
+          "lead": "Date et score probables"
+        },
+        "budget": {
+          "name": "Budget",
+          "lead": "Ce que coûte le projet"
+        },
+        "checklist": {
+          "name": "Checklist",
+          "lead": "Vos documents, un par un"
+        }
+      },
+      "eyebrow": "Entrée express · Canada",
+      "title": "Votre projet Canada, pas à pas.",
+      "lead": "Un conseiller qui parle votre langue, des outils gratuits, un suivi jusqu’à la RP.",
+      "book": "Réserver une consultation",
+      "crs": "Calculer mon score CRS",
+      "services": "Nos services",
+      "service": {
+        "consultation": {
+          "name": "Consultation vidéo",
+          "lead": "45 min avec Stanzy · enregistrée pour vous"
+        },
+        "accompagnement": {
+          "name": "Accompagnement Entrée express",
+          "lead": "De l’évaluation à la RP, étape par étape"
+        },
+        "documents": {
+          "name": "Services documentaires",
+          "lead": "Certificat de police, preuve de fonds…"
+        }
+      }
+    },
+    "ContactButton": {
+      "open": "Parler à Stanzy",
+      "title": "Parler à Stanzy",
+      "reply": "Réponse dans la journée",
+      "close": "Fermer",
+      "message": "Écrire sur WhatsApp",
+      "channel": "Rejoindre la chaîne WhatsApp",
+      "channelLead": "Les tirages et les nouvelles, en direct",
+      "contact": "Page Contact",
+      "contactLead": "Email, téléphone, bureau à Douala"
+    },
+    "ContactPage": {
+      "metaTitle": "Contact · Stanzy",
+      "title": "Contact",
+      "lead": "Une question sur votre projet Canada ? Écrivez à Stanzy, réponse dans la journée.",
+      "email": {
+        "label": "Email",
+        "value": "contact@stanzy-immigration-consulting.com"
+      },
+      "phone": {
+        "label": "Téléphone",
+        "value": "+237 679 306 015"
+      },
+      "office": {
+        "label": "Bureau",
+        "value": "Douala, Cameroun"
+      },
+      "hello": "Bonjour ! Je suis Stanzy.",
+      "ask": "Dites-moi ce qui vous amène.",
+      "call": "Appeler Stanzy",
+      "copy": "Copier l’adresse email",
+      "copied": "Adresse email copiée",
+      "map": "Voir Douala sur la carte",
+      "follow": "Suivez @stanzycanada"
     }
   },
   "Auth": {
@@ -446,10 +567,90 @@
     },
     "Compte": {
       "metaTitle": "Mon compte",
+      "eyebrow": "Mon espace",
       "title": "Mon compte",
-      "signedInAs": "Connecté en tant que {name} ({email}).",
-      "comingSoon": "Votre espace personnel arrive bientôt : sécurité du compte, Coffre-fort et suivi de vos démarches.",
-      "backHome": "Retour à l’accueil"
+      "edit": "Modifier",
+      "create": "Créer",
+      "manage": "Gérer",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "error": "Ça n’a pas marché. Réessayez.",
+      "banner": {
+        "title": "Créez votre mot de passe",
+        "lead": "Votre compte a été créé à la réservation. Choisissez un mot de passe pour revenir sans lien par e-mail.",
+        "short": "Pour revenir sans lien par e-mail",
+        "cta": "Créer mon mot de passe"
+      },
+      "profile": {
+        "title": "Profil",
+        "name": "Nom",
+        "nameHint": "Sur vos Factures et dans les e-mails de Stanzy",
+        "email": "E-mail",
+        "emailHint": "Pour vous connecter et recevoir vos confirmations",
+        "verified": "Vérifié",
+        "whatsapp": "Numéro WhatsApp",
+        "whatsappHint": "Pour les rappels avant vos Réunions",
+        "whatsappLead": "Avec l’indicatif du pays. Il vaut pour vos consultations à venir.",
+        "locale": "Langue des e-mails",
+        "localeHint": "Confirmations, rappels et Factures"
+      },
+      "signIn": {
+        "title": "Connexion",
+        "password": "Mot de passe",
+        "passwordHint": "{min} caractères minimum",
+        "noPassword": "Pas encore créé",
+        "googleHint": "Se connecter en un clic avec le même e-mail",
+        "linked": "Associé",
+        "notLinked": "Non associé",
+        "link": "Associer",
+        "devices": "Appareils connectés",
+        "devicesHint": "Un téléphone perdu ? Déconnectez-le d’ici.",
+        "deviceCount": "{count, plural, one {# appareil} other {# appareils}}"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "reminders": "Rappels sur WhatsApp",
+        "remindersHint": "La veille et 1 heure avant chaque Réunion",
+        "device": "Notifications sur cet appareil",
+        "deviceHint": "Quand Stanzy publie votre récap ou vous écrit",
+        "always": "Les e-mails de confirmation, de paiement et de Facture partent toujours."
+      },
+      "signOut": "Se déconnecter",
+      "delete": "Supprimer votre compte ? <link>Écrivez à Stanzy sur WhatsApp</link>.",
+      "password": {
+        "createTitle": "Créer mon mot de passe",
+        "createLead": "Vous vous connecterez avec votre e-mail et ce mot de passe.",
+        "changeTitle": "Changer de mot de passe",
+        "changeLead": "Vos autres appareils seront déconnectés.",
+        "current": "Mot de passe actuel",
+        "new": "Nouveau mot de passe",
+        "rule": "{min} caractères minimum.",
+        "tooShort": "Choisissez au moins {min} caractères.",
+        "wrongCurrent": "Le mot de passe actuel n’est pas le bon.",
+        "create": "Créer mon mot de passe",
+        "change": "Changer",
+        "created": "Mot de passe créé",
+        "changed": "Mot de passe changé",
+        "sent": "Pour votre sécurité, un lien vous a été envoyé par e-mail.",
+        "error": "Ça n’a pas marché. Réessayez."
+      },
+      "devices": {
+        "title": "Appareils connectés",
+        "lead": "Ceux où votre compte est ouvert. Vous ne reconnaissez pas l’un d’eux ? Déconnectez les autres, puis changez de mot de passe.",
+        "unknown": "Appareil inconnu",
+        "since": "Depuis le {date, date, medium}",
+        "this": "Cet appareil",
+        "signOutOthers": "Déconnecter les autres appareils",
+        "done": "Les autres appareils sont déconnectés",
+        "error": "Ça n’a pas marché. Réessayez."
+      },
+      "site": {
+        "title": "Le site Stanzy",
+        "home": "Accueil du site",
+        "services": "Nos services",
+        "blog": "Blog",
+        "contact": "Contact"
+      }
     },
     "Emails": {
       "Verification": {
@@ -471,7 +672,18 @@
         "title": "Un nouveau mot de passe"
       },
       "eyebrow": "Votre compte",
-      "footer": "Stanzy Immigration Consulting · e-mail de votre compte"
+      "footer": "Stanzy Immigration Consulting · e-mail de votre compte",
+      "AccountReady": {
+        "subject": "Votre compte Stanzy est prêt",
+        "title": "Votre compte est prêt, {name}.",
+        "body": "Votre consultation est confirmée. Nous avons créé votre compte pour que vous retrouviez tout au même endroit : la Réunion, votre Facture et, après, l’enregistrement.",
+        "login": "Identifiant",
+        "password": "Mot de passe",
+        "passwordValue": "À choisir vous-même",
+        "cta": "Créer mon mot de passe",
+        "expiry": "Le lien marche {days} jours, une seule fois. Passé ce délai : « Mot de passe oublié » sur la page de connexion.",
+        "ignore": "Vous n’avez pas réservé chez Stanzy ? Ignorez cet e-mail : sans mot de passe, personne ne peut se connecter."
+      }
     },
     "MotDePasseOublie": {
       "metaTitle": "Mot de passe oublié",
@@ -496,7 +708,24 @@
       "vaultBody": "Votre Coffre-fort est chiffré avec une phrase secrète que vous seul connaissez. Changer de mot de passe ne la modifie pas et ne permet pas de la retrouver : si vous l’avez oubliée, personne, pas même Stanzy, ne peut rouvrir son contenu.",
       "invalidTitle": "Lien invalide ou expiré",
       "invalidBody": "Ce lien de réinitialisation a déjà été utilisé ou a expiré. Demandez-en un nouveau : il arrive en quelques minutes.",
-      "requestNew": "Demander un nouveau lien"
+      "requestNew": "Demander un nouveau lien",
+      "createTitle": "Créez votre mot de passe",
+      "createSubtitle": "Vous vous connecterez avec votre e-mail et ce mot de passe.",
+      "createSubmit": "Créer mon mot de passe"
+    },
+    "Visitor": {
+      "title": "Compte",
+      "spaceTitle": "Votre espace Stanzy",
+      "spaceLead": "Vos consultations, vos documents et votre dossier, au même endroit.",
+      "signUp": "Créer un compte",
+      "language": "Langue",
+      "install": "Installer l’app sur ce téléphone",
+      "whatsapp": "Écrire à Stanzy sur WhatsApp",
+      "installTitle": "Stanzy sur votre écran d’accueil",
+      "installShare": "Dans Safari, touchez « Partager ».",
+      "installAdd": "Puis « Sur l’écran d’accueil », et « Ajouter ».",
+      "installAndroid": "Sur Android, ouvrez le menu ⋮ de Chrome, puis « Installer l’application ».",
+      "signIn": "Se connecter"
     }
   },
   "Crs": {
@@ -1423,7 +1652,8 @@
     "by": "Par {author}",
     "tags": "Tags",
     "cardLabel": "Lire l’article : {title}",
-    "read": "Lire l’article"
+    "read": "Lire l’article",
+    "phoneTitle": "Blog"
   },
   "Dashboard": {
     "metaTitle": "Tableau de bord",
@@ -1453,7 +1683,8 @@
       "services": "Services documentaires",
       "services-en-cours": "Services en cours",
       "signalements": "Signalements",
-      "codes-promo": "Codes promo"
+      "codes-promo": "Codes promo",
+      "consultations": "Consultations"
     },
     "viewSite": "Voir le site",
     "overview": {
@@ -1480,9 +1711,80 @@
         "nothingNew": "À jour : pas de nouveau tirage",
         "alerted": "{count, plural, one {Alerte envoyée pour # tirage} other {Alertes envoyées pour # tirages}}",
         "failed": "Le flux IRCC n’a pas répondu. Réessayez dans un moment."
-      }
+      },
+      "today": {
+        "figures": "Chiffres du jour",
+        "toHandle": "À traiter",
+        "overdueSub": "{count, plural, one {dont # facture en retard} other {dont # factures en retard}}",
+        "meetingsToday": "Réunions aujourd’hui",
+        "meetingsShort": "Réunions auj.",
+        "nextAt": "La prochaine à {time}",
+        "openDossiers": "Dossiers ouverts",
+        "openedThisMonth": "{count, plural, =0 {aucun créé ce mois-ci} one {# créé ce mois-ci} other {# créés ce mois-ci}}",
+        "collected": "Encaissé en {month}",
+        "collectedShort": "Encaissé ce mois",
+        "collectedSub": "FCFA · Recettes et Consultations",
+        "oldestFirst": "Les plus anciens d’abord",
+        "allDone": "Tout est traité",
+        "allDoneSub": "Rien n’attend votre réponse pour l’instant.",
+        "rows": {
+          "overdue": "Factures en retard",
+          "dueOn": "échue le {date}",
+          "interests": "Demandes d’intérêt",
+          "interestsSub": "{others, plural, =0 {{name} attend votre réponse} one {{name} et 1 autre attendent votre réponse} other {{name} et # autres attendent votre réponse}}",
+          "orders": "Commandes de services",
+          "signatures": "Signatures en attente",
+          "signaturesSub": "Envoyées, pas encore signées par le Client",
+          "reports": "Signalements",
+          "reportsSub": "Un problème signalé depuis le site",
+          "none": "Rien en attente"
+        },
+        "today": "Aujourd’hui",
+        "doualaTime": "Heure de Douala",
+        "noMeetings": "Aucune réunion aujourd’hui.",
+        "paid": "payée",
+        "paidConsultation": "Consultation payée",
+        "join": "Rejoindre",
+        "allMeetings": "Toutes les réunions",
+        "nextMeeting": "Prochaine réunion",
+        "activePromo": "Code promo actif",
+        "active": "Actif",
+        "exhausted": "Épuisé",
+        "usedCount": "{count, plural, =0 {pas encore utilisé} one {# utilisation} other {# utilisations}}",
+        "endsAt": "Fin {date} · {in}",
+        "noEnd": "Sans date de fin",
+        "recentDossiers": "Dossiers récents",
+        "allDossiers": "Tous les dossiers",
+        "stageOf": "{position} sur {total}",
+        "instant": "Réunion instantanée",
+        "newDossier": "Ouvrir un dossier",
+        "noPromo": "Aucun code en cours",
+        "createPromo": "Créer un code",
+        "overduePill": "{count, plural, one {# en retard} other {# en retard}}",
+        "nextPill": "Prochaine {time}",
+        "createdPill": "+{count} ce mois-ci",
+        "collectedLabel": "FCFA encaissés",
+        "nextShort": "Prochaine",
+        "consultation": "Consultation",
+        "meeting": "Réunion",
+        "opensAt": "Ouvre {time}",
+        "restUpToDate": "Le reste est à jour"
+      },
+      "hello": "Bonjour {name}"
     },
-    "greeting": "Bonjour {name}"
+    "greeting": "Bonjour {name}",
+    "tabs": {
+      "label": "Onglets du tableau de bord",
+      "overview": "Aperçu",
+      "consultations": "Consultations",
+      "reunions": "Réunions",
+      "dossiers": "Dossiers",
+      "more": "Plus"
+    },
+    "more": {
+      "overdue": "{count} en retard",
+      "report": "Signaler un problème"
+    }
   },
   "BlogDashboard": {
     "title": "Articles",
@@ -2023,7 +2325,8 @@
       "openDossier": "Voir le dossier et ses documents",
       "loadingDossier": "Chargement du dossier",
       "services": "Services documentaires",
-      "servicesHint": "Preuve de fonds, certificat de police, CNPS… obtenus par Stanzy."
+      "servicesHint": "Preuve de fonds, certificat de police, CNPS… obtenus par Stanzy.",
+      "hello": "Bonjour {name}"
     },
     "consultantEmails": {
       "cta": "Ouvrir le dossier",
@@ -3640,7 +3943,20 @@
       "recordingNow": "Enregistrement en cours",
       "left": "Vous avez quitté la réunion.",
       "rejoin": "Revenir dans la réunion",
-      "failed": "Connexion impossible. Vérifiez la caméra et le micro, puis réessayez."
+      "failed": "Connexion impossible. Vérifiez la caméra et le micro, puis réessayez.",
+      "preview": {
+        "you": "Vous · {name}",
+        "heard": "On vous entend",
+        "speak": "Dites quelques mots",
+        "starting": "Ouverture de la caméra…",
+        "blocked": "Le navigateur n’a pas accès à la caméra ou au micro. Autorisez-les dans les réglages du site, puis rechargez la page.",
+        "ready": "Caméra et micro prêts",
+        "notReady": "Caméra et micro à vérifier",
+        "title": "Tout est prêt pour la Réunion",
+        "consent": "J’accepte que la Réunion soit enregistrée et transcrite. Je la retrouve ensuite dans Mon espace.",
+        "join": "Rejoindre la Réunion",
+        "trouble": "Un souci de connexion ? <link>Prévenir Stanzy sur WhatsApp</link>"
+      }
     },
     "toast": {
       "scheduled": "Réunion planifiée",
@@ -3713,7 +4029,8 @@
         "recordings": "{count, plural, one {# enregistrement} other {# enregistrements}}",
         "nobody": "Aucun participant",
         "more": "et {count} autres",
-        "invitation": "Invitation à la réunion « {subject} » ({when}) : {link}"
+        "invitation": "Invitation à la réunion « {subject} » ({when}) : {link}",
+        "after": "Voir l’après"
       },
       "recordings": {
         "empty": "Aucun enregistrement pour l’instant : ils arrivent quelques minutes après la fin d’une réunion enregistrée.",
@@ -3721,7 +4038,8 @@
         "playLabel": "Lire l’enregistrement de « {subject} »",
         "transcribed": "Transcrite",
         "open": "Voir la réunion",
-        "duration": "{minutes} min"
+        "duration": "{minutes} min",
+        "openConsultation": "Voir l’après"
       },
       "personal": {
         "intro": "Votre salle toujours ouverte. Partagez son lien : les personnes qui ne sont pas invitées attendent que vous les fassiez entrer.",
@@ -3860,7 +4178,8 @@
       "dossier": "Dossier",
       "margin": "Marge",
       "missingRates": "Taux CAD manquant pour {months} : les montants en CAD de ces mois ne sont pas comptés.",
-      "setRates": "Saisir les taux"
+      "setRates": "Saisir les taux",
+      "consultation": "Consultations"
     },
     "form": {
       "amount": "Montant",
@@ -4035,7 +4354,9 @@
           "title": "Stanzy livre",
           "body": "Le document arrive dans votre dossier, prêt pour IRCC."
         }
-      }
+      },
+      "catalogueTitle": "Ce que Stanzy peut obtenir pour vous",
+      "toMySpace": "Retour à Mon espace"
     },
     "service": {
       "back": "Tous les services",
@@ -4227,7 +4548,7 @@
         "sent": "Pièces envoyées à Stanzy",
         "submitted": "Pièces envoyées : vous pouvez encore les modifier jusqu’à ce que Stanzy les confirme.",
         "confirmed": "Pièces confirmées par Stanzy.",
-        "waiting": "Le client n’a pas encore cliqué sur « Suivant ».",
+        "waiting": "Le client n’a pas encore cliqué sur « Suivant ».",
         "toConfirm": "Le client a tout remis : vérifiez les pièces, puis confirmez-les.",
         "confirm": "Confirmer les pièces",
         "confirming": "Confirmation…",
@@ -4331,7 +4652,9 @@
       "confirmed": "Pièces confirmées",
       "underWay": "En cours",
       "open": "Voir le service",
-      "openLabel": "Voir le service {service}"
+      "openLabel": "Voir le service {service}",
+      "emptyTitle": "Aucun document pour l’instant",
+      "emptyLead": "Quand Stanzy obtient un document pour vous, il arrive ici avec son suivi."
     },
     "inProgress": {
       "title": "Services en cours",
@@ -5135,7 +5458,16 @@
       "help": "Une question ? Répondez sur WhatsApp à Stanzy.",
       "footer": "Stanzy Immigration Consulting · e-mail envoyé car vous avez réservé une consultation.",
       "where": "Heure de Douala · vidéo dans Mon espace",
-      "whatsapp": "Écrire à Stanzy"
+      "whatsapp": "Écrire à Stanzy",
+      "published": {
+        "subject": "Votre enregistrement est prêt",
+        "eyebrow": "Après votre Consultation",
+        "title": "C’est dans votre espace, {name}.",
+        "lead": "L’enregistrement de votre Consultation du {date}, sa transcription et les notes de Stanzy vous attendent dans Mon espace. Vous pouvez les revoir quand vous voulez.",
+        "leadSteps": "{count, plural, one {Une prochaine étape vous attend aussi, à cocher une fois faite.} other {# prochaines étapes vous attendent aussi, à cocher une fois faites.}}",
+        "stepsLabel": "Vos prochaines étapes",
+        "cta": "Voir dans Mon espace"
+      }
     },
     "promoCodes": {
       "eyebrow": "Facturation",
@@ -5205,7 +5537,23 @@
           "taken": "Un code actif porte déjà ce nom."
         }
       },
-      "endPrefix": "Fin"
+      "endPrefix": "Fin",
+      "back": "Plus",
+      "filter": {
+        "live": "Actifs · {count}",
+        "over": "Terminés · {count}"
+      },
+      "noneOver": "Aucun code terminé.",
+      "phoneNote": "Une place compte quand le paiement réussit. Touchez un code pour le voir ou l’arrêter.",
+      "places": "places",
+      "endedOn": "Terminé le {day}",
+      "sheet": {
+        "reduction": "Réduction",
+        "services": "Pour",
+        "used": "Utilisations",
+        "end": "Fin",
+        "status": "État"
+      }
     },
     "invoice": {
       "service": "Consultation vidéo",
@@ -5216,6 +5564,421 @@
       "paid": "Payée le {date} par {how}, via SasPay.",
       "fees": "Débité : {charged}, dont {fee} de frais SasPay à la charge du client.",
       "noRefund": "Non remboursable : la Consultation peut être déplacée depuis Mon espace."
+    },
+    "admin": {
+      "eyebrow": "Clients",
+      "title": "Consultations",
+      "lead": "Réservées et payées en ligne. La Réunion vidéo est créée dès le paiement.",
+      "loading": "Chargement des consultations",
+      "close": "Fermer",
+      "join": "Rejoindre",
+      "move": "Déplacer",
+      "emptyUpcoming": "Aucune consultation à venir pour l’instant.",
+      "emptyPast": "Aucune consultation passée.",
+      "tabs": {
+        "label": "Consultations",
+        "upcoming": "À venir · {count}",
+        "past": "Passées",
+        "failed": "Paiements échoués · {count}",
+        "failedBanner": "{count, plural, one {# paiement non abouti} other {# paiements non aboutis}}",
+        "failedHint": "Personne n’a été débité",
+        "failedBack": "Touchez pour revenir aux consultations"
+      },
+      "columns": {
+        "when": "Quand",
+        "client": "Client",
+        "payment": "Paiement",
+        "action": "Action",
+        "prepared": "Préparé"
+      },
+      "row": {
+        "paid": "Payée · {network}",
+        "card": "carte",
+        "held": "En attente · gardé {minutes} min",
+        "holding": "Créneau gardé, paiement en cours",
+        "crs": "CRS {score}",
+        "status": {
+          "USER": "Nouveau compte",
+          "LEAD": "Lead",
+          "CLIENT": "Client"
+        }
+      },
+      "failed": {
+        "label": "Paiements échoués",
+        "empty": "Aucun paiement échoué.",
+        "columns": {
+          "attempt": "Tentative",
+          "client": "Client",
+          "payment": "Paiement",
+          "next": "Suite"
+        },
+        "released": "créneau libéré",
+        "wanted": "Voulait {when}",
+        "retried": "Réessayé {minutes} min après",
+        "refused": "Refusé",
+        "notSent": "Non abouti",
+        "paidLater": "Payée ensuite",
+        "account": "Voir le Compte",
+        "note": "Le Client reçoit « Votre paiement n’est pas passé » et peut réessayer. Rien n’est débité ; le créneau reste gardé 15 min, puis il est libéré."
+      },
+      "availability": {
+        "title": "Disponibilités",
+        "lead": "Heure de Douala. Les créneaux pris ou bloqués disparaissent.",
+        "hours": "Heures par jour",
+        "off": "Indisponible",
+        "hoursHint": "Une ou plusieurs plages : 09:00 – 12:00 · 14:00 – 16:00. Vide : indisponible.",
+        "hoursError": "Une plage n’est pas lisible : écrivez par exemple 09:00 – 12:00 · 14:00 – 16:00.",
+        "duration": "Durée",
+        "buffer": "Pause entre deux",
+        "notice": "Réserver au plus tôt",
+        "horizon": "Ouvert sur",
+        "cutoff": "Déplacer jusqu’à",
+        "hoursUnit": "h avant",
+        "weeksUnit": "semaines",
+        "price": "Tarif",
+        "noPrice": "Sans tarif, le paiement reste fermé.",
+        "blocked": "Dates bloquées",
+        "blockDate": "Bloquer une date",
+        "unblock": "Débloquer le {day}",
+        "add": "Ajouter",
+        "save": "Enregistrer",
+        "saved": "Disponibilités enregistrées",
+        "error": "Ça n’a pas marché. Vérifiez les champs et réessayez.",
+        "hoursShort": "Horaires",
+        "rules": "Règles",
+        "cancel": "Annuler",
+        "weekHours": "Horaires de la semaine",
+        "douala": "Heure de Douala",
+        "edit": "Modifier",
+        "panelLead": "Heure de Douala. La page publique suit dès l’enregistrement.",
+        "noHours": "Aucune heure ouverte",
+        "noPriceShort": "Sans tarif",
+        "rulesSummary": "{duration} + {buffer} min · {notice} h avant · {weeks} sem.",
+        "addAt": "Ajouter {time}",
+        "addSlot": "Ajouter une plage",
+        "addSlotDay": "Ajouter une plage le {day}",
+        "editSlot": "{range}, modifier",
+        "removeSlot": "Supprimer {range}",
+        "from": "De",
+        "to": "À",
+        "remove": "Supprimer",
+        "ok": "OK",
+        "overlap": "Ces heures chevauchent une autre plage, ou finissent avant de commencer.",
+        "closed": "Fermé",
+        "hoverHint": "Survolez pour ajouter une plage",
+        "helpHover": "<b>Survoler</b> un creux : « + Ajouter »",
+        "helpDrag": "<b>Tirer</b> un bord : allonger",
+        "helpClick": "<b>Cliquer</b> une plage : heures exactes",
+        "weeklyTotal": "{hours} h par semaine",
+        "available": "Disponible",
+        "copyTo": "Copier vers",
+        "durationRow": "Durée et pause",
+        "hoursBefore": "{hours} h avant",
+        "weeksAhead": "{weeks, plural, one {# semaine} other {# semaines}}",
+        "unblockShort": "Retirer",
+        "savedAtOnce": "Chaque changement est enregistré tout de suite. Les Consultations déjà payées gardent leur créneau."
+      },
+      "detail": {
+        "back": "Consultations",
+        "paid": "Payée · {network}",
+        "card": "Carte bancaire",
+        "held": "En attente de paiement",
+        "move": "Déplacer",
+        "join": "Rejoindre",
+        "opensAt": "S’ouvre à {time}",
+        "prepared": "Ce que {name} a préparé",
+        "preparedLead": "Ses réponses à « Préparer l’échange », à la réservation",
+        "nothingPrepared": "Rien de préparé : aucune réponse à la réservation.",
+        "topics": "De quoi parler",
+        "crs": "Score CRS",
+        "ita": "Invitation (ITA)",
+        "itaYes": "Oui, reçue",
+        "itaNo": "Pas encore",
+        "situation": "Sa situation",
+        "notes": "Vos notes",
+        "private": "Privées · {name} ne les voit pas",
+        "autosaved": "Enregistrées automatiquement · elles restent avec la Réunion",
+        "saving": "Enregistrement…",
+        "saveError": "Pas enregistrées : vérifiez la connexion, elles seront renvoyées à la prochaine frappe.",
+        "payment": "Paiement",
+        "price": "Consultation",
+        "paidAmount": "Payé",
+        "invoice": "Facture payée {number}",
+        "view": "Voir",
+        "account": "Son Compte",
+        "noDossier": "Pas encore de Dossier. Ouvrez-en un après l’échange si la personne veut être accompagnée.",
+        "dossiers": "{count, plural, one {# Dossier} other {# Dossiers}}",
+        "seeAccount": "Voir le Compte",
+        "openDossier": "Ouvrir un dossier",
+        "moveTitle": "Déplacer la consultation",
+        "moveLead": "Choisissez un créneau libre. Le Client reçoit l’e-mail « Déplacée » avec la nouvelle date.",
+        "moveConfirm": "Déplacer ici",
+        "moved": "Consultation déplacée : le Client est prévenu",
+        "slotTaken": "Ce créneau vient d’être pris : choisissez-en un autre.",
+        "noFreeSlot": "Aucun créneau libre dans vos disponibilités.",
+        "cancel": "Annuler",
+        "cancelTitle": "Annuler ce créneau",
+        "cancelLead": "{name} passera au prochain créneau libre : {when}. La consultation n’est ni perdue ni remboursée ; la personne est prévenue avec votre motif et peut encore changer.",
+        "looking": "Recherche du prochain créneau libre…",
+        "reason": "Motif, dit au Client",
+        "keep": "Garder ce créneau",
+        "cancelConfirm": "Annuler et déplacer",
+        "cancelled": "{name} passe au {when} : prévenue par e-mail",
+        "error": "Ça n’a pas marché. Réessayez.",
+        "preparedElided": "Ce qu’{name} a préparé",
+        "whenShort": "{date} · {start} – {end} · heure de Douala",
+        "timeline": {
+          "title": "Déroulé",
+          "lead": "Ce que {name} reçoit, et quand",
+          "paid": "Réservée et payée",
+          "paidDetail": "{when} · confirmation et Facture envoyées",
+          "dayBefore": "Rappel e-mail la veille",
+          "soon": "Rappel 15 min avant",
+          "soonDetail": "e-mail et cloche · « Rejoindre » s’ouvre",
+          "sent": "Envoyé {when}",
+          "planned": "Prévu {when}",
+          "tooLate": "Pas envoyé : réservée moins de 24 h avant",
+          "consultation": "Consultation",
+          "over": "terminée"
+        },
+        "menu": {
+          "label": "Plus d’actions",
+          "resend": "Renvoyer la confirmation",
+          "resendHint": "E-mail avec la Facture et le lien",
+          "resent": "Confirmation renvoyée à {email}",
+          "cancel": "Annuler ce créneau",
+          "cancelHint": "{name} passe au prochain créneau libre"
+        },
+        "over": "Terminée · {minutes} min",
+        "recorded": "enregistrée avec son accord",
+        "notRecorded": "pas d’enregistrement",
+        "joinOpensAt": "Rejoindre · s’ouvre à {time}",
+        "phoneMenuHint": "Déplacer ou annuler ce créneau : menu ⋯ en haut",
+        "overLine": "Terminée · {minutes} min · {date}"
+      },
+      "calendar": {
+        "view": {
+          "label": "Affichage",
+          "list": "Liste",
+          "calendar": "Calendrier",
+          "availability": "Disponibilités"
+        },
+        "weekLabel": "Semaine du {week}",
+        "days": "Jours de la semaine",
+        "today": "Aujourd’hui",
+        "previous": "Semaine précédente",
+        "next": "Semaine suivante",
+        "douala": "Heure de Douala",
+        "blocked": "Bloquée",
+        "blockedDay": "Date bloquée : personne ne peut réserver ce jour-là.",
+        "closedDay": "Fermé ce jour-là, et rien de prévu.",
+        "paid": "Payée",
+        "held": "Gardé {minutes} min",
+        "meeting": "Réunion",
+        "blockLabel": "{title}, {time}, {status}",
+        "legend": {
+          "paid": "Payée",
+          "held": "Gardée, paiement en cours",
+          "meeting": "Autre Réunion",
+          "open": "Ouvert",
+          "blocked": "Date bloquée"
+        }
+      },
+      "after": {
+        "tabs": {
+          "label": "Après la Consultation",
+          "notes": "Notes pour {name}",
+          "transcript": "Transcription",
+          "private": "Vos notes privées",
+          "notesShort": "Notes · {count}",
+          "stepsShort": "Étapes · {count}",
+          "transcriptShort": "Texte",
+          "privateShort": "Privé"
+        },
+        "recording": "Enregistrement",
+        "recordingLength": "Enregistrement · {length}",
+        "transcriptReady": "Transcription prête",
+        "transcriptPending": "Transcription en cours",
+        "noRecordingTitle": "Pas encore d’enregistrement",
+        "noRecording": "Il arrive quelques minutes après la fin de la Réunion. S’il ne vient pas, elle n’a pas été enregistrée : vos notes et ses prochaines étapes peuvent quand même lui être publiées.",
+        "placeMarker": "Placer un repère à ce moment de la vidéo",
+        "goTo": "Aller à {time}",
+        "markersHint": "Repères ajoutés depuis vos notes · cliquez la barre pour en placer un",
+        "notesLead": "Ce qu’on a vu · la personne les lit sous la vidéo, chaque repère la renvoie au bon moment",
+        "noNotes": "Pas encore de note pour {name}.",
+        "addNoteAtVideo": "Ajouter une note au moment de la vidéo",
+        "addNote": "Ajouter une note",
+        "noteLabel": "Note, lue par le Client",
+        "editNote": "Modifier la note",
+        "removeNote": "Supprimer la note",
+        "noteSaved": "Note enregistrée",
+        "noteRemoved": "Note supprimée",
+        "noTranscript": "La transcription n’est pas encore prête.",
+        "steps": "Ses prochaines étapes",
+        "stepsLead": "Une liste à cocher dans son espace, écrite pour la personne",
+        "stepLabel": "Étape",
+        "stepPlaceholder": "Ex. Passer le test de langue",
+        "addStep": "Ajouter une étape",
+        "add": "Ajouter",
+        "editStep": "Modifier « {step} »",
+        "removeStep": "Supprimer « {step} »",
+        "stepDone": "Cochée par le Client",
+        "stepSaved": "Étape enregistrée",
+        "stepRemoved": "Étape supprimée",
+        "space": {
+          "title": "Dans son espace",
+          "video": "Vidéo et transcription",
+          "ready": "Prêtes",
+          "videoOnly": "Vidéo prête",
+          "none": "Pas encore",
+          "notes": "{count, plural, one {# note} other {# notes}} · {markers, plural, =0 {sans repère} one {# repère} other {# repères}}",
+          "never": "Jamais partagées",
+          "beforePublish": "Rien n’est visible avant « Publier ». Vous pourrez modifier ensuite.",
+          "published": "Publié le {date} : vos changements s’affichent tout de suite, sans nouvel e-mail."
+        },
+        "andThen": {
+          "eyebrow": "Et ensuite",
+          "title": "Un accompagnement pour {name} ?",
+          "lead": "Son espace lui propose d’envoyer une Demande d’intérêt. Ou ouvrez son Dossier tout de suite.",
+          "cta": "Ouvrir un dossier",
+          "phoneTitle": "Ouvrir son Dossier",
+          "phoneLead": "S’il ou elle continue avec l’Accompagnement"
+        },
+        "publish": "Publier dans son espace",
+        "publishHint": "La personne reçoit « Votre enregistrement est prêt »",
+        "publishedBadge": "Publiée",
+        "publishedToast": "Publiée : {name} est prévenu·e par e-mail",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "error": "Ça n’a pas marché. Réessayez."
+      }
+    },
+    "space": {
+      "eyebrow": "Mon espace",
+      "listTitle": "Mes consultations",
+      "detailTitle": "Ma consultation",
+      "tabs": {
+        "label": "Mon espace",
+        "home": "Accueil",
+        "consultations": "Mes consultations"
+      },
+      "yourConsultation": "Votre consultation",
+      "where": "Vidéo avec Stanzy dans Mon espace · heure de Douala",
+      "join": "Rejoindre la Réunion",
+      "prepare": "Préparer",
+      "calendarTitle": "Consultation vidéo avec Stanzy",
+      "calendarDetails": "Rejoignez la Réunion depuis Mon espace, 15 minutes avant.",
+      "book": "Réserver une consultation",
+      "upcoming": "À venir",
+      "past": "Passées",
+      "row": {
+        "title": "Consultation vidéo · {day} {start} – {end}",
+        "pastTitle": "Consultation vidéo · {minutes} min",
+        "paid": "Payée {amount}",
+        "pending": "{network} n’a pas encore confirmé le paiement · ne payez pas deux fois",
+        "published": "Notes de Stanzy · transcription · {steps, plural, =0 {sans étape} one {# prochaine étape, {done} faite} other {# prochaines étapes, {done} faites}}",
+        "preparing": "Stanzy prépare votre récapitulatif",
+        "phonePast": "{minutes} min · {done} étape sur {total}"
+      },
+      "badge": {
+        "pending": "Paiement en attente",
+        "recording": "Enregistrement disponible",
+        "preparing": "Récap en préparation"
+      },
+      "cta": {
+        "see": "Voir",
+        "review": "Revoir",
+        "prepare": "Préparer"
+      },
+      "empty": {
+        "title": "Pas encore de consultation.",
+        "lead": "45 minutes en vidéo avec Stanzy pour faire le point sur votre projet : admissibilité, score CRS, documents. L’enregistrement et la transcription vous restent.",
+        "book": "Réserver une consultation",
+        "crs": "Calculer mon score CRS"
+      },
+      "stanzyRole": "Votre conseiller · répond sur WhatsApp",
+      "stanzyLead": "Il lit vos réponses avant la Réunion. Une question d’ici là ? Écrivez-lui.",
+      "whatsapp": "Écrire sur WhatsApp",
+      "invoice": "Facture payée {number}",
+      "paid": "Paiement reçu",
+      "paidBadge": "Payée",
+      "before": {
+        "move": "Déplacer",
+        "title": "Avant la Réunion",
+        "progress": "{done} sur {total} fait",
+        "answers": "Vos réponses sont chez Stanzy",
+        "noAnswers": "Pas de réponse à la réservation : vous en parlerez en direct",
+        "crs": "Score CRS {score}",
+        "camera": "Testez votre caméra et votre micro",
+        "cameraHint": "1 minute. Pour ne rien rater le jour J.",
+        "test": "Tester",
+        "retest": "Refaire",
+        "obstacle": "Un empêchement ?",
+        "moveUntil": "Déplacez votre créneau jusqu’à {hours} h avant la Réunion (jusqu’au {until}). La Consultation n’est pas remboursable.",
+        "moveClosed": "Il est trop tard pour déplacer en ligne. Écrivez à Stanzy sur WhatsApp.",
+        "moveSlot": "Déplacer le créneau"
+      },
+      "camera": {
+        "title": "Tester ma caméra et mon micro",
+        "lead": "Autorisez la caméra et le micro : vous devez vous voir, et la barre bouge quand vous parlez.",
+        "failed": "Le navigateur n’a pas accès à la caméra ou au micro. Autorisez-les dans les réglages du site, puis réessayez.",
+        "mic": "Micro",
+        "works": "Ça marche",
+        "done": "Caméra et micro prêts"
+      },
+      "move": {
+        "title": "Choisir un autre créneau",
+        "lead": "Actuel : {current}. Votre paiement et vos réponses suivent.",
+        "days": "Jours libres",
+        "times": "Heures libres",
+        "none": "Aucun créneau libre pour l’instant. Écrivez à Stanzy sur WhatsApp.",
+        "pick": "Choisissez une heure",
+        "confirm": "Déplacer à {when}",
+        "keep": "Garder mon créneau",
+        "cancelHint": "Besoin d’annuler ? Écrivez à Stanzy sur WhatsApp.",
+        "moved": "Consultation déplacée : un e-mail vous le confirme",
+        "taken": "Ce créneau vient d’être pris : choisissez-en un autre.",
+        "closed": "Il est trop tard pour déplacer en ligne.",
+        "error": "Ça n’a pas marché. Réessayez."
+      },
+      "preparing": {
+        "title": "Consultation du {date}",
+        "lead": "Stanzy prépare votre récapitulatif : l’enregistrement, ses notes et vos prochaines étapes. Vous recevez un e-mail dès que c’est prêt."
+      },
+      "after": {
+        "title": "Consultation du {date}",
+        "meta": "Vidéo avec Stanzy · {minutes} min · enregistrée avec votre accord",
+        "video": "Enregistrement",
+        "goTo": "Aller à {time}",
+        "noVideo": "L’enregistrement n’est pas disponible pour cette Réunion.",
+        "tabsLabel": "Après la Consultation",
+        "notes": "Notes de Stanzy",
+        "transcript": "Transcription",
+        "noNotes": "Pas de note de Stanzy.",
+        "noTranscript": "La transcription n’est pas disponible.",
+        "steps": "Vos prochaines étapes",
+        "stepsProgress": "{done} sur {total}",
+        "stepDone": "Étape cochée",
+        "stepUndone": "Étape décochée",
+        "andNow": "Et maintenant ?",
+        "accompanyTitle": "Faites-vous accompagner jusqu’à l’ITA.",
+        "accompanyLead": "Stanzy vous suit étape par étape avec l’Accompagnement Entrée express.",
+        "accompanyCta": "Envoyer ma demande",
+        "error": "Ça n’a pas marché. Réessayez.",
+        "phoneMeta": "{minutes} min · avec Stanzy",
+        "phoneAccompany": "Accompagnement jusqu’à l’ITA",
+        "phoneCta": "Demander"
+      },
+      "phoneTitle": "Consultations"
+    }
+  },
+  "Shared": {
+    "spaceTabs": {
+      "label": "Onglets de Mon espace",
+      "home": "Accueil",
+      "consultations": "Consultations",
+      "documents": "Documents",
+      "profile": "Profil"
     }
   }
 }

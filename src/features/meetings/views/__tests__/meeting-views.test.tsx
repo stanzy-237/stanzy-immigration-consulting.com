@@ -13,8 +13,17 @@ import { createTestTRPC } from '@/trpc/__tests__/test-utils';
 
 /** Seam: the Réunion screens with their data in the cache; Stream's call is stubbed. */
 vi.mock('@/features/meetings/components/meeting-call', () => ({
-  MeetingCall: ({ access }: { access: { callId: string } }) => <p>call {access.callId}</p>,
+  MeetingCall: ({ access, onEnded }: { access: { callId: string }; onEnded: () => void }) => (
+    <>
+      <p>call {access.callId}</p>
+      <button type="button" onClick={onEnded}>
+        call ended
+      </button>
+    </>
+  ),
 }));
+/** Seam: where each side is sent when a Consultation's Réunion is over. */
+const go = vi.hoisted(() => ({ client: vi.fn(), consultant: vi.fn() }));
 vi.mock('@/features/landing/components/site-nav', () => ({ SiteNav: () => null }));
 vi.mock('@/features/landing/components/site-footer', () => ({ SiteFooter: () => null }));
 vi.mock('@/i18n/navigation', () => ({
@@ -23,9 +32,9 @@ vi.mock('@/i18n/navigation', () => ({
       {children}
     </a>
   ),
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: go.client }),
 }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), replace: go.consultant }) }));
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -124,25 +133,41 @@ describe('the room', () => {
     past: false,
     consentedAt: null,
     configured: true,
+    consultationId: null,
     ...extra,
   });
-  function open(data: unknown, handlers: Record<string, (input: never) => unknown> = {}) {
+  function open(data: unknown, handlers: Record<string, (input: never) => unknown> = {}, viewer: 'client' | 'consultant' = 'client') {
     const { trpc, queryClient, wrap } = createTestTRPC({ 'meetings.room': () => data, ...handlers });
     queryClient.setQueryData(trpc.meetings.room.queryKey({ id: 'm_1' }), data as never);
-    return render(withIntl(wrap(<MeetingRoomView meetingId="m_1" viewer="client" />)));
+    return render(withIntl(wrap(<MeetingRoomView meetingId="m_1" viewer={viewer} />)));
   }
+
+  const joined = { 'meetings.join': () => ({ apiKey: 'k', token: 't', callId: 'meeting_m_1', user: { id: 'acc_1', name: 'A' } }) };
+
+  it('sends the Client to their Consultation once its Réunion is ended for everyone, never back to « Rejoindre »', async () => {
+    open(room({ consentedAt: new Date('2026-11-11T12:45:00Z'), consultationId: 'con_1' }), joined);
+    fireEvent.click(screen.getByRole('button', { name: 'Rejoindre la Réunion' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'call ended' }));
+    await waitFor(() => expect(go.client).toHaveBeenCalledWith('/mon-espace/consultations/con_1'));
+    expect(screen.queryByRole('button', { name: /Rejoindre/ })).toBeNull();
+  });
+
+  it('sends the consultant to the Consultation’s « 2 Après », also when he opens a Réunion already over', async () => {
+    open(room({ consultationId: 'con_1', past: true, joinable: false, endedAt: new Date('2026-11-11T12:40:00Z') }), {}, 'consultant');
+    await waitFor(() => expect(go.consultant).toHaveBeenCalledWith('/consultations/con_1'));
+  });
 
   it('asks to accept the recording before joining', async () => {
     const join = vi.fn();
     const { container } = open(room(), {
       'meetings.join': (input) => join(input) ?? { apiKey: 'k', token: 't', callId: 'meeting_m_1', user: { id: 'acc_1', name: 'A' } },
     });
-    expect(screen.getByRole('heading', { name: 'Cette réunion est enregistrée' })).toBeInTheDocument();
-    const button = screen.getByRole('button', { name: 'Rejoindre' });
+    expect(screen.getByRole('heading', { name: 'Tout est prêt pour la Réunion' })).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: 'Rejoindre la Réunion' });
     expect(button).toBeDisabled();
     expect(await axe(container)).toHaveNoViolations();
 
-    fireEvent.click(screen.getByLabelText('J’accepte que la réunion soit enregistrée'));
+    fireEvent.click(screen.getByLabelText(/J’accepte que la Réunion soit enregistrée et transcrite/));
     fireEvent.click(button);
     await waitFor(() => expect(join).toHaveBeenCalledWith({ id: 'm_1', accepted: true }));
     expect(await screen.findByText('call meeting_m_1')).toBeInTheDocument();

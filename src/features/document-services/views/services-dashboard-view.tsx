@@ -13,6 +13,7 @@ import { toast } from '@/components/ui/toast';
 import { ServicePrice } from '@/features/document-services/components/service-parts';
 import { STARTER_SERVICES } from '@/features/document-services/data/starter-services';
 import { textIn } from '@/features/document-services/lib/service-schema';
+import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
 /**
@@ -26,7 +27,7 @@ import { useTRPC } from '@/trpc/client';
 export function ServicesDashboardView(): ReactNode {
   const t = useTranslations('DocumentServices.dashboard');
   return (
-    <div className="mx-auto grid grid-cols-1 max-w-5xl gap-6">
+    <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-heading text-2xl font-bold text-navy-deep md:text-3xl">{t('title')}</h1>
@@ -83,35 +84,31 @@ function Catalogue(): ReactNode {
       {services.length === 0 ? (
         <p className="rounded-2xl bg-white px-6 py-10 text-center text-sm text-slate shadow-sm">{t('empty')}</p>
       ) : (
-        <ul className="grid grid-cols-1 gap-3">
+        <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {services.map((service) => (
-            <li key={service.id} className="grid grid-cols-1 gap-2">
-              <Link
-                href={`/services/${service.id}`}
-                className="flex flex-col gap-3 rounded-2xl border border-fog-light bg-white p-5 shadow-sm hover:border-navy-deep sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-              >
-                <div className="min-w-0 sm:flex-1">
-                  <p className="flex flex-wrap items-center gap-2">
-                    <span className="font-semibold text-navy-deep">{textIn(service.name, locale)}</span>
-                    <span
-                      className={
-                        service.active
-                          ? 'rounded-full bg-leaf-tint px-2.5 py-0.5 text-xs font-semibold text-leaf'
-                          : 'rounded-full bg-fog-light px-2.5 py-0.5 text-xs font-semibold text-slate'
-                      }
-                    >
-                      {service.active ? t('active') : t('inactive')}
-                    </span>
-                  </p>
-                  <p className="mt-0.5 truncate text-sm text-slate">
-                    {t('requests', { count: service._count.requests })} · /{service.slug}
-                  </p>
-                </div>
-                {service.price > 0 ? (
-                  <ServicePrice service={service} className="sm:max-w-56 sm:shrink-0 sm:text-right" />
-                ) : (
-                  <span className="w-fit shrink-0 rounded-full bg-honey-tint px-3 py-1 text-xs font-semibold text-honey">{t('noPrice')}</span>
-                )}
+            <li key={service.id} className="flex flex-col overflow-hidden rounded-2xl border border-fog-light bg-white shadow-sm hover:border-navy-deep">
+              {/* The name and its state, then the price (or « Prix à fixer ») beside the demand; the link lives in the card's foot. */}
+              <Link href={`/services/${service.id}`} className="flex flex-col gap-3 p-4 sm:p-5">
+                <span className="flex items-start justify-between gap-3">
+                  <span className="line-clamp-2 font-heading text-body font-bold text-navy-deep">{textIn(service.name, locale)}</span>
+                  <span
+                    className={cn(
+                      'mt-0.5 flex shrink-0 items-center gap-1.5 text-caption font-semibold',
+                      service.active ? 'text-leaf' : 'text-slate',
+                    )}
+                  >
+                    <span aria-hidden={true} className={cn('size-2 rounded-full', service.active ? 'bg-leaf' : 'bg-fog')} />
+                    {service.active ? t('active') : t('inactive')}
+                  </span>
+                </span>
+                <span className="flex items-end justify-between gap-3">
+                  {service.price > 0 ? (
+                    <ServicePrice service={service} className="line-clamp-2 min-w-0" />
+                  ) : (
+                    <span className="w-fit rounded-full bg-honey-tint px-3 py-1 text-caption font-semibold text-honey">{t('noPrice')}</span>
+                  )}
+                  <span className="shrink-0 text-caption text-slate">{t('requests', { count: service._count.requests })}</span>
+                </span>
               </Link>
               {service.active ? <ShareLink serviceId={service.id} name={textIn(service.name, locale)} /> : null}
             </li>
@@ -137,13 +134,13 @@ function ShareLink({ serviceId, name }: { serviceId: string; name: string }): Re
     }
   };
   return (
-    <div className="flex flex-wrap items-center gap-1 px-2">
+    <div className="flex items-center justify-between gap-2 border-t border-fog-light bg-off-white px-2 py-1">
       <button
         type="button"
         disabled={share.isPending}
         onClick={() => void copy(false)}
         aria-label={t('copyLinkLabel', { name })}
-        className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-rouge hover:bg-white disabled:opacity-50"
+        className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-rouge hover:bg-white disabled:opacity-50"
       >
         <Link2 aria-hidden={true} className="size-4" />
         {t('copyLink')}
@@ -153,7 +150,7 @@ function ShareLink({ serviceId, name }: { serviceId: string; name: string }): Re
         disabled={share.isPending}
         onClick={() => void copy(true)}
         aria-label={t('renewLinkLabel', { name })}
-        className="inline-flex h-9 items-center rounded-full px-3 text-xs font-semibold text-slate hover:bg-white hover:text-navy-deep disabled:opacity-50"
+        className="inline-flex h-10 items-center rounded-full px-3 text-xs font-semibold text-slate hover:bg-white hover:text-navy-deep disabled:opacity-50"
       >
         {t('renewLink')}
       </button>

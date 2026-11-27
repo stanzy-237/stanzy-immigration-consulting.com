@@ -16,6 +16,7 @@ export function PhoneScoreBar({
   return (
     <div
       aria-hidden={true}
+      data-phone-score-bar=""
       className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-white/10 bg-navy-deep px-5 py-3 text-white shadow-lg lg:hidden"
     >
       <span className="font-label text-white/60">{label}</span>

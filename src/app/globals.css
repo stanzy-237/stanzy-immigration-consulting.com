@@ -344,6 +344,18 @@
       transform: scale(0.96);
     }
   }
+
+  /* « Rejoindre » just opened (T−15 min): one soft ring, never a loop (docs/design/consultation-motion.md). */
+  --animate-ring-once: ring-once 900ms ease-out 1 both;
+
+  @keyframes ring-once {
+    from {
+      box-shadow: 0 0 0 0 rgb(204 22 39 / 0.45);
+    }
+    to {
+      box-shadow: 0 0 0 14px rgb(204 22 39 / 0);
+    }
+  }
 }
 
 @layer base {
@@ -374,6 +386,11 @@
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.2em;
+}
+
+/* A blocked date in the Consultations calendar: blush stripes. */
+@utility bg-hatch-blush {
+  background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--color-rose) 40%, white) 0 3px, white 3px 8px);
 }
 
 /* A row that scrolls sideways without showing a scrollbar (filter chips on phones). */
@@ -493,4 +510,28 @@ select:not([multiple]):not([size]):not([data-slot='native-select']) {
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Below the iPhone's notch in the installed app (PWA), never less than 1.5 rem. */
+/* The site's tab bar on phones (`PWA · Visiteur`) is fixed: the page ends above it, the iPhone's notch above the page. */
+@media (max-width: 767px) {
+  body:has([data-site-tabs]) {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+  /* A tool's score bar (CRS, 67 points…) sits on top of the tab bar, not under it. */
+  body:has([data-site-tabs]) [data-phone-score-bar] {
+    bottom: calc(4rem + 1px + max(0px, env(safe-area-inset-bottom) - 0.75rem));
+  }
+}
+
+/* The installed app (PWA rules): no site footer, the tab bar is the way around. */
+@media (display-mode: standalone) and (max-width: 767px) {
+  [data-site-footer] {
+    display: none;
+  }
+}
+
+@utility pt-safe {
+  padding-top: max(1.5rem, env(safe-area-inset-top));
 }

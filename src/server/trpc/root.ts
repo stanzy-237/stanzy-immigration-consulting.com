@@ -1,4 +1,6 @@
 import { accompagnementRouter } from '@/features/accompagnement/server/accompagnement-router';
+import { accountRouter } from '@/features/auth/server/account-router';
+import { overviewRouter } from '@/features/dashboard/server/overview-router';
 import { authRouter } from '@/features/auth/server/auth-router';
 import { blogRouter } from '@/features/blog/server/blog-router';
 import { budgetRouter } from '@/features/budget/server/budget-router';
@@ -7,6 +9,8 @@ import { clientFormsRouter } from '@/features/client-forms/server/client-forms-r
 import { crsRouter } from '@/features/crs/server/crs-router';
 import { documentServicesRouter } from '@/features/document-services/server/document-services-router';
 import { accountsRouter } from '@/features/accounts/server/accounts-router';
+import { consultationAdminRouter } from '@/features/consultation/server/consultation-admin-router';
+import { consultationSpaceRouter } from '@/features/consultation/server/consultation-space-router';
 import { consultationRouter } from '@/features/consultation/server/consultation-router';
 import { promoCodesRouter } from '@/features/consultation/server/promo-router';
 import { contractsRouter } from '@/features/contracts/server/contracts-router';
@@ -30,11 +34,15 @@ import { createCallerFactory, createTRPCRouter } from './trpc';
 export const appRouter = createTRPCRouter({
   accompagnement: accompagnementRouter,
   auth: authRouter,
+  account: accountRouter,
+  overview: overviewRouter,
   blog: blogRouter,
   budget: budgetRouter,
   checklist: checklistRouter,
   clientForms: clientFormsRouter,
   consultation: consultationRouter,
+  consultationAdmin: consultationAdminRouter,
+  consultationSpace: consultationSpaceRouter,
   promoCodes: promoCodesRouter,
   contracts: contractsRouter,
   crs: crsRouter,
