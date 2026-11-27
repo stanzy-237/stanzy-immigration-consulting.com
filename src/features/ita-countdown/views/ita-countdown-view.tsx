@@ -5,6 +5,7 @@ import { ItaCountdown } from '@/features/ita-countdown/components/ita-countdown'
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { NextStepsGuide } from '@/features/shared/components/next-steps-guide';
+import { ToolAnswers } from '@/features/shared/components/tool-answers';
 
 /** The Compte à rebours ITA page: header, countdown and « À savoir » band. */
 export function ItaCountdownView(): ReactNode {
@@ -26,6 +27,7 @@ export function ItaCountdownView(): ReactNode {
         <div className="px-5 pb-16 sm:px-8">
           <ItaCountdown />
         </div>
+        <ToolAnswers tool="ita" />
         <NextStepsGuide
           id="ita"
           title={t('guide.title')}

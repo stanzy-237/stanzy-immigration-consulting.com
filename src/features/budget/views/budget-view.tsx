@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { BudgetTabs } from '@/features/budget/components/budget-tabs';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
+import { ToolAnswers } from '@/features/shared/components/tool-answers';
 
 /**
  * The Budget & dépenses page: the estimator, free and without an account, and
@@ -26,6 +27,7 @@ export function BudgetView(): ReactNode {
           <p className="mx-auto mt-4 max-w-xl text-body text-slate">{t('lead')}</p>
         </header>
         <BudgetTabs />
+        <ToolAnswers tool="budget" />
       </main>
       <SiteFooter />
     </>

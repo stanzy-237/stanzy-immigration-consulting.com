@@ -6,6 +6,7 @@ import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { NclcCalculator } from '@/features/nclc/components/nclc-calculator';
 import { NextStepsGuide } from '@/features/shared/components/next-steps-guide';
+import { ToolAnswers } from '@/features/shared/components/tool-answers';
 
 /** The Calculateur NCLC / CLB page: header, calculator and « À savoir » band. */
 export function NclcView(): ReactNode {
@@ -30,6 +31,8 @@ export function NclcView(): ReactNode {
         <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8 lg:py-14">
           <NclcCalculator />
         </div>
+
+        <ToolAnswers tool="nclc" />
 
         <NextStepsGuide
           id="nclc"

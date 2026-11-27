@@ -17,6 +17,7 @@ import { Link, useRouter } from '@/i18n/navigation';
 import { track } from '@/lib/analytics';
 import { useTRPC } from '@/trpc/client';
 import { isBotRefusal } from '@/lib/bot-protection';
+import { ToolAnswers } from '@/features/shared/components/tool-answers';
 
 const PAGE = '/outils/pdf';
 const PROMISES = [
@@ -157,6 +158,7 @@ export function PublicPdfToolView({ engine = browserEngine }: { engine?: Workben
             </div>
           </section>
         </div>
+        <ToolAnswers tool="pdf" />
       </main>
       <SiteFooter />
     </>

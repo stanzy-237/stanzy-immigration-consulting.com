@@ -5,6 +5,7 @@ import { CrsCalculator } from '@/features/crs/components/crs-calculator';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { NextStepsGuide } from '@/features/shared/components/next-steps-guide';
+import { ToolAnswers } from '@/features/shared/components/tool-answers';
 
 /** The Calculateur CRS page: header, calculator and result card. */
 export function CrsView(): ReactNode {
@@ -26,6 +27,7 @@ export function CrsView(): ReactNode {
         <div className="mx-auto max-w-6xl px-5 pb-16 sm:px-8">
           <CrsCalculator />
         </div>
+        <ToolAnswers tool="crs" />
         <NextStepsGuide
           id="crs"
           title={t('guide.title')}
