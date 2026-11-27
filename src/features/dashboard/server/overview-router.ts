@@ -46,7 +46,8 @@ export const overviewRouter = createTRPCRouter({
           select: { id: true, kind: true, subject: true, startsAt: true, durationMinutes: true, endedAt: true, consultation: { select: { id: true, status: true } } },
         }),
         db.dossier.count({ where: { state: 'OPEN' } }),
-        db.dossier.count({ where: { createdAt: { gte: monthStart } } }),
+        // Of the open ones, those opened this month (« +2 ce mois-ci » never exceeds the open count).
+        db.dossier.count({ where: { state: 'OPEN', createdAt: { gte: monthStart } } }),
         db.dossier.findMany({
           where: { state: 'OPEN' },
           orderBy: { updatedAt: 'desc' },

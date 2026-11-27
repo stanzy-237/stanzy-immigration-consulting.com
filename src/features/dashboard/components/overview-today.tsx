@@ -144,7 +144,8 @@ function Figures({ data }: { data: Today }): ReactNode {
         <li
           key={f.key}
           className={cn(
-            'flex w-32 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border lg:w-auto lg:rounded-3xl',
+            // `relative`: keeps the sr-only pill text inside the strip, not off the page's edge.
+            'relative flex w-32 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border lg:w-auto lg:rounded-3xl',
             f.dark ? 'border-navy-deep bg-navy-deep text-white' : 'border-fog-light bg-white text-navy-deep',
           )}
         >
@@ -226,7 +227,7 @@ function ToHandle({ data }: { data: Today }): ReactNode {
         <ul className="flex flex-1 flex-col divide-y divide-fog-light border-t border-fog-light">
           {rows.map((row) => (
             <li key={row.key} className="flex flex-1">
-              <Link href={row.href} className={cn('flex flex-1 items-center gap-4 px-5 py-4 lg:px-6', row.urgent ? 'bg-blush hover:bg-blush/70' : 'hover:bg-off-white')}>
+              <Link href={row.href} className={cn('flex min-w-0 flex-1 items-center gap-4 px-5 py-4 lg:px-6', row.urgent ? 'bg-blush hover:bg-blush/70' : 'hover:bg-off-white')}>
                 <span
                   aria-hidden={true}
                   className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', row.urgent ? 'bg-white text-rouge' : row.count ? 'bg-ice-blue text-navy-deep' : 'bg-off-white text-slate-mute')}
