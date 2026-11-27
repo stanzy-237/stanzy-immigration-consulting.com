@@ -477,7 +477,6 @@
       "metaTitle": "Contact · Stanzy",
       "title": "Contact",
       "lead": "A question about your Canada plan? Write to Stanzy, reply within the day.",
-      "whatsapp": "Message on WhatsApp",
       "email": {
         "label": "Email",
         "value": "contact@stanzy-immigration-consulting.com"
@@ -486,14 +485,17 @@
         "label": "Phone",
         "value": "+237 679 306 015"
       },
-      "channel": {
-        "label": "WhatsApp channel",
-        "value": "Draws and news, live"
-      },
       "office": {
         "label": "Office",
         "value": "Douala, Cameroon"
-      }
+      },
+      "hello": "Hello! I’m Stanzy.",
+      "ask": "Tell me what brings you here.",
+      "call": "Call Stanzy",
+      "copy": "Copy the email address",
+      "copied": "Email address copied",
+      "map": "See Douala on the map",
+      "follow": "Follow @stanzycanada"
     }
   },
   "Auth": {

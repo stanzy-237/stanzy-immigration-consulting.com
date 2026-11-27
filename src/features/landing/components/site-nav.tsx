@@ -393,7 +393,8 @@ export function SiteNav(): ReactNode {
     {visitorTabs ? (
       <>
         <SiteTabBar />
-        <ContactButton />
+        {/* Not on the Contact page: everything it opens is already there. */}
+        {pathname === '/contact' ? null : <ContactButton />}
       </>
     ) : null}
     </>

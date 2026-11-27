@@ -477,7 +477,6 @@
       "metaTitle": "Contact · Stanzy",
       "title": "Contact",
       "lead": "Une question sur votre projet Canada ? Écrivez à Stanzy, réponse dans la journée.",
-      "whatsapp": "Écrire sur WhatsApp",
       "email": {
         "label": "Email",
         "value": "contact@stanzy-immigration-consulting.com"
@@ -486,14 +485,17 @@
         "label": "Téléphone",
         "value": "+237 679 306 015"
       },
-      "channel": {
-        "label": "Chaîne WhatsApp",
-        "value": "Les tirages et les nouvelles, en direct"
-      },
       "office": {
         "label": "Bureau",
         "value": "Douala, Cameroun"
-      }
+      },
+      "hello": "Bonjour ! Je suis Stanzy.",
+      "ask": "Dites-moi ce qui vous amène.",
+      "call": "Appeler Stanzy",
+      "copy": "Copier l’adresse email",
+      "copied": "Adresse email copiée",
+      "map": "Voir Douala sur la carte",
+      "follow": "Suivez @stanzycanada"
     }
   },
   "Auth": {
