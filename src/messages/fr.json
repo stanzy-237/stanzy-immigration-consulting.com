@@ -390,7 +390,11 @@
       "tools": "Outils",
       "services": "Services",
       "blog": "Blog",
-      "account": "Compte"
+      "account": "Compte",
+      "mySpace": "Mon espace",
+      "consultations": "Consultations",
+      "documents": "Documents",
+      "profile": "Profil"
     },
     "Phone": {
       "lastDraw": "Dernier tirage",

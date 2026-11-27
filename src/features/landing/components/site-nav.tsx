@@ -36,7 +36,7 @@ import { cn } from '@/lib/utils';
 import { MapleLeafIcon } from '@/features/landing/components/brand-icons';
 import { LocaleToggle } from '@/features/landing/components/locale-toggle';
 import { ContactButton } from '@/features/landing/components/contact-button';
-import { isTaskPath, SiteTabBar } from '@/features/landing/components/site-tab-bar';
+import { isOwnBarPath, isTaskPath, SiteTabBar } from '@/features/landing/components/site-tab-bar';
 import {
   SERVICE_ENTRIES,
   TOOL_ENTRIES,
@@ -126,11 +126,13 @@ export function SiteNav(): ReactNode {
   // « Signaler un problème » (#160), from the account menu.
   const [reporting, setReporting] = useState<boolean>(false);
 
-  // Phones, signed out (`PWA · Visiteur`): no header and no ≡ menu, the tab bar
-  // instead, except on a task screen. Signed-in Clients keep the header for now.
-  const visitorTabs: boolean = !account && !isTaskPath(pathname);
+  // Phones (`PWA · Navigation mobile · Règles`): no header and no ≡ menu, the tab bar
+  // instead, except on a task screen.
+  // Signed-in Clients get theirs (Mon espace · Consultations · Documents · Outils · Profil); the consultant has the Tableau de bord.
+  const tabsFor: 'visitor' | 'client' | null = account?.isConsultant ? null : account ? 'client' : 'visitor';
+  const visitorTabs: boolean = tabsFor !== null && !isTaskPath(pathname);
   // The home page stays as designed, its header included; the tab bar still sits at the bottom.
-  const hideHeader: boolean = visitorTabs && pathname !== '/';
+  const hideHeader: boolean = (visitorTabs || (tabsFor === 'client' && isOwnBarPath(pathname))) && pathname !== '/';
 
   return (
     <>
@@ -392,9 +394,9 @@ export function SiteNav(): ReactNode {
     </nav>
     {visitorTabs ? (
       <>
-        <SiteTabBar />
-        {/* Not on the Contact page: everything it opens is already there. */}
-        {pathname === '/contact' ? null : <ContactButton />}
+        <SiteTabBar audience={tabsFor ?? 'visitor'} />
+        {/* Visitors only (`PWA · Pied de page mobile · C`), and not on the Contact page, which has it all. */}
+        {pathname === '/contact' || tabsFor !== 'visitor' ? null : <ContactButton />}
       </>
     ) : null}
     </>

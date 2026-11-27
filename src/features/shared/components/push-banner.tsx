@@ -42,8 +42,9 @@ export function PushBanner(): ReactNode {
       className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-fog-light bg-ice-blue px-4 py-3"
     >
       <BellRing aria-hidden={true} className="size-5 shrink-0 text-navy-deep" />
-      <p className="min-w-0 flex-1 text-sm font-semibold text-navy-deep">{t('title')}</p>
-      <div className="flex gap-2">
+      {/* At least ~13 words wide: on a phone the buttons go under the sentence instead of squeezing it. */}
+      <p className="min-w-52 flex-1 text-sm font-semibold text-navy-deep">{t('title')}</p>
+      <div className="flex gap-2 max-sm:ml-auto">
         <button
           type="button"
           onClick={later}

@@ -17,7 +17,7 @@ import { consultationInvoicePath } from '@/features/consultation/lib/payment';
 import { LABEL_CLASS, PRESS } from '@/features/consultation/lib/styles';
 import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
-import { SpaceTabBar, TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
+import { TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
@@ -56,7 +56,6 @@ function Consultation({ id }: { id: string }): ReactNode {
   return (
     <>
       {data.over ? <Preparing data={data} /> : <Before data={data} />}
-      <SpaceTabBar />
     </>
   );
 }

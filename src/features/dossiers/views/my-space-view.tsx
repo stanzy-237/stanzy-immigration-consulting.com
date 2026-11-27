@@ -14,7 +14,8 @@ import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { PushBanner } from '@/features/shared/components/push-banner';
-import { SpaceTabBar, TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
+import { NotificationBell } from '@/features/shared/components/notification-bell';
+import { TAB_BAR_ROOM } from '@/features/shared/components/space-tab-bar';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
@@ -56,7 +57,6 @@ export function MySpaceView({ notice, consultations = true }: { notice?: ReactNo
           </div>
         </div>
       </main>
-      {consultations ? <SpaceTabBar /> : null}
       <SiteFooter />
     </>
   );
@@ -173,11 +173,17 @@ function PhoneGreeting(): ReactNode {
     <div className="flex items-center justify-between gap-3 sm:hidden">
       <div className="flex min-w-0 flex-col">
         <p className="text-body-sm text-slate first-letter:uppercase">{format.dateTime(now, { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'Africa/Douala' })}</p>
-        <h1 className="truncate font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep">{t('hello', { name })}</h1>
+        <h1 className="truncate font-heading text-2xl leading-8 font-extrabold tracking-tight text-navy-deep">{t('hello', { name })}</h1>
       </div>
-      <Link href="/compte" aria-label={tTabs('profile')} className="flex size-11 shrink-0 items-center justify-center rounded-full bg-navy-deep font-heading text-body font-extrabold text-white">
-        {name.charAt(0).toUpperCase()}
-      </Link>
+      {/* The bell lived in the site header, which phones no longer show: here, beside the profile. */}
+      <div className="flex shrink-0 items-center gap-2">
+        <span className="grid size-11 place-items-center rounded-full border border-fog-light bg-white">
+          <NotificationBell audience="client" />
+        </span>
+        <Link href="/compte" aria-label={tTabs('profile')} className="flex size-11 items-center justify-center rounded-full bg-navy-deep font-heading text-body font-extrabold text-white">
+          {name.charAt(0).toUpperCase()}
+        </Link>
+      </div>
     </div>
   );
 }
