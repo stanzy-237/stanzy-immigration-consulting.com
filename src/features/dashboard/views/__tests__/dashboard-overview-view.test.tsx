@@ -109,7 +109,8 @@ describe('Tableau de bord — Aperçu', () => {
   it('shows the day: the figures, what waits on him (overdue first), today’s Réunions and the promo code', async () => {
     const { container } = page();
     const figures = within(screen.getByRole('list', { name: 'Chiffres du jour' }));
-    expect(figures.getByText('dont 1 facture en retard')).toBeInTheDocument();
+    expect(figures.getAllByText('1 en retard')[0]).toBeInTheDocument();
+    expect(figures.getAllByText(/^Prochaine \d\d:\d\d$/)[0]).toBeInTheDocument();
     expect(figures.getByText('12')).toBeInTheDocument();
     const toHandle = within(screen.getByRole('region', { name: 'À traiter' }));
     const rows = toHandle.getAllByRole('link');

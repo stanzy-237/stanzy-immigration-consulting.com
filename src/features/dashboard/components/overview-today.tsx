@@ -9,6 +9,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
+import { CollectedIllustration, CountdownIllustration, DossierIllustration } from '@/features/dashboard/components/overview-illustrations';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
@@ -73,16 +74,69 @@ export function OverviewTodaySkeleton(): ReactNode {
   );
 }
 
+type Figure = {
+  key: string;
+  label: string;
+  short: string;
+  value: string;
+  /** The band's pill (« 1 en retard », « Prochaine 10:00 »…), if there is something to say. */
+  pill: { text: string; tone: 'rouge' | 'navy' | 'leaf' } | null;
+  band: string;
+  art: ReactNode;
+  dark?: boolean;
+};
+
+/**
+ * The four figures (`Aperçu · Chiffres illustrés`, variant C « Bandeau
+ * illustré »): each card opens on a tinted band with its scene and a pill,
+ * the number under it; Stanzy leads « À traiter ». Phones keep the compact
+ * tiles that scroll (`Aperçu · Mobile`).
+ */
 function Figures({ data }: { data: Today }): ReactNode {
   const t = useTranslations('Dashboard.overview.today');
   const format = useFormatter();
   const time = (d: Date | string) => format.dateTime(new Date(d), { hour: '2-digit', minute: '2-digit', timeZone: DOUALA });
   const month = format.dateTime(new Date(`${data.collected.month}-15T12:00:00Z`), { month: 'long', timeZone: 'UTC' });
-  const figures = [
-    { key: 'toHandle', label: t('toHandle'), short: t('toHandle'), value: String(data.toHandle.total), sub: data.toHandle.overdue.count ? t('overdueSub', { count: data.toHandle.overdue.count }) : null, dark: true },
-    { key: 'meetings', label: t('meetingsToday'), short: t('meetingsShort'), value: String(data.meetings.today.length), sub: data.meetings.next ? t('nextAt', { time: time(data.meetings.next.startsAt) }) : null },
-    { key: 'dossiers', label: t('openDossiers'), short: t('openDossiers'), value: String(data.dossiers.open), sub: t('openedThisMonth', { count: data.dossiers.openedThisMonth }) },
-    { key: 'collected', label: t('collected', { month }), short: t('collectedShort'), value: format.number(data.collected.total, { maximumFractionDigits: 0 }), sub: t('collectedSub') },
+  const overdue = data.toHandle.overdue.count;
+  const art = 'absolute top-1 left-3 size-28';
+  const figures: Figure[] = [
+    {
+      key: 'toHandle',
+      label: t('toHandle'),
+      short: t('toHandle'),
+      value: String(data.toHandle.total),
+      pill: overdue ? { text: t('overduePill', { count: overdue }), tone: 'rouge' } : null,
+      band: 'bg-navy-80',
+      art: <Image src="/stanzy/pointr.svg" alt="" width={96} height={168} className="absolute top-2.5 left-3.5 h-42 w-24" />,
+      dark: true,
+    },
+    {
+      key: 'meetings',
+      label: t('meetingsToday'),
+      short: t('meetingsShort'),
+      value: String(data.meetings.today.length),
+      pill: data.meetings.next ? { text: t('nextPill', { time: time(data.meetings.next.startsAt) }), tone: 'navy' } : null,
+      band: 'bg-ice-blue',
+      art: <CountdownIllustration className={art} />,
+    },
+    {
+      key: 'dossiers',
+      label: t('openDossiers'),
+      short: t('openDossiers'),
+      value: String(data.dossiers.open),
+      pill: data.dossiers.openedThisMonth ? { text: t('createdPill', { count: data.dossiers.openedThisMonth }), tone: 'navy' } : null,
+      band: 'bg-ice-blue',
+      art: <DossierIllustration className={art} />,
+    },
+    {
+      key: 'collected',
+      label: t('collectedLabel'),
+      short: t('collectedShort'),
+      value: format.number(data.collected.total, { maximumFractionDigits: 0 }),
+      pill: { text: month, tone: 'leaf' },
+      band: 'bg-leaf-tint',
+      art: <CollectedIllustration className={art} />,
+    },
   ];
   return (
     <ul aria-label={t('figures')} className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible lg:px-0">
@@ -90,17 +144,33 @@ function Figures({ data }: { data: Today }): ReactNode {
         <li
           key={f.key}
           className={cn(
-            'flex w-32 shrink-0 snap-start flex-col gap-1.5 rounded-2xl border p-3.5 lg:w-auto lg:gap-2 lg:rounded-3xl lg:p-5',
+            'flex w-32 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border lg:w-auto lg:rounded-3xl',
             f.dark ? 'border-navy-deep bg-navy-deep text-white' : 'border-fog-light bg-white text-navy-deep',
           )}
         >
-          <span className={cn('order-2 text-caption leading-4 lg:order-1 lg:text-body-sm', f.dark ? 'text-white/80' : 'text-slate')}>
-            <span className="lg:hidden">{f.short}</span>
-            <span className="max-lg:hidden">{f.label}</span>
-          </span>
-          {/* A long amount (« 2 592 500 ») steps down a size so it stays in its card. */}
-          <span className={cn('order-1 font-heading text-h3 leading-8 font-extrabold whitespace-nowrap tabular-nums lg:order-2', f.value.length > 6 ? 'lg:text-h3 lg:leading-11' : 'lg:text-h2 lg:leading-11')}>{f.value}</span>
-          {f.sub ? <span className={cn('order-3 text-caption max-lg:hidden', f.dark ? 'text-white/80' : 'text-slate')}>{f.sub}</span> : null}
+          <div aria-hidden={true} className={cn('relative h-24 overflow-hidden max-lg:hidden', f.band)}>
+            {f.art}
+            {f.pill ? (
+              <span
+                className={cn(
+                  'absolute top-4 right-4 rounded-full px-2.5 py-1 text-caption font-bold first-letter:uppercase',
+                  f.pill.tone === 'rouge' ? 'bg-rouge text-white' : f.pill.tone === 'leaf' ? 'bg-white text-leaf' : 'bg-white text-navy-deep',
+                )}
+              >
+                {f.pill.text}
+              </span>
+            ) : null}
+          </div>
+          <div className="flex flex-col gap-1.5 p-3.5 lg:gap-1 lg:px-5 lg:pt-4 lg:pb-5">
+            {/* A long amount (« 2 592 500 ») steps down a size so it stays in its card. */}
+            <span className={cn('font-heading text-h3 leading-8 font-extrabold whitespace-nowrap tabular-nums lg:leading-11', f.value.length > 6 ? 'lg:text-h3' : 'lg:text-h2')}>{f.value}</span>
+            <span className={cn('text-caption leading-4 lg:text-body-sm', f.dark ? 'text-white/80' : 'text-slate')}>
+              <span className="lg:hidden">{f.short}</span>
+              <span className="max-lg:hidden">{f.label}</span>
+            </span>
+            {/* What the pill says, for screen readers (the band is decorative). */}
+            {f.pill ? <span className="sr-only">{f.pill.text}</span> : null}
+          </div>
         </li>
       ))}
     </ul>

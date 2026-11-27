@@ -1617,7 +1617,11 @@
         "instant": "Réunion instantanée",
         "newDossier": "Ouvrir un dossier",
         "noPromo": "Aucun code en cours",
-        "createPromo": "Créer un code"
+        "createPromo": "Créer un code",
+        "overduePill": "{count, plural, one {# en retard} other {# en retard}}",
+        "nextPill": "Prochaine {time}",
+        "createdPill": "+{count} ce mois-ci",
+        "collectedLabel": "FCFA encaissés"
       }
     },
     "greeting": "Bonjour {name}"

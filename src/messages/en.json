@@ -1600,7 +1600,11 @@
         "instant": "Instant meeting",
         "newDossier": "Open a file",
         "noPromo": "No code running",
-        "createPromo": "Create a code"
+        "createPromo": "Create a code",
+        "overduePill": "{count} overdue",
+        "nextPill": "Next {time}",
+        "createdPill": "+{count} this month",
+        "collectedLabel": "FCFA collected"
       }
     },
     "greeting": "Hello {name}"
