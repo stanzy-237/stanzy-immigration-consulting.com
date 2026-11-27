@@ -1623,7 +1623,8 @@
       "more": "More"
     },
     "more": {
-      "overdue": "{count} overdue"
+      "overdue": "{count} overdue",
+      "report": "Report a problem"
     }
   },
   "BlogDashboard": {
@@ -5370,7 +5371,23 @@
           "taken": "An active code already has this name."
         }
       },
-      "endPrefix": "Ends"
+      "endPrefix": "Ends",
+      "back": "More",
+      "filter": {
+        "live": "Live · {count}",
+        "over": "Over · {count}"
+      },
+      "noneOver": "No finished code.",
+      "phoneNote": "A place counts when the payment goes through. Tap a code to see or stop it.",
+      "places": "places",
+      "endedOn": "Ended {day}",
+      "sheet": {
+        "reduction": "Reduction",
+        "services": "For",
+        "used": "Uses",
+        "end": "End",
+        "status": "Status"
+      }
     },
     "invoice": {
       "service": "Video consultation",

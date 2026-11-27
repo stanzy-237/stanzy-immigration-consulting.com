@@ -1,13 +1,14 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ArrowUpRight, ChevronRight } from 'lucide-react';
+import { ArrowUpRight, ChevronRight, Flag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 // The dashboard runs on admin.<site>: plain links to its short paths (see dashboard-host).
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { TAB_SEGMENTS } from '@/features/dashboard/components/dashboard-tab-bar';
+import { ReportProblemDialog } from '@/features/shared/components/report-problem';
 import { DASHBOARD_GROUPS, DASHBOARD_SECTIONS, type DashboardSection } from '@/features/dashboard/data/sections';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
@@ -23,6 +24,7 @@ export function DashboardMoreView({ siteUrl }: { siteUrl: string }): ReactNode {
   const t = useTranslations('Dashboard');
   const trpc = useTRPC();
   const { data } = useQuery(trpc.overview.today.queryOptions());
+  const [reporting, setReporting] = useState(false);
   const badge = (key: DashboardSection['key']): { text: string; tone: 'navy' | 'rouge' | 'plain' } | null => {
     if (!data) return null;
     if (key === 'demandes' && data.toHandle.interests.count) return { text: String(data.toHandle.interests.count), tone: 'navy' };
@@ -72,10 +74,18 @@ export function DashboardMoreView({ siteUrl }: { siteUrl: string }): ReactNode {
           </section>
         );
       })}
-      <a href={siteUrl} className={cn(ROW, 'rounded-2xl border border-fog-light bg-white text-body text-ink')}>
-        <span className="flex-1">{t('viewSite')}</span>
-        <ArrowUpRight aria-hidden={true} className="size-4 text-slate-mute" strokeWidth={2.4} />
-      </a>
+      <div className="flex flex-col divide-y divide-fog-light overflow-hidden rounded-2xl border border-fog-light bg-white">
+        {/* The header's flag, on wider screens. */}
+        <button type="button" onClick={() => setReporting(true)} className={cn(ROW, 'w-full text-left text-body text-ink hover:bg-off-white')}>
+          <Flag aria-hidden={true} className="size-4.5 shrink-0 text-navy-deep" strokeWidth={2} />
+          <span className="flex-1">{t('more.report')}</span>
+        </button>
+        <a href={siteUrl} className={cn(ROW, 'text-body text-ink hover:bg-off-white')}>
+          <ArrowUpRight aria-hidden={true} className="size-4.5 shrink-0 text-navy-deep" strokeWidth={2} />
+          <span className="flex-1">{t('viewSite')}</span>
+        </a>
+      </div>
+      <ReportProblemDialog open={reporting} onOpenChange={setReporting} />
     </div>
   );
 }

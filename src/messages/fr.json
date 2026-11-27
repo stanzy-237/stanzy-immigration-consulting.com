@@ -1640,7 +1640,8 @@
       "more": "Plus"
     },
     "more": {
-      "overdue": "{count} en retard"
+      "overdue": "{count} en retard",
+      "report": "Signaler un problème"
     }
   },
   "BlogDashboard": {
@@ -5387,7 +5388,23 @@
           "taken": "Un code actif porte déjà ce nom."
         }
       },
-      "endPrefix": "Fin"
+      "endPrefix": "Fin",
+      "back": "Plus",
+      "filter": {
+        "live": "Actifs · {count}",
+        "over": "Terminés · {count}"
+      },
+      "noneOver": "Aucun code terminé.",
+      "phoneNote": "Une place compte quand le paiement réussit. Touchez un code pour le voir ou l’arrêter.",
+      "places": "places",
+      "endedOn": "Terminé le {day}",
+      "sheet": {
+        "reduction": "Réduction",
+        "services": "Pour",
+        "used": "Utilisations",
+        "end": "Fin",
+        "status": "État"
+      }
     },
     "invoice": {
       "service": "Consultation vidéo",

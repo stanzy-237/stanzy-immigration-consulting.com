@@ -29,8 +29,9 @@ export function DashboardTabBar(): ReactNode {
   const t = useTranslations('Dashboard.tabs');
   const segments = useSelectedLayoutSegments();
   const current = segments[0] ?? null;
-  // A task screen (a Consultation, a Réunion's room) has its own bar at the bottom instead (PWA rules).
-  if ((current === 'consultations' || current === 'reunions') && segments.length > 1) return null;
+  // A task screen (a Consultation, a Réunion's room) or one with its own action bar (Codes promo,
+  // « + Nouveau code ») has its bar at the bottom instead (PWA rules).
+  if (((current === 'consultations' || current === 'reunions') && segments.length > 1) || current === 'codes-promo') return null;
   const active = (TAB_SEGMENTS as readonly (string | null)[]).includes(current) ? current : 'plus';
   return (
     <nav
