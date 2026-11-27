@@ -1,10 +1,11 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { X } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { toast } from '@/components/ui/toast';
 import { WeekHours } from '@/features/consultation/components/week-hours';
 import { mergeTouching } from '@/features/consultation/lib/day-ranges';
@@ -38,6 +39,8 @@ export function parseRanges(day: number, text: string): Range[] | null {
   return ranges;
 }
 
+type Patch = Partial<Record<'duration' | 'buffer' | 'notice' | 'weeks' | 'cutoff' | 'price', string> & { blocked: string[] }>;
+
 /**
  * The Disponibilités being edited: each day's ranges as typed, the numbers,
  * the price and the blocked dates; `submit` checks the hours and saves.
@@ -69,8 +72,12 @@ function useAvailabilityDraft(settings: Settings, onSaved?: () => void) {
     }),
   );
 
-  /** Checks every day's hours and saves it all; `current` when the days were just changed. */
-  function save(current: Record<number, string> = days) {
+  /**
+   * Checks every day's hours and saves it all; `current` when the days were
+   * just changed, `patch` for a rule, the price or the blocked dates just
+   * changed (a phone sheet saves at once, before the state has caught up).
+   */
+  function save(current: Record<number, string> = days, patch: Patch = {}) {
     const weeklyHours: Range[] = [];
     const bad: number[] = [];
     for (const day of DAYS) {
@@ -81,15 +88,16 @@ function useAvailabilityDraft(settings: Settings, onSaved?: () => void) {
     setBadDays(bad);
     if (bad.length) return;
     const int = (value: string, fallback: number) => (Number.isFinite(Number.parseInt(value, 10)) ? Number.parseInt(value, 10) : fallback);
+    const value = { duration, buffer, notice, weeks, cutoff, price, blocked, ...patch };
     save_.mutate({
       weeklyHours,
-      durationMinutes: int(duration, 45),
-      bufferMinutes: int(buffer, 0),
-      minNoticeHours: int(notice, 24),
-      horizonDays: int(weeks, 4) * 7,
-      moveCutoffHours: int(cutoff, 24),
-      price: price.trim() ? int(price.replace(/\D/g, ''), 0) || null : null,
-      blockedDates: blocked,
+      durationMinutes: int(value.duration, 45),
+      bufferMinutes: int(value.buffer, 0),
+      minNoticeHours: int(value.notice, 24),
+      horizonDays: int(value.weeks, 4) * 7,
+      moveCutoffHours: int(value.cutoff, 24),
+      price: value.price.trim() ? int(value.price.replace(/\D/g, ''), 0) || null : null,
+      blockedDates: value.blocked,
     });
   }
 
@@ -119,6 +127,17 @@ function useAvailabilityDraft(settings: Settings, onSaved?: () => void) {
     saving: save_.isPending,
     ranges: (day: number) => parseRanges(day, days[day] ?? '') ?? [],
     setRanges: (day: number, ranges: Range[]) => setDays((all) => ({ ...all, [day]: rangesText(mergeTouching(ranges)) })),
+    /** Phones: one change from a sheet, saved at once. */
+    savePatch: (patch: Patch) => {
+      if (patch.duration !== undefined) setDuration(patch.duration);
+      if (patch.buffer !== undefined) setBuffer(patch.buffer);
+      if (patch.notice !== undefined) setNotice(patch.notice);
+      if (patch.weeks !== undefined) setWeeks(patch.weeks);
+      if (patch.cutoff !== undefined) setCutoff(patch.cutoff);
+      if (patch.price !== undefined) setPrice(patch.price);
+      if (patch.blocked !== undefined) setBlocked(patch.blocked);
+      save(days, patch);
+    },
     saveDays: (changes: Record<number, Range[]>) => {
       const next = { ...days, ...Object.fromEntries(Object.entries(changes).map(([day, ranges]) => [day, rangesText(mergeTouching(ranges))])) };
       setDays(next);
@@ -190,17 +209,19 @@ function PageLayout({ draft }: { draft: Draft }): ReactNode {
   const t = useTranslations('Consultation.admin.availability');
   return (
     <form onSubmit={draft.submit} className="flex flex-col gap-6 lg:flex-row lg:items-start">
-      <section aria-labelledby="week-hours" className="flex min-w-0 flex-1 flex-col gap-4 rounded-3xl border border-fog-light bg-white p-5 lg:p-6">
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 id="week-hours" className="font-heading text-h4 font-bold text-navy-deep">
+      <section aria-labelledby="week-hours" className="flex min-w-0 flex-1 flex-col gap-4 rounded-3xl border border-fog-light bg-white p-5 max-md:gap-2 max-md:border-0 max-md:bg-transparent max-md:p-0 lg:p-6">
+        <div className="flex items-baseline justify-between gap-3 max-md:px-1">
+          <h2 id="week-hours" className="font-heading text-h4 font-bold text-navy-deep max-md:font-label max-md:text-label max-md:tracking-wide max-md:text-slate max-md:uppercase">
             {t('weekHours')}
           </h2>
-          <span className="hidden text-caption whitespace-nowrap text-slate sm:inline">{t('douala')}</span>
+          <span className="text-caption whitespace-nowrap text-slate">{t('douala')}</span>
         </div>
         <WeekHours source={draft} />
       </section>
 
-      <div className="flex w-full shrink-0 flex-col gap-4 lg:w-90">
+      {/* Phones (`Mobile v2 · 3 Disponibilités`): rules and dates as rows, each saved from its sheet. */}
+      <PhoneRules draft={draft} />
+      <div className="flex w-full shrink-0 flex-col gap-4 max-md:hidden lg:w-90">
         <section aria-label={t('rules')} className="flex flex-col rounded-3xl border border-fog-light bg-white px-5 py-2 lg:px-6">
           {draft.numbers.map((n) => (
             <label key={n.key} className="flex items-center justify-between gap-4 border-b border-fog-light py-3 text-body-sm last:border-b-0">
@@ -352,5 +373,126 @@ function SaveButton({ draft, className }: { draft: Draft; className?: string }):
     <button type="submit" disabled={draft.saving} className={cn('h-12 shrink-0 rounded-full bg-leaf px-8 font-heading text-body-sm font-bold text-white disabled:opacity-60', PRESS, className)}>
       {t('save')}
     </button>
+  );
+}
+
+type Sheet = null | 'price' | 'duration' | 'notice' | 'horizon' | 'cutoff' | 'block';
+
+/**
+ * Phones: the rules and the blocked dates as rows (Fresha's opening hours,
+ * Bevel's settings). A row opens its sheet; « Enregistrer » there saves at
+ * once, so there is no save button on the page.
+ */
+function PhoneRules({ draft }: { draft: Draft }): ReactNode {
+  const t = useTranslations('Consultation.admin.availability');
+  const format = useFormatter();
+  const [sheet, setSheet] = useState<Sheet>(null);
+  const n = Object.fromEntries(draft.numbers.map((x) => [x.key, x.value])) as Record<(typeof draft.numbers)[number]['key'], string>;
+  const rows: { key: Exclude<Sheet, null | 'block'>; label: string; value: string; strong?: boolean; missing?: boolean }[] = [
+    { key: 'price', label: t('price'), value: draft.price ? `${format.number(Number(draft.price))} FCFA` : t('noPriceShort'), strong: true, missing: !draft.price },
+    { key: 'duration', label: t('durationRow'), value: `${n.duration} + ${n.buffer} min` },
+    { key: 'notice', label: t('notice'), value: t('hoursBefore', { hours: n.notice }) },
+    { key: 'horizon', label: t('horizon'), value: t('weeksAhead', { weeks: n.horizon }) },
+    { key: 'cutoff', label: t('cutoff'), value: t('hoursBefore', { hours: n.cutoff }) },
+  ];
+  const row = 'flex min-h-12 w-full items-center gap-3 px-4 text-left';
+  const card = 'flex flex-col divide-y divide-fog-light overflow-hidden rounded-2xl border border-fog-light bg-white';
+  const label = 'px-1 font-label text-label font-bold tracking-wide text-slate uppercase';
+  return (
+    <div className="flex flex-col gap-5 md:hidden">
+      <section aria-labelledby="rules-phone" className="flex flex-col gap-2">
+        <h2 id="rules-phone" className={label}>
+          {t('rules')}
+        </h2>
+        <ul className={card}>
+          {rows.map((r) => (
+            <li key={r.key}>
+              <button type="button" onClick={() => setSheet(r.key)} className={row}>
+                <span className="flex-1 text-body text-ink">{r.label}</span>
+                <span className={cn('text-body-sm', r.missing ? 'font-bold text-honey' : r.strong ? 'font-bold text-ink' : 'text-slate')}>{r.value}</span>
+                <ChevronRight aria-hidden={true} className="size-4 shrink-0 text-slate-mute" strokeWidth={2.4} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section aria-labelledby="blocked-phone" className="flex flex-col gap-2">
+        <h2 id="blocked-phone" className={label}>
+          {t('blocked')}
+        </h2>
+        <ul className={card}>
+          {draft.blocked.map((d) => (
+            <li key={d} className={row}>
+              <span className="flex-1 text-body text-ink first-letter:uppercase">
+                {format.dateTime(new Date(`${d}T12:00:00Z`), { weekday: 'short', day: 'numeric', month: 'long', timeZone: 'UTC' })}
+              </span>
+              <button type="button" onClick={() => draft.savePatch({ blocked: draft.blocked.filter((x) => x !== d) })} className="text-body-sm font-semibold text-rouge">
+                {t('unblockShort')}
+              </button>
+            </li>
+          ))}
+          <li>
+            <button type="button" onClick={() => setSheet('block')} className={cn(row, 'font-bold text-rouge')}>
+              + {t('blockDate')}
+            </button>
+          </li>
+        </ul>
+      </section>
+      <p className="px-1 text-caption leading-4 text-slate">{t('savedAtOnce')}</p>
+      <Drawer open={sheet !== null} onOpenChange={(open) => !open && setSheet(null)} showSwipeHandle={true}>
+        <DrawerContent className="rounded-t-3xl bg-white px-5 pt-2 pb-8 md:hidden">
+          {sheet ? <RuleSheet key={sheet} sheet={sheet} draft={draft} onDone={() => setSheet(null)} /> : null}
+        </DrawerContent>
+      </Drawer>
+    </div>
+  );
+}
+
+/** One rule's sheet: its number(s), then « Enregistrer », saved at once. */
+function RuleSheet({ sheet, draft, onDone }: { sheet: Exclude<Sheet, null>; draft: Draft; onDone: () => void }): ReactNode {
+  const t = useTranslations('Consultation.admin.availability');
+  const n = Object.fromEntries(draft.numbers.map((x) => [x.key, x.value])) as Record<(typeof draft.numbers)[number]['key'], string>;
+  const [a, setA] = useState(sheet === 'price' ? draft.price : sheet === 'duration' ? n.duration : sheet === 'block' ? '' : n[sheet]);
+  const [b, setB] = useState(n.buffer);
+  const digits = (set: (v: string) => void) => (v: string) => set(v.replace(/\D/g, ''));
+  const title = sheet === 'block' ? t('blockDate') : sheet === 'duration' ? t('durationRow') : t(sheet);
+  const submit = () => {
+    if (sheet === 'block') {
+      if (a) draft.savePatch({ blocked: [...new Set([...draft.blocked, a])].toSorted() });
+    } else if (sheet === 'duration') draft.savePatch({ duration: a, buffer: b });
+    else if (sheet === 'horizon') draft.savePatch({ weeks: a });
+    else draft.savePatch({ [sheet]: a });
+    onDone();
+  };
+  return (
+    <div className="flex flex-col gap-5 pt-3">
+      <DrawerTitle className="font-heading text-h4 font-bold text-navy-deep">{title}</DrawerTitle>
+      {sheet === 'block' ? (
+        <input type="date" aria-label={t('blockDate')} value={a} onChange={(e) => setA(e.target.value)} className="h-12 rounded-xl border border-fog px-4 text-body" />
+      ) : sheet === 'duration' ? (
+        <div className="flex flex-col divide-y divide-fog-light rounded-2xl border border-fog-light">
+          <label className="flex items-center justify-between gap-4 px-4 py-3 text-body">
+            {t('duration')}
+            <NumberInput value={a} onChange={digits(setA)} unit="min" />
+          </label>
+          <label className="flex items-center justify-between gap-4 px-4 py-3 text-body">
+            {t('buffer')}
+            <NumberInput value={b} onChange={digits(setB)} unit="min" />
+          </label>
+        </div>
+      ) : (
+        <label className="flex items-center justify-between gap-4 rounded-2xl border border-fog-light px-4 py-3 text-body">
+          {title}
+          <NumberInput
+            value={a}
+            onChange={digits(setA)}
+            unit={sheet === 'price' ? 'FCFA' : sheet === 'horizon' ? t('weeksUnit') : t('hoursUnit')}
+          />
+        </label>
+      )}
+      <button type="button" disabled={draft.saving || (sheet === 'block' && !a)} onClick={submit} className={cn('h-13 rounded-full bg-rouge font-heading text-body font-bold text-white disabled:opacity-50', PRESS)}>
+        {sheet === 'block' ? t('blockDate') : t('save')}
+      </button>
+    </div>
   );
 }

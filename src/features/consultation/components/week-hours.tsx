@@ -328,12 +328,13 @@ function DayList({ source }: { source: HoursSource }): ReactNode {
   const [editing, setEditing] = useState<number | null>(null);
   return (
     <div className="flex flex-col md:hidden">
-      <ul className="flex flex-col divide-y divide-fog-light">
+      <ul className="flex flex-col divide-y divide-fog-light rounded-2xl border border-fog-light bg-white px-4">
         {DAYS.map((day) => {
           const ranges = source.ranges(day);
           return (
             <li key={day}>
               <button type="button" onClick={() => setEditing(day)} className="flex w-full items-center gap-3 py-3.5 text-left">
+                <span aria-hidden={true} className={cn('size-2 shrink-0 rounded-full', ranges.length ? 'bg-leaf' : 'bg-fog')} />
                 <span className={cn('w-24 shrink-0 text-body font-bold capitalize', ranges.length ? 'text-ink' : 'text-slate-mute')}>{dayName(day, 'long')}</span>
                 <span className={cn('flex-1 text-right text-body-sm', ranges.length ? 'text-ink' : 'text-slate-mute')}>{ranges.length ? shortRanges(ranges) : t('closed')}</span>
                 <ChevronRight aria-hidden={true} className="size-4 shrink-0 text-slate-mute" strokeWidth={2.4} />

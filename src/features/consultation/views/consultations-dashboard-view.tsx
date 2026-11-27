@@ -1,7 +1,7 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { CalendarDays, ChevronRight, Clock, List } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Clock, List, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
 import { useFormatter, useNow, useTranslations } from 'next-intl';
 import { useState, useSyncExternalStore, useTransition, type ReactNode } from 'react';
@@ -70,7 +70,8 @@ export function ConsultationsDashboardView(): ReactNode {
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <PhoneHeader view={view} onView={setView} />
+      <div className="flex flex-col gap-4 max-md:hidden lg:flex-row lg:items-end lg:justify-between">
         <div className="flex flex-col gap-2">
           <p className={cn(LABEL_CLASS, 'text-steel-blue lg:hidden')}>{t('eyebrow')}</p>
           <h1 className="font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep sm:text-h2 sm:leading-11 lg:text-h1 lg:leading-14">{t('title')}</h1>
@@ -104,6 +105,40 @@ export function ConsultationsDashboardView(): ReactNode {
           <AvailabilityPage />
         </QueryBoundary>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * Phones (`Mobile v2 · 2 Consultations`): the title and two round buttons,
+ * Calendrier and Disponibilités; either opens as its own screen, with « ‹ »
+ * back to the list.
+ */
+function PhoneHeader({ view, onView }: { view: View; onView: (view: View) => void }): ReactNode {
+  const t = useTranslations('Consultation.admin');
+  const tView = useTranslations('Consultation.admin.calendar.view');
+  const round = 'flex size-11 shrink-0 items-center justify-center rounded-full border border-fog-light bg-white text-navy-deep';
+  if (view !== 'list') {
+    return (
+      <div className="flex items-center gap-3 md:hidden">
+        <button type="button" onClick={() => onView('list')} aria-label={tView('list')} className={round}>
+          <ChevronLeft aria-hidden={true} className="size-5" strokeWidth={2.4} />
+        </button>
+        <h1 className="font-heading text-h4 leading-7 font-extrabold tracking-tight text-navy-deep">{tView(view)}</h1>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center justify-between gap-3 md:hidden">
+      <h1 className="font-heading text-h4 leading-7 font-extrabold tracking-tight text-navy-deep">{t('title')}</h1>
+      <div className="flex gap-2">
+        <button type="button" onClick={() => onView('calendar')} aria-label={tView('calendar')} className={round}>
+          <CalendarDays aria-hidden={true} className="size-5" strokeWidth={2} />
+        </button>
+        <button type="button" onClick={() => onView('availability')} aria-label={tView('availability')} className={round}>
+          <Clock aria-hidden={true} className="size-5" strokeWidth={2} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -149,6 +184,7 @@ function Tabs({ tab, onTab }: { tab: Tab; onTab: (tab: Tab) => void }): ReactNod
     { key: 'failed', label: t('failed', { count: data.counts.failed }) },
   ];
   return (
+    <div className="flex flex-col gap-3">
     <div role="tablist" aria-label={t('label')} className="flex gap-1 rounded-full bg-ice-blue p-1 lg:gap-2 lg:bg-transparent lg:p-0">
       {tabs.map(({ key, label }) => (
         <button
@@ -158,13 +194,31 @@ function Tabs({ tab, onTab }: { tab: Tab; onTab: (tab: Tab) => void }): ReactNod
           aria-selected={tab === key}
           onClick={() => onTab(key)}
           className={cn(
+            // Phones: « Paiements échoués » is the banner under the two tabs, not a third tab.
             'h-11 flex-1 rounded-full px-4 text-body-sm font-bold whitespace-nowrap lg:flex-none lg:border-2',
+            key === 'failed' && 'max-lg:hidden',
             tab === key ? 'bg-white text-ink shadow-sm lg:border-navy-deep lg:bg-navy-deep lg:text-white' : 'text-slate lg:border-fog-light lg:bg-white lg:text-ink',
           )}
         >
           {label}
         </button>
       ))}
+    </div>
+      {data.counts.failed ? (
+        <button
+          type="button"
+          onClick={() => onTab(tab === 'failed' ? 'upcoming' : 'failed')}
+          aria-pressed={tab === 'failed'}
+          className="flex items-center gap-3 rounded-2xl bg-honey-tint px-4 py-3 text-left lg:hidden"
+        >
+          <TriangleAlert aria-hidden={true} className="size-5 shrink-0 text-honey" strokeWidth={2} />
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="text-body-sm font-bold text-ink">{t('failedBanner', { count: data.counts.failed })}</span>
+            <span className="text-caption text-slate">{tab === 'failed' ? t('failedBack') : t('failedHint')}</span>
+          </span>
+          <ChevronRight aria-hidden={true} className={cn('size-4 shrink-0 text-honey transition-transform', tab === 'failed' && 'rotate-90')} strokeWidth={2.4} />
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -297,12 +351,13 @@ function ConsultationList({ tab }: { tab: 'upcoming' | 'past' }): ReactNode {
                 key={row.id}
                 href={`/consultations/${row.id}`}
                 className={cn(
-                  'flex items-center gap-4 rounded-2xl bg-white p-4',
+                  'flex items-center gap-3 rounded-2xl bg-white p-4',
                   row.status === 'HELD' ? 'border border-dashed border-fog' : 'border border-fog-light',
                 )}
               >
-                <span className="flex w-14 flex-col">
-                  <span className="font-heading text-h4 font-extrabold text-ink">{time(new Date(row.startsAt))}</span>
+                {/* A fixed column, wide enough for Syne's « 14:00 »: the name never runs under it. */}
+                <span className="flex w-19 shrink-0 flex-col">
+                  <span className="font-heading text-body font-extrabold whitespace-nowrap text-ink tabular-nums">{time(new Date(row.startsAt))}</span>
                   <span className="text-caption text-slate">{row.durationMinutes} min</span>
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col items-start gap-1">

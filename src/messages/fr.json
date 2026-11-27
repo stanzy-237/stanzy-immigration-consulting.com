@@ -5413,7 +5413,10 @@
         "label": "Consultations",
         "upcoming": "À venir · {count}",
         "past": "Passées",
-        "failed": "Paiements échoués · {count}"
+        "failed": "Paiements échoués · {count}",
+        "failedBanner": "{count, plural, one {# paiement non abouti} other {# paiements non aboutis}}",
+        "failedHint": "Personne n’a été débité",
+        "failedBack": "Touchez pour revenir aux consultations"
       },
       "columns": {
         "when": "Quand",
@@ -5502,7 +5505,12 @@
         "helpClick": "<b>Cliquer</b> une plage : heures exactes",
         "weeklyTotal": "{hours} h par semaine",
         "available": "Disponible",
-        "copyTo": "Copier vers"
+        "copyTo": "Copier vers",
+        "durationRow": "Durée et pause",
+        "hoursBefore": "{hours} h avant",
+        "weeksAhead": "{weeks, plural, one {# semaine} other {# semaines}}",
+        "unblockShort": "Retirer",
+        "savedAtOnce": "Chaque changement est enregistré tout de suite. Les Consultations déjà payées gardent leur créneau."
       },
       "detail": {
         "back": "Consultations",

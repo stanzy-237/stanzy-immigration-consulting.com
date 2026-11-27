@@ -5396,7 +5396,10 @@
         "label": "Consultations",
         "upcoming": "Upcoming · {count}",
         "past": "Past",
-        "failed": "Failed payments · {count}"
+        "failed": "Failed payments · {count}",
+        "failedBanner": "{count, plural, one {# payment that didn’t go through} other {# payments that didn’t go through}}",
+        "failedHint": "Nobody was charged",
+        "failedBack": "Tap to go back to the consultations"
       },
       "columns": {
         "when": "When",
@@ -5485,7 +5488,12 @@
         "helpClick": "<b>Click</b> a slot: exact hours",
         "weeklyTotal": "{hours} h a week",
         "available": "Available",
-        "copyTo": "Copy to"
+        "copyTo": "Copy to",
+        "durationRow": "Length and break",
+        "hoursBefore": "{hours} h before",
+        "weeksAhead": "{weeks, plural, one {# week} other {# weeks}}",
+        "unblockShort": "Remove",
+        "savedAtOnce": "Every change is saved at once. Consultations already paid keep their slot."
       },
       "detail": {
         "back": "Consultations",
