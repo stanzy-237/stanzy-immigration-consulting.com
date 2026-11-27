@@ -128,12 +128,14 @@ export function SiteNav(): ReactNode {
   // Phones, signed out (`PWA · Visiteur`): no header and no ≡ menu, the tab bar
   // instead, except on a task screen. Signed-in Clients keep the header for now.
   const visitorTabs: boolean = !account && !isTaskPath(pathname);
+  // The home page stays as designed, its header included; the tab bar still sits at the bottom.
+  const hideHeader: boolean = visitorTabs && pathname !== '/';
 
   return (
     <>
     <nav
       aria-label={t('ariaLabel')}
-      className={cn('bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-backdrop-filter:bg-surface/80', visitorTabs && 'max-md:hidden')}
+      className={cn('bg-surface/95 border-fog sticky top-0 z-40 w-full border-b backdrop-blur supports-backdrop-filter:bg-surface/80', hideHeader && 'max-md:hidden')}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 md:px-6">
         <Link

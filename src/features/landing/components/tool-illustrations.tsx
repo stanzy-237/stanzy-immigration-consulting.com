@@ -166,3 +166,102 @@ export function PdfIllustration({ className }: Props): ReactNode {
     </Ground>
   );
 }
+
+/** Parcours: the road to PR, its stops ticked, the maple flag at the end. */
+export function TimelineIllustration({ className }: Props): ReactNode {
+  return (
+    <Ground className={className}>
+      <path d="M30 120C30 96 62 100 62 78S94 58 94 40" fill="none" stroke={NAVY} strokeWidth="10" strokeLinecap="round" />
+      <path d="M30 120C30 96 62 100 62 78S94 58 94 40" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeDasharray="6 8" />
+      <circle cx="30" cy="120" r="9" fill={LEAF} stroke={NAVY} strokeWidth="3" />
+      <circle cx="62" cy="80" r="9" fill={LEAF} stroke={NAVY} strokeWidth="3" />
+      <circle cx="94" cy="44" r="9" fill="#FFFFFF" stroke={NAVY} strokeWidth="3" />
+      <path d="M108 22v52" fill="none" stroke={NAVY} strokeWidth="4" strokeLinecap="round" />
+      <path d="M110 24h30l-8 11 8 11h-30z" fill={ROUGE} stroke={NAVY} strokeWidth="3" strokeLinejoin="round" />
+      <path d={MAPLE} transform="translate(116 28) scale(0.5)" fill="#FFFFFF" />
+    </Ground>
+  );
+}
+
+/** Dernier tirage: the round's ticket, its CRS, the invitation it sent. */
+export function DrawIllustration({ className }: Props): ReactNode {
+  return (
+    <Ground className={className}>
+      <rect x="24" y="44" width="92" height="64" rx="10" fill="#FFFFFF" stroke={NAVY} strokeWidth="3.5" />
+      <path d="M24 64h92" fill="none" stroke={NAVY} strokeWidth="3" strokeDasharray="5 5" />
+      <text x="70" y="59" textAnchor="middle" className="font-label" fontWeight="800" fontSize="11" fill={NAVY}>
+        N° 453
+      </text>
+      <text x="70" y="95" textAnchor="middle" className="font-label" fontWeight="800" fontSize="24" fill={ROUGE}>
+        477
+      </text>
+      <rect x="100" y="78" width="40" height="28" rx="4" fill="#FFFFFF" stroke={NAVY} strokeWidth="3" />
+      <path d="M101 80l19 13 19-13" fill="none" stroke={NAVY} strokeWidth="3" strokeLinejoin="round" />
+      <circle cx="136" cy="76" r="9" fill={LEAF} stroke={NAVY} strokeWidth="2.5" />
+      <path d="M132 76l3 3 5-6" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </Ground>
+  );
+}
+
+/** Prochain tirage: the calendar, a day circled, the trend going up. */
+export function PredictionIllustration({ className }: Props): ReactNode {
+  return (
+    <Ground className={className}>
+      <rect x="24" y="36" width="80" height="82" rx="10" fill="#FFFFFF" stroke={NAVY} strokeWidth="3.5" />
+      <rect x="25.75" y="37.75" width="76.5" height="18" rx="8" fill={NAVY} />
+      <path d="M44 28v16M84 28v16" fill="none" stroke={NAVY} strokeWidth="3.5" strokeLinecap="round" />
+      <g fill={FOG}>
+        <rect x="36" y="66" width="10" height="10" rx="2" />
+        <rect x="52" y="66" width="10" height="10" rx="2" />
+        <rect x="68" y="66" width="10" height="10" rx="2" />
+        <rect x="36" y="84" width="10" height="10" rx="2" />
+        <rect x="52" y="84" width="10" height="10" rx="2" />
+        <rect x="36" y="102" width="10" height="10" rx="2" />
+      </g>
+      <circle cx="73" cy="89" r="10" fill="none" stroke={ROUGE} strokeWidth="3.5" />
+      <path d="M100 118l14-18 10 8 18-26" fill="none" stroke={ROUGE} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M130 82h12v12" fill="none" stroke={ROUGE} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+    </Ground>
+  );
+}
+
+/** Budget: a wallet, a banknote with the leaf, a coin. */
+export function BudgetIllustration({ className }: Props): ReactNode {
+  return (
+    <Ground className={className}>
+      <rect x="38" y="34" width="70" height="40" rx="6" transform="rotate(-12 73 54)" fill={ICE} stroke={NAVY} strokeWidth="3" />
+      <path d={MAPLE} transform="translate(62 42) scale(0.9) rotate(-12 12 10)" fill={ROUGE} />
+      <rect x="24" y="58" width="100" height="62" rx="12" fill={NAVY} />
+      <path d="M24 74h100" fill="none" stroke={ICE} strokeOpacity="0.4" strokeWidth="2" />
+      <rect x="92" y="80" width="40" height="26" rx="8" fill="#FFFFFF" stroke={NAVY} strokeWidth="3" />
+      <circle cx="106" cy="93" r="5" fill={ROUGE} />
+      <circle cx="132" cy="44" r="14" fill="#FFFFFF" stroke={NAVY} strokeWidth="3" />
+      <text x="132" y="48.5" textAnchor="middle" className="font-label" fontWeight="800" fontSize="12" fill={NAVY}>
+        $
+      </text>
+    </Ground>
+  );
+}
+
+/** Checklist: the documents to gather, two already in, a pen. */
+export function ChecklistIllustration({ className }: Props): ReactNode {
+  const rows = [
+    [50, true],
+    [72, true],
+    [94, false],
+  ] as const;
+  return (
+    <Ground className={className}>
+      <rect x="30" y="28" width="78" height="100" rx="10" fill="#FFFFFF" stroke={NAVY} strokeWidth="3.5" />
+      {rows.map(([y, done]) => (
+        <g key={y}>
+          <rect x="42" y={y - 7} width="14" height="14" rx="3" fill={done ? LEAF : '#FFFFFF'} stroke={NAVY} strokeWidth="2.5" />
+          {done ? <path d={`M45 ${y}l3 3 5-6`} fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /> : null}
+          <rect x="62" y={y - 3} width="34" height="6" rx="3" fill={FOG} />
+        </g>
+      ))}
+      <path d="M108 120l26-50 10 5-26 50-12 6z" fill={ROUGE} stroke={NAVY} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M131 76l10 5" fill="none" stroke={NAVY} strokeWidth="3" />
+    </Ground>
+  );
+}

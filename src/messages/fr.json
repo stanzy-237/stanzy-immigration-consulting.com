@@ -401,17 +401,9 @@
           "name": "Calculateur CRS",
           "lead": "Votre score, en 5 min"
         },
-        "points": {
-          "name": "67 points",
-          "lead": "Êtes-vous admissible ?"
-        },
         "nclc": {
           "name": "NCLC",
           "lead": "Vos notes de TCF en niveau"
-        },
-        "cnp": {
-          "name": "CNP",
-          "lead": "Le code de votre métier"
         },
         "ita": {
           "name": "Après l’ITA",
@@ -420,6 +412,30 @@
         "pdf": {
           "name": "Outil PDF",
           "lead": "Assembler, compresser"
+        },
+        "fsw": {
+          "name": "67 points",
+          "lead": "Êtes-vous admissible ?"
+        },
+        "timeline": {
+          "name": "Mon parcours",
+          "lead": "Chaque étape jusqu’à la RP"
+        },
+        "draw": {
+          "name": "Dernier tirage",
+          "lead": "Score et invitations"
+        },
+        "prediction": {
+          "name": "Prochain tirage",
+          "lead": "Date et score probables"
+        },
+        "budget": {
+          "name": "Budget",
+          "lead": "Ce que coûte le projet"
+        },
+        "checklist": {
+          "name": "Checklist",
+          "lead": "Vos documents, un par un"
         }
       },
       "eyebrow": "Entrée express · Canada",

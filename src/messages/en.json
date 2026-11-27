@@ -401,17 +401,9 @@
           "name": "CRS calculator",
           "lead": "Your score in 5 min"
         },
-        "points": {
-          "name": "67 points",
-          "lead": "Are you eligible?"
-        },
         "nclc": {
           "name": "CLB",
           "lead": "Your test scores as a level"
-        },
-        "cnp": {
-          "name": "NOC",
-          "lead": "Your job’s code"
         },
         "ita": {
           "name": "After the ITA",
@@ -420,6 +412,30 @@
         "pdf": {
           "name": "PDF tool",
           "lead": "Merge, compress"
+        },
+        "fsw": {
+          "name": "67 points",
+          "lead": "Are you eligible?"
+        },
+        "timeline": {
+          "name": "My journey",
+          "lead": "Every step to PR"
+        },
+        "draw": {
+          "name": "Latest draw",
+          "lead": "Score and invitations"
+        },
+        "prediction": {
+          "name": "Next draw",
+          "lead": "Likely date and score"
+        },
+        "budget": {
+          "name": "Budget",
+          "lead": "What the plan costs"
+        },
+        "checklist": {
+          "name": "Checklist",
+          "lead": "Your documents, one by one"
         }
       },
       "eyebrow": "Express Entry · Canada",
