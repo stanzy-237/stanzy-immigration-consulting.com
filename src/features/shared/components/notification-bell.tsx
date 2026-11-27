@@ -6,12 +6,14 @@ import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NotificationItem } from '@/features/shared/components/notification-item';
 import { useMarkRead, useUnreadCount } from '@/features/notifications/hooks/use-notifications';
 import type { Audience } from '@/features/notifications/lib/notification-links';
 import { BELL_SIZE } from '@/features/notifications/lib/notification-schema';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useTRPC } from '@/trpc/client';
 
 /**
@@ -27,45 +29,67 @@ export function NotificationBell({ audience, enabled = true }: { audience: Audie
   const { markAllRead } = useMarkRead();
   const allHref = audience === 'client' ? `/${locale}/mon-espace/notifications` : '/notifications';
 
+  const mobile = useIsMobile();
+  const badge =
+    unread > 0 ? (
+      <span
+        aria-hidden={true}
+        className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rouge px-1 text-xs leading-none font-bold text-white"
+      >
+        {unread > 9 ? '9+' : unread}
+      </span>
+    ) : null;
+  const label = unread > 0 ? t('bellUnread', { count: unread }) : t('bell');
+  const trigger = 'relative inline-flex size-10 items-center justify-center rounded-full text-navy-deep hover:bg-off-white';
+  const body = (
+    <>
+      <div className="flex items-center justify-between gap-2 border-b border-fog-light px-4 py-3">
+        <p className="font-heading text-base font-bold text-navy-deep">{t('title')}</p>
+        <button
+          type="button"
+          disabled={unread === 0}
+          onClick={() => markAllRead.mutate({})}
+          className="inline-flex items-center gap-1 text-xs font-semibold text-rouge hover:text-crimson disabled:text-slate-mute"
+        >
+          <CheckCheck aria-hidden={true} className="size-3.5" />
+          {t('markAllRead')}
+        </button>
+      </div>
+      {open ? <LatestNotifications audience={audience} onOpen={() => setOpen(false)} /> : null}
+      <div className="border-t border-fog-light px-4 py-2.5 text-center">
+        <Link href={allHref} onClick={() => setOpen(false)} className="text-sm font-semibold text-navy-deep hover:text-rouge">
+          {t('seeAll')}
+        </Link>
+      </div>
+    </>
+  );
+
+  // Phones: a bottom sheet (PWA rules), not a popover squeezed under the bell.
+  if (mobile) {
+    return (
+      <>
+        <button type="button" aria-label={label} onClick={() => setOpen(true)} className={trigger}>
+          <Bell aria-hidden={true} className="size-5" />
+          {badge}
+        </button>
+        <Drawer open={open} onOpenChange={setOpen} showSwipeHandle={true}>
+          <DrawerContent className="rounded-t-3xl bg-white pb-4">
+            <DrawerTitle className="sr-only">{t('title')}</DrawerTitle>
+            {body}
+          </DrawerContent>
+        </Drawer>
+      </>
+    );
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        aria-label={unread > 0 ? t('bellUnread', { count: unread }) : t('bell')}
-        className="relative inline-flex size-10 items-center justify-center rounded-full text-navy-deep hover:bg-off-white"
-      >
+      <PopoverTrigger aria-label={label} className={trigger}>
         <Bell aria-hidden={true} className="size-5" />
-        {unread > 0 ? (
-          <span
-            aria-hidden={true}
-            className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rouge px-1 text-xs leading-none font-bold text-white"
-          >
-            {unread > 9 ? '9+' : unread}
-          </span>
-        ) : null}
+        {badge}
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0 sm:w-96">
-        <div className="flex items-center justify-between gap-2 border-b border-fog-light px-4 py-3">
-          <p className="font-heading text-base font-bold text-navy-deep">{t('title')}</p>
-          <button
-            type="button"
-            disabled={unread === 0}
-            onClick={() => markAllRead.mutate({})}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-rouge hover:text-crimson disabled:text-slate-mute"
-          >
-            <CheckCheck aria-hidden={true} className="size-3.5" />
-            {t('markAllRead')}
-          </button>
-        </div>
-        {open ? <LatestNotifications audience={audience} onOpen={() => setOpen(false)} /> : null}
-        <div className="border-t border-fog-light px-4 py-2.5 text-center">
-          <Link
-            href={allHref}
-            onClick={() => setOpen(false)}
-            className="text-sm font-semibold text-navy-deep hover:text-rouge"
-          >
-            {t('seeAll')}
-          </Link>
-        </div>
+        {body}
       </PopoverContent>
     </Popover>
   );

@@ -71,6 +71,8 @@ const consultantOnly = {
   notes: true,
   plannedById: true,
   dossier: { select: { id: true, service: true, account: { select: { name: true } } } },
+  // A Consultation's Réunion opens on its page (« 2 Après » once over), not in the room.
+  consultation: { select: { id: true } },
   recordings: {
     orderBy: { startedAt: 'asc' },
     select: { id: true, kind: true, startedAt: true, endedAt: true, text: true },
@@ -483,7 +485,7 @@ export const meetingsRouter = createTRPCRouter({
           kind: true,
           startedAt: true,
           endedAt: true,
-          meeting: { select: { id: true, subject: true, kind: true, dossierId: true } },
+          meeting: { select: { id: true, subject: true, kind: true, dossierId: true, consultation: { select: { id: true } } } },
         },
       });
       const transcribed = new Set(rows.filter((row) => row.kind === 'TRANSCRIPTION').map((row) => row.meeting.id));

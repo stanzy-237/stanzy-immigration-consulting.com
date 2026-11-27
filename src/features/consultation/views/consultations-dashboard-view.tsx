@@ -91,9 +91,12 @@ export function ConsultationsDashboardView(): ReactNode {
 
       {view === 'calendar' ? (
         <div className="flex flex-col gap-4">
-          <QueryBoundary fallback={<Skeleton className="h-16 rounded-2xl" />}>
-            <AvailabilityBar />
-          </QueryBoundary>
+          {/* Phones reach Disponibilités from their own round button: no summary here. */}
+          <div className="max-md:hidden">
+            <QueryBoundary fallback={<Skeleton className="h-16 rounded-2xl" />}>
+              <AvailabilityBar />
+            </QueryBoundary>
+          </div>
           <QueryBoundary fallback={<Skeleton className="h-150 rounded-3xl" />}>
             <ConsultationsCalendar week={week} onWeek={(next) => startTransition(() => setWeek(next))} />
           </QueryBoundary>

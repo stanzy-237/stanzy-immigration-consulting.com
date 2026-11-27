@@ -3887,7 +3887,8 @@
         "recordings": "{count, plural, one {# enregistrement} other {# enregistrements}}",
         "nobody": "Aucun participant",
         "more": "et {count} autres",
-        "invitation": "Invitation à la réunion « {subject} » ({when}) : {link}"
+        "invitation": "Invitation à la réunion « {subject} » ({when}) : {link}",
+        "after": "Voir l’après"
       },
       "recordings": {
         "empty": "Aucun enregistrement pour l’instant : ils arrivent quelques minutes après la fin d’une réunion enregistrée.",
@@ -3895,7 +3896,8 @@
         "playLabel": "Lire l’enregistrement de « {subject} »",
         "transcribed": "Transcrite",
         "open": "Voir la réunion",
-        "duration": "{minutes} min"
+        "duration": "{minutes} min",
+        "openConsultation": "Voir l’après"
       },
       "personal": {
         "intro": "Votre salle toujours ouverte. Partagez son lien : les personnes qui ne sont pas invitées attendent que vous les fassiez entrer.",
@@ -4401,7 +4403,7 @@
         "sent": "Pièces envoyées à Stanzy",
         "submitted": "Pièces envoyées : vous pouvez encore les modifier jusqu’à ce que Stanzy les confirme.",
         "confirmed": "Pièces confirmées par Stanzy.",
-        "waiting": "Le client n’a pas encore cliqué sur « Suivant ».",
+        "waiting": "Le client n’a pas encore cliqué sur « Suivant ».",
         "toConfirm": "Le client a tout remis : vérifiez les pièces, puis confirmez-les.",
         "confirm": "Confirmer les pièces",
         "confirming": "Confirmation…",

@@ -3870,7 +3870,8 @@
         "recordings": "{count, plural, one {# recording} other {# recordings}}",
         "nobody": "No participants",
         "more": "and {count} more",
-        "invitation": "Invitation to the meeting “{subject}” ({when}): {link}"
+        "invitation": "Invitation to the meeting “{subject}” ({when}): {link}",
+        "after": "See the follow-up"
       },
       "recordings": {
         "empty": "No recordings yet: they arrive a few minutes after a recorded meeting ends.",
@@ -3878,7 +3879,8 @@
         "playLabel": "Play the recording of “{subject}”",
         "transcribed": "Transcribed",
         "open": "See the meeting",
-        "duration": "{minutes} min"
+        "duration": "{minutes} min",
+        "openConsultation": "See the follow-up"
       },
       "personal": {
         "intro": "Your room, always open. Share its link: people who aren’t invited wait until you let them in.",

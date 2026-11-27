@@ -1,6 +1,6 @@
 'use client';
 
-import { ExternalLink } from 'lucide-react';
+import { ChevronLeft, ExternalLink } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -25,7 +25,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { DashboardTabBar } from '@/features/dashboard/components/dashboard-tab-bar';
+import { DashboardTabBar, TAB_SEGMENTS } from '@/features/dashboard/components/dashboard-tab-bar';
 import { DASHBOARD_GROUPS, DASHBOARD_SECTIONS, isSectionActive } from '@/features/dashboard/data/sections';
 import { NotificationBell } from '@/features/shared/components/notification-bell';
 import { ReportProblemButton } from '@/features/shared/components/report-problem';
@@ -69,7 +69,10 @@ export function DashboardShell({
             </div>
           </header>
           {/* SidebarInset is the page's <main>. */}
-          <div className="min-w-0 flex-1 px-4 py-6 max-md:pt-safe max-md:pb-32 sm:px-7 sm:py-8">{children}</div>
+          <div className="min-w-0 flex-1 px-4 py-6 max-md:pt-safe max-md:pb-32 sm:px-7 sm:py-8">
+            <BackToMore />
+            {children}
+          </div>
           <DashboardTabBar />
         </SidebarInset>
       </SidebarProvider>
@@ -167,5 +170,26 @@ function SectionGroups(): ReactNode {
         );
       })}
     </nav>
+  );
+}
+
+/** Sections with their own back to « Plus » already (Codes promo, in its top bar). */
+const OWN_BACK = new Set(['plus', 'codes-promo', 'notifications']);
+
+/**
+ * Phones: a section opened from « Plus » (no tab of its own) starts with
+ * « ‹ Plus », back to that tab. Only on the section's first page: deeper
+ * pages carry their own way back.
+ */
+function BackToMore(): ReactNode {
+  const t = useTranslations('Dashboard.tabs');
+  const segments = useSelectedLayoutSegments();
+  const current = segments[0] ?? null;
+  if ((TAB_SEGMENTS as readonly (string | null)[]).includes(current) || OWN_BACK.has(current ?? '') || segments.length > 1) return null;
+  return (
+    <Link href="/plus" className="mb-4 flex items-center gap-1 self-start text-body-sm font-semibold text-navy-deep md:hidden">
+      <ChevronLeft aria-hidden={true} className="size-5" strokeWidth={2.4} />
+      {t('more')}
+    </Link>
   );
 }

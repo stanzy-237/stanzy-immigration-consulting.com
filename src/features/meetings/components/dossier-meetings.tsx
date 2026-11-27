@@ -344,7 +344,7 @@ export function ConsultantPart({ meeting, upcoming }: { meeting: NotedMeeting; u
               </ul>
             ) : null}
             <div className="flex flex-wrap gap-1.5">
-              {transcripts.map((file) => (
+              {transcripts.map((file, index) => (
                 <button
                   key={file.id}
                   type="button"
@@ -354,6 +354,8 @@ export function ConsultantPart({ meeting, upcoming }: { meeting: NotedMeeting; u
                 >
                   <FileText aria-hidden={true} className="size-4" />
                   {reading === file.id ? t('hideTranscript') : t('showTranscript')}
+                  {/* Two recordings (the call restarted): two Transcriptions, told apart. */}
+                  {transcripts.length > 1 ? ` ${index + 1}` : null}
                 </button>
               ))}
             </div>

@@ -10,7 +10,7 @@ import { useDeferredValue, useId, useState, type ReactNode } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { siteOriginOf } from '@/features/dashboard/lib/dashboard-host';
-import { consultantRoomPath, invitationPath, PARTICIPANTS_MAX, peopleSearchInput } from '@/features/meetings/lib/meeting-schema';
+import { consultantAfterPath, consultantRoomPath, invitationPath, PARTICIPANTS_MAX, peopleSearchInput } from '@/features/meetings/lib/meeting-schema';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
 
@@ -125,8 +125,9 @@ export function MeetingCard({ meeting, upcoming }: { meeting: HubMeeting; upcomi
 
   return (
     <li className="flex flex-col gap-4 rounded-2xl border border-fog-light bg-white p-5 shadow-sm">
+      {/* Who's in it at the top left (the card's face), its badges at the right. */}
       <div className="flex items-start justify-between gap-2">
-        <Icon aria-hidden={true} className="size-6 text-navy-deep" />
+        {people.length ? <Avatars people={people} /> : <Icon aria-hidden={true} className="size-6 text-navy-deep" />}
         <span className="flex flex-wrap justify-end gap-1">
           {meeting.kind === 'INSTANT' ? (
             <span className="rounded-full bg-ice-blue px-2 py-0.5 text-xs font-semibold text-navy-deep">{t('instant')}</span>
@@ -149,8 +150,7 @@ export function MeetingCard({ meeting, upcoming }: { meeting: HubMeeting; upcomi
           </Link>
         ) : null}
       </div>
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-3">
-        <Avatars people={people} />
+      <div className="mt-auto flex flex-wrap items-center gap-2 empty:hidden">
         {upcoming ? (
           <span className="flex gap-2">
             <Link
@@ -171,6 +171,14 @@ export function MeetingCard({ meeting, upcoming }: { meeting: HubMeeting; upcomi
               {t('copy')}
             </button>
           </span>
+        ) : meeting.consultation ? (
+          <Link
+            href={consultantAfterPath(meeting)}
+            className="inline-flex h-10 items-center gap-1.5 rounded-full bg-off-white px-4 text-sm font-semibold text-navy-deep hover:bg-fog-light"
+          >
+            <Play aria-hidden={true} className="size-4" />
+            {t('after')}
+          </Link>
         ) : files > 0 ? (
           <Link
             href={consultantRoomPath(meeting.id)}
