@@ -1604,10 +1604,27 @@
         "overduePill": "{count} overdue",
         "nextPill": "Next {time}",
         "createdPill": "+{count} this month",
-        "collectedLabel": "FCFA collected"
-      }
+        "collectedLabel": "FCFA collected",
+        "nextShort": "Next",
+        "consultation": "Consultation",
+        "meeting": "Meeting",
+        "opensAt": "Opens {time}",
+        "restUpToDate": "The rest is up to date"
+      },
+      "hello": "Hello {name}"
     },
-    "greeting": "Hello {name}"
+    "greeting": "Hello {name}",
+    "tabs": {
+      "label": "Dashboard tabs",
+      "overview": "Overview",
+      "consultations": "Consultations",
+      "reunions": "Meetings",
+      "dossiers": "Files",
+      "more": "More"
+    },
+    "more": {
+      "overdue": "{count} overdue"
+    }
   },
   "BlogDashboard": {
     "title": "Articles",

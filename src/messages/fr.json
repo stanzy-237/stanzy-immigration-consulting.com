@@ -1621,10 +1621,27 @@
         "overduePill": "{count, plural, one {# en retard} other {# en retard}}",
         "nextPill": "Prochaine {time}",
         "createdPill": "+{count} ce mois-ci",
-        "collectedLabel": "FCFA encaissés"
-      }
+        "collectedLabel": "FCFA encaissés",
+        "nextShort": "Prochaine",
+        "consultation": "Consultation",
+        "meeting": "Réunion",
+        "opensAt": "Ouvre {time}",
+        "restUpToDate": "Le reste est à jour"
+      },
+      "hello": "Bonjour {name}"
     },
-    "greeting": "Bonjour {name}"
+    "greeting": "Bonjour {name}",
+    "tabs": {
+      "label": "Onglets du tableau de bord",
+      "overview": "Aperçu",
+      "consultations": "Consultations",
+      "reunions": "Réunions",
+      "dossiers": "Dossiers",
+      "more": "Plus"
+    },
+    "more": {
+      "overdue": "{count} en retard"
+    }
   },
   "BlogDashboard": {
     "title": "Articles",

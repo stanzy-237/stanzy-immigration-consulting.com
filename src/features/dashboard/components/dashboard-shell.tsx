@@ -1,6 +1,6 @@
 'use client';
 
-import { ExternalLink, XIcon } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -25,7 +25,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
+import { DashboardTabBar } from '@/features/dashboard/components/dashboard-tab-bar';
 import { DASHBOARD_GROUPS, DASHBOARD_SECTIONS, isSectionActive } from '@/features/dashboard/data/sections';
 import { NotificationBell } from '@/features/shared/components/notification-bell';
 import { ReportProblemButton } from '@/features/shared/components/report-problem';
@@ -33,8 +33,8 @@ import { ReportProblemButton } from '@/features/shared/components/report-problem
 /**
  * The Tableau de bord's frame around every dashboard page: from tablets up,
  * the shadcn Sidebar, its sections grouped, folding down to its icons (the
- * button, ⌘/Ctrl + B, or the rail; remembered in a cookie); on phones, the
- * bottom drawer. A header with the greeting and the bell; the way back to
+ * button, ⌘/Ctrl + B, or the rail; remembered in a cookie); on phones, a tab
+ * bar and « Plus » (PWA rules). A header with the greeting and the bell; the way back to
  * the public site, on the main domain (`siteUrl`), at the bottom.
  */
 export function DashboardShell({
@@ -57,7 +57,8 @@ export function DashboardShell({
         <ShellNavigation siteUrl={siteUrl} />
 
         <SidebarInset className="min-w-0 bg-off-white">
-          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-fog-light bg-white/95 px-4 backdrop-blur sm:px-7">
+          {/* Phones have no header: each screen has its own title, and the tab bar does the navigating. */}
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-fog-light bg-white/95 px-4 backdrop-blur max-md:hidden sm:px-7">
             <div className="flex min-w-0 items-center gap-2">
               <SidebarTrigger aria-label={t('nav.toggle')} className="size-10 text-navy-deep" />
               <p className="truncate font-heading text-base font-bold text-navy-deep">{t('greeting', { name })}</p>
@@ -68,7 +69,8 @@ export function DashboardShell({
             </div>
           </header>
           {/* SidebarInset is the page's <main>. */}
-          <div className="min-w-0 flex-1 px-4 py-6 sm:px-7 sm:py-8">{children}</div>
+          <div className="min-w-0 flex-1 px-4 py-6 max-md:pt-safe max-md:pb-32 sm:px-7 sm:py-8">{children}</div>
+          <DashboardTabBar />
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>
@@ -76,42 +78,15 @@ export function DashboardShell({
 }
 
 /**
- * The sections: on phones the bottom drawer (swipe it down, or the menu
- * button), from tablets up the sidebar. The header's menu button opens the
- * one or folds the other.
+ * The sections, in the sidebar from tablets up (phones have the tab bar). The
+ * header's menu button folds it.
  */
 function ShellNavigation({ siteUrl }: { siteUrl: string }): ReactNode {
   const t = useTranslations('Dashboard');
-  const { isMobile, openMobile, setOpenMobile } = useSidebar();
+  const { isMobile } = useSidebar();
 
-  if (isMobile) {
-    return (
-      <Drawer open={openMobile} onOpenChange={setOpenMobile} showSwipeHandle>
-        <DrawerContent className="rounded-t-3xl pt-2">
-          <div className="flex shrink-0 items-center justify-between px-5 pt-2 pb-4">
-            <DrawerTitle className="font-heading text-lg font-bold text-navy-deep">{t('title')}</DrawerTitle>
-            <DrawerClose
-              aria-label={t('nav.close')}
-              className="grid size-9 place-items-center rounded-full bg-off-white text-navy-deep hover:bg-ice-blue"
-            >
-              <XIcon aria-hidden={true} className="size-4" />
-            </DrawerClose>
-          </div>
-          {/* Taller than the screen on a phone: the sections scroll, down to Outils and Contenus. */}
-          <div className="grid grid-cols-1 min-h-0 flex-1 gap-4 overflow-y-auto overscroll-contain px-4 pb-8">
-            <DrawerSections onNavigate={() => setOpenMobile(false)} />
-            <a
-              href={siteUrl}
-              className="flex h-11 items-center gap-3 rounded-xl px-3.5 text-sm font-semibold text-navy-deep hover:bg-ice-blue"
-            >
-              <ExternalLink aria-hidden={true} className="size-4.5 shrink-0" />
-              {t('viewSite')}
-            </a>
-          </div>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
+  // Phones: the tab bar at the bottom (DashboardTabBar) and « Plus » replace the sidebar.
+  if (isMobile) return null;
 
   return (
     <Sidebar collapsible="icon">
@@ -134,48 +109,6 @@ function ShellNavigation({ siteUrl }: { siteUrl: string }): ReactNode {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  );
-}
-
-/** The phone drawer's sections, under their group labels; choosing one closes it. */
-function DrawerSections({ onNavigate }: { onNavigate: () => void }): ReactNode {
-  const t = useTranslations('Dashboard.nav');
-  const segments = useSelectedLayoutSegments();
-  return (
-    <nav aria-label={t('label')} className="grid grid-cols-1 gap-4">
-      {DASHBOARD_GROUPS.map((group) => {
-        const sections = DASHBOARD_SECTIONS.filter((section) => section.group === group);
-        if (sections.length === 0) return null;
-        return (
-          <div key={group}>
-            <p className="px-3.5 pb-1 text-xs font-semibold tracking-wider text-slate uppercase">
-              {t(`groups.${group}`)}
-            </p>
-            <ul className="flex flex-col gap-1">
-              {sections.map((section) => {
-                const active = isSectionActive(section, segments);
-                const Icon = section.icon;
-                return (
-                  <li key={section.key}>
-                    <Link
-                      href={section.href}
-                      onClick={onNavigate}
-                      aria-current={active ? 'page' : undefined}
-                      className={`flex h-11 items-center gap-3 rounded-xl px-3.5 text-sm font-semibold transition-colors ${
-                        active ? 'bg-navy-deep text-white' : 'text-navy-deep hover:bg-ice-blue'
-                      }`}
-                    >
-                      <Icon aria-hidden={true} className="size-4.5 shrink-0" />
-                      {t(section.key)}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        );
-      })}
-    </nav>
   );
 }
 

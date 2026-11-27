@@ -511,3 +511,8 @@ select:not([multiple]):not([size]):not([data-slot='native-select']) {
     display: none;
   }
 }
+
+/* Below the iPhone's notch in the installed app (PWA), never less than 1.5 rem. */
+@utility pt-safe {
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+}

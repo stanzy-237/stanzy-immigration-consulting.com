@@ -11,7 +11,9 @@ import { QueryBoundary } from '@/components/query-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
 import { OverviewDate, OverviewToday, OverviewTodaySkeleton } from '@/features/dashboard/components/overview-today';
+import { useCurrentAccount } from '@/features/auth/hooks/use-current-account';
 import { InstantDialog } from '@/features/meetings/components/meeting-dialogs';
+import { NotificationBell } from '@/features/shared/components/notification-bell';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 
@@ -153,7 +155,7 @@ export function DashboardOverviewView(): ReactNode {
   const [instant, setInstant] = useState(false);
 
   const blog = (
-    <section aria-labelledby={blogId} className="rounded-3xl border border-fog-light bg-white p-5 lg:col-span-2 lg:p-6">
+    <section aria-labelledby={blogId} className="rounded-3xl border border-fog-light bg-white p-5 max-md:hidden lg:col-span-2 lg:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id={blogId} className="font-heading text-h4 font-bold text-navy-deep">
           {t('overview.blogTitle')}
@@ -174,8 +176,9 @@ export function DashboardOverviewView(): ReactNode {
   );
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-24 lg:gap-8 lg:pb-0">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div className="mx-auto flex max-w-7xl flex-col gap-5 md:gap-6 lg:gap-8">
+      <PhoneHeader />
+      <header className="flex flex-col gap-4 max-md:hidden lg:flex-row lg:items-end lg:justify-between">
         <div className="flex flex-col gap-1.5">
           <OverviewDate />
           <h1 className="font-heading text-h2 leading-11 font-extrabold tracking-tight text-navy-deep lg:text-h1 lg:leading-14">{t('nav.overview')}</h1>
@@ -197,7 +200,7 @@ export function DashboardOverviewView(): ReactNode {
         <OverviewToday blog={blog} />
       </QueryBoundary>
 
-      <section aria-labelledby={drawsId} className="rounded-3xl border border-fog-light bg-white p-5 lg:p-6">
+      <section aria-labelledby={drawsId} className="rounded-3xl border border-fog-light bg-white p-5 max-md:hidden lg:p-6">
         <h2 id={drawsId} className="flex items-center gap-2 font-heading text-h4 font-bold text-navy-deep">
           <TrendingUp aria-hidden={true} className="size-5 text-rouge" />
           {t('overview.draws.title')}
@@ -207,15 +210,35 @@ export function DashboardOverviewView(): ReactNode {
         </QueryBoundary>
       </section>
 
-      {/* Phone: « Ouvrir un dossier » floats over the page. */}
-      <Link
-        href="/dossiers/nouveau"
-        className="fixed right-4 bottom-6 z-30 inline-flex h-14 items-center gap-2 rounded-full bg-rouge px-6 font-heading text-body font-bold text-white shadow-lg lg:hidden"
-      >
-        <Plus aria-hidden={true} className="size-5" strokeWidth={2.4} />
-        {t('overview.today.newDossier')}
-      </Link>
       <InstantDialog open={instant} onOpenChange={setInstant} />
     </div>
+  );
+}
+
+/**
+ * Phones (`Mobile v2 · 1 Aperçu`): the day and « Bonjour Richil », the bell
+ * and « + » (Ouvrir un dossier). The shell has no header there.
+ */
+function PhoneHeader(): ReactNode {
+  const t = useTranslations('Dashboard');
+  const { account } = useCurrentAccount();
+  const name = account?.name.trim().split(/\s+/)[0] ?? '';
+  return (
+    <header className="flex items-center justify-between gap-3 md:hidden">
+      <div className="flex min-w-0 flex-col">
+        <span className="text-body-sm text-slate first-letter:uppercase">
+          <OverviewDate plain={true} />
+        </span>
+        <h1 className="truncate font-heading text-h4 leading-7 font-extrabold tracking-tight text-navy-deep">{t('overview.hello', { name })}</h1>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        <span className="flex size-11 items-center justify-center rounded-full border border-fog-light bg-white">
+          <NotificationBell audience="consultant" />
+        </span>
+        <Link href="/dossiers/nouveau" aria-label={t('overview.today.newDossier')} className="flex size-11 items-center justify-center rounded-full bg-rouge text-white">
+          <Plus aria-hidden={true} className="size-5" strokeWidth={2.6} />
+        </Link>
+      </div>
+    </header>
   );
 }

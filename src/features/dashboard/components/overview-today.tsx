@@ -9,7 +9,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { CollectedIllustration, CountdownIllustration, DossierIllustration } from '@/features/dashboard/components/overview-illustrations';
+import { CollectedIllustration, CountdownIllustration, DossierIllustration, ToHandleIllustration } from '@/features/dashboard/components/overview-illustrations';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 import type { RouterOutputs } from '@/trpc/types';
@@ -20,10 +20,11 @@ const card = 'rounded-3xl border border-fog-light bg-white';
 const PRESS = 'transition-transform duration-150 ease-standard active:scale-97 motion-reduce:active:scale-100';
 
 /** « Lundi 23 novembre », over the title. */
-export function OverviewDate(): ReactNode {
+export function OverviewDate({ plain = false }: { plain?: boolean }): ReactNode {
   const format = useFormatter();
   const now = useNow({ updateInterval: 60_000 });
-  return <p className="font-label text-caption font-bold tracking-wide text-steel-blue uppercase">{format.dateTime(now, { weekday: 'long', day: 'numeric', month: 'long', timeZone: DOUALA })}</p>;
+  const text = format.dateTime(now, plain ? { weekday: 'long', day: 'numeric', month: 'short', timeZone: DOUALA } : { weekday: 'long', day: 'numeric', month: 'long', timeZone: DOUALA });
+  return plain ? text : <p className="font-label text-caption font-bold tracking-wide text-steel-blue uppercase">{text}</p>;
 }
 
 /** The day: four figures, « À traiter », « Aujourd'hui », the live promo code, « Dossiers récents ». `blog` sits beside the Dossiers. */
@@ -32,13 +33,13 @@ export function OverviewToday({ blog }: { blog: ReactNode }): ReactNode {
   const { data } = useSuspenseQuery({ ...trpc.overview.today.queryOptions(), refetchInterval: 60_000 });
   return (
     <div className="flex flex-col gap-6">
-      <Figures data={data} />
-      {/* Phone (`Aperçu · Mobile`): the next Réunion right under the figures. */}
+      {/* Below `lg` (`Mobile v2 · 1 Aperçu`): the next Réunion first. */}
       {data.meetings.next ? (
         <div className="lg:hidden">
           <NextMeeting data={data} />
         </div>
       ) : null}
+      <Figures data={data} />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
           <ToHandle data={data} />
@@ -47,7 +48,8 @@ export function OverviewToday({ blog }: { blog: ReactNode }): ReactNode {
           <div className="flex flex-1 flex-col max-lg:hidden">
             <TodayList data={data} />
           </div>
-          {data.promo ? <Promo promo={data.promo} /> : <NoPromo />}
+          {/* Phones: the promo code is in « Plus ». */}
+          <div className="max-md:hidden">{data.promo ? <Promo promo={data.promo} /> : <NoPromo />}</div>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
@@ -83,6 +85,10 @@ type Figure = {
   pill: { text: string; tone: 'rouge' | 'navy' | 'leaf' } | null;
   band: string;
   art: ReactNode;
+  /** Below `lg` (`Mobile v2 · 1 Aperçu`): a small spot instead of the band. */
+  spot: ReactNode;
+  /** Below `lg`, where the tile is narrow (« 2,59 M »). */
+  compact?: string;
   dark?: boolean;
 };
 
@@ -99,6 +105,7 @@ function Figures({ data }: { data: Today }): ReactNode {
   const month = format.dateTime(new Date(`${data.collected.month}-15T12:00:00Z`), { month: 'long', timeZone: 'UTC' });
   const overdue = data.toHandle.overdue.count;
   const art = 'absolute top-1 left-3 size-28';
+  const spot = 'size-11';
   const figures: Figure[] = [
     {
       key: 'toHandle',
@@ -108,6 +115,7 @@ function Figures({ data }: { data: Today }): ReactNode {
       pill: overdue ? { text: t('overduePill', { count: overdue }), tone: 'rouge' } : null,
       band: 'bg-navy-80',
       art: <Image src="/stanzy/pointr.svg" alt="" width={96} height={168} className="absolute top-2.5 left-3.5 h-42 w-24" />,
+      spot: <ToHandleIllustration className={spot} />,
       dark: true,
     },
     {
@@ -118,6 +126,7 @@ function Figures({ data }: { data: Today }): ReactNode {
       pill: data.meetings.next ? { text: t('nextPill', { time: time(data.meetings.next.startsAt) }), tone: 'navy' } : null,
       band: 'bg-ice-blue',
       art: <CountdownIllustration className={art} />,
+      spot: <CountdownIllustration className={spot} />,
     },
     {
       key: 'dossiers',
@@ -127,25 +136,28 @@ function Figures({ data }: { data: Today }): ReactNode {
       pill: data.dossiers.openedThisMonth ? { text: t('createdPill', { count: data.dossiers.openedThisMonth }), tone: 'navy' } : null,
       band: 'bg-ice-blue',
       art: <DossierIllustration className={art} />,
+      spot: <DossierIllustration className={spot} />,
     },
     {
       key: 'collected',
       label: t('collectedLabel'),
       short: t('collectedShort'),
       value: format.number(data.collected.total, { maximumFractionDigits: 0 }),
+      compact: format.number(data.collected.total, { notation: 'compact', maximumFractionDigits: 2 }),
       pill: { text: month, tone: 'leaf' },
       band: 'bg-leaf-tint',
       art: <CollectedIllustration className={art} />,
+      spot: <CollectedIllustration className={spot} />,
     },
   ];
   return (
-    <ul aria-label={t('figures')} className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible lg:px-0">
+    <ul aria-label={t('figures')} className="grid grid-cols-2 gap-2.5 lg:grid-cols-4 lg:gap-5">
       {figures.map((f) => (
         <li
           key={f.key}
           className={cn(
             // `relative`: keeps the sr-only pill text inside the strip, not off the page's edge.
-            'relative flex w-32 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border lg:w-auto lg:rounded-3xl',
+            'relative flex flex-col overflow-hidden rounded-2xl border lg:rounded-3xl',
             f.dark ? 'border-navy-deep bg-navy-deep text-white' : 'border-fog-light bg-white text-navy-deep',
           )}
         >
@@ -162,11 +174,20 @@ function Figures({ data }: { data: Today }): ReactNode {
               </span>
             ) : null}
           </div>
-          <div className="flex flex-col gap-1.5 p-3.5 lg:gap-1 lg:px-5 lg:pt-4 lg:pb-5">
+          <div className="flex flex-1 flex-col gap-1 p-3.5 lg:px-5 lg:pt-4 lg:pb-5">
+            <span aria-hidden={true} className="mb-1.5 lg:hidden">
+              {f.spot}
+            </span>
             {/* A long amount (« 2 592 500 ») steps down a size so it stays in its card. */}
-            <span className={cn('font-heading text-h3 leading-8 font-extrabold whitespace-nowrap tabular-nums lg:leading-11', f.value.length > 6 ? 'lg:text-h3' : 'lg:text-h2')}>{f.value}</span>
+            <span className={cn('font-heading text-h4 leading-8 font-extrabold whitespace-nowrap tabular-nums sm:text-h3 lg:leading-11', f.value.length > 6 ? 'lg:text-h3' : 'lg:text-h2')}>
+              <span className={cn(f.compact && 'lg:hidden', !f.compact && 'hidden')}>{f.compact}</span>
+              <span className={cn(f.compact && 'max-lg:hidden')}>{f.value}</span>
+            </span>
             <span className={cn('text-caption leading-4 lg:text-body-sm', f.dark ? 'text-white/80' : 'text-slate')}>
-              <span className="lg:hidden">{f.short}</span>
+              <span className="lg:hidden">
+                {f.short}
+                {f.pill && f.key === 'toHandle' ? ` · ${f.pill.text}` : ''}
+              </span>
               <span className="max-lg:hidden">{f.label}</span>
             </span>
             {/* What the pill says, for screen readers (the band is decorative). */}
@@ -216,6 +237,7 @@ function ToHandle({ data }: { data: Today }): ReactNode {
           {t('toHandle')}
         </h2>
         <span className="text-caption text-slate max-lg:hidden">{t('oldestFirst')}</span>
+        {!allDone && rows.some((row) => row.count === 0) ? <span className="text-caption text-slate lg:hidden">{t('restUpToDate')}</span> : null}
       </div>
       {allDone ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 pt-2 pb-8 text-center">
@@ -226,7 +248,8 @@ function ToHandle({ data }: { data: Today }): ReactNode {
       ) : (
         <ul className="flex flex-1 flex-col divide-y divide-fog-light border-t border-fog-light">
           {rows.map((row) => (
-            <li key={row.key} className="flex flex-1">
+            // Below `lg` only what waits: the empty lines stay on wider screens.
+            <li key={row.key} className={cn('flex flex-1', row.count === 0 && 'max-lg:hidden')}>
               <Link href={row.href} className={cn('flex min-w-0 flex-1 items-center gap-4 px-5 py-4 lg:px-6', row.urgent ? 'bg-blush hover:bg-blush/70' : 'hover:bg-off-white')}>
                 <span
                   aria-hidden={true}
@@ -325,42 +348,41 @@ function JoinButton({ meeting, wide }: { meeting: Today['meetings']['today'][num
   );
 }
 
-/** Phone « Prochaine réunion »: navy, the next one big with « Rejoindre », the rest of the day under it. */
+/**
+ * Below `lg` (`Mobile v2 · 1 Aperçu`): the next Réunion in one line, its time
+ * in a tile, who, and « Rejoindre » once the room opens (« Ouvre 13:45 » before).
+ */
 function NextMeeting({ data }: { data: Today }): ReactNode {
   const t = useTranslations('Dashboard.overview.today');
   const format = useFormatter();
   const now = useNow({ updateInterval: 30_000 });
-  const { today, next } = data.meetings;
-  const time = (d: Date | string) => format.dateTime(new Date(d), { hour: '2-digit', minute: '2-digit', timeZone: DOUALA });
+  const { next } = data.meetings;
   if (!next) return null;
-  const rest = today.filter((m) => m.id !== next.id && !m.past);
+  const starts = new Date(next.startsAt);
+  const time = (d: Date) => format.dateTime(d, { hour: '2-digit', minute: '2-digit', timeZone: DOUALA });
+  const who = next.subject.replace(/^Consultation · /, '');
   return (
-    <section aria-labelledby="next-meeting" className="flex flex-col gap-4 rounded-3xl bg-navy-deep p-5 text-white">
-      <div className="flex items-center justify-between gap-3">
+    <section aria-labelledby="next-meeting" className="flex items-center gap-3.5 rounded-2xl bg-navy-deep p-3.5 text-white">
+      <span className="flex w-18 shrink-0 flex-col items-center justify-center rounded-xl bg-white/10 px-1 py-2">
+        <span className="font-heading text-body font-extrabold tabular-nums">{time(starts)}</span>
+        <span className="font-label text-label font-bold whitespace-nowrap text-rose">{format.relativeTime(starts, { now, style: 'short' })}</span>
+      </span>
+      <Link href={meetingHref(next)} className="flex min-w-0 flex-1 flex-col">
         <h2 id="next-meeting" className="font-label text-label font-bold tracking-wide text-white/70 uppercase">
-          {t('nextMeeting')}
+          {t('nextShort')}
         </h2>
-        <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-caption font-semibold">{format.relativeTime(new Date(next.startsAt), now)}</span>
-      </div>
-      <Link href={meetingHref(next)} className="flex flex-col gap-1">
-        <span className="font-heading text-h4 font-extrabold">
-          {time(next.startsAt)} · {next.subject}
-        </span>
-        <span className="text-body-sm text-white/70">{[next.consultationId && next.paid ? t('paidConsultation') : null, t('doualaTime')].filter(Boolean).join(' · ')}</span>
+        <span className="truncate text-body font-bold">{who}</span>
+        <span className="text-caption text-white/70">{next.consultationId ? (next.paid ? t('paidConsultation') : t('consultation')) : t('meeting')}</span>
       </Link>
-      <JoinButton meeting={next} wide={true} />
-      {rest.length ? (
-        <ul className="flex flex-col gap-2 border-t border-white/15 pt-3">
-          {rest.map((m) => (
-            <li key={m.id}>
-              <Link href={meetingHref(m)} className="flex gap-3 text-body-sm">
-                <span className="w-12 shrink-0 font-bold tabular-nums">{time(m.startsAt)}</span>
-                <span className="truncate text-white/85">{m.subject}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      {next.joinable ? (
+        <Link href={`/reunions/${next.id}`} className={cn('flex h-10 shrink-0 animate-ring-once items-center rounded-full bg-white px-4 font-heading text-body-sm font-bold text-navy-deep motion-reduce:animate-none', PRESS)}>
+          {t('join')}
+        </Link>
+      ) : (
+        <span className="shrink-0 rounded-full bg-white/10 px-3 py-2 font-heading text-caption font-bold whitespace-nowrap text-white/70">
+          {t('opensAt', { time: time(new Date(starts.getTime() - 15 * 60_000)) })}
+        </span>
+      )}
     </section>
   );
 }
