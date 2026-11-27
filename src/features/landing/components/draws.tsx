@@ -65,7 +65,7 @@ export function Draws(): ReactNode {
               id="draws-title"
               className="font-heading text-[clamp(32px,4vw,48px)] font-bold leading-none tracking-tight text-white"
             >
-              {t('titleLead')}
+              {t('titleLead')}{' '}
               <br />
               {t('titleRest')}
               <span

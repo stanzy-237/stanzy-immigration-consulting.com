@@ -14,7 +14,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ToolsGrid.Items',
   });
-  return shareMetadata({ locale, path: '/outils/cnp', card: 'cnp', title: t('cnpName'), description: t('cnpDesc') });
+  return shareMetadata({ locale, path: '/outils/cnp', card: 'cnp', title: t('cnpName'), description: t('cnpDesc'), indexable: false });
 }
 
 export default async function Page({

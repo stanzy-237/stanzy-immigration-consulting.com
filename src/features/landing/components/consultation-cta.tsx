@@ -42,7 +42,7 @@ export function ConsultationCta(): ReactNode {
               id="consultation-cta-title"
               className="font-heading text-[clamp(26px,3.5vw,44px)] font-bold leading-none tracking-tight text-navy-deep lg:leading-[1.08]"
             >
-              {t('titleLead')}
+              {t('titleLead')}{' '}
               <br />
               <span className="text-rouge">{t('titleAccent')}</span>
             </h2>

@@ -43,7 +43,7 @@ export function Subscribe(): ReactNode {
               id="subscribe-title"
               className="font-heading text-[clamp(30px,3.6vw,46px)] font-bold leading-none tracking-tight text-navy-deep"
             >
-              {t('titleLead')}
+              {t('titleLead')}{' '}
               <br />
               <span className="text-rouge">{t('titleRest')}</span>
             </h2>

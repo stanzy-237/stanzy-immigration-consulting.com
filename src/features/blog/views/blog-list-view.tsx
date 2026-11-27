@@ -52,7 +52,7 @@ export async function BlogListView({ locale: rawLocale, params }: { locale: stri
       <main>
         {/* Phones (`PWA · Blog · Filtres · Retenu`): a short header, then one row of pills that scrolls. */}
         <header className="flex flex-col gap-0.5 px-5 pt-6 md:hidden">
-          <h1 className="font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep">{t('phoneTitle')}</h1>
+          <p role="heading" aria-level={1} className="font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep">{t('phoneTitle')}</p>
           <p className="text-body-sm text-slate">{t('title')}</p>
         </header>
         <nav aria-label={t('filtersLabel')} className="no-scrollbar mt-4 flex snap-x scroll-px-5 gap-2 overflow-x-auto px-5 pb-1 md:hidden">

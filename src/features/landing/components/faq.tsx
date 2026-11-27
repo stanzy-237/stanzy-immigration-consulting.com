@@ -4,6 +4,7 @@ import { ArrowRight, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
+import { JsonLd } from '@/components/json-ld';
 import { Link } from '@/i18n/navigation';
 import { FAQ_ITEMS, type FaqItem } from '@/features/landing/data/faq';
 
@@ -17,6 +18,18 @@ export function Faq(): ReactNode {
       aria-labelledby="faq-title"
       className="bg-navy-deep px-5 py-14 md:px-7 md:py-24 text-white"
     >
+      {/* The same questions and answers, for search and AI engines (schema.org FAQPage). */}
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: FAQ_ITEMS.map((item) => ({
+            '@type': 'Question',
+            name: tItems(item.qKey),
+            acceptedAnswer: { '@type': 'Answer', text: tItems(item.aKey) },
+          })),
+        }}
+      />
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         {/* Left column */}
         <div>
@@ -33,7 +46,7 @@ export function Faq(): ReactNode {
             id="faq-title"
             className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-none tracking-tight text-white"
           >
-            {t('titleLead')}
+            {t('titleLead')}{' '}
             <br />
             <span className="text-rouge">{t('titleAccent')}</span>
           </h2>

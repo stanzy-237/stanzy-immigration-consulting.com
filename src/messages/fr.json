@@ -57,7 +57,7 @@
       },
       "Services": {
         "consultationName": "Consultation privée",
-        "consultationDesc": "60 minutes avec notre consultante en immigration",
+        "consultationDesc": "Un échange vidéo avec Stanzy, et un plan d'action écrit",
         "accompagnementName": "Accompagnement complet",
         "accompagnementDesc": "Suivi de A à Z pour votre dossier Entrée Express",
         "verificationName": "Vérification de documents",
@@ -95,8 +95,8 @@
       "Items": {
         "timelineName": "Timeline Immigration",
         "timelineDesc": "Visualisez chaque étape de votre parcours vers la Résidence Permanente. Du profil à l'ITA, en passant par le tirage.",
-        "cloudsName": "Clouds",
-        "cloudsDesc": "Analyse nuagique de votre profil. Identifiez vos forces et vos axes d'amélioration pour maximiser votre score CRS.",
+        "cloudsName": "Coffre-fort",
+        "cloudsDesc": "Rangez vos documents d'immigration au même endroit, chiffrés et accessibles partout : passeport, diplômes, résultats de test.",
         "itaName": "Compte à rebours ITA",
         "itaDesc": "Vous avez reçu une ITA ? Vous avez 60 jours. Notre chrono vous guide étape par étape pour ne rien manquer.",
         "fswName": "Calculateur de 67 points",
@@ -193,7 +193,7 @@
       "titleAccent": "notre priorité.",
       "description": "Une session individuelle avec un expert Stanzy pour analyser votre profil CRS, identifier vos forces et définir la stratégie optimale pour votre Entrée Express.",
       "ctaBook": "Booker une consultation",
-      "note": "Prend environ 2 minutes · Session vidéo 60 min · Échange confidentiel",
+      "note": "Prend environ 2 minutes · Session vidéo · Échange confidentiel",
       "noteBold": "2 minutes",
       "imageAlt": "Expert en immigration Stanzy",
       "badge": {
@@ -210,7 +210,7 @@
       "cardAriaLabel": "Ouvrir le service : {name}",
       "Items": {
         "consultationName": "Consultation privée",
-        "consultationDesc": "60 minutes avec un expert Stanzy pour analyser votre profil CRS et définir la stratégie optimale.",
+        "consultationDesc": "Un échange vidéo avec un expert Stanzy pour analyser votre profil CRS et définir la stratégie optimale.",
         "accompagnementName": "Accompagnement Entrée Express",
         "accompagnementDesc": "Suivi complet de votre procédure Entrée Express, de la création du profil jusqu'à l'obtention de votre Résidence Permanente.",
         "verificationName": "Vérification & soumission des documents",
@@ -478,7 +478,8 @@
       "contactLead": "Email, téléphone, bureau à Douala"
     },
     "ContactPage": {
-      "metaTitle": "Contact · Stanzy",
+      "metaTitle": "Nous contacter",
+      "metaDescription": "Une question sur votre projet Canada ou l'Entrée Express ? Écrivez à Stanzy par e-mail, WhatsApp ou téléphone depuis Douala : réponse dans la journée.",
       "title": "Contact",
       "lead": "Une question sur votre projet Canada ? Écrivez à Stanzy, réponse dans la journée.",
       "email": {
@@ -1071,6 +1072,7 @@
   },
   "Draws": {
     "metaTitle": "Derniers tirages Entrée Express",
+    "metaDescription": "Score CRS minimum, nombre d'invitations et catégorie de chaque tirage Entrée Express d'IRCC, mis à jour après chaque ronde et comparés à votre profil.",
     "eyebrow": "Express Entry · Données IRCC",
     "title": "Les tirages, sans détour.",
     "subtitle": "Suivez les derniers tirages Entrée express et trouvez le score qui vous concerne.",

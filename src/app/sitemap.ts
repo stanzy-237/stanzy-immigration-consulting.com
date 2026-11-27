@@ -17,14 +17,11 @@ const PAGES = [
   '/outils/dernier-tirage',
   '/outils/prochain-tirage',
   '/outils/compte-a-rebours-ita',
-  '/outils/timeline',
   '/outils/budget',
   '/outils/checklist',
   '/outils/pdf',
   '/services/consultation',
   '/services/accompagnement',
-  '/services/ede',
-  '/services/verification',
 ];
 
 export const revalidate = 3600;

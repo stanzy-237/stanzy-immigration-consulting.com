@@ -15,7 +15,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ServicesGrid.Items',
   });
-  return shareMetadata({ locale, path: '/services/ede', card: 'ede', title: t('edeName'), description: t('edeDesc') });
+  return shareMetadata({ locale, path: '/services/ede', card: 'ede', title: t('edeName'), description: t('edeDesc'), indexable: false });
 }
 
 export default async function Page({

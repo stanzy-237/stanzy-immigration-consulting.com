@@ -4,10 +4,12 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Plus_Jakarta_Sans, Syne, Work_Sans } from 'next/font/google';
 
+import { JsonLd } from '@/components/json-ld';
 import { NavigationProgress } from '@/components/navigation-progress';
 import { ServiceWorkerRegister } from '@/components/service-worker-register';
 import { SiteAnalytics } from '@/components/site-analytics';
 import { ErrorTracking } from '@/features/reports/components/error-tracking';
+import { organizationJsonLd } from '@/features/landing/lib/organization-json-ld';
 import { Toaster } from '@/components/ui/toast';
 import { DrawAlertsAuto } from '@/features/draws/components/draw-alerts-auto';
 import { routing, type LocaleParams } from '@/i18n/routing';
@@ -51,7 +53,8 @@ export async function generateMetadata({
   const card = shareImage(locale, 'accueil', t('title'));
   return {
     metadataBase: new URL(siteUrl()),
-    title: t('title'),
+    // Every page's own title, then the brand (the home page sets its whole title, see page.tsx).
+    title: { default: t('title'), template: '%s | Stanzy' },
     description: t('description'),
     // The default card, for a page without its own (see shareMetadata).
     openGraph: {
@@ -88,6 +91,7 @@ export default async function LocaleLayout({
   }
 
   setRequestLocale(locale);
+  const meta = await getTranslations({ locale, namespace: 'Metadata' });
 
   return (
     // suppressHydrationWarning: browser extensions (e.g. LanguageTool) add
@@ -112,6 +116,7 @@ export default async function LocaleLayout({
           </TRPCReactProvider>
         </NextIntlClientProvider>
         <ServiceWorkerRegister />
+        <JsonLd data={organizationJsonLd(siteUrl(), meta('description'))} />
       </body>
     </html>
   );

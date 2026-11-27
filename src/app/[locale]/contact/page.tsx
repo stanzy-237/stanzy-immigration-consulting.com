@@ -7,7 +7,7 @@ import { shareMetadata } from '@/lib/share-metadata';
 export async function generateMetadata({ params }: { params: LocaleParams }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Home.ContactPage' });
-  return shareMetadata({ locale, path: '/contact', card: 'accueil', title: t('metaTitle'), description: t('lead') });
+  return shareMetadata({ locale, path: '/contact', card: 'accueil', title: t('metaTitle'), description: t('metaDescription') });
 }
 
 export default async function Page({ params }: { params: LocaleParams }) {

@@ -190,7 +190,7 @@ export function ToolsGrid({
           id="tools-grid-title"
           className="mb-2.5 font-heading text-[clamp(34px,4vw,52px)] font-bold leading-none tracking-tight text-navy-deep"
         >
-          {t("titleLead")}
+          {t("titleLead")}{' '}
           <br />
           <span className="text-rouge">{t("titleAccent")}</span>
         </Heading>

@@ -15,7 +15,7 @@ export async function generateMetadata({
     namespace: 'Home.ToolsGrid.Items',
   });
   const nav = await getTranslations({ locale, namespace: 'Home.Nav.Tools' });
-  return shareMetadata({ locale, path: '/outils/coffre-fort', card: 'coffre-fort', title: t('cloudsName'), description: nav('cloudsDesc') });
+  return shareMetadata({ locale, path: '/outils/coffre-fort', card: 'coffre-fort', title: t('cloudsName'), description: nav('cloudsDesc'), indexable: false });
 }
 
 export default async function Page({

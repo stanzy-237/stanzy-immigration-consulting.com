@@ -15,7 +15,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ServicesGrid.Items',
   });
-  return shareMetadata({ locale, path: '/services/verification', card: 'verification', title: t('verificationName'), description: t('verificationDesc') });
+  return shareMetadata({ locale, path: '/services/verification', card: 'verification', title: t('verificationName'), description: t('verificationDesc'), indexable: false });
 }
 
 export default async function Page({

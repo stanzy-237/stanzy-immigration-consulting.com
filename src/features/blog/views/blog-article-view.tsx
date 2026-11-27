@@ -12,6 +12,9 @@ import { SiteFooter } from '@/features/landing/components/site-footer';
 import { SiteNav } from '@/features/landing/components/site-nav';
 import { isOptimisableImage } from '@/features/blog/lib/render-article';
 import { Link } from '@/i18n/navigation';
+import { JsonLd } from '@/components/json-ld';
+import { articleJsonLd } from '@/features/blog/lib/article-json-ld';
+import { siteUrl } from '@/lib/site-url';
 
 /** A published Article's page; a draft or an unknown slug is the site's 404. */
 export async function BlogArticleView({ locale: rawLocale, slug }: { locale: string; slug: string }): Promise<ReactNode> {
@@ -27,6 +30,18 @@ export async function BlogArticleView({ locale: rawLocale, slug }: { locale: str
       <SiteNav />
       <main className="bg-white">
         <article className="mx-auto max-w-3xl px-4 py-10 sm:px-7 sm:py-14" lang={article.locale}>
+          <JsonLd
+            data={articleJsonLd(
+              {
+                ...article,
+                title: article.seoTitle || article.title,
+                description: article.seoDescription || article.excerpt,
+                categoryName: categoryName(article.category, article.locale),
+              },
+              siteUrl(),
+              { home: 'Stanzy', blog: 'Blog' },
+            )}
+          />
           <Link href="/blog" className="mb-8 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-deep hover:text-rouge">
             <ArrowLeft aria-hidden={true} className="size-4" />
             {t('backToBlog')}

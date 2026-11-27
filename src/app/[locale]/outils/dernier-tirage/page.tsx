@@ -16,7 +16,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Draws' });
-  return shareMetadata({ locale, path: '/outils/dernier-tirage', card: 'dernier-tirage', title: t('metaTitle'), description: t('subtitle') });
+  return shareMetadata({ locale, path: '/outils/dernier-tirage', card: 'dernier-tirage', title: t('metaTitle'), description: t('metaDescription') });
 }
 
 export default async function Page({

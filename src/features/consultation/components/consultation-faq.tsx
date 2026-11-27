@@ -47,7 +47,7 @@ export function ConsultationFaq({ moveCutoffHours }: { moveCutoffHours: number }
             <span className="text-caption font-semibold tracking-widest uppercase">{t('eyebrow')}</span>
           </div>
           <h2 id="consultation-faq" className="font-heading text-h2 leading-none font-bold tracking-tight lg:text-5xl">
-            {t('titleLead')}
+            {t('titleLead')}{' '}
             <br />
             <span className="text-rouge">{t('titleAccent')}</span>
           </h2>
