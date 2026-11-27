@@ -10,7 +10,7 @@ vi.mock('next-intl/server', () => ({
     key === 'readingMinutes' ? `${values?.minutes} min de lecture` : 'Le blog Stanzy',
 }));
 
-const { articleShareImage, coverSource } = await import('@/features/blog/server/article-share-image');
+const { articleShareImage, CARD_CACHE_CONTROL, coverSource } = await import('@/features/blog/server/article-share-image');
 
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47];
 
@@ -32,6 +32,7 @@ describe('articleShareImage', () => {
 
     expect(response.headers.get('content-type')).toBe('image/png');
     expect([...bytes.slice(0, 4)]).toEqual(PNG_SIGNATURE);
+    expect(response.headers.get('cache-control')).toBe(CARD_CACHE_CONTROL);
     if (process.env.SHARE_IMAGE_OUT) await writeFile(process.env.SHARE_IMAGE_OUT, bytes);
   });
 
