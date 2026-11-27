@@ -22,6 +22,7 @@ const dataUri = (bytes: Buffer, type: string) => `data:${type};base64,${bytes.to
 /** The only cover formats Satori decodes; a WebP or AVIF upload would make the whole card fail. */
 const DRAWABLE = new Set(['image/png', 'image/jpeg']);
 const COVER_TIMEOUT_MS = 5000;
+export const CARD_CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=86400';
 
 const typeFromName = (name: string) =>
   /\.png$/i.test(name) ? 'image/png' : /\.jpe?g$/i.test(name) ? 'image/jpeg' : null;
@@ -129,6 +130,10 @@ export async function articleShareImage(slug: string, locale: string): Promise<I
     ),
     {
       ...SHARE_IMAGE_SIZE,
+      // Drawing takes seconds and share bots wait less than that: the CDN keeps
+      // the card 5 minutes (like the Article, BLOG_CACHE_SECONDS) and serves the
+      // last one for a day while it redraws.
+      headers: { 'Cache-Control': CARD_CACHE_CONTROL },
       fonts: [
         { name: 'Syne', data: syne, weight: 800, style: 'normal' },
         { name: 'Plus Jakarta Sans', data: jakarta, weight: 700, style: 'normal' },
