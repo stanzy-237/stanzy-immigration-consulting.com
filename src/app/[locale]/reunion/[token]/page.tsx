@@ -3,13 +3,14 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { requireSession } from '@/features/auth/server/guards';
 import { InvitationView } from '@/features/meetings/views/invitation-view';
 import { HydrateClient, prefetch, trpc } from '@/trpc/server';
+import { shareMetadata } from '@/lib/share-metadata';
 
 type Params = Promise<{ locale: string; token: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
-  const { locale } = await params;
+  const { locale, token } = await params;
   const t = await getTranslations({ locale, namespace: 'Meetings.hub.invitation' });
-  return { title: t('title'), robots: { index: false } };
+  return shareMetadata({ locale, path: `/reunion/${token}`, card: 'reunion', title: t('title'), indexable: false });
 }
 
 // Signed in only: everyone joins with their account (ADR 0005).

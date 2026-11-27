@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ItaCountdownView } from '@/features/ita-countdown/views/ita-countdown-view';
 import type { LocaleParams } from '@/i18n/routing';
 import { HydrateClient, prefetch, publicTrpc } from '@/trpc/server';
+import { shareMetadata } from '@/lib/share-metadata';
 
 // Static; the « Derniers tirages » shortcut's Tirages are in its HTML, refreshed every 5 minutes.
 export const revalidate = 300;
@@ -17,7 +18,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ToolsGrid.Items',
   });
-  return { title: t('itaName') };
+  return shareMetadata({ locale, path: '/outils/compte-a-rebours-ita', card: 'compte-a-rebours-ita', title: t('itaName'), description: t('itaDesc') });
 }
 
 export default async function Page({

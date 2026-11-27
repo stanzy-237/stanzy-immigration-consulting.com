@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { ServicePlaceholderView } from '@/features/service-placeholder/views/service-placeholder-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { shareMetadata } from '@/lib/share-metadata';
 
 export async function generateMetadata({
   params,
@@ -14,7 +15,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ServicesGrid.Items',
   });
-  return { title: t('verificationName') };
+  return shareMetadata({ locale, path: '/services/verification', card: 'verification', title: t('verificationName'), description: t('verificationDesc') });
 }
 
 export default async function Page({

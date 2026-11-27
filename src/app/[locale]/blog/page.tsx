@@ -2,11 +2,12 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { BlogListView, type BlogListParams } from '@/features/blog/views/blog-list-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { shareMetadata } from '@/lib/share-metadata';
 
 export async function generateMetadata({ params }: { params: LocaleParams }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Blog' });
-  return { title: t('metaTitle'), description: t('metaDescription') };
+  return shareMetadata({ locale, path: '/blog', card: 'blog', title: t('metaTitle'), description: t('metaDescription') });
 }
 
 export default async function Page({

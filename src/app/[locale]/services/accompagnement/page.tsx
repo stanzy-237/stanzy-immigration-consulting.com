@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { AccompagnementView } from '@/features/accompagnement/views/accompagnement-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { shareMetadata } from '@/lib/share-metadata';
 
 export async function generateMetadata({
   params,
@@ -13,7 +14,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ServicesGrid.Items',
   });
-  return { title: t('accompagnementName') };
+  return shareMetadata({ locale, path: '/services/accompagnement', card: 'accompagnement', title: t('accompagnementName'), description: t('accompagnementDesc') });
 }
 
 export default async function Page({

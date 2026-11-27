@@ -11,6 +11,8 @@ import { ErrorTracking } from '@/features/reports/components/error-tracking';
 import { Toaster } from '@/components/ui/toast';
 import { DrawAlertsAuto } from '@/features/draws/components/draw-alerts-auto';
 import { routing, type LocaleParams } from '@/i18n/routing';
+import { ogLocale, shareImage, SITE_NAME } from '@/lib/share-metadata';
+import { siteUrl } from '@/lib/site-url';
 import { TRPCReactProvider } from '@/trpc/client';
 
 import '../globals.css';
@@ -46,9 +48,21 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Metadata' });
+  const card = shareImage(locale, 'accueil', t('title'));
   return {
+    metadataBase: new URL(siteUrl()),
     title: t('title'),
     description: t('description'),
+    // The default card, for a page without its own (see shareMetadata).
+    openGraph: {
+      type: 'website',
+      siteName: SITE_NAME,
+      title: t('title'),
+      description: t('description'),
+      locale: ogLocale(locale),
+      images: [card],
+    },
+    twitter: { card: 'summary_large_image', title: t('title'), description: t('description'), images: [card.url] },
     manifest: '/manifest.webmanifest',
     appleWebApp: {
       capable: true,

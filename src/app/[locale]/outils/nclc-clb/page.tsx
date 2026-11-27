@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { NclcView } from '@/features/nclc/views/nclc-view';
 import type { LocaleParams } from '@/i18n/routing';
+import { shareMetadata } from '@/lib/share-metadata';
 
 export async function generateMetadata({
   params,
@@ -13,7 +14,7 @@ export async function generateMetadata({
     locale,
     namespace: 'Home.ToolsGrid.Items',
   });
-  return { title: t('nclcName') };
+  return shareMetadata({ locale, path: '/outils/nclc-clb', card: 'nclc-clb', title: t('nclcName'), description: t('nclcDesc') });
 }
 
 export default async function Page({

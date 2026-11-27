@@ -5,14 +5,15 @@ import { notFound } from 'next/navigation';
 import { OfferView } from '@/features/document-services/views/offer-view';
 import { getCurrentSession } from '@/server/auth/session';
 import { getQueryClient, HydrateClient, trpc } from '@/trpc/server';
+import { shareMetadata } from '@/lib/share-metadata';
 
 type Params = Promise<{ locale: string; token: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
-  const { locale } = await params;
+  const { locale, token } = await params;
   const t = await getTranslations({ locale, namespace: 'DocumentServices.offer' });
   // A private link: never indexed.
-  return { title: t('metaTitle'), robots: { index: false, follow: false } };
+  return { ...shareMetadata({ locale, path: `/services/offre/${token}`, card: 'offre', title: t('metaTitle'), indexable: false }), robots: { index: false, follow: false } };
 }
 
 // Open to anyone with the link; the order needs a session (the procedures decide, ADR 0005).

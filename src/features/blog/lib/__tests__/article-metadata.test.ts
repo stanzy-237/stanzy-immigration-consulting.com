@@ -13,8 +13,6 @@ const ARTICLE: MetadataArticle = {
   fallbackExcerpt: 'Le TCF Canada est le test de français reconnu par IRCC…',
   seoTitle: null,
   seoDescription: null,
-  coverUrl: 'https://abc.public.blob.vercel-storage.com/blog/tcf.webp',
-  coverAlt: 'Une candidate en salle d’examen',
   publishedAt: new Date('2026-10-20T08:00:00Z'),
   updatedAt: new Date('2026-10-22T15:30:00Z'),
   categoryName: 'Tests de langue',
@@ -29,6 +27,7 @@ describe('articleMetadata', () => {
       alternates: { canonical: 'https://stanzy.ca/fr/blog/reussir-le-tcf-canada' },
       openGraph: {
         type: 'article',
+        siteName: 'Stanzy Immigration Consulting',
         url: 'https://stanzy.ca/fr/blog/reussir-le-tcf-canada',
         title: 'Réussir le TCF Canada du premier coup',
         description: 'Les quatre épreuves, le barème et un plan de six semaines.',
@@ -37,13 +36,11 @@ describe('articleMetadata', () => {
         modifiedTime: '2026-10-22T15:30:00.000Z',
         section: 'Tests de langue',
         tags: ['tcf', 'nclc'],
-        images: [{ url: 'https://abc.public.blob.vercel-storage.com/blog/tcf.webp', alt: 'Une candidate en salle d’examen' }],
       },
       twitter: {
         card: 'summary_large_image',
         title: 'Réussir le TCF Canada du premier coup',
         description: 'Les quatre épreuves, le barème et un plan de six semaines.',
-        images: ['https://abc.public.blob.vercel-storage.com/blog/tcf.webp'],
       },
     });
   });
@@ -55,11 +52,9 @@ describe('articleMetadata', () => {
     expect(meta.openGraph).toMatchObject({ title: 'TCF Canada : le guide', description: 'Tout pour viser NCLC 7.' });
   });
 
-  it('falls back to the opening of the Article without an excerpt, and to the site logo without a cover', () => {
-    const meta = articleMetadata({ ...ARTICLE, excerpt: null, coverUrl: null, coverAlt: null }, SITE);
+  it('falls back to the opening of the Article without an excerpt', () => {
+    const meta = articleMetadata({ ...ARTICLE, excerpt: null }, SITE);
     expect(meta.description).toBe('Le TCF Canada est le test de français reconnu par IRCC…');
-    expect(meta.openGraph).toMatchObject({ images: [{ url: 'https://stanzy.ca/logo2.png', alt: 'Stanzy Immigration Consulting' }] });
-    expect(meta.twitter).toMatchObject({ images: ['https://stanzy.ca/logo2.png'] });
   });
 
   it('points an English Article to its English address', () => {

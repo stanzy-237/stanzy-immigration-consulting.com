@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
   // The letterhead Factures are printed on, read from disk by whichever route builds one (#79).
   outputFileTracingIncludes: {
     '/api/**/*': ['./src/features/invoices/assets/letterhead.pdf'],
+    // An Article's share card is drawn with the brand fonts, the logo and, for covers kept in public/, the cover.
+    '/*/blog/**/*': ['./src/features/blog/assets/fonts/*.ttf', './public/logo2.png', './public/blog/covers/*'],
   },
   images: {
     // AVIF first, WebP for browsers without it (#165).
