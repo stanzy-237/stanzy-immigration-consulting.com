@@ -4161,7 +4161,8 @@
       "dossier": "File",
       "margin": "Margin",
       "missingRates": "CAD rate missing for {months}: CAD amounts in those months aren’t counted.",
-      "setRates": "Enter the rates"
+      "setRates": "Enter the rates",
+      "consultation": "Consultations"
     },
     "form": {
       "amount": "Amount",

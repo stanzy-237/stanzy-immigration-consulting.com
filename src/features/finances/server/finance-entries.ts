@@ -33,7 +33,7 @@ export async function loadEntries(db: Db, scope: { year: number } | { dossiers: 
   const linked: Prisma.IncomeWhereInput & Prisma.ChargeWhereInput =
     'dossierId' in scope ? { dossierId: scope.dossierId } : 'dossiers' in scope ? { dossierId: { not: null } } : {};
 
-  const [payments, incomes, charges] = await Promise.all([
+  const [payments, incomes, charges, consultations] = await Promise.all([
     db.payment.findMany({
       where: {
         invoice: countedPayments('dossierId' in scope ? scope.dossierId : undefined),
@@ -53,6 +53,14 @@ export async function loadEntries(db: Db, scope: { year: number } | { dossiers: 
       where: { ...linked, ...(bounds ? { date: bounds.days } : {}) },
       select: { amount: true, currency: true, date: true, dossierId: true, category: { select: { name: true } } },
     }),
+    // Paid Consultations are Recettes too (the Client pays SasPay's fees on top: `amount` is the price after
+    // any promo code). They belong to no Dossier, so only the year's reports count them.
+    bounds
+      ? db.consultationPayment.findMany({
+          where: { status: 'SUCCESS', settledAt: { gte: bounds.days.gte, lt: bounds.days.lt } },
+          select: { amount: true, currency: true, settledAt: true },
+        })
+      : Promise.resolve([]),
   ]);
 
   return [
@@ -74,6 +82,16 @@ export async function loadEntries(db: Db, scope: { year: number } | { dossiers: 
         currency: income.currency,
         service: income.service,
         dossierId: income.dossierId,
+      }),
+    ),
+    ...consultations.map(
+      (payment): Entry => ({
+        kind: 'income',
+        day: dayOf(payment.settledAt!),
+        amount: payment.amount,
+        currency: payment.currency as Entry['currency'],
+        service: 'CONSULTATION',
+        dossierId: null,
       }),
     ),
     ...charges.map(

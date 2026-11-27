@@ -4178,7 +4178,8 @@
       "dossier": "Dossier",
       "margin": "Marge",
       "missingRates": "Taux CAD manquant pour {months} : les montants en CAD de ces mois ne sont pas comptés.",
-      "setRates": "Saisir les taux"
+      "setRates": "Saisir les taux",
+      "consultation": "Consultations"
     },
     "form": {
       "amount": "Montant",

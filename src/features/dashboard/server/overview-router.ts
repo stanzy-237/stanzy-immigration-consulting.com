@@ -26,7 +26,7 @@ export const overviewRouter = createTRPCRouter({
     const year = Number(day.slice(0, 4));
     const month = Number(day.slice(5, 7));
 
-    const [interests, interestCount, orders, orderCount, overdue, overdueCount, signatures, reports, meetings, openDossiers, openedThisMonth, recent, entries, rates, consultationIncome, promo] =
+    const [interests, interestCount, orders, orderCount, overdue, overdueCount, signatures, reports, meetings, openDossiers, openedThisMonth, recent, entries, rates, promo] =
       await Promise.all([
         db.interestRequest.findMany({ where: { status: 'SUBMITTED' }, orderBy: { createdAt: 'asc' }, take: 2, select: { account: { select: { name: true } } } }),
         db.interestRequest.count({ where: { status: 'SUBMITTED' } }),
@@ -56,8 +56,6 @@ export const overviewRouter = createTRPCRouter({
         }),
         loadEntries(db, { year }),
         loadRates(db),
-        // Paid Consultations aren't Recettes in Finances (yet): added here, at their price in FCFA.
-        db.consultationPayment.aggregate({ where: { status: 'SUCCESS', settledAt: { gte: monthStart } }, _sum: { amount: true } }),
         db.promoCode.findFirst({
           where: { deletedAt: null, OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
           orderBy: { createdAt: 'desc' },
@@ -95,7 +93,8 @@ export const overviewRouter = createTRPCRouter({
         openedThisMonth,
         recent: recent.map((d) => ({ id: d.id, name: d.account.name, service: d.service, stage: d.stage, ...stagePosition(d.service, d.stage), updatedAt: d.updatedAt })),
       },
-      collected: { month: `${day.slice(0, 7)}`, total: finances + (consultationIncome._sum.amount ?? 0) },
+      // Finances' Recettes of the month, paid Consultations included.
+      collected: { month: `${day.slice(0, 7)}`, total: finances },
       promo: promo
         ? { id: promo.id, code: promo.code, used, places: promo.places, endsAt: promo.endsAt, exhausted: promo.places !== null && used >= promo.places }
         : null,
