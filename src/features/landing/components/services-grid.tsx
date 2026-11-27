@@ -36,7 +36,7 @@ export function ServicesGrid({ heading: Heading = 'h2' }: { heading?: 'h1' | 'h2
             id="services-grid-title"
             className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-none tracking-tight text-navy-deep"
           >
-            {t('titleLead')}
+            {t('titleLead')}{' '}
             <br />
             <span className="text-rouge">{t('titleAccent')}</span>
           </Heading>

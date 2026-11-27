@@ -47,7 +47,7 @@ export function PhoneTools(): ReactNode {
   return (
     <div className="flex flex-col gap-5 px-5 pt-6 pb-8 md:hidden">
       <div className="flex flex-col gap-1">
-        <h1 className="font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep">{t('toolsTitle')}</h1>
+        <p role="heading" aria-level={1} className="font-heading text-h3 leading-9 font-extrabold tracking-tight text-navy-deep">{t('toolsTitle')}</p>
         <p className="text-body-sm text-slate">{t('toolsLead')}</p>
       </div>
       <ul className="grid grid-cols-2 gap-2.5">

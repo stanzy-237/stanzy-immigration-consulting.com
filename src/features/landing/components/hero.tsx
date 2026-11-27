@@ -60,7 +60,7 @@ export function Hero(): ReactNode {
 
           {/* Headline */}
           <h1 className="font-heading text-navy-deep mt-5 text-[clamp(38px,4.5vw,56px)] font-bold leading-none tracking-tight">
-            {t('headlineLead')}
+            {t('headlineLead')}{' '}
             <br />
             {t('headlineRest')}{' '}
             <span className="text-rouge">{t('headlineAccent')}</span>

@@ -16,7 +16,8 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Home' });
   const meta = await getTranslations({ locale, namespace: 'Metadata' });
-  return shareMetadata({ locale, path: '', card: 'accueil', title: meta('title'), description: t('Hero.subtitle') });
+  // Already « Stanzy — … »: no « | Stanzy » after it.
+  return { ...shareMetadata({ locale, path: '', card: 'accueil', title: meta('title'), description: t('Hero.subtitle') }), title: { absolute: meta('title') } };
 }
 
 export default async function HomePage({

@@ -44,7 +44,7 @@ type ShareMetadataInput = {
   card: ShareCard;
   title: string;
   description?: string;
-  /** Private links (an offer, a meeting, sign-in) are shared but never indexed: `noindex`, no canonical, no hreflang. */
+  /** Private links (an offer, a meeting, sign-in) and pages not launched yet are shared but never indexed: `noindex`, no canonical, no hreflang. */
   indexable?: boolean;
 };
 

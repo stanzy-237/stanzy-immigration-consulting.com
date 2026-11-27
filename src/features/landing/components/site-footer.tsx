@@ -341,7 +341,7 @@ function PhoneFooter(): ReactNode {
         ))}
       </ul>
       <p className="text-xs leading-relaxed text-white/65">
-        {t("phoneDisclaimer")}
+        {t("phoneDisclaimer")}{' '}
         <br />
         {t("phoneMade", { year })}
       </p>

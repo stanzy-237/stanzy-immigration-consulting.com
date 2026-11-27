@@ -49,7 +49,7 @@ export function AccompagnementHero(): ReactNode {
             {...enter(0.06)}
             className="mt-5 font-heading text-[clamp(38px,4.5vw,56px)] leading-none font-bold tracking-tight text-navy-deep"
           >
-            {t('hero.headlineLead')}
+            {t('hero.headlineLead')}{' '}
             <br />
             {t('hero.headlineRest')} <span className="text-rouge">{t('hero.headlineAccent')}</span>
           </motion.h1>

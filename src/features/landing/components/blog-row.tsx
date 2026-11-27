@@ -138,7 +138,7 @@ export function BlogRow({ articles, locale }: { articles: ArticleCard[]; locale:
               id="blog-row-title"
               className="font-heading text-[clamp(32px,4vw,50px)] font-bold leading-none tracking-tight text-navy-deep"
             >
-              {t('titleLead')}
+              {t('titleLead')}{' '}
               <br />
               <span className="text-rouge">{t('titleAccent')}</span>
             </h2>
