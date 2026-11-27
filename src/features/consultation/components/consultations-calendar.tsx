@@ -165,8 +165,8 @@ function DayView({ days, initial, blocks, settings, today, now, onWeek }: ViewPr
   return (
     <section aria-label={format.dateTime(dayDate(selected), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })} className="flex flex-col gap-4 lg:hidden">
       <div className="flex flex-col gap-2.5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-heading text-body font-extrabold whitespace-nowrap text-navy-deep first-letter:uppercase">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="min-w-0 truncate font-heading text-body-sm font-extrabold whitespace-nowrap text-navy-deep first-letter:uppercase">
             {format.dateTime(dayDate(selected), { month: 'long', year: 'numeric', timeZone: 'UTC' })}
           </h2>
           <WeekNav days={days} today={today} onWeek={onWeek} />
@@ -228,7 +228,7 @@ function WeekNav({ days, today, onWeek }: { days: string[]; today: string; onWee
   const t = useTranslations('Consultation.admin.calendar');
   const round = 'flex size-8 items-center justify-center rounded-full border border-fog-light text-ink hover:bg-off-white';
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex shrink-0 items-center gap-1">
       <button type="button" aria-label={t('previous')} onClick={() => onWeek(addDays(days[0]!, -7))} className={cn(round, PRESS)}>
         <ChevronLeft aria-hidden={true} className="size-4" strokeWidth={2.4} />
       </button>

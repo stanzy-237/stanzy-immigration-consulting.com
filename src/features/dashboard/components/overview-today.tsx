@@ -363,8 +363,8 @@ function NextMeeting({ data }: { data: Today }): ReactNode {
   const who = next.subject.replace(/^Consultation · /, '');
   return (
     <section aria-labelledby="next-meeting" className="flex items-center gap-3.5 rounded-2xl bg-navy-deep p-3.5 text-white">
-      <span className="flex w-18 shrink-0 flex-col items-center justify-center rounded-xl bg-white/10 px-1 py-2">
-        <span className="font-heading text-body font-extrabold tabular-nums">{time(starts)}</span>
+      <span className="flex min-w-20 shrink-0 flex-col items-center justify-center rounded-xl bg-white/10 px-2.5 py-2">
+        <span className="font-heading text-body font-extrabold whitespace-nowrap tabular-nums">{time(starts)}</span>
         <span className="font-label text-label font-bold whitespace-nowrap text-rose">{format.relativeTime(starts, { now, style: 'short' })}</span>
       </span>
       <Link href={meetingHref(next)} className="flex min-w-0 flex-1 flex-col">
