@@ -13,6 +13,7 @@ import type { ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
 import { CanadaFlagIcon } from "@/features/landing/components/brand-icons";
+import { SOCIAL_GLYPHS } from "@/features/landing/components/social-glyphs";
 import {
   FOOTER_CONTACT,
   FOOTER_CONTENT_LINKS,
@@ -38,9 +39,10 @@ export function SiteFooter(): ReactNode {
   return (
     <footer data-site-footer=""
       aria-label={t("ariaLabel")}
-      className="bg-ink-deep text-white w-full border-t border-white/10"
+      className="bg-ink-deep max-md:bg-navy-deep text-white w-full border-t border-white/10"
     >
-      <div className="mx-auto flex max-w-7xl flex-col gap-12 px-4 py-16 md:px-6">
+      <PhoneFooter />
+      <div className="mx-auto flex max-w-7xl flex-col gap-12 px-4 py-16 max-md:hidden md:px-6">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12">
           {/* Brand column */}
           <div className="lg:col-span-4 flex flex-col gap-6">
@@ -296,5 +298,53 @@ function ContactRow({
         body
       )}
     </li>
+  );
+}
+
+/**
+ * The footer on a phone (`PWA · Pied de page mobile · C Retenu`): the round
+ * logo, the promise, the four networks, the legal links and one line of
+ * fine print, centred. The tab bar leads everywhere else.
+ */
+function PhoneFooter(): ReactNode {
+  const t = useTranslations("Home.Footer");
+  const tLegal = useTranslations("Home.Footer.legal");
+  const tSocial = useTranslations("Home.Footer.Social");
+  const year: number = new Date().getFullYear();
+  return (
+    <div className="flex flex-col items-center gap-5 px-7 pt-9 pb-10 text-center md:hidden">
+      <Link href="/" aria-label={t("brandEyebrow")} className="relative inline-flex size-20 overflow-hidden rounded-full bg-white shadow-lg ring-4 ring-white/10">
+        <Image src="/Logo-white-background.svg" alt={t("brandEyebrow")} fill={true} className="scale-125 object-contain" />
+      </Link>
+      <p className="font-heading text-2xl leading-7 font-extrabold tracking-tight whitespace-pre-line">{t("phoneTitle")}</p>
+      <ul className="flex items-center gap-1.5">
+        {FOOTER_SOCIALS.map((s: SocialLink): ReactNode => {
+          const Glyph = SOCIAL_GLYPHS[s.key];
+          return (
+            <li key={s.key}>
+              <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={tSocial(s.key)} className="grid size-11 place-items-center rounded-full text-white hover:bg-white/10">
+                <Glyph className="size-5.5" />
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+      <span aria-hidden={true} className="h-px w-12 bg-white/20" />
+      <ul className="flex flex-wrap justify-center gap-x-1 text-sm font-semibold">
+        {FOOTER_LEGAL_LINKS.map((link: FooterLink, i: number): ReactNode => (
+          <li key={link.key}>
+            {i > 0 ? <span aria-hidden={true} className="px-1.5 text-white/50">·</span> : null}
+            <Link href={link.href} className="hover:text-white/80">
+              {tLegal(link.labelKey)}
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <p className="text-xs leading-relaxed text-white/65">
+        {t("phoneDisclaimer")}
+        <br />
+        {t("phoneMade", { year })}
+      </p>
+    </div>
   );
 }

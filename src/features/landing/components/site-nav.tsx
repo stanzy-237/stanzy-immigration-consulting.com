@@ -35,6 +35,7 @@ import { cn } from '@/lib/utils';
 
 import { MapleLeafIcon } from '@/features/landing/components/brand-icons';
 import { LocaleToggle } from '@/features/landing/components/locale-toggle';
+import { ContactButton } from '@/features/landing/components/contact-button';
 import { isTaskPath, SiteTabBar } from '@/features/landing/components/site-tab-bar';
 import {
   SERVICE_ENTRIES,
@@ -389,7 +390,12 @@ export function SiteNav(): ReactNode {
       </div>
       {accountName ? <ReportProblemDialog open={reporting} onOpenChange={setReporting} /> : null}
     </nav>
-    {visitorTabs ? <SiteTabBar /> : null}
+    {visitorTabs ? (
+      <>
+        <SiteTabBar />
+        <ContactButton />
+      </>
+    ) : null}
     </>
   );
 }

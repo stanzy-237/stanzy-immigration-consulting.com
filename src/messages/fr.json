@@ -372,7 +372,10 @@
         "tiktok": "TikTok",
         "instagram": "Instagram",
         "whatsapp": "WhatsApp"
-      }
+      },
+      "phoneTitle": "Votre projet Canada,\npas à pas.",
+      "phoneDisclaimer": "Service indépendant, sans lien avec IRCC ni le gouvernement du Canada.",
+      "phoneMade": "Fait avec ♥ à Douala · © {year} Stanzy"
     },
     "ServicesPage": {
       "subtitle": "De la consultation à la résidence permanente : chaque service vous fait avancer d’un pas, avec un dossier en ligne et Stanzy à vos côtés.",
@@ -457,6 +460,39 @@
           "name": "Services documentaires",
           "lead": "Certificat de police, preuve de fonds…"
         }
+      }
+    },
+    "ContactButton": {
+      "open": "Parler à Stanzy",
+      "title": "Parler à Stanzy",
+      "reply": "Réponse dans la journée",
+      "close": "Fermer",
+      "message": "Écrire sur WhatsApp",
+      "channel": "Rejoindre la chaîne WhatsApp",
+      "channelLead": "Les tirages et les nouvelles, en direct",
+      "contact": "Page Contact",
+      "contactLead": "Email, téléphone, bureau à Douala"
+    },
+    "ContactPage": {
+      "metaTitle": "Contact · Stanzy",
+      "title": "Contact",
+      "lead": "Une question sur votre projet Canada ? Écrivez à Stanzy, réponse dans la journée.",
+      "whatsapp": "Écrire sur WhatsApp",
+      "email": {
+        "label": "Email",
+        "value": "contact@stanzy-immigration-consulting.com"
+      },
+      "phone": {
+        "label": "Téléphone",
+        "value": "+237 679 306 015"
+      },
+      "channel": {
+        "label": "Chaîne WhatsApp",
+        "value": "Les tirages et les nouvelles, en direct"
+      },
+      "office": {
+        "label": "Bureau",
+        "value": "Douala, Cameroun"
       }
     }
   },
